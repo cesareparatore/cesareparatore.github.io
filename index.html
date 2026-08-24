@@ -19,6 +19,7 @@
   <title>In the making — 2026</title>
 
   <style>
+
     /* =========================================================
        01 — DESIGN TOKENS
     ========================================================= */
@@ -36,8 +37,7 @@
 
       --content-max: 1280px;
 
-      --ease-out:
-        cubic-bezier(.16, 1, .3, 1);
+      --ease-out: cubic-bezier(.16, 1, .3, 1);
     }
 
 
@@ -59,6 +59,7 @@
 
     body {
       min-width: 280px;
+
       min-height: 100vh;
       min-height: 100dvh;
 
@@ -68,11 +69,6 @@
       background: var(--bg);
       color: var(--fg);
 
-      /*
-        System stack:
-        zero external font dependency,
-        excellent rendering on every platform.
-      */
       font-family:
         Inter,
         ui-sans-serif,
@@ -88,10 +84,6 @@
 
       text-rendering: optimizeLegibility;
 
-      /*
-        Prevents mobile browsers from unexpectedly
-        resizing text.
-      */
       -webkit-text-size-adjust: 100%;
       text-size-adjust: 100%;
     }
@@ -115,6 +107,7 @@
     .ambient {
       position: fixed;
       z-index: 0;
+
       inset: -25%;
 
       pointer-events: none;
@@ -138,6 +131,7 @@
     }
 
     @keyframes ambient-breathe {
+
       from {
         transform: scale(.97);
         opacity: .45;
@@ -147,6 +141,7 @@
         transform: scale(1.035);
         opacity: .85;
       }
+
     }
 
 
@@ -157,6 +152,7 @@
     .grain {
       position: fixed;
       z-index: 10;
+
       inset: -50%;
 
       pointer-events: none;
@@ -173,11 +169,27 @@
     }
 
     @keyframes grain-shift {
-      0%   { transform: translate3d(0, 0, 0); }
-      25%  { transform: translate3d(2%, -1%, 0); }
-      50%  { transform: translate3d(-1%, 2%, 0); }
-      75%  { transform: translate3d(1%, 1%, 0); }
-      100% { transform: translate3d(-2%, -2%, 0); }
+
+      0% {
+        transform: translate3d(0, 0, 0);
+      }
+
+      25% {
+        transform: translate3d(2%, -1%, 0);
+      }
+
+      50% {
+        transform: translate3d(-1%, 2%, 0);
+      }
+
+      75% {
+        transform: translate3d(1%, 1%, 0);
+      }
+
+      100% {
+        transform: translate3d(-2%, -2%, 0);
+      }
+
     }
 
 
@@ -193,7 +205,11 @@
       min-height: 100dvh;
 
       display: grid;
-      grid-template-rows: auto 1fr auto;
+
+      grid-template-rows:
+        auto
+        1fr
+        auto;
 
       padding:
         max(var(--page-y), env(safe-area-inset-top))
@@ -205,6 +221,7 @@
     header,
     footer {
       display: flex;
+
       align-items: center;
       justify-content: space-between;
 
@@ -223,12 +240,15 @@
       font-weight: 600;
 
       line-height: 1;
+
       letter-spacing: -.025em;
     }
 
     .status {
       display: flex;
+
       align-items: center;
+
       gap: 9px;
 
       color: var(--muted);
@@ -240,9 +260,11 @@
         monospace;
 
       font-size: 9px;
+
       line-height: 1;
 
       letter-spacing: .14em;
+
       text-transform: uppercase;
     }
 
@@ -265,6 +287,7 @@
     }
 
     @keyframes pulse {
+
       0%,
       100% {
         opacity: .45;
@@ -275,6 +298,7 @@
         opacity: 1;
         transform: scale(1);
       }
+
     }
 
 
@@ -286,6 +310,7 @@
       min-height: 0;
 
       display: flex;
+
       align-items: center;
     }
 
@@ -294,11 +319,13 @@
 
       margin-inline: auto;
 
-      padding-block: clamp(28px, 5vh, 72px);
+      padding-block:
+        clamp(28px, 5vh, 72px);
     }
 
     .eyebrow {
-      margin-bottom: clamp(22px, 3vw, 32px);
+      margin-bottom:
+        clamp(22px, 3vw, 32px);
 
       color: var(--muted);
 
@@ -309,9 +336,11 @@
         monospace;
 
       font-size: 10px;
+
       line-height: 1;
 
       letter-spacing: .15em;
+
       text-transform: uppercase;
     }
 
@@ -329,10 +358,6 @@
 
       margin: 0;
 
-      /*
-        clamp tuned for:
-        phones → tablets → laptops → large desktop
-      */
       font-size:
         clamp(
           4rem,
@@ -346,9 +371,6 @@
 
       letter-spacing: -.078em;
 
-      /*
-        Avoids synthetic font rendering where possible.
-      */
       font-synthesis: none;
     }
 
@@ -357,18 +379,16 @@
 
       overflow: hidden;
 
-      /*
-        Protects reveal animation from accidental
-        horizontal overflow.
-      */
       padding-bottom: .06em;
+
       margin-bottom: -.06em;
     }
 
     .word span {
       display: inline-block;
 
-      transform: translate3d(0, 115%, 0);
+      transform:
+        translate3d(0, 115%, 0);
 
       animation:
         reveal 1.15s var(--ease-out) forwards;
@@ -385,9 +405,12 @@
     }
 
     @keyframes reveal {
+
       to {
-        transform: translate3d(0, 0, 0);
+        transform:
+          translate3d(0, 0, 0);
       }
+
     }
 
 
@@ -397,11 +420,16 @@
 
     .subline {
       display: grid;
-      grid-template-columns: 70px minmax(0, 430px);
 
-      gap: clamp(20px, 3vw, 42px);
+      grid-template-columns:
+        70px
+        minmax(0, 430px);
 
-      margin-top: clamp(42px, 6vh, 70px);
+      gap:
+        clamp(20px, 3vw, 42px);
+
+      margin-top:
+        clamp(42px, 6vh, 70px);
     }
 
     .rule {
@@ -441,6 +469,7 @@
 
     .progress-top {
       display: flex;
+
       align-items: center;
       justify-content: space-between;
 
@@ -455,9 +484,11 @@
         monospace;
 
       font-size: 9px;
+
       line-height: 1;
 
       letter-spacing: .1em;
+
       text-transform: uppercase;
     }
 
@@ -476,7 +507,9 @@
       content: "";
 
       position: absolute;
-      inset: 0 auto 0 0;
+
+      inset:
+        0 auto 0 0;
 
       width: 67%;
 
@@ -485,7 +518,8 @@
       transform:
         scaleX(0);
 
-      transform-origin: left center;
+      transform-origin:
+        left center;
 
       animation:
         progress 1.7s var(--ease-out) .35s forwards;
@@ -494,9 +528,11 @@
     }
 
     @keyframes progress {
+
       to {
         transform: scaleX(1);
       }
+
     }
 
 
@@ -514,15 +550,19 @@
         monospace;
 
       font-size: 9px;
+
       line-height: 1;
 
       letter-spacing: .1em;
+
       text-transform: uppercase;
     }
 
     .coordinates {
       display: flex;
+
       align-items: center;
+
       gap: 26px;
     }
 
@@ -532,6 +572,7 @@
     ========================================================= */
 
     @media (max-width: 900px) {
+
       h1 {
         font-size:
           clamp(
@@ -544,6 +585,7 @@
       .content {
         padding-block: 36px;
       }
+
     }
 
 
@@ -563,6 +605,7 @@
 
       .status {
         font-size: 8px;
+
         letter-spacing: .1em;
       }
 
@@ -571,10 +614,6 @@
       }
 
       h1 {
-        /*
-          19vw keeps the composition bold without
-          causing horizontal overflow.
-        */
         font-size:
           clamp(
             3.65rem,
@@ -583,11 +622,14 @@
           );
 
         line-height: .84;
+
         letter-spacing: -.082em;
       }
 
       .subline {
-        grid-template-columns: 32px minmax(0, 1fr);
+        grid-template-columns:
+          32px
+          minmax(0, 1fr);
 
         gap: 18px;
 
@@ -598,6 +640,7 @@
         max-width: 320px;
 
         font-size: 14px;
+
         line-height: 1.68;
       }
 
@@ -608,6 +651,7 @@
       .coordinates {
         display: none;
       }
+
     }
 
 
@@ -616,6 +660,7 @@
     ========================================================= */
 
     @media (max-width: 360px) {
+
       .page {
         padding-inline: 18px;
       }
@@ -626,6 +671,7 @@
 
       .status {
         gap: 6px;
+
         font-size: 7px;
       }
 
@@ -634,18 +680,56 @@
       }
 
       .subline {
-        grid-template-columns: 22px minmax(0, 1fr);
+        grid-template-columns:
+          22px
+          minmax(0, 1fr);
+
         gap: 14px;
       }
 
       .description {
         font-size: 13px;
       }
+
     }
 
 
     /* =========================================================
-       15 — LANDSCAPE MOBILE
+       15 — SHORT PORTRAIT VIEWPORTS
+    ========================================================= */
+
+    @media (max-height: 700px) and (orientation: portrait) {
+
+      .content {
+        padding-block: 18px;
+      }
+
+      .eyebrow {
+        margin-bottom: 18px;
+      }
+
+      h1 {
+        font-size:
+          clamp(
+            3.4rem,
+            17vw,
+            6.5rem
+          );
+      }
+
+      .subline {
+        margin-top: 30px;
+      }
+
+      .progress {
+        margin-top: 22px;
+      }
+
+    }
+
+
+    /* =========================================================
+       16 — LANDSCAPE MOBILE
     ========================================================= */
 
     @media (max-height: 560px) and (orientation: landscape) {
@@ -678,11 +762,12 @@
       .progress {
         margin-top: 18px;
       }
+
     }
 
 
     /* =========================================================
-       16 — LARGE DESKTOP
+       17 — LARGE DESKTOP
     ========================================================= */
 
     @media (min-width: 1600px) {
@@ -694,11 +779,12 @@
       .content {
         padding-block: 8vh;
       }
+
     }
 
 
     /* =========================================================
-       17 — REDUCED MOTION
+       18 — REDUCED MOTION
     ========================================================= */
 
     @media (prefers-reduced-motion: reduce) {
@@ -732,11 +818,12 @@
       .grain {
         display: none;
       }
+
     }
 
 
     /* =========================================================
-       18 — HIGH CONTRAST
+       19 — HIGH CONTRAST
     ========================================================= */
 
     @media (prefers-contrast: more) {
@@ -750,18 +837,21 @@
       .grain {
         display: none;
       }
+
     }
 
 
     /* =========================================================
-       19 — PRINT
+       20 — PRINT
     ========================================================= */
 
     @media print {
 
       body {
         overflow: visible;
+
         background: white;
+
         color: black;
       }
 
@@ -774,37 +864,62 @@
       .page {
         min-height: auto;
       }
+
     }
+
   </style>
 </head>
 
 
 <body>
 
-  <div class="ambient" aria-hidden="true"></div>
-  <div class="grain" aria-hidden="true"></div>
+  <!-- Ambient atmosphere -->
+  <div
+    class="ambient"
+    aria-hidden="true"
+  ></div>
+
+
+  <!-- Subtle film grain -->
+  <div
+    class="grain"
+    aria-hidden="true"
+  ></div>
 
 
   <div class="page">
 
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
     <header>
 
-      <!-- Sostituisci con il tuo nome -->
+      <!-- INSERISCI QUI IL TUO NOME -->
       <div class="brand">
         CESARE PARATORE
       </div>
 
-      <div class="status" aria-label="Website in development">
+      <div
+        class="status"
+        aria-label="Website in development"
+      >
+
         <span
           class="status-dot"
           aria-hidden="true"
         ></span>
 
         In development
+
       </div>
 
     </header>
 
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
 
     <main>
 
@@ -814,9 +929,15 @@
       >
 
         <div class="eyebrow">
+
           Personal website
-          <span>/</span>
+
+          <span aria-hidden="true">
+            /
+          </span>
+
           2026
+
         </div>
 
 
@@ -860,9 +981,17 @@
             >
 
               <div class="progress-top">
-                <span>Progress</span>
-                <span>67%</span>
+
+                <span>
+                  Progress
+                </span>
+
+                <span>
+                  67%
+                </span>
+
               </div>
+
 
               <div
                 class="progress-bar"
@@ -870,6 +999,7 @@
                 aria-valuemin="0"
                 aria-valuemax="100"
                 aria-valuenow="67"
+                aria-label="67 percent complete"
               ></div>
 
             </div>
@@ -883,11 +1013,16 @@
     </main>
 
 
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
     <footer>
 
       <span>
         © 2026
       </span>
+
 
       <div class="coordinates">
 
