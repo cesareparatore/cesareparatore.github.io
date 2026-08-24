@@ -1,1 +1,432 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <meta name="description" content="A new digital experience is taking shape.">
+  <meta name="theme-color" content="#080808">
+
+  <title>In the making — 2026</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600&display=swap');
+
+    :root {
+      --bg: #080808;
+      --fg: #f1f0ec;
+      --muted: #777773;
+      --line: rgba(241, 240, 236, 0.13);
+      --accent: #d9ff52;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      background: var(--bg);
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow: hidden;
+      background:
+        radial-gradient(
+          circle at 72% 42%,
+          rgba(217, 255, 82, 0.055),
+          transparent 25%
+        ),
+        var(--bg);
+      color: var(--fg);
+      font-family: "Manrope", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ------------------------------
+       Ambient light
+    ------------------------------ */
+
+    .ambient {
+      position: fixed;
+      inset: -20%;
+      pointer-events: none;
+      opacity: 0.7;
+      background:
+        radial-gradient(
+          circle at 50% 50%,
+          transparent 0%,
+          rgba(255,255,255,0.012) 30%,
+          transparent 65%
+        );
+      animation: breathe 12s ease-in-out infinite alternate;
+    }
+
+    @keyframes breathe {
+      from {
+        transform: scale(0.96);
+        opacity: 0.45;
+      }
+
+      to {
+        transform: scale(1.04);
+        opacity: 0.8;
+      }
+    }
+
+    /* ------------------------------
+       Grain
+    ------------------------------ */
+
+    .grain {
+      position: fixed;
+      inset: -50%;
+      z-index: 20;
+      pointer-events: none;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E");
+      animation: grain 0.25s steps(2) infinite;
+    }
+
+    @keyframes grain {
+      0%   { transform: translate(0,0); }
+      25%  { transform: translate(2%, -1%); }
+      50%  { transform: translate(-1%, 2%); }
+      75%  { transform: translate(1%, 1%); }
+      100% { transform: translate(-2%, -2%); }
+    }
+
+    /* ------------------------------
+       Layout
+    ------------------------------ */
+
+    .page {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: 28px 34px 26px;
+    }
+
+    header,
+    footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+
+      color: var(--muted);
+      font-family: "DM Mono", monospace;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 14px rgba(217,255,82,.7);
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 0.45;
+        transform: scale(0.8);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* ------------------------------
+       Main
+    ------------------------------ */
+
+    main {
+      display: flex;
+      align-items: center;
+    }
+
+    .content {
+      width: min(100%, 1200px);
+      margin: 0 auto;
+      padding: 5vh 4vw;
+    }
+
+    .eyebrow {
+      margin-bottom: 28px;
+
+      color: var(--muted);
+      font-family: "DM Mono", monospace;
+      font-size: 11px;
+      line-height: 1;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow span {
+      color: var(--accent);
+    }
+
+    h1 {
+      max-width: 1100px;
+
+      font-size: clamp(4.2rem, 11vw, 10.8rem);
+      font-weight: 500;
+      line-height: 0.82;
+      letter-spacing: -0.075em;
+    }
+
+    .word {
+      display: block;
+      overflow: hidden;
+    }
+
+    .word span {
+      display: inline-block;
+      transform: translateY(110%);
+      animation: reveal 1.2s cubic-bezier(.16,1,.3,1) forwards;
+    }
+
+    .word:nth-child(2) span {
+      animation-delay: 0.12s;
+    }
+
+    .word:nth-child(3) span {
+      animation-delay: 0.24s;
+    }
+
+    @keyframes reveal {
+      to {
+        transform: translateY(0);
+      }
+    }
+
+    .subline {
+      display: flex;
+      align-items: flex-start;
+      gap: 42px;
+
+      margin-top: 68px;
+      margin-left: 1px;
+    }
+
+    .rule {
+      flex: 0 0 70px;
+      height: 1px;
+      margin-top: 9px;
+      background: var(--line);
+    }
+
+    .description {
+      max-width: 390px;
+
+      color: #aaa9a3;
+      font-size: 15px;
+      line-height: 1.7;
+      letter-spacing: -0.01em;
+    }
+
+    /* ------------------------------
+       Progress
+    ------------------------------ */
+
+    .progress {
+      width: 180px;
+      margin-top: 36px;
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+
+      color: var(--muted);
+      font-family: "DM Mono", monospace;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .progress-bar {
+      position: relative;
+      height: 1px;
+      overflow: hidden;
+      background: var(--line);
+    }
+
+    .progress-bar::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      width: 67%;
+      background: var(--fg);
+      transform-origin: left;
+      animation: progress 1.8s cubic-bezier(.16,1,.3,1) forwards;
+    }
+
+    @keyframes progress {
+      from {
+        transform: scaleX(0);
+      }
+      to {
+        transform: scaleX(1);
+      }
+    }
+
+    /* ------------------------------
+       Footer
+    ------------------------------ */
+
+    footer {
+      color: var(--muted);
+      font-family: "DM Mono", monospace;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .coordinates {
+      display: flex;
+      gap: 28px;
+    }
+
+    /* ------------------------------
+       Responsive
+    ------------------------------ */
+
+    @media (max-width: 700px) {
+      .page {
+        padding: 22px 20px;
+      }
+
+      .content {
+        padding: 0;
+      }
+
+      h1 {
+        font-size: clamp(4rem, 19vw, 7rem);
+        line-height: 0.84;
+      }
+
+      .subline {
+        gap: 20px;
+        margin-top: 48px;
+      }
+
+      .rule {
+        flex-basis: 34px;
+      }
+
+      .description {
+        max-width: 300px;
+        font-size: 14px;
+      }
+
+      .progress {
+        margin-top: 30px;
+      }
+
+      .coordinates {
+        display: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="ambient"></div>
+  <div class="grain"></div>
+
+  <div class="page">
+
+    <header>
+      <div class="brand">CESARE PARATORE</div>
+
+      <div class="status">
+        <span class="status-dot"></span>
+        In development
+      </div>
+    </header>
+
+    <main>
+      <section class="content">
+
+        <div class="eyebrow">
+          Personal website <span>/</span> 2026
+        </div>
+
+        <h1 aria-label="Something is taking shape">
+          <span class="word"><span>Something</span></span>
+          <span class="word"><span>is taking</span></span>
+          <span class="word"><span>shape.</span></span>
+        </h1>
+
+        <div class="subline">
+          <div class="rule"></div>
+
+          <div>
+            <p class="description">
+              Una nuova identità digitale è in costruzione.
+              Strategie, competenze e idee stanno prendendo forma
+              in uno spazio progettato per fare le cose diversamente.
+            </p>
+
+            <div class="progress">
+              <div class="progress-top">
+                <span>Progress</span>
+                <span>67%</span>
+              </div>
+
+              <div class="progress-bar"></div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+    <footer>
+      <span>© 2026</span>
+
+      <div class="coordinates">
+        <span>Digital / Personal</span>
+        <span>—</span>
+        <span>01 / 01</span>
+      </div>
+    </footer>
+
+  </div>
+
+</body>
+</html>
