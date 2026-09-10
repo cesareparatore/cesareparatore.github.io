@@ -219,9 +219,42 @@
       text-transform: uppercase;
     }
 
-    .brand:focus-visible {
+    .brand:focus-visible,
+    .community-link:focus-visible {
       outline: 1px solid var(--fg);
       outline-offset: 7px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: flex-start;
+      gap: clamp(1.25rem, 3vw, 3rem);
+    }
+
+    .community-link {
+      display: inline-block;
+
+      color: var(--secondary);
+
+      font-family: var(--mono);
+
+      font-size:
+        clamp(.59rem, .56vw, .67rem);
+
+      font-weight: 450;
+
+      line-height: 1.4;
+
+      letter-spacing: .065em;
+      text-transform: uppercase;
+
+      transition:
+        color .35s ease,
+        opacity .35s ease;
+    }
+
+    .community-link:hover {
+      color: var(--fg);
     }
 
     .status {
@@ -429,6 +462,104 @@
       text-transform: uppercase;
     }
 
+    .community {
+      margin-top:
+        clamp(3.5rem, 7vh, 6.5rem);
+
+      animation:
+        fade-up .95s .43s var(--ease) both;
+    }
+
+    .community-link-block {
+      display: grid;
+
+      grid-template-columns:
+        clamp(35px, 5vw, 72px)
+        minmax(0, 500px);
+
+      gap:
+        clamp(1.1rem, 3vw, 3rem);
+
+      width: fit-content;
+      max-width: 100%;
+    }
+
+    .community-rule {
+      width: 100%;
+      height: 1px;
+
+      margin-top: .7rem;
+
+      background: var(--line);
+    }
+
+    .community-link-copy {
+      display: block;
+    }
+
+    .community-label {
+      display: block;
+
+      color: var(--muted);
+
+      font-family: var(--mono);
+
+      font-size: .66rem;
+      font-weight: 450;
+
+      line-height: 1.5;
+
+      letter-spacing: .065em;
+
+      text-transform: uppercase;
+    }
+
+    .community-title {
+      display: block;
+
+      margin-top: .45rem;
+
+      color: var(--fg);
+
+      font-size:
+        clamp(1.35rem, 2.2vw, 2rem);
+
+      font-weight: 500;
+
+      line-height: 1.1;
+
+      letter-spacing: -.035em;
+
+      transition:
+        opacity .35s ease,
+        transform .35s var(--ease);
+    }
+
+    .community-description {
+      display: block;
+
+      margin-top: .55rem;
+
+      color: var(--secondary);
+
+      font-size:
+        clamp(.92rem, .25vw + .88rem, 1rem);
+
+      line-height: 1.5;
+
+      letter-spacing: -.01em;
+    }
+
+    .community-link-block:hover
+      .community-title {
+      transform: translateX(5px);
+    }
+
+    .community-link-block:focus-visible {
+      outline: 1px solid var(--fg);
+      outline-offset: 10px;
+    }
+
     .footer {
       display: grid;
 
@@ -551,6 +682,14 @@
         font-size: .72rem;
       }
 
+      .header-right {
+        gap: .9rem;
+      }
+
+      .community-link {
+        font-size: .56rem;
+      }
+
       .status {
         max-width: 125px;
 
@@ -598,7 +737,8 @@
         margin-top: 3.7rem;
       }
 
-      .location-grid {
+      .location-grid,
+      .community-link-block {
         grid-template-columns:
           28px
           minmax(0, 1fr);
@@ -606,7 +746,8 @@
         gap: 1rem;
       }
 
-      .location-rule {
+      .location-rule,
+      .community-rule {
         margin-top: .62rem;
       }
 
@@ -615,10 +756,23 @@
         line-height: 1.56;
       }
 
-      .location-place {
+      .location-place,
+      .community-label {
         margin-top: .72rem;
 
         font-size: .6rem;
+      }
+
+      .community {
+        margin-top: 3.7rem;
+      }
+
+      .community-title {
+        font-size: 1.35rem;
+      }
+
+      .community-description {
+        font-size: .92rem;
       }
 
       .footer {
@@ -644,6 +798,14 @@
           );
       }
 
+      .header-right {
+        gap: .7rem;
+      }
+
+      .community-link {
+        font-size: .52rem;
+      }
+
       .status {
         font-size: .52rem;
       }
@@ -654,6 +816,10 @@
 
       .location-copy {
         font-size: .97rem;
+      }
+
+      .community-title {
+        font-size: 1.25rem;
       }
     }
 
@@ -666,6 +832,10 @@
       }
 
       .location {
+        margin-top: 3rem;
+      }
+
+      .community {
         margin-top: 3rem;
       }
     }
@@ -689,6 +859,10 @@
       }
 
       .location {
+        margin-top: 2.7rem;
+      }
+
+      .community {
         margin-top: 2.7rem;
       }
     }
@@ -747,16 +921,28 @@
         CESARE PARATORE
       </a>
 
-      <div
-        class="status"
-        aria-label="Sito personale in sviluppo"
-      >
-        <span
-          class="status-dot"
-          aria-hidden="true"
-        ></span>
+      <div class="header-right">
 
-        In sviluppo
+        <a
+          class="community-link"
+          href="/community/"
+          aria-label="Vai alla sezione Comunità"
+        >
+          Comunità
+        </a>
+
+        <div
+          class="status"
+          aria-label="Sito personale in sviluppo"
+        >
+          <span
+            class="status-dot"
+            aria-hidden="true"
+          ></span>
+
+          In sviluppo
+        </div>
+
       </div>
 
     </header>
@@ -836,6 +1022,43 @@
             </div>
 
           </div>
+
+        </section>
+
+
+        <section
+          class="community"
+          aria-label="Comunità"
+        >
+
+          <a
+            class="community-link-block"
+            href="/community/"
+            aria-label="Scopri la Comunità"
+          >
+
+            <div
+              class="community-rule"
+              aria-hidden="true"
+            ></div>
+
+            <div class="community-link-copy">
+
+              <span class="community-label">
+                Comunità
+              </span>
+
+              <span class="community-title">
+                Partinico / Digital Community
+              </span>
+
+              <span class="community-description">
+                Uno spazio dedicato alla comunità locale.
+              </span>
+
+            </div>
+
+          </a>
 
         </section>
 
