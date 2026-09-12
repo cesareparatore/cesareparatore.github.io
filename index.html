@@ -257,40 +257,6 @@
       color: var(--fg);
     }
 
-    .status {
-      display: flex;
-      align-items: center;
-      gap: .6rem;
-
-      color: var(--secondary);
-
-      font-family: var(--mono);
-
-      font-size:
-        clamp(.59rem, .56vw, .67rem);
-
-      font-weight: 450;
-
-      line-height: 1.4;
-
-      letter-spacing: .065em;
-      text-transform: uppercase;
-    }
-
-    .status-dot {
-      width: 5px;
-      height: 5px;
-
-      flex: 0 0 5px;
-
-      border-radius: 50%;
-
-      background: var(--fg);
-
-      animation:
-        pulse 3.4s ease-in-out infinite;
-    }
-
     main {
       flex: 1;
 
@@ -633,17 +599,6 @@
       }
     }
 
-    @keyframes pulse {
-      0%,
-      100% {
-        opacity: 1;
-      }
-
-      50% {
-        opacity: .38;
-      }
-    }
-
     @media (min-width: 1600px) {
       .content {
         padding-block: 8vh;
@@ -688,17 +643,6 @@
 
       .community-link {
         font-size: .56rem;
-      }
-
-      .status {
-        max-width: 125px;
-
-        justify-content: flex-end;
-
-        font-size: .56rem;
-        line-height: 1.45;
-
-        text-align: right;
       }
 
       main {
@@ -803,10 +747,6 @@
       }
 
       .community-link {
-        font-size: .52rem;
-      }
-
-      .status {
         font-size: .52rem;
       }
 
@@ -931,18 +871,6 @@
           Comunità
         </a>
 
-        <div
-          class="status"
-          aria-label="Sito personale in sviluppo"
-        >
-          <span
-            class="status-dot"
-            aria-hidden="true"
-          ></span>
-
-          In sviluppo
-        </div>
-
       </div>
 
     </header>
@@ -1010,8 +938,7 @@
                   Uno spazio personale.
                 </strong>
 
-                Una nuova identità digitale
-                prende forma.
+                Un'identità digitale.
 
               </p>
 
