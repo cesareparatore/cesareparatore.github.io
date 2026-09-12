@@ -1,0 +1,1949 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <title>Privacy Policy — Cesare Paratore</title>
+
+  <meta
+    name="description"
+    content="Privacy Policy dei siti e delle pagine digitali riconducibili a Cesare Paratore."
+  >
+
+  <meta name="author" content="Cesare Paratore">
+
+  <meta
+    name="robots"
+    content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+  >
+
+  <link
+    rel="canonical"
+    href="https://cesareparatore.github.io/privacy/"
+  >
+
+  <meta name="theme-color" content="#050505">
+  <meta name="color-scheme" content="dark">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Cesare Paratore">
+  <meta property="og:locale" content="it_IT">
+
+  <meta
+    property="og:title"
+    content="Privacy Policy — Cesare Paratore"
+  >
+
+  <meta
+    property="og:description"
+    content="Informativa sulla privacy dei siti e delle pagine digitali riconducibili a Cesare Paratore."
+  >
+
+  <meta
+    property="og:url"
+    content="https://cesareparatore.github.io/privacy/"
+  >
+
+  <!-- X / Twitter -->
+  <meta name="twitter:card" content="summary">
+
+  <meta
+    name="twitter:title"
+    content="Privacy Policy — Cesare Paratore"
+  >
+
+  <meta
+    name="twitter:description"
+    content="Informativa sulla privacy dei siti e delle pagine digitali riconducibili a Cesare Paratore."
+  >
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Privacy Policy — Cesare Paratore",
+    "url": "https://cesareparatore.github.io/privacy/",
+    "description": "Informativa sulla privacy dei siti e delle pagine digitali riconducibili a Cesare Paratore.",
+    "inLanguage": "it-IT",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "Cesare Paratore",
+      "url": "https://cesareparatore.github.io/"
+    },
+    "about": {
+      "@type": "Person",
+      "name": "Cesare Paratore",
+      "url": "https://cesareparatore.github.io/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      --bg: #050505;
+      --fg: #f4f3ef;
+      --secondary: #aaa9a3;
+      --muted: #77766f;
+      --line: #292927;
+      --line-soft: #1b1b1a;
+
+      --sans:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Helvetica,
+        Arial,
+        sans-serif;
+
+      --mono:
+        "SFMono-Regular",
+        "Cascadia Mono",
+        "Roboto Mono",
+        Consolas,
+        "Liberation Mono",
+        monospace;
+
+      --gutter:
+        clamp(1.1rem, 3vw, 3.75rem);
+
+      --top:
+        clamp(1.15rem, 2.2vw, 2.75rem);
+
+      --content:
+        min(100%, 1240px);
+
+      --ease:
+        cubic-bezier(.16, 1, .3, 1);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-width: 280px;
+      min-height: 100%;
+
+      background: var(--bg);
+      color-scheme: dark;
+
+      text-size-adjust: 100%;
+      -webkit-text-size-adjust: 100%;
+
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-width: 280px;
+      min-height: 100svh;
+
+      margin: 0;
+
+      overflow-x: clip;
+
+      background: var(--bg);
+      color: var(--fg);
+
+      font-family: var(--sans);
+      font-synthesis: none;
+
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+
+      text-rendering: optimizeLegibility;
+    }
+
+    ::selection {
+      color: var(--bg);
+      background: var(--fg);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      min-height: 100svh;
+
+      display: flex;
+      flex-direction: column;
+
+      padding:
+        max(var(--top), env(safe-area-inset-top))
+        max(var(--gutter), env(safe-area-inset-right))
+        max(var(--top), env(safe-area-inset-bottom))
+        max(var(--gutter), env(safe-area-inset-left));
+    }
+
+    /* =========================================================
+       HEADER
+       ========================================================= */
+
+    .header {
+      position: relative;
+      z-index: 2;
+
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+
+      animation:
+        header-in .8s var(--ease) both;
+    }
+
+    .brand {
+      display: inline-block;
+
+      color: var(--fg);
+
+      font-size:
+        clamp(.76rem, .72vw, .86rem);
+
+      font-weight: 600;
+
+      line-height: 1;
+
+      letter-spacing: -.035em;
+      text-transform: uppercase;
+
+      transition: opacity .3s ease;
+    }
+
+    .brand:hover {
+      opacity: .58;
+    }
+
+    .brand:focus-visible,
+    .back-link:focus-visible,
+    .email-link:focus-visible {
+      outline: 1px solid var(--fg);
+      outline-offset: 7px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: flex-start;
+      gap: clamp(1.25rem, 3vw, 3rem);
+    }
+
+    .back-link {
+      display: inline-block;
+
+      color: var(--secondary);
+
+      font-family: var(--mono);
+
+      font-size:
+        clamp(.59rem, .56vw, .67rem);
+
+      font-weight: 450;
+
+      line-height: 1.4;
+
+      letter-spacing: .065em;
+      text-transform: uppercase;
+
+      transition:
+        color .35s ease,
+        transform .35s var(--ease);
+    }
+
+    .back-link:hover {
+      color: var(--fg);
+      transform: translateX(-3px);
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+
+      color: var(--secondary);
+
+      font-family: var(--mono);
+
+      font-size:
+        clamp(.59rem, .56vw, .67rem);
+
+      font-weight: 450;
+
+      line-height: 1.4;
+
+      letter-spacing: .065em;
+      text-transform: uppercase;
+    }
+
+    .status-dot {
+      width: 5px;
+      height: 5px;
+
+      flex: 0 0 5px;
+
+      border-radius: 50%;
+
+      background: var(--fg);
+
+      animation:
+        pulse 3.4s ease-in-out infinite;
+    }
+
+    /* =========================================================
+       MAIN
+       ========================================================= */
+
+    main {
+      flex: 1;
+
+      width: 100%;
+
+      padding:
+        clamp(5rem, 10vh, 9rem)
+        0
+        clamp(5rem, 9vh, 8rem);
+    }
+
+    .intro {
+      width: var(--content);
+
+      margin-inline: auto;
+
+      padding-bottom:
+        clamp(4rem, 7vw, 7rem);
+
+      border-bottom:
+        1px solid var(--line-soft);
+
+      animation:
+        fade-up .9s .05s var(--ease) both;
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+
+      margin-bottom:
+        clamp(2rem, 3vw, 3.25rem);
+
+      color: var(--secondary);
+
+      font-family: var(--mono);
+
+      font-size:
+        clamp(.62rem, .62vw, .7rem);
+
+      font-weight: 450;
+
+      line-height: 1.4;
+
+      letter-spacing: .055em;
+
+      text-transform: uppercase;
+    }
+
+    .eyebrow-rule {
+      width: 2rem;
+      height: 1px;
+
+      background: var(--line);
+    }
+
+    .intro-grid {
+      display: grid;
+
+      grid-template-columns:
+        minmax(0, 1.65fr)
+        minmax(180px, .65fr);
+
+      gap:
+        clamp(3rem, 9vw, 9rem);
+    }
+
+    h1 {
+      max-width: 1000px;
+
+      margin: 0;
+
+      color: var(--fg);
+
+      font-size:
+        clamp(
+          3.4rem,
+          calc(6vw + 1rem),
+          8.8rem
+        );
+
+      font-weight: 430;
+
+      line-height: .94;
+
+      letter-spacing: -.075em;
+
+      text-wrap: balance;
+    }
+
+    .intro-side {
+      align-self: end;
+
+      padding-bottom: .5rem;
+    }
+
+    .intro-side-label {
+      margin-bottom: .7rem;
+
+      color: var(--muted);
+
+      font-family: var(--mono);
+
+      font-size: .62rem;
+      font-weight: 450;
+
+      line-height: 1.45;
+
+      letter-spacing: .065em;
+
+      text-transform: uppercase;
+    }
+
+    .intro-side-copy {
+      margin: 0;
+
+      color: var(--secondary);
+
+      font-size:
+        clamp(.9rem, .2vw + .87rem, 1rem);
+
+      line-height: 1.5;
+
+      letter-spacing: -.01em;
+    }
+
+    /* =========================================================
+       POLICY CONTENT
+       ========================================================= */
+
+    .policy {
+      width: var(--content);
+
+      margin-inline: auto;
+
+      padding-top:
+        clamp(4rem, 7vw, 7rem);
+    }
+
+    .policy-grid {
+      display: grid;
+
+      grid-template-columns:
+        minmax(145px, .45fr)
+        minmax(0, 1.55fr);
+
+      gap:
+        clamp(2rem, 7vw, 7rem);
+    }
+
+    .policy-index {
+      position: sticky;
+
+      top: 2rem;
+
+      align-self: start;
+    }
+
+    .policy-index-label {
+      margin-bottom: .8rem;
+
+      color: var(--muted);
+
+      font-family: var(--mono);
+
+      font-size: .61rem;
+      font-weight: 450;
+
+      line-height: 1.45;
+
+      letter-spacing: .065em;
+
+      text-transform: uppercase;
+    }
+
+    .policy-index-title {
+      color: var(--fg);
+
+      font-size: .9rem;
+      font-weight: 500;
+
+      line-height: 1.35;
+
+      letter-spacing: -.02em;
+    }
+
+    .policy-index-line {
+      width: 2.5rem;
+      height: 1px;
+
+      margin-top: 1rem;
+
+      background: var(--line);
+    }
+
+    .policy-content {
+      max-width: 850px;
+    }
+
+    .policy-section {
+      padding-bottom: clamp(3rem, 5vw, 5rem);
+      margin-bottom: clamp(3rem, 5vw, 5rem);
+
+      border-bottom:
+        1px solid var(--line-soft);
+
+      animation:
+        fade-up .8s var(--ease) both;
+    }
+
+    .policy-section:last-child {
+      margin-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .section-number {
+      display: block;
+
+      margin-bottom: .8rem;
+
+      color: var(--muted);
+
+      font-family: var(--mono);
+
+      font-size: .6rem;
+      font-weight: 450;
+
+      line-height: 1.4;
+
+      letter-spacing: .065em;
+    }
+
+    h2 {
+      margin: 0 0 1.15rem;
+
+      color: var(--fg);
+
+      font-size:
+        clamp(1.45rem, 2.2vw, 2.05rem);
+
+      font-weight: 500;
+
+      line-height: 1.1;
+
+      letter-spacing: -.04em;
+    }
+
+    .policy-content p {
+      max-width: 760px;
+
+      margin:
+        0 0 1.05rem;
+
+      color: var(--secondary);
+
+      font-size:
+        clamp(
+          .98rem,
+          .16vw + .95rem,
+          1.08rem
+        );
+
+      font-weight: 400;
+
+      line-height: 1.65;
+
+      letter-spacing: -.012em;
+    }
+
+    .policy-content p:last-child {
+      margin-bottom: 0;
+    }
+
+    .policy-content strong {
+      color: var(--fg);
+      font-weight: 540;
+    }
+
+    .policy-content ul {
+      max-width: 760px;
+
+      margin:
+        1.25rem 0 0;
+
+      padding: 0;
+
+      list-style: none;
+    }
+
+    .policy-content li {
+      position: relative;
+
+      padding-left: 1.25rem;
+
+      margin-bottom: .75rem;
+
+      color: var(--secondary);
+
+      font-size:
+        clamp(
+          .98rem,
+          .16vw + .95rem,
+          1.08rem
+        );
+
+      line-height: 1.6;
+
+      letter-spacing: -.012em;
+    }
+
+    .policy-content li::before {
+      content: "";
+
+      position: absolute;
+
+      top: .72em;
+      left: 0;
+
+      width: 4px;
+      height: 4px;
+
+      border-radius: 50%;
+
+      background: var(--muted);
+    }
+
+    .contact-card {
+      display: grid;
+
+      grid-template-columns:
+        minmax(0, 1fr)
+        auto;
+
+      align-items: end;
+
+      gap: 2rem;
+
+      padding:
+        clamp(1.35rem, 2.5vw, 2.2rem);
+
+      margin-top: 1.75rem;
+
+      border:
+        1px solid var(--line);
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(255,255,255,.025),
+          rgba(255,255,255,0)
+        );
+    }
+
+    .contact-label {
+      margin-bottom: .55rem;
+
+      color: var(--muted);
+
+      font-family: var(--mono);
+
+      font-size: .61rem;
+      font-weight: 450;
+
+      line-height: 1.4;
+
+      letter-spacing: .065em;
+
+      text-transform: uppercase;
+    }
+
+    .contact-name {
+      margin: 0;
+
+      color: var(--fg);
+
+      font-size:
+        clamp(1.15rem, 1.5vw, 1.45rem);
+
+      font-weight: 500;
+
+      line-height: 1.2;
+
+      letter-spacing: -.035em;
+    }
+
+    .contact-location {
+      margin-top: .35rem;
+
+      color: var(--secondary);
+
+      font-size: .78rem;
+
+      line-height: 1.4;
+    }
+
+    .email-link {
+      display: inline-block;
+
+      padding-bottom: .35rem;
+
+      border-bottom:
+        1px solid var(--line);
+
+      color: var(--fg);
+
+      font-family: var(--mono);
+
+      font-size: .68rem;
+
+      line-height: 1.4;
+
+      letter-spacing: .025em;
+
+      transition:
+        border-color .3s ease,
+        color .3s ease;
+    }
+
+    .email-link:hover {
+      border-color: var(--fg);
+      color: var(--fg);
+    }
+
+    .updated {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+
+      margin-top: 1.5rem;
+
+      color: var(--muted);
+
+      font-family: var(--mono);
+
+      font-size: .59rem;
+
+      line-height: 1.4;
+
+      letter-spacing: .06em;
+
+      text-transform: uppercase;
+    }
+
+    .updated-rule {
+      width: 1.4rem;
+      height: 1px;
+
+      background: var(--line);
+    }
+
+    /* =========================================================
+       FOOTER
+       ========================================================= */
+
+    .footer {
+      display: grid;
+
+      grid-template-columns:
+        1fr
+        auto
+        1fr;
+
+      align-items: end;
+
+      padding-top: 1rem;
+
+      border-top:
+        1px solid var(--line-soft);
+
+      color: var(--secondary);
+
+      font-family: var(--mono);
+
+      font-size: .6rem;
+      font-weight: 450;
+
+      line-height: 1.45;
+
+      letter-spacing: .05em;
+
+      text-transform: uppercase;
+
+      animation:
+        fade-up .9s .25s var(--ease) both;
+    }
+
+    .footer-center {
+      text-align: center;
+    }
+
+    .footer-right {
+      text-align: right;
+    }
+
+    .footer-link {
+      transition: color .3s ease;
+    }
+
+    .footer-link:hover {
+      color: var(--fg);
+    }
+
+    .footer-link:focus-visible {
+      outline: 1px solid var(--fg);
+      outline-offset: 6px;
+    }
+
+    /* =========================================================
+       ANIMATIONS
+       ========================================================= */
+
+    @keyframes header-in {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fade-up {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: .38;
+      }
+    }
+
+    /* =========================================================
+       TABLET
+       ========================================================= */
+
+    @media (max-width: 900px) {
+
+      .intro-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+
+      .intro-side {
+        max-width: 500px;
+        padding-bottom: 0;
+      }
+
+      .policy-grid {
+        grid-template-columns:
+          1fr;
+        gap: 3rem;
+      }
+
+      .policy-index {
+        position: static;
+      }
+
+      .policy-index-line {
+        width: 2rem;
+      }
+    }
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 640px) {
+
+      :root {
+        --gutter: 1.15rem;
+        --top: 1.15rem;
+      }
+
+      .brand {
+        font-size: .72rem;
+      }
+
+      .header-right {
+        gap: .8rem;
+      }
+
+      .back-link {
+        font-size: .55rem;
+      }
+
+      .status {
+        max-width: 120px;
+
+        justify-content: flex-end;
+
+        font-size: .55rem;
+
+        line-height: 1.45;
+
+        text-align: right;
+      }
+
+      main {
+        padding-top: 4.8rem;
+        padding-bottom: 4rem;
+      }
+
+      .intro {
+        padding-bottom: 3.5rem;
+      }
+
+      .eyebrow {
+        gap: .62rem;
+
+        margin-bottom: 2rem;
+
+        font-size: .59rem;
+      }
+
+      .eyebrow-rule {
+        width: 1.35rem;
+      }
+
+      h1 {
+        font-size:
+          clamp(
+            3.25rem,
+            calc(10vw + 1.1rem),
+            5.4rem
+          );
+
+        line-height: .97;
+
+        letter-spacing: -.068em;
+      }
+
+      .intro-side {
+        max-width: 340px;
+      }
+
+      .intro-side-copy {
+        font-size: .92rem;
+      }
+
+      .policy {
+        padding-top: 3.6rem;
+      }
+
+      .policy-grid {
+        gap: 2.6rem;
+      }
+
+      .policy-index-title {
+        font-size: .82rem;
+      }
+
+      .policy-section {
+        padding-bottom: 3.2rem;
+        margin-bottom: 3.2rem;
+      }
+
+      h2 {
+        font-size: 1.45rem;
+        line-height: 1.12;
+      }
+
+      .policy-content p,
+      .policy-content li {
+        font-size: .96rem;
+        line-height: 1.62;
+      }
+
+      .contact-card {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .email-link {
+        width: fit-content;
+      }
+
+      .footer {
+        grid-template-columns: 1fr 1fr;
+
+        font-size: .56rem;
+      }
+
+      .footer-center {
+        display: none;
+      }
+    }
+
+    /* =========================================================
+       SMALL MOBILE
+       ========================================================= */
+
+    @media (max-width: 390px) {
+
+      .back-link {
+        font-size: .51rem;
+      }
+
+      .status {
+        font-size: .51rem;
+      }
+
+      .eyebrow {
+        font-size: .56rem;
+      }
+
+      .policy-content p,
+      .policy-content li {
+        font-size: .94rem;
+      }
+
+      .contact-card {
+        padding: 1.2rem;
+      }
+    }
+
+    /* =========================================================
+       LANDSCAPE MOBILE
+       ========================================================= */
+
+    @media
+      (max-width: 900px)
+      and (orientation: landscape)
+      and (max-height: 600px) {
+
+      main {
+        padding-top: 3.5rem;
+        padding-bottom: 3rem;
+      }
+
+      .intro {
+        padding-bottom: 3.5rem;
+      }
+    }
+
+    /* =========================================================
+       REDUCED MOTION
+       ========================================================= */
+
+    @media (prefers-reduced-motion: reduce) {
+
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: .01ms !important;
+        animation-delay: 0ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
+
+    /* =========================================================
+       HIGH CONTRAST
+       ========================================================= */
+
+    @media (prefers-contrast: more) {
+
+      :root {
+        --secondary: #c2c1bb;
+        --muted: #9d9c96;
+        --line: #3a3a37;
+      }
+    }
+
+    /* =========================================================
+       PRINT
+       ========================================================= */
+
+    @media print {
+
+      body {
+        background: white;
+        color: black;
+      }
+
+      .page {
+        min-height: auto;
+      }
+
+      .header-right,
+      .status,
+      .footer {
+        display: none;
+      }
+
+      .intro,
+      .policy-section {
+        border-color: #ccc;
+      }
+
+      .policy-content p,
+      .policy-content li,
+      .intro-side-copy {
+        color: #222;
+      }
+
+      h1,
+      h2,
+      .brand,
+      .contact-name {
+        color: black;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="page">
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <header class="header">
+
+      <a
+        class="brand"
+        href="/"
+        aria-label="Cesare Paratore — pagina principale"
+      >
+        CESARE PARATORE
+      </a>
+
+      <div class="header-right">
+
+        <a
+          class="back-link"
+          href="/"
+          aria-label="Torna al sito personale"
+        >
+          ← Sito personale
+        </a>
+
+        <div
+          class="status"
+          aria-label="Informativa privacy"
+        >
+
+          <span
+            class="status-dot"
+            aria-hidden="true"
+          ></span>
+
+          Privacy
+
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         MAIN
+         ===================================================== -->
+
+    <main>
+
+      <!-- INTRO -->
+
+      <section
+        class="intro"
+        aria-labelledby="page-title"
+      >
+
+        <div class="eyebrow">
+
+          <span>
+            Informativa
+          </span>
+
+          <span
+            class="eyebrow-rule"
+            aria-hidden="true"
+          ></span>
+
+          <span>
+            2026
+          </span>
+
+        </div>
+
+
+        <div class="intro-grid">
+
+          <h1 id="page-title">
+            Privacy<br>
+            Policy.
+          </h1>
+
+
+          <div class="intro-side">
+
+            <div class="intro-side-label">
+              Ambito
+            </div>
+
+            <p class="intro-side-copy">
+              Informativa generale relativa ai siti
+              e alle pagine digitali riconducibili
+              a Cesare Paratore.
+            </p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- POLICY -->
+
+      <section
+        class="policy"
+        aria-label="Privacy Policy"
+      >
+
+        <div class="policy-grid">
+
+          <aside class="policy-index">
+
+            <div class="policy-index-label">
+              Documento
+            </div>
+
+            <div class="policy-index-title">
+              Privacy Policy
+            </div>
+
+            <div
+              class="policy-index-line"
+              aria-hidden="true"
+            ></div>
+
+          </aside>
+
+
+          <article class="policy-content">
+
+
+            <!-- 01 -->
+
+            <section class="policy-section">
+
+              <span class="section-number">
+                01 / Titolare
+              </span>
+
+              <h2>
+                Titolare del trattamento
+              </h2>
+
+              <p>
+                Il Titolare del trattamento è
+                <strong>Cesare Paratore</strong>,
+                con riferimento ai siti e alle pagine
+                digitali riconducibili alla propria
+                attività personale e ai propri progetti.
+              </p>
+
+              <p>
+                Per qualsiasi richiesta relativa al
+                trattamento dei dati personali è
+                possibile contattare il Titolare
+                all'indirizzo email indicato di seguito.
+              </p>
+
+            </section>
+
+
+            <!-- 02 -->
+
+            <section class="policy-section">
+
+              <span class="section-number">
+                02 / Dati
+              </span>
+
+              <h2>
+                Quali dati possono essere trattati
+              </h2>
+
+              <p>
+                I siti sono progettati come pagine
+                informative e, salvo eventuali
+                funzionalità introdotte in futuro,
+                non richiedono la creazione di un
+                account per la semplice consultazione.
+              </p>
+
+              <p>
+                Durante la normale navigazione possono
+                tuttavia essere trattati alcuni dati
+                tecnici necessari al funzionamento,
+                alla sicurezza e alla corretta
+                erogazione delle pagine.
+              </p>
+
+              <ul>
+
+                <li>
+                  indirizzo IP;
+                </li>
+
+                <li>
+                  informazioni relative al dispositivo
+                  e al browser utilizzato;
+                </li>
+
+                <li>
+                  data e ora della richiesta;
+                </li>
+
+                <li>
+                  risorse o pagine richieste;
+                </li>
+
+                <li>
+                  informazioni tecniche relative
+                  alla connessione;
+                </li>
+
+                <li>
+                  dati relativi a eventuali errori
+                  e alla sicurezza del servizio.
+                </li>
+
+              </ul>
+
+            </section>
+
+
+            <!-- 03 -->
+
+            <section class="policy-section">
+
+              <span class="section-number">
+                03 / Comunicazioni
+              </span>
+
+              <h2>
+                Dati comunicati volontariamente
+              </h2>
+
+              <p>
+                Qualora l'utente scelga volontariamente
+                di contattare il Titolare tramite email,
+                potranno essere trattati l'indirizzo
+                email, il nome o altri dati eventualmente
+                indicati, il contenuto della comunicazione
+                e gli eventuali allegati.
+              </p>
+
+              <p>
+                Il conferimento di tali dati è volontario
+                e i dati vengono utilizzati nella misura
+                necessaria per leggere, gestire e
+                rispondere alla comunicazione ricevuta.
+              </p>
+
+            </section>
+
+
+            <!-- 04 -->
+
+            <section class="policy-section">
+
+              <span class="section-number">
+                04 / Finalità
+              </span>
+
+              <h2>
+                Perché vengono trattati i dati
+              </h2>
+
+              <p>
+                I dati personali possono essere trattati
+                per consentire il corretto funzionamento
+                dei siti, garantire la sicurezza
+                dell'infrastruttura, gestire le
+                comunicazioni ricevute e adempiere agli
+                eventuali obblighi previsti dalla legge.
+              </p>
+
+              <p>
+                I dati non vengono utilizzati per finalità
+                incompatibili con quelle indicate nella
+                presente informativa.
+              </p>
+
+            </section>
+
+
+            <!-- 05 -->
+
+            <section class="policy-section">
+
+              <span class="section-number">
+                05 / Base giuridica
+              </span>
+
+              <h2>
+                Base giuridica del trattamento
+              </h2>
+
+              <p>
+                Il trattamento può basarsi, a seconda
+                della specifica operazione, sulle basi
+                giuridiche previste dall'articolo 6 del
+                Regolamento (UE) 2016/679.
+              </p>
+
+              <ul>
+
+                <li>
+                  necessità di gestire una richiesta
+                  dell'interessato;
+                </li>
+
+                <li>
+                  adempimento di un obbligo legale;
+                </li>
+
+                <li>
+                  perseguimento di un legittimo
+                  interesse del Titolare, ad esempio
+                  per sicurezza e tutela dei propri
+                  diritti;
+                </li>
+
+                <li>
+                  consenso dell'interessato, quando
+                  richiesto dalla normativa applicabile.
+                </li>
+
+              </ul>
+
+            </section>
+
+
+            <!-- 06 -->
+
+            <section class="policy-section">
+
+              <span class="section-number">
+                06 / Hosting
+              </span>
+
+              <h2>
+                Hosting e infrastruttura tecnica
+              </h2>
+
+              <p>
+                I siti sono pubblicati tramite
+                infrastrutture di hosting web,
+                attualmente basate su
+                <strong>GitHub Pages</strong>.
+              </p>
+
+              <p>
+                L'utilizzo di tale infrastruttura può
+                comportare il trattamento di dati tecnici
+                relativi alla connessione e alla sicurezza,
+                incluso l'indirizzo IP del visitatore.
+              </p>
+
+              <p>
+                Il trattamento dei dati da parte dei
+                fornitori dell'infrastruttura è inoltre
+                disciplinato dalle rispettive condizioni
+                e informative sulla privacy.
+              </p>
+
+            </section>
+
+
+            <!-- 07 -->
+
+            <section class="policy-section">
+
+              <span class="section-number">
+                07 / Cookie
+              </span>
+
+              <h2>
+                Cookie e strumenti di tracciamento
+              </h2>
+
+              <p>
+                Le pagine sono progettate per funzionare
+                senza l'utilizzo di cookie di profilazione
+                propri.
+              </p>
+
+              <p>
+                Non vengono intenzionalmente utilizzati
+                strumenti di advertising, profilazione
+                comportamentale o sistemi analoghi per
+                creare profili personali degli utenti.
+              </p>
+
+              <p>
+                Qualora in futuro vengano introdotti
+                strumenti di analisi, servizi esterni,
+                cookie non strettamente necessari o altri
+                sistemi di tracciamento, la presente
+                informativa verrà aggiornata e, quando
+                richiesto, saranno predisposti gli
+                strumenti necessari per ottenere il
+                consenso dell'utente.
+              </p>
+
+            </section>
+
+
+            <!-- 08 -->
+
+            <section class="policy-section">
+
+              <span class="section-number">
+                08 / Servizi esterni
+              </span>
+
+              <h2>
+                Collegamenti verso siti esterni
+              </h2>
+
+              <p>
+                Le pagine possono contenere collegamenti
+                verso siti, servizi o piattaforme gestiti
+                da soggetti terzi.
+              </p>
+
+              <p>
+                Il Titolare non è responsabile delle
+                modalità con cui tali soggetti trattano
+                i dati personali degli utenti.
+              </p>
+
+              <p>
+                La consultazione di un sito esterno è
+                soggetta alla relativa informativa privacy
+                e alle condizioni del gestore del servizio.
+              </p>
+
+            </section>
+
+
+            <!-- 09 -->
+
+            <section class="policy-section">
+
+              <span class="section-number">
+                09 / Destinatari
+              </span>
+
+              <h2>
+                Comunicazione dei dati
+              </h2>
+
+              <p>
+                I dati personali non vengono venduti né
+                ceduti a terzi per finalità commerciali.
+              </p>
+
+              <p>
+                Nei limiti necessari alle finalità indicate,
+                i dati possono essere trattati da fornitori
+                di servizi tecnici, hosting, servizi email,
+                assistenza tecnica, autorità pubbliche o
+                altri soggetti quando previsto dalla legge
+                o necessario alla tutela dei diritti del
+                Titolare.
+              </p>
+
+            </section>
+
+
+            <!-- 10 -->
+
+            <section class="policy-section">
+
+              <span class="section-number">
+                10 / Conservazione
+              </span>
+
+              <h2>
+                Periodo di conservazione
+              </h2>
+
+              <p>
+                I dati personali vengono conservati per
+                un periodo non superiore a quello necessario
+                rispetto alle finalità per le quali sono
+                stati raccolti.
+              </p>
+
+              <p>
+                I tempi effettivi possono dipendere dalla
+                natura del dato, dall'infrastruttura tecnica
+                utilizzata, dalle esigenze di sicurezza e
+                dagli eventuali obblighi di legge.
+              </p>
+
+            </section>
+
+
+            <!-- 11 -->
+
+            <section class="policy-section">
+
+              <span class="section-number">
+                11 / Diritti
+              </span>
+
+              <h2>
+                I diritti dell'interessato
+              </h2>
+
+              <p>
+                Nei casi previsti dal GDPR, l'interessato
+                può esercitare i diritti riconosciuti dagli
+                articoli 15-22 del Regolamento (UE) 2016/679.
+              </p>
+
+              <ul>
+
+                <li>
+                  accesso ai propri dati personali;
+                </li>
+
+                <li>
+                  rettifica dei dati inesatti;
+                </li>
+
+                <li>
+                  cancellazione dei dati, quando ne
+                  ricorrono i presupposti;
+                </li>
+
+                <li>
+                  limitazione del trattamento;
+                </li>
+
+                <li>
+                  portabilità dei dati nei casi previsti;
+                </li>
+
+                <li>
+                  opposizione al trattamento fondato
+                  sul legittimo interesse;
+                </li>
+
+                <li>
+                  revoca del consenso, quando il trattamento
+                  è basato sul consenso.
+                </li>
+
+              </ul>
+
+            </section>
+
+
+            <!-- 12 -->
+
+            <section class="policy-section">
+
+              <span class="section-number">
+                12 / Reclamo
+              </span>
+
+              <h2>
+                Autorità di controllo
+              </h2>
+
+              <p>
+                Qualora l'interessato ritenga che il
+                trattamento dei propri dati personali
+                avvenga in violazione della normativa
+                applicabile, ha il diritto di proporre
+                reclamo all'autorità di controllo competente.
+              </p>
+
+              <p>
+                Per l'Italia, l'autorità di controllo è
+                il <strong>Garante per la protezione
+                dei dati personali</strong>.
+              </p>
+
+            </section>
+
+
+            <!-- 13 -->
+
+            <section class="policy-section">
+
+              <span class="section-number">
+                13 / Sicurezza
+              </span>
+
+              <h2>
+                Sicurezza dei dati
+              </h2>
+
+              <p>
+                Il Titolare adotta misure tecniche e
+                organizzative ragionevoli e proporzionate
+                alla natura dei dati trattati e ai rischi
+                connessi al trattamento.
+              </p>
+
+              <p>
+                Le pagine sono progettate per ridurre
+                al minimo la raccolta di dati personali.
+                Nessun sistema informatico può tuttavia
+                garantire una sicurezza assoluta.
+              </p>
+
+            </section>
+
+
+            <!-- 14 -->
+
+            <section class="policy-section">
+
+              <span class="section-number">
+                14 / Minori
+              </span>
+
+              <h2>
+                Dati relativi a minori
+              </h2>
+
+              <p>
+                I siti non sono specificamente destinati
+                alla raccolta di dati personali di minori.
+              </p>
+
+              <p>
+                Il Titolare invita gli utenti minorenni
+                a non fornire volontariamente dati personali
+                senza il coinvolgimento e la supervisione
+                di un genitore o di chi ne esercita la
+                responsabilità, quando richiesto dalla
+                normativa applicabile.
+              </p>
+
+            </section>
+
+
+            <!-- 15 -->
+
+            <section class="policy-section">
+
+              <span class="section-number">
+                15 / Aggiornamenti
+              </span>
+
+              <h2>
+                Modifiche alla policy
+              </h2>
+
+              <p>
+                La presente Privacy Policy può essere
+                modificata o aggiornata nel tempo per
+                riflettere cambiamenti normativi, tecnici,
+                organizzativi o relativi ai servizi
+                utilizzati.
+              </p>
+
+              <p>
+                La versione aggiornata sarà pubblicata
+                su questa pagina con l'indicazione della
+                relativa data di aggiornamento.
+              </p>
+
+            </section>
+
+
+            <!-- 16 -->
+
+            <section class="policy-section">
+
+              <span class="section-number">
+                16 / Ambito
+              </span>
+
+              <h2>
+                Ambito di applicazione
+              </h2>
+
+              <p>
+                La presente informativa è concepita come
+                informativa generale per i siti e le pagine
+                web riconducibili a
+                <strong>Cesare Paratore</strong>, compresi
+                i progetti personali e le iniziative digitali
+                collegate, nella misura in cui utilizzino
+                modalità di trattamento coerenti con quanto
+                descritto in questa pagina.
+              </p>
+
+              <p>
+                Qualora una specifica pagina o servizio
+                introduca trattamenti ulteriori o differenti,
+                potrà essere pubblicata una specifica
+                informativa aggiuntiva.
+              </p>
+
+            </section>
+
+
+            <!-- 17 -->
+
+            <section class="policy-section">
+
+              <span class="section-number">
+                17 / Contatti
+              </span>
+
+              <h2>
+                Contatti
+              </h2>
+
+              <p>
+                Per qualsiasi domanda relativa alla privacy,
+                al trattamento dei dati personali o
+                all'esercizio dei propri diritti è possibile
+                contattare il Titolare.
+              </p>
+
+
+              <div class="contact-card">
+
+                <div>
+
+                  <div class="contact-label">
+                    Titolare
+                  </div>
+
+                  <p class="contact-name">
+                    Cesare Paratore
+                  </p>
+
+                  <div class="contact-location">
+                    Partinico / Sicilia / Italia
+                  </div>
+
+                </div>
+
+
+                <a
+                  class="email-link"
+                  href="mailto:cesare.paratore@gmail.com"
+                >
+                  cesare.paratore@gmail.com
+                </a>
+
+              </div>
+
+
+              <div class="updated">
+
+                <span
+                  class="updated-rule"
+                  aria-hidden="true"
+                ></span>
+
+                <span>
+                  Ultimo aggiornamento — 12 / 09 / 2026
+                </span>
+
+              </div>
+
+            </section>
+
+
+          </article>
+
+        </div>
+
+      </section>
+
+    </main>
+
+
+    <!-- =====================================================
+         FOOTER
+         ===================================================== -->
+
+    <footer class="footer">
+
+      <div>
+        © 2026 Cesare Paratore
+      </div>
+
+      <div class="footer-center">
+
+        <a
+          class="footer-link"
+          href="/"
+          aria-label="Torna al sito personale"
+        >
+          Cesare Paratore
+        </a>
+
+      </div>
+
+      <div class="footer-right">
+
+        <a
+          class="footer-link"
+          href="/privacy/"
+          aria-current="page"
+        >
+          Privacy Policy
+        </a>
+
+      </div>
+
+    </footer>
+
+  </div>
+
+</body>
+</html>
