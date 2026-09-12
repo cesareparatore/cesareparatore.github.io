@@ -260,11 +260,11 @@
 
     .brand:focus-visible,
     .back-link:focus-visible,
+    .portal-card:focus-visible,
     .privacy-link:focus-visible,
-    .signature-link:focus-visible,
-    .portal-card:focus-visible {
+    .signature-link:focus-visible {
       outline: 1px solid var(--fg);
-      outline-offset: 8px;
+      outline-offset: 7px;
     }
 
     .brand-sub {
@@ -460,6 +460,10 @@
 
       background: var(--line);
     }
+
+    /* =========================
+       INTRO
+       ========================= */
 
     .intro {
       width: min(100%, 900px);
@@ -867,9 +871,8 @@
     }
 
     /* =========================
-       FOOTER
-       STANDARD GLOBALE
-       IDENTICO ALLA HOMEPAGE
+       GLOBAL FOOTER
+       Identico alla home
        ========================= */
 
     .footer {
@@ -891,6 +894,7 @@
       font-family: var(--mono);
 
       font-size: .6rem;
+
       font-weight: 450;
 
       line-height: 1.45;
@@ -933,20 +937,6 @@
     .privacy-link:hover {
       color: var(--fg);
     }
-
-    /*
-      FIRMA STANDARD GLOBALE
-
-      Il comportamento deve essere identico
-      a quello della homepage:
-
-      Cesare Paratore
-      → linea che si estende verso destra
-      → freccia ↗ che entra con movimento diagonale
-
-      Non sostituire questo effetto con una semplice
-      freccia visibile o con un'altra animazione.
-    */
 
     .signature-link {
       display: inline-flex;
@@ -1000,6 +990,7 @@
       font-family: var(--sans);
 
       font-size: .78rem;
+
       font-weight: 400;
 
       line-height: 1;
@@ -1344,12 +1335,7 @@
         margin-top: 4rem;
       }
 
-      /*
-        FOOTER MOBILE
-        Identico alla homepage.
-        Privacy resta al centro della griglia.
-      */
-
+      /* Footer identico alla home su mobile */
       .footer {
         grid-template-columns:
           1fr
@@ -1814,7 +1800,7 @@
           <a
             class="back-link"
             href="/"
-            aria-label="Torna al sito personale di Cesare Paratore"
+            aria-label="Torna alla pagina personale di Cesare Paratore"
           >
 
             <span
@@ -1824,7 +1810,7 @@
               ←
             </span>
 
-            Torna al sito personale
+            Cesare Paratore
 
           </a>
 
@@ -1836,13 +1822,14 @@
 
 
     <!--
-      FOOTER STANDARD DEL SITO
+      FOOTER GLOBALE DEL SITO
 
-      Questo footer è identico alla homepage:
-      - Privacy al centro
-      - Cesare Paratore a destra
-      - linea + freccia ↗ con identico effetto hover/focus
-      - comportamento mobile identico
+      Questo footer deve rimanere identico su tutte le pagine:
+      - Privacy sempre al centro
+      - firma Cesare Paratore sulla destra
+      - stessa linea animata
+      - stessa freccia ↗
+      - stesso comportamento hover/focus
     -->
 
     <footer class="footer">
