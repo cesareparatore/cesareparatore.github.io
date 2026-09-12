@@ -12,7 +12,7 @@
 
   <meta
     name="description"
-    content="Privacy Policy dei siti e dei progetti digitali di Cesare Paratore."
+    content="Informativa sulla protezione dei dati personali relativa ai siti e ai progetti digitali di Cesare Paratore."
   >
 
   <meta name="author" content="Cesare Paratore">
@@ -42,7 +42,7 @@
 
   <meta
     property="og:description"
-    content="Informativa sulla privacy relativa ai siti e ai progetti digitali di Cesare Paratore."
+    content="Informativa sulla protezione dei dati personali relativa ai siti e ai progetti digitali di Cesare Paratore."
   >
 
   <meta
@@ -60,7 +60,7 @@
 
   <meta
     name="twitter:description"
-    content="Informativa sulla privacy relativa ai siti e ai progetti digitali di Cesare Paratore."
+    content="Informativa sulla protezione dei dati personali relativa ai siti e ai progetti digitali di Cesare Paratore."
   >
 
   <!-- Structured data -->
@@ -68,18 +68,20 @@
   {
     "@context": "https://schema.org",
     "@type": "WebPage",
+    "@id": "https://cesareparatore.github.io/privacy/#webpage",
     "name": "Privacy Policy — Cesare Paratore",
     "url": "https://cesareparatore.github.io/privacy/",
-    "description": "Informativa sulla privacy relativa ai siti e ai progetti digitali di Cesare Paratore.",
+    "description": "Informativa sulla protezione dei dati personali relativa ai siti e ai progetti digitali di Cesare Paratore.",
     "inLanguage": "it-IT",
     "isPartOf": {
       "@type": "WebSite",
+      "@id": "https://cesareparatore.github.io/#website",
       "name": "Cesare Paratore",
       "url": "https://cesareparatore.github.io/"
     },
     "about": {
       "@type": "Thing",
-      "name": "Privacy e protezione dei dati personali"
+      "name": "Protezione dei dati personali e privacy"
     }
   }
   </script>
@@ -186,9 +188,9 @@
         max(var(--gutter), env(safe-area-inset-left));
     }
 
-    /* --------------------------------
+    /* ================================
        HEADER
-    -------------------------------- */
+    ================================= */
 
     .header {
       position: relative;
@@ -294,9 +296,9 @@
         pulse 3.4s ease-in-out infinite;
     }
 
-    /* --------------------------------
+    /* ================================
        MAIN
-    -------------------------------- */
+    ================================= */
 
     main {
       flex: 1;
@@ -396,9 +398,9 @@
       text-transform: uppercase;
     }
 
-    /* --------------------------------
-       POLICY CONTENT
-    -------------------------------- */
+    /* ================================
+       POLICY
+    ================================= */
 
     .policy {
       display: grid;
@@ -460,6 +462,8 @@
     }
 
     .policy-section {
+      scroll-margin-top: 2rem;
+
       padding-bottom:
         clamp(3rem, 5vw, 5rem);
 
@@ -540,7 +544,7 @@
       max-width: 720px;
 
       margin:
-        1.2rem 0 0;
+        1.2rem 0 1rem;
 
       padding-left: 1.25rem;
 
@@ -554,7 +558,12 @@
 
     .policy-content li {
       padding-left: .3rem;
+
       margin-bottom: .55rem;
+    }
+
+    .policy-content li:last-child {
+      margin-bottom: 0;
     }
 
     .policy-content li::marker {
@@ -650,9 +659,9 @@
       text-transform: uppercase;
     }
 
-    /* --------------------------------
+    /* ================================
        FOOTER
-    -------------------------------- */
+    ================================= */
 
     .footer {
       display: grid;
@@ -710,9 +719,9 @@
       color: var(--fg);
     }
 
-    /* --------------------------------
+    /* ================================
        ANIMATIONS
-    -------------------------------- */
+    ================================= */
 
     @keyframes header-in {
       from {
@@ -749,9 +758,9 @@
       }
     }
 
-    /* --------------------------------
+    /* ================================
        TABLET
-    -------------------------------- */
+    ================================= */
 
     @media (max-width: 900px) {
 
@@ -783,9 +792,9 @@
       }
     }
 
-    /* --------------------------------
+    /* ================================
        MOBILE
-    -------------------------------- */
+    ================================= */
 
     @media (max-width: 640px) {
 
@@ -904,6 +913,10 @@
       }
     }
 
+    /* ================================
+       SMALL MOBILE
+    ================================= */
+
     @media (max-width: 390px) {
 
       :root {
@@ -938,9 +951,9 @@
       }
     }
 
-    /* --------------------------------
+    /* ================================
        LANDSCAPE MOBILE
-    -------------------------------- */
+    ================================= */
 
     @media
       (max-width: 900px)
@@ -966,9 +979,9 @@
       }
     }
 
-    /* --------------------------------
+    /* ================================
        REDUCED MOTION
-    -------------------------------- */
+    ================================= */
 
     @media (prefers-reduced-motion: reduce) {
 
@@ -986,9 +999,9 @@
       }
     }
 
-    /* --------------------------------
+    /* ================================
        HIGH CONTRAST
-    -------------------------------- */
+    ================================= */
 
     @media (prefers-contrast: more) {
 
@@ -999,9 +1012,9 @@
       }
     }
 
-    /* --------------------------------
+    /* ================================
        PRINT
-    -------------------------------- */
+    ================================= */
 
     @media print {
 
@@ -1038,7 +1051,9 @@
 
   <div class="page">
 
-    <!-- HEADER -->
+    <!-- ================================
+         HEADER
+    ================================= -->
 
     <header class="header">
 
@@ -1055,7 +1070,7 @@
         <a
           class="nav-link"
           href="https://partinico.github.io/"
-          aria-label="Vai alla community di Partinico"
+          aria-label="Vai alla community digitale di Partinico"
         >
           Partinico
         </a>
@@ -1077,7 +1092,9 @@
     </header>
 
 
-    <!-- MAIN -->
+    <!-- ================================
+         MAIN
+    ================================= -->
 
     <main>
 
@@ -1105,12 +1122,10 @@
 
         </div>
 
-
         <h1 id="page-title">
           Privacy<br>
           Policy.
         </h1>
-
 
         <div class="intro-meta">
 
@@ -1123,7 +1138,7 @@
           </span>
 
           <span>
-            Ultimo aggiornamento: 2026
+            Ultimo aggiornamento: 12 settembre 2026
           </span>
 
         </div>
@@ -1131,9 +1146,13 @@
       </section>
 
 
-      <!-- POLICY -->
+      <!-- ================================
+           POLICY
+      ================================= -->
 
       <div class="policy">
+
+        <!-- INDEX -->
 
         <aside
           class="policy-index"
@@ -1150,38 +1169,64 @@
               01 / Titolare
             </a>
 
+            <a href="#ambito">
+              02 / Ambito
+            </a>
+
             <a href="#dati">
-              02 / Dati
+              03 / Dati
             </a>
 
             <a href="#finalita">
-              03 / Finalità
+              04 / Finalità
+            </a>
+
+            <a href="#base-giuridica">
+              05 / Base giuridica
             </a>
 
             <a href="#tecnologie">
-              04 / Tecnologie
+              06 / Tecnologie
             </a>
 
             <a href="#terze-parti">
-              05 / Terze parti
+              07 / Terze parti
+            </a>
+
+            <a href="#trasferimenti">
+              08 / Trasferimenti
             </a>
 
             <a href="#conservazione">
-              06 / Conservazione
+              09 / Conservazione
             </a>
 
             <a href="#diritti">
-              07 / Diritti
+              10 / Diritti
+            </a>
+
+            <a href="#sicurezza">
+              11 / Sicurezza
+            </a>
+
+            <a href="#minori">
+              12 / Minori
+            </a>
+
+            <a href="#modifiche">
+              13 / Modifiche
             </a>
 
             <a href="#contatti">
-              08 / Contatti
+              14 / Contatti
             </a>
 
           </nav>
 
         </aside>
 
+
+        <!-- CONTENT -->
 
         <div class="policy-content">
 
@@ -1197,19 +1242,27 @@
             </div>
 
             <h2>
-              Chi gestisce i dati
+              Chi è il titolare
             </h2>
 
             <p>
               Il titolare del trattamento dei dati personali
-              eventualmente raccolti attraverso i siti e i
-              progetti digitali indicati in questa informativa è
+              eventualmente trattati attraverso i siti e i
+              progetti digitali riconducibili a questa
+              informativa è
               <strong>Cesare Paratore</strong>.
             </p>
 
             <p>
-              Il riferimento principale per le attività
-              personali e i relativi progetti digitali è
+              Per le comunicazioni relative alla protezione dei
+              dati personali è possibile utilizzare l'indirizzo
+              e-mail indicato nella sezione
+              <strong>Contatti</strong>.
+            </p>
+
+            <p>
+              Il riferimento territoriale indicato per il
+              progetto è
               <strong>Partinico, Sicilia, Italia</strong>.
             </p>
 
@@ -1220,37 +1273,37 @@
 
           <section
             class="policy-section"
-            id="dati"
+            id="ambito"
           >
 
             <div class="section-number">
-              02 / Dati personali
+              02 / Ambito dell'informativa
             </div>
 
             <h2>
-              Quali dati possono essere trattati
+              A quali attività si applica
             </h2>
 
             <p>
-              Questi siti sono progettati con un approccio
-              essenziale e non richiedono, per la semplice
-              navigazione, la creazione di un account o
-              l'inserimento obbligatorio di dati personali.
+              La presente informativa descrive le modalità
+              generali con cui possono essere trattati dati
+              personali nell'ambito dei siti e dei progetti
+              digitali gestiti o collegati a
+              <strong>Cesare Paratore</strong>.
             </p>
 
             <p>
-              Eventuali dati personali possono essere forniti
-              volontariamente dall'utente, ad esempio quando
-              decide di contattare il titolare tramite
-              e-mail.
+              L'informativa è destinata agli utenti che
+              consultano le pagine web, utilizzano eventuali
+              funzionalità disponibili o scelgono
+              volontariamente di comunicare con il titolare.
             </p>
 
             <p>
-              In questo caso possono essere trattati i dati
-              contenuti nella comunicazione, come indirizzo
-              e-mail, nome eventualmente indicato e contenuto
-              del messaggio, nella misura necessaria a gestire
-              la richiesta.
+              Singoli servizi o progetti potranno prevedere
+              informative specifiche qualora introducano
+              trattamenti ulteriori, funzionalità differenti o
+              soggetti terzi con ruoli autonomi.
             </p>
 
           </section>
@@ -1260,43 +1313,66 @@
 
           <section
             class="policy-section"
-            id="finalita"
+            id="dati"
           >
 
             <div class="section-number">
-              03 / Finalità
+              03 / Dati personali
             </div>
 
             <h2>
-              Perché possono essere utilizzati
+              Quali dati possono essere trattati
             </h2>
 
             <p>
-              I dati eventualmente forniti vengono utilizzati
-              esclusivamente per finalità coerenti con la
-              richiesta dell'utente, tra cui:
+              La semplice consultazione delle pagine non richiede
+              necessariamente la registrazione di un account,
+              l'invio di un modulo o la comunicazione volontaria
+              di dati personali.
+            </p>
+
+            <p>
+              A seconda delle modalità con cui il sito viene
+              utilizzato, possono essere trattate categorie di
+              dati differenti.
             </p>
 
             <ul>
+
               <li>
-                rispondere a comunicazioni e richieste;
+                <strong>Dati forniti volontariamente:</strong>
+                informazioni contenute nelle comunicazioni inviate
+                dall'utente, compresi eventualmente nome,
+                indirizzo e-mail e contenuto del messaggio.
               </li>
 
               <li>
-                gestire eventuali rapporti avviati
-                volontariamente dall'utente;
+                <strong>Dati tecnici:</strong>
+                informazioni che possono essere generate o
+                trasmesse nell'ambito della comunicazione
+                informatica necessaria alla consultazione delle
+                pagine, secondo le modalità adottate dai servizi
+                tecnici utilizzati.
               </li>
 
               <li>
-                mantenere e migliorare i siti e i progetti
-                digitali;
+                <strong>Dati relativi alla richiesta:</strong>
+                informazioni necessarie per comprendere,
+                gestire e rispondere a una richiesta formulata
+                volontariamente dall'utente.
               </li>
 
-              <li>
-                adempiere a eventuali obblighi previsti
-                dalla legge.
-              </li>
             </ul>
+
+            <p>
+              Non viene richiesto all'utente di fornire categorie
+              particolari di dati personali per la semplice
+              navigazione. Qualora l'utente scelga comunque di
+              comunicarle spontaneamente, tali informazioni
+              saranno trattate nei limiti consentiti dalla
+              normativa applicabile e per quanto strettamente
+              necessario alla gestione della comunicazione.
+            </p>
 
           </section>
 
@@ -1305,37 +1381,65 @@
 
           <section
             class="policy-section"
-            id="tecnologie"
+            id="finalita"
           >
 
             <div class="section-number">
-              04 / Tecnologie
+              04 / Finalità del trattamento
             </div>
 
             <h2>
-              Cookie e strumenti tecnici
+              Perché i dati possono essere utilizzati
             </h2>
 
             <p>
-              I siti sono sviluppati con l'obiettivo di
-              utilizzare il minor numero possibile di
-              tecnologie di tracciamento.
+              I dati personali eventualmente raccolti possono
+              essere trattati per finalità determinate, esplicite
+              e compatibili con il rapporto instaurato con
+              l'utente.
             </p>
 
-            <p>
-              La semplice navigazione può comportare il
-              trattamento di informazioni tecniche
-              strettamente necessarie alla trasmissione,
-              sicurezza e corretta visualizzazione delle
-              pagine, secondo le modalità proprie dei servizi
-              tecnici utilizzati per la loro pubblicazione.
-            </p>
+            <ul>
+
+              <li>
+                rispondere a richieste, messaggi e comunicazioni;
+              </li>
+
+              <li>
+                gestire eventuali rapporti avviati
+                volontariamente dall'utente;
+              </li>
+
+              <li>
+                fornire informazioni richieste dall'utente;
+              </li>
+
+              <li>
+                mantenere, amministrare e migliorare i siti e
+                i progetti digitali;
+              </li>
+
+              <li>
+                prevenire o gestire problemi tecnici e di
+                sicurezza;
+              </li>
+
+              <li>
+                adempiere a obblighi previsti dalla legge,
+                da regolamenti o dalla normativa applicabile;
+              </li>
+
+              <li>
+                esercitare o difendere un diritto del titolare,
+                quando necessario.
+              </li>
+
+            </ul>
 
             <p>
-              Al momento della pubblicazione di questa
-              informativa non vengono dichiarati strumenti
-              pubblicitari o sistemi di profilazione personali
-              che non siano effettivamente presenti nei siti.
+              I dati non vengono utilizzati per finalità
+              incompatibili con quelle per cui sono stati
+              raccolti.
             </p>
 
           </section>
@@ -1345,34 +1449,59 @@
 
           <section
             class="policy-section"
-            id="terze-parti"
+            id="base-giuridica"
           >
 
             <div class="section-number">
-              05 / Servizi di terze parti
+              05 / Base giuridica
             </div>
 
             <h2>
-              Servizi esterni
+              Perché il trattamento è consentito
             </h2>
 
             <p>
-              Alcune componenti tecniche necessarie alla
-              pubblicazione o al funzionamento dei siti possono
-              essere fornite da soggetti terzi, come servizi di
-              hosting, infrastruttura web o strumenti tecnici.
+              La base giuridica del trattamento dipende dalla
+              specifica attività svolta e dalla natura dei dati
+              trattati.
             </p>
 
-            <p>
-              Tali soggetti possono trattare dati tecnici
-              secondo le proprie informative e nei limiti
-              necessari alla fornitura dei rispettivi servizi.
-            </p>
+            <ul>
+
+              <li>
+                <strong>Consenso:</strong>
+                quando il trattamento richiede il consenso
+                dell'interessato e questo viene validamente
+                prestato.
+              </li>
+
+              <li>
+                <strong>Esecuzione di misure precontrattuali
+                o di un contratto:</strong>
+                quando il trattamento è necessario per gestire
+                una richiesta o un rapporto con l'utente.
+              </li>
+
+              <li>
+                <strong>Obbligo legale:</strong>
+                quando il trattamento è necessario per adempiere
+                a un obbligo previsto dalla normativa.
+              </li>
+
+              <li>
+                <strong>Legittimo interesse:</strong>
+                quando ricorrono i presupposti previsti dalla
+                normativa, nel rispetto dei diritti e delle
+                libertà fondamentali dell'interessato.
+              </li>
+
+            </ul>
 
             <p>
-              Quando vengono introdotti nuovi servizi che
-              comportano trattamenti ulteriori o differenti,
-              questa informativa può essere aggiornata.
+              Quando una specifica funzionalità richiede una
+              diversa base giuridica o il consenso dell'utente,
+              le relative informazioni saranno fornite secondo
+              quanto richiesto dalla normativa applicabile.
             </p>
 
           </section>
@@ -1382,31 +1511,52 @@
 
           <section
             class="policy-section"
-            id="conservazione"
+            id="tecnologie"
           >
 
             <div class="section-number">
-              06 / Conservazione
+              06 / Cookie e tecnologie
             </div>
 
             <h2>
-              Per quanto tempo
+              Tecnologie utilizzate
             </h2>
 
             <p>
-              I dati personali eventualmente ricevuti tramite
-              comunicazioni vengono conservati per il tempo
-              necessario a gestire la richiesta e, quando
-              applicabile, per il periodo necessario a
-              soddisfare obblighi legali o tutelare i diritti
-              del titolare.
+              I siti sono progettati secondo un approccio
+              essenziale e orientato a limitare l'utilizzo di
+              tecnologie non necessarie alla loro funzione.
             </p>
 
             <p>
-              Non vengono conservati dati personali per periodi
-              superiori a quelli necessari rispetto alle finalità
-              per cui sono stati raccolti, salvo specifici
-              obblighi o necessità previste dalla normativa.
+              La consultazione di una pagina web può comportare
+              il trattamento di informazioni tecniche necessarie
+              alla trasmissione dei contenuti, alla sicurezza,
+              alla gestione delle connessioni e alla corretta
+              visualizzazione delle pagine.
+            </p>
+
+            <p>
+              Tali informazioni possono dipendere anche
+              dall'infrastruttura tecnica utilizzata per
+              pubblicare e distribuire il sito.
+            </p>
+
+            <p>
+              Al momento della redazione della presente
+              informativa non viene dichiarata l'esistenza di
+              strumenti pubblicitari, di profilazione o di
+              analisi comportamentale diversi da quelli che
+              risultino effettivamente implementati nei singoli
+              siti.
+            </p>
+
+            <p>
+              Qualora vengano introdotti cookie o tecnologie
+              analoghe che richiedano specifiche informazioni o
+              consenso, le relative modalità saranno aggiornate
+              e, ove necessario, sarà predisposto un apposito
+              meccanismo di gestione.
             </p>
 
           </section>
@@ -1416,36 +1566,46 @@
 
           <section
             class="policy-section"
-            id="diritti"
+            id="terze-parti"
           >
 
             <div class="section-number">
-              07 / Diritti dell'interessato
+              07 / Servizi di terze parti
             </div>
 
             <h2>
-              I tuoi diritti
+              Hosting e fornitori tecnici
             </h2>
 
             <p>
-              Nei casi previsti dalla normativa applicabile,
-              l'interessato può esercitare i diritti riconosciuti
-              dalla legislazione in materia di protezione dei
-              dati personali.
+              Per la pubblicazione, distribuzione, sicurezza o
+              gestione tecnica dei siti possono essere utilizzati
+              servizi forniti da soggetti terzi.
             </p>
 
             <p>
-              Tra questi rientrano, secondo le condizioni
-              previste dalla legge, il diritto di chiedere
-              l'accesso ai dati personali, la rettifica,
-              la cancellazione, la limitazione del trattamento
-              o di opporsi a determinati trattamenti.
+              Tali soggetti possono trattare informazioni
+              tecniche necessarie alla fornitura dei propri
+              servizi, secondo i rispettivi ruoli, condizioni e
+              informative sulla privacy.
             </p>
 
             <p>
-              È inoltre possibile proporre reclamo all'autorità
-              di controllo competente, secondo quanto previsto
-              dalla normativa applicabile.
+              La presenza e il ruolo di specifici fornitori
+              dipendono dall'architettura tecnica effettivamente
+              utilizzata dal singolo sito.
+            </p>
+
+            <p>
+              Non vengono utilizzati dati personali per la
+              vendita a terzi.
+            </p>
+
+            <p>
+              Quando vengono aggiunti servizi esterni che
+              comportano nuovi trattamenti di dati personali,
+              l'informativa può essere aggiornata per riflettere
+              tali modifiche.
             </p>
 
           </section>
@@ -1455,11 +1615,276 @@
 
           <section
             class="policy-section"
+            id="trasferimenti"
+          >
+
+            <div class="section-number">
+              08 / Trasferimenti di dati
+            </div>
+
+            <h2>
+              Trattamenti e trasferimenti internazionali
+            </h2>
+
+            <p>
+              Alcuni fornitori tecnici utilizzati per la
+              pubblicazione o il funzionamento dei servizi
+              digitali potrebbero avere infrastrutture o
+              collaboratori situati al di fuori dello Spazio
+              Economico Europeo.
+            </p>
+
+            <p>
+              Qualora un trattamento comporti un trasferimento
+              verso un Paese terzo, il trasferimento sarà
+              effettuato nel rispetto delle condizioni previste
+              dalla normativa applicabile, incluse, ove
+              pertinenti, le decisioni di adeguatezza o le
+              garanzie appropriate previste dal Regolamento
+              (UE) 2016/679.
+            </p>
+
+            <p>
+              La concreta applicazione di tali garanzie dipende
+              dai servizi tecnici effettivamente utilizzati.
+            </p>
+
+          </section>
+
+
+          <!-- 09 -->
+
+          <section
+            class="policy-section"
+            id="conservazione"
+          >
+
+            <div class="section-number">
+              09 / Conservazione
+            </div>
+
+            <h2>
+              Per quanto tempo vengono conservati i dati
+            </h2>
+
+            <p>
+              I dati personali sono conservati per un periodo
+              non superiore a quello necessario rispetto alle
+              finalità per cui sono stati raccolti, tenendo conto
+              della natura del dato e delle esigenze connesse
+              alla gestione della richiesta.
+            </p>
+
+            <p>
+              Le comunicazioni ricevute tramite e-mail possono
+              essere conservate per il tempo necessario a gestire
+              la richiesta, mantenere una corretta continuità
+              della comunicazione o adempiere a eventuali
+              obblighi di legge.
+            </p>
+
+            <p>
+              Quando non sussistono più le finalità che
+              giustificano la conservazione, i dati vengono
+              cancellati, anonimizzati o ulteriormente conservati
+              soltanto quando ciò sia richiesto o consentito
+              dalla normativa applicabile.
+            </p>
+
+          </section>
+
+
+          <!-- 10 -->
+
+          <section
+            class="policy-section"
+            id="diritti"
+          >
+
+            <div class="section-number">
+              10 / Diritti dell'interessato
+            </div>
+
+            <h2>
+              I tuoi diritti
+            </h2>
+
+            <p>
+              Nei casi previsti dalla normativa applicabile,
+              l'interessato può esercitare i diritti riconosciuti
+              dal Regolamento (UE) 2016/679 e dalla normativa
+              nazionale applicabile.
+            </p>
+
+            <ul>
+
+              <li>
+                ottenere conferma dell'esistenza o meno di dati
+                personali che lo riguardano;
+              </li>
+
+              <li>
+                ottenere l'accesso ai propri dati personali e
+                alle informazioni previste dalla normativa;
+              </li>
+
+              <li>
+                chiedere la rettifica dei dati inesatti o
+                l'integrazione di quelli incompleti;
+              </li>
+
+              <li>
+                chiedere la cancellazione dei dati nei casi
+                previsti dalla normativa;
+              </li>
+
+              <li>
+                chiedere la limitazione del trattamento nei casi
+                previsti dalla normativa;
+              </li>
+
+              <li>
+                opporsi al trattamento quando ricorrono i
+                presupposti previsti dalla legge;
+              </li>
+
+              <li>
+                esercitare il diritto alla portabilità dei dati,
+                quando applicabile;
+              </li>
+
+              <li>
+                revocare il consenso precedentemente prestato,
+                quando il trattamento si basa sul consenso.
+              </li>
+
+            </ul>
+
+            <p>
+              L'esercizio di tali diritti può essere soggetto
+              alle condizioni, limitazioni ed eccezioni previste
+              dalla normativa applicabile.
+            </p>
+
+            <p>
+              La richiesta può essere inviata utilizzando
+              l'indirizzo e-mail indicato nella sezione
+              <strong>Contatti</strong>.
+            </p>
+
+          </section>
+
+
+          <!-- 11 -->
+
+          <section
+            class="policy-section"
+            id="sicurezza"
+          >
+
+            <div class="section-number">
+              11 / Sicurezza
+            </div>
+
+            <h2>
+              Protezione dei dati
+            </h2>
+
+            <p>
+              Il titolare adotta misure tecniche e organizzative
+              ragionevoli e proporzionate alla natura dei
+              trattamenti effettuati, con l'obiettivo di
+              proteggere i dati personali da perdita, uso illecito,
+              accesso non autorizzato, alterazione o divulgazione
+              non autorizzata.
+            </p>
+
+            <p>
+              Nessuna trasmissione o infrastruttura informatica
+              può essere considerata assolutamente sicura.
+              Per questo motivo non è possibile garantire una
+              sicurezza assoluta dei dati trasmessi attraverso
+              Internet.
+            </p>
+
+          </section>
+
+
+          <!-- 12 -->
+
+          <section
+            class="policy-section"
+            id="minori"
+          >
+
+            <div class="section-number">
+              12 / Minori
+            </div>
+
+            <h2>
+              Dati relativi a minori
+            </h2>
+
+            <p>
+              I siti non sono specificamente rivolti alla
+              raccolta intenzionale di dati personali di minori.
+            </p>
+
+            <p>
+              Qualora un minore invii spontaneamente informazioni
+              personali, il titolare invita il genitore o il
+              soggetto esercente la responsabilità genitoriale a
+              contattarlo qualora ritenga necessario richiedere
+              informazioni, limitazioni o cancellazioni relative
+              al trattamento.
+            </p>
+
+          </section>
+
+
+          <!-- 13 -->
+
+          <section
+            class="policy-section"
+            id="modifiche"
+          >
+
+            <div class="section-number">
+              13 / Aggiornamenti
+            </div>
+
+            <h2>
+              Un documento che può cambiare
+            </h2>
+
+            <p>
+              La presente Privacy Policy può essere aggiornata
+              nel tempo per riflettere modifiche ai siti, ai
+              servizi utilizzati, alle modalità di trattamento o
+              alla normativa applicabile.
+            </p>
+
+            <p>
+              La versione pubblicata su questa pagina rappresenta
+              la versione vigente alla data indicata di seguito.
+            </p>
+
+            <p class="update-note">
+              Ultimo aggiornamento / 12 settembre 2026
+            </p>
+
+          </section>
+
+
+          <!-- 14 -->
+
+          <section
+            class="policy-section"
             id="contatti"
           >
 
             <div class="section-number">
-              08 / Contatti
+              14 / Contatti
             </div>
 
             <h2>
@@ -1467,9 +1892,10 @@
             </h2>
 
             <p>
-              Per domande relative alla presente informativa o
-              al trattamento dei dati personali è possibile
-              contattare direttamente il titolare.
+              Per domande relative alla presente informativa,
+              richieste relative ai dati personali o esercizio
+              dei diritti previsti dalla normativa applicabile,
+              è possibile contattare il titolare.
             </p>
 
             <div class="contact-card">
@@ -1487,29 +1913,12 @@
 
             </div>
 
-          </section>
-
-
-          <!-- NOTE -->
-
-          <section class="policy-section">
-
-            <div class="section-number">
-              Nota finale
-            </div>
-
-            <h2>
-              Un documento aggiornabile
-            </h2>
-
-            <p>
-              Questa Privacy Policy può essere aggiornata nel
-              tempo per riflettere modifiche ai siti, ai servizi
-              utilizzati o alla normativa applicabile.
-            </p>
-
-            <p class="update-note">
-              Ultimo aggiornamento / 2026
+            <p style="margin-top: 1.5rem;">
+              È inoltre possibile proporre reclamo all'autorità
+              di controllo competente, in particolare al
+              <strong>Garante per la protezione dei dati
+              personali</strong>, secondo le modalità previste
+              dalla normativa applicabile.
             </p>
 
           </section>
@@ -1521,7 +1930,9 @@
     </main>
 
 
-    <!-- FOOTER -->
+    <!-- ================================
+         FOOTER
+    ================================= -->
 
     <footer class="footer">
 
