@@ -824,33 +824,36 @@
        ========================= */
 
     @media (prefers-reduced-motion: reduce) {
-      html {
-        scroll-behavior: auto;
-      }
+  html {
+    scroll-behavior: auto;
+  }
 
-      *,
-      *::before,
-      *::after {
-        animation-duration: .01ms !important;
-        animation-delay: 0ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: .01ms !important;
-      }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 
-      .hero-line-inner {
-        transform: none;
-      }
+  .hero-line-inner {
+    transform: none;
+  }
 
-      .signature-line {
-        width: 0 !important;
-        opacity: 0 !important;
-      }
+  .header,
+  .eyebrow,
+  .location,
+  .footer {
+    opacity: 1;
+    transform: none;
+  }
 
-      .signature-arrow {
-        opacity: 0 !important;
-        transform: none !important;
-      }
-    }
+  .signature-line,
+  .signature-arrow {
+    transition: none;
+  }
+}
 
     /* =========================
        HIGH CONTRAST
