@@ -473,7 +473,6 @@ h3 {
 .hero {
   position: relative;
 
-  /* CORREZIONE 2 */
   min-height: clamp(600px, 90svh, 900px);
 
   display: flex;
@@ -481,8 +480,8 @@ h3 {
 
   overflow: hidden;
 
-  background: var(--cp-deep-blue);
-  color: var(--cp-white);
+  background: var(--cp-off-white);
+  color: var(--cp-deep-blue);
 }
 
 .hero::after {
@@ -497,7 +496,7 @@ h3 {
 
   width: 1px;
 
-  background: rgba(183, 201, 214, 0.18);
+  background: rgba(11, 31, 51, 0.12);
 
   transform: translateX(-50%);
 
@@ -519,13 +518,13 @@ h3 {
 .hero .eyebrow {
   margin-bottom: clamp(24px, 3vw, 42px);
 
-  color: var(--cp-accent);
+  color: var(--cp-slate);
 }
 
 .hero-title {
   max-width: 1250px;
 
-  color: var(--cp-white);
+  color: var(--cp-deep-blue);
 
   /* CORREZIONE 4 */
   font-weight: 700;
@@ -541,7 +540,7 @@ h3 {
 .hero-support {
   margin-top: clamp(28px, 4vw, 48px);
 
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--cp-slate);
 
   font-size: var(--body-large-size);
   line-height: 1.45;
@@ -557,9 +556,9 @@ h3 {
 
   padding-bottom: 8px;
 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+  border-bottom-color: rgba(11, 31, 51, 0.55);
 
-  color: var(--cp-white);
+  color: var(--cp-deep-blue);
 
   font-size: var(--label-size);
   font-weight: 600;
@@ -574,7 +573,7 @@ h3 {
 
 .hero-cta:hover,
 .hero-cta:focus-visible {
-  border-color: var(--cp-white);
+  border-color: var(--cp-deep-blue);
 }
 
 .hero-cta span {
@@ -587,8 +586,8 @@ h3 {
 }
 
 .hero-cta:hover span,
-.hero-cta:focus-visible span {
-  transform: translateY(4px);
+.hero-cta:focus-visible {
+  outline-color: var(--cp-deep-blue);
 }
 
 
@@ -1193,11 +1192,11 @@ h3 {
    ========================================================= */
 
 .site-footer {
-  background: var(--cp-deep-blue);
-  color: var(--cp-white);
+  background: var(--cp-off-white);
+  color: var(--cp-deep-blue);
 
   border-top:
-    1px solid rgba(255, 255, 255, 0.12);
+    1px solid var(--cp-line);
 }
 
 .footer-inner {
@@ -1251,7 +1250,7 @@ h3 {
 }
 
 .footer-copy {
-  color: rgba(255, 255, 255, 0.48);
+  color: var(--cp-slate);
 
   font-size: 0.72rem;
   line-height: 1.4;
@@ -1266,7 +1265,7 @@ h3 {
 }
 
 .footer-links a {
-  color: rgba(255, 255, 255, 0.68);
+  color: var(--cp-slate);
 
   font-size: 0.72rem;
   font-weight: 600;
@@ -1277,7 +1276,7 @@ h3 {
 
 .footer-links a:hover,
 .footer-links a:focus-visible {
-  color: var(--cp-white);
+  color: var(--cp-deep-blue);
 }
 
 
@@ -1729,7 +1728,8 @@ h3 {
      ------------------------------------------------------- */
 
   .final-signature {
-    min-height: 76svh;
+  background: var(--cp-white);
+  color: var(--cp-deep-blue);
   }
 
   .final-signature::before {
@@ -1737,11 +1737,11 @@ h3 {
   }
 
   .signature-content h2 {
-    font-size: clamp(3rem, 14vw, 5.5rem);
+    color: var(--cp-deep-blue);
   }
 
   .signature-meta {
-    max-width: 280px;
+  color: var(--cp-slate);
 
     line-height: 1.7;
   }
@@ -1961,7 +1961,7 @@ h3 {
   .hero-support,
   .signature-meta,
   .signature-monogram {
-    color: #333;
+  color: var(--cp-deep-blue);
   }
 
   .hero-cta {
