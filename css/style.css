@@ -105,7 +105,10 @@
 html {
   min-width: 320px;
   scroll-behavior: smooth;
-  scroll-padding-top: 96px;
+
+  /* CORREZIONE 3 */
+  scroll-padding-top: 88px;
+
   background: var(--color-bg);
   hanging-punctuation: first last;
 }
@@ -244,8 +247,10 @@ h3 {
   outline-offset: 5px;
 }
 
+.hero :focus-visible,
 .final-signature :focus-visible,
 .site-footer :focus-visible {
+  /* CORREZIONE 1 */
   outline-color: var(--cp-white);
 }
 
@@ -468,7 +473,8 @@ h3 {
 .hero {
   position: relative;
 
-  min-height: max(90svh, 680px);
+  /* CORREZIONE 2 */
+  min-height: clamp(600px, 90svh, 900px);
 
   display: flex;
   align-items: flex-end;
@@ -521,8 +527,10 @@ h3 {
 
   color: var(--cp-white);
 
+  /* CORREZIONE 4 */
+  font-weight: 700;
+
   font-size: var(--hero-size);
-  font-weight: 750;
 
   line-height: 0.9;
   letter-spacing: var(--tracking-tight);
@@ -1156,8 +1164,10 @@ h3 {
 
   color: var(--cp-white);
 
+  /* CORREZIONE 4 */
+  font-weight: 700;
+
   font-size: clamp(3rem, 7vw, 7.5rem);
-  font-weight: 750;
 
   line-height: 0.9;
   letter-spacing: -0.055em;
@@ -1416,7 +1426,8 @@ h3 {
   }
 
   html {
-    scroll-padding-top: 76px;
+    /* CORREZIONE 3 — mobile */
+    scroll-padding-top: 72px;
   }
 
   body {
@@ -1958,111 +1969,141 @@ h3 {
     border-color: #000;
   }
 
-  .hero::after,
-  .final-signature::before,
+  .hero-cta span,
+  .ecosystem-item a span {
+    color: #000;
+  }
+
+  .journey-image {
+    min-height: 420px;
+
+    background:
+      #eee;
+  }
+
+  .journey-image::after {
+    display: none;
+  }
+
+  .journey-image span {
+    color: #333;
+  }
+
+  .method-steps::before,
   .principle-section::before,
   .method-section::before,
   .dimensions-section::before,
   .journey-section::before,
   .skills-section::before,
-  .ecosystem-section::before {
-    display: none;
+  .ecosystem-section::before,
+  .final-signature::before {
+    background: #ccc;
   }
 
-  .reveal,
-  .js-enabled .reveal {
-    opacity: 1 !important;
-    transform: none !important;
+  .method-number {
+    background: #fff;
+    border-color: #999;
+    color: #000;
   }
 
-  .journey-image {
-    background: #ddd !important;
+  .section,
+  .value-section {
+    padding-block: 48px;
+  }
+
+  .final-signature {
+    min-height: auto;
+    padding-block: 72px;
+  }
+
+  .site-footer {
+    border-top-color: #ccc;
+  }
+
+  .footer-copy,
+  .footer-links a {
+    color: #333;
+  }
+
+  .footer-brand {
+    color: #000;
   }
 
   a {
     text-decoration: underline;
+    text-decoration-thickness: 1px;
   }
 
+  /*
+   * Mostra gli URL dei link esterni durante la stampa.
+   * Esclude i link interni/ancore e i controlli puramente decorativi.
+   */
+  .ecosystem-item a[href^="http"]::after,
+  .footer-links a[href^="http"]::after {
+    content: " (" attr(href) ")";
+
+    color: #555;
+
+    font-size: 0.7em;
+    font-weight: 400;
+
+    word-break: break-all;
+  }
+
+  /*
+   * Evita che elementi strutturali vengano spezzati
+   * inutilmente tra due pagine.
+   */
+  .method-step,
+  .dimension,
+  .skill-group,
+  .ecosystem-item,
+  .journey-copy article {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  img {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /*
+   * Gli elementi di animazione devono risultare sempre
+   * visibili sulla stampa.
+   */
+  .reveal,
+  .js-enabled .reveal,
+  .js-enabled .reveal.is-visible {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /*
+   * Nasconde elementi puramente interattivi/non essenziali
+   * alla versione cartacea.
+   */
+  .hero-cta,
+  .ecosystem-item a span {
+    display: none;
+  }
+
+  /*
+   * Evita colori troppo scuri/sfondi pieni quando il browser
+   * non stampa i background.
+   */
+  .hero,
+  .value-section,
+  .final-signature,
   .site-footer {
-    border-top: 1px solid #000;
-  }
-
-  .footer-links a,
-  .footer-copy {
-    color: #000;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 }
-
-
-/* =========================================================
-   25. LOGO SAFETY
-   ========================================================= */
-
-/*
-   Il logo viene utilizzato esclusivamente tramite immagine.
-   Non viene generato automaticamente alcun testo "CP".
-
-   HTML previsto:
-
-   Header:
-   <a class="monogram" href="/" aria-label="Cesare Paratore">
-     <img src="assets/images/logo.svg" alt="Cesare Paratore">
-   </a>
-
-   Footer:
-   <a class="footer-brand" href="/" aria-label="Cesare Paratore">
-     <img src="assets/images/logo.svg" alt="Cesare Paratore">
-   </a>
-*/
-
-.monogram img,
-.footer-brand img {
-  object-fit: contain;
-  object-position: left center;
-}
-
-/* Evita che eventuali immagini SVG trasparenti
-   risultino troppo grandi rispetto al layout. */
-
-.monogram,
-.footer-brand {
-  flex-shrink: 0;
-}
-
-
-/* =========================================================
-   26. HEADER / FOOTER CONTRAST
-   ========================================================= */
-
-.site-header .monogram img,
-.site-footer .footer-brand img {
-  max-height: 100%;
-}
-
-
-/* =========================================================
-   27. FINAL CONSISTENCY
-   ========================================================= */
-
-.hero,
-.final-signature,
-.site-footer {
-  isolation: isolate;
-}
-
-.hero > *,
-.final-signature > *,
-.site-footer > * {
-  position: relative;
-}
-
-.hero-title,
-.signature-content h2 {
-  max-width: min(1250px, 100%);
-}
-
-
-/* =========================================================
-   END
-   CESARE PARATORE — LANDING PAGE
-   ========================================================= */
