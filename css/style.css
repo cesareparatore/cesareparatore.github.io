@@ -1532,9 +1532,20 @@ img {
   }
 
   .journey-image {
-    width: 100%;
-    min-height: min(125vw, 560px);
-  }
+  position: relative;
+
+  min-height: clamp(460px, 55vw, 760px);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(11, 31, 51, 0.04),
+      rgba(11, 31, 51, 0.18)
+    ),
+    url("../assets/images/fotografia.jpg") center / cover no-repeat;
+
+  overflow: hidden;
+}
 
   /* Skills */
 
