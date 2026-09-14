@@ -1,27 +1,24 @@
 /* ==========================================================================
-   DESIGN SYSTEM & BASELINE VARIABLES (PDD Cap. 19 & 21)
+   DESIGN SYSTEM — HIGH-EDITORIAL & INDUSTRIAL (Steve Jobs Baseline)
    ========================================================================== */
 :root {
   --jobs-black: #050505;
   --jobs-ink: #111111;
   --jobs-white: #ffffff;
-  --jobs-paper: #f5f5f3;
-  --jobs-gray: #686866;
-  --jobs-gray-light: #969694;
-  --jobs-line: #d9d9d6;
+  --jobs-paper: #fbfbf9;
+  --jobs-gray: #555553;
+  --jobs-gray-light: #8e8e8c;
+  --jobs-line: #e2e2de;
   --jobs-denim: #304b68;
-  --jobs-denim-dark: #203a54;
-  --jobs-denim-soft: #e8edf1;
-  --jobs-metal: #bcbcb9;
-  --jobs-metal-dark: #888886;
 
-  --container-width: 1180px;
-  --content-width: 680px;
-  --gutter: clamp(20px, 4vw, 64px);
-  --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --container-width: 1200px;
+  --content-width: 720px;
+  --gutter: clamp(24px, 5vw, 80px);
+  --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "SF Mono", "Segoe UI Mono", "Roboto Mono", monospace;
 }
 
-/* CSS Reset */
+/* Reset & Base */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -39,10 +36,10 @@ html {
 
 body {
   overflow-x: hidden;
-  line-height: 1.6;
+  line-height: 1.55;
 }
 
-/* Accessibilità & Focus State Tattile (PDD Cap. 27) */
+/* Accessibilità Focus */
 a:focus-visible, button:focus-visible {
   outline: 2px solid var(--jobs-denim);
   outline-offset: 4px;
@@ -60,11 +57,9 @@ a:focus-visible, button:focus-visible {
   font-size: 0.85rem;
   transition: top 0.2s ease;
 }
-.skip-link:focus {
-  top: 20px;
-}
+.skip-link:focus { top: 20px; }
 
-/* Layout Engine */
+/* Grid Layout Engine */
 .container {
   max-width: var(--container-width);
   margin: 0 auto;
@@ -75,37 +70,41 @@ a:focus-visible, button:focus-visible {
   max-width: var(--content-width);
 }
 
-/* Tipografia Gerarchica (PDD Cap. 20) */
+/* Tipografia d'Impatto Editoriale */
 .label {
-  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.18em;
   color: var(--jobs-gray);
-  font-weight: 600;
   display: block;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
-.label-inverse {
-  color: var(--jobs-gray-light);
-}
+.label-inverse { color: var(--jobs-gray-light); }
 
 h1, h2, h3 {
   color: var(--jobs-black);
   font-weight: 700;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
 }
 
 p {
   color: var(--jobs-ink);
-  font-size: 1.05rem;
-  line-height: 1.65;
+  font-size: clamp(1.05rem, 1.2vw, 1.2rem);
+  line-height: 1.6;
+  font-weight: 400;
 }
 
-/* Header Navigation (Minimal) */
+/* Header Navigation — Ultra Clean */
 .site-header {
-  padding: 32px 0;
+  padding: 40px 0 24px 0;
   border-bottom: 1px solid var(--jobs-line);
   background: var(--jobs-paper);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  background-color: rgba(251, 251, 249, 0.9);
 }
 .header-inner {
   display: flex;
@@ -118,18 +117,18 @@ p {
   gap: 12px;
   text-decoration: none;
   color: var(--jobs-black);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.95rem;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 .brand-logo {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   object-fit: contain;
 }
 .nav-links {
   display: flex;
-  gap: 32px;
+  gap: 36px;
 }
 .nav-link {
   text-decoration: none;
@@ -137,44 +136,45 @@ p {
   font-size: 0.85rem;
   font-weight: 500;
   transition: color 0.2s ease;
+  letter-spacing: -0.01em;
 }
-.nav-link:hover {
-  color: var(--jobs-black);
-}
+.nav-link:hover { color: var(--jobs-black); }
 
-/* 01. Hero Section (PDD Cap. 9) */
+/* 01. HERO — Architettura Imponente */
 .hero {
-  padding: clamp(60px, 10vh, 120px) 0;
+  padding: clamp(80px, 12vh, 160px) 0 clamp(60px, 10vh, 120px) 0;
   border-bottom: 1px solid var(--jobs-line);
 }
 .hero-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 48px;
-  align-items: start;
+  gap: 64px;
+  align-items: center;
 }
-@media (min-width: 900px) {
+@media (min-width: 960px) {
   .hero-grid {
-    grid-template-columns: 1.2fr 0.8fr;
+    grid-template-columns: 1.3fr 0.7fr;
   }
 }
 .hero-title {
-  font-size: clamp(2.8rem, 5vw, 4.2rem);
-  line-height: 1.05;
-  margin-bottom: 24px;
+  font-size: clamp(3.2rem, 6.5vw, 5.8rem);
+  line-height: 0.98;
+  margin-bottom: 32px;
   text-transform: uppercase;
+  letter-spacing: -0.05em;
 }
 .hero-lead {
-  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  font-size: clamp(1.15rem, 2vw, 1.4rem);
   color: var(--jobs-gray);
   line-height: 1.5;
-  margin-bottom: 40px;
-  font-weight: 400;
+  margin-bottom: 48px;
+  max-width: 580px;
 }
 .hero-portrait-wrap {
   width: 100%;
-  aspect-ratio: 4/5;
+  aspect-ratio: 3/4;
   background-color: var(--jobs-line);
+  border: 1px solid var(--jobs-line);
   overflow: hidden;
 }
 .hero-portrait {
@@ -182,102 +182,131 @@ p {
   height: 100%;
   object-fit: cover;
   filter: grayscale(100%);
-  transition: filter 0.5s ease, transform 0.5s ease;
+  contrast: 105%;
+  transition: filter 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .hero-portrait:hover {
   filter: grayscale(0%);
+  transform: scale(1.02);
 }
 
 /* Sections Engine */
 .section-block {
-  padding: clamp(60px, 8vh, 100px) 0;
+  padding: clamp(80px, 10vh, 140px) 0;
   border-bottom: 1px solid var(--jobs-line);
 }
 
 .section-headline {
-  font-size: clamp(1.8rem, 3vw, 2.5rem);
-  line-height: 1.15;
-  margin-bottom: 24px;
+  font-size: clamp(2.2rem, 3.8vw, 3.2rem);
+  line-height: 1.08;
+  margin-bottom: 32px;
+  letter-spacing: -0.04em;
 }
 
-/* Grid System per Prova e Territorio */
+/* Grid d'Impatto (Matrix/Card) */
 .matrix-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
-  margin-top: 40px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 32px;
+  margin-top: 56px;
 }
 .matrix-card {
   background: var(--jobs-white);
   border: 1px solid var(--jobs-line);
-  padding: 32px;
+  padding: 40px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+.matrix-card:hover {
+  border-color: var(--jobs-black);
+  transform: translateY(-4px);
 }
 .matrix-card h3 {
-  font-size: 1.2rem;
-  margin-bottom: 12px;
+  font-size: 1.35rem;
+  margin-bottom: 16px;
+  letter-spacing: -0.03em;
 }
 .matrix-card p {
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   color: var(--jobs-gray);
-  line-height: 1.55;
+  line-height: 1.6;
 }
 .action-link {
-  display: inline-block;
-  margin-top: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 32px;
   color: var(--jobs-black);
   text-decoration: none;
-  font-size: 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 .action-link:hover {
   text-decoration: underline;
 }
 
-/* Liste Metodo */
+/* Lista Metodo Strutturata */
 .plain-list {
   list-style: none;
-  margin-top: 16px;
+  margin-top: 24px;
 }
 .plain-list li {
-  padding: 16px 0;
+  padding: 24px 0;
   border-bottom: 1px solid var(--jobs-line);
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   color: var(--jobs-ink);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
 }
-.plain-list li:last-child {
-  border-bottom: none;
+@media (min-width: 600px) {
+  .plain-list li {
+    grid-template-columns: 220px 1fr;
+    align-items: baseline;
+  }
+}
+.plain-list li strong {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--jobs-black);
 }
 
-/* 08. Dark Contact Section (PDD Cap. 17) */
+/* 08. Dark Contact Section — Impatto Monolitico */
 .section-contact {
   background: var(--jobs-black);
   color: var(--jobs-white);
-  padding: clamp(80px, 12vh, 140px) 0;
+  padding: clamp(100px, 15vh, 180px) 0;
 }
 .section-contact h2 {
   color: var(--jobs-white);
-  font-size: clamp(2.2rem, 4vw, 3.5rem);
-  line-height: 1.1;
-  margin-bottom: 24px;
+  font-size: clamp(2.6rem, 5vw, 4.2rem);
+  line-height: 1.05;
+  margin-bottom: 32px;
+  letter-spacing: -0.04em;
 }
 .section-contact p {
   color: var(--jobs-gray-light);
-  font-size: 1.2rem;
-  margin-bottom: 40px;
+  font-size: clamp(1.15rem, 2vw, 1.35rem);
+  margin-bottom: 56px;
 }
 .cta-button {
   display: inline-block;
   background: var(--jobs-white);
   color: var(--jobs-black);
-  padding: 16px 36px;
+  padding: 20px 48px;
   text-decoration: none;
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   transition: background 0.2s ease, transform 0.2s ease;
 }
 .cta-button:hover {
@@ -285,12 +314,13 @@ p {
   transform: translateY(-2px);
 }
 
-/* Site Footer */
+/* Footer */
 .site-footer {
-  background: var(--jobs-ink);
+  background: var(--jobs-black);
   color: var(--jobs-gray-light);
-  padding: 32px 0;
+  padding: 40px 0;
   font-size: 0.8rem;
+  font-family: var(--font-mono);
   border-top: 1px solid #222222;
 }
 .footer-flex {
@@ -298,22 +328,21 @@ p {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 20px;
 }
 .footer-links a {
   color: var(--jobs-gray-light);
   text-decoration: none;
-  margin-left: 20px;
+  margin-left: 24px;
+  transition: color 0.2s ease;
 }
-.footer-links a:hover {
-  color: var(--jobs-white);
-}
+.footer-links a:hover { color: var(--jobs-white); }
 
-/* Motion Discreto (PDD Cap. 25) */
+/* Motion Engine */
 .fade-in {
   opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  transform: translateY(24px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .fade-in.visible {
   opacity: 1;
