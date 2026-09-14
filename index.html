@@ -3,53 +3,80 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cesare Paratore — High Performance Biomechanics</title>
+  <title>Cesare Paratore</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      background-color: #08090c;
-      color: #f8fafc;
-      font-family: 'Space Grotesk', sans-serif;
-      min-height: 100vh;
+      background-color: #000000;
+      color: #f5f5f7;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      height: 100vh;
       display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 40px 24px;
+      align-items: center;
+      justify-content: center;
+      padding: 0 40px;
+      -webkit-font-smoothing: antialiased;
     }
-    .header { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.1em; color: #38bdf8; text-transform: uppercase; }
-    .main { max-width: 600px; margin: auto 0; }
-    h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; margin-bottom: 24px; }
-    p { color: #94a3b8; font-size: 1.1rem; line-height: 1.6; margin-bottom: 40px; max-width: 480px; }
-    .contact-btn {
-      display: inline-block;
-      background: #f8fafc;
-      color: #08090c;
-      font-weight: 700;
-      font-size: 0.95rem;
-      padding: 16px 32px;
-      border-radius: 6px;
-      text-decoration: none;
-      transition: opacity 0.2s;
+
+    .container {
+      max-width: 640px;
+      width: 100%;
     }
-    .contact-btn:hover { opacity: 0.9; }
-    .footer { font-size: 0.8rem; color: #475569; letter-spacing: 0.05em; border-top: 1px solid #1e293b; padding-top: 24px; }
+
+    .brand {
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #86868b;
+      margin-bottom: 32px;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 300;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      color: #f5f5f7;
+      margin-bottom: 24px;
+    }
+
+    h1 strong {
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    p {
+      font-size: 1.15rem;
+      font-weight: 300;
+      line-height: 1.5;
+      color: #86868b;
+      max-width: 440px;
+    }
+
+    .line {
+      width: 32px;
+      height: 1px;
+      background-color: #333336;
+      margin-top: 48px;
+    }
   </style>
 </head>
 <body>
 
-  <div class="header">// CESARE PARATORE</div>
-
-  <main class="main">
-    <h1>SITO IN AGGIORNAMENTO.</h1>
-    <p>Il nuovo portale di preparazione atletica e biomeccanica della corsa è attualmente in fase di allestimento.</p>
-    <a href="https://wa.me/393000000000" class="contact-btn">CONTATTA SU WHATSAPP &rarr;</a>
-  </main>
-
-  <div class="footer">
-    PARTINICO &bull; PALERMO &bull; TRAPANI &bull; MAZARA DEL VALLO
+  <div class="container">
+    <div class="brand">Cesare Paratore</div>
+    <h1>Progettato per la <strong>prestazione.</strong></h1>
+    <p>Il nuovo portale di biomeccanica e preparazione atletica è in fase di sviluppo.</p>
+    <div class="line"></div>
   </div>
 
 </body>
