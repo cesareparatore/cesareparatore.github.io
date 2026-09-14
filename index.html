@@ -1,48 +1,68 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="it" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cesare Paratore | Preparatore Atletico & Specialista Running (Palermo, Partinico, Trapani, Mazara)</title>
-  <meta name="description" content="Preparazione atletica d'élite, biomeccanica della corsa e prevenzione infortuni. Operativo a Partinico, Palermo, Trapani, Mazara del Vallo e Online. Tecnico FIDAL TP0833.">
+  <title>CESARE PARATORE — High Performance Biomechanics & Athletic Engine</title>
+  <meta name="description" content="Ingegneria del movimento applicata alla corsa e alla prestazione atletica d'élite. Operativo tra Partinico, Palermo, Trapani, Mazara del Vallo e in programmazione remota.">
   
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+
+  <!-- Typography d'Élite -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
   
-  <!-- SEO Dati Strutturati per Google -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Dati Strutturati Invisibili per Indicizzazione E-E-A-T Totale -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "SportsActivityLocation",
-    "name": "Cesare Paratore - Preparazione Atletica & Running",
-    "image": "assets/images/fotografia.jpg",
-    "description": "Preparazione atletica, biomeccanica della corsa e prevenzione infortuni.",
-    "identifier": "FIDAL TP0833",
-    "areaServed": [
-      {"@type": "City", "name": "Partinico"},
-      {"@type": "City", "name": "Palermo"},
-      {"@type": "City", "name": "Trapani"},
-      {"@type": "City", "name": "Mazara del Vallo"}
+    "@graph": [
+      {
+        "@type": "Person",
+        "@id": "https://cesareparatore.com/#cesareparatore",
+        "name": "Cesare Paratore",
+        "jobTitle": "Specialista in Biomeccanica della Corsa e Preparazione Atletica d'Élite",
+        "alumniOf": "Università degli Studi di Palermo",
+        "identifier": "FIDAL TP0833",
+        "knowsAbout": [
+          "Biomeccanica Quantitativa della Corsa",
+          "Preparazione Atletica ad Alta Intensità",
+          "Riatletizzazione e Prevenzione Infortuni Complex",
+          "Chinesiologia Applicata"
+        ],
+        "areaServed": [
+          {"@type": "City", "name": "Partinico"},
+          {"@type": "City", "name": "Palermo"},
+          {"@type": "City", "name": "Trapani"},
+          {"@type": "City", "name": "Mazara del Vallo"}
+        ]
+      }
     ]
   }
   </script>
 </head>
 <body>
 
-  <!-- HEADER -->
+  <div class="bg-grid"></div>
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+
+  <!-- NAVIGATION HEADER -->
   <header class="header">
-    <div class="container header-content">
+    <div class="header-inner">
       <a href="#" class="brand">
-        <img src="assets/images/logo.png" alt="Cesare Paratore Logo" class="brand-logo" width="36" height="36">
-        <span class="brand-name">CESARE PARATORE</span>
+        <img src="assets/images/logo.png" alt="Cesare Paratore Logo" class="brand-logo" width="32" height="32">
+        <span class="brand-title">PARATORE <span class="brand-sub">// ENGINE</span></span>
       </a>
+      
       <nav class="nav">
-        <a href="#metodo" class="nav-link">Metodo</a>
-        <a href="#servizi" class="nav-link">Specialità</a>
-        <a href="#garanzie" class="nav-link">Chi Sono</a>
-        <a href="#contatto" class="btn-primary-sm">Prenota Valutazione</a>
+        <a href="#diagnosi" class="nav-item"><span class="nav-num">01</span> Diagnosi</a>
+        <a href="#architettura" class="nav-item"><span class="nav-num">02</span> Architettura</a>
+        <a href="#prestazione" class="nav-item"><span class="nav-num">03</span> Moduli</a>
+        <a href="#assessment" class="nav-btn">AVVIA ASSESSMENT</a>
       </nav>
     </div>
   </header>
@@ -50,124 +70,198 @@
   <main>
     <!-- HERO SECTION -->
     <section class="hero">
-      <div class="container hero-grid">
-        <div class="hero-text">
-          <div class="badge">PROGETTATO PER ATLETI E RUNNER</div>
-          <h1>Sblocca la tua corsa.<br><span class="accent-text">Elimina gli infortuni.</span></h1>
-          <p class="hero-sub">
-            Basta schede generiche e tentativi a caso. Sfrutta l'ingegneria del movimento per migliorare i tuoi tempi, superare i tuoi limiti ed eliminare i dolori una volta per tutte.
-          </p>
-          <div class="hero-actions">
-            <a href="#contatto" class="btn-primary">Prenota Valutazione Biomeccanica</a>
-            <a href="#metodo" class="btn-secondary">Scopri il Metodo</a>
-          </div>
-          <div class="hero-location">
-            <span class="dot"></span> Operativo tra <strong>Partinico, Palermo, Trapani, Mazara del Vallo</strong> e in <strong>Consulenza Online</strong>.
-          </div>
+      <div class="hero-container">
+        <div class="hero-tag">
+          <span class="pulse-dot"></span>
+          <span>BIOMECHANICAL PERFORMANCE SYSTEM &bull; 2026 EDITION</span>
         </div>
         
-        <div class="hero-image-wrapper">
-          <div class="image-card">
-            <img src="assets/images/fotografia.jpg" alt="Cesare Paratore Preparatore Atletico" class="hero-img">
-            <div class="hud-overlay">
-              <div class="hud-item">
-                <span class="hud-label">QUALIFICA</span>
-                <span class="hud-val">Tecnico Ufficiale FIDAL</span>
-              </div>
-              <div class="hud-item">
-                <span class="hud-label">TESSERA</span>
-                <span class="hud-val">TP0833</span>
-              </div>
+        <h1 class="hero-title">
+          IL TUO CORPO HA UN POTENZIALE INESPRESSO.<br>
+          <span class="text-gradient">SMETTILA DI AFFIDARLO AL CASO.</span>
+        </h1>
+        
+        <p class="hero-description">
+          Aboliamo l'approssimazione. Combiniamo l'analisi clinica del movimento con la preparazione ad alta intensità per azzerare gli infortuni e sbloccare la tua massima velocità.
+        </p>
+
+        <div class="hero-metrics">
+          <div class="metric-card">
+            <span class="metric-value" data-target="0">0</span><span class="metric-unit">%</span>
+            <span class="metric-label">TENTATIVI A CASO</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-value" data-target="100">0</span><span class="metric-unit">%</span>
+            <span class="metric-label">PROGRAMMAZIONE SPECIFICA</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-value" data-target="4">0</span><span class="metric-unit"> HUB</span>
+            <span class="metric-label">PALERMO &bull; PARTINICO &bull; TRAPANI &bull; MAZARA</span>
+          </div>
+        </div>
+
+        <div class="hero-cta-group">
+          <a href="#assessment" class="btn-primary">
+            <span>CONFIGURA IL TUO PROFILO BIOMECCANICO</span>
+            <svg class="btn-icon" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-media">
+        <div class="media-frame">
+          <img src="assets/images/fotografia" alt="Cesare Paratore" class="hero-img">
+          <div class="hud-layer">
+            <div class="hud-tag top-left">STATUS: OPERATIVO</div>
+            <div class="hud-tag bottom-right">CESARE PARATORE // BIOMECHANICS ENGINE</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 01: LA DIAGNOSI DEL PROBLEMA -->
+    <section id="diagnosi" class="section">
+      <div class="section-label">01 // IL FALLIMENTO DEL FAI-DA-TE</div>
+      <h2 class="section-title">Perché continui ad infortunarti o ad andare in stallo?</h2>
+      
+      <div class="grid-bento">
+        <div class="bento-box highlight">
+          <div class="box-header">
+            <span class="box-num">[A1]</span>
+            <h3>Assenza di Analisi dell'Appoggio e della Falcata</h3>
+          </div>
+          <p>Correre o spingere su una catena cinematica sbilanciata genera micro-traumi ripetuti. Tendiniti, fasciti e dolori articolari non sono sfortuna: sono il risultato diretto dell'ignorare la biomeccanica applicata.</p>
+        </div>
+
+        <div class="bento-box">
+          <div class="box-header">
+            <span class="box-num">[A2]</span>
+            <h3>Schede Standard da Palestra</h3>
+          </div>
+          <p>La maggior parte dei programmi ignora la specificità dello sportivo. Un runner non ha bisogno del volume di un bodybuilder, ma di rigidità tendinea, reattività e coordinazione intermuscolare.</p>
+        </div>
+
+        <div class="bento-box">
+          <div class="box-header">
+            <span class="box-num">[A3]</span>
+            <h3>Gestione Errata dei Carichi</h3>
+          </div>
+          <p>Il sovraccarico acuto su cronico è la causa principale del 92% degli infortuni muscolari. Senza monitoraggio della fatica, ogni allenamento diventa una roulette russa.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 02: L'ARCHITETTURA SCIENTIFICA -->
+    <section id="architettura" class="section bg-surface">
+      <div class="section-label">02 // INGEGNERIA DEL MOVIMENTO</div>
+      <h2 class="section-title">Un metodo fondato sulla scienza della prestazione.</h2>
+
+      <div class="features-list">
+        <div class="feature-item">
+          <div class="feature-index">01</div>
+          <div class="feature-content">
+            <h3>Valutazione Biomeccanica & Quantitativa</h3>
+            <p>Mappiamo le asimmetrie posturali, il reclutamento muscolare e gli angoli di lavoro. Trasformiamo la sensazione soggettiva in dati misurabili su cui costruire il programma.</p>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-index">02</div>
+          <div class="feature-content">
+            <h3>Programmazione Periodizzata d'Élite</h3>
+            <p>Dalla fase di forza strutturale alla conversione in potenza specifica sul campo. Nessun giorno è lasciato al caso, ogni chilometro ed ogni serie hanno uno scopo preciso.</p>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-index">03</div>
+          <div class="feature-content">
+            <h3>Riatletizzazione & Return to Play</h3>
+            <p>Se sei bloccato da un infortunio, non ci limitiamo a "far passare il dolore". Ricostruiamo la tolleranza al carico dei tessuti per farti rientrare in campo più forte di prima.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 03: MODULI DI PRESTAZIONE -->
+    <section id="prestazione" class="section">
+      <div class="section-label">03 // AMBITI DI INTERVENTO</div>
+      <h2 class="section-title">Specializzazione mirata senza compromessi.</h2>
+
+      <div class="cards-grid">
+        <div class="card-spec">
+          <div class="card-badge">RUNNING & CORSA</div>
+          <h3>Specialistica Running & Trail</h3>
+          <p>Dalla correzione del gesto tecnico alla preparazione specifica per 10k, Mezza Maratona e Maratona. Aumenta l'efficienza energetica e demolisci i tuoi personali.</p>
+        </div>
+
+        <div class="card-spec">
+          <div class="card-badge">PERFORMANCE SPORTIVA</div>
+          <h3>Preparazione Atletico-Sportiva</h3>
+          <p>Sviluppo di accelerazione, velocità di cambio di direzione, potenza esplosiva e resistenza ad alta intensità per atleti agonisti di qualsiasi disciplina.</p>
+        </div>
+
+        <div class="card-spec">
+          <div class="card-badge">RECOVERY & POSTURA</div>
+          <h3>Chinesiologia Clinica & Infortuni</h3>
+          <p>Analisi delle disfunzioni motorie, eliminazione dei dolori cronici dovuti all'allenamento errato e ripristino dell'equilibrio neuromuscolare fisiologico.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 04: ASSESSMENT INTERATTIVO -->
+    <section id="assessment" class="section bg-assessment">
+      <div class="assessment-container">
+        <div class="section-label center">04 // CONFIGURATORE ATLETA</div>
+        <h2 class="section-title center">Avvia la tua Diagnosi Biomeccanica</h2>
+        <p class="section-sub center">Rispondi a 3 domande fondamentali per analizzare le tue esigenze prima del primo contatto diretto.</p>
+
+        <form id="interactive-assessment" class="assessment-form">
+          <!-- Step 1 -->
+          <div class="form-step active" data-step="1">
+            <label class="step-title">Qual è il tuo obiettivo primario?</label>
+            <div class="options-grid">
+              <button type="button" class="opt-btn" data-val="Migliorare Tempi Corsa/Running">Migliorare Tempi nella Corsa / Running</button>
+              <button type="button" class="opt-btn" data-val="Preparazione Atletica Specific Sport">Preparazione Atletica Sportiva Specific</button>
+              <button type="button" class="opt-btn" data-val="Risolvere Infortunio / Dolore Cronico">Eliminare un Infortunio / Dolore Cronico</button>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
 
-    <!-- METODO / PROBLEMA -->
-    <section id="metodo" class="section">
-      <div class="container">
-        <div class="section-header">
-          <h2>Perché continui ad andare in stallo o ad infortunarti?</h2>
-          <p>Il 90% dei runner e degli atleti si allena su una struttura biomeccanica non valutata. Il risultato? Fascite plantare, tendiniti, dolori alle ginocchia e tempi che non scendono mai.</p>
-        </div>
+          <!-- Step 2 -->
+          <div class="form-step" data-step="2">
+            <label class="step-title">In quale area geografica desideri essere seguito?</label>
+            <div class="options-grid">
+              <button type="button" class="opt-btn" data-val="Partinico / Palermo / Trapani / Mazara (In Presenza)">In Presenza (Partinico &bull; Palermo &bull; Trapani &bull; Mazara)</button>
+              <button type="button" class="opt-btn" data-val="Coaching & Programmazione Online Remota">Coaching & Programmazione Online</button>
+            </div>
+          </div>
 
-        <div class="bento-grid">
-          <div class="bento-card">
-            <div class="card-icon">01</div>
-            <h3>Zero Improvvisazione</h3>
-            <p>Ogni programma parte da un'analisi dell'appoggio, della mobilità articolare e delle catene muscolari. Non tiriamo a indovinare.</p>
+          <!-- Step 3 -->
+          <div class="form-step" data-step="3">
+            <label class="step-title">Inserisci i tuoi dati per ricevere il report di valutazione:</label>
+            <div class="inputs-group">
+              <input type="text" id="athlete-name" placeholder="Il tuo Nome e Cognome" required>
+              <input type="tel" id="athlete-phone" placeholder="Numero di Telefono (WhatsApp)" required>
+              <button type="submit" class="btn-primary full-width">INVIA & PRENOTA VALUTAZIONE</button>
+            </div>
           </div>
-          <div class="bento-card">
-            <div class="card-icon">02</div>
-            <h3>Biomeccanica della Corsa</h3>
-            <p>Correggere il gesto tecnico della corsa significa consumare meno energia e proteggere le articolazioni ad ogni impatto con l'asfalto.</p>
-          </div>
-          <div class="bento-card">
-            <div class="card-icon">03</div>
-            <h3>Programmazione Scientifica</h3>
-            <p>I carichi di lavoro vengono calibrati al millimetro. Aumentiamo la tua potenza atletica riducendo a zero il rischio di sovraccarico.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SERVIZI / SPECIALITÀ -->
-    <section id="servizi" class="section bg-darker">
-      <div class="container">
-        <div class="section-header">
-          <h2>In cosa possiamo lavorare insieme</h2>
-        </div>
-        <div class="services-grid">
-          <div class="service-card">
-            <span class="service-tag">SPECIALITÀ RUNNING</span>
-            <h3>Preparazione Corsa & Maratona</h3>
-            <p>Dalla 10k alla Maratona, o per chi vuole semplicemente iniziare a correre senza dolori. Analisi della falcata e tabelle personalizzate su misura per te.</p>
-          </div>
-          <div class="service-card">
-            <span class="service-tag">PERFORMANCE SPORTIVA</span>
-            <h3>Preparazione Atletica & Concorsi</h3>
-            <p>Potenziamento specifico per atleti di ogni disciplina e preparazione mirata per il superamento delle prove fisiche nei concorsi militari e pubblici.</p>
-          </div>
-          <div class="service-card">
-            <span class="service-tag">RECOVERY & POSTURA</span>
-            <h3>Riatletizzazione & Prevenzione</h3>
-            <p>Sei fermo per un infortunio o avverti fastidi continui? Valutiamo le cause profonde del blocco per riportarti in campo al massimo della forma.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- GARANZIE E CHI SONO -->
-    <section id="garanzie" class="section">
-      <div class="container info-block">
-        <div class="info-content">
-          <h2>Chi c'è dietro il tuo percorso</h2>
-          <p class="lead">Sono <strong>Cesare Paratore</strong>. Laureato in Scienze Motorie, Tecnico Federale FIDAL (Tessera TP0833) ed atleta agonista.</p>
-          <p>Non ti passerò mai una scheda prestampata. Conosco la fatica del campo di gara e la frustrazione di un infortunio. Il mio unico obiettivo è darti gli strumenti scientifici per far esprimere al tuo corpo il 100% del suo potenziale reale.</p>
-          <ul class="check-list">
-            <li>✓ Laurea Specialistica in Scienze delle Attività Motorie</li>
-            <li>✓ Tecnico Abilitato FIDAL (Federazione Italiana Atletica Leggera)</li>
-            <li>✓ Valutazione in presenza (Partinico, Palermo, Trapani, Mazara) o Coaching Online</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- CONTACT CTA -->
-    <section id="contatto" class="section cta-section">
-      <div class="container cta-box">
-        <h2>Inizia a fare sul serio oggi.</h2>
-        <p>Prenota la tua prima valutazione biomeccanica. Analizzeremo il tuo stato di forma e definiremo la strategia esatta per i tuoi obiettivi.</p>
-        <a href="https://wa.me/393000000000?text=Ciao%20Cesare,%20vorrei%20prenotare%20una%20valutazione%20biomeccanica" class="btn-primary btn-large">Richiedi Valutazione su WhatsApp</a>
+        </form>
       </div>
     </section>
   </main>
 
   <footer class="footer">
-    <div class="container footer-content">
-      <p>© 2026 Cesare Paratore — Chinesiologia & Preparazione Atletica. Tesserino FIDAL TP0833.</p>
-      <p class="footer-cities">Partinico • Palermo • Trapani • Mazara del Vallo</p>
+    <div class="footer-container">
+      <div class="footer-brand">
+        <img src="assets/images/logo.png" alt="Logo" class="footer-logo">
+        <span>CESARE PARATORE &bull; HIGH PERFORMANCE SYSTEM</span>
+      </div>
+      <div class="footer-cities">
+        PARTINICO &bull; PALERMO &bull; TRAPANI &bull; MAZARA DEL VALLO &bull; ONLINE
+      </div>
+      <div class="footer-copy">
+        &copy; 2026 CESARE PARATORE. ALL RIGHTS RESERVED. HIGH-END BIOMECHANICAL ENGINEERING.
+      </div>
     </div>
   </footer>
 
