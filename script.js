@@ -1,7 +1,7 @@
 /* =========================================================
    CESARE PARATORE — LANDING PAGE
    JavaScript
-   Progressive Enhancement
+   Progressive enhancement only
    ========================================================= */
 
 (() => {
@@ -9,7 +9,7 @@
 
 
   /* =========================================================
-     01. DOCUMENT STATE
+     01. JS ENABLED
      ========================================================= */
 
   document.documentElement.classList.add("js-enabled");
@@ -22,23 +22,22 @@
   const header = document.querySelector(".site-header");
 
   if (header) {
+    const SCROLL_THRESHOLD = 24;
 
-    const updateHeaderState = () => {
-      header.classList.toggle("is-scrolled", window.scrollY > 24);
+    const updateHeader = () => {
+      header.classList.toggle(
+        "is-scrolled",
+        window.scrollY > SCROLL_THRESHOLD
+      );
     };
 
-
-    updateHeaderState();
-
+    updateHeader();
 
     window.addEventListener(
       "scroll",
-      updateHeaderState,
-      {
-        passive: true
-      }
+      updateHeader,
+      { passive: true }
     );
-
   }
 
 
@@ -48,16 +47,24 @@
 
   const revealElements = document.querySelectorAll(".reveal");
 
-
   if (revealElements.length) {
 
-    /*
-     * Se il browser supporta IntersectionObserver,
-     * gli elementi vengono animati quando entrano
-     * nel viewport.
-     */
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
 
-    if ("IntersectionObserver" in window) {
+
+    /* -------------------------------------------------------
+       Reduced motion
+       ------------------------------------------------------- */
+
+    if (reducedMotion) {
+
+      revealElements.forEach((element) => {
+        element.classList.add("is-visible");
+      });
+
+    } else {
 
       const revealObserver = new IntersectionObserver(
         (entries, observer) => {
@@ -71,14 +78,12 @@
             entry.target.classList.add("is-visible");
 
             observer.unobserve(entry.target);
-
           });
 
         },
         {
-          root: null,
-          rootMargin: "0px 0px -8% 0px",
-          threshold: 0.05
+          threshold: 0.12,
+          rootMargin: "0px 0px -40px 0px"
         }
       );
 
@@ -87,98 +92,73 @@
         revealObserver.observe(element);
       });
 
-    } else {
-
-      /*
-       * Fallback per browser molto vecchi.
-       */
-
-      revealElements.forEach((element) => {
-        element.classList.add("is-visible");
-      });
-
     }
-
   }
 
 
   /* =========================================================
-     04. REDUCED MOTION
+     04. ANCHOR LINKS
      ========================================================= */
 
-  const reducedMotionQuery = window.matchMedia(
-    "(prefers-reduced-motion: reduce)"
+  const internalLinks = document.querySelectorAll(
+    'a[href^="#"]:not([href="#"])'
   );
 
+  internalLinks.forEach((link) => {
 
-  if (reducedMotionQuery.matches) {
+    link.addEventListener("click", () => {
 
-    revealElements.forEach((element) => {
-      element.classList.add("is-visible");
-    });
+      const targetId = link.getAttribute("href");
 
-  }
+      if (!targetId) {
+        return;
+      }
 
-
-  /* =========================================================
-     05. KEYBOARD / HASH NAVIGATION
-     ========================================================= */
-
-  /*
-   * Quando si arriva a una sezione tramite un anchor,
-   * il browser gestisce già lo scroll grazie a CSS.
-   *
-   * Questo blocco evita che un elemento con focus
-   * rimanga in una posizione poco leggibile.
-   */
-
-  window.addEventListener("hashchange", () => {
-
-    const targetId = window.location.hash.slice(1);
-
-    if (!targetId) {
-      return;
-    }
-
-    const target = document.getElementById(targetId);
-
-    if (!target) {
-      return;
-    }
-
-    window.setTimeout(() => {
-
-      target.setAttribute("tabindex", "-1");
-
-      target.focus({
-        preventScroll: true
-      });
-
-    }, 50);
-
-  });
-
-
-  /* =========================================================
-     06. INITIAL HASH
-     ========================================================= */
-
-  if (window.location.hash) {
-
-    window.setTimeout(() => {
-
-      const targetId = window.location.hash.slice(1);
-
-      const target = document.getElementById(targetId);
+      const target = document.querySelector(targetId);
 
       if (!target) {
         return;
       }
 
-      target.setAttribute("tabindex", "-1");
+      /*
+       * La posizione viene gestita da:
+       * html { scroll-behavior: smooth; }
+       * html { scroll-padding-top: ...; }
+       *
+       * Non forziamo quindi una seconda logica
+       * di scroll via JavaScript.
+       */
 
-    }, 0);
+    });
 
-  }
+  });
+
+
+  /* =========================================================
+     05. PAGE VISIBILITY
+     ========================================================= */
+
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+
+      if (document.visibilityState === "hidden") {
+        return;
+      }
+
+      /*
+       * Ri-sincronizza l'header quando l'utente
+       * torna sulla pagina dopo aver cambiato scheda.
+       */
+
+      if (header) {
+        header.classList.toggle(
+          "is-scrolled",
+          window.scrollY > 24
+        );
+      }
+
+    }
+  );
 
 })();
