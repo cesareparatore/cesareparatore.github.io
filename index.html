@@ -66,7 +66,7 @@
 
   <a class="skip-link" href="#main-content">Salta al contenuto principale</a>
 
-  <!-- Navigation Header -->
+  <!-- Header Section -->
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" href="#main-content" aria-label="Cesare Paratore — Home">
@@ -90,14 +90,19 @@
         <div class="hero-grid">
           <div class="hero-text-block">
             <span class="label">01 — PRESENZA</span>
-            <h1 id="hero-title" class="hero-title">Movimento,<br>Metodo e<br>Direzione.</h1>
+            <h1 id="hero-title" class="hero-title">Movimento,<br><span class="text-accent">Metodo</span> e<br>Direzione.</h1>
             <p class="hero-lead">
               Chinesiologia, Atletica Leggera e Sport Management. Un percorso professionale rigoroso che trasforma l'analisi del movimento in prestazione, salute e pianificazione strategica.
             </p>
-            <a class="action-link" href="#contatto">INIZIA UNA CONVERSAZIONE →</a>
+            <a class="action-button-hero" href="#contatto">
+              <span>INIZIA UNA CONVERSAZIONE</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </a>
           </div>
           <div class="hero-portrait-wrap">
-            <img class="hero-portrait" src="assets/images/cesare-paratore.jpg" alt="Cesare Paratore — Chinesiologo e Tecnico Certificato FIDAL" width="400" height="500" loading="eager">
+            <div class="portrait-frame">
+              <img class="hero-portrait" src="assets/images/cesare-paratore.jpg" alt="Cesare Paratore — Chinesiologo e Tecnico Certificato FIDAL" width="400" height="533" loading="eager">
+            </div>
           </div>
         </div>
       </div>
@@ -108,7 +113,7 @@
       <div class="container content-narrow">
         <span class="label">02 — POSIZIONAMENTO</span>
         <h2 id="pos-title" class="section-headline">Dalla valutazione scientifica alla realizzazione dell'obiettivo.</h2>
-        <p>
+        <p class="text-editorial">
           Non vendo soluzioni generiche né schemi preimpostati. L'intervento sul movimento umano e sulla struttura sportiva richiede un'analisi accurata dei dati individuali, rigore metodologico e una direzione chiara.
         </p>
       </div>
@@ -119,7 +124,7 @@
       <div class="container content-narrow">
         <span class="label">03 — PUNTO DI VISTA</span>
         <h2 id="pov-title" class="section-headline">Integrazione tra campo, scienza e gestione.</h2>
-        <p>
+        <p class="text-editorial">
           La prestazione atletica d'élite e la salute motoria di lungo termine condividono gli stessi principi: biomeccanica applicata, gestione dei carichi e costante verifica dei risultati. Il movimento è la base della funzione umana; la gestione è la struttura che lo sostiene.
         </p>
       </div>
@@ -130,7 +135,7 @@
       <div class="container">
         <span class="label">04 — PROVA E CREDENZIALI</span>
         <h2 id="proof-title" class="section-headline">Credenziali verificate e percorso ufficiale.</h2>
-        <p class="content-narrow">
+        <p class="content-narrow text-editorial">
           La competenza non si dichiara: si dimostra attraverso registri federali, titoli accademici e lo storico agonistico.
         </p>
 
@@ -141,7 +146,9 @@
               <h3>Albo Tecnici FIDAL</h3>
               <p>Iscrizione ufficiale al Registro Nazionale Tecnici della Federazione Italiana Atletica Leggera.</p>
             </div>
-            <a class="action-link" href="https://albotecnici.fidal.it/site/view?id=TP0833" target="_blank" rel="noopener noreferrer">VERIFICA NELL'ALBO UFFICIALE ↗</a>
+            <a class="action-link" href="https://albotecnici.fidal.it/site/view?id=TP0833" target="_blank" rel="noopener noreferrer">
+              VERIFICA NELL'ALBO UFFICIALE ↗
+            </a>
           </article>
 
           <article class="matrix-card">
@@ -150,7 +157,9 @@
               <h3>Database Atleta FIDAL</h3>
               <p>Storico delle competizioni, prestazioni ufficiali e percorso agonistico federale.</p>
             </div>
-            <a class="action-link" href="https://www.fidal.it/atleta/Cesare-Paratore/h66RkpSkcWo=" target="_blank" rel="noopener noreferrer">CONSULTA SCHEDA FIDAL ↗</a>
+            <a class="action-link" href="https://www.fidal.it/atleta/Cesare-Paratore/h66RkpSkcWo=" target="_blank" rel="noopener noreferrer">
+              CONSULTA SCHEDA FIDAL ↗
+            </a>
           </article>
 
           <article class="matrix-card">
@@ -159,7 +168,9 @@
               <h3>Chinesiologia & Management</h3>
               <p>Laurea in Scienze Motorie, specializzazione in valutazione funzionale e Sport Management.</p>
             </div>
-            <a class="action-link" href="https://it.linkedin.com/in/cesareparatore" target="_blank" rel="noopener noreferrer">PROFILO LINKEDIN ↗</a>
+            <a class="action-link" href="https://it.linkedin.com/in/cesareparatore" target="_blank" rel="noopener noreferrer">
+              PROFILO LINKEDIN ↗
+            </a>
           </article>
         </div>
       </div>
@@ -172,10 +183,34 @@
         <h2 id="method-title" class="section-headline">Come trasformiamo l'intenzione in risultato.</h2>
         
         <ul class="plain-list">
-          <li><strong>01. Analisi & Valutazione:</strong> Studio anamnestico, biomeccanico e funzionale del soggetto o dell'organizzazione.</li>
-          <li><strong>02. Programmazione:</strong> Definizione del piano d'azione personalizzato, fondato su metriche scientifiche ed esigenze reali.</li>
-          <li><strong>03. Esecuzione & Monitoraggio:</strong> Lavoro diretto sul campo o supervisione strategica con verifica costante dei parametri.</li>
-          <li><strong>04. Ottimizzazione:</strong> Affinamento continuo del processo per garantire il raggiungimento degli obiettivi stabiliti.</li>
+          <li>
+            <span class="list-num">01</span>
+            <div>
+              <strong>Analisi & Valutazione</strong>
+              <p>Studio anamnestico, biomeccanico e funzionale del soggetto o dell'organizzazione.</p>
+            </div>
+          </li>
+          <li>
+            <span class="list-num">02</span>
+            <div>
+              <strong>Programmazione</strong>
+              <p>Definizione del piano d'azione personalizzato, fondato su metriche scientifiche ed esigenze reali.</p>
+            </div>
+          </li>
+          <li>
+            <span class="list-num">03</span>
+            <div>
+              <strong>Esecuzione & Monitoraggio</strong>
+              <p>Lavoro diretto sul campo o supervisione strategica con verifica costante dei parametri.</p>
+            </div>
+          </li>
+          <li>
+            <span class="list-num">04</span>
+            <div>
+              <strong>Ottimizzazione</strong>
+              <p>Affinamento continuo del processo per garantire il raggiungimento degli obiettivi stabiliti.</p>
+            </div>
+          </li>
         </ul>
       </div>
     </section>
@@ -216,7 +251,10 @@
         <p>
           Se cerchi una programmazione rigorosa, basata su dati ed esperienza verificabile sul campo, iniziamo una conversazione.
         </p>
-        <a class="cta-button" href="mailto:cesare.paratore@gmail.com">INIZIAMO UNA CONVERSAZIONE</a>
+        <a class="cta-button" href="mailto:cesare.paratore@gmail.com">
+          <span>INIZIAMO UNA CONVERSAIONE</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </a>
       </div>
     </section>
 
