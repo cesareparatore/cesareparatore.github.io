@@ -1,24 +1,25 @@
 (() => {
   "use strict";
 
-  const root = document.documentElement;
+  const body = document.body;
 
-  /*
-   * JavaScript enabled
-   * Activates progressive-enhancement styles.
-   */
-  root.classList.add("js-enabled");
-
-  /*
-   * Reduced motion
-   */
   const prefersReducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)"
   );
 
   /*
+   * JavaScript enabled
+   *
+   * Aggiungiamo questa classe solo quando JS è realmente disponibile.
+   * In questo modo, se JS non viene caricato, tutti gli elementi
+   * rimangono immediatamente visibili.
+   */
+  body.classList.add("js-enabled");
+
+  /*
    * Header behavior
-   * Adds a subtle state after the user scrolls.
+   *
+   * Stato leggermente diverso dopo lo scroll.
    */
   const header = document.querySelector(".site-header");
 
@@ -32,23 +33,26 @@
 
     updateHeader();
 
-    window.addEventListener("scroll", updateHeader, {
-      passive: true
-    });
+    window.addEventListener(
+      "scroll",
+      updateHeader,
+      { passive: true }
+    );
   }
 
   /*
    * Progressive reveal
+   *
+   * Gli elementi con .reveal vengono mostrati quando entrano
+   * nella viewport.
    */
-  const revealElements = document.querySelectorAll(
-    ".section, .final-signature"
-  );
+  const revealElements = document.querySelectorAll(".reveal");
 
-  if (prefersReducedMotion.matches) {
-    revealElements.forEach((element) => {
-      element.classList.add("reveal", "is-visible");
-    });
-  } else if ("IntersectionObserver" in window) {
+  if (
+    revealElements.length &&
+    "IntersectionObserver" in window &&
+    !prefersReducedMotion.matches
+  ) {
     const observer = new IntersectionObserver(
       (entries, observerInstance) => {
         entries.forEach((entry) => {
@@ -66,17 +70,22 @@
     );
 
     revealElements.forEach((element) => {
-      element.classList.add("reveal");
       observer.observe(element);
     });
   } else {
+    /*
+     * Reduced motion oppure browser senza IntersectionObserver:
+     * tutto immediatamente visibile.
+     */
     revealElements.forEach((element) => {
-      element.classList.add("reveal", "is-visible");
+      element.classList.add("is-visible");
     });
   }
 
   /*
    * Smooth anchor scrolling
+   *
+   * Attivo solo quando l'utente non richiede reduced motion.
    */
   if (!prefersReducedMotion.matches) {
     document
@@ -85,17 +94,15 @@
         link.addEventListener("click", (event) => {
           const targetId = link.getAttribute("href");
 
-          if (!targetId || targetId === "#") return;
-
-          let target;
-
-          try {
-            target = document.querySelector(targetId);
-          } catch {
+          if (!targetId || targetId === "#") {
             return;
           }
 
-          if (!target) return;
+          const target = document.querySelector(targetId);
+
+          if (!target) {
+            return;
+          }
 
           event.preventDefault();
 
@@ -103,13 +110,6 @@
             behavior: "smooth",
             block: "start"
           });
-
-          /*
-           * Keep keyboard navigation / URL state meaningful.
-           */
-          if (history.pushState) {
-            history.pushState(null, "", targetId);
-          }
         });
       });
   }
