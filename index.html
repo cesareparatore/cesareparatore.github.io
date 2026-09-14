@@ -3,107 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>In Costruzione | Cesare Paratore</title>
+  <title>Cesare Paratore — High Performance Biomechanics</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background-color: #08090c;
-      color: #f1f5f9;
+      color: #f8fafc;
       font-family: 'Space Grotesk', sans-serif;
       min-height: 100vh;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      overflow: hidden;
-      position: relative;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 40px 24px;
     }
-    .bg-glow {
-      position: absolute;
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, rgba(0,0,0,0) 70%);
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-    }
-    .card {
-      background: #0f1117;
-      border: 1px solid #1e293b;
-      padding: 48px 36px;
-      border-radius: 16px;
-      max-width: 480px;
-      width: 100%;
-      text-align: center;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-      position: relative;
-      z-index: 1;
-    }
-    .badge {
+    .header { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.1em; color: #38bdf8; text-transform: uppercase; }
+    .main { max-width: 600px; margin: auto 0; }
+    h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; margin-bottom: 24px; }
+    p { color: #94a3b8; font-size: 1.1rem; line-height: 1.6; margin-bottom: 40px; max-width: 480px; }
+    .contact-btn {
       display: inline-block;
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      color: #38bdf8;
-      background: rgba(56, 189, 248, 0.1);
-      padding: 6px 14px;
-      border-radius: 20px;
-      border: 1px solid rgba(56, 189, 248, 0.2);
-      margin-bottom: 24px;
-      text-transform: uppercase;
-    }
-    h1 {
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin-bottom: 12px;
-      letter-spacing: -0.02em;
-    }
-    p {
-      color: #94a3b8;
-      font-size: 0.95rem;
-      line-height: 1.6;
-      margin-bottom: 32px;
-    }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      background: #38bdf8;
+      background: #f8fafc;
       color: #08090c;
       font-weight: 700;
-      font-size: 0.9rem;
-      padding: 14px 20px;
-      border-radius: 8px;
+      font-size: 0.95rem;
+      padding: 16px 32px;
+      border-radius: 6px;
       text-decoration: none;
-      transition: background 0.2s, transform 0.2s;
+      transition: opacity 0.2s;
     }
-    .btn:hover {
-      background: #7dd3fc;
-      transform: translateY(-2px);
-    }
+    .contact-btn:hover { opacity: 0.9; }
+    .footer { font-size: 0.8rem; color: #475569; letter-spacing: 0.05em; border-top: 1px solid #1e293b; padding-top: 24px; }
   </style>
 </head>
 <body>
 
-  <div class="bg-glow"></div>
+  <div class="header">// CESARE PARATORE</div>
 
-  <div class="card">
-    <span class="badge">// Lavori in corso</span>
-    <h1>CESARE PARATORE</h1>
-    <p>Il nuovo portale per la preparazione atletica e la biomeccanica della corsa è in fase di perfezionamento. Saremo online a breve.</p>
-    <a href="https://wa.me/393000000000" class="btn">
-      CONTATTA SU WHATSAPP
-    </a>
+  <main class="main">
+    <h1>SITO IN AGGIORNAMENTO.</h1>
+    <p>Il nuovo portale di preparazione atletica e biomeccanica della corsa è attualmente in fase di allestimento.</p>
+    <a href="https://wa.me/393000000000" class="contact-btn">CONTATTA SU WHATSAPP &rarr;</a>
+  </main>
+
+  <div class="footer">
+    PARTINICO &bull; PALERMO &bull; TRAPANI &bull; MAZARA DEL VALLO
   </div>
 
 </body>
