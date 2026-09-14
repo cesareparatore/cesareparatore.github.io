@@ -1,21 +1,29 @@
 /* ==========================================================================
-   DESIGN SYSTEM — HIGH-EDITORIAL & INDUSTRIAL (Steve Jobs Baseline)
+   DESIGN SYSTEM — HIGH-EDITORIAL & INDUSTRIAL (Steve Jobs Baseline 10/10)
    ========================================================================== */
 :root {
   --jobs-black: #050505;
   --jobs-ink: #111111;
   --jobs-white: #ffffff;
-  --jobs-paper: #fbfbf9;
-  --jobs-gray: #555553;
-  --jobs-gray-light: #8e8e8c;
-  --jobs-line: #e2e2de;
+  --jobs-paper: #f8f8f6;
+  --jobs-gray: #5e5e5c;
+  --jobs-gray-light: #9a9a98;
+  --jobs-line: #e3e3df;
   --jobs-denim: #304b68;
+  --jobs-denim-dark: #203a54;
+  --jobs-denim-soft: #e8edf1;
 
   --container-width: 1200px;
   --content-width: 720px;
   --gutter: clamp(24px, 5vw, 80px);
   --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
   --font-mono: "SF Mono", "Segoe UI Mono", "Roboto Mono", monospace;
+}
+
+/* Selection Color (Denim Soft Accent - PDD Cap. 19) */
+::selection {
+  background-color: var(--jobs-denim-soft);
+  color: var(--jobs-denim-dark);
 }
 
 /* Reset & Base */
@@ -39,7 +47,7 @@ body {
   line-height: 1.55;
 }
 
-/* Accessibilità Focus */
+/* Accessibilità Focus Tattile */
 a:focus-visible, button:focus-visible {
   outline: 2px solid var(--jobs-denim);
   outline-offset: 4px;
@@ -55,7 +63,7 @@ a:focus-visible, button:focus-visible {
   z-index: 10000;
   text-decoration: none;
   font-size: 0.85rem;
-  transition: top 0.2s ease;
+  transition: top 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .skip-link:focus { top: 20px; }
 
@@ -75,10 +83,11 @@ a:focus-visible, button:focus-visible {
   font-family: var(--font-mono);
   font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.2em;
   color: var(--jobs-gray);
   display: block;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  font-weight: 500;
 }
 .label-inverse { color: var(--jobs-gray-light); }
 
@@ -95,16 +104,30 @@ p {
   font-weight: 400;
 }
 
-/* Header Navigation — Ultra Clean */
+.text-editorial {
+  font-size: clamp(1.15rem, 1.8vw, 1.4rem);
+  line-height: 1.5;
+  color: #222222;
+  letter-spacing: -0.01em;
+}
+
+.text-accent {
+  color: var(--jobs-black);
+  position: relative;
+  display: inline-block;
+}
+
+/* Header Navigation — Glassmorphism Apple Style */
 .site-header {
-  padding: 40px 0 24px 0;
-  border-bottom: 1px solid var(--jobs-line);
-  background: var(--jobs-paper);
+  padding: 24px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   position: sticky;
   top: 0;
-  z-index: 100;
-  backdrop-filter: blur(10px);
-  background-color: rgba(251, 251, 249, 0.9);
+  z-index: 1000;
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  background-color: rgba(248, 248, 246, 0.82);
+  transition: padding 0.3s ease;
 }
 .header-inner {
   display: flex;
@@ -125,6 +148,10 @@ p {
   width: 22px;
   height: 22px;
   object-fit: contain;
+  transition: transform 0.3s ease;
+}
+.brand:hover .brand-logo {
+  transform: rotate(-8deg) scale(1.05);
 }
 .nav-links {
   display: flex;
@@ -142,7 +169,7 @@ p {
 
 /* 01. HERO — Architettura Imponente */
 .hero {
-  padding: clamp(80px, 12vh, 160px) 0 clamp(60px, 10vh, 120px) 0;
+  padding: clamp(80px, 12vh, 160px) 0 clamp(80px, 10vh, 140px) 0;
   border-bottom: 1px solid var(--jobs-line);
 }
 .hero-grid {
@@ -153,7 +180,7 @@ p {
 }
 @media (min-width: 960px) {
   .hero-grid {
-    grid-template-columns: 1.3fr 0.7fr;
+    grid-template-columns: 1.25fr 0.75fr;
   }
 }
 .hero-title {
@@ -168,14 +195,48 @@ p {
   color: var(--jobs-gray);
   line-height: 1.5;
   margin-bottom: 48px;
-  max-width: 580px;
+  max-width: 600px;
 }
+
+/* Pulsante Hero */
+.action-button-hero {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--jobs-black);
+  color: var(--jobs-white);
+  padding: 18px 36px;
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: background 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+.action-button-hero:hover {
+  background: var(--jobs-denim-dark);
+  transform: translateY(-2px);
+}
+.action-button-hero svg {
+  transition: transform 0.3s ease;
+}
+.action-button-hero:hover svg {
+  transform: translateX(4px);
+}
+
+/* Ritratto Tattile con Frame */
 .hero-portrait-wrap {
+  width: 100%;
+}
+.portrait-frame {
   width: 100%;
   aspect-ratio: 3/4;
   background-color: var(--jobs-line);
   border: 1px solid var(--jobs-line);
   overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.06);
 }
 .hero-portrait {
   width: 100%;
@@ -183,45 +244,46 @@ p {
   object-fit: cover;
   filter: grayscale(100%);
   contrast: 105%;
-  transition: filter 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: filter 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.hero-portrait:hover {
+.hero-portrait-wrap:hover .hero-portrait {
   filter: grayscale(0%);
-  transform: scale(1.02);
+  transform: scale(1.03);
 }
 
 /* Sections Engine */
 .section-block {
-  padding: clamp(80px, 10vh, 140px) 0;
+  padding: clamp(80px, 12vh, 150px) 0;
   border-bottom: 1px solid var(--jobs-line);
 }
 
 .section-headline {
-  font-size: clamp(2.2rem, 3.8vw, 3.2rem);
+  font-size: clamp(2.2rem, 3.8vw, 3.4rem);
   line-height: 1.08;
   margin-bottom: 32px;
   letter-spacing: -0.04em;
 }
 
-/* Grid d'Impatto (Matrix/Card) */
+/* Grid Cards (Matrix) */
 .matrix-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 32px;
-  margin-top: 56px;
+  margin-top: 60px;
 }
 .matrix-card {
   background: var(--jobs-white);
   border: 1px solid var(--jobs-line);
-  padding: 40px;
+  padding: 44px 36px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: border-color 0.3s ease, transform 0.3s ease;
+  transition: border-color 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
 }
 .matrix-card:hover {
   border-color: var(--jobs-black);
-  transform: translateY(-4px);
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.04);
 }
 .matrix-card h3 {
   font-size: 1.35rem;
@@ -237,98 +299,120 @@ p {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-top: 32px;
+  margin-top: 36px;
   color: var(--jobs-black);
   text-decoration: none;
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+  transition: color 0.2s ease;
 }
 .action-link:hover {
+  color: var(--jobs-denim);
   text-decoration: underline;
 }
 
-/* Lista Metodo Strutturata */
+/* Lista Metodo Strutturata (Apple Industrial) */
 .plain-list {
   list-style: none;
-  margin-top: 24px;
+  margin-top: 40px;
 }
 .plain-list li {
-  padding: 24px 0;
+  padding: 32px 0;
   border-bottom: 1px solid var(--jobs-line);
-  font-size: 1.1rem;
-  color: var(--jobs-ink);
   display: grid;
   grid-template-columns: 1fr;
-  gap: 8px;
+  gap: 16px;
+  transition: background 0.2s ease;
 }
 @media (min-width: 600px) {
   .plain-list li {
-    grid-template-columns: 220px 1fr;
-    align-items: baseline;
+    grid-template-columns: 80px 1fr;
+    align-items: start;
   }
 }
-.plain-list li strong {
+.list-num {
   font-family: var(--font-mono);
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--jobs-gray-light);
+}
+.plain-list li strong {
+  display: block;
+  font-size: 1.25rem;
   color: var(--jobs-black);
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+.plain-list li p {
+  font-size: 1rem;
+  color: var(--jobs-gray);
 }
 
 /* 08. Dark Contact Section — Impatto Monolitico */
 .section-contact {
   background: var(--jobs-black);
   color: var(--jobs-white);
-  padding: clamp(100px, 15vh, 180px) 0;
+  padding: clamp(100px, 16vh, 200px) 0;
+  position: relative;
+  overflow: hidden;
 }
 .section-contact h2 {
   color: var(--jobs-white);
-  font-size: clamp(2.6rem, 5vw, 4.2rem);
+  font-size: clamp(2.6rem, 5.2vw, 4.4rem);
   line-height: 1.05;
   margin-bottom: 32px;
   letter-spacing: -0.04em;
 }
 .section-contact p {
   color: var(--jobs-gray-light);
-  font-size: clamp(1.15rem, 2vw, 1.35rem);
+  font-size: clamp(1.15rem, 2vw, 1.4rem);
   margin-bottom: 56px;
+  line-height: 1.5;
 }
 .cta-button {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
   background: var(--jobs-white);
   color: var(--jobs-black);
-  padding: 20px 48px;
+  padding: 22px 48px;
   text-decoration: none;
   font-family: var(--font-mono);
   font-size: 0.85rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition: background 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .cta-button:hover {
   background: var(--jobs-paper);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+}
+.cta-button svg {
+  transition: transform 0.3s ease;
+}
+.cta-button:hover svg {
+  transform: translateX(6px);
 }
 
 /* Footer */
 .site-footer {
   background: var(--jobs-black);
   color: var(--jobs-gray-light);
-  padding: 40px 0;
+  padding: 48px 0;
   font-size: 0.8rem;
   font-family: var(--font-mono);
-  border-top: 1px solid #222222;
+  border-top: 1px solid #1a1a1a;
 }
 .footer-flex {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 24px;
 }
 .footer-links a {
   color: var(--jobs-gray-light);
@@ -341,8 +425,8 @@ p {
 /* Motion Engine */
 .fade-in {
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(30px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .fade-in.visible {
   opacity: 1;
