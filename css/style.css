@@ -46,6 +46,7 @@
   --display-xl: clamp(4.5rem, 11vw, 12rem);
   --display-lg: clamp(3.5rem, 7vw, 8rem);
   --display-md: clamp(2.8rem, 5vw, 5.5rem);
+
   --heading-xl: clamp(2.5rem, 4.6vw, 5.5rem);
   --heading-lg: clamp(2rem, 3.4vw, 4rem);
   --heading-md: clamp(1.5rem, 2vw, 2.2rem);
@@ -55,6 +56,7 @@
 
   --ease: cubic-bezier(.22, .61, .36, 1);
   --ease-sharp: cubic-bezier(.16, 1, .3, 1);
+
   --duration: 700ms;
 
   --shadow-soft: 0 20px 60px rgba(7, 21, 33, .08);
@@ -295,6 +297,24 @@ header > .container,
   gap: var(--space-4);
 }
 
+
+/* ---------------------------------------------------------
+   06. BRAND / CP MARK
+   --------------------------------------------------------- */
+
+/*
+ * Il monogramma CP mantiene il proprio colore originale.
+ *
+ * Il marchio originale è navy scuro e non deve essere
+ * ricolorato, filtrato o alterato.
+ *
+ * Poiché l'header è collocato sopra il fondo scuro dell'hero,
+ * il logo viene inserito in una micro-area chiara.
+ *
+ * Il risultato è:
+ * IDENTITÀ ORIGINALE + CONTRASTO + LEGGIBILITÀ.
+ */
+
 .brand {
   display: inline-flex;
   align-items: center;
@@ -304,17 +324,32 @@ header > .container,
 }
 
 .brand-mark {
-  width: 42px;
-  height: 42px;
-  flex: 0 0 42px;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+
+  padding: 7px;
+
   object-fit: contain;
+
+  background: var(--paper);
+  border-radius: 4px;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, .08),
+    0 8px 24px rgba(0, 0, 0, .12);
+
   transition:
     transform 500ms var(--ease),
-    opacity 300ms ease;
+    box-shadow 400ms ease;
 }
 
 .brand:hover .brand-mark {
-  transform: rotate(-5deg) scale(1.04);
+  transform: translateY(-1px) scale(1.025);
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, .14),
+    0 10px 28px rgba(0, 0, 0, .16);
 }
 
 .brand-name {
@@ -323,6 +358,11 @@ header > .container,
   letter-spacing: .16em;
   white-space: nowrap;
 }
+
+
+/* ---------------------------------------------------------
+   07. NAVIGATION
+   --------------------------------------------------------- */
 
 nav,
 .nav {
@@ -371,16 +411,19 @@ nav a:hover::after,
 
 
 /* ---------------------------------------------------------
-   06. HERO
+   08. HERO
    --------------------------------------------------------- */
 
 .hero {
   position: relative;
   min-height: max(760px, 100svh);
+
   display: flex;
   align-items: flex-end;
+
   overflow: hidden;
   isolation: isolate;
+
   background:
     radial-gradient(
       circle at 82% 25%,
@@ -393,6 +436,7 @@ nav a:hover::after,
       #0b1f33 48%,
       #102d45 100%
     );
+
   color: var(--white);
 }
 
@@ -400,6 +444,7 @@ nav a:hover::after,
   position: absolute;
   z-index: -1;
   inset: 0;
+
   background-image:
     linear-gradient(
       90deg,
@@ -410,10 +455,13 @@ nav a:hover::after,
       rgba(255,255,255,.035) 1px,
       transparent 1px
     );
+
   background-size:
     12.5% 100%,
     100% 120px;
+
   content: "";
+
   mask-image: linear-gradient(
     to bottom,
     rgba(0,0,0,.7),
@@ -424,20 +472,30 @@ nav a:hover::after,
 .hero::after {
   position: absolute;
   z-index: -1;
+
   right: -8%;
   bottom: -28%;
+
   width: 72vw;
   height: 72vw;
+
   border: 1px solid rgba(255,255,255,.09);
   border-radius: 50%;
+
   content: "";
+
   transform: rotate(-16deg);
 }
 
 .hero-inner {
   position: relative;
   z-index: 2;
-  width: min(calc(100% - (var(--gutter) * 2)), var(--container));
+
+  width: min(
+    calc(100% - (var(--gutter) * 2)),
+    var(--container)
+  );
+
   padding-top: 160px;
   padding-bottom: clamp(54px, 8vw, 110px);
 }
@@ -461,6 +519,7 @@ nav a:hover::after,
 .hero .sub {
   margin-top: clamp(28px, 4vw, 48px);
   margin-bottom: 0;
+
   font-size: clamp(1rem, 1.4vw, 1.25rem);
   font-weight: 500;
   letter-spacing: .03em;
@@ -469,6 +528,7 @@ nav a:hover::after,
 .hero .hero-text {
   max-width: 42ch;
   margin-top: var(--space-4);
+
   color: rgba(255,255,255,.68);
   font-size: var(--body-lg);
 }
@@ -484,37 +544,49 @@ nav a:hover::after,
   position: absolute;
   right: 0;
   bottom: clamp(55px, 8vw, 110px);
+
   color: rgba(255,255,255,.28);
+
   font-size: .68rem;
   font-weight: 650;
   letter-spacing: .18em;
+
   writing-mode: vertical-rl;
   text-transform: uppercase;
 }
 
 
 /* ---------------------------------------------------------
-   07. BUTTONS / CTA
+   09. BUTTONS / CTA
    --------------------------------------------------------- */
 
 .btn,
 .cta,
 a.button {
   position: relative;
+
   display: inline-flex;
+
   min-height: 48px;
+
   align-items: center;
   justify-content: center;
+
   gap: 14px;
+
   padding: 13px 20px;
+
   border: 1px solid transparent;
   border-radius: 999px;
+
   font-size: .7rem;
   font-weight: 650;
   letter-spacing: .12em;
   line-height: 1;
   text-transform: uppercase;
+
   overflow: hidden;
+
   transition:
     color 400ms var(--ease),
     background 400ms var(--ease),
@@ -528,8 +600,11 @@ a.button::before {
   position: absolute;
   z-index: -1;
   inset: 0;
+
   background: currentColor;
+
   content: "";
+
   transform: translateY(105%);
   transition: transform 450ms var(--ease);
 }
@@ -588,7 +663,7 @@ a.button:hover::before {
 
 
 /* ---------------------------------------------------------
-   08. THESIS / INTRO
+   10. THESIS / INTRO
    --------------------------------------------------------- */
 
 .thesis {
@@ -597,7 +672,11 @@ a.button:hover::before {
 
 .thesis-inner {
   display: grid;
-  grid-template-columns: minmax(180px, .8fr) minmax(0, 2.2fr);
+
+  grid-template-columns:
+    minmax(180px, .8fr)
+    minmax(0, 2.2fr);
+
   gap: var(--space-7);
 }
 
@@ -618,16 +697,19 @@ a.button:hover::before {
 
 .thesis-closing {
   margin-top: var(--space-6);
+
   color: var(--ink);
+
   font-size: .7rem;
   font-weight: 700;
   letter-spacing: .16em;
+
   text-transform: uppercase;
 }
 
 
 /* ---------------------------------------------------------
-   09. DARK SECTIONS
+   11. DARK SECTIONS
    --------------------------------------------------------- */
 
 .dark,
@@ -654,7 +736,7 @@ a.button:hover::before {
 
 
 /* ---------------------------------------------------------
-   10. IDENTITY / PROFILE
+   12. IDENTITY / PROFILE
    --------------------------------------------------------- */
 
 .identity,
@@ -667,7 +749,11 @@ a.button:hover::before {
 .about-grid,
 #chi-sono .section-inner {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) minmax(0, 1.7fr);
+
+  grid-template-columns:
+    minmax(220px, 1fr)
+    minmax(0, 1.7fr);
+
   gap: var(--space-8);
 }
 
@@ -691,15 +777,17 @@ a.button:hover::before {
 
 .identity-signature {
   margin-top: var(--space-7);
+
   font-size: .7rem;
   font-weight: 650;
   letter-spacing: .15em;
+
   text-transform: uppercase;
 }
 
 
 /* ---------------------------------------------------------
-   11. CENTRAL DISCIPLINE
+   13. CENTRAL DISCIPLINE
    --------------------------------------------------------- */
 
 #scienze-motorie,
@@ -709,8 +797,11 @@ a.button:hover::before {
 
 .central-discipline .section-inner {
   display: grid;
+
   grid-template-columns: 1fr 1fr;
+
   gap: var(--space-8);
+
   align-items: end;
 }
 
@@ -721,6 +812,7 @@ a.button:hover::before {
 
 .central-discipline p {
   max-width: 48ch;
+
   color: var(--muted);
   font-size: var(--body-lg);
 }
@@ -728,20 +820,26 @@ a.button:hover::before {
 .keyword-line {
   display: flex;
   flex-wrap: wrap;
+
   gap: 10px 20px;
+
   margin-top: var(--space-6);
   padding-top: var(--space-4);
+
   border-top: 1px solid var(--line);
+
   color: var(--ink);
+
   font-size: .68rem;
   font-weight: 650;
   letter-spacing: .12em;
+
   text-transform: uppercase;
 }
 
 
 /* ---------------------------------------------------------
-   12. FOUR DIMENSIONS
+   14. FOUR DIMENSIONS
    --------------------------------------------------------- */
 
 .dimensions,
@@ -752,7 +850,10 @@ a.button:hover::before {
 .dimensions-grid,
 .dimension-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
   border-top: 1px solid var(--line);
   border-left: 1px solid var(--line);
 }
@@ -760,11 +861,16 @@ a.button:hover::before {
 .dimension,
 .dimension-card {
   position: relative;
+
   min-height: 330px;
+
   padding: clamp(28px, 4vw, 54px);
+
   border-right: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
+
   overflow: hidden;
+
   transition:
     background 500ms var(--ease),
     color 500ms var(--ease);
@@ -773,14 +879,20 @@ a.button:hover::before {
 .dimension::after,
 .dimension-card::after {
   position: absolute;
+
   right: -40px;
   bottom: -80px;
+
   width: 180px;
   height: 180px;
+
   border: 1px solid currentColor;
   border-radius: 50%;
+
   content: "";
+
   opacity: .08;
+
   transition: transform 700ms var(--ease);
 }
 
@@ -797,8 +909,11 @@ a.button:hover::before {
 
 .dimension-number {
   display: block;
+
   margin-bottom: var(--space-7);
+
   color: var(--muted);
+
   font-size: .65rem;
   font-weight: 650;
   letter-spacing: .16em;
@@ -807,7 +922,9 @@ a.button:hover::before {
 .dimension h3,
 .dimension-card h3 {
   max-width: 10ch;
+
   margin-bottom: var(--space-3);
+
   font-size: var(--heading-lg);
 }
 
@@ -815,6 +932,7 @@ a.button:hover::before {
 .dimension-card p {
   max-width: 34ch;
   margin-bottom: 0;
+
   color: var(--muted);
 }
 
@@ -825,7 +943,7 @@ a.button:hover::before {
 
 
 /* ---------------------------------------------------------
-   13. CREDENTIALS / PROOF
+   15. CREDENTIALS / PROOF
    --------------------------------------------------------- */
 
 .credentials,
@@ -841,11 +959,20 @@ a.button:hover::before {
 .credential,
 .credential-item {
   display: grid;
-  grid-template-columns: 90px minmax(180px, 1fr) minmax(240px, 1.7fr);
+
+  grid-template-columns:
+    90px
+    minmax(180px, 1fr)
+    minmax(240px, 1.7fr);
+
   gap: var(--space-5);
+
   align-items: start;
+
   padding: 26px 0;
+
   border-bottom: 1px solid var(--line);
+
   transition: padding-left 400ms var(--ease);
 }
 
@@ -856,6 +983,7 @@ a.button:hover::before {
 
 .credential-index {
   color: var(--muted);
+
   font-size: .68rem;
   font-weight: 650;
   letter-spacing: .12em;
@@ -863,6 +991,7 @@ a.button:hover::before {
 
 .credential-title {
   margin: 0;
+
   font-size: 1rem;
   font-weight: 600;
   letter-spacing: -.015em;
@@ -875,13 +1004,16 @@ a.button:hover::before {
 
 
 /* ---------------------------------------------------------
-   14. SPORT
+   16. SPORT
    --------------------------------------------------------- */
 
 .sport-grid {
   display: grid;
+
   grid-template-columns: 1.15fr .85fr;
+
   gap: var(--space-8);
+
   align-items: end;
 }
 
@@ -898,15 +1030,21 @@ a.button:hover::before {
 
 .sport-blocks {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
   margin-top: var(--space-8);
+
   border-top: 1px solid rgba(255,255,255,.15);
   border-left: 1px solid rgba(255,255,255,.15);
 }
 
 .sport-block {
   min-height: 250px;
+
   padding: var(--space-5);
+
   border-right: 1px solid rgba(255,255,255,.15);
   border-bottom: 1px solid rgba(255,255,255,.15);
 }
@@ -922,7 +1060,7 @@ a.button:hover::before {
 
 
 /* ---------------------------------------------------------
-   15. EDUCATION
+   17. EDUCATION
    --------------------------------------------------------- */
 
 .education,
@@ -933,7 +1071,9 @@ a.button:hover::before {
 .education-grid,
 #educazione .section-inner {
   display: grid;
+
   grid-template-columns: .8fr 1.2fr;
+
   gap: var(--space-8);
 }
 
@@ -954,7 +1094,7 @@ a.button:hover::before {
 
 
 /* ---------------------------------------------------------
-   16. MANAGEMENT
+   18. MANAGEMENT
    --------------------------------------------------------- */
 
 .management,
@@ -965,7 +1105,9 @@ a.button:hover::before {
 
 .management-grid {
   display: grid;
+
   grid-template-columns: 1fr 1fr;
+
   gap: var(--space-8);
 }
 
@@ -986,11 +1128,16 @@ a.button:hover::before {
 .management-keywords {
   display: flex;
   flex-wrap: wrap;
+
   gap: 10px 24px;
+
   margin-top: var(--space-6);
   padding-top: var(--space-4);
+
   border-top: 1px solid rgba(255,255,255,.16);
+
   color: rgba(255,255,255,.7);
+
   font-size: .68rem;
   font-weight: 650;
   letter-spacing: .13em;
@@ -998,25 +1145,31 @@ a.button:hover::before {
 
 
 /* ---------------------------------------------------------
-   17. DIGITAL
+   19. DIGITAL
    --------------------------------------------------------- */
 
 .digital,
 #digitale {
   position: relative;
+
   background: var(--white);
+
   overflow: hidden;
 }
 
 .digital::before,
 #digitale::before {
   position: absolute;
+
   right: -15vw;
   top: 10%;
+
   width: 50vw;
   height: 50vw;
+
   border: 1px solid var(--line);
   border-radius: 50%;
+
   content: "";
 }
 
@@ -1024,8 +1177,11 @@ a.button:hover::before {
 #digitale .section-inner {
   position: relative;
   z-index: 2;
+
   display: grid;
+
   grid-template-columns: 1fr 1fr;
+
   gap: var(--space-8);
 }
 
@@ -1046,15 +1202,17 @@ a.button:hover::before {
 
 .digital-closing {
   margin-top: var(--space-6);
+
   font-size: .7rem;
   font-weight: 700;
   letter-spacing: .15em;
+
   text-transform: uppercase;
 }
 
 
 /* ---------------------------------------------------------
-   18. METHOD
+   20. METHOD
    --------------------------------------------------------- */
 
 .method,
@@ -1064,7 +1222,9 @@ a.button:hover::before {
 
 .method-grid {
   display: grid;
+
   grid-template-columns: 1fr 1fr;
+
   gap: var(--space-8);
 }
 
@@ -1079,14 +1239,19 @@ a.button:hover::before {
 
 .method-step {
   display: grid;
+
   grid-template-columns: 60px 1fr;
+
   gap: var(--space-4);
+
   padding: 26px 0;
+
   border-bottom: 1px solid var(--line);
 }
 
 .method-step-number {
   color: var(--muted);
+
   font-size: .68rem;
   font-weight: 650;
   letter-spacing: .12em;
@@ -1102,9 +1267,14 @@ a.button:hover::before {
   color: var(--muted);
 }
 
+.method-conclusion {
+  margin-top: 64px;
+  max-width: 720px;
+}
+
 
 /* ---------------------------------------------------------
-   19. TERRITORY
+   21. TERRITORY
    --------------------------------------------------------- */
 
 .territory,
@@ -1114,8 +1284,11 @@ a.button:hover::before {
 
 .territory-grid {
   display: grid;
+
   grid-template-columns: .85fr 1.15fr;
+
   gap: var(--space-8);
+
   align-items: center;
 }
 
@@ -1133,26 +1306,34 @@ a.button:hover::before {
 .territory-route {
   display: flex;
   flex-wrap: wrap;
+
   align-items: center;
+
   gap: 10px;
+
   margin-top: var(--space-6);
   padding-top: var(--space-4);
+
   border-top: 1px solid var(--line);
+
   font-size: .68rem;
   font-weight: 700;
   letter-spacing: .12em;
+
   text-transform: uppercase;
 }
 
 .territory-route span:not(:last-child)::after {
   margin-left: 10px;
+
   content: "→";
+
   color: var(--muted);
 }
 
 
 /* ---------------------------------------------------------
-   20. NEXT STEP / FUTURE
+   22. NEXT STEP / FUTURE
    --------------------------------------------------------- */
 
 .next-step,
@@ -1163,12 +1344,15 @@ a.button:hover::before {
       var(--ink-deep),
       var(--ink)
     );
+
   color: var(--white);
 }
 
 .next-step .section-inner {
   display: grid;
+
   grid-template-columns: 1fr 1fr;
+
   gap: var(--space-8);
 }
 
@@ -1182,9 +1366,21 @@ a.button:hover::before {
   font-size: var(--body-lg);
 }
 
+.next-step-closing {
+  margin-top: 64px;
+
+  color: rgba(255,255,255,.86);
+
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .15em;
+
+  text-transform: uppercase;
+}
+
 
 /* ---------------------------------------------------------
-   21. PERSON
+   23. PERSON
    --------------------------------------------------------- */
 
 .person,
@@ -1194,7 +1390,9 @@ a.button:hover::before {
 
 .person-grid {
   display: grid;
+
   grid-template-columns: 1fr 1fr;
+
   gap: var(--space-8);
 }
 
@@ -1214,7 +1412,9 @@ a.button:hover::before {
 
 .signature {
   display: inline-block;
+
   margin-top: var(--space-5);
+
   font-size: 1rem;
   font-weight: 600;
   letter-spacing: -.01em;
@@ -1222,16 +1422,20 @@ a.button:hover::before {
 
 
 /* ---------------------------------------------------------
-   22. CONTACT
+   24. CONTACT
    --------------------------------------------------------- */
 
 .contact,
 #contatti {
   position: relative;
+
   min-height: 70vh;
+
   display: flex;
   align-items: center;
+
   overflow: hidden;
+
   background: var(--ink);
   color: var(--white);
 }
@@ -1239,12 +1443,16 @@ a.button:hover::before {
 .contact::before,
 #contatti::before {
   position: absolute;
+
   right: -10%;
   bottom: -40%;
+
   width: 75vw;
   height: 75vw;
+
   border: 1px solid rgba(255,255,255,.09);
   border-radius: 50%;
+
   content: "";
 }
 
@@ -1256,14 +1464,18 @@ a.button:hover::before {
 .contact h2,
 #contatti h2 {
   max-width: 8ch;
+
   margin-bottom: var(--space-5);
+
   font-size: var(--display-lg);
 }
 
 .contact p,
 #contatti p {
   max-width: 48ch;
+
   color: rgba(255,255,255,.64);
+
   font-size: var(--body-lg);
 }
 
@@ -1274,30 +1486,42 @@ a.button:hover::before {
 .contact-links {
   display: flex;
   flex-wrap: wrap;
+
   gap: 14px 28px;
+
   margin-top: var(--space-6);
 }
 
 .contact-links a {
   position: relative;
+
   padding-bottom: 5px;
+
   color: rgba(255,255,255,.8);
+
   font-size: .72rem;
   font-weight: 600;
   letter-spacing: .1em;
+
   text-transform: uppercase;
 }
 
 .contact-links a::after {
   position: absolute;
+
   right: 0;
   bottom: 0;
   left: 0;
+
   height: 1px;
+
   background: currentColor;
+
   content: "";
+
   transform: scaleX(0);
   transform-origin: right;
+
   transition: transform 400ms var(--ease);
 }
 
@@ -1308,7 +1532,7 @@ a.button:hover::before {
 
 
 /* ---------------------------------------------------------
-   23. FOOTER
+   25. FOOTER
    --------------------------------------------------------- */
 
 footer,
@@ -1319,9 +1543,13 @@ footer,
 
 .footer-inner {
   display: grid;
+
   grid-template-columns: 1fr auto;
+
   gap: var(--space-5);
+
   padding-block: 42px;
+
   align-items: end;
 }
 
@@ -1332,8 +1560,18 @@ footer,
 }
 
 .footer-brand img {
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
+
+  padding: 6px;
+
+  object-fit: contain;
+
+  background: var(--paper);
+  border-radius: 4px;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, .07);
 }
 
 .footer-brand span {
@@ -1344,15 +1582,17 @@ footer,
 
 .footer-meta {
   color: rgba(255,255,255,.42);
+
   font-size: .64rem;
   letter-spacing: .08em;
+
   text-align: right;
   text-transform: uppercase;
 }
 
 
 /* ---------------------------------------------------------
-   24. DIVIDERS / EDITORIAL DETAILS
+   26. EDITORIAL DETAILS
    --------------------------------------------------------- */
 
 .rule {
@@ -1363,6 +1603,7 @@ footer,
 
 .section-number {
   color: var(--muted);
+
   font-size: .65rem;
   font-weight: 700;
   letter-spacing: .18em;
@@ -1378,14 +1619,17 @@ footer,
 .editorial-marker::before {
   width: 8px;
   height: 8px;
+
   border-radius: 50%;
+
   background: currentColor;
+
   content: "";
 }
 
 
 /* ---------------------------------------------------------
-   25. MICRO INTERACTIONS
+   27. MICRO INTERACTIONS
    --------------------------------------------------------- */
 
 a,
@@ -1406,6 +1650,7 @@ select:focus-visible {
 [data-reveal] {
   opacity: 0;
   transform: translateY(24px);
+
   transition:
     opacity 800ms var(--ease),
     transform 800ms var(--ease);
@@ -1419,7 +1664,7 @@ select:focus-visible {
 
 
 /* ---------------------------------------------------------
-   26. SCROLLBAR
+   28. SCROLLBAR
    --------------------------------------------------------- */
 
 html {
@@ -1446,7 +1691,7 @@ html {
 
 
 /* ---------------------------------------------------------
-   27. RESPONSIVE — TABLET
+   29. RESPONSIVE — TABLET
    --------------------------------------------------------- */
 
 @media (max-width: 1000px) {
@@ -1510,7 +1755,7 @@ html {
 
 
 /* ---------------------------------------------------------
-   28. RESPONSIVE — MOBILE
+   30. RESPONSIVE — MOBILE
    --------------------------------------------------------- */
 
 @media (max-width: 700px) {
@@ -1536,7 +1781,10 @@ html {
   .section-inner,
   .hero-inner,
   .footer-inner {
-    width: min(calc(100% - 40px), var(--container));
+    width: min(
+      calc(100% - 40px),
+      var(--container)
+    );
   }
 
   .site-header,
@@ -1555,8 +1803,12 @@ html {
   }
 
   .brand-mark {
-    width: 38px;
-    height: 38px;
+    width: 40px;
+    height: 40px;
+
+    flex-basis: 40px;
+
+    padding: 6px;
   }
 
   nav,
@@ -1589,6 +1841,7 @@ html {
   .hero::after {
     right: -55%;
     bottom: -8%;
+
     width: 125vw;
     height: 125vw;
   }
@@ -1604,13 +1857,20 @@ html {
 
   .hero h1 {
     max-width: 7ch;
-    font-size: clamp(4rem, 18vw, 7rem);
+
+    font-size: clamp(
+      4rem,
+      18vw,
+      7rem
+    );
+
     line-height: .82;
   }
 
   .hero .hero-subtitle,
   .hero .sub {
     max-width: 25ch;
+
     font-size: .92rem;
     line-height: 1.5;
   }
@@ -1668,7 +1928,12 @@ html {
   .next-step h2,
   .person h2 {
     max-width: 8ch;
-    font-size: clamp(3.2rem, 15vw, 5rem);
+
+    font-size: clamp(
+      3.2rem,
+      15vw,
+      5rem
+    );
   }
 
   .dimensions-grid,
@@ -1684,7 +1949,9 @@ html {
   .credential,
   .credential-item {
     grid-template-columns: 48px 1fr;
+
     gap: 14px;
+
     padding-block: 22px;
   }
 
@@ -1718,7 +1985,11 @@ html {
 
   .contact h2,
   #contatti h2 {
-    font-size: clamp(3.7rem, 17vw, 6rem);
+    font-size: clamp(
+      3.7rem,
+      17vw,
+      6rem
+    );
   }
 
   .contact-links {
@@ -1728,29 +1999,45 @@ html {
 
   .footer-inner {
     grid-template-columns: 1fr;
+
     align-items: start;
+
     padding-block: 32px;
   }
 
   .footer-meta {
     text-align: left;
   }
+
+  .footer-brand img {
+    width: 38px;
+    height: 38px;
+    padding: 5px;
+  }
 }
 
 
 /* ---------------------------------------------------------
-   29. SMALL MOBILE
+   31. SMALL MOBILE
    --------------------------------------------------------- */
 
 @media (max-width: 420px) {
 
   .hero h1 {
-    font-size: clamp(3.65rem, 18vw, 5.5rem);
+    font-size: clamp(
+      3.65rem,
+      18vw,
+      5.5rem
+    );
   }
 
   .brand-mark {
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
+
+    flex-basis: 36px;
+
+    padding: 5px;
   }
 
   nav a,
@@ -1772,7 +2059,7 @@ html {
 
 
 /* ---------------------------------------------------------
-   30. REDUCED MOTION
+   32. REDUCED MOTION
    --------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
@@ -1798,7 +2085,7 @@ html {
 
 
 /* ---------------------------------------------------------
-   31. PRINT
+   33. PRINT
    --------------------------------------------------------- */
 
 @media print {
@@ -1826,13 +2113,15 @@ html {
 
 
 /* ---------------------------------------------------------
-   32. 404 PAGE
+   34. 404 PAGE
    --------------------------------------------------------- */
 
 .error-page {
   min-height: 100svh;
+
   display: flex;
   align-items: center;
+
   background:
     radial-gradient(
       circle at 75% 25%,
@@ -1840,6 +2129,7 @@ html {
       transparent 30%
     ),
     var(--ink);
+
   color: var(--white);
 }
 
@@ -1849,8 +2139,15 @@ html {
 
 .error-code {
   margin-bottom: 24px;
+
   color: rgba(255,255,255,.35);
-  font-size: clamp(6rem, 18vw, 14rem);
+
+  font-size: clamp(
+    6rem,
+    18vw,
+    14rem
+  );
+
   font-weight: 450;
   letter-spacing: -.09em;
   line-height: .75;
@@ -1863,7 +2160,9 @@ html {
 
 .error-page p {
   max-width: 48ch;
+
   color: rgba(255,255,255,.62);
+
   font-size: 1.05rem;
 }
 
