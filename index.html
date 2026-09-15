@@ -1,100 +1,1224 @@
-/* =========================
-   404 PAGE
-   ========================= */
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
 
-.error-page {
-  min-height: 100svh;
-  display: grid;
-  place-items: center;
-  padding: 40px;
-  background: var(--navy);
-  color: var(--white);
-}
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
 
-.error-content {
-  width: min(100%, 900px);
-}
+  <title>Cesare Paratore | Scienze Motorie e Sport</title>
 
-.error-brand {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 80px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-}
+  <meta
+    name="description"
+    content="Cesare Paratore, professionista delle Scienze Motorie e dello Sport. Sport, educazione, management e digitale."
+  >
 
-.error-brand img {
-  width: 56px;
-  height: 56px;
-  object-fit: contain;
-}
+  <meta
+    name="author"
+    content="Cesare Paratore"
+  >
 
-.error-code {
-  margin: 0 0 20px;
-  color: rgba(255, 255, 255, 0.45);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-}
+  <meta
+    name="robots"
+    content="index, follow"
+  >
 
-.error-content h1 {
-  margin: 0;
-  max-width: 850px;
-  font-size: clamp(3.5rem, 9vw, 8rem);
-  line-height: 0.86;
-  letter-spacing: -0.065em;
-  font-weight: 600;
-}
+  <link
+    rel="canonical"
+    href="https://cesareparatore.github.io/"
+  >
 
-.error-content h1 span {
-  display: block;
-  color: rgba(255, 255, 255, 0.4);
-}
+  <link
+    rel="stylesheet"
+    href="css/style.css"
+  >
 
-.error-description {
-  max-width: 500px;
-  margin: 32px 0 0;
-  color: rgba(255, 255, 255, 0.65);
-  font-size: 1rem;
-  line-height: 1.7;
-}
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
 
-.error-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 14px;
-  margin-top: 40px;
-  padding: 14px 20px;
-  background: var(--white);
-  color: var(--navy);
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  transition:
-    transform 0.25s ease,
-    background 0.25s ease,
-    color 0.25s ease;
-}
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
 
-.error-button:hover {
-  transform: translateY(-2px);
-  background: transparent;
-  color: var(--white);
-  outline: 1px solid var(--white);
-}
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
 
-@media (max-width: 600px) {
-  .error-page {
-    padding: 28px 18px;
+  <meta
+    property="og:type"
+    content="website"
+  >
+
+  <meta
+    property="og:locale"
+    content="it_IT"
+  >
+
+  <meta
+    property="og:title"
+    content="Cesare Paratore | Scienze Motorie e Sport"
+  >
+
+  <meta
+    property="og:description"
+    content="Sport · Educazione · Management · Digitale"
+  >
+
+  <meta
+    property="og:url"
+    content="https://cesareparatore.github.io/"
+  >
+
+  <meta
+    property="og:site_name"
+    content="Cesare Paratore"
+  >
+
+  <meta
+    property="og:image"
+    content="https://cesareparatore.github.io/assets/og-image.jpg"
+  >
+
+  <meta
+    name="twitter:card"
+    content="summary_large_image"
+  >
+
+  <meta
+    name="twitter:title"
+    content="Cesare Paratore | Scienze Motorie e Sport"
+  >
+
+  <meta
+    name="twitter:description"
+    content="Sport · Educazione · Management · Digitale"
+  >
+
+  <meta
+    name="twitter:image"
+    content="https://cesareparatore.github.io/assets/og-image.jpg"
+  >
+
+  <meta
+    name="theme-color"
+    content="#0B1F33"
+  >
+
+  <link
+    rel="icon"
+    href="assets/cp-mark.png"
+    type="image/png"
+  >
+
+  <!-- Structured data: homepage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Cesare Paratore",
+    "url": "https://cesareparatore.github.io/",
+    "description": "Sito professionale di Cesare Paratore, professionista delle Scienze Motorie e dello Sport."
   }
+  </script>
 
-  .error-brand {
-    margin-bottom: 60px;
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Cesare Paratore",
+    "url": "https://cesareparatore.github.io/",
+    "jobTitle": "Professionista delle Scienze Motorie e dello Sport",
+    "description": "Professionista delle Scienze Motorie e dello Sport con formazione in sport, educazione, management e digitale."
   }
+  </script>
+</head>
 
-  .error-content h1 {
-    font-size: clamp(3rem, 15vw, 5rem);
-  }
-}
+<body>
+
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
+
+  <header class="site-header" id="site-header">
+
+    <div class="container header-inner">
+
+      <a
+        href="/"
+        class="brand"
+        aria-label="Cesare Paratore — Home"
+      >
+
+        <img
+          src="assets/cp-mark.png"
+          alt="CP"
+          class="brand-mark"
+          width="42"
+          height="42"
+        >
+
+        <span class="brand-name">
+          CESARE PARATORE
+        </span>
+
+      </a>
+
+      <button
+        class="menu-toggle"
+        type="button"
+        aria-label="Apri menu"
+        aria-expanded="false"
+        aria-controls="main-navigation"
+      >
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav
+        class="main-navigation"
+        id="main-navigation"
+        aria-label="Navigazione principale"
+      >
+
+        <a href="#chi-sono">
+          Chi sono
+        </a>
+
+        <a href="#scienze-motorie">
+          Scienze Motorie
+        </a>
+
+        <a href="#sport">
+          Sport
+        </a>
+
+        <a href="#educazione">
+          Educazione
+        </a>
+
+        <a href="#management">
+          Management
+        </a>
+
+        <a href="#digitale">
+          Digitale
+        </a>
+
+        <a
+          href="#contatti"
+          class="nav-cta"
+        >
+          Parliamone
+        </a>
+
+      </nav>
+
+    </div>
+
+  </header>
+
+
+  <main>
+
+    <!-- =====================================================
+         HERO
+         ===================================================== -->
+
+    <section
+      class="hero section-dark"
+      id="top"
+      aria-labelledby="hero-title"
+    >
+
+      <div class="container hero-grid">
+
+        <div class="hero-content reveal">
+
+          <p class="eyebrow">
+            CESARE PARATORE
+          </p>
+
+          <p class="micro-label">
+            SCIENZE MOTORIE E SPORT
+          </p>
+
+          <h1 id="hero-title">
+            MOVIMENTO
+            <span>CON DIREZIONE.</span>
+          </h1>
+
+          <p class="hero-subtitle">
+            Sport · Educazione · Management · Digitale
+          </p>
+
+          <p class="hero-text">
+            Un percorso costruito tra formazione, sport,
+            educazione e progettazione.
+          </p>
+
+          <div class="hero-actions">
+
+            <a
+              href="#percorso"
+              class="button button-light"
+            >
+              Scopri il percorso
+              <span aria-hidden="true">→</span>
+            </a>
+
+            <a
+              href="#contatti"
+              class="text-link text-link-light"
+            >
+              Parliamone
+              <span aria-hidden="true">→</span>
+            </a>
+
+          </div>
+
+        </div>
+
+        <div
+          class="hero-signature"
+          aria-hidden="true"
+        >
+          <img
+            src="assets/cp-mark.png"
+            alt=""
+            width="420"
+            height="420"
+          >
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         TESI
+         ===================================================== -->
+
+    <section
+      class="section section-light"
+      id="tesi"
+    >
+
+      <div class="container narrow reveal">
+
+        <p class="section-index">
+          01 / UNA PROSPETTIVA
+        </p>
+
+        <h2>
+          NON SONO
+          <span>STRADE DIVERSE.</span>
+        </h2>
+
+        <div class="section-copy">
+
+          <p>
+            Scienze Motorie, sport, educazione, management
+            e digitale possono sembrare dimensioni lontane.
+          </p>
+
+          <p>
+            Nel mio percorso sono cresciute intorno allo
+            stesso centro: comprendere il movimento,
+            sviluppare competenze e trasformarle in progettazione.
+          </p>
+
+        </div>
+
+        <p class="closing-statement">
+          UNA SOLA DIREZIONE.<br>
+          PIÙ PROSPETTIVE.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CHI SONO
+         ===================================================== -->
+
+    <section
+      class="section section-soft"
+      id="chi-sono"
+    >
+
+      <div class="container two-column">
+
+        <div class="section-heading reveal">
+
+          <p class="section-index">
+            02 / CHI SONO
+          </p>
+
+          <h2>
+            IL MOVIMENTO
+            <span>È IL PUNTO DI PARTENZA.</span>
+          </h2>
+
+        </div>
+
+        <div class="section-copy reveal">
+
+          <p>
+            Sono Cesare Paratore, professionista delle
+            Scienze Motorie e dello Sport.
+          </p>
+
+          <p>
+            La mia formazione nasce dalle Scienze Motorie
+            e si sviluppa attraverso il Management dello Sport,
+            l'esperienza nella scuola, l'atletica federale,
+            la didattica e una formazione complementare nel digitale.
+          </p>
+
+          <p>
+            Esperienze differenti, unite dalla stessa esigenza:
+            comprendere ciò che faccio, sviluppare competenze
+            e trovare il modo più coerente di metterle in relazione.
+          </p>
+
+          <a
+            href="#formazione"
+            class="text-link"
+          >
+            Conosci il percorso
+            <span aria-hidden="true">→</span>
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         SCIENZE MOTORIE
+         ===================================================== -->
+
+    <section
+      class="section section-light"
+      id="scienze-motorie"
+    >
+
+      <div class="container">
+
+        <div class="section-heading reveal">
+
+          <p class="section-index">
+            03 / IL CENTRO
+          </p>
+
+          <h2>
+            SCIENZE MOTORIE
+            <span>E SPORT.</span>
+          </h2>
+
+        </div>
+
+        <div class="large-copy reveal">
+
+          <p>
+            È qui che tutto comincia.
+          </p>
+
+          <p>
+            Il movimento, l'attività fisica, lo sport e
+            l'educazione costituiscono la base del mio percorso
+            universitario e professionale.
+          </p>
+
+          <p>
+            Da questa base si sviluppano le prospettive successive:
+            pratica sportiva, progettazione, didattica,
+            organizzazione e strumenti digitali.
+          </p>
+
+        </div>
+
+        <div class="keyword-line reveal">
+          <span>MOVIMENTO</span>
+          <span>SPORT</span>
+          <span>EDUCAZIONE</span>
+          <span>PROGETTAZIONE</span>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         QUATTRO DIMENSIONI
+         ===================================================== -->
+
+    <section
+      class="section section-dark"
+      id="dimensioni"
+    >
+
+      <div class="container">
+
+        <div class="section-heading reveal">
+
+          <p class="section-index">
+            04 / LE PROSPETTIVE
+          </p>
+
+          <h2>
+            UNA BASE.
+            <span>QUATTRO DIMENSIONI.</span>
+          </h2>
+
+        </div>
+
+        <div class="dimension-grid">
+
+          <article class="dimension-card reveal">
+            <span class="card-number">01</span>
+            <h3>SPORT</h3>
+            <p>
+              Pratica, atletica, corsa e preparazione.
+            </p>
+          </article>
+
+          <article class="dimension-card reveal">
+            <span class="card-number">02</span>
+            <h3>EDUCAZIONE</h3>
+            <p>
+              Scuola, movimento, didattica e apprendimento.
+            </p>
+          </article>
+
+          <article class="dimension-card reveal">
+            <span class="card-number">03</span>
+            <h3>MANAGEMENT</h3>
+            <p>
+              Organizzazione, progettazione e gestione dello sport.
+            </p>
+          </article>
+
+          <article class="dimension-card reveal">
+            <span class="card-number">04</span>
+            <h3>DIGITALE</h3>
+            <p>
+              Strumenti, presenza web e progettazione
+              della comunicazione digitale.
+            </p>
+          </article>
+
+        </div>
+
+        <p class="section-endline reveal">
+          La forza non è avere molte direzioni.
+          È sapere come collegarle.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         FORMAZIONE
+         ===================================================== -->
+
+    <section
+      class="section section-light"
+      id="formazione"
+    >
+
+      <div class="container two-column">
+
+        <div class="section-heading reveal">
+
+          <p class="section-index">
+            05 / FORMAZIONE E COMPETENZE
+          </p>
+
+          <h2>
+            LE COMPETENZE
+            <span>HANNO UNA STORIA.</span>
+          </h2>
+
+        </div>
+
+        <div class="credentials reveal">
+
+          <div class="credential">
+            <span>L-22</span>
+            <p>
+              Scienze delle Attività Motorie e Sportive
+            </p>
+          </div>
+
+          <div class="credential">
+            <span>LM-47</span>
+            <p>
+              Management dello Sport e delle Attività Motorie
+            </p>
+          </div>
+
+          <div class="credential">
+            <span>FIDAL</span>
+            <p>
+              Istruttore di Atletica Leggera — 1° livello
+            </p>
+          </div>
+
+          <div class="credential">
+            <span>FIDAL</span>
+            <p>
+              Atleta
+            </p>
+          </div>
+
+          <div class="credential">
+            <span>EEEM</span>
+            <p>
+              Docente di Educazione motoria nella scuola primaria
+            </p>
+          </div>
+
+          <div class="credential">
+            <span>NOCN</span>
+            <p>
+              English — C2
+            </p>
+          </div>
+
+          <div class="credential">
+            <span>DIDATTICA</span>
+            <p>
+              CLIL · tecnologie didattiche · coding
+            </p>
+          </div>
+
+          <p class="credentials-note">
+            Formazione, qualifiche ed esperienze costruiscono
+            il patrimonio professionale.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         SPORT
+         ===================================================== -->
+
+    <section
+      class="section section-soft"
+      id="sport"
+    >
+
+      <div class="container">
+
+        <div class="section-heading reveal">
+
+          <p class="section-index">
+            06 / SPORT
+          </p>
+
+          <h2>
+            DOVE LA TEORIA
+            <span>INCONTRA LA PRATICA.</span>
+          </h2>
+
+        </div>
+
+        <div class="large-copy reveal">
+
+          <p>
+            Lo sport è la dimensione nella quale il movimento
+            diventa esperienza concreta.
+          </p>
+
+          <p>
+            Nel mio percorso questa dimensione passa
+            dall'atletica federale alla corsa e alla
+            preparazione fisica e atletica.
+          </p>
+
+        </div>
+
+        <div class="sport-grid">
+
+          <article class="content-card reveal">
+            <span class="card-number">01</span>
+            <h3>ATLETICA</h3>
+            <p>
+              Disciplina · tecnica · pratica federale.
+            </p>
+          </article>
+
+          <article class="content-card reveal">
+            <span class="card-number">02</span>
+            <h3>CORSA / RUNNING</h3>
+            <p>
+              Movimento · continuità · preparazione.
+            </p>
+          </article>
+
+          <article class="content-card reveal">
+            <span class="card-number">03</span>
+            <h3>PREPARAZIONE FISICA E ATLETICA</h3>
+            <p>
+              Obiettivo · analisi · progettazione.
+            </p>
+          </article>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         EDUCAZIONE
+         ===================================================== -->
+
+    <section
+      class="section section-light"
+      id="educazione"
+    >
+
+      <div class="container two-column">
+
+        <div class="section-heading reveal">
+
+          <p class="section-index">
+            07 / EDUCAZIONE
+          </p>
+
+          <h2>
+            IL MOVIMENTO
+            <span>SI IMPARA ANCHE VIVENDOLO.</span>
+          </h2>
+
+        </div>
+
+        <div class="section-copy reveal">
+
+          <p>
+            Nella scuola il movimento non è soltanto attività fisica.
+          </p>
+
+          <p>
+            È esperienza, relazione, apprendimento e
+            consapevolezza del corpo.
+          </p>
+
+          <p>
+            L'esperienza come docente di Educazione motoria
+            nella scuola primaria si integra con la formazione
+            in didattica, metodologia CLIL e tecnologie educative.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         MANAGEMENT
+         ===================================================== -->
+
+    <section
+      class="section section-dark"
+      id="management"
+    >
+
+      <div class="container two-column">
+
+        <div class="section-heading reveal">
+
+          <p class="section-index">
+            08 / MANAGEMENT
+          </p>
+
+          <h2>
+            LO SPORT È ANCHE
+            <span>ORGANIZZAZIONE.</span>
+          </h2>
+
+        </div>
+
+        <div class="section-copy reveal">
+
+          <p>
+            Dietro un'attività sportiva esistono progettazione,
+            gestione, comunicazione, organizzazione e capacità
+            di costruire condizioni perché un progetto possa svilupparsi.
+          </p>
+
+          <p>
+            La Laurea Magistrale in Management dello Sport e
+            delle Attività Motorie amplia il mio percorso
+            proprio in questa direzione.
+          </p>
+
+          <div class="keyword-line keyword-line-small">
+            <span>ORGANIZZAZIONE</span>
+            <span>PROGETTAZIONE</span>
+            <span>GESTIONE</span>
+            <span>PROMOZIONE</span>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         DIGITALE
+         ===================================================== -->
+
+    <section
+      class="section section-light"
+      id="digitale"
+    >
+
+      <div class="container two-column">
+
+        <div class="section-heading reveal">
+
+          <p class="section-index">
+            09 / DIGITALE
+          </p>
+
+          <h2>
+            ANCHE LA PRESENZA
+            <span>HA BISOGNO DI UNA DIREZIONE.</span>
+          </h2>
+
+        </div>
+
+        <div class="section-copy reveal">
+
+          <p>
+            Una competenza, un'attività o un progetto devono
+            poter essere riconosciuti, compresi e raccontati
+            anche nello spazio digitale.
+          </p>
+
+          <p>
+            La mia formazione complementare comprende tecnologie
+            educative, strumenti digitali e coding e si sviluppa
+            nell'interesse per la progettazione della presenza
+            ufficiale sul web.
+          </p>
+
+          <p class="closing-statement">
+            NON SOLTANTO ESSERCI.<br>
+            ESSERE RICONOSCIBILI.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         METODO
+         ===================================================== -->
+
+    <section
+      class="section section-soft"
+      id="percorso"
+    >
+
+      <div class="container">
+
+        <div class="section-heading reveal">
+
+          <p class="section-index">
+            10 / COME LAVORO
+          </p>
+
+          <h2>
+            PRIMA L'OBIETTIVO.
+            <span>POI LA SOLUZIONE.</span>
+          </h2>
+
+        </div>
+
+        <div class="method-grid">
+
+          <div class="method-step reveal">
+            <span>01</span>
+            <h3>COMPRENDERE</h3>
+            <p>
+              Obiettivo e contesto.
+            </p>
+          </div>
+
+          <div class="method-step reveal">
+            <span>02</span>
+            <h3>ANALIZZARE</h3>
+            <p>
+              Esigenze e possibilità.
+            </p>
+          </div>
+
+          <div class="method-step reveal">
+            <span>03</span>
+            <h3>PROGETTARE</h3>
+            <p>
+              Competenze e strumenti.
+            </p>
+          </div>
+
+          <div class="method-step reveal">
+            <span>04</span>
+            <h3>REALIZZARE</h3>
+            <p>
+              Il risultato.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="method-conclusion reveal">
+
+          <p>
+            NON UNA SOLUZIONE PRECONFEZIONATA.
+          </p>
+
+          <p>
+            UNA DIREZIONE COSTRUITA
+            <br>
+            SUL PROGETTO.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         TERRITORIO
+         ===================================================== -->
+
+    <section
+      class="section section-dark"
+      id="territorio"
+    >
+
+      <div class="container">
+
+        <div class="section-heading reveal">
+
+          <p class="section-index">
+            11 / TERRITORIO
+          </p>
+
+          <h2>
+            DA UN PUNTO PRECISO.
+            <span>VERSO UN ORIZZONTE PIÙ AMPIO.</span>
+          </h2>
+
+        </div>
+
+        <div class="territory-content reveal">
+
+          <p>
+            Partinico è il punto di riferimento territoriale
+            del mio percorso professionale.
+          </p>
+
+          <p>
+            Da qui si sviluppa un'area di riferimento che comprende
+            Palermo, il territorio occidentale siciliano e il
+            corridoio verso Trapani, Marsala e Mazara del Vallo.
+          </p>
+
+          <p>
+            Quando la natura del progetto lo consente,
+            alcune attività possono svilupparsi anche online.
+          </p>
+
+        </div>
+
+        <div class="territory-line reveal">
+
+          <span>PARTINICO</span>
+          <span>PALERMO</span>
+          <span>TRAPANI</span>
+          <span>MARSALA</span>
+          <span>MAZARA DEL VALLO</span>
+
+        </div>
+
+        <p class="territory-note reveal">
+          TERRITORIO + ONLINE
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         PROSSIMO PASSO
+         ===================================================== -->
+
+    <section
+      class="section section-light"
+      id="prossimo-passo"
+    >
+
+      <div class="container narrow reveal">
+
+        <p class="section-index">
+          12 / PROSSIMO PASSO
+        </p>
+
+        <h2>
+          UNA DIREZIONE
+          <span>IN COSTRUZIONE.</span>
+        </h2>
+
+        <div class="section-copy">
+
+          <p>
+            Un percorso professionale non è mai completamente concluso.
+          </p>
+
+          <p>
+            Il prossimo passo è trasformare il patrimonio costruito
+            finora in nuove possibilità di collaborazione e in
+            prestazioni definite intorno a obiettivi concreti.
+          </p>
+
+          <p>
+            Partire dalla necessità reale. Comprendere il contesto.
+            Utilizzare le competenze pertinenti.
+          </p>
+
+        </div>
+
+        <p class="closing-statement">
+          IL FUTURO NON SI DICHIARA.<br>
+          SI COSTRUISCE.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         PERSONA
+         ===================================================== -->
+
+    <section
+      class="section section-soft"
+      id="persona"
+    >
+
+      <div class="container two-column">
+
+        <div class="section-heading reveal">
+
+          <p class="section-index">
+            13 / OLTRE IL PERCORSO
+          </p>
+
+          <h2>
+            DIETRO IL METODO,
+            <span>C'È UNA PERSONA.</span>
+          </h2>
+
+        </div>
+
+        <div class="section-copy reveal">
+
+          <p>
+            Studio, sport, insegnamento e progettazione
+            hanno costruito la mia formazione.
+          </p>
+
+          <p>
+            A mantenerla in movimento è la curiosità:
+            comprendere meglio, continuare a imparare e
+            trasformare ciò che imparo in qualcosa di utile.
+          </p>
+
+          <p class="signature">
+            Cesare Paratore
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CONTATTI
+         ===================================================== -->
+
+    <section
+      class="section section-dark contact-section"
+      id="contatti"
+    >
+
+      <div class="container contact-grid">
+
+        <div class="section-heading reveal">
+
+          <p class="section-index">
+            14 / CONTATTI
+          </p>
+
+          <h2>
+            HAI UN
+            <span>OBIETTIVO?</span>
+          </h2>
+
+        </div>
+
+        <div class="contact-content reveal">
+
+          <p>
+            Raccontami da dove vuoi partire.
+          </p>
+
+          <p>
+            Il primo passo non è scegliere una soluzione.
+          </p>
+
+          <p>
+            È capire quale direzione può avere senso.
+          </p>
+
+          <div class="contact-actions">
+
+            <a
+              href="mailto:INSERIRE-EMAIL@ESEMPIO.IT"
+              class="button button-light"
+            >
+              Parliamone
+              <span aria-hidden="true">→</span>
+            </a>
+
+          </div>
+
+          <div class="contact-channels">
+
+            <span>WhatsApp</span>
+            <span>Email</span>
+            <span>LinkedIn</span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =====================================================
+       FOOTER
+       ===================================================== -->
+
+  <footer class="site-footer">
+
+    <div class="container footer-main">
+
+      <div class="footer-brand">
+
+        <img
+          src="assets/cp-mark.png"
+          alt="CP"
+          width="48"
+          height="48"
+        >
+
+        <div>
+
+          <p class="footer-name">
+            CESARE PARATORE
+          </p>
+
+          <p class="footer-role">
+            Scienze Motorie e Sport
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="footer-concept">
+
+        <p>
+          MOVIMENTO CON DIREZIONE.
+        </p>
+
+        <span>
+          Sport · Educazione · Management · Digitale
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="container footer-bottom">
+
+      <p>
+        © <span id="current-year"></span> Cesare Paratore
+      </p>
+
+      <div class="footer-links">
+
+        <a href="#top">
+          Torna su
+        </a>
+
+        <a href="#contatti">
+          Contatti
+        </a>
+
+      </div>
+
+    </div>
+
+  </footer>
+
+
+  <script src="script.js"></script>
+
+</body>
+</html>
