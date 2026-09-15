@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="it">
+
 <head>
+
   <meta charset="utf-8">
 
   <meta
@@ -30,10 +32,9 @@
     href="https://cesareparatore.github.io/"
   >
 
-  <link
-    rel="stylesheet"
-    href="css/style.css"
-  >
+  <!-- =====================================================
+       TYPOGRAPHY
+       ===================================================== -->
 
   <link
     rel="preconnect"
@@ -50,6 +51,19 @@
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
     rel="stylesheet"
   >
+
+  <!-- =====================================================
+       STYLES
+       ===================================================== -->
+
+  <link
+    rel="stylesheet"
+    href="css/style.css"
+  >
+
+  <!-- =====================================================
+       OPEN GRAPH
+       ===================================================== -->
 
   <meta
     property="og:type"
@@ -86,6 +100,10 @@
     content="https://cesareparatore.github.io/assets/og-image.jpg"
   >
 
+  <!-- =====================================================
+       TWITTER / SOCIAL
+       ===================================================== -->
+
   <meta
     name="twitter:card"
     content="summary_large_image"
@@ -111,13 +129,20 @@
     content="#0B1F33"
   >
 
+  <!-- =====================================================
+       FAVICON
+       ===================================================== -->
+
   <link
     rel="icon"
     href="assets/images/cp-mark.png"
     type="image/png"
   >
 
-  <!-- Structured data: homepage -->
+  <!-- =====================================================
+       STRUCTURED DATA — WEBSITE
+       ===================================================== -->
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -127,6 +152,10 @@
     "description": "Sito professionale di Cesare Paratore, professionista delle Scienze Motorie e dello Sport."
   }
   </script>
+
+  <!-- =====================================================
+       STRUCTURED DATA — PERSON
+       ===================================================== -->
 
   <script type="application/ld+json">
   {
@@ -138,7 +167,9 @@
     "description": "Professionista delle Scienze Motorie e dello Sport con formazione in sport, educazione, management e digitale."
   }
   </script>
+
 </head>
+
 
 <body>
 
@@ -146,7 +177,7 @@
        HEADER
        ===================================================== -->
 
-  <header class="site-header" id="site-header">
+  <header class="site-header">
 
     <div class="container header-inner">
 
@@ -170,20 +201,9 @@
 
       </a>
 
-      <button
-        class="menu-toggle"
-        type="button"
-        aria-label="Apri menu"
-        aria-expanded="false"
-        aria-controls="main-navigation"
-      >
-        <span></span>
-        <span></span>
-      </button>
 
       <nav
         class="main-navigation"
-        id="main-navigation"
         aria-label="Navigazione principale"
       >
 
@@ -227,102 +247,98 @@
 
   <main>
 
-    <!-- =====================================================
+    <!-- ===================================================
          HERO
-         ===================================================== -->
+         =================================================== -->
 
     <section
-      class="hero section-dark"
+      class="hero"
       id="top"
       aria-labelledby="hero-title"
     >
 
-      <div class="container hero-grid">
+      <div class="hero-inner">
 
-        <div class="hero-content reveal">
+        <p class="eyebrow">
+          CESARE PARATORE
+        </p>
 
-          <p class="eyebrow">
-            CESARE PARATORE
-          </p>
+        <p class="micro-label">
+          SCIENZE MOTORIE E SPORT
+        </p>
 
-          <p class="micro-label">
-            SCIENZE MOTORIE E SPORT
-          </p>
+        <h1 id="hero-title">
+          MOVIMENTO
+          <span>CON DIREZIONE.</span>
+        </h1>
 
-          <h1 id="hero-title">
-            MOVIMENTO
-            <span>CON DIREZIONE.</span>
-          </h1>
+        <p class="hero-subtitle">
+          Sport · Educazione · Management · Digitale
+        </p>
 
-          <p class="hero-subtitle">
-            Sport · Educazione · Management · Digitale
-          </p>
+        <p class="hero-text">
+          Un percorso costruito tra formazione, sport,
+          educazione e progettazione.
+        </p>
 
-          <p class="hero-text">
-            Un percorso costruito tra formazione, sport,
-            educazione e progettazione.
-          </p>
+        <div class="hero-actions">
 
-          <div class="hero-actions">
+          <a
+            href="#percorso"
+            class="btn btn-primary"
+          >
+            Scopri il percorso
+            <span aria-hidden="true">→</span>
+          </a>
 
-            <a
-              href="#percorso"
-              class="button button-light"
-            >
-              Scopri il percorso
-              <span aria-hidden="true">→</span>
-            </a>
-
-            <a
-              href="#contatti"
-              class="text-link text-link-light"
-            >
-              Parliamone
-              <span aria-hidden="true">→</span>
-            </a>
-
-          </div>
+          <a
+            href="#contatti"
+            class="btn btn-secondary"
+          >
+            Parliamone
+            <span aria-hidden="true">→</span>
+          </a>
 
         </div>
 
-        <div
-          class="hero-signature"
+        <span
+          class="hero-number"
           aria-hidden="true"
         >
-          <img
-            src="assets/images/cp-mark.png"
-            alt=""
-            width="420"
-            height="420"
-          >
-        </div>
+          SCORRI / 01
+        </span>
 
       </div>
 
     </section>
 
 
-    <!-- =====================================================
-         TESI
-         ===================================================== -->
+    <!-- ===================================================
+         01 — TESI
+         =================================================== -->
 
     <section
-      class="section section-light"
+      class="section thesis"
       id="tesi"
+      aria-labelledby="tesi-title"
     >
 
-      <div class="container narrow reveal">
+      <div class="container thesis-inner">
 
-        <p class="section-index">
-          01 / UNA PROSPETTIVA
-        </p>
+        <div>
 
-        <h2>
-          NON SONO
-          <span>STRADE DIVERSE.</span>
-        </h2>
+          <p class="section-label">
+            01 / UNA PROSPETTIVA
+          </p>
 
-        <div class="section-copy">
+        </div>
+
+        <div class="thesis-copy">
+
+          <h2 id="tesi-title">
+            NON SONO
+            <span>STRADE DIVERSE.</span>
+          </h2>
 
           <p>
             Scienze Motorie, sport, educazione, management
@@ -335,43 +351,43 @@
             sviluppare competenze e trasformarle in progettazione.
           </p>
 
-        </div>
+          <p class="thesis-closing">
+            UNA SOLA DIREZIONE. PIÙ PROSPETTIVE.
+          </p>
 
-        <p class="closing-statement">
-          UNA SOLA DIREZIONE.<br>
-          PIÙ PROSPETTIVE.
-        </p>
+        </div>
 
       </div>
 
     </section>
 
 
-    <!-- =====================================================
-         CHI SONO
-         ===================================================== -->
+    <!-- ===================================================
+         02 — CHI SONO
+         =================================================== -->
 
     <section
-      class="section section-soft"
+      class="section identity"
       id="chi-sono"
+      aria-labelledby="identity-title"
     >
 
-      <div class="container two-column">
+      <div class="container identity-grid">
 
-        <div class="section-heading reveal">
+        <div>
 
-          <p class="section-index">
+          <p class="section-label">
             02 / CHI SONO
           </p>
 
-          <h2>
+          <h2 id="identity-title">
             IL MOVIMENTO
             <span>È IL PUNTO DI PARTENZA.</span>
           </h2>
 
         </div>
 
-        <div class="section-copy reveal">
+        <div class="identity-copy">
 
           <p>
             Sono Cesare Paratore, professionista delle
@@ -393,7 +409,7 @@
 
           <a
             href="#formazione"
-            class="text-link"
+            class="btn"
           >
             Conosci il percorso
             <span aria-hidden="true">→</span>
@@ -406,31 +422,33 @@
     </section>
 
 
-    <!-- =====================================================
-         SCIENZE MOTORIE
-         ===================================================== -->
+    <!-- ===================================================
+         03 — SCIENZE MOTORIE
+         =================================================== -->
 
     <section
-      class="section section-light"
+      class="section central-discipline"
       id="scienze-motorie"
+      aria-labelledby="discipline-title"
     >
 
-      <div class="container">
+      <div class="container section-inner">
 
-        <div class="section-heading reveal">
+        <div>
 
-          <p class="section-index">
+          <p class="section-label">
             03 / IL CENTRO
           </p>
 
-          <h2>
-            SCIENZE MOTORIE
+          <h2 id="discipline-title">
+            SCIENZE
+            MOTORIE
             <span>E SPORT.</span>
           </h2>
 
         </div>
 
-        <div class="large-copy reveal">
+        <div>
 
           <p>
             È qui che tutto comincia.
@@ -448,13 +466,15 @@
             organizzazione e strumenti digitali.
           </p>
 
-        </div>
+          <div class="keyword-line">
 
-        <div class="keyword-line reveal">
-          <span>MOVIMENTO</span>
-          <span>SPORT</span>
-          <span>EDUCAZIONE</span>
-          <span>PROGETTAZIONE</span>
+            <span>MOVIMENTO</span>
+            <span>SPORT</span>
+            <span>EDUCAZIONE</span>
+            <span>PROGETTAZIONE</span>
+
+          </div>
+
         </div>
 
       </div>
@@ -462,227 +482,279 @@
     </section>
 
 
-    <!-- =====================================================
-         QUATTRO DIMENSIONI
-         ===================================================== -->
+    <!-- ===================================================
+         04 — DIMENSIONI
+         =================================================== -->
 
     <section
-      class="section section-dark"
+      class="section dimensions"
       id="dimensioni"
+      aria-labelledby="dimensions-title"
     >
 
       <div class="container">
 
-        <div class="section-heading reveal">
+        <div class="section-header">
 
-          <p class="section-index">
-            04 / LE PROSPETTIVE
-          </p>
+          <div>
 
-          <h2>
-            UNA BASE.
-            <span>QUATTRO DIMENSIONI.</span>
-          </h2>
+            <p class="section-label">
+              04 / LE PROSPETTIVE
+            </p>
+
+          </div>
+
+          <div>
+
+            <h2 id="dimensions-title">
+              UNA BASE.
+              <span>QUATTRO DIMENSIONI.</span>
+            </h2>
+
+            <p>
+              Una sola identità professionale,
+              sviluppata attraverso prospettive complementari.
+            </p>
+
+          </div>
 
         </div>
 
-        <div class="dimension-grid">
 
-          <article class="dimension-card reveal">
-            <span class="card-number">01</span>
-            <h3>SPORT</h3>
+        <div class="dimensions-grid">
+
+          <article class="dimension">
+
+            <span class="dimension-number">
+              01 / SPORT
+            </span>
+
+            <h3>
+              SPORT
+            </h3>
+
             <p>
               Pratica, atletica, corsa e preparazione.
             </p>
+
           </article>
 
-          <article class="dimension-card reveal">
-            <span class="card-number">02</span>
-            <h3>EDUCAZIONE</h3>
+
+          <article class="dimension">
+
+            <span class="dimension-number">
+              02 / EDUCAZIONE
+            </span>
+
+            <h3>
+              EDUCAZIONE
+            </h3>
+
             <p>
               Scuola, movimento, didattica e apprendimento.
             </p>
+
           </article>
 
-          <article class="dimension-card reveal">
-            <span class="card-number">03</span>
-            <h3>MANAGEMENT</h3>
+
+          <article class="dimension">
+
+            <span class="dimension-number">
+              03 / MANAGEMENT
+            </span>
+
+            <h3>
+              MANAGEMENT
+            </h3>
+
             <p>
               Organizzazione, progettazione e gestione dello sport.
             </p>
+
           </article>
 
-          <article class="dimension-card reveal">
-            <span class="card-number">04</span>
-            <h3>DIGITALE</h3>
+
+          <article class="dimension">
+
+            <span class="dimension-number">
+              04 / DIGITALE
+            </span>
+
+            <h3>
+              DIGITALE
+            </h3>
+
             <p>
               Strumenti, presenza web e progettazione
               della comunicazione digitale.
             </p>
+
           </article>
 
         </div>
 
-        <p class="section-endline reveal">
-          La forza non è avere molte direzioni.
-          È sapere come collegarle.
-        </p>
-
       </div>
 
     </section>
 
 
-    <!-- =====================================================
-         FORMAZIONE
-         ===================================================== -->
+    <!-- ===================================================
+         05 — FORMAZIONE
+         =================================================== -->
 
     <section
-      class="section section-light"
+      class="section credentials"
       id="formazione"
-    >
-
-      <div class="container two-column">
-
-        <div class="section-heading reveal">
-
-          <p class="section-index">
-            05 / FORMAZIONE E COMPETENZE
-          </p>
-
-          <h2>
-            LE COMPETENZE
-            <span>HANNO UNA STORIA.</span>
-          </h2>
-
-        </div>
-
-        <div class="credentials reveal">
-
-          <div class="credential">
-            <span>L-22</span>
-            <p>
-              Scienze delle Attività Motorie e Sportive
-            </p>
-          </div>
-
-          <div class="credential">
-            <span>LM-47</span>
-            <p>
-              Management dello Sport e delle Attività Motorie
-            </p>
-          </div>
-
-          <div class="credential">
-            <span>FIDAL</span>
-            <p>
-              Istruttore di Atletica Leggera — 1° livello
-            </p>
-          </div>
-
-          <div class="credential">
-            <span>FIDAL</span>
-            <p>
-              Atleta
-            </p>
-          </div>
-
-          <div class="credential">
-            <span>EEEM</span>
-            <p>
-              Docente di Educazione motoria nella scuola primaria
-            </p>
-          </div>
-
-          <div class="credential">
-            <span>NOCN</span>
-            <p>
-              English — C2
-            </p>
-          </div>
-
-          <div class="credential">
-            <span>DIDATTICA</span>
-            <p>
-              CLIL · tecnologie didattiche · coding
-            </p>
-          </div>
-
-          <p class="credentials-note">
-            Formazione, qualifiche ed esperienze costruiscono
-            il patrimonio professionale.
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         SPORT
-         ===================================================== -->
-
-    <section
-      class="section section-soft"
-      id="sport"
+      aria-labelledby="credentials-title"
     >
 
       <div class="container">
 
-        <div class="section-heading reveal">
+        <div class="section-header">
 
-          <p class="section-index">
-            06 / SPORT
-          </p>
+          <div>
 
-          <h2>
-            DOVE LA TEORIA
-            <span>INCONTRA LA PRATICA.</span>
-          </h2>
+            <p class="section-label">
+              05 / FORMAZIONE E COMPETENZE
+            </p>
+
+          </div>
+
+          <div>
+
+            <h2 id="credentials-title">
+              LE COMPETENZE
+              <span>HANNO UNA STORIA.</span>
+            </h2>
+
+            <p>
+              Formazione, qualifiche ed esperienze costruiscono
+              il patrimonio professionale.
+            </p>
+
+          </div>
 
         </div>
 
-        <div class="large-copy reveal">
 
-          <p>
-            Lo sport è la dimensione nella quale il movimento
-            diventa esperienza concreta.
-          </p>
+        <div class="credentials-list">
 
-          <p>
-            Nel mio percorso questa dimensione passa
-            dall'atletica federale alla corsa e alla
-            preparazione fisica e atletica.
-          </p>
+          <article class="credential">
 
-        </div>
+            <span class="credential-index">
+              01
+            </span>
 
-        <div class="sport-grid">
+            <h3 class="credential-title">
+              L-22
+            </h3>
 
-          <article class="content-card reveal">
-            <span class="card-number">01</span>
-            <h3>ATLETICA</h3>
-            <p>
-              Disciplina · tecnica · pratica federale.
+            <p class="credential-description">
+              Scienze delle Attività Motorie e Sportive
             </p>
+
           </article>
 
-          <article class="content-card reveal">
-            <span class="card-number">02</span>
-            <h3>CORSA / RUNNING</h3>
-            <p>
-              Movimento · continuità · preparazione.
+
+          <article class="credential">
+
+            <span class="credential-index">
+              02
+            </span>
+
+            <h3 class="credential-title">
+              LM-47
+            </h3>
+
+            <p class="credential-description">
+              Management dello Sport e delle Attività Motorie
             </p>
+
           </article>
 
-          <article class="content-card reveal">
-            <span class="card-number">03</span>
-            <h3>PREPARAZIONE FISICA E ATLETICA</h3>
-            <p>
-              Obiettivo · analisi · progettazione.
+
+          <article class="credential">
+
+            <span class="credential-index">
+              03
+            </span>
+
+            <h3 class="credential-title">
+              FIDAL
+            </h3>
+
+            <p class="credential-description">
+              Istruttore di Atletica Leggera — 1° livello
             </p>
+
+          </article>
+
+
+          <article class="credential">
+
+            <span class="credential-index">
+              04
+            </span>
+
+            <h3 class="credential-title">
+              FIDAL
+            </h3>
+
+            <p class="credential-description">
+              Atleta
+            </p>
+
+          </article>
+
+
+          <article class="credential">
+
+            <span class="credential-index">
+              05
+            </span>
+
+            <h3 class="credential-title">
+              EEEM
+            </h3>
+
+            <p class="credential-description">
+              Docente di Educazione motoria nella scuola primaria
+            </p>
+
+          </article>
+
+
+          <article class="credential">
+
+            <span class="credential-index">
+              06
+            </span>
+
+            <h3 class="credential-title">
+              NOCN
+            </h3>
+
+            <p class="credential-description">
+              English — C2
+            </p>
+
+          </article>
+
+
+          <article class="credential">
+
+            <span class="credential-index">
+              07
+            </span>
+
+            <h3 class="credential-title">
+              DIDATTICA
+            </h3>
+
+            <p class="credential-description">
+              CLIL · tecnologie didattiche · coding
+            </p>
+
           </article>
 
         </div>
@@ -692,31 +764,136 @@
     </section>
 
 
-    <!-- =====================================================
-         EDUCAZIONE
-         ===================================================== -->
+    <!-- ===================================================
+         06 — SPORT
+         =================================================== -->
 
     <section
-      class="section section-light"
-      id="educazione"
+      class="section sport"
+      id="sport"
+      aria-labelledby="sport-title"
     >
 
-      <div class="container two-column">
+      <div class="container">
 
-        <div class="section-heading reveal">
+        <div class="sport-grid">
 
-          <p class="section-index">
+          <div>
+
+            <p class="section-label">
+              06 / SPORT
+            </p>
+
+            <h2 id="sport-title">
+              DOVE LA TEORIA
+              <span>INCONTRA LA PRATICA.</span>
+            </h2>
+
+          </div>
+
+          <div class="sport-intro">
+
+            <p>
+              Lo sport è la dimensione nella quale il movimento
+              diventa esperienza concreta.
+            </p>
+
+            <p>
+              Nel mio percorso questa dimensione passa
+              dall'atletica federale alla corsa e alla
+              preparazione fisica e atletica.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="sport-blocks">
+
+          <article class="sport-block">
+
+            <span class="dimension-number">
+              01
+            </span>
+
+            <h3>
+              ATLETICA
+            </h3>
+
+            <p>
+              Disciplina · tecnica · pratica federale.
+            </p>
+
+          </article>
+
+
+          <article class="sport-block">
+
+            <span class="dimension-number">
+              02
+            </span>
+
+            <h3>
+              CORSA / RUNNING
+            </h3>
+
+            <p>
+              Movimento · continuità · preparazione.
+            </p>
+
+          </article>
+
+
+          <article class="sport-block">
+
+            <span class="dimension-number">
+              03
+            </span>
+
+            <h3>
+              PREPARAZIONE FISICA E ATLETICA
+            </h3>
+
+            <p>
+              Obiettivo · analisi · progettazione.
+            </p>
+
+          </article>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         07 — EDUCAZIONE
+         =================================================== -->
+
+    <section
+      class="section education"
+      id="educazione"
+      aria-labelledby="education-title"
+    >
+
+      <div class="container education-grid">
+
+        <div>
+
+          <p class="section-label">
             07 / EDUCAZIONE
           </p>
 
-          <h2>
+          <h2 id="education-title">
             IL MOVIMENTO
             <span>SI IMPARA ANCHE VIVENDOLO.</span>
           </h2>
 
         </div>
 
-        <div class="section-copy reveal">
+        <div class="education-copy">
 
           <p>
             Nella scuola il movimento non è soltanto attività fisica.
@@ -740,31 +917,32 @@
     </section>
 
 
-    <!-- =====================================================
-         MANAGEMENT
-         ===================================================== -->
+    <!-- ===================================================
+         08 — MANAGEMENT
+         =================================================== -->
 
     <section
-      class="section section-dark"
+      class="section management"
       id="management"
+      aria-labelledby="management-title"
     >
 
-      <div class="container two-column">
+      <div class="container management-grid">
 
-        <div class="section-heading reveal">
+        <div>
 
-          <p class="section-index">
+          <p class="section-label">
             08 / MANAGEMENT
           </p>
 
-          <h2>
+          <h2 id="management-title">
             LO SPORT È ANCHE
             <span>ORGANIZZAZIONE.</span>
           </h2>
 
         </div>
 
-        <div class="section-copy reveal">
+        <div class="management-copy">
 
           <p>
             Dietro un'attività sportiva esistono progettazione,
@@ -778,11 +956,13 @@
             proprio in questa direzione.
           </p>
 
-          <div class="keyword-line keyword-line-small">
+          <div class="management-keywords">
+
             <span>ORGANIZZAZIONE</span>
             <span>PROGETTAZIONE</span>
             <span>GESTIONE</span>
             <span>PROMOZIONE</span>
+
           </div>
 
         </div>
@@ -792,31 +972,32 @@
     </section>
 
 
-    <!-- =====================================================
-         DIGITALE
-         ===================================================== -->
+    <!-- ===================================================
+         09 — DIGITALE
+         =================================================== -->
 
     <section
-      class="section section-light"
+      class="section digital"
       id="digitale"
+      aria-labelledby="digital-title"
     >
 
-      <div class="container two-column">
+      <div class="container digital-grid">
 
-        <div class="section-heading reveal">
+        <div>
 
-          <p class="section-index">
+          <p class="section-label">
             09 / DIGITALE
           </p>
 
-          <h2>
+          <h2 id="digital-title">
             ANCHE LA PRESENZA
             <span>HA BISOGNO DI UNA DIREZIONE.</span>
           </h2>
 
         </div>
 
-        <div class="section-copy reveal">
+        <div class="digital-copy">
 
           <p>
             Una competenza, un'attività o un progetto devono
@@ -831,8 +1012,8 @@
             ufficiale sul web.
           </p>
 
-          <p class="closing-statement">
-            NON SOLTANTO ESSERCI.<br>
+          <p class="digital-closing">
+            NON SOLTANTO ESSERCI.
             ESSERE RICONOSCIBILI.
           </p>
 
@@ -843,67 +1024,130 @@
     </section>
 
 
-    <!-- =====================================================
-         METODO
-         ===================================================== -->
+    <!-- ===================================================
+         10 — METODO
+         =================================================== -->
 
     <section
-      class="section section-soft"
+      class="section method"
       id="percorso"
+      aria-labelledby="method-title"
     >
 
-      <div class="container">
+      <div class="container method-grid">
 
-        <div class="section-heading reveal">
+        <div>
 
-          <p class="section-index">
+          <p class="section-label">
             10 / COME LAVORO
           </p>
 
-          <h2>
+          <h2 id="method-title">
             PRIMA L'OBIETTIVO.
             <span>POI LA SOLUZIONE.</span>
           </h2>
 
         </div>
 
-        <div class="method-grid">
+        <div>
 
-          <div class="method-step reveal">
-            <span>01</span>
-            <h3>COMPRENDERE</h3>
-            <p>
-              Obiettivo e contesto.
-            </p>
-          </div>
+          <div class="method-steps">
 
-          <div class="method-step reveal">
-            <span>02</span>
-            <h3>ANALIZZARE</h3>
-            <p>
-              Esigenze e possibilità.
-            </p>
-          </div>
+            <article class="method-step">
 
-          <div class="method-step reveal">
-            <span>03</span>
-            <h3>PROGETTARE</h3>
-            <p>
-              Competenze e strumenti.
-            </p>
-          </div>
+              <span class="method-step-number">
+                01
+              </span>
 
-          <div class="method-step reveal">
-            <span>04</span>
-            <h3>REALIZZARE</h3>
-            <p>
-              Il risultato.
-            </p>
+              <div>
+
+                <h3>
+                  COMPRENDERE
+                </h3>
+
+                <p>
+                  Obiettivo e contesto.
+                </p>
+
+              </div>
+
+            </article>
+
+
+            <article class="method-step">
+
+              <span class="method-step-number">
+                02
+              </span>
+
+              <div>
+
+                <h3>
+                  ANALIZZARE
+                </h3>
+
+                <p>
+                  Esigenze e possibilità.
+                </p>
+
+              </div>
+
+            </article>
+
+
+            <article class="method-step">
+
+              <span class="method-step-number">
+                03
+              </span>
+
+              <div>
+
+                <h3>
+                  PROGETTARE
+                </h3>
+
+                <p>
+                  Competenze e strumenti.
+                </p>
+
+              </div>
+
+            </article>
+
+
+            <article class="method-step">
+
+              <span class="method-step-number">
+                04
+              </span>
+
+              <div>
+
+                <h3>
+                  REALIZZARE
+                </h3>
+
+                <p>
+                  Il risultato.
+                </p>
+
+              </div>
+
+            </article>
+
           </div>
 
         </div>
 
-        <div class="method-conclusion reveal">
+      </div>
+
+      <div class="container">
+
+        <div
+          class="method-conclusion"
+          style="margin-top: 64px; max-width: 720px;"
+        >
 
           <p>
             NON UNA SOLUZIONE PRECONFEZIONATA.
@@ -922,31 +1166,32 @@
     </section>
 
 
-    <!-- =====================================================
-         TERRITORIO
-         ===================================================== -->
+    <!-- ===================================================
+         11 — TERRITORIO
+         =================================================== -->
 
     <section
-      class="section section-dark"
+      class="section territory"
       id="territorio"
+      aria-labelledby="territory-title"
     >
 
-      <div class="container">
+      <div class="container territory-grid">
 
-        <div class="section-heading reveal">
+        <div>
 
-          <p class="section-index">
+          <p class="section-label">
             11 / TERRITORIO
           </p>
 
-          <h2>
+          <h2 id="territory-title">
             DA UN PUNTO PRECISO.
             <span>VERSO UN ORIZZONTE PIÙ AMPIO.</span>
           </h2>
 
         </div>
 
-        <div class="territory-content reveal">
+        <div class="territory-copy">
 
           <p>
             Partinico è il punto di riferimento territoriale
@@ -964,48 +1209,49 @@
             alcune attività possono svilupparsi anche online.
           </p>
 
+          <div class="territory-route">
+
+            <span>PARTINICO</span>
+            <span>PALERMO</span>
+            <span>TRAPANI</span>
+            <span>MARSALA</span>
+            <span>MAZARA DEL VALLO</span>
+
+          </div>
+
         </div>
-
-        <div class="territory-line reveal">
-
-          <span>PARTINICO</span>
-          <span>PALERMO</span>
-          <span>TRAPANI</span>
-          <span>MARSALA</span>
-          <span>MAZARA DEL VALLO</span>
-
-        </div>
-
-        <p class="territory-note reveal">
-          TERRITORIO + ONLINE
-        </p>
 
       </div>
 
     </section>
 
 
-    <!-- =====================================================
-         PROSSIMO PASSO
-         ===================================================== -->
+    <!-- ===================================================
+         12 — PROSSIMO PASSO
+         =================================================== -->
 
     <section
-      class="section section-light"
+      class="section next-step"
       id="prossimo-passo"
+      aria-labelledby="next-title"
     >
 
-      <div class="container narrow reveal">
+      <div class="container section-inner">
 
-        <p class="section-index">
-          12 / PROSSIMO PASSO
-        </p>
+        <div>
 
-        <h2>
-          UNA DIREZIONE
-          <span>IN COSTRUZIONE.</span>
-        </h2>
+          <p class="section-label">
+            12 / PROSSIMO PASSO
+          </p>
 
-        <div class="section-copy">
+          <h2 id="next-title">
+            UNA DIREZIONE
+            <span>IN COSTRUZIONE.</span>
+          </h2>
+
+        </div>
+
+        <div>
 
           <p>
             Un percorso professionale non è mai completamente concluso.
@@ -1024,8 +1270,25 @@
 
         </div>
 
-        <p class="closing-statement">
-          IL FUTURO NON SI DICHIARA.<br>
+      </div>
+
+      <div
+        class="container"
+        style="margin-top: 64px;"
+      >
+
+        <p
+          style="
+            max-width: 700px;
+            margin: 0;
+            font-size: clamp(1.8rem, 3vw, 3rem);
+            font-weight: 500;
+            letter-spacing: -.04em;
+            line-height: 1;
+          "
+        >
+          IL FUTURO NON SI DICHIARA.
+          <br>
           SI COSTRUISCE.
         </p>
 
@@ -1034,31 +1297,32 @@
     </section>
 
 
-    <!-- =====================================================
-         PERSONA
-         ===================================================== -->
+    <!-- ===================================================
+         13 — PERSONA
+         =================================================== -->
 
     <section
-      class="section section-soft"
+      class="section person"
       id="persona"
+      aria-labelledby="person-title"
     >
 
-      <div class="container two-column">
+      <div class="container person-grid">
 
-        <div class="section-heading reveal">
+        <div>
 
-          <p class="section-index">
+          <p class="section-label">
             13 / OLTRE IL PERCORSO
           </p>
 
-          <h2>
+          <h2 id="person-title">
             DIETRO IL METODO,
             <span>C'È UNA PERSONA.</span>
           </h2>
 
         </div>
 
-        <div class="section-copy reveal">
+        <div class="person-copy">
 
           <p>
             Studio, sport, insegnamento e progettazione
@@ -1082,63 +1346,61 @@
     </section>
 
 
-    <!-- =====================================================
-         CONTATTI
-         ===================================================== -->
+    <!-- ===================================================
+         14 — CONTATTI
+         =================================================== -->
 
     <section
-      class="section section-dark contact-section"
+      class="section contact"
       id="contatti"
+      aria-labelledby="contact-title"
     >
 
-      <div class="container contact-grid">
+      <div class="container contact-inner">
 
-        <div class="section-heading reveal">
+        <p class="section-label">
+          14 / CONTATTI
+        </p>
 
-          <p class="section-index">
-            14 / CONTATTI
-          </p>
+        <h2 id="contact-title">
+          HAI UN
+          <span>OBIETTIVO?</span>
+        </h2>
 
-          <h2>
-            HAI UN
-            <span>OBIETTIVO?</span>
-          </h2>
+        <p>
+          Raccontami da dove vuoi partire.
+        </p>
+
+        <p>
+          Il primo passo non è scegliere una soluzione.
+          È capire quale direzione può avere senso.
+        </p>
+
+        <div class="contact-actions">
+
+          <a
+            href="mailto:INSERIRE-EMAIL@ESEMPIO.IT"
+            class="btn btn-primary"
+          >
+            Parliamone
+            <span aria-hidden="true">→</span>
+          </a>
 
         </div>
 
-        <div class="contact-content reveal">
+        <div class="contact-links">
 
-          <p>
-            Raccontami da dove vuoi partire.
-          </p>
+          <a href="#contatti">
+            WhatsApp
+          </a>
 
-          <p>
-            Il primo passo non è scegliere una soluzione.
-          </p>
+          <a href="mailto:INSERIRE-EMAIL@ESEMPIO.IT">
+            Email
+          </a>
 
-          <p>
-            È capire quale direzione può avere senso.
-          </p>
-
-          <div class="contact-actions">
-
-            <a
-              href="mailto:INSERIRE-EMAIL@ESEMPIO.IT"
-              class="button button-light"
-            >
-              Parliamone
-              <span aria-hidden="true">→</span>
-            </a>
-
-          </div>
-
-          <div class="contact-channels">
-
-            <span>WhatsApp</span>
-            <span>Email</span>
-            <span>LinkedIn</span>
-
-          </div>
+          <a href="#">
+            LinkedIn
+          </a>
 
         </div>
 
@@ -1155,61 +1417,47 @@
 
   <footer class="site-footer">
 
-    <div class="container footer-main">
+    <div class="container footer-inner">
 
       <div class="footer-brand">
 
         <img
           src="assets/images/cp-mark.png"
           alt="CP"
-          width="48"
-          height="48"
+          width="38"
+          height="38"
         >
 
-        <div>
-
-          <p class="footer-name">
-            CESARE PARATORE
-          </p>
-
-          <p class="footer-role">
-            Scienze Motorie e Sport
-          </p>
-
-        </div>
+        <span>
+          CESARE PARATORE
+        </span>
 
       </div>
 
-      <div class="footer-concept">
 
-        <p>
+      <div class="footer-meta">
+
+        <span>
+          Scienze Motorie e Sport
+        </span>
+
+        <br>
+
+        <span>
           MOVIMENTO CON DIREZIONE.
-        </p>
+        </span>
+
+        <br>
 
         <span>
           Sport · Educazione · Management · Digitale
         </span>
 
-      </div>
+        <br>
 
-    </div>
-
-
-    <div class="container footer-bottom">
-
-      <p>
-        © <span id="current-year"></span> Cesare Paratore
-      </p>
-
-      <div class="footer-links">
-
-        <a href="#top">
-          Torna su
-        </a>
-
-        <a href="#contatti">
-          Contatti
-        </a>
+        <span>
+          © <span data-year></span> Cesare Paratore
+        </span>
 
       </div>
 
@@ -1218,7 +1466,12 @@
   </footer>
 
 
+  <!-- =====================================================
+       JAVASCRIPT
+       ===================================================== -->
+
   <script src="script.js"></script>
 
 </body>
+
 </html>
