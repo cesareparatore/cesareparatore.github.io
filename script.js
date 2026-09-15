@@ -1,60 +1,202 @@
 /* =========================================================
-   CESARE PARATORE — DIGITAL HEADQUARTERS
-   INTERACTION SYSTEM
-   Version: 15.09.2026
+   CESARE PARATORE — MAIN SCRIPT
+   Static GitHub Pages
    ========================================================= */
 
 (() => {
   "use strict";
 
-  /* -------------------------------------------------------
-     01. DOM READY
-     ------------------------------------------------------- */
 
-  document.addEventListener("DOMContentLoaded", () => {
-    initYear();
-    initReveal();
-    initSmoothAnchors();
-    initHeader();
-    initActiveNavigation();
-    initExternalLinks();
-    initImageProtection();
-  });
+  /* =======================================================
+     01 — YEAR
+     ======================================================= */
 
-
-  /* -------------------------------------------------------
-     02. CURRENT YEAR
-     ------------------------------------------------------- */
-
-  function initYear() {
+  const initYear = () => {
     const yearElements = document.querySelectorAll("[data-year]");
 
-    if (!yearElements.length) return;
+    if (!yearElements.length) {
+      return;
+    }
 
-    const year = new Date().getFullYear();
+    const currentYear = new Date().getFullYear();
 
     yearElements.forEach((element) => {
-      element.textContent = year;
+      element.textContent = currentYear;
     });
-  }
+  };
 
 
-  /* -------------------------------------------------------
-     03. REVEAL ON SCROLL
-     ------------------------------------------------------- */
+  /* =======================================================
+     02 — HEADER / SCROLL STATE
+     ======================================================= */
 
-  function initReveal() {
-    const elements = document.querySelectorAll(
-      ".reveal, [data-reveal]"
+  const initHeader = () => {
+    const header = document.querySelector(".site-header");
+
+    if (!header) {
+      return;
+    }
+
+    const updateHeader = () => {
+      if (window.scrollY > 24) {
+        header.classList.add("is-scrolled");
+      } else {
+        header.classList.remove("is-scrolled");
+      }
+    };
+
+    updateHeader();
+
+    window.addEventListener(
+      "scroll",
+      updateHeader,
+      { passive: true }
+    );
+  };
+
+
+  /* =======================================================
+     03 — SMOOTH SCROLL
+     ======================================================= */
+
+  const initSmoothScroll = () => {
+    const links = document.querySelectorAll(
+      'a[href^="#"]'
     );
 
-    if (!elements.length) return;
+    if (!links.length) {
+      return;
+    }
 
-    const reduceMotion = window.matchMedia(
+    links.forEach((link) => {
+      link.addEventListener("click", (event) => {
+
+        const targetId = link.getAttribute("href");
+
+        if (!targetId || targetId === "#") {
+          return;
+        }
+
+        const target = document.querySelector(targetId);
+
+        if (!target) {
+          return;
+        }
+
+        event.preventDefault();
+
+        target.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+
+        /*
+         * Aggiorna l'URL senza generare un salto.
+         * Se l'utente preferisce non avere hash nell'URL,
+         * questa parte può essere rimossa.
+         */
+        if (history.replaceState) {
+          history.replaceState(
+            null,
+            "",
+            targetId
+          );
+        }
+      });
+    });
+  };
+
+
+  /* =======================================================
+     04 — ACTIVE NAVIGATION
+     ======================================================= */
+
+  const initActiveNavigation = () => {
+    const sections = document.querySelectorAll(
+      "main section[id]"
+    );
+
+    const navLinks = document.querySelectorAll(
+      '.nav a[href^="#"]'
+    );
+
+    if (!sections.length || !navLinks.length) {
+      return;
+    }
+
+    const linkMap = new Map();
+
+    navLinks.forEach((link) => {
+      const targetId = link.getAttribute("href");
+
+      if (targetId) {
+        linkMap.set(targetId.substring(1), link);
+      }
+    });
+
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+
+        entries.forEach((entry) => {
+
+          if (!entry.isIntersecting) {
+            return;
+          }
+
+          navLinks.forEach((link) => {
+            link.removeAttribute("aria-current");
+            link.classList.remove("is-active");
+          });
+
+          const activeLink = linkMap.get(
+            entry.target.id
+          );
+
+          if (activeLink) {
+            activeLink.setAttribute(
+              "aria-current",
+              "page"
+            );
+
+            activeLink.classList.add("is-active");
+          }
+        });
+      },
+      {
+        rootMargin: "-25% 0px -60% 0px",
+        threshold: 0
+      }
+    );
+
+
+    sections.forEach((section) => {
+      observer.observe(section);
+    });
+  };
+
+
+  /* =======================================================
+     05 — REVEAL ON SCROLL
+     ======================================================= */
+
+  const initReveal = () => {
+    const elements = document.querySelectorAll(
+      "[data-reveal]"
+    );
+
+    if (!elements.length) {
+      return;
+    }
+
+    /*
+     * Rispetta le preferenze di accessibilità.
+     */
+    const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
 
-    if (reduceMotion || !("IntersectionObserver" in window)) {
+    if (reducedMotion) {
       elements.forEach((element) => {
         element.classList.add("is-visible");
       });
@@ -62,310 +204,137 @@
       return;
     }
 
+
     const observer = new IntersectionObserver(
       (entries, observerInstance) => {
+
         entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
+
+          if (!entry.isIntersecting) {
+            return;
+          }
 
           entry.target.classList.add("is-visible");
-          observerInstance.unobserve(entry.target);
+
+          observerInstance.unobserve(
+            entry.target
+          );
         });
       },
       {
-        root: null,
         threshold: 0.12,
-        rootMargin: "0px 0px -8% 0px"
+        rootMargin: "0px 0px -5% 0px"
       }
     );
+
 
     elements.forEach((element) => {
       observer.observe(element);
     });
-  }
+  };
 
 
-  /* -------------------------------------------------------
-     04. SMOOTH ANCHOR NAVIGATION
-     ------------------------------------------------------- */
+  /* =======================================================
+     06 — REDUCED MOTION
+     ======================================================= */
 
-  function initSmoothAnchors() {
-    const anchors = document.querySelectorAll(
-      'a[href^="#"]'
-    );
-
-    if (!anchors.length) return;
-
-    anchors.forEach((anchor) => {
-      anchor.addEventListener("click", (event) => {
-        const targetId = anchor.getAttribute("href");
-
-        if (!targetId || targetId === "#") return;
-
-        const target = document.querySelector(targetId);
-
-        if (!target) return;
-
-        event.preventDefault();
-
-        const reduceMotion = window.matchMedia(
-          "(prefers-reduced-motion: reduce)"
-        ).matches;
-
-        target.scrollIntoView({
-          behavior: reduceMotion ? "auto" : "smooth",
-          block: "start"
-        });
-
-        /*
-         * Aggiorna l'URL senza provocare il salto
-         * automatico del browser.
-         */
-        if (history.pushState) {
-          history.pushState(null, "", targetId);
-        }
-      });
-    });
-  }
-
-
-  /* -------------------------------------------------------
-     05. HEADER — SCROLL STATE
-     ------------------------------------------------------- */
-
-  function initHeader() {
-    const header = document.querySelector(
-      ".site-header, header"
-    );
-
-    if (!header) return;
-
-    let ticking = false;
-
-    const updateHeader = () => {
-      const scrollY = window.scrollY;
-
-      header.classList.toggle(
-        "is-scrolled",
-        scrollY > 40
-      );
-
-      ticking = false;
-    };
-
-    updateHeader();
-
-    window.addEventListener(
-      "scroll",
-      () => {
-        if (ticking) return;
-
-        window.requestAnimationFrame(updateHeader);
-        ticking = true;
-      },
-      { passive: true }
-    );
-  }
-
-
-  /* -------------------------------------------------------
-     06. ACTIVE NAVIGATION
-     ------------------------------------------------------- */
-
-  function initActiveNavigation() {
-    const navigationLinks = document.querySelectorAll(
-      'nav a[href^="#"], .nav a[href^="#"]'
-    );
-
-    if (!navigationLinks.length) return;
-
-    const sections = [];
-
-    navigationLinks.forEach((link) => {
-      const id = link.getAttribute("href");
-
-      if (!id || id === "#") return;
-
-      const section = document.querySelector(id);
-
-      if (section) {
-        sections.push({
-          section,
-          link
-        });
-      }
-    });
-
-    if (!sections.length) return;
-
-    const reduceMotion = window.matchMedia(
+  const initReducedMotion = () => {
+    const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
-    ).matches;
-
-    if (!("IntersectionObserver" in window)) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-
-          sections.forEach(({ link }) => {
-            link.classList.remove("is-active");
-          });
-
-          const current = sections.find(
-            ({ section }) => section === entry.target
-          );
-
-          if (current) {
-            current.link.classList.add("is-active");
-          }
-        });
-      },
-      {
-        threshold: reduceMotion ? 0.1 : 0.35,
-        rootMargin: "-15% 0px -55% 0px"
-      }
     );
 
-    sections.forEach(({ section }) => {
-      observer.observe(section);
-    });
-  }
-
-
-  /* -------------------------------------------------------
-     07. EXTERNAL LINKS
-     ------------------------------------------------------- */
-
-  function initExternalLinks() {
-    const links = document.querySelectorAll(
-      'a[href^="http://"], a[href^="https://"]'
-    );
-
-    links.forEach((link) => {
-      const currentHost = window.location.hostname;
-
-      try {
-        const url = new URL(link.href);
-
-        if (
-          url.hostname &&
-          url.hostname !== currentHost
-        ) {
-          link.setAttribute(
-            "rel",
-            "noopener noreferrer"
-          );
-        }
-      } catch {
-        /* URL non valida: nessuna modifica */
-      }
-    });
-  }
-
-
-  /* -------------------------------------------------------
-     08. IMAGE LOADING
-     ------------------------------------------------------- */
-
-  function initImageProtection() {
-    const images = document.querySelectorAll(
-      "img"
-    );
-
-    images.forEach((image) => {
-      /*
-       * Lazy loading solo per immagini non critiche.
-       * Logo e immagini già esplicitamente eager
-       * non vengono modificati.
-       */
-      if (
-        !image.hasAttribute("loading") &&
-        !image.closest(".hero")
-      ) {
-        image.setAttribute(
-          "loading",
-          "lazy"
-        );
-      }
-
-      if (
-        !image.hasAttribute("decoding")
-      ) {
-        image.setAttribute(
-          "decoding",
-          "async"
-        );
-      }
-    });
-  }
-
-
-  /* -------------------------------------------------------
-     09. KEYBOARD ACCESSIBILITY
-     ------------------------------------------------------- */
-
-  document.addEventListener("keydown", (event) => {
-    /*
-     * Evita effetti grafici o comportamenti invasivi
-     * quando l'utente naviga da tastiera.
-     */
-    if (event.key === "Tab") {
+    if (reducedMotion.matches) {
       document.documentElement.classList.add(
-        "keyboard-navigation"
+        "reduce-motion"
       );
     }
-  });
 
 
-  document.addEventListener("mousedown", () => {
-    document.documentElement.classList.remove(
-      "keyboard-navigation"
-    );
-  });
+    const handleChange = (event) => {
 
-
-  /* -------------------------------------------------------
-     10. PAGE VISIBILITY
-     ------------------------------------------------------- */
-
-  document.addEventListener(
-    "visibilitychange",
-    () => {
-      if (document.hidden) {
+      if (event.matches) {
         document.documentElement.classList.add(
-          "page-hidden"
+          "reduce-motion"
         );
       } else {
         document.documentElement.classList.remove(
-          "page-hidden"
+          "reduce-motion"
         );
       }
+
+    };
+
+
+    if (
+      typeof reducedMotion.addEventListener ===
+      "function"
+    ) {
+      reducedMotion.addEventListener(
+        "change",
+        handleChange
+      );
     }
-  );
+  };
 
 
-  /* -------------------------------------------------------
-     11. BACK / FORWARD NAVIGATION
-     ------------------------------------------------------- */
+  /* =======================================================
+     07 — ESC KEY
+     ======================================================= */
 
-  window.addEventListener("popstate", () => {
-    /*
-     * Mantiene il comportamento naturale del browser
-     * quando si utilizzano avanti/indietro.
-     */
-    const hash = window.location.hash;
+  const initKeyboardSupport = () => {
+    document.addEventListener(
+      "keydown",
+      (event) => {
 
-    if (!hash) return;
+        if (event.key !== "Escape") {
+          return;
+        }
 
-    const target = document.querySelector(hash);
+        document.activeElement?.blur();
+      }
+    );
+  };
 
-    if (!target) return;
 
-    target.scrollIntoView({
-      behavior: "auto",
-      block: "start"
-    });
-  });
+  /* =======================================================
+     08 — INITIALIZATION
+     ======================================================= */
+
+  const init = () => {
+
+    initYear();
+
+    initHeader();
+
+    initSmoothScroll();
+
+    initActiveNavigation();
+
+    initReveal();
+
+    initReducedMotion();
+
+    initKeyboardSupport();
+
+  };
+
+
+  /* =======================================================
+     DOM READY
+     ======================================================= */
+
+  if (document.readyState === "loading") {
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      init,
+      { once: true }
+    );
+
+  } else {
+
+    init();
+
+  }
 
 })();
