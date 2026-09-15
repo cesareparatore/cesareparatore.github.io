@@ -1,340 +1,528 @@
-/* =========================================================
-   CESARE PARATORE — MAIN SCRIPT
-   Static GitHub Pages
-   ========================================================= */
-
 (() => {
   "use strict";
 
 
-  /* =======================================================
-     01 — YEAR
-     ======================================================= */
+  /* ==========================================================
+     DOM READY
+  ========================================================== */
 
-  const initYear = () => {
-    const yearElements = document.querySelectorAll("[data-year]");
+  const ready = (callback) => {
 
-    if (!yearElements.length) {
-      return;
+    if (document.readyState === "loading") {
+
+      document.addEventListener(
+        "DOMContentLoaded",
+        callback,
+        { once: true }
+      );
+
+    } else {
+
+      callback();
+
     }
-
-    const currentYear = new Date().getFullYear();
-
-    yearElements.forEach((element) => {
-      element.textContent = currentYear;
-    });
   };
 
 
-  /* =======================================================
-     02 — HEADER / SCROLL STATE
-     ======================================================= */
+  ready(() => {
 
-  const initHeader = () => {
-    const header = document.querySelector(".site-header");
+    /* ========================================================
+       ELEMENTS
+    ======================================================== */
 
-    if (!header) {
-      return;
+    const body =
+      document.body;
+
+    const header =
+      document.querySelector("[data-header]");
+
+    const menuToggle =
+      document.querySelector("[data-menu-toggle]");
+
+    const navigation =
+      document.querySelector("[data-nav]");
+
+    const navigationLinks =
+      [...document.querySelectorAll("[data-nav-link]")];
+
+    const year =
+      document.querySelector("[data-year]");
+
+    const reducedMotion =
+      window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      );
+
+
+    /* ========================================================
+       YEAR
+    ======================================================== */
+
+    if (year) {
+
+      year.textContent =
+        new Date().getFullYear();
+
     }
 
-    const updateHeader = () => {
-      if (window.scrollY > 24) {
-        header.classList.add("is-scrolled");
-      } else {
-        header.classList.remove("is-scrolled");
-      }
-    };
+
+    /* ========================================================
+       HEADER STATE
+    ======================================================== */
+
+    const updateHeader =
+      () => {
+
+        if (!header) {
+          return;
+        }
+
+        header.classList.toggle(
+          "is-scrolled",
+          window.scrollY > 8
+        );
+
+      };
+
 
     updateHeader();
+
 
     window.addEventListener(
       "scroll",
       updateHeader,
-      { passive: true }
-    );
-  };
-
-
-  /* =======================================================
-     03 — SMOOTH SCROLL
-     ======================================================= */
-
-  const initSmoothScroll = () => {
-    const links = document.querySelectorAll(
-      'a[href^="#"]'
+      {
+        passive: true
+      }
     );
 
-    if (!links.length) {
-      return;
-    }
 
-    links.forEach((link) => {
-      link.addEventListener("click", (event) => {
+    /* ========================================================
+       MOBILE NAVIGATION
+    ======================================================== */
 
-        const targetId = link.getAttribute("href");
+    const closeMenu =
+      ({
+        restoreFocus = false
+      } = {}) => {
 
-        if (!targetId || targetId === "#") {
+        if (!menuToggle || !navigation) {
           return;
         }
 
-        const target = document.querySelector(targetId);
+        menuToggle.setAttribute(
+          "aria-expanded",
+          "false"
+        );
+
+        menuToggle.setAttribute(
+          "aria-label",
+          "Apri il menu"
+        );
+
+        navigation.classList.remove(
+          "is-open"
+        );
+
+        body.classList.remove(
+          "menu-open"
+        );
+
+        if (restoreFocus) {
+
+          menuToggle.focus();
+
+        }
+
+      };
+
+
+    const openMenu =
+      () => {
+
+        if (!menuToggle || !navigation) {
+          return;
+        }
+
+        menuToggle.setAttribute(
+          "aria-expanded",
+          "true"
+        );
+
+        menuToggle.setAttribute(
+          "aria-label",
+          "Chiudi il menu"
+        );
+
+        navigation.classList.add(
+          "is-open"
+        );
+
+        body.classList.add(
+          "menu-open"
+        );
+
+        const firstLink =
+          navigation.querySelector("a");
+
+        if (firstLink) {
+
+          firstLink.focus();
+
+        }
+
+      };
+
+
+    if (menuToggle) {
+
+      menuToggle.addEventListener(
+        "click",
+        () => {
+
+          const isOpen =
+            menuToggle.getAttribute(
+              "aria-expanded"
+            ) === "true";
+
+
+          if (isOpen) {
+
+            closeMenu();
+
+          } else {
+
+            openMenu();
+
+          }
+
+        }
+      );
+
+    }
+
+
+    /* ========================================================
+       CLOSE MOBILE MENU ON LINK
+    ======================================================== */
+
+    navigationLinks.forEach(
+      (link) => {
+
+        link.addEventListener(
+          "click",
+          () => {
+
+            closeMenu();
+
+          }
+        );
+
+      }
+    );
+
+
+    /* ========================================================
+       ESCAPE
+    ======================================================== */
+
+    document.addEventListener(
+      "keydown",
+      (event) => {
+
+        if (
+          event.key === "Escape" &&
+          menuToggle?.getAttribute(
+            "aria-expanded"
+          ) === "true"
+        ) {
+
+          closeMenu({
+            restoreFocus: true
+          });
+
+        }
+
+      }
+    );
+
+
+    /* ========================================================
+       RESIZE
+    ======================================================== */
+
+    window.addEventListener(
+      "resize",
+      () => {
+
+        if (
+          window.innerWidth > 760 &&
+          menuToggle?.getAttribute(
+            "aria-expanded"
+          ) === "true"
+        ) {
+
+          closeMenu();
+
+        }
+
+      },
+      {
+        passive: true
+      }
+    );
+
+
+    /* ========================================================
+       ACTIVE SECTION / SCROLL SPY
+    ======================================================== */
+
+    const sections =
+      [
+        ...document.querySelectorAll(
+          "main section[id]"
+        )
+      ];
+
+
+    const trackedSections =
+      sections.filter(
+        (section) => {
+
+          return navigationLinks.some(
+            (link) =>
+              link.getAttribute("href") ===
+              `#${section.id}`
+          );
+
+        }
+      );
+
+
+    if (
+      "IntersectionObserver" in window &&
+      trackedSections.length
+    ) {
+
+      const rootMargin =
+        getComputedStyle(
+          document.documentElement
+        ).getPropertyValue(
+          "--header-height"
+        );
+
+
+      const observer =
+        new IntersectionObserver(
+          (entries) => {
+
+            entries.forEach(
+              (entry) => {
+
+                if (!entry.isIntersecting) {
+                  return;
+                }
+
+
+                navigationLinks.forEach(
+                  (link) => {
+
+                    const isActive =
+                      link.getAttribute("href") ===
+                      `#${entry.target.id}`;
+
+
+                    if (isActive) {
+
+                      link.setAttribute(
+                        "aria-current",
+                        "true"
+                      );
+
+                    } else {
+
+                      link.removeAttribute(
+                        "aria-current"
+                      );
+
+                    }
+
+                  }
+                );
+
+              }
+            );
+
+          },
+          {
+            rootMargin:
+              `-${parseInt(rootMargin, 10) || 72}px 0px -55% 0px`,
+
+            threshold: 0
+          }
+        );
+
+
+      trackedSections.forEach(
+        (section) =>
+          observer.observe(section)
+      );
+
+    }
+
+
+    /* ========================================================
+       SAME PAGE ANCHOR NAVIGATION
+    ======================================================== */
+
+    document
+      .querySelectorAll('a[href^="#"]')
+      .forEach(
+        (link) => {
+
+          link.addEventListener(
+            "click",
+            (event) => {
+
+              const hash =
+                link.getAttribute("href");
+
+
+              if (
+                !hash ||
+                hash === "#"
+              ) {
+
+                return;
+
+              }
+
+
+              const target =
+                document.querySelector(hash);
+
+
+              if (!target) {
+                return;
+              }
+
+
+              event.preventDefault();
+
+
+              target.scrollIntoView({
+                behavior:
+                  reducedMotion.matches
+                    ? "auto"
+                    : "smooth",
+
+                block: "start"
+              });
+
+
+              /*
+                Aggiorniamo l'URL senza ricaricare
+                la pagina.
+              */
+
+              history.pushState(
+                null,
+                "",
+                hash
+              );
+
+
+              /*
+                Dopo la navigazione rendiamo il target
+                disponibile alla tastiera.
+              */
+
+              target.setAttribute(
+                "tabindex",
+                "-1"
+              );
+
+
+              window.setTimeout(
+                () => {
+
+                  target.focus({
+                    preventScroll: true
+                  });
+
+                },
+                reducedMotion.matches
+                  ? 0
+                  : 450
+              );
+
+            }
+          );
+
+        }
+      );
+
+
+    /* ========================================================
+       HASH NAVIGATION DIRECT
+    ======================================================== */
+
+    const focusHashTarget =
+      () => {
+
+        if (!window.location.hash) {
+          return;
+        }
+
+
+        const target =
+          document.querySelector(
+            window.location.hash
+          );
+
 
         if (!target) {
           return;
         }
 
-        event.preventDefault();
 
-        target.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
-        });
-
-        /*
-         * Aggiorna l'URL senza generare un salto.
-         * Se l'utente preferisce non avere hash nell'URL,
-         * questa parte può essere rimossa.
-         */
-        if (history.replaceState) {
-          history.replaceState(
-            null,
-            "",
-            targetId
-          );
-        }
-      });
-    });
-  };
+        target.setAttribute(
+          "tabindex",
+          "-1"
+        );
 
 
-  /* =======================================================
-     04 — ACTIVE NAVIGATION
-     ======================================================= */
+        window.setTimeout(
+          () => {
 
-  const initActiveNavigation = () => {
-    const sections = document.querySelectorAll(
-      "main section[id]"
+            target.focus({
+              preventScroll: true
+            });
+
+          },
+          50
+        );
+
+      };
+
+
+    window.addEventListener(
+      "hashchange",
+      focusHashTarget
     );
 
-    const navLinks = document.querySelectorAll(
-      '.nav a[href^="#"]'
-    );
-
-    if (!sections.length || !navLinks.length) {
-      return;
-    }
-
-    const linkMap = new Map();
-
-    navLinks.forEach((link) => {
-      const targetId = link.getAttribute("href");
-
-      if (targetId) {
-        linkMap.set(targetId.substring(1), link);
-      }
-    });
-
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-
-        entries.forEach((entry) => {
-
-          if (!entry.isIntersecting) {
-            return;
-          }
-
-          navLinks.forEach((link) => {
-            link.removeAttribute("aria-current");
-            link.classList.remove("is-active");
-          });
-
-          const activeLink = linkMap.get(
-            entry.target.id
-          );
-
-          if (activeLink) {
-            activeLink.setAttribute(
-              "aria-current",
-              "page"
-            );
-
-            activeLink.classList.add("is-active");
-          }
-        });
-      },
-      {
-        rootMargin: "-25% 0px -60% 0px",
-        threshold: 0
-      }
-    );
-
-
-    sections.forEach((section) => {
-      observer.observe(section);
-    });
-  };
-
-
-  /* =======================================================
-     05 — REVEAL ON SCROLL
-     ======================================================= */
-
-  const initReveal = () => {
-    const elements = document.querySelectorAll(
-      "[data-reveal]"
-    );
-
-    if (!elements.length) {
-      return;
-    }
 
     /*
-     * Rispetta le preferenze di accessibilità.
-     */
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
+      Eseguito solo quando la pagina viene aperta
+      direttamente con un hash.
+    */
 
-    if (reducedMotion) {
-      elements.forEach((element) => {
-        element.classList.add("is-visible");
-      });
+    if (window.location.hash) {
 
-      return;
+      focusHashTarget();
+
     }
 
-
-    const observer = new IntersectionObserver(
-      (entries, observerInstance) => {
-
-        entries.forEach((entry) => {
-
-          if (!entry.isIntersecting) {
-            return;
-          }
-
-          entry.target.classList.add("is-visible");
-
-          observerInstance.unobserve(
-            entry.target
-          );
-        });
-      },
-      {
-        threshold: 0.12,
-        rootMargin: "0px 0px -5% 0px"
-      }
-    );
-
-
-    elements.forEach((element) => {
-      observer.observe(element);
-    });
-  };
-
-
-  /* =======================================================
-     06 — REDUCED MOTION
-     ======================================================= */
-
-  const initReducedMotion = () => {
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    );
-
-    if (reducedMotion.matches) {
-      document.documentElement.classList.add(
-        "reduce-motion"
-      );
-    }
-
-
-    const handleChange = (event) => {
-
-      if (event.matches) {
-        document.documentElement.classList.add(
-          "reduce-motion"
-        );
-      } else {
-        document.documentElement.classList.remove(
-          "reduce-motion"
-        );
-      }
-
-    };
-
-
-    if (
-      typeof reducedMotion.addEventListener ===
-      "function"
-    ) {
-      reducedMotion.addEventListener(
-        "change",
-        handleChange
-      );
-    }
-  };
-
-
-  /* =======================================================
-     07 — ESC KEY
-     ======================================================= */
-
-  const initKeyboardSupport = () => {
-    document.addEventListener(
-      "keydown",
-      (event) => {
-
-        if (event.key !== "Escape") {
-          return;
-        }
-
-        document.activeElement?.blur();
-      }
-    );
-  };
-
-
-  /* =======================================================
-     08 — INITIALIZATION
-     ======================================================= */
-
-  const init = () => {
-
-    initYear();
-
-    initHeader();
-
-    initSmoothScroll();
-
-    initActiveNavigation();
-
-    initReveal();
-
-    initReducedMotion();
-
-    initKeyboardSupport();
-
-  };
-
-
-  /* =======================================================
-     DOM READY
-     ======================================================= */
-
-  if (document.readyState === "loading") {
-
-    document.addEventListener(
-      "DOMContentLoaded",
-      init,
-      { once: true }
-    );
-
-  } else {
-
-    init();
-
-  }
+  });
 
 })();
