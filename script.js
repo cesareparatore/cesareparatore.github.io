@@ -1,325 +1,371 @@
 /* =========================================================
-   CESARE PARATORE
-   SCIENZE MOTORIE E SPORT
-   JavaScript — static GitHub Pages
+   CESARE PARATORE — DIGITAL HEADQUARTERS
+   INTERACTION SYSTEM
+   Version: 15.09.2026
    ========================================================= */
 
-"use strict";
+(() => {
+  "use strict";
 
+  /* -------------------------------------------------------
+     01. DOM READY
+     ------------------------------------------------------- */
 
-/* =========================================================
-   DOM
-   ========================================================= */
-
-const header = document.querySelector(".site-header");
-const menuToggle = document.querySelector(".menu-toggle");
-const navigation = document.querySelector(".primary-navigation");
-const navigationLinks = document.querySelectorAll(
-  ".primary-navigation a"
-);
-
-const revealElements = document.querySelectorAll(".reveal");
-
-const yearElement = document.getElementById("current-year");
-
-
-/* =========================================================
-   YEAR
-   ========================================================= */
-
-if (yearElement) {
-  yearElement.textContent = new Date().getFullYear();
-}
-
-
-/* =========================================================
-   HEADER SCROLL STATE
-   ========================================================= */
-
-function updateHeader() {
-  if (!header) return;
-
-  if (window.scrollY > 20) {
-    header.classList.add("scrolled");
-  } else {
-    header.classList.remove("scrolled");
-  }
-}
-
-updateHeader();
-
-window.addEventListener(
-  "scroll",
-  updateHeader,
-  { passive: true }
-);
-
-
-/* =========================================================
-   MOBILE MENU
-   ========================================================= */
-
-function closeMenu() {
-  if (!menuToggle || !navigation) return;
-
-  menuToggle.classList.remove("active");
-  menuToggle.setAttribute("aria-expanded", "false");
-  menuToggle.setAttribute("aria-label", "Apri il menu");
-
-  navigation.classList.remove("open");
-}
-
-if (menuToggle && navigation) {
-
-  menuToggle.addEventListener("click", () => {
-
-    const isOpen =
-      menuToggle.getAttribute("aria-expanded") === "true";
-
-    menuToggle.classList.toggle("active", !isOpen);
-
-    menuToggle.setAttribute(
-      "aria-expanded",
-      String(!isOpen)
-    );
-
-    menuToggle.setAttribute(
-      "aria-label",
-      isOpen ? "Apri il menu" : "Chiudi il menu"
-    );
-
-    navigation.classList.toggle("open", !isOpen);
+  document.addEventListener("DOMContentLoaded", () => {
+    initYear();
+    initReveal();
+    initSmoothAnchors();
+    initHeader();
+    initActiveNavigation();
+    initExternalLinks();
+    initImageProtection();
   });
 
-  navigationLinks.forEach((link) => {
-    link.addEventListener("click", () => {
-      closeMenu();
+
+  /* -------------------------------------------------------
+     02. CURRENT YEAR
+     ------------------------------------------------------- */
+
+  function initYear() {
+    const yearElements = document.querySelectorAll("[data-year]");
+
+    if (!yearElements.length) return;
+
+    const year = new Date().getFullYear();
+
+    yearElements.forEach((element) => {
+      element.textContent = year;
     });
-  });
+  }
 
-  document.addEventListener("click", (event) => {
 
-    if (!navigation.classList.contains("open")) {
+  /* -------------------------------------------------------
+     03. REVEAL ON SCROLL
+     ------------------------------------------------------- */
+
+  function initReveal() {
+    const elements = document.querySelectorAll(
+      ".reveal, [data-reveal]"
+    );
+
+    if (!elements.length) return;
+
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (reduceMotion || !("IntersectionObserver" in window)) {
+      elements.forEach((element) => {
+        element.classList.add("is-visible");
+      });
+
       return;
     }
 
-    const target = event.target;
-
-    if (
-      target instanceof Node &&
-      !navigation.contains(target) &&
-      !menuToggle.contains(target)
-    ) {
-      closeMenu();
-    }
-  });
-
-  document.addEventListener("keydown", (event) => {
-
-    if (event.key === "Escape") {
-      closeMenu();
-    }
-  });
-}
-
-
-/* =========================================================
-   INTERSECTION OBSERVER
-   ========================================================= */
-
-if (
-  "IntersectionObserver" in window &&
-  revealElements.length
-) {
-
-  const observer = new IntersectionObserver(
-    (entries, observerInstance) => {
-
-      entries.forEach((entry) => {
-
-        if (!entry.isIntersecting) {
-          return;
-        }
-
-        entry.target.classList.add("visible");
-
-        observerInstance.unobserve(entry.target);
-      });
-
-    },
-    {
-      threshold: 0.12,
-      rootMargin: "0px 0px -50px 0px"
-    }
-  );
-
-  revealElements.forEach((element) => {
-    observer.observe(element);
-  });
-
-} else {
-
-  revealElements.forEach((element) => {
-    element.classList.add("visible");
-  });
-
-}
-
-
-/* =========================================================
-   ACTIVE SECTION
-   ========================================================= */
-
-const sections = document.querySelectorAll(
-  "main section[id]"
-);
-
-const navMap = new Map();
-
-navigationLinks.forEach((link) => {
-
-  const href = link.getAttribute("href");
-
-  if (!href || !href.startsWith("#")) {
-    return;
-  }
-
-  navMap.set(href.substring(1), link);
-});
-
-
-if (
-  "IntersectionObserver" in window &&
-  sections.length
-) {
-
-  const sectionObserver =
-    new IntersectionObserver(
-      (entries) => {
-
+    const observer = new IntersectionObserver(
+      (entries, observerInstance) => {
         entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
 
-          const link = navMap.get(entry.target.id);
-
-          if (!link) {
-            return;
-          }
-
-          if (entry.isIntersecting) {
-
-            navigationLinks.forEach((item) => {
-              item.removeAttribute("aria-current");
-            });
-
-            link.setAttribute(
-              "aria-current",
-              "page"
-            );
-          }
-
+          entry.target.classList.add("is-visible");
+          observerInstance.unobserve(entry.target);
         });
-
       },
       {
-        rootMargin: "-35% 0px -55% 0px",
-        threshold: 0
+        root: null,
+        threshold: 0.12,
+        rootMargin: "0px 0px -8% 0px"
       }
     );
 
-  sections.forEach((section) => {
-    sectionObserver.observe(section);
-  });
-}
+    elements.forEach((element) => {
+      observer.observe(element);
+    });
+  }
 
 
-/* =========================================================
-   EXTERNAL LINK SAFETY
-   ========================================================= */
+  /* -------------------------------------------------------
+     04. SMOOTH ANCHOR NAVIGATION
+     ------------------------------------------------------- */
 
-document
-  .querySelectorAll('a[target="_blank"]')
-  .forEach((link) => {
+  function initSmoothAnchors() {
+    const anchors = document.querySelectorAll(
+      'a[href^="#"]'
+    );
 
-    const rel =
-      link.getAttribute("rel") || "";
+    if (!anchors.length) return;
 
-    if (!rel.includes("noopener")) {
-      link.setAttribute(
-        "rel",
-        `${rel} noopener noreferrer`.trim()
+    anchors.forEach((anchor) => {
+      anchor.addEventListener("click", (event) => {
+        const targetId = anchor.getAttribute("href");
+
+        if (!targetId || targetId === "#") return;
+
+        const target = document.querySelector(targetId);
+
+        if (!target) return;
+
+        event.preventDefault();
+
+        const reduceMotion = window.matchMedia(
+          "(prefers-reduced-motion: reduce)"
+        ).matches;
+
+        target.scrollIntoView({
+          behavior: reduceMotion ? "auto" : "smooth",
+          block: "start"
+        });
+
+        /*
+         * Aggiorna l'URL senza provocare il salto
+         * automatico del browser.
+         */
+        if (history.pushState) {
+          history.pushState(null, "", targetId);
+        }
+      });
+    });
+  }
+
+
+  /* -------------------------------------------------------
+     05. HEADER — SCROLL STATE
+     ------------------------------------------------------- */
+
+  function initHeader() {
+    const header = document.querySelector(
+      ".site-header, header"
+    );
+
+    if (!header) return;
+
+    let ticking = false;
+
+    const updateHeader = () => {
+      const scrollY = window.scrollY;
+
+      header.classList.toggle(
+        "is-scrolled",
+        scrollY > 40
+      );
+
+      ticking = false;
+    };
+
+    updateHeader();
+
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (ticking) return;
+
+        window.requestAnimationFrame(updateHeader);
+        ticking = true;
+      },
+      { passive: true }
+    );
+  }
+
+
+  /* -------------------------------------------------------
+     06. ACTIVE NAVIGATION
+     ------------------------------------------------------- */
+
+  function initActiveNavigation() {
+    const navigationLinks = document.querySelectorAll(
+      'nav a[href^="#"], .nav a[href^="#"]'
+    );
+
+    if (!navigationLinks.length) return;
+
+    const sections = [];
+
+    navigationLinks.forEach((link) => {
+      const id = link.getAttribute("href");
+
+      if (!id || id === "#") return;
+
+      const section = document.querySelector(id);
+
+      if (section) {
+        sections.push({
+          section,
+          link
+        });
+      }
+    });
+
+    if (!sections.length) return;
+
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (!("IntersectionObserver" in window)) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+
+          sections.forEach(({ link }) => {
+            link.classList.remove("is-active");
+          });
+
+          const current = sections.find(
+            ({ section }) => section === entry.target
+          );
+
+          if (current) {
+            current.link.classList.add("is-active");
+          }
+        });
+      },
+      {
+        threshold: reduceMotion ? 0.1 : 0.35,
+        rootMargin: "-15% 0px -55% 0px"
+      }
+    );
+
+    sections.forEach(({ section }) => {
+      observer.observe(section);
+    });
+  }
+
+
+  /* -------------------------------------------------------
+     07. EXTERNAL LINKS
+     ------------------------------------------------------- */
+
+  function initExternalLinks() {
+    const links = document.querySelectorAll(
+      'a[href^="http://"], a[href^="https://"]'
+    );
+
+    links.forEach((link) => {
+      const currentHost = window.location.hostname;
+
+      try {
+        const url = new URL(link.href);
+
+        if (
+          url.hostname &&
+          url.hostname !== currentHost
+        ) {
+          link.setAttribute(
+            "rel",
+            "noopener noreferrer"
+          );
+        }
+      } catch {
+        /* URL non valida: nessuna modifica */
+      }
+    });
+  }
+
+
+  /* -------------------------------------------------------
+     08. IMAGE LOADING
+     ------------------------------------------------------- */
+
+  function initImageProtection() {
+    const images = document.querySelectorAll(
+      "img"
+    );
+
+    images.forEach((image) => {
+      /*
+       * Lazy loading solo per immagini non critiche.
+       * Logo e immagini già esplicitamente eager
+       * non vengono modificati.
+       */
+      if (
+        !image.hasAttribute("loading") &&
+        !image.closest(".hero")
+      ) {
+        image.setAttribute(
+          "loading",
+          "lazy"
+        );
+      }
+
+      if (
+        !image.hasAttribute("decoding")
+      ) {
+        image.setAttribute(
+          "decoding",
+          "async"
+        );
+      }
+    });
+  }
+
+
+  /* -------------------------------------------------------
+     09. KEYBOARD ACCESSIBILITY
+     ------------------------------------------------------- */
+
+  document.addEventListener("keydown", (event) => {
+    /*
+     * Evita effetti grafici o comportamenti invasivi
+     * quando l'utente naviga da tastiera.
+     */
+    if (event.key === "Tab") {
+      document.documentElement.classList.add(
+        "keyboard-navigation"
       );
     }
   });
 
 
-/* =========================================================
-   SMOOTH ANCHOR HANDLING
-   ========================================================= */
-
-document
-  .querySelectorAll('a[href^="#"]')
-  .forEach((anchor) => {
-
-    anchor.addEventListener("click", (event) => {
-
-      const href =
-        anchor.getAttribute("href");
-
-      if (!href || href === "#") {
-        return;
-      }
-
-      const target =
-        document.querySelector(href);
-
-      if (!target) {
-        return;
-      }
-
-      event.preventDefault();
-
-      target.scrollIntoView({
-        behavior:
-          window.matchMedia(
-            "(prefers-reduced-motion: reduce)"
-          ).matches
-            ? "auto"
-            : "smooth",
-        block: "start"
-      });
-
-      history.replaceState(
-        null,
-        "",
-        href
-      );
-    });
+  document.addEventListener("mousedown", () => {
+    document.documentElement.classList.remove(
+      "keyboard-navigation"
+    );
   });
 
 
-/* =========================================================
-   RESIZE SAFETY
-   ========================================================= */
+  /* -------------------------------------------------------
+     10. PAGE VISIBILITY
+     ------------------------------------------------------- */
 
-let resizeTimer;
-
-window.addEventListener(
-  "resize",
-  () => {
-
-    clearTimeout(resizeTimer);
-
-    resizeTimer = setTimeout(() => {
-
-      if (
-        window.innerWidth > 780 &&
-        navigation &&
-        navigation.classList.contains("open")
-      ) {
-        closeMenu();
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+      if (document.hidden) {
+        document.documentElement.classList.add(
+          "page-hidden"
+        );
+      } else {
+        document.documentElement.classList.remove(
+          "page-hidden"
+        );
       }
+    }
+  );
 
-    }, 150);
-  },
-  { passive: true }
-);
+
+  /* -------------------------------------------------------
+     11. BACK / FORWARD NAVIGATION
+     ------------------------------------------------------- */
+
+  window.addEventListener("popstate", () => {
+    /*
+     * Mantiene il comportamento naturale del browser
+     * quando si utilizzano avanti/indietro.
+     */
+    const hash = window.location.hash;
+
+    if (!hash) return;
+
+    const target = document.querySelector(hash);
+
+    if (!target) return;
+
+    target.scrollIntoView({
+      behavior: "auto",
+      block: "start"
+    });
+  });
+
+})();
