@@ -967,3 +967,32 @@ scroll-behavior: auto !important;
 }
 
 }
+/* ---------------------------------------------------------
+   20. REVEAL MOTION
+   --------------------------------------------------------- */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+
+  transition:
+    opacity 700ms ease,
+    transform 700ms ease;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.site-header.is-scrolled {
+  box-shadow:
+    0 8px 30px rgba(11, 31, 51, 0.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
