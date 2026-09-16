@@ -1,13 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<urlset
-  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
   <url>
     <loc>https://cesareparatore.github.io/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>1.0</priority>
+  </url>
+
+  <url>
+    <loc>https://cesareparatore.github.io/chi-sono/</loc>
+  </url>
+
+  <url>
+    <loc>https://cesareparatore.github.io/scienze-motorie/</loc>
+  </url>
+
+  <url>
+    <loc>https://cesareparatore.github.io/sport/</loc>
+  </url>
+
+  <url>
+    <loc>https://cesareparatore.github.io/corsa-running/</loc>
+  </url>
+
+  <url>
+    <loc>https://cesareparatore.github.io/preparazione-atletica/</loc>
+  </url>
+
+  <url>
+    <loc>https://cesareparatore.github.io/educazione/</loc>
+  </url>
+
+  <url>
+    <loc>https://cesareparatore.github.io/educazione-motoria/</loc>
+  </url>
+
+  <url>
+    <loc>https://cesareparatore.github.io/scienze-motorie-sportive/</loc>
+  </url>
+
+  <url>
+    <loc>https://cesareparatore.github.io/management-dello-sport/</loc>
+  </url>
+
+  <url>
+    <loc>https://cesareparatore.github.io/presenza-web/</loc>
+  </url>
+
+  <url>
+    <loc>https://cesareparatore.github.io/territorio/</loc>
+  </url>
+
+  <url>
+    <loc>https://cesareparatore.github.io/contatti/</loc>
   </url>
 
 </urlset>
