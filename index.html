@@ -8,11 +8,11 @@
     content="width=device-width, initial-scale=1, viewport-fit=cover"
   >
 
-  <title>Cesare Paratore | Scienze Motorie, Sport, Educazione, Management e Digitale - Partinico e oltre</title>
+  <title>Cesare Paratore | Scienze Motorie e Sport | Partinico e oltre</title>
 
   <meta
     name="description"
-    content="Cesare Paratore, professionista delle Scienze Motorie e dello Sport, integra competenze motorie, sportive, educative, manageriali e digitali, con base a Partinico e un percorso aperto al territorio e alle collaborazioni online."
+    content="Cesare Paratore, professionista delle Scienze Motorie e dello Sport, con una formazione che integra competenze motorie, sportive, educative, manageriali e digitali. Con base a Partinico, il suo percorso è aperto al territorio e alle collaborazioni online."
   >
 
   <meta name="author" content="Cesare Paratore">
@@ -33,43 +33,75 @@
     href="assets/images/cp-mark.png"
   >
 
-  <!-- Open Graph -->
+  <!-- =====================================================
+       OPEN GRAPH
+       ===================================================== -->
+
   <meta property="og:type" content="website">
+
   <meta
     property="og:title"
-    content="Cesare Paratore | Movimento, con direzione"
+    content="Cesare Paratore | Scienze Motorie e Sport | Partinico e oltre"
   >
+
   <meta
     property="og:description"
-    content="Scienze Motorie, Sport, Educazione, Management e Digitale. Un percorso nato dal movimento e costruito con direzione."
+    content="Cesare Paratore, professionista delle Scienze Motorie e dello Sport, con una formazione che integra competenze motorie, sportive, educative, manageriali e digitali. Con base a Partinico, il suo percorso è aperto al territorio e alle collaborazioni online."
   >
+
   <meta property="og:url" content="/">
   <meta property="og:site_name" content="Cesare Paratore">
+  <meta property="og:locale" content="it_IT">
+
   <meta
     property="og:image"
     content="assets/images/cp-mark.png"
   >
-  <meta property="og:locale" content="it_IT">
 
-  <!-- Twitter / X -->
+  <meta
+    property="og:image:alt"
+    content="CP — Cesare Paratore"
+  >
+
+
+  <!-- =====================================================
+       TWITTER / X
+       ===================================================== -->
+
   <meta name="twitter:card" content="summary_large_image">
+
   <meta
     name="twitter:title"
-    content="Cesare Paratore | Movimento, con direzione"
+    content="Cesare Paratore | Scienze Motorie e Sport | Partinico e oltre"
   >
+
   <meta
     name="twitter:description"
-    content="Scienze Motorie, Sport, Educazione, Management e Digitale."
+    content="Cesare Paratore, professionista delle Scienze Motorie e dello Sport, con una formazione che integra competenze motorie, sportive, educative, manageriali e digitali."
   >
+
   <meta
     name="twitter:image"
     content="assets/images/cp-mark.png"
   >
 
-  <!-- Styles -->
+  <meta
+    name="twitter:image:alt"
+    content="CP — Cesare Paratore"
+  >
+
+
+  <!-- =====================================================
+       STYLES
+       ===================================================== -->
+
   <link rel="stylesheet" href="css/style.css">
 
-  <!-- Structured data -->
+
+  <!-- =====================================================
+       STRUCTURED DATA
+       ===================================================== -->
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -90,12 +122,17 @@
         "name": "Cesare Paratore",
         "url": "/",
         "image": "assets/images/cp-mark.png",
+        "jobTitle": "Professionista delle Scienze Motorie e dello Sport",
         "knowsAbout": [
           "Scienze Motorie",
+          "Scienze delle Attività Motorie e Sportive",
           "Sport",
           "Atletica",
-          "Educazione",
+          "Educazione motoria",
+          "Didattica",
           "Management dello Sport",
+          "Tecnologie educative",
+          "Competenze digitali",
           "Presenza Web"
         ],
         "homeLocation": {
@@ -106,21 +143,43 @@
     ]
   }
   </script>
+
 </head>
 
-<body>
+
+<body
+  data-page="home"
+  data-motion-system="movement-direction"
+>
+
 
   <!-- =====================================================
        ACCESSIBILITY
        ===================================================== -->
 
-  <a class="skip-link" href="#main">
+  <a
+    class="skip-link"
+    href="#main"
+  >
     Vai al contenuto
   </a>
 
 
   <!-- =====================================================
-       INTRO
+       MOTION SYSTEM
+       Decorative GPU / Canvas layer.
+       Hidden from assistive technology.
+       ===================================================== -->
+
+  <canvas
+    class="motion-canvas"
+    id="motion-canvas"
+    aria-hidden="true"
+  ></canvas>
+
+
+  <!-- =====================================================
+       INTRO / LOADER
        ===================================================== -->
 
   <div
@@ -129,12 +188,16 @@
     aria-hidden="false"
   >
 
-    <div class="loader-mark" aria-hidden="true">
+    <div
+      class="loader-mark"
+      aria-hidden="true"
+    >
       <img
         src="assets/images/cp-mark.png"
         alt=""
         width="90"
         height="90"
+        decoding="async"
       >
     </div>
 
@@ -160,6 +223,7 @@
   <header
     class="site-header"
     id="site-header"
+    data-header-state="top"
   >
 
     <a
@@ -173,6 +237,7 @@
         alt="CP"
         width="48"
         height="48"
+        decoding="async"
       >
 
       <span class="brand-name">
@@ -191,6 +256,7 @@
       >
         01 / 10
       </span>
+
 
       <button
         class="menu-toggle"
@@ -236,6 +302,7 @@
       aria-hidden="true"
     ></div>
 
+
     <div class="menu-panel">
 
       <div class="menu-top">
@@ -246,51 +313,80 @@
 
       <nav aria-label="Navigazione principale">
 
-        <a href="chi-sono/">
+        <a
+          href="chi-sono/"
+          data-menu-link
+        >
           <span>01</span>
           <strong>Chi sono</strong>
           <em>La persona</em>
         </a>
 
-        <a href="scienze-motorie/">
+
+        <a
+          href="scienze-motorie/"
+          data-menu-link
+        >
           <span>02</span>
           <strong>Scienze Motorie</strong>
           <em>Il centro</em>
         </a>
 
-        <a href="sport/">
+
+        <a
+          href="sport/"
+          data-menu-link
+        >
           <span>03</span>
           <strong>Sport</strong>
           <em>La pratica</em>
         </a>
 
-        <a href="educazione/">
+
+        <a
+          href="educazione/"
+          data-menu-link
+        >
           <span>04</span>
           <strong>Educazione</strong>
           <em>La scuola</em>
         </a>
 
-        <a href="management-dello-sport/">
+
+        <a
+          href="management-dello-sport/"
+          data-menu-link
+        >
           <span>05</span>
           <strong>Management</strong>
           <em>La progettazione</em>
         </a>
 
-        <a href="presenza-web/">
+
+        <a
+          href="presenza-web/"
+          data-menu-link
+        >
           <span>06</span>
           <strong>Presenza Web</strong>
           <em>Il digitale</em>
         </a>
 
-        <a href="territorio/">
+
+        <a
+          href="territorio/"
+          data-menu-link
+        >
           <span>07</span>
           <strong>Territorio</strong>
           <em>Le radici</em>
         </a>
 
+
         <a
           class="menu-contact"
           href="contatti/"
+          data-menu-link
         >
           <span>08</span>
           <strong>Contatti</strong>
@@ -302,6 +398,7 @@
 
       <div class="menu-bottom">
         <span>PARTINICO · SICILIA</span>
+
         <span>
           SCIENZE MOTORIE · SPORT · EDUCAZIONE · MANAGEMENT · DIGITALE
         </span>
@@ -328,7 +425,10 @@
        MAIN
        ===================================================== -->
 
-  <main id="main">
+  <main
+    id="main"
+    data-scroll-container
+  >
 
 
     <!-- ===================================================
@@ -340,6 +440,8 @@
       id="inizio"
       data-section="01"
       data-title="L'inizio"
+      data-motion-section="hero"
+      data-motion-state="origin"
       aria-labelledby="hero-title"
     >
 
@@ -348,25 +450,32 @@
         aria-hidden="true"
       ></div>
 
+
       <div
         class="hero-orbit hero-orbit-a"
         aria-hidden="true"
       ></div>
+
 
       <div
         class="hero-orbit hero-orbit-b"
         aria-hidden="true"
       ></div>
 
+
       <div
         class="hero-node"
+        data-motion-node="origin"
         aria-hidden="true"
       >
         <span>CP</span>
       </div>
 
 
-      <div class="hero-inner">
+      <div
+        class="hero-inner"
+        data-motion-content
+      >
 
         <p class="eyebrow hero-eyebrow">
           <span>01</span>
@@ -380,9 +489,25 @@
             CESARE PARATORE
           </p>
 
+
           <h1 id="hero-title">
-            MOVIMENTO.<br>
-            <span>CON DIREZIONE.</span>
+
+            <span
+              class="hero-word hero-word-movement"
+              data-motion-word="movement"
+            >
+              MOVIMENTO.
+            </span>
+
+            <br>
+
+            <span
+              class="hero-word hero-word-direction"
+              data-motion-word="direction"
+            >
+              CON DIREZIONE.
+            </span>
+
           </h1>
 
         </div>
@@ -395,6 +520,7 @@
             <br>
             La direzione è ciò che gli dà senso.
           </p>
+
 
           <span class="scroll-cue">
             <i></i>
@@ -417,6 +543,8 @@
       id="centro"
       data-section="02"
       data-title="Il centro"
+      data-motion-section="center"
+      data-motion-state="focus"
     >
 
       <div class="section-shell">
@@ -457,6 +585,7 @@
             <p class="question">
               Cosa può diventare una persona quando impara davvero a muoversi?
             </p>
+
 
             <div class="answer-copy">
 
@@ -513,6 +642,8 @@
       id="direzioni"
       data-section="03"
       data-title="Cinque direzioni"
+      data-motion-section="directions"
+      data-motion-state="expand"
     >
 
       <div class="section-shell">
@@ -562,10 +693,28 @@
         </div>
 
 
+        <!--
+          Creative-tech stage.
+          CSS/JS can progressively enhance this layer with:
+          - trajectories
+          - particles
+          - magnetic fields
+          - morphing
+          - velocity
+          - GPU rendering
+        -->
+
         <div
           class="directions-stage"
           data-directions-stage
+          data-motion-field="directions"
         >
+
+          <div
+            class="direction-field"
+            aria-hidden="true"
+          ></div>
+
 
           <div
             class="direction-orbit"
@@ -574,7 +723,14 @@
 
 
           <div
+            class="direction-orbit direction-orbit-inner"
+            aria-hidden="true"
+          ></div>
+
+
+          <div
             class="directions-core"
+            data-motion-node="core"
             aria-hidden="true"
           >
             <span>CP</span>
@@ -585,9 +741,12 @@
             class="direction-item direction-1 is-active"
             href="scienze-motorie/"
             data-direction="scienze-motorie"
+            data-direction-index="01"
           >
 
-            <span class="direction-number">01</span>
+            <span class="direction-number">
+              01
+            </span>
 
             <span class="direction-name">
               SCIENZE MOTORIE
@@ -605,9 +764,12 @@
             class="direction-item direction-2"
             href="sport/"
             data-direction="sport"
+            data-direction-index="02"
           >
 
-            <span class="direction-number">02</span>
+            <span class="direction-number">
+              02
+            </span>
 
             <span class="direction-name">
               SPORT
@@ -625,9 +787,12 @@
             class="direction-item direction-3"
             href="educazione/"
             data-direction="educazione"
+            data-direction-index="03"
           >
 
-            <span class="direction-number">03</span>
+            <span class="direction-number">
+              03
+            </span>
 
             <span class="direction-name">
               EDUCAZIONE
@@ -645,9 +810,12 @@
             class="direction-item direction-4"
             href="management-dello-sport/"
             data-direction="management"
+            data-direction-index="04"
           >
 
-            <span class="direction-number">04</span>
+            <span class="direction-number">
+              04
+            </span>
 
             <span class="direction-name">
               MANAGEMENT
@@ -665,9 +833,12 @@
             class="direction-item direction-5"
             href="presenza-web/"
             data-direction="digitale"
+            data-direction-index="05"
           >
 
-            <span class="direction-number">05</span>
+            <span class="direction-number">
+              05
+            </span>
 
             <span class="direction-name">
               DIGITALE
@@ -679,6 +850,44 @@
             </span>
 
           </a>
+
+
+          <!--
+            SVG path layer reserved for the five trajectories.
+            Kept empty so JS/CSS can progressively enhance it.
+          -->
+
+          <svg
+            class="direction-paths"
+            viewBox="0 0 1000 700"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <path
+              data-direction-path="1"
+              d=""
+            ></path>
+
+            <path
+              data-direction-path="2"
+              d=""
+            ></path>
+
+            <path
+              data-direction-path="3"
+              d=""
+            ></path>
+
+            <path
+              data-direction-path="4"
+              d=""
+            ></path>
+
+            <path
+              data-direction-path="5"
+              d=""
+            ></path>
+          </svg>
 
         </div>
 
@@ -709,6 +918,8 @@
       id="persona"
       data-section="04"
       data-title="La persona"
+      data-motion-section="person"
+      data-motion-state="editorial"
     >
 
       <div class="section-shell">
@@ -803,6 +1014,8 @@
       id="direzione"
       data-section="05"
       data-title="La direzione"
+      data-motion-section="direction"
+      data-motion-state="converge"
     >
 
       <div class="section-shell">
@@ -822,7 +1035,9 @@
             PRIMA DI ACCELERARE
           </p>
 
-          <h2>
+          <h2
+            data-morph-heading
+          >
             MUOVERSI
             <br>
             È FACILE.
@@ -877,6 +1092,8 @@
       id="tracce"
       data-section="06"
       data-title="Le tracce"
+      data-motion-section="traces"
+      data-motion-state="trace"
     >
 
       <div class="section-shell">
@@ -909,11 +1126,15 @@
           </div>
 
 
-          <div class="trace-line">
+          <div
+            class="trace-line"
+            data-trace-system
+          >
 
             <article
               class="trace"
               data-reveal
+              data-trace="formazione"
             >
 
               <span
@@ -944,6 +1165,7 @@
             <article
               class="trace"
               data-reveal
+              data-trace="sport"
             >
 
               <span
@@ -974,6 +1196,7 @@
             <article
               class="trace"
               data-reveal
+              data-trace="scuola"
             >
 
               <span
@@ -1004,6 +1227,7 @@
             <article
               class="trace"
               data-reveal
+              data-trace="management"
             >
 
               <span
@@ -1034,6 +1258,7 @@
             <article
               class="trace"
               data-reveal
+              data-trace="digitale"
             >
 
               <span
@@ -1078,6 +1303,8 @@
       id="territorio"
       data-section="07"
       data-title="Il punto zero"
+      data-motion-section="territory"
+      data-motion-state="origin-map"
     >
 
       <div class="section-shell">
@@ -1100,6 +1327,7 @@
               <br>
               <em>PARTENZA.</em>
             </h2>
+
 
             <div class="territory-text">
 
@@ -1149,7 +1377,14 @@
             aria-label="Schema concettuale del percorso territoriale"
             role="img"
             data-reveal
+            data-territory-field
           >
+
+            <div
+              class="territory-field"
+              aria-hidden="true"
+            ></div>
+
 
             <span class="place place-online">
               ONLINE
@@ -1166,6 +1401,7 @@
             <span class="place place-west">
               SICILIA OCCIDENTALE
             </span>
+
 
             <span
               class="territory-line"
@@ -1190,6 +1426,8 @@
       id="adesso"
       data-section="08"
       data-title="Adesso tocca a te"
+      data-motion-section="visitor"
+      data-motion-state="handoff"
     >
 
       <div class="section-shell">
@@ -1256,11 +1494,15 @@
             </p>
 
 
-            <div class="visitor-doors">
+            <div
+              class="visitor-doors"
+              data-interaction-group="directions"
+            >
 
               <a
                 class="visitor-door"
                 href="scienze-motorie/"
+                data-direction="scienze-motorie"
               >
                 Movimento
               </a>
@@ -1268,6 +1510,7 @@
               <a
                 class="visitor-door"
                 href="sport/"
+                data-direction="sport"
               >
                 Sport
               </a>
@@ -1275,6 +1518,7 @@
               <a
                 class="visitor-door"
                 href="educazione/"
+                data-direction="educazione"
               >
                 Educazione
               </a>
@@ -1282,6 +1526,7 @@
               <a
                 class="visitor-door"
                 href="management-dello-sport/"
+                data-direction="management"
               >
                 Management
               </a>
@@ -1289,6 +1534,7 @@
               <a
                 class="visitor-door"
                 href="presenza-web/"
+                data-direction="digitale"
               >
                 Digitale
               </a>
@@ -1313,6 +1559,8 @@
       id="tua-direzione"
       data-section="09"
       data-title="La tua direzione"
+      data-motion-section="choice"
+      data-motion-state="selection"
     >
 
       <div class="section-shell">
@@ -1373,11 +1621,15 @@
             </p>
 
 
-            <div class="visitor-doors">
+            <div
+              class="visitor-doors"
+              data-interaction-group="directions"
+            >
 
               <a
                 class="visitor-door"
                 href="scienze-motorie/"
+                data-direction="scienze-motorie"
               >
                 Scienze Motorie
               </a>
@@ -1385,6 +1637,7 @@
               <a
                 class="visitor-door"
                 href="sport/"
+                data-direction="sport"
               >
                 Sport
               </a>
@@ -1392,6 +1645,7 @@
               <a
                 class="visitor-door"
                 href="educazione/"
+                data-direction="educazione"
               >
                 Educazione
               </a>
@@ -1399,6 +1653,7 @@
               <a
                 class="visitor-door"
                 href="management-dello-sport/"
+                data-direction="management"
               >
                 Management
               </a>
@@ -1406,6 +1661,7 @@
               <a
                 class="visitor-door"
                 href="presenza-web/"
+                data-direction="digitale"
               >
                 Digitale
               </a>
@@ -1430,6 +1686,8 @@
       id="contatto"
       data-section="10"
       data-title="Il contatto"
+      data-motion-section="contact"
+      data-motion-state="still"
     >
 
       <div class="section-shell">
@@ -1450,7 +1708,10 @@
           </p>
 
 
-          <h2 data-reveal="large">
+          <h2
+            data-reveal="large"
+            data-morph-heading
+          >
             PARTIAMO
             <br>
             DA
@@ -1498,8 +1759,9 @@
               <a
                 class="contact-link"
                 href="contatti/"
+                data-magnetic
               >
-                PARLIAMONE
+                <span>PARLIAMONE</span>
               </a>
 
             </div>
@@ -1519,7 +1781,11 @@
        EPILOGO
        ===================================================== -->
 
-  <footer class="epilogue">
+  <footer
+    class="epilogue"
+    data-motion-section="epilogue"
+    data-motion-state="quiet"
+  >
 
     <div class="epilogue-inner">
 
@@ -1529,6 +1795,8 @@
         alt="CP"
         width="90"
         height="90"
+        loading="lazy"
+        decoding="async"
       >
 
 
