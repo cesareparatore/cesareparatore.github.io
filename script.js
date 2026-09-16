@@ -1,371 +1,280 @@
+/* =========================================================
+   CESARE PARATORE — MOVIMENTO / CON DIREZIONE
+   JavaScript V3 — stable / progressive enhancement
+   ========================================================= */
+
 (() => {
   "use strict";
 
-  /*
-   * CESARE PARATORE
-   * MOVIMENTO / CON DIREZIONE.
-   *
-   * script.js — V2
-   *
-   * Principi:
-   * - progressive enhancement
-   * - nessuna dipendenza esterna
-   * - animazioni via requestAnimationFrame
-   * - rispetto di prefers-reduced-motion
-   * - navigazione da tastiera
-   * - focus management
-   * - IntersectionObserver per reveal e capitoli
-   * - nessuna manipolazione continua del layout
-   */
+  document.documentElement.classList.add("js");
 
-
-  /* =========================================================
-     01 — ROOT / CAPABILITIES
-     ========================================================= */
-
-  const root = document.documentElement;
   const body = document.body;
 
-  root.classList.add("js");
+  /* -------------------------------------------------------
+     ELEMENTS
+     ------------------------------------------------------- */
 
-  const reducedMotionQuery = window.matchMedia(
+  const loader = document.querySelector(".site-loader");
+  const header = document.querySelector(".site-header");
+  const progress = document.querySelector(".scroll-progress");
+
+  const menu = document.querySelector(".site-menu");
+  const menuToggle = document.querySelector(".menu-toggle");
+  const menuPanel = document.querySelector(".menu-panel");
+  const menuBackdrop = document.querySelector(".menu-backdrop");
+  const menuLinks = menu
+    ? Array.from(menu.querySelectorAll("a"))
+    : [];
+
+  const revealElements = Array.from(
+    document.querySelectorAll("[data-reveal]")
+  );
+
+  const directionItems = Array.from(
+    document.querySelectorAll(".direction-item")
+  );
+
+  const sections = Array.from(
+    document.querySelectorAll("main section[id]")
+  );
+
+  /* -------------------------------------------------------
+     STATE
+     ------------------------------------------------------- */
+
+  let menuOpen = false;
+  let previousFocus = null;
+
+  const reduceMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)"
   );
 
-  const finePointerQuery = window.matchMedia(
-    "(pointer: fine)"
-  );
+  /* -------------------------------------------------------
+     LOADER
+     ------------------------------------------------------- */
 
-  const reducedMotion = () => reducedMotionQuery.matches;
+  function hideLoader() {
+    if (!loader) return;
 
-
-  /* =========================================================
-     02 — DOM
-     ========================================================= */
-
-  const intro = document.getElementById("intro");
-
-  const header = document.getElementById("site-header");
-
-  const menuToggle = document.getElementById("menu-toggle");
-  const menu = document.getElementById("site-menu");
-  const menuBackdrop = menu?.querySelector(".menu-backdrop");
-  const menuPanel = menu?.querySelector(".menu-panel");
-
-  const scrollProgress = document.getElementById("scroll-progress");
-  const sectionIndex = document.getElementById("section-index");
-
-  const hero = document.querySelector(".hero");
-  const heroOrbitA = document.querySelector(".hero-orbit-a");
-  const heroOrbitB = document.querySelector(".hero-orbit-b");
-  const heroNode = document.querySelector(".hero-node");
-
-  const directionItems = [
-    ...document.querySelectorAll(".direction-item")
-  ];
-
-  const revealItems = [
-    ...document.querySelectorAll("[data-reveal]")
-  ];
-
-  const sections = [
-    ...document.querySelectorAll("[data-section]")
-  ];
-
-  const year = document.getElementById("year");
-
-
-  /* =========================================================
-     03 — UTILITIES
-     ========================================================= */
-
-  const clamp = (value, min, max) =>
-    Math.min(Math.max(value, min), max);
-
-
-  const isVisible = (element) => {
-    if (!element) return false;
-
-    const style = window.getComputedStyle(element);
-
-    return (
-      style.display !== "none" &&
-      style.visibility !== "hidden"
-    );
-  };
-
-
-  const getFocusable = (container) => {
-    if (!container) return [];
-
-    return [
-      ...container.querySelectorAll(
-        [
-          "a[href]",
-          "button:not([disabled])",
-          "input:not([disabled])",
-          "select:not([disabled])",
-          "textarea:not([disabled])",
-          "[tabindex]:not([tabindex='-1'])"
-        ].join(",")
-      )
-    ].filter(isVisible);
-  };
-
-
-  /* =========================================================
-     04 — CURRENT YEAR
-     ========================================================= */
-
-  if (year) {
-    year.textContent = String(new Date().getFullYear());
-  }
-
-
-  /* =========================================================
-     05 — INTRO / LOADER
-     ========================================================= */
-
-  let introTimer = null;
-
-  const closeIntro = () => {
-    if (!intro || intro.dataset.closed === "true") {
-      return;
-    }
-
-    intro.dataset.closed = "true";
-    intro.setAttribute("aria-hidden", "true");
-
-    root.classList.add("intro-complete");
-
-    const delay = reducedMotion() ? 0 : 520;
+    loader.classList.add("is-hidden");
 
     window.setTimeout(() => {
-      intro.hidden = true;
-    }, delay);
-  };
-
-
-  if (intro) {
-    introTimer = window.setTimeout(
-      closeIntro,
-      reducedMotion() ? 650 : 1900
-    );
+      if (loader && loader.parentNode) {
+        loader.setAttribute("aria-hidden", "true");
+      }
+    }, 750);
   }
 
+  if (reduceMotion.matches) {
+    hideLoader();
+  } else {
+    window.setTimeout(hideLoader, 900);
+  }
 
-  /* =========================================================
-     06 — HEADER / SCROLL STATE
-     ========================================================= */
+  /* -------------------------------------------------------
+     HEADER
+     ------------------------------------------------------- */
 
-  let scrollTicking = false;
+  function updateHeader() {
+    if (!header) return;
 
-  const updateScrollUI = () => {
-    const scrollTop = window.scrollY || window.pageYOffset;
-    const scrollHeight =
-      document.documentElement.scrollHeight - window.innerHeight;
-
-    const progress =
-      scrollHeight > 0
-        ? clamp(scrollTop / scrollHeight, 0, 1)
-        : 0;
-
-    if (scrollProgress) {
-      scrollProgress.style.transform =
-        `scaleY(${progress})`;
+    if (window.scrollY > 20) {
+      header.classList.add("is-scrolled");
+    } else {
+      header.classList.remove("is-scrolled");
     }
+  }
 
-    if (header) {
-      header.classList.toggle(
-        "is-scrolled",
-        scrollTop > 48
-      );
-    }
+  /* -------------------------------------------------------
+     SCROLL PROGRESS
+     ------------------------------------------------------- */
 
-    scrollTicking = false;
-  };
+  function updateProgress() {
+    if (!progress) return;
 
+    const documentHeight =
+      document.documentElement.scrollHeight -
+      window.innerHeight;
 
-  const requestScrollUI = () => {
-    if (scrollTicking) return;
-
-    scrollTicking = true;
-
-    window.requestAnimationFrame(updateScrollUI);
-  };
-
-
-  window.addEventListener(
-    "scroll",
-    requestScrollUI,
-    { passive: true }
-  );
-
-  window.addEventListener(
-    "resize",
-    requestScrollUI,
-    { passive: true }
-  );
-
-  updateScrollUI();
-
-
-  /* =========================================================
-     07 — SECTION INDEX
-     ========================================================= */
-
-  const sectionObserver = new IntersectionObserver(
-    (entries) => {
-      const visibleSections = entries
-        .filter((entry) => entry.isIntersecting)
-        .sort(
-          (a, b) =>
-            b.intersectionRatio - a.intersectionRatio
-        );
-
-      if (!visibleSections.length) return;
-
-      const activeSection =
-        visibleSections[0].target;
-
-      const number =
-        activeSection.dataset.section || "01";
-
-      const total =
-        String(sections.length).padStart(2, "0");
-
-      if (sectionIndex) {
-        sectionIndex.textContent =
-          `${number} / ${total}`;
-      }
-
-      sections.forEach((section) => {
-        section.classList.toggle(
-          "is-current",
-          section === activeSection
-        );
-      });
-    },
-    {
-      threshold: [0.2, 0.45, 0.65],
-      rootMargin: "-10% 0px -35% 0px"
-    }
-  );
-
-
-  sections.forEach((section) => {
-    sectionObserver.observe(section);
-  });
-
-
-  /* =========================================================
-     08 — MENU
-     ========================================================= */
-
-  let menuOpen = false;
-  let lastFocusedElement = null;
-
-  const openMenu = () => {
-    if (!menu || !menuToggle || menuOpen) {
+    if (documentHeight <= 0) {
+      progress.style.transform = "scaleX(0)";
       return;
     }
 
-    menuOpen = true;
-    lastFocusedElement = document.activeElement;
+    const value = Math.min(
+      1,
+      Math.max(0, window.scrollY / documentHeight)
+    );
 
-    menu.hidden = false;
+    progress.style.transform = `scaleX(${value})`;
+  }
+
+  /* -------------------------------------------------------
+     SECTION INDEX
+     ------------------------------------------------------- */
+
+  function updateSectionIndex() {
+    const index = document.querySelector(".header-index");
+
+    if (!index || !sections.length) return;
+
+    const reference = window.scrollY + window.innerHeight * 0.35;
+
+    let activeSection = sections[0];
+
+    for (const section of sections) {
+      if (section.offsetTop <= reference) {
+        activeSection = section;
+      }
+    }
+
+    const number = Array.from(
+      sections
+    ).indexOf(activeSection) + 1;
+
+    if (number > 0) {
+      index.textContent = String(number).padStart(2, "0");
+    }
+  }
+
+  function handleScroll() {
+    updateHeader();
+    updateProgress();
+    updateSectionIndex();
+  }
+
+  window.addEventListener("scroll", handleScroll, {
+    passive: true
+  });
+
+  /* -------------------------------------------------------
+     REVEALS
+     ------------------------------------------------------- */
+
+  function revealAll() {
+    revealElements.forEach((element) => {
+      element.classList.add("is-revealed");
+    });
+  }
+
+  /*
+   * If reduced motion is enabled, show everything immediately.
+   */
+  if (reduceMotion.matches) {
+    revealAll();
+  } else if ("IntersectionObserver" in window) {
+
+    const revealObserver = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+
+          entry.target.classList.add("is-revealed");
+          observer.unobserve(entry.target);
+        });
+      },
+      {
+        root: null,
+        threshold: 0.08,
+        rootMargin: "0px 0px -40px 0px"
+      }
+    );
+
+    revealElements.forEach((element) => {
+      revealObserver.observe(element);
+    });
+
+  } else {
+    revealAll();
+  }
+
+  /* -------------------------------------------------------
+     MENU
+     ------------------------------------------------------- */
+
+  function getFocusableMenuElements() {
+    if (!menu) return [];
+
+    return Array.from(
+      menu.querySelectorAll(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )
+    ).filter((element) => {
+      return element.offsetParent !== null;
+    });
+  }
+
+  function openMenu() {
+    if (!menu || !menuToggle) return;
+
+    previousFocus = document.activeElement;
+
+    menuOpen = true;
+
+    body.classList.add("menu-open");
+
     menu.setAttribute("aria-hidden", "false");
     menu.removeAttribute("inert");
 
-    menuToggle.setAttribute(
-      "aria-expanded",
-      "true"
-    );
+    menuToggle.setAttribute("aria-expanded", "true");
 
-    menuToggle.setAttribute(
-      "aria-label",
-      "Chiudi il menu"
-    );
-
-    root.classList.add("menu-open");
-    body.classList.add("menu-open");
-
-    const focusable = getFocusable(menu);
+    const focusable = getFocusableMenuElements();
 
     if (focusable.length) {
-      window.requestAnimationFrame(() => {
+      window.setTimeout(() => {
         focusable[0].focus();
-      });
+      }, 50);
     }
-  };
+  }
 
-
-  const closeMenu = ({
-    restoreFocus = true
-  } = {}) => {
-    if (!menu || !menuToggle || !menuOpen) {
-      return;
-    }
+  function closeMenu(restoreFocus = true) {
+    if (!menu || !menuToggle) return;
 
     menuOpen = false;
 
+    body.classList.remove("menu-open");
+
     menu.setAttribute("aria-hidden", "true");
     menu.setAttribute("inert", "");
 
-    menuToggle.setAttribute(
-      "aria-expanded",
-      "false"
-    );
-
-    menuToggle.setAttribute(
-      "aria-label",
-      "Apri il menu"
-    );
-
-    root.classList.remove("menu-open");
-    body.classList.remove("menu-open");
+    menuToggle.setAttribute("aria-expanded", "false");
 
     if (
       restoreFocus &&
-      lastFocusedElement &&
-      typeof lastFocusedElement.focus === "function"
+      previousFocus &&
+      typeof previousFocus.focus === "function"
     ) {
-      window.requestAnimationFrame(() => {
-        lastFocusedElement.focus();
-      });
+      window.setTimeout(() => {
+        previousFocus.focus();
+      }, 50);
     }
-  };
-
-
-  if (menu) {
-    menu.setAttribute("aria-hidden", "true");
-    menu.setAttribute("inert", "");
   }
 
+  if (menuToggle) {
+    menuToggle.addEventListener("click", () => {
+      if (menuOpen) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    });
+  }
 
-  menuToggle?.addEventListener("click", () => {
-    if (menuOpen) {
+  if (menuBackdrop) {
+    menuBackdrop.addEventListener("click", () => {
       closeMenu();
-    } else {
-      openMenu();
-    }
-  });
+    });
+  }
 
-
-  menuBackdrop?.addEventListener(
-    "click",
-    () => closeMenu()
-  );
-
-
-  menu?.querySelectorAll("a").forEach((link) => {
+  menuLinks.forEach((link) => {
     link.addEventListener("click", () => {
-      closeMenu({
-        restoreFocus: false
-      });
+      closeMenu(false);
     });
   });
 
+  /* -------------------------------------------------------
+     MENU KEYBOARD ACCESS
+     ------------------------------------------------------- */
 
   document.addEventListener("keydown", (event) => {
     if (!menuOpen) return;
@@ -378,591 +287,185 @@
 
     if (event.key !== "Tab") return;
 
-    const focusable = getFocusable(menu);
+    const focusable = getFocusableMenuElements();
 
-    if (!focusable.length) {
-      event.preventDefault();
-      return;
-    }
+    if (!focusable.length) return;
 
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
 
-    if (
-      event.shiftKey &&
-      document.activeElement === first
-    ) {
+    if (event.shiftKey && document.activeElement === first) {
       event.preventDefault();
       last.focus();
-      return;
-    }
-
-    if (
-      !event.shiftKey &&
-      document.activeElement === last
-    ) {
+    } else if (!event.shiftKey && document.activeElement === last) {
       event.preventDefault();
       first.focus();
     }
   });
 
+  /* -------------------------------------------------------
+     DIRECTION ITEMS
+     ------------------------------------------------------- */
 
-  /* =========================================================
-     09 — HERO PARALLAX
-     ========================================================= */
+  if (directionItems.length) {
 
-  let pointerX = 0;
-  let pointerY = 0;
-
-  let currentX = 0;
-  let currentY = 0;
-
-  let parallaxFrame = null;
-
-  const resetHeroParallax = () => {
-    pointerX = 0;
-    pointerY = 0;
-
-    currentX = 0;
-    currentY = 0;
-
-    if (heroOrbitA) {
-      heroOrbitA.style.transform = "";
-    }
-
-    if (heroOrbitB) {
-      heroOrbitB.style.transform = "";
-    }
-
-    if (heroNode) {
-      heroNode.style.transform = "";
-    }
-  };
-
-
-  const renderHeroParallax = () => {
-    parallaxFrame = null;
-
-    if (
-      reducedMotion() ||
-      !finePointerQuery.matches ||
-      !hero
-    ) {
-      resetHeroParallax();
-      return;
-    }
-
-    const smoothing = 0.075;
-
-    currentX +=
-      (pointerX - currentX) * smoothing;
-
-    currentY +=
-      (pointerY - currentY) * smoothing;
-
-    const x = currentX;
-    const y = currentY;
-
-    if (heroOrbitA) {
-      heroOrbitA.style.transform =
-        `translate3d(${x * 0.65}px, ${y * 0.65}px, 0)`;
-    }
-
-    if (heroOrbitB) {
-      heroOrbitB.style.transform =
-        `translate3d(${x * -0.45}px, ${y * -0.45}px, 0)`;
-    }
-
-    if (heroNode) {
-      heroNode.style.transform =
-        `translate3d(${x * 1.15}px, ${y * 1.15}px, 0)`;
-    }
-
-    parallaxFrame =
-      window.requestAnimationFrame(
-        renderHeroParallax
-      );
-  };
-
-
-  const handlePointerMove = (event) => {
-    if (
-      reducedMotion() ||
-      !finePointerQuery.matches ||
-      !hero
-    ) {
-      return;
-    }
-
-    const rect = hero.getBoundingClientRect();
-
-    if (
-      event.clientY < rect.top ||
-      event.clientY > rect.bottom
-    ) {
-      return;
-    }
-
-    const relativeX =
-      (event.clientX - rect.left) / rect.width - 0.5;
-
-    const relativeY =
-      (event.clientY - rect.top) / rect.height - 0.5;
-
-    const limit = 16;
-
-    pointerX = relativeX * limit;
-    pointerY = relativeY * limit;
-
-    if (!parallaxFrame) {
-      parallaxFrame =
-        window.requestAnimationFrame(
-          renderHeroParallax
-        );
-    }
-  };
-
-
-  const handlePointerLeave = () => {
-    resetHeroParallax();
-
-    if (parallaxFrame) {
-      window.cancelAnimationFrame(
-        parallaxFrame
-      );
-
-      parallaxFrame = null;
-    }
-  };
-
-
-  if (hero) {
-    hero.addEventListener(
-      "pointermove",
-      handlePointerMove,
-      { passive: true }
-    );
-
-    hero.addEventListener(
-      "pointerleave",
-      handlePointerLeave,
-      { passive: true }
-    );
-  }
-
-
-  /* =========================================================
-     10 — DIRECTIONS INTERACTION
-     ========================================================= */
-
-  const clearDirectionState = () => {
     directionItems.forEach((item) => {
-      item.classList.remove("is-active");
-    });
-  };
 
-
-  directionItems.forEach((item) => {
-
-    item.addEventListener("mouseenter", () => {
-      clearDirectionState();
-      item.classList.add("is-active");
-    });
-
-
-    item.addEventListener("focusin", () => {
-      clearDirectionState();
-      item.classList.add("is-active");
-    });
-
-
-    item.addEventListener("mouseleave", () => {
-      item.classList.remove("is-active");
-    });
-
-
-    item.addEventListener("focusout", () => {
-      item.classList.remove("is-active");
-    });
-
-  });
-
-
-  const directionObserver = new IntersectionObserver(
-    (entries) => {
-
-      const visible = entries
-        .filter((entry) => entry.isIntersecting)
-        .sort(
-          (a, b) =>
-            b.intersectionRatio -
-            a.intersectionRatio
-        );
-
-      if (!visible.length) return;
-
-      const active =
-        visible[0].target;
-
-      clearDirectionState();
-      active.classList.add("is-active");
-    },
-    {
-      threshold: 0.65,
-      rootMargin: "-15% 0px -15% 0px"
-    }
-  );
-
-
-  directionItems.forEach((item) => {
-    directionObserver.observe(item);
-  });
-
-
-  /* =========================================================
-     11 — REVEAL SYSTEM
-     ========================================================= */
-
-  if (
-    "IntersectionObserver" in window &&
-    revealItems.length
-  ) {
-
-    const revealObserver =
-      new IntersectionObserver(
-        (entries, observer) => {
-
-          entries.forEach((entry) => {
-
-            if (!entry.isIntersecting) {
-              return;
-            }
-
-            entry.target.classList.add(
-              "is-revealed"
-            );
-
-            observer.unobserve(
-              entry.target
-            );
-
-          });
-
-        },
-        {
-          threshold: reducedMotion() ? 0.05 : 0.18,
-          rootMargin: "0px 0px -8% 0px"
-        }
-      );
-
-
-    revealItems.forEach((item) => {
-      revealObserver.observe(item);
-    });
-
-  } else {
-
-    revealItems.forEach((item) => {
-      item.classList.add("is-revealed");
-    });
-
-  }
-
-
-  /* =========================================================
-     12 — INTERNAL ANCHORS
-     ========================================================= */
-
-  const prefersNativeSmoothScroll =
-    !reducedMotion();
-
-
-  const getAnchorTarget = (href) => {
-    if (!href || href === "#") {
-      return null;
-    }
-
-    if (!href.startsWith("#")) {
-      return null;
-    }
-
-    const id =
-      decodeURIComponent(
-        href.slice(1)
-      );
-
-    if (!id) return null;
-
-    return document.getElementById(id);
-  };
-
-
-  const focusTarget = (target) => {
-    if (!target) return;
-
-    const hadTabIndex =
-      target.hasAttribute("tabindex");
-
-    if (!hadTabIndex) {
-      target.setAttribute(
-        "tabindex",
-        "-1"
-      );
-    }
-
-    target.focus({
-      preventScroll: true
-    });
-
-    if (!hadTabIndex) {
-      window.setTimeout(() => {
-        target.removeAttribute("tabindex");
-      }, 1000);
-    }
-  };
-
-
-  document
-    .querySelectorAll('a[href^="#"]')
-    .forEach((link) => {
-
-      link.addEventListener("click", (event) => {
-
-        const target =
-          getAnchorTarget(
-            link.getAttribute("href")
-          );
-
-        if (!target) return;
-
-        event.preventDefault();
-
-        const headerHeight =
-          header?.offsetHeight || 0;
-
-        const targetTop =
-          target.getBoundingClientRect().top +
-          window.scrollY -
-          headerHeight -
-          16;
-
-        window.scrollTo({
-          top: Math.max(targetTop, 0),
-          behavior:
-            prefersNativeSmoothScroll
-              ? "smooth"
-              : "auto"
+      item.addEventListener("mouseenter", () => {
+        directionItems.forEach((other) => {
+          other.classList.remove("is-active");
         });
 
-        history.pushState(
-          null,
-          "",
-          `#${target.id}`
-        );
+        item.classList.add("is-active");
+      });
 
-        window.setTimeout(() => {
-          focusTarget(target);
-        }, reducedMotion() ? 0 : 450);
+      item.addEventListener("focus", () => {
+        directionItems.forEach((other) => {
+          other.classList.remove("is-active");
+        });
 
+        item.classList.add("is-active");
       });
 
     });
-
-
-  /* =========================================================
-     13 — CLOSE MENU WHEN ESCAPE / HASH NAVIGATION
-     ========================================================= */
-
-  window.addEventListener("hashchange", () => {
-
-    if (menuOpen) {
-      closeMenu({
-        restoreFocus: false
-      });
-    }
-
-  });
-
-
-  /* =========================================================
-     14 — VIEWPORT / VISIBILITY
-     ========================================================= */
-
-  document.addEventListener(
-    "visibilitychange",
-    () => {
-
-      if (document.hidden) {
-        if (parallaxFrame) {
-          window.cancelAnimationFrame(
-            parallaxFrame
-          );
-
-          parallaxFrame = null;
-        }
-
-        return;
-      }
-
-      requestScrollUI();
-
-    }
-  );
-
-
-  /* =========================================================
-     15 — REDUCED MOTION CHANGES
-     ========================================================= */
-
-  const handleMotionPreferenceChange = () => {
-
-    if (reducedMotion()) {
-      resetHeroParallax();
-
-      if (parallaxFrame) {
-        window.cancelAnimationFrame(
-          parallaxFrame
-        );
-
-        parallaxFrame = null;
-      }
-
-    }
-
-  };
-
-
-  if (
-    typeof reducedMotionQuery.addEventListener ===
-    "function"
-  ) {
-
-    reducedMotionQuery.addEventListener(
-      "change",
-      handleMotionPreferenceChange
-    );
-
-  } else if (
-    typeof reducedMotionQuery.addListener ===
-    "function"
-  ) {
-
-    reducedMotionQuery.addListener(
-      handleMotionPreferenceChange
-    );
-
   }
 
+  /* -------------------------------------------------------
+     INTERNAL LINKS
+     ------------------------------------------------------- */
 
-  /* =========================================================
-     16 — FOCUS VISIBILITY
-     ========================================================= */
+  document.addEventListener("click", (event) => {
 
-  document.addEventListener(
-    "keydown",
-    (event) => {
+    const link = event.target.closest("a");
 
-      if (event.key === "Tab") {
-        root.classList.add("keyboard-user");
-      }
+    if (!link) return;
 
-    },
-    { passive: true }
-  );
+    const href = link.getAttribute("href");
 
+    if (!href) return;
 
-  document.addEventListener(
-    "pointerdown",
-    () => {
-      root.classList.remove("keyboard-user");
-    },
-    { passive: true }
-  );
+    /*
+     * Only intercept same-page anchors.
+     * Normal page navigation remains completely native.
+     */
+    if (!href.startsWith("#")) return;
 
+    const target = document.querySelector(href);
 
-  /* =========================================================
-     17 — ESCAPE FROM OPEN UI
-     ========================================================= */
+    if (!target) return;
 
-  document.addEventListener(
-    "keydown",
-    (event) => {
+    event.preventDefault();
 
-      if (
-        event.key === "Escape" &&
-        menuOpen
-      ) {
-        closeMenu();
-      }
+    closeMenu(false);
 
+    const headerHeight = header
+      ? header.offsetHeight
+      : 0;
+
+    const targetTop =
+      target.getBoundingClientRect().top +
+      window.scrollY -
+      headerHeight;
+
+    window.scrollTo({
+      top: targetTop,
+      behavior: reduceMotion.matches
+        ? "auto"
+        : "smooth"
+    });
+
+    /*
+     * Keep URL hash without forcing a page reload.
+     */
+    if (history.pushState) {
+      history.pushState(null, "", href);
     }
-  );
+  });
 
+  /* -------------------------------------------------------
+     KEYBOARD USER STATE
+     ------------------------------------------------------- */
 
-  /* =========================================================
-     18 — RESIZE SAFETY
-     ========================================================= */
+  let keyboardUser = false;
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Tab") {
+      keyboardUser = true;
+      document.documentElement.classList.add(
+        "keyboard-user"
+      );
+    }
+  });
+
+  document.addEventListener("pointerdown", () => {
+    if (!keyboardUser) return;
+
+    keyboardUser = false;
+
+    document.documentElement.classList.remove(
+      "keyboard-user"
+    );
+  });
+
+  /* -------------------------------------------------------
+     RESIZE
+     ------------------------------------------------------- */
 
   let resizeTimer = null;
 
-  window.addEventListener(
-    "resize",
-    () => {
+  window.addEventListener("resize", () => {
 
-      window.clearTimeout(
-        resizeTimer
-      );
+    clearTimeout(resizeTimer);
 
-      resizeTimer =
-        window.setTimeout(() => {
+    resizeTimer = window.setTimeout(() => {
 
-          resetHeroParallax();
-          requestScrollUI();
-
-        }, 120);
-
-    },
-    { passive: true }
-  );
-
-
-  /* =========================================================
-     19 — INITIAL STATE
-     ========================================================= */
-
-  document.body.classList.add(
-    "site-ready"
-  );
-
-  directionItems[0]?.classList.add(
-    "is-active"
-  );
-
-  updateScrollUI();
-
-
-  /* =========================================================
-     20 — CLEANUP ON PAGE UNLOAD
-     ========================================================= */
-
-  window.addEventListener(
-    "pagehide",
-    () => {
-
-      if (introTimer) {
-        window.clearTimeout(
-          introTimer
-        );
+      /*
+       * Never leave the interface in an impossible state
+       * after orientation change / resize.
+       */
+      if (window.innerWidth > 900 && menuOpen) {
+        closeMenu(false);
       }
 
-      if (parallaxFrame) {
-        window.cancelAnimationFrame(
-          parallaxFrame
-        );
-      }
+      handleScroll();
 
-    },
-    { passive: true }
-  );
+    }, 150);
+
+  }, {
+    passive: true
+  });
+
+  /* -------------------------------------------------------
+     VISIBILITY
+     ------------------------------------------------------- */
+
+  document.addEventListener("visibilitychange", () => {
+
+    if (document.hidden) return;
+
+    handleScroll();
+
+  });
+
+  /* -------------------------------------------------------
+     INITIAL STATE
+     ------------------------------------------------------- */
+
+  /*
+   * The menu starts closed.
+   */
+  if (menu) {
+    menu.setAttribute("aria-hidden", "true");
+    menu.setAttribute("inert", "");
+  }
+
+  if (menuToggle) {
+    menuToggle.setAttribute("aria-expanded", "false");
+  }
+
+  /*
+   * Initial calculations.
+   */
+  handleScroll();
 
 })();
