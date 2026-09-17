@@ -1,3355 +1,1719 @@
-/* =========================================================
-   CESARE PARATORE
-   MOVIMENTO / CON DIREZIONE.
-   MASTER CSS — 17/09/2026
-   ========================================================= */
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>
+    Cesare Paratore | Scienze Motorie e Sport | Partinico e oltre
+  </title>
+
+  <meta
+    name="description"
+    content="Cesare Paratore, professionista delle Scienze Motorie e dello Sport, con una formazione che integra competenze motorie, sportive, educative, manageriali e digitali. Con base a Partinico, il suo percorso è aperto al territorio e alle collaborazioni online."
+  >
+
+  <meta name="theme-color" content="#071b3a">
+  <meta name="robots" content="index, follow">
+
+  <link
+    rel="canonical"
+    href="https://www.cesareparatore.it/"
+  >
+
+  <link
+    rel="icon"
+    type="image/png"
+    href="/assets/images/cp-mark.png"
+  >
+
+  <link
+    rel="stylesheet"
+    href="/css/style.css"
+  >
+
+  <script
+    src="/script.js"
+    defer
+  ></script>
+</head>
+
+<body>
+
+  <!-- =====================================================
+       PAGE LOADER
+       ===================================================== -->
+
+  <div
+    id="page-loader"
+    class="page-loader"
+    aria-hidden="true"
+  >
+    <div class="page-loader-inner">
+
+      <div class="page-loader-logo page-loader-logo--large">
+        <img
+          src="/assets/images/cp-mark.png"
+          alt="Cesare Paratore"
+          width="180"
+          height="180"
+        >
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- =====================================================
+       PAGE TRANSITION
+       ===================================================== -->
+
+  <div
+    class="page-transition"
+    aria-hidden="true"
+  >
+    <div class="page-transition-circle">
+      <img
+        src="/assets/images/cp-mark.png"
+        alt=""
+        width="180"
+        height="180"
+      >
+    </div>
+  </div>
+
+
+  <!-- =====================================================
+       STANDBY
+       ===================================================== -->
+
+  <div
+    class="standby-screen"
+    aria-hidden="true"
+  >
+
+    <div class="standby-atmosphere">
+
+      <span class="standby-orbit standby-orbit-a"></span>
+      <span class="standby-orbit standby-orbit-b"></span>
+      <span class="standby-orbit standby-orbit-c"></span>
+
+      <span class="standby-line standby-line-a"></span>
+      <span class="standby-line standby-line-b"></span>
+      <span class="standby-line standby-line-c"></span>
+
+    </div>
+
+    <div class="standby-center">
 
+      <div class="standby-logo-circle standby-logo-circle--large">
+        <img
+          src="/assets/images/cp-mark.png"
+          alt="Cesare Paratore"
+          width="250"
+          height="250"
+        >
+      </div>
 
-/* =========================================================
-   01 — DESIGN TOKENS
-   ========================================================= */
+      <div class="standby-copy">
+        <span class="standby-label">
+          IN ATTESA
+        </span>
+      </div>
 
-:root {
-  --navy: #071b3a;
-  --navy-deep: #041225;
+      <button
+        class="standby-wake"
+        type="button"
+        aria-label="Riattiva la pagina"
+      >
+        RIATTIVA
+      </button>
 
-  --paper: #f3f0e8;
-  --paper-bright: #faf8f2;
+    </div>
 
-  --ink: #101820;
-  --muted: rgba(16, 24, 32, .62);
+  </div>
 
-  --line-dark: rgba(255, 255, 255, .16);
-  --line-light: rgba(7, 27, 58, .14);
 
-  --page-padding: clamp(22px, 4vw, 72px);
-  --section-space: clamp(110px, 15vw, 240px);
-  --content-width: 1680px;
+  <!-- =====================================================
+       CUSTOM CURSOR
+       ===================================================== -->
 
-  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  <div
+    class="custom-cursor"
+    aria-hidden="true"
+  >
+    <span class="custom-cursor-dot"></span>
+    <span class="custom-cursor-ring"></span>
+  </div>
 
-  --ease: cubic-bezier(.22, .8, .24, 1);
-  --ease-soft: cubic-bezier(.16, 1, .3, 1);
-  --ease-linear: linear;
 
-  --header-height: 128px;
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
 
-  /* Trajectory Engine */
-  --trajectory-progress: 0;
-  --trajectory-drift: 0;
-  --trajectory-scale: 1;
-  --trajectory-opacity: 1;
-}
+  <header class="site-header">
 
+    <a
+      class="site-header-brand"
+      href="/"
+      aria-label="Cesare Paratore — Home"
+    >
 
-/* =========================================================
-   02 — RESET
-   ========================================================= */
+      <span class="site-header-logo site-header-logo--large">
+        <img
+          src="/assets/images/cp-mark.png"
+          alt="Cesare Paratore"
+          width="150"
+          height="150"
+        >
+      </span>
+
+      <span class="site-header-brand-copy">
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+        <span class="site-header-name">
+          CESARE PARATORE
+        </span>
 
-html {
-  margin: 0;
-  padding: 0;
+        <span class="site-header-motto">
+          MOVIMENTO / CON DIREZIONE.
+        </span>
+
+      </span>
+
+    </a>
+
 
-  scroll-behavior: smooth;
+    <div class="site-header-meta">
+
+      <span
+        class="site-header-section-counter"
+        aria-live="polite"
+      >
+        01 / 10
+      </span>
+
+      <button
+        class="menu-trigger"
+        type="button"
+        aria-expanded="false"
+        aria-controls="site-menu"
+      >
+
+        <span class="menu-trigger-label">
+          MENU
+        </span>
+
+        <span class="menu-trigger-line"></span>
+
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- =====================================================
+       SITE MENU
+       INTERNAL ARCHITECTURE
+       ===================================================== -->
+
+  <aside
+    id="site-menu"
+    class="site-menu"
+    aria-hidden="true"
+  >
+
+    <div class="site-menu-inner">
+
+      <div class="site-menu-header">
+
+        <span class="site-menu-kicker">
+          ARCHITETTURA
+        </span>
+
+        <span class="site-menu-intro">
+          Le direzioni del percorso.
+        </span>
+
+      </div>
+
+
+      <nav
+        class="site-menu-navigation"
+        aria-label="Navigazione principale"
+      >
+
+        <a
+          class="site-menu-item"
+          href="/chi-sono/"
+        >
+          <span class="site-menu-item-number">01</span>
+          <span class="site-menu-item-title">CHI SONO</span>
+          <span class="site-menu-item-trace">
+            <span class="site-menu-item-trace-line"></span>
+            <span class="site-menu-item-trace-point"></span>
+          </span>
+        </a>
+
+
+        <a
+          class="site-menu-item"
+          href="/scienze-motorie/"
+        >
+          <span class="site-menu-item-number">02</span>
+          <span class="site-menu-item-title">SCIENZE MOTORIE</span>
+          <span class="site-menu-item-trace">
+            <span class="site-menu-item-trace-line"></span>
+            <span class="site-menu-item-trace-point"></span>
+          </span>
+        </a>
+
+
+        <a
+          class="site-menu-item"
+          href="/sport/"
+        >
+          <span class="site-menu-item-number">03</span>
+          <span class="site-menu-item-title">SPORT</span>
+          <span class="site-menu-item-trace">
+            <span class="site-menu-item-trace-line"></span>
+            <span class="site-menu-item-trace-point"></span>
+          </span>
+        </a>
+
+
+        <a
+          class="site-menu-item"
+          href="/corsa-running/"
+        >
+          <span class="site-menu-item-number">04</span>
+          <span class="site-menu-item-title">CORSA / RUNNING</span>
+          <span class="site-menu-item-trace">
+            <span class="site-menu-item-trace-line"></span>
+            <span class="site-menu-item-trace-point"></span>
+          </span>
+        </a>
+
+
+        <a
+          class="site-menu-item"
+          href="/preparazione-atletica/"
+        >
+          <span class="site-menu-item-number">05</span>
+          <span class="site-menu-item-title">PREPARAZIONE ATLETICA</span>
+          <span class="site-menu-item-trace">
+            <span class="site-menu-item-trace-line"></span>
+            <span class="site-menu-item-trace-point"></span>
+          </span>
+        </a>
+
+
+        <a
+          class="site-menu-item"
+          href="/educazione/"
+        >
+          <span class="site-menu-item-number">06</span>
+          <span class="site-menu-item-title">EDUCAZIONE</span>
+          <span class="site-menu-item-trace">
+            <span class="site-menu-item-trace-line"></span>
+            <span class="site-menu-item-trace-point"></span>
+          </span>
+        </a>
+
+
+        <a
+          class="site-menu-item"
+          href="/management-dello-sport/"
+        >
+          <span class="site-menu-item-number">07</span>
+          <span class="site-menu-item-title">MANAGEMENT DELLO SPORT</span>
+          <span class="site-menu-item-trace">
+            <span class="site-menu-item-trace-line"></span>
+            <span class="site-menu-item-trace-point"></span>
+          </span>
+        </a>
+
+
+        <a
+          class="site-menu-item"
+          href="/presenza-web/"
+        >
+          <span class="site-menu-item-number">08</span>
+          <span class="site-menu-item-title">PRESENZA WEB</span>
+          <span class="site-menu-item-trace">
+            <span class="site-menu-item-trace-line"></span>
+            <span class="site-menu-item-trace-point"></span>
+          </span>
+        </a>
+
+
+        <a
+          class="site-menu-item"
+          href="/territorio/"
+        >
+          <span class="site-menu-item-number">09</span>
+          <span class="site-menu-item-title">TERRITORIO</span>
+          <span class="site-menu-item-trace">
+            <span class="site-menu-item-trace-line"></span>
+            <span class="site-menu-item-trace-point"></span>
+          </span>
+        </a>
+
+
+        <a
+          class="site-menu-item"
+          href="/contatti/"
+        >
+          <span class="site-menu-item-number">10</span>
+          <span class="site-menu-item-title">CONTATTI</span>
+          <span class="site-menu-item-trace">
+            <span class="site-menu-item-trace-line"></span>
+            <span class="site-menu-item-trace-point"></span>
+          </span>
+        </a>
+
+      </nav>
+
+
+      <div class="site-menu-footer">
+
+        <span>
+          CESARE PARATORE
+        </span>
+
+        <span>
+          MOVIMENTO / CON DIREZIONE.
+        </span>
+
+      </div>
+
+    </div>
+
+  </aside>
+
+
+  <!-- =====================================================
+       SCROLL PROGRESS
+       ===================================================== -->
+
+  <div
+    class="scroll-progress"
+    aria-hidden="true"
+  >
+    <span class="scroll-progress-bar"></span>
+  </div>
+
+
+  <!-- =====================================================
+       HOME SECTION NAVIGATION
+       IMPORTANT:
+       NORMAL FLOW — NOT FIXED — NOT STICKY
+       ===================================================== -->
+
+  <nav
+    class="home-section-nav"
+    aria-label="Navigazione delle sezioni della Home"
+  >
+
+    <div class="home-section-nav-inner">
+
+      <div class="home-section-nav-current">
+
+        <span class="home-section-nav-current-number">
+          01
+        </span>
+
+        <span class="home-section-nav-current-label">
+          L'INIZIO
+        </span>
+
+      </div>
+
+
+      <div class="home-section-nav-route">
+
+        <span
+          class="home-section-nav-route-line"
+          aria-hidden="true"
+        ></span>
+
+        <span
+          class="home-section-nav-route-progress"
+          aria-hidden="true"
+        ></span>
+
+        <span
+          class="home-section-nav-route-point"
+          aria-hidden="true"
+        ></span>
+
+
+        <div class="home-section-nav-items">
+
+          <a
+            class="home-section-nav-item is-active"
+            href="#inizio"
+            data-section-target="inizio"
+            aria-label="01 — L'INIZIO"
+            aria-current="true"
+          >
+            <span class="home-section-nav-number">01</span>
+            <span class="home-section-nav-label">L'INIZIO</span>
+          </a>
+
+
+          <a
+            class="home-section-nav-item"
+            href="#centro"
+            data-section-target="centro"
+            aria-label="02 — IL CENTRO"
+          >
+            <span class="home-section-nav-number">02</span>
+            <span class="home-section-nav-label">IL CENTRO</span>
+          </a>
+
+
+          <a
+            class="home-section-nav-item"
+            href="#direzioni"
+            data-section-target="direzioni"
+            aria-label="03 — CINQUE DIREZIONI"
+          >
+            <span class="home-section-nav-number">03</span>
+            <span class="home-section-nav-label">CINQUE DIREZIONI</span>
+          </a>
+
+
+          <a
+            class="home-section-nav-item"
+            href="#persona"
+            data-section-target="persona"
+            aria-label="04 — LA PERSONA"
+          >
+            <span class="home-section-nav-number">04</span>
+            <span class="home-section-nav-label">LA PERSONA</span>
+          </a>
+
+
+          <a
+            class="home-section-nav-item"
+            href="#direzione"
+            data-section-target="direzione"
+            aria-label="05 — LA DIREZIONE"
+          >
+            <span class="home-section-nav-number">05</span>
+            <span class="home-section-nav-label">LA DIREZIONE</span>
+          </a>
+
+
+          <a
+            class="home-section-nav-item"
+            href="#tracce"
+            data-section-target="tracce"
+            aria-label="06 — LE TRACCE"
+          >
+            <span class="home-section-nav-number">06</span>
+            <span class="home-section-nav-label">LE TRACCE</span>
+          </a>
+
+
+          <a
+            class="home-section-nav-item"
+            href="#punto-zero"
+            data-section-target="punto-zero"
+            aria-label="07 — IL PUNTO ZERO"
+          >
+            <span class="home-section-nav-number">07</span>
+            <span class="home-section-nav-label">IL PUNTO ZERO</span>
+          </a>
+
+
+          <a
+            class="home-section-nav-item"
+            href="#tocca-a-te"
+            data-section-target="tocca-a-te"
+            aria-label="08 — ADESSO TOCCA A TE"
+          >
+            <span class="home-section-nav-number">08</span>
+            <span class="home-section-nav-label">ADESSO TOCCA A TE</span>
+          </a>
+
+
+          <a
+            class="home-section-nav-item"
+            href="#tua-direzione"
+            data-section-target="tua-direzione"
+            aria-label="09 — LA TUA DIREZIONE"
+          >
+            <span class="home-section-nav-number">09</span>
+            <span class="home-section-nav-label">LA TUA DIREZIONE</span>
+          </a>
+
+
+          <a
+            class="home-section-nav-item"
+            href="#contatto"
+            data-section-target="contatto"
+            aria-label="10 — IL CONTATTO"
+          >
+            <span class="home-section-nav-number">10</span>
+            <span class="home-section-nav-label">IL CONTATTO</span>
+          </a>
+
+        </div>
+
+      </div>
+
+
+      <div class="home-section-nav-total">
+        <span>10</span>
+      </div>
+
+    </div>
+
+  </nav>
+
+
+  <!-- =====================================================
+       MAIN
+       ===================================================== -->
+
+  <main id="main-content">
+
+
+    <!-- ===================================================
+         01 — L'INIZIO
+         =================================================== -->
 
-  background: var(--paper);
-}
+    <section
+      id="inizio"
+      class="home-section home-section--dark home-section--hero"
+      data-section="01"
+      data-section-label="L'INIZIO"
+    >
+
+      <div class="section-atmosphere" aria-hidden="true">
 
-body {
-  margin: 0;
-  padding: 0;
+        <span class="section-orbit section-orbit-a"></span>
+        <span class="section-orbit section-orbit-b"></span>
+        <span class="section-orbit section-orbit-c"></span>
 
-  min-width: 320px;
+        <span class="section-trace section-trace-a"></span>
+        <span class="section-trace section-trace-b"></span>
 
-  background: var(--paper);
-  color: var(--ink);
+        <span class="section-node section-node-a"></span>
+        <span class="section-node section-node-b"></span>
 
-  font-family: var(--font-sans);
+      </div>
 
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 
-  text-rendering: optimizeLegibility;
+      <div class="section-inner section-inner--hero">
 
-  overflow-x: hidden;
-}
+        <div class="section-index reveal">
+          01 / 10
+        </div>
 
-body.is-menu-open,
-body.is-standby {
-  overflow: hidden;
-}
 
-img {
-  display: block;
-  max-width: 100%;
-}
+        <div class="hero-copy">
 
-button,
-a {
-  -webkit-tap-highlight-color: transparent;
-}
+          <p class="hero-kicker reveal">
+            CESARE PARATORE
+          </p>
 
-button {
-  font: inherit;
-}
+          <h1 class="hero-title reveal">
+            <span>MOVIMENTO.</span>
+            <span>CON DIREZIONE.</span>
+          </h1>
 
-a {
-  color: inherit;
-}
+          <div class="hero-intro reveal">
 
-::selection {
-  background: var(--navy);
-  color: var(--paper);
-}
+            <p>
+              Il movimento è ciò da cui tutto prende forma.
+            </p>
 
+            <p>
+              La direzione è ciò che gli dà senso.
+            </p>
 
-/* =========================================================
-   03 — PAGE LOADER
-   ========================================================= */
+          </div>
+
+        </div>
 
-.page-loader {
-  position: fixed;
-  inset: 0;
+
+        <div class="hero-body editorial-copy reveal">
 
-  z-index: 10000;
+          <p>
+            Prima viene il movimento.
+            Il primo passo.
+            Il corpo che scopre uno spazio.
+            La corsa che diventa ritmo.
+            La fatica che diventa esperienza.
+            La pratica che diventa conoscenza.
+          </p>
 
-  display: grid;
-  place-items: center;
+          <p>
+            È da qui che è iniziato il mio percorso.
+            Non sapevo ancora quante strade avrebbe preso.
+            Sapevo soltanto che volevo continuare a seguirlo.
+          </p>
 
-  background: var(--navy);
+        </div>
 
-  opacity: 1;
-  visibility: visible;
+      </div>
 
-  transition:
-    opacity 700ms var(--ease),
-    visibility 700ms var(--ease);
-}
+    </section>
 
-.page-loader.is-hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
 
-.page-loader-inner {
-  display: grid;
-  place-items: center;
-}
+    <!-- ===================================================
+         02 — IL CENTRO
+         =================================================== -->
 
-.page-loader-logo {
-  width: clamp(120px, 12vw, 175px);
-  aspect-ratio: 1;
+    <section
+      id="centro"
+      class="home-section home-section--paper"
+      data-section="02"
+      data-section-label="IL CENTRO"
+    >
 
-  padding: 20px;
+      <div class="section-inner section-inner--editorial">
 
-  display: grid;
-  place-items: center;
+        <div class="section-index reveal">
+          02 / 10
+        </div>
 
-  background: var(--paper);
 
-  border-radius: 50%;
+        <div class="editorial-heading reveal">
 
-  transform: scale(.82);
+          <p class="section-kicker">
+            IL CENTRO
+          </p>
 
-  animation:
-    loader-pulse 1500ms var(--ease-soft) infinite alternate;
-}
+          <h2>
+            TUTTO È PARTITO<br>
+            DA UNA DOMANDA.
+          </h2>
 
-.page-loader-logo img {
-  width: 100%;
-  height: 100%;
+        </div>
 
-  object-fit: contain;
-}
 
-@keyframes loader-pulse {
-  to {
-    transform: scale(1);
-  }
-}
+        <div class="editorial-question reveal">
 
+          <p>
+            Cosa può diventare una persona quando impara davvero a muoversi?
+          </p>
 
-/* =========================================================
-   04 — PAGE TRANSITION
-   ========================================================= */
+        </div>
 
-.page-transition {
-  position: fixed;
-  inset: 0;
 
-  z-index: 9990;
+        <div class="editorial-copy editorial-copy--wide reveal">
 
-  display: grid;
-  place-items: center;
+          <p>
+            Non soltanto più veloce.
+            Più consapevole.
+            Capace di conoscere il proprio corpo,
+            affrontare una difficoltà,
+            stare dentro una squadra,
+            imparare attraverso l’esperienza.
+          </p>
 
-  background: var(--navy);
+          <p>
+            Il movimento può essere allenamento.
+            Può essere educazione.
+            Può essere sport.
+            Può diventare metodo.
+          </p>
 
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
+          <p>
+            E, quando lo si osserva abbastanza a lungo,
+            racconta molto più del corpo.
+            Racconta come impariamo.
+            Come cambiamo.
+            Come scegliamo una direzione.
+          </p>
 
-  transition:
-    opacity 450ms var(--ease),
-    visibility 450ms var(--ease);
-}
+          <p>
+            Per questo
+            <strong>Scienze Motorie e Sport</strong>
+            sono il centro del mio percorso.
+            Tutto il resto è nato da lì.
+          </p>
 
-.page-transition.is-active {
-  opacity: 1;
-  visibility: visible;
-}
+        </div>
 
-.page-transition-circle {
-  width: clamp(120px, 12vw, 175px);
-  aspect-ratio: 1;
+      </div>
 
-  display: grid;
-  place-items: center;
+    </section>
 
-  padding: 20px;
 
-  background: var(--paper);
+    <!-- ===================================================
+         03 — CINQUE DIREZIONI
+         =================================================== -->
 
-  border-radius: 50%;
+    <section
+      id="direzioni"
+      class="home-section home-section--dark home-section--directions"
+      data-section="03"
+      data-section-label="CINQUE DIREZIONI"
+    >
 
-  transform: scale(.75);
+      <div class="section-inner section-inner--directions">
 
-  transition:
-    transform 700ms var(--ease-soft);
-}
+        <div class="section-index reveal">
+          03 / 10
+        </div>
 
-.page-transition.is-active .page-transition-circle {
-  transform: scale(1);
-}
 
-.page-transition-circle img {
-  width: 100%;
-  height: 100%;
+        <div class="directions-heading reveal">
 
-  object-fit: contain;
-}
+          <p class="section-kicker">
+            CINQUE DIREZIONI
+          </p>
 
+          <h2>
+            A UN CERTO PUNTO,<br>
+            IL PERCORSO SI È APERTO.
+          </h2>
 
-/* =========================================================
-   05 — STANDBY
-   ========================================================= */
+          <p class="directions-lead">
+            Non in cinque percorsi diversi.
+            <strong>In cinque direzioni.</strong>
+          </p>
 
-.standby-screen {
-  position: fixed;
-  inset: 0;
+        </div>
 
-  z-index: 9000;
 
-  display: grid;
-  place-items: center;
+        <div class="directions-grid">
 
-  background: var(--navy);
-  color: var(--paper);
+          <article
+            class="direction-card reveal"
+            data-direction="01"
+          >
 
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
+            <span class="direction-card-number">
+              01
+            </span>
 
-  transition:
-    opacity 900ms var(--ease),
-    visibility 900ms var(--ease);
-}
+            <h3>
+              SCIENZE MOTORIE
+            </h3>
 
-.standby-screen.is-active {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
+            <p class="direction-card-intro">
+              Il punto di partenza.
+            </p>
 
-.standby-atmosphere {
-  position: absolute;
-  inset: 0;
+            <p>
+              Il corpo.
+              Il movimento.
+              Le capacità motorie.
+              La formazione.
+              Il metodo.
+              La base da cui tutto ha preso forma.
+            </p>
 
-  overflow: hidden;
+          </article>
 
-  pointer-events: none;
-}
 
-.standby-orbit,
-.standby-line {
-  position: absolute;
+          <article
+            class="direction-card reveal"
+            data-direction="02"
+          >
 
-  display: block;
+            <span class="direction-card-number">
+              02
+            </span>
 
-  pointer-events: none;
-}
+            <h3>
+              SPORT
+            </h3>
 
-.standby-orbit {
-  border: 1px solid rgba(255,255,255,.13);
-  border-radius: 50%;
-}
+            <p class="direction-card-intro">
+              Poi arriva la pratica.
+            </p>
 
-.standby-orbit-a {
-  width: 48vw;
-  height: 48vw;
+            <p>
+              La corsa.
+              L’atletica.
+              L’allenamento.
+              La preparazione.
+              Ciò che studi incontra qualcosa di reale:
+              un corpo,
+              una pista,
+              un obiettivo.
+            </p>
 
-  left: 50%;
-  top: 50%;
+            <p>
+              È lì che la conoscenza smette di essere soltanto teoria.
+            </p>
 
-  transform:
-    translate(-50%, -50%);
+          </article>
 
-  animation:
-    standby-rotate-a 26s linear infinite;
-}
 
-.standby-orbit-b {
-  width: 72vw;
-  height: 28vw;
+          <article
+            class="direction-card reveal"
+            data-direction="03"
+          >
 
-  left: 50%;
-  top: 50%;
+            <span class="direction-card-number">
+              03
+            </span>
 
-  transform:
-    translate(-50%, -50%)
-    rotate(28deg);
+            <h3>
+              EDUCAZIONE
+            </h3>
 
-  animation:
-    standby-rotate-b 34s linear infinite reverse;
-}
+            <p class="direction-card-intro">
+              Poi arriva una domanda più grande.
+            </p>
 
-.standby-orbit-c {
-  width: 90vw;
-  height: 55vw;
+            <p>
+              Cosa succede quando il movimento non lo vivi soltanto,
+              ma lo insegni?
+            </p>
 
-  left: 50%;
-  top: 50%;
+            <p>
+              A scuola il corpo entra nella relazione.
+              Diventa esperienza.
+              Diventa apprendimento.
+              Diventa crescita.
+            </p>
 
-  transform:
-    translate(-50%, -50%)
-    rotate(-24deg);
+          </article>
 
-  animation:
-    standby-rotate-c 44s linear infinite;
-}
 
-.standby-line {
-  height: 1px;
-  width: 75vw;
+          <article
+            class="direction-card reveal"
+            data-direction="04"
+          >
 
-  background:
-    linear-gradient(
-      90deg,
-      transparent,
-      rgba(255,255,255,.22),
-      transparent
-    );
-}
+            <span class="direction-card-number">
+              04
+            </span>
 
-.standby-line-a {
-  top: 34%;
-  left: -10%;
+            <h3>
+              MANAGEMENT
+            </h3>
 
-  transform: rotate(-12deg);
-}
+            <p class="direction-card-intro">
+              E quando qualcosa deve essere costruito,
+              serve una visione.
+            </p>
 
-.standby-line-b {
-  top: 63%;
-  right: -10%;
+            <p>
+              Progettare.
+              Organizzare.
+              Comprendere.
+              Mettere in relazione persone,
+              idee e possibilità.
+            </p>
 
-  transform: rotate(9deg);
-}
+            <p>
+              Dare forma a un’idea prima che diventi realtà.
+            </p>
 
-.standby-line-c {
-  top: 50%;
-  left: 10%;
+          </article>
 
-  width: 80vw;
 
-  opacity: .5;
-}
+          <article
+            class="direction-card reveal"
+            data-direction="05"
+          >
 
-@keyframes standby-rotate-a {
-  to {
-    transform:
-      translate(-50%, -50%)
-      rotate(360deg);
-  }
-}
+            <span class="direction-card-number">
+              05
+            </span>
 
-@keyframes standby-rotate-b {
-  to {
-    transform:
-      translate(-50%, -50%)
-      rotate(-332deg);
-  }
-}
+            <h3>
+              DIGITALE
+            </h3>
 
-@keyframes standby-rotate-c {
-  to {
-    transform:
-      translate(-50%, -50%)
-      rotate(336deg);
-  }
-}
+            <p class="direction-card-intro">
+              Infine, un altro spazio.
+            </p>
 
-.standby-center {
-  position: relative;
-  z-index: 2;
+            <p>
+              Quello in cui le idee possono incontrare persone
+              anche a distanza.
+            </p>
 
-  display: grid;
-  justify-items: center;
+            <p>
+              Il digitale non è il centro.
+              È uno strumento.
+              Per raccontare.
+              Progettare.
+              Creare presenza.
+              Mettere in relazione mondi che altrimenti
+              rimarrebbero lontani.
+            </p>
 
-  gap: 28px;
+          </article>
 
-  text-align: center;
-}
+        </div>
 
-.standby-logo-circle {
-  width: clamp(190px, 19vw, 290px);
-  aspect-ratio: 1;
 
-  display: grid;
-  place-items: center;
+        <div class="directions-ending reveal">
 
-  padding: clamp(28px, 3.5vw, 46px);
+          <span>
+            Cinque direzioni.
+          </span>
 
-  background: var(--paper);
+          <span>
+            Un solo punto di partenza.
+          </span>
 
-  border-radius: 50%;
+          <strong class="directions-cp-mark">
 
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.1),
-    0 30px 100px rgba(0,0,0,.25);
+            <img
+              src="/assets/images/cp-mark.png"
+              alt="CP"
+              width="130"
+              height="130"
+            >
 
-  animation:
-    standby-breathe 4s ease-in-out infinite;
-}
+          </strong>
 
-.standby-logo-circle img {
-  width: 100%;
-  height: 100%;
+        </div>
 
-  object-fit: contain;
-}
+      </div>
 
-@keyframes standby-breathe {
-  0%,
-  100% {
-    transform: scale(1);
-  }
+    </section>
 
-  50% {
-    transform: scale(1.025);
-  }
-}
 
-.standby-copy {
-  padding: 11px 20px;
+    <!-- ===================================================
+         04 — LA PERSONA
+         =================================================== -->
 
-  border: 1px solid rgba(255,255,255,.18);
+    <section
+      id="persona"
+      class="home-section home-section--paper"
+      data-section="04"
+      data-section-label="LA PERSONA"
+    >
 
-  background: rgba(7,27,58,.16);
+      <div class="section-inner section-inner--editorial">
 
-  backdrop-filter: blur(8px);
-}
+        <div class="section-index reveal">
+          04 / 10
+        </div>
 
-.standby-label {
-  display: block;
 
-  font-family: var(--font-mono);
+        <div class="editorial-heading reveal">
 
-  font-size: .68rem;
-  line-height: 1;
+          <p class="section-kicker">
+            LA PERSONA
+          </p>
 
-  letter-spacing: .16em;
-}
+          <h2>
+            UN CURRICULUM DICE<br>
+            COSA HAI FATTO.
+          </h2>
 
-.standby-wake {
-  appearance: none;
+        </div>
 
-  padding: 9px 15px;
 
-  border: 1px solid rgba(255,255,255,.18);
+        <div class="editorial-question reveal">
 
-  background: transparent;
-  color: var(--paper);
+          <p>
+            Un percorso racconta
+            <strong>cosa quelle esperienze hanno fatto a te.</strong>
+          </p>
 
-  font-family: var(--font-mono);
+        </div>
 
-  font-size: .58rem;
-  letter-spacing: .12em;
 
-  opacity: .38;
+        <div class="editorial-copy editorial-copy--wide reveal">
 
-  cursor: pointer;
+          <p>
+            Le Scienze Motorie mi hanno dato un centro.
+            Lo sport mi ha insegnato la pratica.
+            La corsa mi ha insegnato che il tempo conta.
+            La scuola mi ha mostrato che ogni persona impara
+            in modo diverso.
+            Il management mi ha insegnato a guardare oltre l’esecuzione.
+            Il digitale mi ha insegnato che anche una presenza
+            può essere progettata.
+          </p>
 
-  transition:
-    opacity 250ms ease,
-    background 250ms ease,
-    color 250ms ease;
-}
+          <p>
+            Ogni esperienza ha lasciato una traccia.
+            Ma nessuna è rimasta dove l’avevo incontrata.
+            È passata nella successiva.
+            Si è trasformata.
+            Ha cambiato il modo in cui guardavo quella dopo ancora.
+          </p>
 
-.standby-wake:hover,
-.standby-wake:focus-visible {
-  opacity: 1;
+          <p>
+            Forse è questo che significa crescere:
+            <strong>
+              non accumulare esperienze,
+              ma permettere loro di cambiarti.
+            </strong>
+          </p>
 
-  background: var(--paper);
-  color: var(--navy);
-}
+        </div>
 
+      </div>
 
-/* =========================================================
-   06 — CUSTOM CURSOR
-   ========================================================= */
+    </section>
 
-.cursor {
-  position: fixed;
 
-  left: 0;
-  top: 0;
+    <!-- ===================================================
+         05 — LA DIREZIONE
+         =================================================== -->
 
-  z-index: 11000;
+    <section
+      id="direzione"
+      class="home-section home-section--dark home-section--direction"
+      data-section="05"
+      data-section-label="LA DIREZIONE"
+    >
 
-  pointer-events: none;
+      <div class="section-inner section-inner--direction">
 
-  opacity: 0;
-}
+        <div class="section-index reveal">
+          05 / 10
+        </div>
 
-.cursor-dot {
-  width: 5px;
-  height: 5px;
 
-  border-radius: 50%;
+        <div class="direction-copy">
 
-  background: currentColor;
+          <div class="editorial-heading reveal">
 
-  transform:
-    translate(-50%, -50%);
-}
+            <p class="section-kicker">
+              LA DIREZIONE
+            </p>
 
-.cursor-ring {
-  width: 32px;
-  height: 32px;
+            <h2>
+              MUOVERSI È FACILE.
+            </h2>
 
-  border: 1px solid currentColor;
+          </div>
 
-  border-radius: 50%;
 
-  transform:
-    translate(-50%, -50%);
+          <div class="editorial-copy reveal">
 
-  transition:
-    width 300ms var(--ease),
-    height 300ms var(--ease),
-    opacity 300ms ease;
-}
+            <p>
+              Basta partire.
+              La parte difficile viene dopo.
+              Capire dove andare.
+            </p>
 
-body.has-custom-cursor .cursor {
-  opacity: 1;
-}
+            <p>
+              Per questo movimento e direzione,
+              per me, non sono due parole separate.
+            </p>
 
-body.cursor-hover .cursor-ring {
-  width: 48px;
-  height: 48px;
-}
+            <p>
+              <strong>
+                Il movimento è ciò che accade.
+              </strong>
+            </p>
 
-@media (hover: none) {
-  .cursor {
-    display: none;
-  }
-}
+            <p>
+              <strong>
+                La direzione è ciò che gli dà senso.
+              </strong>
+            </p>
 
+            <p>
+              Vale nello sport.
+              Nell’educazione.
+              Nella formazione.
+              Quando costruisci un progetto.
+            </p>
 
-/* =========================================================
-   07 — HEADER
-   ========================================================= */
+            <p>
+              Prima di accelerare, guardo.
+              Prima di costruire, comprendo.
+              Prima di scegliere una strada,
+              provo a capire perché quella strada.
+            </p>
 
-.site-header {
-  position: relative;
+            <p>
+              <strong>
+                Non tutto ciò che porta avanti
+                porta nella direzione giusta.
+              </strong>
+            </p>
 
-  z-index: 500;
+          </div>
 
-  width: 100%;
-  min-height: var(--header-height);
+        </div>
 
-  display: flex;
 
-  align-items: center;
-  justify-content: space-between;
+        <div
+          class="direction-visual"
+          aria-hidden="true"
+        >
 
-  gap: 30px;
+          <div class="direction-visual-field">
 
-  padding:
-    18px
-    var(--page-padding);
+            <span class="direction-visual-axis direction-visual-axis-x"></span>
+            <span class="direction-visual-axis direction-visual-axis-y"></span>
 
-  background: var(--paper);
-  color: var(--navy);
+            <span class="direction-visual-orbit direction-visual-orbit-a"></span>
+            <span class="direction-visual-orbit direction-visual-orbit-b"></span>
 
-  border-bottom:
-    1px solid var(--line-light);
-}
+            <span class="direction-visual-vector"></span>
 
-.site-header-brand {
-  display: flex;
+            <span class="direction-visual-point"></span>
 
-  align-items: center;
+          </div>
 
-  gap: clamp(18px, 2vw, 28px);
+        </div>
 
-  min-width: 0;
+      </div>
 
-  color: inherit;
+    </section>
 
-  text-decoration: none;
-}
 
-.site-header-logo {
-  flex: 0 0 auto;
+    <!-- ===================================================
+         06 — LE TRACCE
+         =================================================== -->
 
-  width: clamp(112px, 8vw, 150px);
-  aspect-ratio: 1;
+    <section
+      id="tracce"
+      class="home-section home-section--paper home-section--traces"
+      data-section="06"
+      data-section-label="LE TRACCE"
+    >
 
-  display: grid;
-  place-items: center;
-}
+      <div class="section-inner section-inner--traces">
 
-.site-header-logo img {
-  width: 100%;
-  height: 100%;
+        <div class="section-index reveal">
+          06 / 10
+        </div>
 
-  object-fit: contain;
-}
 
-.site-header-brand-copy {
-  display: grid;
+        <div class="traces-content">
 
-  gap: 6px;
-}
+          <div class="editorial-heading reveal">
 
-.site-header-name {
-  font-size: .8rem;
+            <p class="section-kicker">
+              LE TRACCE
+            </p>
 
-  font-weight: 700;
+            <h2>
+              ALCUNE COSE<br>
+              LE IMPARI STUDIANDO.
+            </h2>
 
-  letter-spacing: .12em;
-}
+          </div>
 
-.site-header-motto {
-  font-family: var(--font-mono);
 
-  font-size: .6rem;
+          <div class="editorial-copy reveal">
 
-  letter-spacing: .1em;
+            <p>
+              Altre correndo.
+              Altre ancora insegnando.
+              E alcune soltanto dopo aver sbagliato.
+            </p>
 
-  opacity: .62;
-}
+            <p>
+              La formazione universitaria ha costruito le fondamenta.
+              Lo sport ha dato a quelle conoscenze un corpo.
+              La scuola ha aggiunto persone, relazioni, responsabilità.
+              Il management ha aperto la prospettiva della progettazione.
+              Il digitale ha portato il percorso in uno spazio nuovo.
+            </p>
 
-.site-header-meta {
-  display: flex;
+            <p>
+              Nessuna di queste esperienze è arrivata davvero alla fine.
+              Ognuna ha lasciato una domanda.
+              E quella domanda ha portato alla successiva.
+            </p>
 
-  align-items: center;
+            <p>
+              È così che un percorso cresce.
+              Non come una linea retta.
+              Più come una traiettoria.
+              A volte precisa.
+              A volte inattesa.
+              <strong>
+                Ma sempre in movimento.
+              </strong>
+            </p>
 
-  gap: 30px;
-}
+          </div>
 
-.site-header-section-counter {
-  font-family: var(--font-mono);
+        </div>
 
-  font-size: .64rem;
 
-  letter-spacing: .08em;
+        <div
+          class="traces-visual"
+          aria-hidden="true"
+        >
 
-  opacity: .55;
-}
+          <div class="traces-visual-field">
 
-.menu-trigger {
-  appearance: none;
+            <span class="trace-line trace-line-a"></span>
+            <span class="trace-line trace-line-b"></span>
+            <span class="trace-line trace-line-c"></span>
 
-  display: inline-flex;
+            <span class="trace-orbit trace-orbit-a"></span>
+            <span class="trace-orbit trace-orbit-b"></span>
 
-  align-items: center;
+            <span class="trace-node trace-node-a"></span>
+            <span class="trace-node trace-node-b"></span>
+            <span class="trace-node trace-node-c"></span>
 
-  gap: 12px;
+            <span class="trace-axis trace-axis-x"></span>
+            <span class="trace-axis trace-axis-y"></span>
 
-  padding: 8px 0;
+          </div>
 
-  border: 0;
+        </div>
 
-  background: transparent;
-  color: inherit;
+      </div>
 
-  cursor: pointer;
-}
+    </section>
 
-.menu-trigger-label {
-  font-family: var(--font-mono);
 
-  font-size: .66rem;
+    <!-- ===================================================
+         07 — IL PUNTO ZERO
+         =================================================== -->
 
-  letter-spacing: .1em;
-}
+    <section
+      id="punto-zero"
+      class="home-section home-section--dark home-section--territory"
+      data-section="07"
+      data-section-label="IL PUNTO ZERO"
+    >
 
-.menu-trigger-line {
-  position: relative;
+      <div class="section-inner section-inner--territory">
 
-  display: block;
+        <div class="section-index reveal">
+          07 / 10
+        </div>
 
-  width: 38px;
-  height: 1px;
 
-  background: currentColor;
-}
+        <div class="territory-content">
 
-.menu-trigger-line::after {
-  content: "";
+          <div class="editorial-heading reveal">
 
-  position: absolute;
+            <p class="section-kicker">
+              IL PUNTO ZERO
+            </p>
 
-  left: 0;
-  top: 6px;
+            <h2>
+              OGNI TRAIETTORIA<br>
+              HA BISOGNO DI UN PUNTO DI PARTENZA.
+            </h2>
 
-  width: 23px;
-  height: 1px;
+          </div>
 
-  background: currentColor;
 
-  transition:
-    width 350ms var(--ease);
-}
+          <div class="territory-place reveal">
 
-.menu-trigger:hover .menu-trigger-line::after,
-.menu-trigger:focus-visible .menu-trigger-line::after {
-  width: 38px;
-}
+            <span class="territory-place-label">
+              IL MIO È
+            </span>
 
+            <strong>
+              PARTINICO.
+            </strong>
 
-/* =========================================================
-   08 — SITE MENU
-   ========================================================= */
+          </div>
 
-.site-menu {
-  position: fixed;
-  inset: 0;
 
-  z-index: 700;
+          <div class="editorial-copy reveal">
 
-  visibility: hidden;
+            <p>
+              Un luogo preciso.
+              Un contesto fatto di sport,
+              persone, associazioni,
+              incontri e possibilità.
+            </p>
 
-  pointer-events: none;
-}
+            <p>
+              È qui che alcune delle prime direzioni
+              hanno preso forma.
+            </p>
 
-.site-menu.is-open {
-  visibility: visible;
+            <p>
+              Oggi uno spazio che non ha più bisogno
+              di una distanza fisica per creare una connessione.
+            </p>
 
-  pointer-events: auto;
-}
+            <p>
+              Ma partire da un luogo significa qualcosa.
+              Significa avere radici.
+            </p>
 
-.site-menu-backdrop {
-  position: absolute;
-  inset: 0;
+            <p>
+              E le radici non servono a trattenerti.
+              <strong>
+                Servono a permetterti di andare più lontano.
+              </strong>
+            </p>
 
-  background: rgba(7,27,58,.45);
+            <p>
+              Partinico è il punto di partenza.
+              Non il punto di arrivo.
+            </p>
 
-  opacity: 0;
+          </div>
 
-  transition:
-    opacity 500ms var(--ease);
-}
+        </div>
 
-.site-menu.is-open .site-menu-backdrop {
-  opacity: 1;
-}
 
-.site-menu-panel {
-  position: absolute;
+        <div
+          class="territory-visual"
+          aria-hidden="true"
+        >
 
-  top: 0;
-  right: 0;
+          <span class="territory-ring territory-ring-a"></span>
+          <span class="territory-ring territory-ring-b"></span>
+          <span class="territory-ring territory-ring-c"></span>
 
-  width: min(780px, 94vw);
-  height: 100%;
+          <span class="territory-point"></span>
 
-  overflow-y: auto;
+          <span class="territory-trace"></span>
 
-  padding:
-    38px
-    clamp(28px, 5vw, 72px)
-    42px;
+        </div>
 
-  background: var(--paper);
-  color: var(--navy);
+      </div>
 
-  transform: translateX(100%);
+    </section>
 
-  transition:
-    transform 700ms var(--ease);
-}
 
-.site-menu.is-open .site-menu-panel {
-  transform: translateX(0);
-}
+    <!-- ===================================================
+         08 — ADESSO TOCCA A TE
+         =================================================== -->
 
-.site-menu-header {
-  display: flex;
+    <section
+      id="tocca-a-te"
+      class="home-section home-section--paper home-section--visitor"
+      data-section="08"
+      data-section-label="ADESSO TOCCA A TE"
+    >
 
-  align-items: flex-start;
-  justify-content: space-between;
+      <div class="section-inner section-inner--visitor">
 
-  gap: 30px;
+        <div class="section-index reveal">
+          08 / 10
+        </div>
 
-  margin-bottom: 60px;
-}
 
-.site-menu-kicker {
-  display: block;
+        <div class="visitor-content">
 
-  margin-bottom: 12px;
+          <div class="editorial-heading reveal">
 
-  font-family: var(--font-mono);
+            <p class="section-kicker">
+              ADESSO TOCCA A TE
+            </p>
 
-  font-size: .62rem;
+            <h2>
+              FORSE SEI ARRIVATO QUI<br>
+              PER CASO.
+            </h2>
 
-  letter-spacing: .12em;
+          </div>
 
-  opacity: .55;
-}
 
-.site-menu-title {
-  margin: 0;
+          <div class="editorial-copy reveal">
 
-  font-size: clamp(2.4rem, 5vw, 5rem);
+            <p>
+              O forse stavi cercando qualcosa.
+            </p>
 
-  line-height: .92;
+            <p>
+              Un modo per allenarti.
+              Un’idea per un progetto.
+              Una prospettiva sullo sport.
+              Un’esperienza educativa.
+              Un modo diverso di costruire qualcosa.
+              Una presenza digitale che abbia finalmente un senso.
+            </p>
 
-  letter-spacing: -.045em;
-}
+            <p>
+              Non so ancora quale sia la tua domanda.
+              Ed è giusto così.
+            </p>
 
-.site-menu-close {
-  position: relative;
+            <p>
+              Non tutte le domande arrivano già formulate.
+              A volte bisogna prima fermarsi.
+              Guardare.
+              Mettere ordine.
+              Capire cosa conta davvero.
+            </p>
 
-  width: 46px;
-  height: 46px;
+            <p>
+              <strong>
+                Poi scegliere.
+              </strong>
+            </p>
 
-  flex: 0 0 auto;
+          </div>
 
-  border:
-    1px solid rgba(7,27,58,.18);
+        </div>
 
-  background: transparent;
+      </div>
 
-  cursor: pointer;
-}
+    </section>
 
-.site-menu-close-mark,
-.site-menu-close-mark::after {
-  position: absolute;
 
-  left: 50%;
-  top: 50%;
+    <!-- ===================================================
+         09 — LA TUA DIREZIONE
+         =================================================== -->
 
-  width: 22px;
-  height: 1px;
+    <section
+      id="tua-direzione"
+      class="home-section home-section--dark home-section--your-direction"
+      data-section="09"
+      data-section-label="LA TUA DIREZIONE"
+    >
 
-  background: var(--navy);
+      <div class="section-inner section-inner--your-direction">
 
-  content: "";
-}
+        <div class="section-index reveal">
+          09 / 10
+        </div>
 
-.site-menu-close-mark {
-  transform:
-    translate(-50%, -50%)
-    rotate(45deg);
-}
 
-.site-menu-close-mark::after {
-  left: 0;
-  top: 0;
+        <div class="your-direction-content">
 
-  transform: rotate(90deg);
-}
+          <div class="editorial-heading reveal">
 
-.site-menu-nav {
-  display: grid;
-}
+            <p class="section-kicker">
+              LA TUA DIREZIONE
+            </p>
 
-.site-menu-link {
-  position: relative;
+            <h2>
+              NON ESISTE UN SOLO<br>
+              PUNTO DI INGRESSO.
+            </h2>
 
-  display: grid;
+          </div>
 
-  grid-template-columns: 44px minmax(0, 1fr);
 
-  gap: 18px;
+          <div class="editorial-copy reveal">
 
-  padding: 21px 0;
+            <p>
+              Puoi arrivare dal movimento.
+              Dallo sport.
+              Dalla corsa.
+              Dalla preparazione atletica.
+              Dall’educazione.
+              Dalla scuola.
+              Dal management.
+              Dal digitale.
+            </p>
 
-  color: inherit;
+            <p>
+              Puoi avere già un progetto.
+              Oppure soltanto un’intuizione.
+            </p>
 
-  text-decoration: none;
+            <p>
+              Puoi sapere dove vuoi arrivare.
+              Oppure sapere soltanto che
+              <strong>
+                non vuoi rimanere dove sei.
+              </strong>
+            </p>
 
-  border-bottom:
-    1px solid rgba(7,27,58,.12);
-}
+            <p>
+              Non serve avere tutto chiaro.
+              Serve trovare il prossimo passo che abbia senso.
+            </p>
 
-.site-menu-link-number {
-  padding-top: 3px;
+          </div>
 
-  font-family: var(--font-mono);
 
-  font-size: .62rem;
+          <div class="direction-list reveal">
 
-  opacity: .48;
-}
+            <span>Scienze Motorie e Sport.</span>
+            <span>Sport.</span>
+            <span>Educazione.</span>
+            <span>Management.</span>
+            <span>Digitale.</span>
 
-.site-menu-link-content {
-  display: grid;
+          </div>
 
-  gap: 14px;
-}
 
-.site-menu-link-title {
-  font-size: clamp(1rem, 2vw, 1.55rem);
+          <div class="direction-question reveal">
 
-  font-weight: 600;
+            <span>
+              Cinque direzioni.
+            </span>
 
-  letter-spacing: -.025em;
+            <span>
+              Una sola domanda.
+            </span>
 
-  transition:
-    transform 400ms var(--ease);
-}
+            <strong>
+              QUAL È LA TUA?
+            </strong>
 
-.site-menu-trace {
-  display: block;
+          </div>
 
-  width: 100%;
-}
+        </div>
 
-.site-menu-trace-line {
-  position: relative;
+      </div>
 
-  display: block;
+    </section>
 
-  width: 100%;
-  height: 1px;
 
-  background: rgba(7,27,58,.16);
+    <!-- ===================================================
+         10 — IL CONTATTO
+         =================================================== -->
 
-  overflow: visible;
-}
+    <section
+      id="contatto"
+      class="home-section home-section--paper home-section--contact"
+      data-section="10"
+      data-section-label="IL CONTATTO"
+    >
 
-.site-menu-trace-point {
-  position: absolute;
+      <div class="section-inner section-inner--contact">
 
-  top: 50%;
-  left: 0;
+        <div class="section-index reveal">
+          10 / 10
+        </div>
 
-  width: 8px;
-  height: 8px;
 
-  border:
-    1px solid var(--navy);
+        <div class="contact-content">
 
-  border-radius: 50%;
+          <div class="editorial-heading reveal">
 
-  background: var(--paper);
+            <p class="section-kicker">
+              IL CONTATTO
+            </p>
 
-  transform:
-    translate(-50%, -50%);
+            <h2>
+              HAI UN OBIETTIVO?
+            </h2>
 
-  transition:
-    left 550ms var(--ease),
-    transform 350ms ease;
-}
+          </div>
 
-.site-menu-trace-point::after {
-  content: "";
 
-  position: absolute;
+          <div class="editorial-copy reveal">
 
-  inset: 2px;
+            <p>
+              Allora partiamo da quello.
+              Non dalla soluzione.
+            </p>
 
-  border-radius: 50%;
+            <p>
+              Dal punto in cui sei.
+              Da ciò che vuoi costruire.
+              Da quello che ancora non sai come chiamare.
+            </p>
 
-  background: var(--navy);
+            <p>
+              Raccontamelo.
+              Poi guardiamo insieme quale direzione
+              può avere senso.
+            </p>
 
-  opacity: 0;
+            <p>
+              E, se c’è,
+              <strong>
+                cominciamo a seguirla.
+              </strong>
+            </p>
 
-  transition: opacity 250ms ease;
-}
+          </div>
 
-.site-menu-link:hover .site-menu-link-title,
-.site-menu-link:focus-visible .site-menu-link-title {
-  transform: translateX(8px);
-}
 
-.site-menu-link:hover .site-menu-trace-point,
-.site-menu-link:focus-visible .site-menu-trace-point {
-  left: 100%;
+          <a
+            class="contact-cta reveal"
+            href="/contatti/"
+          >
+            <span class="contact-cta-label">
+              PARLIAMONE.
+            </span>
 
-  transform:
-    translate(-50%, -50%)
-    scale(1.4);
-}
+            <span
+              class="contact-cta-trace"
+              aria-hidden="true"
+            >
+              <span class="contact-cta-trace-line"></span>
+              <span class="contact-cta-trace-point"></span>
+            </span>
+          </a>
 
-.site-menu-link:hover .site-menu-trace-point::after,
-.site-menu-link:focus-visible .site-menu-trace-point::after {
-  opacity: 1;
-}
+        </div>
 
-.site-menu-footer {
-  display: flex;
 
-  justify-content: space-between;
+        <!--
+          Visual kept completely independent from text.
+          The logo remains above all orbit elements.
+        -->
 
-  gap: 30px;
+        <div
+          class="contact-logo-area reveal"
+          aria-hidden="true"
+        >
 
-  margin-top: 70px;
+          <div class="contact-logo-disc">
 
-  font-family: var(--font-mono);
+            <span class="contact-logo-orbit contact-logo-orbit-a"></span>
+            <span class="contact-logo-orbit contact-logo-orbit-b"></span>
 
-  font-size: .58rem;
+            <span class="contact-logo-trace"></span>
 
-  letter-spacing: .08em;
+            <img
+              class="contact-logo"
+              src="/assets/images/cp-mark.png"
+              alt="Cesare Paratore"
+              width="300"
+              height="300"
+            >
 
-  opacity: .55;
-}
+          </div>
 
+        </div>
 
-/* =========================================================
-   09 — SCROLL PROGRESS
-   ========================================================= */
+      </div>
 
-.scroll-progress {
-  position: fixed;
+    </section>
 
-  left: 0;
-  top: 0;
+  </main>
 
-  z-index: 600;
 
-  width: 100%;
-  height: 2px;
+  <!-- =====================================================
+       FOOTER
+       STRICT VERSION
+       ===================================================== -->
 
-  pointer-events: none;
-}
+  <footer class="site-footer">
 
-.scroll-progress-bar {
-  display: block;
+    <div class="footer-main">
 
-  width: 0;
-  height: 100%;
+      <div class="footer-brand">
 
-  background: var(--navy);
+        <img
+          src="/assets/images/cp-mark.png"
+          alt="Cesare Paratore"
+          width="220"
+          height="220"
+        >
 
-  transform-origin: left center;
-}
+      </div>
 
 
-/* =========================================================
-   10 — GENERAL SECTIONS
-   ========================================================= */
+      <div class="footer-identity">
 
-.home-section {
-  position: relative;
+        <span class="footer-motto">
+          MOVIMENTO / CON DIREZIONE.
+        </span>
 
-  width: 100%;
+      </div>
 
-  overflow: hidden;
 
-  --section-progress: 0;
-  --section-drift: 0;
-}
+      <div class="footer-copyright">
+        © CESARE PARATORE
+      </div>
 
-.home-section-dark {
-  background: var(--navy);
-  color: var(--paper);
-}
+    </div>
 
-.home-section-light {
-  background: var(--paper);
-  color: var(--ink);
-}
+  </footer>
 
-.section-inner {
-  position: relative;
-
-  width: min(
-    calc(100% - (var(--page-padding) * 2)),
-    var(--content-width)
-  );
-
-  margin: 0 auto;
-
-  padding-top: var(--section-space);
-  padding-bottom: var(--section-space);
-}
-
-.section-kicker {
-  position: relative;
-
-  z-index: 5;
-
-  margin-bottom:
-    clamp(36px, 5vw, 80px);
-
-  font-family: var(--font-mono);
-
-  font-size: .62rem;
-
-  line-height: 1;
-
-  letter-spacing: .13em;
-
-  opacity: .58;
-}
-
-.section-title {
-  position: relative;
-
-  z-index: 5;
-
-  margin: 0;
-
-  max-width: 1100px;
-
-  font-size:
-    clamp(2.7rem, 6vw, 8rem);
-
-  line-height: .92;
-
-  letter-spacing: -.055em;
-
-  font-weight: 600;
-}
-
-.reveal {
-  opacity: 0;
-
-  transform:
-    translateY(28px);
-
-  transition:
-    opacity 900ms var(--ease),
-    transform 900ms var(--ease);
-}
-
-.reveal.is-visible {
-  opacity: 1;
-
-  transform:
-    translateY(0);
-}
-
-
-/* =========================================================
-   11 — GLOBAL TRAJECTORY ATMOSPHERE
-   ========================================================= */
-
-.home-section::before {
-  content: "";
-
-  position: absolute;
-
-  left: -12%;
-  right: -12%;
-
-  top: 50%;
-
-  height: 1px;
-
-  background:
-    linear-gradient(
-      90deg,
-      transparent 0%,
-      currentColor 25%,
-      currentColor 75%,
-      transparent 100%
-    );
-
-  opacity: .045;
-
-  transform:
-    translate3d(
-      calc(var(--section-drift) * 1px),
-      -50%,
-      0
-    )
-    rotate(
-      calc(
-        var(--section-progress) * 5deg
-      )
-    );
-
-  pointer-events: none;
-}
-
-.home-section-dark::before {
-  color: var(--paper);
-}
-
-.home-section-light::before {
-  color: var(--navy);
-}
-
-
-/* =========================================================
-   12 — HERO
-   ========================================================= */
-
-.home-section-hero {
-  min-height:
-    calc(100svh - var(--header-height));
-
-  display: flex;
-
-  align-items: center;
-}
-
-.hero-inner {
-  min-height:
-    calc(100svh - var(--header-height));
-
-  display: grid;
-
-  align-content: center;
-}
-
-.hero-atmosphere {
-  position: absolute;
-  inset: 0;
-
-  overflow: hidden;
-
-  pointer-events: none;
-}
-
-.hero-orbit,
-.hero-trace {
-  position: absolute;
-}
-
-.hero-orbit {
-  border:
-    1px solid rgba(255,255,255,.1);
-
-  border-radius: 50%;
-
-  will-change: transform;
-}
-
-.hero-orbit-a {
-  width: 55vw;
-  height: 55vw;
-
-  right: -14vw;
-  top: 12%;
-
-  animation:
-    hero-orbit-a 28s linear infinite;
-}
-
-.hero-orbit-b {
-  width: 75vw;
-  height: 30vw;
-
-  right: -18vw;
-  top: 38%;
-
-  transform: rotate(-22deg);
-
-  animation:
-    hero-orbit-b 36s linear infinite reverse;
-}
-
-.hero-orbit-c {
-  width: 38vw;
-  height: 38vw;
-
-  left: -18vw;
-  bottom: -8vw;
-
-  animation:
-    hero-orbit-c 32s linear infinite;
-}
-
-.hero-trace {
-  height: 1px;
-
-  background:
-    linear-gradient(
-      90deg,
-      transparent,
-      rgba(255,255,255,.24),
-      transparent
-    );
-
-  will-change: transform;
-}
-
-.hero-trace-a {
-  width: 75vw;
-
-  top: 28%;
-  right: -12vw;
-
-  transform: rotate(-10deg);
-}
-
-.hero-trace-b {
-  width: 60vw;
-
-  bottom: 20%;
-  left: -8vw;
-
-  transform: rotate(13deg);
-}
-
-@keyframes hero-orbit-a {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes hero-orbit-b {
-  to {
-    transform: rotate(-382deg);
-  }
-}
-
-@keyframes hero-orbit-c {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.hero-copy {
-  position: relative;
-
-  z-index: 2;
-
-  max-width: 1500px;
-}
-
-.hero-identity {
-  margin-bottom: 18px;
-
-  font-family: var(--font-mono);
-
-  font-size: .72rem;
-
-  letter-spacing: .13em;
-
-  opacity: .62;
-}
-
-.hero-title {
-  margin: 0;
-
-  display: grid;
-
-  font-size:
-    clamp(4rem, 11vw, 14rem);
-
-  line-height: .82;
-
-  letter-spacing: -.075em;
-
-  font-weight: 600;
-}
-
-.hero-title span:last-child {
-  padding-left:
-    clamp(18px, 8vw, 150px);
-}
-
-.hero-intro {
-  max-width: 560px;
-
-  margin-top:
-    clamp(38px, 5vw, 70px);
-
-  margin-left:
-    clamp(18px, 8vw, 150px);
-
-  font-size:
-    clamp(1rem, 1.5vw, 1.35rem);
-
-  line-height: 1.35;
-}
-
-.hero-text {
-  position: relative;
-
-  z-index: 2;
-
-  max-width: 650px;
-
-  margin-top:
-    clamp(70px, 10vw, 150px);
-
-  margin-left: auto;
-
-  font-size:
-    clamp(1rem, 1.4vw, 1.25rem);
-
-  line-height: 1.55;
-}
-
-.hero-text p {
-  margin: 0 0 24px;
-}
-
-
-/* =========================================================
-   13 — EDITORIAL SECTIONS
-   ========================================================= */
-
-.editorial-grid {
-  display: grid;
-
-  grid-template-columns:
-    minmax(160px, .35fr)
-    minmax(0, 1fr);
-
-  gap:
-    clamp(40px, 8vw, 140px);
-
-  align-items: start;
-}
-
-.editorial-main {
-  max-width: 1000px;
-}
-
-.editorial-question {
-  margin:
-    clamp(42px, 6vw, 80px)
-    0
-    0;
-
-  max-width: 800px;
-
-  font-size:
-    clamp(1.5rem, 3vw, 3.4rem);
-
-  line-height: 1.05;
-
-  letter-spacing: -.04em;
-}
-
-.editorial-body {
-  max-width: 760px;
-
-  margin-top:
-    clamp(50px, 7vw, 100px);
-
-  font-size:
-    clamp(1rem, 1.35vw, 1.22rem);
-
-  line-height: 1.65;
-}
-
-.editorial-body p {
-  margin: 0 0 28px;
-}
-
-
-/* =========================================================
-   14 — FIVE DIRECTIONS
-   ========================================================= */
-
-.directions-heading {
-  max-width: 1050px;
-}
-
-.directions-lead {
-  margin: 45px 0 0;
-
-  max-width: 720px;
-
-  font-size:
-    clamp(1.5rem, 3vw, 3rem);
-
-  line-height: 1.05;
-
-  letter-spacing: -.04em;
-}
-
-.directions-grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(5, minmax(0, 1fr));
-
-  gap: 1px;
-
-  margin-top:
-    clamp(80px, 10vw, 150px);
-
-  background:
-    rgba(255,255,255,.15);
-}
-
-.direction-card {
-  position: relative;
-
-  min-height: 420px;
-
-  padding: 28px;
-
-  background: var(--navy);
-
-  border:
-    1px solid rgba(255,255,255,.1);
-
-  overflow: hidden;
-
-  transition:
-    background 400ms var(--ease),
-    transform 400ms var(--ease);
-}
-
-.direction-card::after {
-  content: "";
-
-  position: absolute;
-
-  left: 28px;
-  right: 28px;
-  bottom: 28px;
-
-  height: 1px;
-
-  background:
-    linear-gradient(
-      90deg,
-      rgba(255,255,255,.35),
-      transparent
-    );
-
-  transform:
-    scaleX(.15);
-
-  transform-origin: left center;
-
-  transition:
-    transform 500ms var(--ease);
-}
-
-.direction-card:hover {
-  background:
-    rgba(255,255,255,.045);
-
-  transform:
-    translateY(-8px);
-}
-
-.direction-card:hover::after {
-  transform:
-    scaleX(1);
-}
-
-.direction-number {
-  display: block;
-
-  margin-bottom: 90px;
-
-  font-family: var(--font-mono);
-
-  font-size: .62rem;
-
-  opacity: .48;
-}
-
-.direction-card h3 {
-  margin: 0 0 24px;
-
-  font-size: 1rem;
-
-  letter-spacing: .04em;
-}
-
-.direction-card p {
-  margin: 0;
-
-  font-size: .9rem;
-
-  line-height: 1.55;
-
-  opacity: .72;
-}
-
-.directions-ending {
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  flex-wrap: wrap;
-
-  gap: 14px 24px;
-
-  margin-top: 70px;
-
-  font-family: var(--font-mono);
-
-  font-size: .72rem;
-
-  letter-spacing: .06em;
-}
-
-.directions-cp-mark {
-  width: 68px;
-  height: 68px;
-
-  display: grid;
-  place-items: center;
-
-  margin-left: 8px;
-}
-
-.directions-cp-mark img {
-  width: 100%;
-  height: 100%;
-
-  object-fit: contain;
-}
-
-
-/* =========================================================
-   15 — DIRECTION
-   ========================================================= */
-
-.direction-layout {
-  display: grid;
-
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(300px, .7fr);
-
-  gap:
-    clamp(60px, 10vw, 180px);
-
-  align-items: center;
-}
-
-.direction-copy {
-  max-width: 900px;
-}
-
-.direction-body {
-  max-width: 720px;
-
-  margin-top: 60px;
-
-  font-size:
-    clamp(1rem, 1.4vw, 1.25rem);
-
-  line-height: 1.6;
-}
-
-.direction-body p {
-  margin: 0 0 30px;
-}
-
-.direction-final {
-  margin-top: 60px !important;
-
-  font-size:
-    clamp(1.5rem, 3vw, 3rem);
-
-  line-height: 1.05;
-
-  letter-spacing: -.04em;
-}
-
-.direction-visual {
-  position: relative;
-
-  width:
-    min(38vw, 560px);
-
-  aspect-ratio: 1;
-
-  margin-left: auto;
-
-  isolation: isolate;
-}
-
-.direction-orbit {
-  position: absolute;
-
-  inset: 12%;
-
-  border:
-    1px solid rgba(255,255,255,.18);
-
-  border-radius: 50%;
-}
-
-.direction-orbit-b {
-  inset: 28%;
-
-  transform:
-    rotate(40deg)
-    scaleX(1.6);
-}
-
-.direction-vector {
-  position: absolute;
-
-  left: 8%;
-  right: 8%;
-  top: 50%;
-
-  height: 1px;
-
-  background:
-    rgba(255,255,255,.4);
-
-  transform:
-    rotate(-20deg);
-
-  transform-origin: center;
-}
-
-.direction-point {
-  position: absolute;
-
-  width: 13px;
-  height: 13px;
-
-  right: 18%;
-  top: 30%;
-
-  border:
-    1px solid var(--paper);
-
-  border-radius: 50%;
-
-  background: var(--navy);
-
-  box-shadow:
-    0 0 0 8px rgba(255,255,255,.05);
-}
-
-
-/* =========================================================
-   16 — TRACES
-   ========================================================= */
-
-.traces-layout {
-  display: grid;
-
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(300px, .75fr);
-
-  gap:
-    clamp(60px, 10vw, 180px);
-
-  align-items: start;
-}
-
-.traces-copy {
-  max-width: 850px;
-
-  position: relative;
-
-  z-index: 5;
-}
-
-.traces-body {
-  max-width: 730px;
-
-  margin-top: 60px;
-
-  font-size:
-    clamp(1rem, 1.35vw, 1.2rem);
-
-  line-height: 1.65;
-}
-
-.traces-body p {
-  margin: 0 0 28px;
-}
-
-.traces-visual {
-  position: relative;
-
-  min-height: 560px;
-
-  display: grid;
-
-  place-items: center;
-
-  z-index: 1;
-}
-
-.traces-visual-field {
-  position: relative;
-
-  width: 100%;
-
-  aspect-ratio: 1;
-
-  overflow: hidden;
-
-  isolation: isolate;
-}
-
-.traces-visual-field::after {
-  content: "";
-
-  position: absolute;
-
-  inset: 0;
-
-  background:
-    radial-gradient(
-      circle at 50% 50%,
-      rgba(7,27,58,.035),
-      transparent 58%
-    );
-
-  pointer-events: none;
-}
-
-.trace-line,
-.trace-axis {
-  position: absolute;
-
-  display: block;
-
-  background:
-    rgba(7,27,58,.18);
-}
-
-.trace-line {
-  width: 130%;
-  height: 1px;
-
-  left: -15%;
-}
-
-.trace-line-a {
-  top: 28%;
-
-  transform: rotate(-14deg);
-}
-
-.trace-line-b {
-  top: 52%;
-
-  transform: rotate(7deg);
-}
-
-.trace-line-c {
-  top: 74%;
-
-  transform: rotate(-4deg);
-}
-
-.trace-orbit {
-  position: absolute;
-
-  border:
-    1px solid rgba(7,27,58,.16);
-
-  border-radius: 50%;
-}
-
-.trace-orbit-a {
-  width: 70%;
-  height: 70%;
-
-  left: 15%;
-  top: 15%;
-}
-
-.trace-orbit-b {
-  width: 45%;
-  height: 80%;
-
-  left: 27%;
-  top: 10%;
-
-  transform: rotate(34deg);
-}
-
-.trace-node {
-  position: absolute;
-
-  width: 10px;
-  height: 10px;
-
-  border:
-    1px solid var(--navy);
-
-  border-radius: 50%;
-
-  background: var(--paper);
-
-  z-index: 3;
-}
-
-.trace-node-a {
-  left: 23%;
-  top: 31%;
-}
-
-.trace-node-b {
-  left: 58%;
-  top: 50%;
-}
-
-.trace-node-c {
-  left: 76%;
-  top: 72%;
-}
-
-.trace-axis-x {
-  left: 10%;
-  right: 10%;
-  top: 50%;
-
-  height: 1px;
-}
-
-.trace-axis-y {
-  top: 10%;
-  bottom: 10%;
-  left: 50%;
-
-  width: 1px;
-}
-
-
-/* =========================================================
-   17 — TERRITORY
-   ========================================================= */
-
-.territory-layout {
-  display: grid;
-
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(300px, .7fr);
-
-  gap:
-    clamp(60px, 10vw, 180px);
-
-  align-items: center;
-}
-
-.territory-copy {
-  max-width: 900px;
-}
-
-.territory-body {
-  max-width: 720px;
-
-  margin-top: 60px;
-
-  font-size:
-    clamp(1rem, 1.4vw, 1.25rem);
-
-  line-height: 1.65;
-}
-
-.territory-body p {
-  margin: 0 0 28px;
-}
-
-.territory-visual {
-  position: relative;
-
-  width:
-    min(38vw, 520px);
-
-  aspect-ratio: 1;
-
-  margin-left: auto;
-
-  isolation: isolate;
-}
-
-.territory-circle {
-  position: absolute;
-
-  inset: 15%;
-
-  border:
-    1px solid rgba(255,255,255,.2);
-
-  border-radius: 50%;
-}
-
-.territory-point {
-  position: absolute;
-
-  left: 50%;
-  top: 50%;
-
-  width: 18px;
-  height: 18px;
-
-  border-radius: 50%;
-
-  background: var(--paper);
-
-  transform:
-    translate(-50%, -50%);
-
-  box-shadow:
-    0 0 0 12px rgba(255,255,255,.06),
-    0 0 0 28px rgba(255,255,255,.035);
-}
-
-.territory-line {
-  position: absolute;
-
-  width: 80%;
-  height: 1px;
-
-  left: 10%;
-  top: 50%;
-
-  background:
-    rgba(255,255,255,.25);
-
-  transform:
-    rotate(-18deg);
-}
-
-
-/* =========================================================
-   18 — VISITOR
-   ========================================================= */
-
-.visitor-layout {
-  min-height: 80vh;
-
-  display: grid;
-
-  grid-template-columns:
-    minmax(160px, .35fr)
-    minmax(0, 1fr);
-
-  gap:
-    clamp(40px, 8vw, 140px);
-
-  align-content: center;
-}
-
-.visitor-copy {
-  max-width: 900px;
-}
-
-.visitor-body {
-  max-width: 760px;
-
-  margin-top: 60px;
-
-  font-size:
-    clamp(1rem, 1.4vw, 1.25rem);
-
-  line-height: 1.65;
-}
-
-.visitor-body p {
-  margin: 0 0 28px;
-}
-
-
-/* =========================================================
-   19 — YOUR DIRECTION
-   ========================================================= */
-
-.your-direction-layout {
-  display: grid;
-
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(240px, .5fr);
-
-  gap:
-    clamp(50px, 8vw, 130px);
-}
-
-.your-direction-copy {
-  max-width: 900px;
-}
-
-.your-direction-body {
-  max-width: 740px;
-
-  margin-top: 60px;
-
-  font-size:
-    clamp(1rem, 1.4vw, 1.25rem);
-
-  line-height: 1.65;
-}
-
-.your-direction-body p {
-  margin: 0 0 28px;
-}
-
-.your-direction-fields {
-  display: grid;
-
-  align-content: center;
-
-  gap: 12px;
-
-  font-size:
-    clamp(1rem, 1.5vw, 1.3rem);
-
-  line-height: 1.2;
-}
-
-.your-direction-fields span {
-  opacity: .42;
-
-  transition:
-    opacity 300ms ease,
-    transform 300ms ease;
-}
-
-.your-direction-fields span:hover {
-  opacity: 1;
-
-  transform:
-    translateX(10px);
-}
-
-.your-direction-question {
-  grid-column: 1 / -1;
-
-  display: grid;
-
-  gap: 12px;
-
-  margin-top: 70px;
-}
-
-.your-direction-question span,
-.your-direction-question strong {
-  font-family: var(--font-mono);
-
-  font-size: .72rem;
-
-  letter-spacing: .08em;
-}
-
-.your-direction-question-mark {
-  margin-top: 20px;
-
-  font-family:
-    var(--font-sans) !important;
-
-  font-size:
-    clamp(3rem, 9vw, 10rem) !important;
-
-  line-height: .85 !important;
-
-  letter-spacing: -.07em !important;
-}
-
-
-/* =========================================================
-   20 — CONTACT
-   ========================================================= */
-
-.contact-inner {
-  padding-bottom: 0;
-}
-
-.contact-layout {
-  display: grid;
-
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(300px, .7fr);
-
-  gap:
-    clamp(60px, 10vw, 180px);
-
-  align-items: center;
-
-  min-height: 72vh;
-}
-
-.contact-copy {
-  max-width: 900px;
-
-  position: relative;
-
-  z-index: 5;
-}
-
-.contact-body {
-  max-width: 720px;
-
-  margin-top: 60px;
-
-  font-size:
-    clamp(1rem, 1.4vw, 1.25rem);
-
-  line-height: 1.65;
-}
-
-.contact-body p {
-  margin: 0 0 28px;
-}
-
-.contact-cta {
-  display: inline-flex;
-
-  align-items: center;
-
-  gap: 28px;
-
-  margin-top: 50px;
-
-  color: inherit;
-
-  text-decoration: none;
-}
-
-.contact-cta-label {
-  font-family: var(--font-mono);
-
-  font-size: .72rem;
-
-  letter-spacing: .1em;
-}
-
-.contact-cta-trace {
-  position: relative;
-
-  width: 100px;
-  height: 20px;
-
-  display: block;
-}
-
-.contact-cta-trace-line {
-  position: absolute;
-
-  left: 0;
-  top: 50%;
-
-  width: 100%;
-  height: 1px;
-
-  background: currentColor;
-}
-
-.contact-cta-trace-point {
-  position: absolute;
-
-  left: 0;
-  top: 50%;
-
-  width: 8px;
-  height: 8px;
-
-  border:
-    1px solid currentColor;
-
-  border-radius: 50%;
-
-  background: var(--paper);
-
-  transform:
-    translate(-50%, -50%);
-
-  transition:
-    left 450ms var(--ease),
-    transform 300ms ease;
-}
-
-.contact-cta:hover .contact-cta-trace-point,
-.contact-cta:focus-visible .contact-cta-trace-point {
-  left: 100%;
-
-  transform:
-    translate(-50%, -50%)
-    scale(1.35);
-}
-
-.contact-logo-area {
-  position: relative;
-
-  z-index: 2;
-
-  display: grid;
-
-  place-items: center;
-
-  min-height: 500px;
-
-  isolation: isolate;
-}
-
-.contact-logo-disc {
-  position: relative;
-
-  width:
-    min(34vw, 500px);
-
-  aspect-ratio: 1;
-
-  display: grid;
-
-  place-items: center;
-
-  background: var(--paper-bright);
-
-  border-radius: 50%;
-
-  border:
-    1px solid rgba(7,27,58,.1);
-
-  isolation: isolate;
-}
-
-.contact-logo {
-  position: relative;
-
-  z-index: 5;
-
-  width: 64%;
-  height: 64%;
-
-  object-fit: contain;
-}
-
-.contact-logo-orbit {
-  position: absolute;
-
-  border:
-    1px solid rgba(7,27,58,.14);
-
-  border-radius: 50%;
-
-  pointer-events: none;
-
-  z-index: 1;
-}
-
-.contact-logo-orbit-a {
-  inset: -7%;
-
-  transform:
-    rotate(18deg);
-}
-
-.contact-logo-orbit-b {
-  inset: 12% -10%;
-
-  transform:
-    rotate(-24deg);
-}
-
-
-/* =========================================================
-   21 — FOOTER
-   STRICT:
-   LOGO | MOVIMENTO / CON DIREZIONE. | COPYRIGHT
-   ========================================================= */
-
-.site-footer {
-  position: relative;
-
-  z-index: 10;
-
-  width: 100%;
-
-  margin-top:
-    clamp(100px, 13vw, 190px);
-
-  background: transparent;
-
-  color: var(--navy);
-
-  border-top:
-    1px solid rgba(7,27,58,.13);
-}
-
-.footer-main {
-  width: 100%;
-
-  min-height: 220px;
-
-  padding:
-    30px
-    var(--page-padding);
-
-  display: grid;
-
-  grid-template-columns:
-    minmax(180px, 1fr)
-    minmax(260px, 1fr)
-    minmax(180px, 1fr);
-
-  align-items: center;
-
-  gap: 40px;
-}
-
-.footer-brand {
-  display: flex;
-
-  align-items: center;
-
-  justify-content: flex-start;
-}
-
-.footer-brand img {
-  width:
-    clamp(155px, 12vw, 215px);
-
-  height: auto;
-
-  object-fit: contain;
-}
-
-.footer-identity {
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  text-align: center;
-}
-
-.footer-motto {
-  font-family: var(--font-mono);
-
-  font-size:
-    clamp(.62rem, .8vw, .78rem);
-
-  line-height: 1.2;
-
-  letter-spacing: .1em;
-}
-
-.footer-copyright {
-  display: flex;
-
-  justify-content: flex-end;
-  align-items: center;
-
-  text-align: right;
-
-  font-family: var(--font-mono);
-
-  font-size: .62rem;
-
-  letter-spacing: .08em;
-
-  white-space: nowrap;
-}
-
-
-/* =========================================================
-   22 — SECTION NAVIGATION
-   TRAIETTORIA
-   IMPORTANT:
-   NEVER FIXED.
-   NEVER STICKY.
-   NEVER OVER FOOTER.
-   ========================================================= */
-
-.home-section-nav {
-  position: relative;
-
-  z-index: 40;
-
-  width: 100%;
-
-  margin: 0;
-
-  padding:
-    22px 0 24px;
-
-  background: var(--paper);
-
-  color: var(--navy);
-
-  border-top:
-    1px solid rgba(7,27,58,.1);
-
-  border-bottom:
-    1px solid rgba(7,27,58,.1);
-
-  overflow: hidden;
-
-  isolation: isolate;
-}
-
-.home-section-nav::before {
-  content: "";
-
-  position: absolute;
-
-  left: 0;
-  right: 0;
-  bottom: 0;
-
-  height: 2px;
-
-  background:
-    linear-gradient(
-      90deg,
-      transparent,
-      rgba(7,27,58,.1),
-      transparent
-    );
-
-  pointer-events: none;
-}
-
-.home-section-nav-inner {
-  width:
-    min(
-      calc(100% - 48px),
-      var(--content-width)
-    );
-
-  margin: 0 auto;
-
-  display: grid;
-
-  grid-template-columns:
-    auto
-    minmax(0, 1fr)
-    auto;
-
-  align-items: center;
-
-  gap: 30px;
-}
-
-
-/* ---------------------------------------------------------
-   CURRENT
-   --------------------------------------------------------- */
-
-.home-section-nav-current {
-  display: flex;
-
-  align-items: baseline;
-
-  gap: 12px;
-
-  min-width: max-content;
-
-  white-space: nowrap;
-}
-
-.home-section-nav-current-number {
-  font-family: var(--font-mono);
-
-  font-size: .68rem;
-
-  line-height: 1;
-
-  letter-spacing: .08em;
-
-  opacity: .5;
-}
-
-.home-section-nav-current-label {
-  font-size: .68rem;
-
-  font-weight: 600;
-
-  line-height: 1;
-
-  letter-spacing: .08em;
-}
-
-
-/* ---------------------------------------------------------
-   ROUTE
-   --------------------------------------------------------- */
-
-.home-section-nav-route {
-  position: relative;
-
-  min-width: 0;
-
-  height: 48px;
-
-  display: flex;
-
-  align-items: center;
-}
-
-.home-section-nav-route-line,
-.home-section-nav-route-progress {
-  position: absolute;
-
-  left: 0;
-  right: 0;
-  top: 50%;
-
-  height: 1px;
-
-  transform:
-    translateY(-50%);
-
-  pointer-events: none;
-}
-
-.home-section-nav-route-line {
-  background:
-    rgba(7,27,58,.16);
-}
-
-.home-section-nav-route-progress {
-  right: auto;
-
-  width: 0;
-
-  background:
-    var(--navy);
-
-  transition:
-    width 700ms var(--ease);
-}
-
-.home-section-nav-route-point {
-  position: absolute;
-
-  top: 50%;
-  left: 0;
-
-  width: 11px;
-  height: 11px;
-
-  border:
-    1px solid var(--navy);
-
-  border-radius: 50%;
-
-  background: var(--paper);
-
-  transform:
-    translate(-50%, -50%);
-
-  z-index: 4;
-
-  pointer-events: none;
-
-  transition:
-    left 700ms var(--ease),
-    transform 350ms ease;
-}
-
-.home-section-nav-route-point::after {
-  content: "";
-
-  position: absolute;
-
-  inset: 3px;
-
-  border-radius: 50%;
-
-  background: var(--navy);
-
-  transition:
-    transform 350ms var(--ease);
-}
-
-.home-section-nav:hover
-.home-section-nav-route-point::after {
-  transform: scale(1.2);
-}
-
-
-/* ---------------------------------------------------------
-   ITEMS
-   --------------------------------------------------------- */
-
-.home-section-nav-items {
-  position: relative;
-
-  z-index: 5;
-
-  width: 100%;
-  height: 100%;
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(10, minmax(30px, 1fr));
-
-  align-items: center;
-}
-
-.home-section-nav-item {
-  position: relative;
-
-  height: 48px;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  color: var(--navy);
-
-  text-decoration: none;
-
-  opacity: .35;
-
-  transition:
-    opacity 300ms ease,
-    transform 300ms var(--ease);
-}
-
-.home-section-nav-item:hover,
-.home-section-nav-item.is-active {
-  opacity: 1;
-}
-
-.home-section-nav-item:hover {
-  transform:
-    translateY(-2px);
-}
-
-.home-section-nav-item:focus-visible {
-  outline:
-    1px solid var(--navy);
-
-  outline-offset: 5px;
-}
-
-.home-section-nav-number {
-  position: relative;
-
-  z-index: 5;
-
-  font-family: var(--font-mono);
-
-  font-size: .62rem;
-
-  line-height: 1;
-
-  letter-spacing: .04em;
-
-  transition:
-    transform 350ms var(--ease);
-}
-
-.home-section-nav-item.is-active
-.home-section-nav-number {
-  transform:
-    scale(1.18);
-}
-
-.home-section-nav-label {
-  position: absolute;
-
-  left: 50%;
-  top: calc(50% + 18px);
-
-  width: max-content;
-
-  max-width: 150px;
-
-  transform:
-    translate(-50%, 5px);
-
-  font-size: .52rem;
-
-  font-weight: 600;
-
-  line-height: 1.1;
-
-  letter-spacing: .07em;
-
-  text-align: center;
-
-  opacity: 0;
-
-  pointer-events: none;
-
-  transition:
-    opacity 300ms ease,
-    transform 300ms var(--ease);
-}
-
-.home-section-nav-item:hover
-.home-section-nav-label,
-.home-section-nav-item.is-active
-.home-section-nav-label {
-  opacity: 1;
-
-  transform:
-    translate(-50%, 0);
-}
-
-
-/* ---------------------------------------------------------
-   TOTAL
-   --------------------------------------------------------- */
-
-.home-section-nav-total {
-  min-width: max-content;
-
-  font-family: var(--font-mono);
-
-  font-size: .68rem;
-
-  line-height: 1;
-
-  letter-spacing: .08em;
-
-  opacity: .45;
-}
-
-.home-section-nav-total::before {
-  content: "/";
-
-  margin-right: 5px;
-
-  opacity: .5;
-}
-
-
-/* =========================================================
-   23 — MOBILE SECTION NAVIGATION
-   ========================================================= */
-
-@media (max-width: 900px) {
-
-  .home-section-nav {
-    padding:
-      15px 0 17px;
-  }
-
-  .home-section-nav-inner {
-    width: 100%;
-
-    display: block;
-  }
-
-  .home-section-nav-current {
-    padding:
-      0 20px 13px;
-  }
-
-  .home-section-nav-route {
-    height: 48px;
-
-    overflow-x: auto;
-    overflow-y: hidden;
-
-    scrollbar-width: none;
-
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .home-section-nav-route::-webkit-scrollbar {
-    display: none;
-  }
-
-  .home-section-nav-items {
-    display: flex;
-
-    width: max-content;
-
-    min-width: 100%;
-
-    padding:
-      0 22px;
-
-    gap: 24px;
-  }
-
-  .home-section-nav-item {
-    flex:
-      0 0 32px;
-
-    width: 32px;
-    height: 48px;
-  }
-
-  .home-section-nav-label,
-  .home-section-nav-total {
-    display: none;
-  }
-
-  .home-section-nav-route-line,
-  .home-section-nav-route-progress {
-    left: 22px;
-    right: 22px;
-  }
-
-  .home-section-nav-route-point {
-    width: 8px;
-    height: 8px;
-  }
-
-  .home-section-nav-route-point::after {
-    inset: 2px;
-  }
-}
-
-
-/* =========================================================
-   24 — SMALL MOBILE
-   ========================================================= */
-
-@media (max-width: 520px) {
-
-  :root {
-    --header-height: 92px;
-    --page-padding: 18px;
-    --section-space: clamp(90px, 20vw, 150px);
-  }
-
-  .site-header {
-    min-height: var(--header-height);
-
-    padding:
-      10px 18px;
-  }
-
-  .site-header-logo {
-    width: 88px;
-  }
-
-  .site-header-brand {
-    gap: 12px;
-  }
-
-  .site-header-brand-copy {
-    gap: 3px;
-  }
-
-  .site-header-name {
-    font-size: .62rem;
-  }
-
-  .site-header-motto {
-    font-size: .48rem;
-  }
-
-  .site-header-section-counter {
-    display: none;
-  }
-
-  .menu-trigger {
-    gap: 9px;
-  }
-
-  .menu-trigger-label {
-    font-size: .58rem;
-  }
-
-  .menu-trigger-line {
-    width: 31px;
-  }
-
-  .menu-trigger-line::after {
-    width: 20px;
-  }
-
-  .home-section-nav-current {
-    padding-left: 18px;
-    padding-right: 18px;
-  }
-
-  .home-section-nav-current-label {
-    font-size: .63rem;
-  }
-
-  .home-section-nav-items {
-    padding-left: 18px;
-    padding-right: 18px;
-
-    gap: 20px;
-  }
-
-  .home-section-nav-route-line,
-  .home-section-nav-route-progress {
-    left: 18px;
-    right: 18px;
-  }
-
-  .footer-main {
-    min-height: 0;
-
-    padding:
-      32px 18px;
-
-    grid-template-columns:
-      1fr 1fr;
-
-    gap: 28px;
-  }
-
-  .footer-brand {
-    justify-content: flex-start;
-  }
-
-  .footer-brand img {
-    width: 140px;
-  }
-
-  .footer-identity {
-    justify-content: flex-end;
-
-    text-align: right;
-  }
-
-  .footer-motto {
-    font-size: .56rem;
-  }
-
-  .footer-copyright {
-    grid-column: 1 / -1;
-
-    justify-content: flex-start;
-
-    text-align: left;
-
-    font-size: .56rem;
-  }
-
-  .hero-title {
-    font-size:
-      clamp(3.3rem, 16vw, 6rem);
-  }
-
-  .hero-title span:last-child {
-    padding-left: 0;
-  }
-
-  .hero-intro {
-    margin-left: 0;
-  }
-
-  .hero-text {
-    margin-left: 0;
-  }
-
-  .editorial-grid,
-  .direction-layout,
-  .traces-layout,
-  .territory-layout,
-  .contact-layout,
-  .your-direction-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .direction-copy,
-  .traces-copy,
-  .territory-copy,
-  .contact-copy,
-  .your-direction-copy {
-    max-width: 100%;
-  }
-
-  .direction-visual,
-  .territory-visual {
-    width:
-      min(80vw, 420px);
-
-    margin:
-      50px auto 0;
-  }
-
-  .contact-layout {
-    align-items: start;
-  }
-
-  .contact-logo-area {
-    min-height: 380px;
-
-    margin-top: 20px;
-  }
-
-  .contact-logo-disc {
-    width:
-      min(76vw, 370px);
-  }
-
-  .contact-logo {
-    width: 64%;
-    height: 64%;
-  }
-
-  .traces-layout {
-    gap: 60px;
-  }
-
-  .traces-visual {
-    min-height: 360px;
-
-    order: 2;
-  }
-
-  .traces-copy {
-    order: 1;
-  }
-
-  .directions-grid {
-    grid-template-columns: 1fr;
-
-    margin-top: 70px;
-  }
-
-  .direction-card {
-    min-height: auto;
-
-    padding: 25px;
-  }
-
-  .direction-number {
-    margin-bottom: 45px;
-  }
-
-  .directions-ending {
-    justify-content: flex-start;
-  }
-
-  .directions-cp-mark {
-    width: 58px;
-    height: 58px;
-  }
-
-  .visitor-layout {
-    grid-template-columns: 1fr;
-
-    min-height: 70vh;
-  }
-
-  .your-direction-question {
-    margin-top: 40px;
-  }
-
-  .your-direction-question-mark {
-    font-size:
-      clamp(3rem, 16vw, 6rem) !important;
-  }
-
-  .site-menu-panel {
-    width: 100%;
-
-    padding:
-      24px 20px 32px;
-  }
-
-  .site-menu-header {
-    margin-bottom: 35px;
-  }
-
-  .site-menu-title {
-    font-size: 2.8rem;
-  }
-
-  .site-menu-link {
-    grid-template-columns:
-      34px minmax(0, 1fr);
-
-    gap: 12px;
-
-    padding:
-      18px 0;
-  }
-
-  .site-menu-link-title {
-    font-size: 1rem;
-  }
-
-  .site-menu-footer {
-    display: grid;
-
-    gap: 8px;
-  }
-
-  .standby-logo-circle {
-    width:
-      min(72vw, 260px);
-
-    padding:
-      clamp(25px, 7vw, 38px);
-  }
-}
-
-
-/* =========================================================
-   25 — VERY SMALL SCREENS
-   ========================================================= */
-
-@media (max-width: 360px) {
-
-  .site-header-logo {
-    width: 78px;
-  }
-
-  .site-header-name,
-  .site-header-motto {
-    display: none;
-  }
-
-  .home-section-nav-items {
-    gap: 17px;
-  }
-
-  .footer-main {
-    grid-template-columns: 1fr;
-  }
-
-  .footer-identity {
-    justify-content: flex-start;
-
-    text-align: left;
-  }
-
-  .footer-copyright {
-    grid-column: auto;
-  }
-}
-
-
-/* =========================================================
-   26 — PERFORMANCE
-   ========================================================= */
-
-.hero-orbit,
-.hero-trace,
-.standby-orbit,
-.standby-line,
-.direction-orbit,
-.direction-vector,
-.contact-logo-orbit,
-.trace-line,
-.trace-orbit,
-.home-section-nav-route-point,
-.site-menu-trace-point {
-  will-change: transform;
-}
-
-
-/* =========================================================
-   27 — ACCESSIBILITY
-   ========================================================= */
-
-:focus-visible {
-  outline:
-    2px solid currentColor;
-
-  outline-offset: 4px;
-}
-
-
-/* =========================================================
-   28 — REDUCED MOTION
-   ========================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-
-  html {
-    scroll-behavior: auto;
-  }
-
-  *,
-  *::before,
-  *::after {
-    animation-duration: .001ms !important;
-
-    animation-iteration-count: 1 !important;
-
-    transition-duration: .001ms !important;
-
-    scroll-behavior: auto !important;
-  }
-
-  .reveal {
-    opacity: 1;
-
-    transform: none;
-  }
-
-  .home-section::before {
-    transform: none;
-  }
-}
-
-
-/* =========================================================
-   29 — HIGH CONTRAST
-   ========================================================= */
-
-@media (prefers-contrast: more) {
-
-  .home-section-nav-route-line,
-  .site-menu-link,
-  .site-footer {
-    border-color:
-      currentColor;
-  }
-
-  .home-section-nav-item,
-  .site-menu-link-title {
-    opacity: 1;
-  }
-
-  .standby-copy {
-    border-color:
-      currentColor;
-  }
-}
-
-
-/* =========================================================
-   30 — PRINT
-   ========================================================= */
-
-@media print {
-
-  .page-loader,
-  .page-transition,
-  .standby-screen,
-  .cursor,
-  .scroll-progress,
-  .site-menu,
-  .home-section-nav,
-  .site-header-meta {
-    display: none !important;
-  }
-
-  body {
-    background: #fff;
-    color: #000;
-  }
-
-  .home-section-dark,
-  .home-section-light {
-    background: #fff;
-    color: #000;
-  }
-
-  .site-header {
-    color: #000;
-    background: #fff;
-  }
-
-  .site-footer {
-    color: #000;
-  }
-}
+</body>
+</html>
