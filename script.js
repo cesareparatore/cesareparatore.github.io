@@ -16,7 +16,7 @@
     loaderMaximumWait: 4500,
 
     standbyDelay: 30000,
-    standbyWakeDistance: 14,
+    standbyWakeDistance: 4,
 
     revealThreshold: 0.12,
     sectionThreshold: 0.52,
@@ -24,7 +24,6 @@
     cursorLerp: 0.16,
     magneticStrength: 0.18,
 
-    scrollActivityReset: 180,
     resizeDebounce: 180
   };
 
@@ -35,6 +34,7 @@
 
   const state = {
     menuOpen: false,
+
     standbyActive: false,
     standbyWaking: false,
 
@@ -58,8 +58,6 @@
     resizeTimer: null,
 
     lastActivity: Date.now(),
-    lastPointerX: null,
-    lastPointerY: null,
 
     menuLastFocused: null
   };
@@ -94,9 +92,6 @@
       ? Number(element.dataset.section)
       : null;
 
-  const sleep = (ms) =>
-    new Promise((resolve) => setTimeout(resolve, ms));
-
 
   /* =======================================================
      04 — INITIALIZATION
@@ -108,7 +103,6 @@
     initMenu();
     initScrollProgress();
     initSectionNavigation();
-    initMobileCompatibility();
     initReveal();
     initDirectionInteractions();
     initMagneticElements();
@@ -119,12 +113,16 @@
     initKeyboardNavigation();
     initVisibilityHandling();
     initResizeHandling();
-    initPointerPolish();
-
-    updateSectionState();
-    resetStandbyTimer();
+    initScrollState();
 
     document.documentElement.classList.add("js");
+
+    updateSectionState();
+    updateHeaderCounter();
+    updateSectionNavigation();
+    updateNavigationTheme();
+
+    resetStandbyTimer();
   }
 
 
@@ -149,7 +147,9 @@
 
       completed = true;
 
-      const elapsed = performance.now() - startedAt;
+      const elapsed =
+        performance.now() - startedAt;
+
       const remaining = Math.max(
         0,
         CONFIG.loaderMinimumTime - elapsed
@@ -159,7 +159,10 @@
         loader.classList.add("is-hidden");
 
         window.setTimeout(() => {
-          loader.setAttribute("aria-hidden", "true");
+          loader.setAttribute(
+            "aria-hidden",
+            "true"
+          );
         }, 750);
       }, remaining);
     };
@@ -174,7 +177,10 @@
       );
     }
 
-    window.setTimeout(finish, CONFIG.loaderMaximumWait);
+    window.setTimeout(
+      finish,
+      CONFIG.loaderMaximumWait
+    );
   }
 
 
@@ -208,8 +214,7 @@
 
   /* =======================================================
      07 — MAIN MENU
-     Menu = pagine interne.
-     Non contiene le 10 sezioni Home.
+     Il menu contiene le pagine interne.
      ======================================================= */
 
   function initMenu() {
@@ -229,19 +234,32 @@
       }
 
       state.menuOpen = true;
-      state.menuLastFocused = document.activeElement;
+      state.menuLastFocused =
+        document.activeElement;
 
       menu.classList.add("is-open");
-      document.body.classList.add("is-menu-open");
 
-      toggle.setAttribute("aria-expanded", "true");
-      menu.setAttribute("aria-hidden", "false");
+      document.body.classList.add(
+        "is-menu-open"
+      );
+
+      toggle.setAttribute(
+        "aria-expanded",
+        "true"
+      );
+
+      menu.setAttribute(
+        "aria-hidden",
+        "false"
+      );
+
+      window.clearTimeout(
+        state.standbyTimer
+      );
 
       requestAnimationFrame(() => {
         closeButton?.focus();
       });
-
-      resetStandbyTimer();
     };
 
     const closeMenu = () => {
@@ -252,28 +270,44 @@
       state.menuOpen = false;
 
       menu.classList.remove("is-open");
-      document.body.classList.remove("is-menu-open");
 
-      toggle.setAttribute("aria-expanded", "false");
-      menu.setAttribute("aria-hidden", "true");
+      document.body.classList.remove(
+        "is-menu-open"
+      );
+
+      toggle.setAttribute(
+        "aria-expanded",
+        "false"
+      );
+
+      menu.setAttribute(
+        "aria-hidden",
+        "true"
+      );
 
       if (
         state.menuLastFocused &&
-        typeof state.menuLastFocused.focus === "function"
+        typeof state.menuLastFocused.focus ===
+          "function"
       ) {
         state.menuLastFocused.focus();
       }
 
       state.menuLastFocused = null;
+
+      resetStandbyTimer();
     };
 
-    toggle.addEventListener("click", () => {
-      if (state.menuOpen) {
-        closeMenu();
-      } else {
-        openMenu();
+    toggle.addEventListener(
+      "click",
+      () => {
+        if (state.menuOpen) {
+          closeMenu();
+        } else {
+          openMenu();
+        }
       }
-    });
+    );
 
     closeButton?.addEventListener(
       "click",
@@ -286,11 +320,15 @@
     );
 
     links.forEach((link) => {
-      link.addEventListener("click", () => {
-        closeMenu();
-      });
+      link.addEventListener(
+        "click",
+        () => {
+          closeMenu();
+        }
+      );
 
-      const href = link.getAttribute("href");
+      const href =
+        link.getAttribute("href");
 
       if (
         href &&
@@ -299,48 +337,63 @@
           href.replace(/\/$/, "")
         )
       ) {
-        link.classList.add("is-active");
+        link.classList.add(
+          "is-active"
+        );
       }
     });
 
-    document.addEventListener("keydown", (event) => {
-      if (!state.menuOpen) {
-        return;
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        if (!state.menuOpen) {
+          return;
+        }
+
+        if (event.key === "Escape") {
+          event.preventDefault();
+          closeMenu();
+          return;
+        }
+
+        if (event.key !== "Tab") {
+          return;
+        }
+
+        const focusable = $$(
+          "a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex='-1'])",
+          menu
+        );
+
+        if (!focusable.length) {
+          return;
+        }
+
+        const first =
+          focusable[0];
+
+        const last =
+          focusable[
+            focusable.length - 1
+          ];
+
+        if (
+          event.shiftKey &&
+          document.activeElement === first
+        ) {
+          event.preventDefault();
+          last.focus();
+        }
+
+        if (
+          !event.shiftKey &&
+          document.activeElement === last
+        ) {
+          event.preventDefault();
+          first.focus();
+        }
       }
-
-      if (event.key === "Escape") {
-        event.preventDefault();
-        closeMenu();
-        return;
-      }
-
-      if (event.key !== "Tab") {
-        return;
-      }
-
-      const focusable = $$(
-        "a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex='-1'])",
-        menu
-      );
-
-      if (!focusable.length) {
-        return;
-      }
-
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (
-        !event.shiftKey &&
-        document.activeElement === last
-      ) {
-        event.preventDefault();
-        first.focus();
-      }
-    });
+    );
   }
 
 
@@ -349,7 +402,8 @@
      ======================================================= */
 
   function initScrollProgress() {
-    const progress = $(".scroll-progress-fill");
+    const progress =
+      $(".scroll-progress-fill");
 
     if (!progress) {
       return;
@@ -362,11 +416,17 @@
 
       const percentage =
         documentHeight > 0
-          ? (window.scrollY / documentHeight) * 100
+          ? (window.scrollY /
+              documentHeight) *
+            100
           : 0;
 
       progress.style.width =
-        `${clamp(percentage, 0, 100)}%`;
+        `${clamp(
+          percentage,
+          0,
+          100
+        )}%`;
     };
 
     update();
@@ -390,70 +450,96 @@
      ======================================================= */
 
   function initSectionNavigation() {
-    const nav = $(".home-section-nav");
-    const track = $(".home-section-nav-track", nav || document);
-    const items = $$(".home-section-nav-item");
+    const nav =
+      $(".home-section-nav");
 
-    if (!nav || !track || !items.length) {
+    if (!nav) {
+      return;
+    }
+
+    const track =
+      $(".home-section-nav-track", nav);
+
+    const items =
+      $$(".home-section-nav-item", nav);
+
+    if (!track || !items.length) {
       return;
     }
 
     items.forEach((item) => {
-      item.addEventListener("click", (event) => {
-        const targetNumber =
-          Number(item.dataset.sectionTarget);
+      item.addEventListener(
+        "click",
+        (event) => {
+          event.preventDefault();
 
-        if (!targetNumber) {
-          return;
-        }
+          const targetNumber =
+            Number(
+              item.dataset.sectionTarget
+            );
 
-        const section = getSection(targetNumber);
-
-        if (!section) {
-          return;
-        }
-
-        event.preventDefault();
-
-        section.scrollIntoView({
-          behavior: state.reducedMotion
-            ? "auto"
-            : "smooth",
-          block: "start"
-        });
-
-        resetStandbyTimer();
-      });
-    });
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) {
+          if (!targetNumber) {
             return;
           }
 
-          const sectionNumber =
-            getSectionNumber(entry.target);
+          const section =
+            getSection(targetNumber);
 
-          if (!sectionNumber) {
+          if (!section) {
             return;
           }
 
-          updateCurrentSection(
-            sectionNumber
-          );
-        });
-      },
-      {
-        threshold: CONFIG.sectionThreshold,
-        rootMargin: "-10% 0px -35% 0px"
-      }
-    );
+          section.scrollIntoView({
+            behavior:
+              state.reducedMotion
+                ? "auto"
+                : "smooth",
+            block: "start"
+          });
 
-    $$(".home-section").forEach((section) => {
-      observer.observe(section);
+          resetStandbyTimer();
+        }
+      );
     });
+
+    if (
+      "IntersectionObserver" in window
+    ) {
+      const observer =
+        new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) {
+                return;
+              }
+
+              const number =
+                getSectionNumber(
+                  entry.target
+                );
+
+              if (number) {
+                updateCurrentSection(
+                  number
+                );
+              }
+            });
+          },
+          {
+            threshold:
+              CONFIG.sectionThreshold,
+
+            rootMargin:
+              "-10% 0px -35% 0px"
+          }
+        );
+
+      $$(".home-section").forEach(
+        (section) => {
+          observer.observe(section);
+        }
+      );
+    }
   }
 
 
@@ -462,30 +548,43 @@
      ======================================================= */
 
   function updateSectionState() {
-    const sections = $$(".home-section");
+    const sections =
+      $$(".home-section");
 
     if (!sections.length) {
       return;
     }
 
     let closest = null;
-    let closestDistance = Infinity;
+    let closestDistance =
+      Infinity;
 
-    sections.forEach((section) => {
-      const rect = section.getBoundingClientRect();
+    sections.forEach(
+      (section) => {
+        const rect =
+          section.getBoundingClientRect();
 
-      const distance = Math.abs(
-        rect.top -
-        window.innerHeight * .35
-      );
+        const distance =
+          Math.abs(
+            rect.top -
+              window.innerHeight *
+                0.35
+          );
 
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closest = section;
+        if (
+          distance <
+          closestDistance
+        ) {
+          closestDistance =
+            distance;
+
+          closest = section;
+        }
       }
-    });
+    );
 
-    const number = getSectionNumber(closest);
+    const number =
+      getSectionNumber(closest);
 
     if (number) {
       updateCurrentSection(number);
@@ -493,10 +592,13 @@
   }
 
 
-  function updateCurrentSection(number) {
+  function updateCurrentSection(
+    number
+  ) {
     if (
       !number ||
-      number === state.currentSection
+      number ===
+        state.currentSection
     ) {
       return;
     }
@@ -504,7 +606,8 @@
     state.previousSection =
       state.currentSection;
 
-    state.currentSection = number;
+    state.currentSection =
+      number;
 
     updateHeaderCounter();
     updateSectionNavigation();
@@ -521,8 +624,9 @@
     }
 
     current.textContent =
-      String(state.currentSection)
-        .padStart(2, "0");
+      String(
+        state.currentSection
+      ).padStart(2, "0");
   }
 
 
@@ -532,36 +636,47 @@
 
     items.forEach((item) => {
       const target =
-        Number(item.dataset.sectionTarget);
+        Number(
+          item.dataset.sectionTarget
+        );
 
       const active =
-        target === state.currentSection;
+        target ===
+        state.currentSection;
 
       item.classList.toggle(
         "is-active",
         active
       );
 
-      item.setAttribute(
-        "aria-current",
-        active
-          ? "true"
-          : "false"
-      );
+      if (active) {
+        item.setAttribute(
+          "aria-current",
+          "true"
+        );
+      } else {
+        item.removeAttribute(
+          "aria-current"
+        );
+      }
     });
 
     const active =
       items.find(
         (item) =>
-          Number(item.dataset.sectionTarget) ===
+          Number(
+            item.dataset.sectionTarget
+          ) ===
           state.currentSection
       );
 
     if (active) {
       active.scrollIntoView({
-        behavior: state.reducedMotion
-          ? "auto"
-          : "smooth",
+        behavior:
+          state.reducedMotion
+            ? "auto"
+            : "smooth",
+
         inline: "center",
         block: "nearest"
       });
@@ -570,14 +685,17 @@
 
 
   function updateNavigationTheme() {
-    const nav = $(".home-section-nav");
+    const nav =
+      $(".home-section-nav");
 
     if (!nav) {
       return;
     }
 
     const section =
-      getSection(state.currentSection);
+      getSection(
+        state.currentSection
+      );
 
     if (!section) {
       return;
@@ -596,26 +714,12 @@
 
 
   /* =======================================================
-     11 — MOBILE COMPATIBILITY
-     ======================================================= */
-
-  function initMobileCompatibility() {
-    /*
-     * La navigation Home è già unica:
-     * orizzontale su desktop e mobile.
-     *
-     * Nessun secondo sistema verticale
-     * viene creato.
-     */
-  }
-
-
-  /* =======================================================
-     12 — REVEAL
+     11 — REVEAL
      ======================================================= */
 
   function initReveal() {
-    const elements = $$(".reveal");
+    const elements =
+      $$(".reveal");
 
     if (!elements.length) {
       return;
@@ -623,31 +727,45 @@
 
     if (
       state.reducedMotion ||
-      !("IntersectionObserver" in window)
+      !(
+        "IntersectionObserver" in
+        window
+      )
     ) {
-      elements.forEach((element) => {
-        element.classList.add("is-visible");
-      });
+      elements.forEach(
+        (element) => {
+          element.classList.add(
+            "is-visible"
+          );
+        }
+      );
 
       return;
     }
 
     const observer =
       new IntersectionObserver(
-        (entries, observerInstance) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) {
-              return;
+        (
+          entries,
+          observerInstance
+        ) => {
+          entries.forEach(
+            (entry) => {
+              if (
+                !entry.isIntersecting
+              ) {
+                return;
+              }
+
+              entry.target.classList.add(
+                "is-visible"
+              );
+
+              observerInstance.unobserve(
+                entry.target
+              );
             }
-
-            entry.target.classList.add(
-              "is-visible"
-            );
-
-            observerInstance.unobserve(
-              entry.target
-            );
-          });
+          );
         },
         {
           threshold:
@@ -655,14 +773,16 @@
         }
       );
 
-    elements.forEach((element) => {
-      observer.observe(element);
-    });
+    elements.forEach(
+      (element) => {
+        observer.observe(element);
+      }
+    );
   }
 
 
   /* =======================================================
-     13 — DIRECTION INTERACTIONS
+     12 — DIRECTION INTERACTIONS
      ======================================================= */
 
   function initDirectionInteractions() {
@@ -692,7 +812,7 @@
 
 
   /* =======================================================
-     14 — MAGNETIC ELEMENTS
+     13 — MAGNETIC ELEMENTS
      ======================================================= */
 
   function initMagneticElements() {
@@ -706,50 +826,59 @@
     const elements =
       $$("[data-magnetic]");
 
-    elements.forEach((element) => {
-      element.addEventListener(
-        "pointermove",
-        (event) => {
-          if (
-            event.pointerType !== "mouse"
-          ) {
-            return;
+    elements.forEach(
+      (element) => {
+        element.addEventListener(
+          "pointermove",
+          (event) => {
+            if (
+              event.pointerType !==
+              "mouse"
+            ) {
+              return;
+            }
+
+            const rect =
+              element.getBoundingClientRect();
+
+            const x =
+              event.clientX -
+              (rect.left +
+                rect.width / 2);
+
+            const y =
+              event.clientY -
+              (rect.top +
+                rect.height / 2);
+
+            const moveX =
+              x *
+              CONFIG.magneticStrength;
+
+            const moveY =
+              y *
+              CONFIG.magneticStrength;
+
+            element.style.transform =
+              `translate3d(${moveX}px, ${moveY}px, 0)`;
+          },
+          { passive: true }
+        );
+
+        element.addEventListener(
+          "pointerleave",
+          () => {
+            element.style.transform =
+              "";
           }
-
-          const rect =
-            element.getBoundingClientRect();
-
-          const x =
-            event.clientX -
-            (rect.left + rect.width / 2);
-
-          const y =
-            event.clientY -
-            (rect.top + rect.height / 2);
-
-          const moveX =
-            x * CONFIG.magneticStrength;
-
-          const moveY =
-            y * CONFIG.magneticStrength;
-
-          element.style.transform =
-            `translate3d(${moveX}px, ${moveY}px, 0)`;
-        }
-      );
-
-      element.addEventListener(
-        "pointerleave",
-        () => {
-          element.style.transform = "";
-        }
-      );
-    });
+        );
+      }
+    );
   }
 
 
   /* =======================================================
-     15 — CUSTOM CURSOR
+     14 — CUSTOM CURSOR
      ======================================================= */
 
   function initCursor() {
@@ -760,15 +889,26 @@
       return;
     }
 
-    const cursor = $(".cursor");
-    const dot = $(".cursor-dot");
-    const ring = $(".cursor-ring");
+    const cursor =
+      $(".cursor");
 
-    if (!cursor || !dot || !ring) {
+    const dot =
+      $(".cursor-dot");
+
+    const ring =
+      $(".cursor-ring");
+
+    if (
+      !cursor ||
+      !dot ||
+      !ring
+    ) {
       return;
     }
 
-    state.cursorEnabled = true;
+    state.cursorEnabled =
+      true;
+
     cursor.classList.add(
       "is-enabled"
     );
@@ -793,11 +933,11 @@
 
       ringX +=
         (mouseX - ringX) *
-        .1;
+        0.1;
 
       ringY +=
         (mouseY - ringY) *
-        .1;
+        0.1;
 
       dot.style.transform =
         `translate3d(${dotX}px, ${dotY}px, 0) translate(-50%, -50%)`;
@@ -805,7 +945,9 @@
       ring.style.transform =
         `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
 
-      requestAnimationFrame(render);
+      requestAnimationFrame(
+        render
+      );
     };
 
     render();
@@ -814,18 +956,17 @@
       "pointermove",
       (event) => {
         if (
-          event.pointerType !== "mouse"
+          event.pointerType !==
+          "mouse"
         ) {
           return;
         }
 
-        mouseX = event.clientX;
-        mouseY = event.clientY;
+        mouseX =
+          event.clientX;
 
-        cursor.style.color =
-          getComputedStyle(
-            document.body
-          ).color;
+        mouseY =
+          event.clientY;
       },
       { passive: true }
     );
@@ -855,10 +996,10 @@
 
 
   /* =======================================================
-     16 — STANDBY
+     15 — STANDBY
      Attivazione dopo inattività.
-     Risveglio tramite MOVIMENTO.
-     Non tramite touch/click.
+     Risveglio tramite movimento.
+     Click / wheel / tastiera = fallback.
      ======================================================= */
 
   function initStandby() {
@@ -869,49 +1010,15 @@
       return;
     }
 
-    const wake = () => {
-      if (!state.standbyActive) {
-        return;
-      }
+    let standbyMouseX = null;
+    let standbyMouseY = null;
 
-      if (state.standbyWaking) {
-        return;
-      }
 
-      state.standbyWaking = true;
+    /* -------------------------------------------------------
+       ATTIVA
+       ------------------------------------------------------- */
 
-      standby.classList.add(
-        "is-waking"
-      );
-
-      window.clearTimeout(
-        state.standbyWakeTimer
-      );
-
-      state.standbyWakeTimer =
-        window.setTimeout(() => {
-          standby.classList.remove(
-            "is-active",
-            "is-waking"
-          );
-
-          standby.setAttribute(
-            "aria-hidden",
-            "true"
-          );
-
-          document.body.classList.remove(
-            "is-standby"
-          );
-
-          state.standbyActive = false;
-          state.standbyWaking = false;
-
-          resetStandbyTimer();
-        }, state.reducedMotion ? 0 : 360);
-    };
-
-    const activate = () => {
+    const activateStandby = () => {
       if (
         state.standbyActive ||
         state.menuOpen
@@ -919,8 +1026,14 @@
         return;
       }
 
-      state.standbyActive = true;
-      state.standbyWaking = false;
+      state.standbyActive =
+        true;
+
+      state.standbyWaking =
+        false;
+
+      standbyMouseX = null;
+      standbyMouseY = null;
 
       standby.classList.add(
         "is-active"
@@ -940,136 +1053,270 @@
       );
     };
 
-    window.CPStandby = {
-      activate,
-      wake
-    };
 
-    const movementHandler = (event) => {
+    /* -------------------------------------------------------
+       RISVEGLIA
+       ------------------------------------------------------- */
+
+    const wakeStandby = () => {
       if (
-        state.standbyActive
+        !state.standbyActive ||
+        state.standbyWaking
       ) {
-        handleStandbyMovement(
-          event,
-          wake
-        );
-
         return;
       }
 
-      resetStandbyTimer();
+      state.standbyWaking =
+        true;
+
+      standby.classList.add(
+        "is-waking"
+      );
+
+      window.clearTimeout(
+        state.standbyWakeTimer
+      );
+
+      state.standbyWakeTimer =
+        window.setTimeout(
+          () => {
+            standby.classList.remove(
+              "is-active",
+              "is-waking"
+            );
+
+            standby.setAttribute(
+              "aria-hidden",
+              "true"
+            );
+
+            document.body.classList.remove(
+              "is-standby"
+            );
+
+            state.standbyActive =
+              false;
+
+            state.standbyWaking =
+              false;
+
+            standbyMouseX = null;
+            standbyMouseY = null;
+
+            resetStandbyTimer();
+          },
+          state.reducedMotion
+            ? 0
+            : 360
+        );
     };
+
+
+    /* -------------------------------------------------------
+       MOVIMENTO POINTER
+       ------------------------------------------------------- */
+
+    const handlePointerMove =
+      (event) => {
+
+        if (!state.standbyActive) {
+          resetStandbyTimer();
+          return;
+        }
+
+        /*
+         * Mouse e penna:
+         * il movimento fisico del puntatore
+         * è il trigger principale.
+         */
+        if (
+          event.pointerType &&
+          event.pointerType !== "mouse" &&
+          event.pointerType !== "pen"
+        ) {
+          return;
+        }
+
+        const x =
+          event.clientX;
+
+        const y =
+          event.clientY;
+
+
+        /*
+         * Primo rilevamento.
+         */
+        if (
+          standbyMouseX === null ||
+          standbyMouseY === null
+        ) {
+          standbyMouseX = x;
+          standbyMouseY = y;
+          return;
+        }
+
+
+        const dx =
+          x - standbyMouseX;
+
+        const dy =
+          y - standbyMouseY;
+
+        const distance =
+          Math.sqrt(
+            dx * dx +
+            dy * dy
+          );
+
+
+        standbyMouseX = x;
+        standbyMouseY = y;
+
+
+        /*
+         * Anche un piccolo movimento
+         * deve essere sufficiente.
+         */
+        if (
+          distance >=
+          CONFIG.standbyWakeDistance
+        ) {
+          wakeStandby();
+        }
+      };
+
 
     window.addEventListener(
       "pointermove",
-      movementHandler,
-      { passive: true }
+      handlePointerMove,
+      {
+        passive: true
+      }
     );
 
-    window.addEventListener(
-      "pointerdown",
-      () => {
-        if (!state.standbyActive) {
-          resetStandbyTimer();
-        }
-      },
-      { passive: true }
-    );
 
-    window.addEventListener(
-      "wheel",
-      () => {
-        if (!state.standbyActive) {
-          resetStandbyTimer();
-        }
-      },
-      { passive: true }
-    );
+    /* -------------------------------------------------------
+       TOUCH MOVE
+       ------------------------------------------------------- */
 
     window.addEventListener(
       "touchmove",
       () => {
-        if (!state.standbyActive) {
+        if (
+          state.standbyActive
+        ) {
+          wakeStandby();
+        } else {
           resetStandbyTimer();
         }
       },
-      { passive: true }
+      {
+        passive: true
+      }
     );
+
+
+    /* -------------------------------------------------------
+       WHEEL
+       ------------------------------------------------------- */
+
+    window.addEventListener(
+      "wheel",
+      () => {
+        if (
+          state.standbyActive
+        ) {
+          wakeStandby();
+        } else {
+          resetStandbyTimer();
+        }
+      },
+      {
+        passive: true
+      }
+    );
+
+
+    /* -------------------------------------------------------
+       CLICK FALLBACK
+       ------------------------------------------------------- */
+
+    window.addEventListener(
+      "click",
+      () => {
+        if (
+          state.standbyActive
+        ) {
+          wakeStandby();
+        } else {
+          resetStandbyTimer();
+        }
+      },
+      true
+    );
+
+
+    /* -------------------------------------------------------
+       KEYBOARD FALLBACK
+       ------------------------------------------------------- */
 
     window.addEventListener(
       "keydown",
       () => {
-        if (!state.standbyActive) {
+        if (
+          state.standbyActive
+        ) {
+          wakeStandby();
+        } else {
           resetStandbyTimer();
         }
       },
-      { passive: true }
+      true
     );
 
-    /*
-     * Il pulsante RIATTIVA, se presente nel markup,
-     * rimane una compatibilità accessibile.
-     * Il comportamento principale resta il movimento.
-     */
+
+    /* -------------------------------------------------------
+       EVENTUALE PULSANTE LEGACY
+       ------------------------------------------------------- */
+
     const wakeButton =
       $(".standby-wake");
 
-    wakeButton?.addEventListener(
-      "click",
-      wake
-    );
-  }
-
-
-  function handleStandbyMovement(
-    event,
-    wake
-  ) {
-    if (
-      event.pointerType !== "mouse" &&
-      event.pointerType !== "pen"
-    ) {
-      return;
-    }
-
-    const x = event.clientX;
-    const y = event.clientY;
-
-    if (
-      state.lastPointerX === null ||
-      state.lastPointerY === null
-    ) {
-      state.lastPointerX = x;
-      state.lastPointerY = y;
-      return;
-    }
-
-    const dx =
-      x - state.lastPointerX;
-
-    const dy =
-      y - state.lastPointerY;
-
-    const distance =
-      Math.sqrt(
-        dx * dx +
-        dy * dy
+    if (wakeButton) {
+      wakeButton.addEventListener(
+        "click",
+        (event) => {
+          event.preventDefault();
+          wakeStandby();
+        }
       );
-
-    state.lastPointerX = x;
-    state.lastPointerY = y;
-
-    if (
-      distance >=
-      CONFIG.standbyWakeDistance
-    ) {
-      wake();
     }
+
+
+    /* -------------------------------------------------------
+       API PUBBLICA
+       ------------------------------------------------------- */
+
+    window.CPStandby = {
+      activate:
+        activateStandby,
+
+      wake:
+        wakeStandby
+    };
   }
 
+
+  /* =======================================================
+     16 — STANDBY TIMER
+     ======================================================= */
 
   function resetStandbyTimer() {
-    if (state.menuOpen) {
+    if (
+      state.menuOpen ||
+      state.standbyActive
+    ) {
       return;
     }
 
@@ -1080,40 +1327,27 @@
     state.lastActivity =
       Date.now();
 
-    state.lastPointerX = null;
-    state.lastPointerY = null;
-
     state.standbyTimer =
       window.setTimeout(
         () => {
           if (
             !state.menuOpen &&
+            !state.standbyActive &&
             document.visibilityState ===
               "visible"
           ) {
-            activateStandby();
+            if (
+              window.CPStandby &&
+              typeof
+                window.CPStandby.activate ===
+                "function"
+            ) {
+              window.CPStandby.activate();
+            }
           }
         },
         CONFIG.standbyDelay
       );
-  }
-
-
-  function activateStandby() {
-    if (
-      state.standbyActive ||
-      state.menuOpen
-    ) {
-      return;
-    }
-
-    if (
-      window.CPStandby &&
-      typeof window.CPStandby.activate ===
-        "function"
-    ) {
-      window.CPStandby.activate();
-    }
   }
 
 
@@ -1136,6 +1370,7 @@
       link.addEventListener(
         "click",
         (event) => {
+
           if (
             event.defaultPrevented ||
             event.button !== 0 ||
@@ -1148,14 +1383,18 @@
           }
 
           const href =
-            link.getAttribute("href");
+            link.getAttribute(
+              "href"
+            );
 
           if (
             !href ||
             href.startsWith("#") ||
             href.startsWith("mailto:") ||
             href.startsWith("tel:") ||
-            href.startsWith("javascript:")
+            href.startsWith(
+              "javascript:"
+            )
           ) {
             return;
           }
@@ -1221,8 +1460,16 @@
       return;
     }
 
-    const target =
-      document.querySelector(hash);
+    let target = null;
+
+    try {
+      target =
+        document.querySelector(
+          hash
+        );
+    } catch {
+      return;
+    }
 
     if (!target) {
       return;
@@ -1241,13 +1488,14 @@
 
 
   /* =======================================================
-     19 — KEYBOARD NAVIGATION
+     19 — KEYBOARD SECTION NAVIGATION
      ======================================================= */
 
   function initKeyboardNavigation() {
     document.addEventListener(
       "keydown",
       (event) => {
+
         if (
           state.menuOpen ||
           state.standbyActive
@@ -1265,7 +1513,11 @@
 
         let targetNumber = null;
 
-        if (event.key === "ArrowDown") {
+
+        if (
+          event.key ===
+          "ArrowDown"
+        ) {
           targetNumber =
             clamp(
               state.currentSection + 1,
@@ -1274,7 +1526,11 @@
             );
         }
 
-        if (event.key === "ArrowUp") {
+
+        if (
+          event.key ===
+          "ArrowUp"
+        ) {
           targetNumber =
             clamp(
               state.currentSection - 1,
@@ -1283,7 +1539,11 @@
             );
         }
 
-        if (event.key === "PageDown") {
+
+        if (
+          event.key ===
+          "PageDown"
+        ) {
           targetNumber =
             clamp(
               state.currentSection + 1,
@@ -1292,7 +1552,11 @@
             );
         }
 
-        if (event.key === "PageUp") {
+
+        if (
+          event.key ===
+          "PageUp"
+        ) {
           targetNumber =
             clamp(
               state.currentSection - 1,
@@ -1301,34 +1565,50 @@
             );
         }
 
-        if (event.key === "Home") {
+
+        if (
+          event.key ===
+          "Home"
+        ) {
           targetNumber = 1;
         }
 
-        if (event.key === "End") {
+
+        if (
+          event.key ===
+          "End"
+        ) {
           targetNumber = 10;
         }
+
 
         if (!targetNumber) {
           return;
         }
 
+
         const section =
-          getSection(targetNumber);
+          getSection(
+            targetNumber
+          );
 
         if (!section) {
           return;
         }
 
+
         event.preventDefault();
+
 
         section.scrollIntoView({
           behavior:
             state.reducedMotion
               ? "auto"
               : "smooth",
+
           block: "start"
         });
+
 
         resetStandbyTimer();
       }
@@ -1344,11 +1624,16 @@
     document.addEventListener(
       "visibilitychange",
       () => {
+
         if (
           document.visibilityState ===
           "visible"
         ) {
-          resetStandbyTimer();
+          if (
+            !state.standbyActive
+          ) {
+            resetStandbyTimer();
+          }
         } else {
           window.clearTimeout(
             state.standbyTimer
@@ -1367,6 +1652,7 @@
     window.addEventListener(
       "resize",
       () => {
+
         window.clearTimeout(
           state.resizeTimer
         );
@@ -1375,70 +1661,95 @@
           window.setTimeout(
             () => {
               updateSectionState();
+              updateSectionNavigation();
               updateNavigationTheme();
             },
             CONFIG.resizeDebounce
           );
       },
-      { passive: true }
+      {
+        passive: true
+      }
     );
   }
 
 
   /* =======================================================
-     22 — POINTER POLISH
+     22 — SCROLL STATE
      ======================================================= */
 
-  function initPointerPolish() {
-    window.addEventListener(
-      "pointermove",
-      (event) => {
-        if (
-          event.pointerType === "mouse"
-        ) {
-          state.lastPointerX =
-            event.clientX;
-
-          state.lastPointerY =
-            event.clientY;
-        }
-      },
-      { passive: true }
-    );
-
+  function initScrollState() {
     window.addEventListener(
       "scroll",
       () => {
+
         if (
           state.scrollTicking
         ) {
           return;
         }
 
-        state.scrollTicking = true;
+        state.scrollTicking =
+          true;
 
-        requestAnimationFrame(() => {
-          updateSectionState();
-          state.scrollTicking = false;
-        });
+        requestAnimationFrame(
+          () => {
+            updateSectionState();
 
-        resetStandbyTimer();
+            state.scrollTicking =
+              false;
+          }
+        );
+
+        /*
+         * Lo scroll costituisce
+         * attività dell'utente.
+         */
+        if (
+          !state.standbyActive
+        ) {
+          resetStandbyTimer();
+        }
       },
-      { passive: true }
+      {
+        passive: true
+      }
     );
   }
 
 
   /* =======================================================
-     23 — GLOBAL DEBUG API
+     23 — START
+     ======================================================= */
+
+  if (
+    document.readyState ===
+    "loading"
+  ) {
+    document.addEventListener(
+      "DOMContentLoaded",
+      init,
+      {
+        once: true
+      }
+    );
+  } else {
+    init();
+  }
+
+
+  /* =======================================================
+     24 — GLOBAL API
      ======================================================= */
 
   window.CP = {
+
     get state() {
       return {
         ...state
       };
     },
+
 
     goToSection(number) {
       const target =
@@ -1460,51 +1771,60 @@
           state.reducedMotion
             ? "auto"
             : "smooth",
+
         block: "start"
       });
     },
 
-    openMenu() {
-      $(".menu-toggle")?.click();
-    },
 
-    closeMenu() {
-      if (state.menuOpen) {
-        $(".site-menu-close")?.click();
+    openMenu() {
+      const toggle =
+        $(".menu-toggle");
+
+      if (
+        toggle &&
+        !state.menuOpen
+      ) {
+        toggle.click();
       }
     },
 
-    activateStandby() {
-      activateStandby();
+
+    closeMenu() {
+      const close =
+        $(".site-menu-close");
+
+      if (
+        close &&
+        state.menuOpen
+      ) {
+        close.click();
+      }
     },
+
+
+    activateStandby() {
+      if (
+        window.CPStandby &&
+        typeof
+          window.CPStandby.activate ===
+          "function"
+      ) {
+        window.CPStandby.activate();
+      }
+    },
+
 
     wakeStandby() {
       if (
         window.CPStandby &&
-        typeof window.CPStandby.wake ===
+        typeof
+          window.CPStandby.wake ===
           "function"
       ) {
         window.CPStandby.wake();
       }
     }
   };
-
-
-  /* =======================================================
-     24 — START
-     ======================================================= */
-
-  if (
-    document.readyState ===
-    "loading"
-  ) {
-    document.addEventListener(
-      "DOMContentLoaded",
-      init,
-      { once: true }
-    );
-  } else {
-    init();
-  }
 
 })();
