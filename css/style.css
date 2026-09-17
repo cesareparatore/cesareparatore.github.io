@@ -1,1719 +1,3848 @@
-<!doctype html>
-<html lang="it">
-<head>
-  <meta charset="utf-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1"
-  >
-
-  <title>
-    Cesare Paratore | Scienze Motorie e Sport | Partinico e oltre
-  </title>
-
-  <meta
-    name="description"
-    content="Cesare Paratore, professionista delle Scienze Motorie e dello Sport, con una formazione che integra competenze motorie, sportive, educative, manageriali e digitali. Con base a Partinico, il suo percorso è aperto al territorio e alle collaborazioni online."
-  >
-
-  <meta name="theme-color" content="#071b3a">
-  <meta name="robots" content="index, follow">
-
-  <link
-    rel="canonical"
-    href="https://www.cesareparatore.it/"
-  >
-
-  <link
-    rel="icon"
-    type="image/png"
-    href="/assets/images/cp-mark.png"
-  >
-
-  <link
-    rel="stylesheet"
-    href="/css/style.css"
-  >
-
-  <script
-    src="/script.js"
-    defer
-  ></script>
-</head>
-
-<body>
-
-  <!-- =====================================================
-       PAGE LOADER
-       ===================================================== -->
-
-  <div
-    id="page-loader"
-    class="page-loader"
-    aria-hidden="true"
-  >
-    <div class="page-loader-inner">
-
-      <div class="page-loader-logo page-loader-logo--large">
-        <img
-          src="/assets/images/cp-mark.png"
-          alt="Cesare Paratore"
-          width="180"
-          height="180"
-        >
-      </div>
-
-    </div>
-  </div>
-
-
-  <!-- =====================================================
-       PAGE TRANSITION
-       ===================================================== -->
-
-  <div
-    class="page-transition"
-    aria-hidden="true"
-  >
-    <div class="page-transition-circle">
-      <img
-        src="/assets/images/cp-mark.png"
-        alt=""
-        width="180"
-        height="180"
-      >
-    </div>
-  </div>
-
-
-  <!-- =====================================================
-       STANDBY
-       ===================================================== -->
-
-  <div
-    class="standby-screen"
-    aria-hidden="true"
-  >
-
-    <div class="standby-atmosphere">
-
-      <span class="standby-orbit standby-orbit-a"></span>
-      <span class="standby-orbit standby-orbit-b"></span>
-      <span class="standby-orbit standby-orbit-c"></span>
-
-      <span class="standby-line standby-line-a"></span>
-      <span class="standby-line standby-line-b"></span>
-      <span class="standby-line standby-line-c"></span>
-
-    </div>
-
-    <div class="standby-center">
+/* =========================================================
+   CESARE PARATORE
+   MOVIMENTO / CON DIREZIONE.
+   MASTER STYLE SYSTEM
+   ========================================================= */
 
-      <div class="standby-logo-circle standby-logo-circle--large">
-        <img
-          src="/assets/images/cp-mark.png"
-          alt="Cesare Paratore"
-          width="250"
-          height="250"
-        >
-      </div>
 
-      <div class="standby-copy">
-        <span class="standby-label">
-          IN ATTESA
-        </span>
-      </div>
+/* =========================================================
+   01 — DESIGN TOKENS
+   ========================================================= */
 
-      <button
-        class="standby-wake"
-        type="button"
-        aria-label="Riattiva la pagina"
-      >
-        RIATTIVA
-      </button>
+:root {
 
-    </div>
+  --navy: #071b3a;
+  --navy-deep: #041225;
+  --navy-soft: #0b2854;
 
-  </div>
+  --paper: #f3f0e8;
+  --paper-bright: #faf8f2;
+  --paper-deep: #e8e3d8;
 
+  --ink: #101820;
+  --muted: rgba(16, 24, 32, .62);
 
-  <!-- =====================================================
-       CUSTOM CURSOR
-       ===================================================== -->
+  --white: #ffffff;
 
-  <div
-    class="custom-cursor"
-    aria-hidden="true"
-  >
-    <span class="custom-cursor-dot"></span>
-    <span class="custom-cursor-ring"></span>
-  </div>
+  --line-dark: rgba(255, 255, 255, .15);
+  --line-dark-strong: rgba(255, 255, 255, .28);
 
+  --line-light: rgba(7, 27, 58, .13);
+  --line-light-strong: rgba(7, 27, 58, .24);
 
-  <!-- =====================================================
-       HEADER
-       ===================================================== -->
+  --page-padding: clamp(22px, 4vw, 72px);
+  --section-space: clamp(110px, 15vw, 240px);
 
-  <header class="site-header">
+  --content-width: 1680px;
+  --copy-width: 820px;
+  --narrow-width: 680px;
 
-    <a
-      class="site-header-brand"
-      href="/"
-      aria-label="Cesare Paratore — Home"
-    >
+  --header-height: 132px;
 
-      <span class="site-header-logo site-header-logo--large">
-        <img
-          src="/assets/images/cp-mark.png"
-          alt="Cesare Paratore"
-          width="150"
-          height="150"
-        >
-      </span>
-
-      <span class="site-header-brand-copy">
+  --font-sans:
+    Helvetica Neue,
+    Helvetica,
+    Arial,
+    sans-serif;
 
-        <span class="site-header-name">
-          CESARE PARATORE
-        </span>
+  --font-mono:
+    "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    monospace;
 
-        <span class="site-header-motto">
-          MOVIMENTO / CON DIREZIONE.
-        </span>
-
-      </span>
-
-    </a>
-
+  --ease:
+    cubic-bezier(.22, .61, .36, 1);
 
-    <div class="site-header-meta">
-
-      <span
-        class="site-header-section-counter"
-        aria-live="polite"
-      >
-        01 / 10
-      </span>
-
-      <button
-        class="menu-trigger"
-        type="button"
-        aria-expanded="false"
-        aria-controls="site-menu"
-      >
-
-        <span class="menu-trigger-label">
-          MENU
-        </span>
-
-        <span class="menu-trigger-line"></span>
-
-      </button>
-
-    </div>
-
-  </header>
-
-
-  <!-- =====================================================
-       SITE MENU
-       INTERNAL ARCHITECTURE
-       ===================================================== -->
-
-  <aside
-    id="site-menu"
-    class="site-menu"
-    aria-hidden="true"
-  >
-
-    <div class="site-menu-inner">
-
-      <div class="site-menu-header">
-
-        <span class="site-menu-kicker">
-          ARCHITETTURA
-        </span>
-
-        <span class="site-menu-intro">
-          Le direzioni del percorso.
-        </span>
-
-      </div>
-
-
-      <nav
-        class="site-menu-navigation"
-        aria-label="Navigazione principale"
-      >
-
-        <a
-          class="site-menu-item"
-          href="/chi-sono/"
-        >
-          <span class="site-menu-item-number">01</span>
-          <span class="site-menu-item-title">CHI SONO</span>
-          <span class="site-menu-item-trace">
-            <span class="site-menu-item-trace-line"></span>
-            <span class="site-menu-item-trace-point"></span>
-          </span>
-        </a>
-
-
-        <a
-          class="site-menu-item"
-          href="/scienze-motorie/"
-        >
-          <span class="site-menu-item-number">02</span>
-          <span class="site-menu-item-title">SCIENZE MOTORIE</span>
-          <span class="site-menu-item-trace">
-            <span class="site-menu-item-trace-line"></span>
-            <span class="site-menu-item-trace-point"></span>
-          </span>
-        </a>
-
-
-        <a
-          class="site-menu-item"
-          href="/sport/"
-        >
-          <span class="site-menu-item-number">03</span>
-          <span class="site-menu-item-title">SPORT</span>
-          <span class="site-menu-item-trace">
-            <span class="site-menu-item-trace-line"></span>
-            <span class="site-menu-item-trace-point"></span>
-          </span>
-        </a>
-
-
-        <a
-          class="site-menu-item"
-          href="/corsa-running/"
-        >
-          <span class="site-menu-item-number">04</span>
-          <span class="site-menu-item-title">CORSA / RUNNING</span>
-          <span class="site-menu-item-trace">
-            <span class="site-menu-item-trace-line"></span>
-            <span class="site-menu-item-trace-point"></span>
-          </span>
-        </a>
-
-
-        <a
-          class="site-menu-item"
-          href="/preparazione-atletica/"
-        >
-          <span class="site-menu-item-number">05</span>
-          <span class="site-menu-item-title">PREPARAZIONE ATLETICA</span>
-          <span class="site-menu-item-trace">
-            <span class="site-menu-item-trace-line"></span>
-            <span class="site-menu-item-trace-point"></span>
-          </span>
-        </a>
-
-
-        <a
-          class="site-menu-item"
-          href="/educazione/"
-        >
-          <span class="site-menu-item-number">06</span>
-          <span class="site-menu-item-title">EDUCAZIONE</span>
-          <span class="site-menu-item-trace">
-            <span class="site-menu-item-trace-line"></span>
-            <span class="site-menu-item-trace-point"></span>
-          </span>
-        </a>
-
-
-        <a
-          class="site-menu-item"
-          href="/management-dello-sport/"
-        >
-          <span class="site-menu-item-number">07</span>
-          <span class="site-menu-item-title">MANAGEMENT DELLO SPORT</span>
-          <span class="site-menu-item-trace">
-            <span class="site-menu-item-trace-line"></span>
-            <span class="site-menu-item-trace-point"></span>
-          </span>
-        </a>
-
-
-        <a
-          class="site-menu-item"
-          href="/presenza-web/"
-        >
-          <span class="site-menu-item-number">08</span>
-          <span class="site-menu-item-title">PRESENZA WEB</span>
-          <span class="site-menu-item-trace">
-            <span class="site-menu-item-trace-line"></span>
-            <span class="site-menu-item-trace-point"></span>
-          </span>
-        </a>
-
-
-        <a
-          class="site-menu-item"
-          href="/territorio/"
-        >
-          <span class="site-menu-item-number">09</span>
-          <span class="site-menu-item-title">TERRITORIO</span>
-          <span class="site-menu-item-trace">
-            <span class="site-menu-item-trace-line"></span>
-            <span class="site-menu-item-trace-point"></span>
-          </span>
-        </a>
-
-
-        <a
-          class="site-menu-item"
-          href="/contatti/"
-        >
-          <span class="site-menu-item-number">10</span>
-          <span class="site-menu-item-title">CONTATTI</span>
-          <span class="site-menu-item-trace">
-            <span class="site-menu-item-trace-line"></span>
-            <span class="site-menu-item-trace-point"></span>
-          </span>
-        </a>
-
-      </nav>
-
-
-      <div class="site-menu-footer">
-
-        <span>
-          CESARE PARATORE
-        </span>
-
-        <span>
-          MOVIMENTO / CON DIREZIONE.
-        </span>
-
-      </div>
-
-    </div>
-
-  </aside>
-
-
-  <!-- =====================================================
-       SCROLL PROGRESS
-       ===================================================== -->
-
-  <div
-    class="scroll-progress"
-    aria-hidden="true"
-  >
-    <span class="scroll-progress-bar"></span>
-  </div>
-
-
-  <!-- =====================================================
-       HOME SECTION NAVIGATION
-       IMPORTANT:
-       NORMAL FLOW — NOT FIXED — NOT STICKY
-       ===================================================== -->
-
-  <nav
-    class="home-section-nav"
-    aria-label="Navigazione delle sezioni della Home"
-  >
-
-    <div class="home-section-nav-inner">
-
-      <div class="home-section-nav-current">
-
-        <span class="home-section-nav-current-number">
-          01
-        </span>
-
-        <span class="home-section-nav-current-label">
-          L'INIZIO
-        </span>
-
-      </div>
-
-
-      <div class="home-section-nav-route">
-
-        <span
-          class="home-section-nav-route-line"
-          aria-hidden="true"
-        ></span>
-
-        <span
-          class="home-section-nav-route-progress"
-          aria-hidden="true"
-        ></span>
-
-        <span
-          class="home-section-nav-route-point"
-          aria-hidden="true"
-        ></span>
-
-
-        <div class="home-section-nav-items">
-
-          <a
-            class="home-section-nav-item is-active"
-            href="#inizio"
-            data-section-target="inizio"
-            aria-label="01 — L'INIZIO"
-            aria-current="true"
-          >
-            <span class="home-section-nav-number">01</span>
-            <span class="home-section-nav-label">L'INIZIO</span>
-          </a>
-
-
-          <a
-            class="home-section-nav-item"
-            href="#centro"
-            data-section-target="centro"
-            aria-label="02 — IL CENTRO"
-          >
-            <span class="home-section-nav-number">02</span>
-            <span class="home-section-nav-label">IL CENTRO</span>
-          </a>
-
-
-          <a
-            class="home-section-nav-item"
-            href="#direzioni"
-            data-section-target="direzioni"
-            aria-label="03 — CINQUE DIREZIONI"
-          >
-            <span class="home-section-nav-number">03</span>
-            <span class="home-section-nav-label">CINQUE DIREZIONI</span>
-          </a>
-
-
-          <a
-            class="home-section-nav-item"
-            href="#persona"
-            data-section-target="persona"
-            aria-label="04 — LA PERSONA"
-          >
-            <span class="home-section-nav-number">04</span>
-            <span class="home-section-nav-label">LA PERSONA</span>
-          </a>
-
-
-          <a
-            class="home-section-nav-item"
-            href="#direzione"
-            data-section-target="direzione"
-            aria-label="05 — LA DIREZIONE"
-          >
-            <span class="home-section-nav-number">05</span>
-            <span class="home-section-nav-label">LA DIREZIONE</span>
-          </a>
-
-
-          <a
-            class="home-section-nav-item"
-            href="#tracce"
-            data-section-target="tracce"
-            aria-label="06 — LE TRACCE"
-          >
-            <span class="home-section-nav-number">06</span>
-            <span class="home-section-nav-label">LE TRACCE</span>
-          </a>
-
-
-          <a
-            class="home-section-nav-item"
-            href="#punto-zero"
-            data-section-target="punto-zero"
-            aria-label="07 — IL PUNTO ZERO"
-          >
-            <span class="home-section-nav-number">07</span>
-            <span class="home-section-nav-label">IL PUNTO ZERO</span>
-          </a>
-
-
-          <a
-            class="home-section-nav-item"
-            href="#tocca-a-te"
-            data-section-target="tocca-a-te"
-            aria-label="08 — ADESSO TOCCA A TE"
-          >
-            <span class="home-section-nav-number">08</span>
-            <span class="home-section-nav-label">ADESSO TOCCA A TE</span>
-          </a>
-
-
-          <a
-            class="home-section-nav-item"
-            href="#tua-direzione"
-            data-section-target="tua-direzione"
-            aria-label="09 — LA TUA DIREZIONE"
-          >
-            <span class="home-section-nav-number">09</span>
-            <span class="home-section-nav-label">LA TUA DIREZIONE</span>
-          </a>
-
-
-          <a
-            class="home-section-nav-item"
-            href="#contatto"
-            data-section-target="contatto"
-            aria-label="10 — IL CONTATTO"
-          >
-            <span class="home-section-nav-number">10</span>
-            <span class="home-section-nav-label">IL CONTATTO</span>
-          </a>
-
-        </div>
-
-      </div>
-
-
-      <div class="home-section-nav-total">
-        <span>10</span>
-      </div>
-
-    </div>
-
-  </nav>
-
-
-  <!-- =====================================================
-       MAIN
-       ===================================================== -->
-
-  <main id="main-content">
-
-
-    <!-- ===================================================
-         01 — L'INIZIO
-         =================================================== -->
+  --ease-fast:
+    cubic-bezier(.16, 1, .3, 1);
 
-    <section
-      id="inizio"
-      class="home-section home-section--dark home-section--hero"
-      data-section="01"
-      data-section-label="L'INIZIO"
-    >
-
-      <div class="section-atmosphere" aria-hidden="true">
+  --ease-soft:
+    cubic-bezier(.33, 1, .68, 1);
 
-        <span class="section-orbit section-orbit-a"></span>
-        <span class="section-orbit section-orbit-b"></span>
-        <span class="section-orbit section-orbit-c"></span>
+  --trajectory-progress: 0;
+  --trajectory-drift: 0px;
+  --trajectory-scale: 1;
+  --trajectory-opacity: 1;
 
-        <span class="section-trace section-trace-a"></span>
-        <span class="section-trace section-trace-b"></span>
+  --section-progress: 0;
+  --section-drift: 0px;
+}
 
-        <span class="section-node section-node-a"></span>
-        <span class="section-node section-node-b"></span>
 
-      </div>
+/* =========================================================
+   02 — RESET
+   ========================================================= */
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
-      <div class="section-inner section-inner--hero">
+html {
+  margin: 0;
+  padding: 0;
 
-        <div class="section-index reveal">
-          01 / 10
-        </div>
+  scroll-behavior: smooth;
 
+  background: var(--paper);
+}
 
-        <div class="hero-copy">
+body {
+  margin: 0;
+  padding: 0;
 
-          <p class="hero-kicker reveal">
-            CESARE PARATORE
-          </p>
+  min-width: 320px;
 
-          <h1 class="hero-title reveal">
-            <span>MOVIMENTO.</span>
-            <span>CON DIREZIONE.</span>
-          </h1>
+  background: var(--paper);
+  color: var(--ink);
 
-          <div class="hero-intro reveal">
+  font-family: var(--font-sans);
 
-            <p>
-              Il movimento è ciò da cui tutto prende forma.
-            </p>
+  font-size: 16px;
+  line-height: 1.55;
 
-            <p>
-              La direzione è ciò che gli dà senso.
-            </p>
+  text-rendering: optimizeLegibility;
 
-          </div>
-
-        </div>
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-
-        <div class="hero-body editorial-copy reveal">
+body.is-menu-open,
+body.is-standby {
+  overflow: hidden;
+}
 
-          <p>
-            Prima viene il movimento.
-            Il primo passo.
-            Il corpo che scopre uno spazio.
-            La corsa che diventa ritmo.
-            La fatica che diventa esperienza.
-            La pratica che diventa conoscenza.
-          </p>
+img {
+  display: block;
 
-          <p>
-            È da qui che è iniziato il mio percorso.
-            Non sapevo ancora quante strade avrebbe preso.
-            Sapevo soltanto che volevo continuare a seguirlo.
-          </p>
+  max-width: 100%;
+  height: auto;
+}
 
-        </div>
+button,
+a {
+  font: inherit;
+}
 
-      </div>
+button {
+  border: 0;
 
-    </section>
+  background: none;
 
+  color: inherit;
 
-    <!-- ===================================================
-         02 — IL CENTRO
-         =================================================== -->
+  cursor: pointer;
+}
 
-    <section
-      id="centro"
-      class="home-section home-section--paper"
-      data-section="02"
-      data-section-label="IL CENTRO"
-    >
+a {
+  color: inherit;
 
-      <div class="section-inner section-inner--editorial">
+  text-decoration: none;
+}
 
-        <div class="section-index reveal">
-          02 / 10
-        </div>
+::selection {
+  background: var(--navy);
+  color: var(--paper);
+}
 
 
-        <div class="editorial-heading reveal">
+/* =========================================================
+   03 — ACCESSIBILITY
+   ========================================================= */
 
-          <p class="section-kicker">
-            IL CENTRO
-          </p>
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 5px;
+}
 
-          <h2>
-            TUTTO È PARTITO<br>
-            DA UNA DOMANDA.
-          </h2>
+@media (pointer: coarse) {
+  .custom-cursor {
+    display: none !important;
+  }
+}
 
-        </div>
 
+/* =========================================================
+   04 — PAGE LOADER
+   ========================================================= */
 
-        <div class="editorial-question reveal">
+.page-loader {
+  position: fixed;
 
-          <p>
-            Cosa può diventare una persona quando impara davvero a muoversi?
-          </p>
+  inset: 0;
 
-        </div>
+  z-index: 1000;
 
+  display: grid;
+  place-items: center;
 
-        <div class="editorial-copy editorial-copy--wide reveal">
+  background: var(--navy);
 
-          <p>
-            Non soltanto più veloce.
-            Più consapevole.
-            Capace di conoscere il proprio corpo,
-            affrontare una difficoltà,
-            stare dentro una squadra,
-            imparare attraverso l’esperienza.
-          </p>
+  opacity: 1;
+  visibility: visible;
 
-          <p>
-            Il movimento può essere allenamento.
-            Può essere educazione.
-            Può essere sport.
-            Può diventare metodo.
-          </p>
+  transition:
+    opacity 700ms var(--ease),
+    visibility 700ms var(--ease);
+}
 
-          <p>
-            E, quando lo si osserva abbastanza a lungo,
-            racconta molto più del corpo.
-            Racconta come impariamo.
-            Come cambiamo.
-            Come scegliamo una direzione.
-          </p>
+.page-loader.is-hidden {
+  opacity: 0;
+  visibility: hidden;
 
-          <p>
-            Per questo
-            <strong>Scienze Motorie e Sport</strong>
-            sono il centro del mio percorso.
-            Tutto il resto è nato da lì.
-          </p>
+  pointer-events: none;
+}
 
-        </div>
+.page-loader-inner {
+  display: grid;
+  place-items: center;
+}
 
-      </div>
+.page-loader-logo {
+  position: relative;
 
-    </section>
+  display: grid;
+  place-items: center;
 
+  width: clamp(150px, 15vw, 230px);
+  aspect-ratio: 1;
 
-    <!-- ===================================================
-         03 — CINQUE DIREZIONI
-         =================================================== -->
+  border-radius: 50%;
 
-    <section
-      id="direzioni"
-      class="home-section home-section--dark home-section--directions"
-      data-section="03"
-      data-section-label="CINQUE DIREZIONI"
-    >
+  background: var(--paper);
 
-      <div class="section-inner section-inner--directions">
+  overflow: hidden;
 
-        <div class="section-index reveal">
-          03 / 10
-        </div>
+  animation:
+    loader-breathe 1800ms ease-in-out infinite;
+}
 
+.page-loader-logo::before {
+  content: "";
 
-        <div class="directions-heading reveal">
+  position: absolute;
 
-          <p class="section-kicker">
-            CINQUE DIREZIONI
-          </p>
+  inset: 10px;
 
-          <h2>
-            A UN CERTO PUNTO,<br>
-            IL PERCORSO SI È APERTO.
-          </h2>
+  border: 1px solid rgba(7, 27, 58, .14);
 
-          <p class="directions-lead">
-            Non in cinque percorsi diversi.
-            <strong>In cinque direzioni.</strong>
-          </p>
+  border-radius: 50%;
+}
 
-        </div>
+.page-loader-logo img {
+  position: relative;
 
+  z-index: 2;
 
-        <div class="directions-grid">
+  width: 72%;
+  height: auto;
 
-          <article
-            class="direction-card reveal"
-            data-direction="01"
-          >
+  object-fit: contain;
+}
 
-            <span class="direction-card-number">
-              01
-            </span>
+@keyframes loader-breathe {
 
-            <h3>
-              SCIENZE MOTORIE
-            </h3>
+  0%,
+  100% {
+    transform: scale(1);
+  }
 
-            <p class="direction-card-intro">
-              Il punto di partenza.
-            </p>
+  50% {
+    transform: scale(1.035);
+  }
+}
 
-            <p>
-              Il corpo.
-              Il movimento.
-              Le capacità motorie.
-              La formazione.
-              Il metodo.
-              La base da cui tutto ha preso forma.
-            </p>
 
-          </article>
+/* =========================================================
+   05 — PAGE TRANSITION
+   ========================================================= */
 
+.page-transition {
+  position: fixed;
 
-          <article
-            class="direction-card reveal"
-            data-direction="02"
-          >
+  inset: 0;
 
-            <span class="direction-card-number">
-              02
-            </span>
+  z-index: 990;
 
-            <h3>
-              SPORT
-            </h3>
+  display: grid;
+  place-items: center;
 
-            <p class="direction-card-intro">
-              Poi arriva la pratica.
-            </p>
+  background: var(--navy);
 
-            <p>
-              La corsa.
-              L’atletica.
-              L’allenamento.
-              La preparazione.
-              Ciò che studi incontra qualcosa di reale:
-              un corpo,
-              una pista,
-              un obiettivo.
-            </p>
+  opacity: 0;
+  visibility: hidden;
 
-            <p>
-              È lì che la conoscenza smette di essere soltanto teoria.
-            </p>
+  pointer-events: none;
 
-          </article>
+  transition:
+    opacity 500ms var(--ease),
+    visibility 500ms var(--ease);
+}
 
+.page-transition.is-active {
+  opacity: 1;
+  visibility: visible;
 
-          <article
-            class="direction-card reveal"
-            data-direction="03"
-          >
+  pointer-events: auto;
+}
 
-            <span class="direction-card-number">
-              03
-            </span>
+.page-transition-circle {
+  display: grid;
+  place-items: center;
 
-            <h3>
-              EDUCAZIONE
-            </h3>
+  width: clamp(110px, 12vw, 190px);
+  aspect-ratio: 1;
 
-            <p class="direction-card-intro">
-              Poi arriva una domanda più grande.
-            </p>
+  border-radius: 50%;
 
-            <p>
-              Cosa succede quando il movimento non lo vivi soltanto,
-              ma lo insegni?
-            </p>
+  background: var(--paper);
 
-            <p>
-              A scuola il corpo entra nella relazione.
-              Diventa esperienza.
-              Diventa apprendimento.
-              Diventa crescita.
-            </p>
+  transform: scale(.7);
 
-          </article>
+  transition:
+    transform 700ms var(--ease);
+}
 
+.page-transition.is-active .page-transition-circle {
+  transform: scale(1);
+}
 
-          <article
-            class="direction-card reveal"
-            data-direction="04"
-          >
+.page-transition-circle img {
+  width: 72%;
+  height: auto;
+}
 
-            <span class="direction-card-number">
-              04
-            </span>
 
-            <h3>
-              MANAGEMENT
-            </h3>
+/* =========================================================
+   06 — STANDBY
+   ========================================================= */
 
-            <p class="direction-card-intro">
-              E quando qualcosa deve essere costruito,
-              serve una visione.
-            </p>
+.standby-screen {
+  position: fixed;
 
-            <p>
-              Progettare.
-              Organizzare.
-              Comprendere.
-              Mettere in relazione persone,
-              idee e possibilità.
-            </p>
+  inset: 0;
 
-            <p>
-              Dare forma a un’idea prima che diventi realtà.
-            </p>
+  z-index: 950;
 
-          </article>
+  display: grid;
+  place-items: center;
 
+  background: var(--navy);
 
-          <article
-            class="direction-card reveal"
-            data-direction="05"
-          >
+  opacity: 0;
+  visibility: hidden;
 
-            <span class="direction-card-number">
-              05
-            </span>
+  pointer-events: none;
 
-            <h3>
-              DIGITALE
-            </h3>
+  transition:
+    opacity 900ms var(--ease),
+    visibility 900ms var(--ease);
+}
 
-            <p class="direction-card-intro">
-              Infine, un altro spazio.
-            </p>
+.standby-screen.is-active {
+  opacity: 1;
+  visibility: visible;
 
-            <p>
-              Quello in cui le idee possono incontrare persone
-              anche a distanza.
-            </p>
+  pointer-events: auto;
+}
 
-            <p>
-              Il digitale non è il centro.
-              È uno strumento.
-              Per raccontare.
-              Progettare.
-              Creare presenza.
-              Mettere in relazione mondi che altrimenti
-              rimarrebbero lontani.
-            </p>
+.standby-atmosphere {
+  position: absolute;
 
-          </article>
+  inset: 0;
 
-        </div>
+  overflow: hidden;
 
+  pointer-events: none;
+}
 
-        <div class="directions-ending reveal">
+.standby-orbit {
+  position: absolute;
 
-          <span>
-            Cinque direzioni.
-          </span>
+  left: 50%;
+  top: 50%;
 
-          <span>
-            Un solo punto di partenza.
-          </span>
+  border: 1px solid rgba(255, 255, 255, .12);
 
-          <strong class="directions-cp-mark">
+  border-radius: 50%;
 
-            <img
-              src="/assets/images/cp-mark.png"
-              alt="CP"
-              width="130"
-              height="130"
-            >
+  transform:
+    translate(-50%, -50%);
+}
 
-          </strong>
+.standby-orbit-a {
+  width: 42vw;
+  height: 42vw;
 
-        </div>
+  animation:
+    standby-orbit-a 18s linear infinite;
+}
 
-      </div>
+.standby-orbit-b {
+  width: 64vw;
+  height: 28vw;
 
-    </section>
+  transform:
+    translate(-50%, -50%)
+    rotate(28deg);
 
+  animation:
+    standby-orbit-b 24s linear infinite reverse;
+}
 
-    <!-- ===================================================
-         04 — LA PERSONA
-         =================================================== -->
+.standby-orbit-c {
+  width: 78vw;
+  height: 78vw;
 
-    <section
-      id="persona"
-      class="home-section home-section--paper"
-      data-section="04"
-      data-section-label="LA PERSONA"
-    >
+  border-color: rgba(255, 255, 255, .06);
 
-      <div class="section-inner section-inner--editorial">
+  animation:
+    standby-orbit-c 32s linear infinite;
+}
 
-        <div class="section-index reveal">
-          04 / 10
-        </div>
+@keyframes standby-orbit-a {
+  to {
+    transform:
+      translate(-50%, -50%)
+      rotate(360deg);
+  }
+}
 
+@keyframes standby-orbit-b {
+  to {
+    transform:
+      translate(-50%, -50%)
+      rotate(388deg);
+  }
+}
 
-        <div class="editorial-heading reveal">
+@keyframes standby-orbit-c {
+  to {
+    transform:
+      translate(-50%, -50%)
+      rotate(360deg);
+  }
+}
 
-          <p class="section-kicker">
-            LA PERSONA
-          </p>
+.standby-line {
+  position: absolute;
 
-          <h2>
-            UN CURRICULUM DICE<br>
-            COSA HAI FATTO.
-          </h2>
+  height: 1px;
 
-        </div>
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, .22),
+      transparent
+    );
 
+  transform-origin: center;
 
-        <div class="editorial-question reveal">
+  opacity: .7;
+}
 
-          <p>
-            Un percorso racconta
-            <strong>cosa quelle esperienze hanno fatto a te.</strong>
-          </p>
+.standby-line-a {
+  width: 90vw;
 
-        </div>
+  left: 5vw;
+  top: 50%;
 
+  transform:
+    rotate(-18deg);
+}
 
-        <div class="editorial-copy editorial-copy--wide reveal">
+.standby-line-b {
+  width: 75vw;
 
-          <p>
-            Le Scienze Motorie mi hanno dato un centro.
-            Lo sport mi ha insegnato la pratica.
-            La corsa mi ha insegnato che il tempo conta.
-            La scuola mi ha mostrato che ogni persona impara
-            in modo diverso.
-            Il management mi ha insegnato a guardare oltre l’esecuzione.
-            Il digitale mi ha insegnato che anche una presenza
-            può essere progettata.
-          </p>
+  left: 12vw;
+  top: 48%;
 
-          <p>
-            Ogni esperienza ha lasciato una traccia.
-            Ma nessuna è rimasta dove l’avevo incontrata.
-            È passata nella successiva.
-            Si è trasformata.
-            Ha cambiato il modo in cui guardavo quella dopo ancora.
-          </p>
+  transform:
+    rotate(31deg);
+}
 
-          <p>
-            Forse è questo che significa crescere:
-            <strong>
-              non accumulare esperienze,
-              ma permettere loro di cambiarti.
-            </strong>
-          </p>
+.standby-line-c {
+  width: 65vw;
 
-        </div>
+  left: 18vw;
+  top: 53%;
 
-      </div>
+  transform:
+    rotate(-7deg);
+}
 
-    </section>
+.standby-center {
+  position: relative;
 
+  z-index: 4;
 
-    <!-- ===================================================
-         05 — LA DIREZIONE
-         =================================================== -->
+  display: flex;
 
-    <section
-      id="direzione"
-      class="home-section home-section--dark home-section--direction"
-      data-section="05"
-      data-section-label="LA DIREZIONE"
-    >
+  flex-direction: column;
 
-      <div class="section-inner section-inner--direction">
+  align-items: center;
 
-        <div class="section-index reveal">
-          05 / 10
-        </div>
+  gap: 26px;
+}
 
+.standby-logo-circle {
+  position: relative;
 
-        <div class="direction-copy">
+  display: grid;
+  place-items: center;
 
-          <div class="editorial-heading reveal">
+  width: clamp(210px, 25vw, 360px);
+  aspect-ratio: 1;
 
-            <p class="section-kicker">
-              LA DIREZIONE
-            </p>
+  border-radius: 50%;
 
-            <h2>
-              MUOVERSI È FACILE.
-            </h2>
+  background: var(--paper);
 
-          </div>
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, .1),
+    0 30px 100px rgba(0, 0, 0, .24);
 
+  overflow: hidden;
+}
 
-          <div class="editorial-copy reveal">
+.standby-logo-circle::before {
+  content: "";
 
-            <p>
-              Basta partire.
-              La parte difficile viene dopo.
-              Capire dove andare.
-            </p>
+  position: absolute;
 
-            <p>
-              Per questo movimento e direzione,
-              per me, non sono due parole separate.
-            </p>
+  inset: 12px;
 
-            <p>
-              <strong>
-                Il movimento è ciò che accade.
-              </strong>
-            </p>
+  border: 1px solid rgba(7, 27, 58, .13);
 
-            <p>
-              <strong>
-                La direzione è ciò che gli dà senso.
-              </strong>
-            </p>
+  border-radius: 50%;
+}
 
-            <p>
-              Vale nello sport.
-              Nell’educazione.
-              Nella formazione.
-              Quando costruisci un progetto.
-            </p>
+.standby-logo-circle img {
+  position: relative;
 
-            <p>
-              Prima di accelerare, guardo.
-              Prima di costruire, comprendo.
-              Prima di scegliere una strada,
-              provo a capire perché quella strada.
-            </p>
+  z-index: 2;
 
-            <p>
-              <strong>
-                Non tutto ciò che porta avanti
-                porta nella direzione giusta.
-              </strong>
-            </p>
+  width: 74%;
+  height: auto;
 
-          </div>
+  object-fit: contain;
+}
 
-        </div>
+.standby-copy {
+  display: grid;
+  place-items: center;
 
+  min-width: 150px;
+  min-height: 42px;
 
-        <div
-          class="direction-visual"
-          aria-hidden="true"
-        >
+  padding: 0 20px;
 
-          <div class="direction-visual-field">
+  border: 1px solid rgba(255, 255, 255, .2);
 
-            <span class="direction-visual-axis direction-visual-axis-x"></span>
-            <span class="direction-visual-axis direction-visual-axis-y"></span>
+  background: rgba(7, 27, 58, .22);
+}
 
-            <span class="direction-visual-orbit direction-visual-orbit-a"></span>
-            <span class="direction-visual-orbit direction-visual-orbit-b"></span>
+.standby-label {
+  color: var(--paper);
 
-            <span class="direction-visual-vector"></span>
+  font-family: var(--font-mono);
 
-            <span class="direction-visual-point"></span>
+  font-size: .68rem;
 
-          </div>
+  letter-spacing: .18em;
 
-        </div>
+  text-transform: uppercase;
+}
 
-      </div>
+.standby-wake {
+  padding: 9px 18px;
 
-    </section>
+  border: 1px solid rgba(255, 255, 255, .18);
 
+  color: rgba(255, 255, 255, .68);
 
-    <!-- ===================================================
-         06 — LE TRACCE
-         =================================================== -->
+  font-family: var(--font-mono);
 
-    <section
-      id="tracce"
-      class="home-section home-section--paper home-section--traces"
-      data-section="06"
-      data-section-label="LE TRACCE"
-    >
+  font-size: .58rem;
 
-      <div class="section-inner section-inner--traces">
+  letter-spacing: .12em;
 
-        <div class="section-index reveal">
-          06 / 10
-        </div>
+  transition:
+    color 250ms ease,
+    border-color 250ms ease,
+    background 250ms ease;
+}
 
+.standby-wake:hover {
+  color: var(--navy);
 
-        <div class="traces-content">
+  border-color: var(--paper);
 
-          <div class="editorial-heading reveal">
+  background: var(--paper);
+}
 
-            <p class="section-kicker">
-              LE TRACCE
-            </p>
 
-            <h2>
-              ALCUNE COSE<br>
-              LE IMPARI STUDIANDO.
-            </h2>
+/* =========================================================
+   07 — CUSTOM CURSOR
+   ========================================================= */
 
-          </div>
+.custom-cursor {
+  position: fixed;
 
+  left: 0;
+  top: 0;
 
-          <div class="editorial-copy reveal">
+  z-index: 1100;
 
-            <p>
-              Altre correndo.
-              Altre ancora insegnando.
-              E alcune soltanto dopo aver sbagliato.
-            </p>
+  width: 1px;
+  height: 1px;
 
-            <p>
-              La formazione universitaria ha costruito le fondamenta.
-              Lo sport ha dato a quelle conoscenze un corpo.
-              La scuola ha aggiunto persone, relazioni, responsabilità.
-              Il management ha aperto la prospettiva della progettazione.
-              Il digitale ha portato il percorso in uno spazio nuovo.
-            </p>
+  pointer-events: none;
 
-            <p>
-              Nessuna di queste esperienze è arrivata davvero alla fine.
-              Ognuna ha lasciato una domanda.
-              E quella domanda ha portato alla successiva.
-            </p>
+  mix-blend-mode: difference;
+}
 
-            <p>
-              È così che un percorso cresce.
-              Non come una linea retta.
-              Più come una traiettoria.
-              A volte precisa.
-              A volte inattesa.
-              <strong>
-                Ma sempre in movimento.
-              </strong>
-            </p>
+.custom-cursor-dot,
+.custom-cursor-ring {
+  position: absolute;
 
-          </div>
+  left: 0;
+  top: 0;
 
-        </div>
+  display: block;
 
+  border-radius: 50%;
 
-        <div
-          class="traces-visual"
-          aria-hidden="true"
-        >
+  transform:
+    translate(-50%, -50%);
+}
 
-          <div class="traces-visual-field">
+.custom-cursor-dot {
+  width: 6px;
+  height: 6px;
 
-            <span class="trace-line trace-line-a"></span>
-            <span class="trace-line trace-line-b"></span>
-            <span class="trace-line trace-line-c"></span>
+  background: #fff;
+}
 
-            <span class="trace-orbit trace-orbit-a"></span>
-            <span class="trace-orbit trace-orbit-b"></span>
+.custom-cursor-ring {
+  width: 30px;
+  height: 30px;
 
-            <span class="trace-node trace-node-a"></span>
-            <span class="trace-node trace-node-b"></span>
-            <span class="trace-node trace-node-c"></span>
+  border: 1px solid rgba(255, 255, 255, .7);
 
-            <span class="trace-axis trace-axis-x"></span>
-            <span class="trace-axis trace-axis-y"></span>
+  transition:
+    width 250ms var(--ease),
+    height 250ms var(--ease),
+    border-color 250ms ease;
+}
 
-          </div>
+.custom-cursor.is-hovering .custom-cursor-ring {
+  width: 52px;
+  height: 52px;
 
-        </div>
+  border-color: #fff;
+}
 
-      </div>
 
-    </section>
+/* =========================================================
+   08 — HEADER
+   ========================================================= */
 
+.site-header {
+  position: relative;
 
-    <!-- ===================================================
-         07 — IL PUNTO ZERO
-         =================================================== -->
+  z-index: 200;
 
-    <section
-      id="punto-zero"
-      class="home-section home-section--dark home-section--territory"
-      data-section="07"
-      data-section-label="IL PUNTO ZERO"
-    >
+  width: 100%;
+  min-height: var(--header-height);
 
-      <div class="section-inner section-inner--territory">
+  display: flex;
 
-        <div class="section-index reveal">
-          07 / 10
-        </div>
+  align-items: center;
+  justify-content: space-between;
 
+  gap: 30px;
 
-        <div class="territory-content">
+  padding:
+    18px
+    var(--page-padding);
 
-          <div class="editorial-heading reveal">
+  background: var(--paper);
 
-            <p class="section-kicker">
-              IL PUNTO ZERO
-            </p>
+  color: var(--navy);
 
-            <h2>
-              OGNI TRAIETTORIA<br>
-              HA BISOGNO DI UN PUNTO DI PARTENZA.
-            </h2>
+  border-bottom: 1px solid var(--line-light);
+}
 
-          </div>
+.site-header-brand {
+  display: flex;
 
+  align-items: center;
 
-          <div class="territory-place reveal">
+  gap: 22px;
 
-            <span class="territory-place-label">
-              IL MIO È
-            </span>
+  min-width: 0;
+}
 
-            <strong>
-              PARTINICO.
-            </strong>
+.site-header-logo {
+  position: relative;
 
-          </div>
+  flex: 0 0 auto;
 
+  display: grid;
+  place-items: center;
 
-          <div class="editorial-copy reveal">
+  width: clamp(118px, 9vw, 170px);
+  height: clamp(92px, 8vw, 145px);
+}
 
-            <p>
-              Un luogo preciso.
-              Un contesto fatto di sport,
-              persone, associazioni,
-              incontri e possibilità.
-            </p>
+.site-header-logo img {
+  width: 100%;
+  height: 100%;
 
-            <p>
-              È qui che alcune delle prime direzioni
-              hanno preso forma.
-            </p>
+  object-fit: contain;
 
-            <p>
-              Oggi uno spazio che non ha più bisogno
-              di una distanza fisica per creare una connessione.
-            </p>
+  /*
+   * ORIGINAL LOGO.
+   * No filter.
+   * No recoloring.
+   */
+  filter: none;
+}
 
-            <p>
-              Ma partire da un luogo significa qualcosa.
-              Significa avere radici.
-            </p>
+.site-header-brand-copy {
+  display: flex;
 
-            <p>
-              E le radici non servono a trattenerti.
-              <strong>
-                Servono a permetterti di andare più lontano.
-              </strong>
-            </p>
+  flex-direction: column;
 
-            <p>
-              Partinico è il punto di partenza.
-              Non il punto di arrivo.
-            </p>
+  gap: 5px;
 
-          </div>
+  min-width: 0;
+}
 
-        </div>
+.site-header-name {
+  font-size: clamp(.78rem, 1vw, .94rem);
 
+  font-weight: 700;
 
-        <div
-          class="territory-visual"
-          aria-hidden="true"
-        >
+  letter-spacing: .11em;
 
-          <span class="territory-ring territory-ring-a"></span>
-          <span class="territory-ring territory-ring-b"></span>
-          <span class="territory-ring territory-ring-c"></span>
+  white-space: nowrap;
+}
 
-          <span class="territory-point"></span>
+.site-header-motto {
+  font-family: var(--font-mono);
 
-          <span class="territory-trace"></span>
+  font-size: clamp(.56rem, .72vw, .68rem);
 
-        </div>
+  letter-spacing: .08em;
 
-      </div>
+  white-space: nowrap;
 
-    </section>
+  opacity: .55;
+}
 
+.site-header-meta {
+  display: flex;
 
-    <!-- ===================================================
-         08 — ADESSO TOCCA A TE
-         =================================================== -->
+  align-items: center;
 
-    <section
-      id="tocca-a-te"
-      class="home-section home-section--paper home-section--visitor"
-      data-section="08"
-      data-section-label="ADESSO TOCCA A TE"
-    >
+  gap: 30px;
 
-      <div class="section-inner section-inner--visitor">
+  flex: 0 0 auto;
+}
 
-        <div class="section-index reveal">
-          08 / 10
-        </div>
+.site-header-section-counter {
+  font-family: var(--font-mono);
 
+  font-size: .66rem;
 
-        <div class="visitor-content">
+  letter-spacing: .08em;
 
-          <div class="editorial-heading reveal">
+  opacity: .48;
 
-            <p class="section-kicker">
-              ADESSO TOCCA A TE
-            </p>
+  white-space: nowrap;
+}
 
-            <h2>
-              FORSE SEI ARRIVATO QUI<br>
-              PER CASO.
-            </h2>
+.menu-trigger {
+  position: relative;
 
-          </div>
+  display: flex;
 
+  align-items: center;
 
-          <div class="editorial-copy reveal">
+  gap: 14px;
 
-            <p>
-              O forse stavi cercando qualcosa.
-            </p>
+  padding: 8px 0;
 
-            <p>
-              Un modo per allenarti.
-              Un’idea per un progetto.
-              Una prospettiva sullo sport.
-              Un’esperienza educativa.
-              Un modo diverso di costruire qualcosa.
-              Una presenza digitale che abbia finalmente un senso.
-            </p>
+  color: var(--navy);
+}
 
-            <p>
-              Non so ancora quale sia la tua domanda.
-              Ed è giusto così.
-            </p>
+.menu-trigger-label {
+  font-family: var(--font-mono);
 
-            <p>
-              Non tutte le domande arrivano già formulate.
-              A volte bisogna prima fermarsi.
-              Guardare.
-              Mettere ordine.
-              Capire cosa conta davvero.
-            </p>
+  font-size: .64rem;
 
-            <p>
-              <strong>
-                Poi scegliere.
-              </strong>
-            </p>
+  letter-spacing: .12em;
+}
 
-          </div>
+.menu-trigger-line {
+  position: relative;
 
-        </div>
+  display: block;
 
-      </div>
+  width: 34px;
+  height: 14px;
+}
 
-    </section>
+.menu-trigger-line::before,
+.menu-trigger-line::after {
+  content: "";
 
+  position: absolute;
 
-    <!-- ===================================================
-         09 — LA TUA DIREZIONE
-         =================================================== -->
+  left: 0;
 
-    <section
-      id="tua-direzione"
-      class="home-section home-section--dark home-section--your-direction"
-      data-section="09"
-      data-section-label="LA TUA DIREZIONE"
-    >
+  width: 100%;
+  height: 1px;
 
-      <div class="section-inner section-inner--your-direction">
+  background: currentColor;
 
-        <div class="section-index reveal">
-          09 / 10
-        </div>
+  transition:
+    transform 400ms var(--ease),
+    top 400ms var(--ease);
+}
 
+.menu-trigger-line::before {
+  top: 4px;
+}
 
-        <div class="your-direction-content">
+.menu-trigger-line::after {
+  top: 10px;
+}
 
-          <div class="editorial-heading reveal">
+.menu-trigger[aria-expanded="true"]
+.menu-trigger-line::before {
+  top: 7px;
 
-            <p class="section-kicker">
-              LA TUA DIREZIONE
-            </p>
+  transform:
+    rotate(45deg);
+}
 
-            <h2>
-              NON ESISTE UN SOLO<br>
-              PUNTO DI INGRESSO.
-            </h2>
+.menu-trigger[aria-expanded="true"]
+.menu-trigger-line::after {
+  top: 7px;
 
-          </div>
+  transform:
+    rotate(-45deg);
+}
 
 
-          <div class="editorial-copy reveal">
+/* =========================================================
+   09 — SITE MENU
+   ========================================================= */
 
-            <p>
-              Puoi arrivare dal movimento.
-              Dallo sport.
-              Dalla corsa.
-              Dalla preparazione atletica.
-              Dall’educazione.
-              Dalla scuola.
-              Dal management.
-              Dal digitale.
-            </p>
+.site-menu {
+  position: fixed;
 
-            <p>
-              Puoi avere già un progetto.
-              Oppure soltanto un’intuizione.
-            </p>
+  inset: 0;
 
-            <p>
-              Puoi sapere dove vuoi arrivare.
-              Oppure sapere soltanto che
-              <strong>
-                non vuoi rimanere dove sei.
-              </strong>
-            </p>
+  z-index: 180;
 
-            <p>
-              Non serve avere tutto chiaro.
-              Serve trovare il prossimo passo che abbia senso.
-            </p>
+  display: flex;
 
-          </div>
+  align-items: stretch;
 
+  justify-content: flex-end;
 
-          <div class="direction-list reveal">
+  background: rgba(4, 18, 37, .35);
 
-            <span>Scienze Motorie e Sport.</span>
-            <span>Sport.</span>
-            <span>Educazione.</span>
-            <span>Management.</span>
-            <span>Digitale.</span>
+  opacity: 0;
+  visibility: hidden;
 
-          </div>
+  pointer-events: none;
 
+  transition:
+    opacity 500ms var(--ease),
+    visibility 500ms var(--ease);
+}
 
-          <div class="direction-question reveal">
+.site-menu[aria-hidden="false"] {
+  opacity: 1;
+  visibility: visible;
 
-            <span>
-              Cinque direzioni.
-            </span>
+  pointer-events: auto;
+}
 
-            <span>
-              Una sola domanda.
-            </span>
+.site-menu-inner {
+  width: min(780px, 94vw);
 
-            <strong>
-              QUAL È LA TUA?
-            </strong>
+  height: 100%;
 
-          </div>
+  display: flex;
 
-        </div>
+  flex-direction: column;
 
-      </div>
+  padding:
+    calc(var(--header-height) + 34px)
+    clamp(26px, 5vw, 72px)
+    34px;
 
-    </section>
+  background: var(--paper);
 
+  color: var(--navy);
 
-    <!-- ===================================================
-         10 — IL CONTATTO
-         =================================================== -->
+  transform:
+    translateX(100%);
 
-    <section
-      id="contatto"
-      class="home-section home-section--paper home-section--contact"
-      data-section="10"
-      data-section-label="IL CONTATTO"
-    >
+  transition:
+    transform 700ms var(--ease);
+}
 
-      <div class="section-inner section-inner--contact">
+.site-menu[aria-hidden="false"]
+.site-menu-inner {
+  transform:
+    translateX(0);
+}
 
-        <div class="section-index reveal">
-          10 / 10
-        </div>
+.site-menu-header {
+  display: flex;
 
+  flex-direction: column;
 
-        <div class="contact-content">
+  gap: 7px;
 
-          <div class="editorial-heading reveal">
+  margin-bottom: 34px;
+}
 
-            <p class="section-kicker">
-              IL CONTATTO
-            </p>
+.site-menu-kicker {
+  font-family: var(--font-mono);
 
-            <h2>
-              HAI UN OBIETTIVO?
-            </h2>
+  font-size: .58rem;
 
-          </div>
+  letter-spacing: .14em;
 
+  opacity: .45;
+}
 
-          <div class="editorial-copy reveal">
+.site-menu-intro {
+  font-size: 1.1rem;
 
-            <p>
-              Allora partiamo da quello.
-              Non dalla soluzione.
-            </p>
+  line-height: 1.2;
+}
 
-            <p>
-              Dal punto in cui sei.
-              Da ciò che vuoi costruire.
-              Da quello che ancora non sai come chiamare.
-            </p>
+.site-menu-navigation {
+  display: flex;
 
-            <p>
-              Raccontamelo.
-              Poi guardiamo insieme quale direzione
-              può avere senso.
-            </p>
+  flex-direction: column;
 
-            <p>
-              E, se c’è,
-              <strong>
-                cominciamo a seguirla.
-              </strong>
-            </p>
+  overflow-y: auto;
 
-          </div>
+  scrollbar-width: thin;
+}
 
+.site-menu-item {
+  position: relative;
 
-          <a
-            class="contact-cta reveal"
-            href="/contatti/"
-          >
-            <span class="contact-cta-label">
-              PARLIAMONE.
-            </span>
+  display: grid;
 
-            <span
-              class="contact-cta-trace"
-              aria-hidden="true"
-            >
-              <span class="contact-cta-trace-line"></span>
-              <span class="contact-cta-trace-point"></span>
-            </span>
-          </a>
+  grid-template-columns: 44px minmax(0, 1fr) 110px;
 
-        </div>
+  align-items: center;
 
+  min-height: 68px;
 
-        <!--
-          Visual kept completely independent from text.
-          The logo remains above all orbit elements.
-        -->
+  border-top: 1px solid var(--line-light);
 
-        <div
-          class="contact-logo-area reveal"
-          aria-hidden="true"
-        >
+  overflow: hidden;
+}
 
-          <div class="contact-logo-disc">
+.site-menu-item:last-child {
+  border-bottom: 1px solid var(--line-light);
+}
 
-            <span class="contact-logo-orbit contact-logo-orbit-a"></span>
-            <span class="contact-logo-orbit contact-logo-orbit-b"></span>
+.site-menu-item-number {
+  font-family: var(--font-mono);
 
-            <span class="contact-logo-trace"></span>
+  font-size: .58rem;
 
-            <img
-              class="contact-logo"
-              src="/assets/images/cp-mark.png"
-              alt="Cesare Paratore"
-              width="300"
-              height="300"
-            >
+  opacity: .42;
+}
 
-          </div>
+.site-menu-item-title {
+  position: relative;
 
-        </div>
+  z-index: 2;
 
-      </div>
+  font-size: clamp(1rem, 2vw, 1.4rem);
 
-    </section>
+  font-weight: 500;
 
-  </main>
+  letter-spacing: -.02em;
 
+  transition:
+    transform 450ms var(--ease);
+}
 
-  <!-- =====================================================
-       FOOTER
-       STRICT VERSION
-       ===================================================== -->
+.site-menu-item-trace {
+  position: relative;
 
-  <footer class="site-footer">
+  height: 24px;
+}
 
-    <div class="footer-main">
+.site-menu-item-trace-line {
+  position: absolute;
 
-      <div class="footer-brand">
+  left: 0;
+  right: 0;
+  top: 50%;
 
-        <img
-          src="/assets/images/cp-mark.png"
-          alt="Cesare Paratore"
-          width="220"
-          height="220"
-        >
+  height: 1px;
 
-      </div>
+  background: var(--line-light-strong);
 
+  transform-origin: left center;
 
-      <div class="footer-identity">
+  transition:
+    transform 500ms var(--ease);
+}
 
-        <span class="footer-motto">
-          MOVIMENTO / CON DIREZIONE.
-        </span>
+.site-menu-item-trace-point {
+  position: absolute;
 
-      </div>
+  left: 12px;
+  top: 50%;
 
+  width: 8px;
+  height: 8px;
 
-      <div class="footer-copyright">
-        © CESARE PARATORE
-      </div>
+  border: 1px solid var(--navy);
 
-    </div>
+  border-radius: 50%;
 
-  </footer>
+  background: var(--paper);
 
-</body>
-</html>
+  transform:
+    translate(-50%, -50%);
+
+  transition:
+    left 500ms var(--ease),
+    background 300ms ease,
+    transform 500ms var(--ease);
+}
+
+.site-menu-item:hover
+.site-menu-item-title {
+  transform:
+    translateX(8px);
+}
+
+.site-menu-item:hover
+.site-menu-item-trace-line {
+  transform:
+    scaleX(1.08);
+}
+
+.site-menu-item:hover
+.site-menu-item-trace-point {
+  left: 92%;
+
+  background: var(--navy);
+
+  transform:
+    translate(-50%, -50%)
+    scale(1.25);
+}
+
+.site-menu-footer {
+  margin-top: auto;
+
+  padding-top: 28px;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  font-family: var(--font-mono);
+
+  font-size: .56rem;
+
+  letter-spacing: .08em;
+
+  opacity: .48;
+}
+
+
+/* =========================================================
+   10 — SCROLL PROGRESS
+   ========================================================= */
+
+.scroll-progress {
+  position: fixed;
+
+  top: 0;
+  left: 0;
+  right: 0;
+
+  z-index: 300;
+
+  height: 2px;
+
+  background: transparent;
+
+  pointer-events: none;
+}
+
+.scroll-progress-bar {
+  display: block;
+
+  width: 0;
+  height: 100%;
+
+  background: var(--navy);
+
+  transform-origin: left center;
+}
+
+
+/* =========================================================
+   11 — HOME SECTION NAVIGATION
+   CRITICAL:
+   NORMAL FLOW.
+   NEVER FIXED.
+   NEVER STICKY.
+   ========================================================= */
+
+.home-section-nav {
+  position: relative;
+
+  /*
+   * THIS IS INTENTIONAL.
+   *
+   * Do not change to:
+   * position: fixed;
+   * position: sticky;
+   */
+  inset: auto;
+
+  z-index: 40;
+
+  width: 100%;
+
+  margin: 0;
+  padding: 20px 0 22px;
+
+  background: var(--paper);
+
+  color: var(--navy);
+
+  border-top: 1px solid var(--line-light);
+  border-bottom: 1px solid var(--line-light);
+
+  overflow: hidden;
+
+  transform: none;
+
+  isolation: isolate;
+}
+
+.home-section-nav::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(7, 27, 58, .14),
+      transparent
+    );
+
+  pointer-events: none;
+}
+
+.home-section-nav-inner {
+  width:
+    min(
+      calc(100% - (var(--page-padding) * 2)),
+      var(--content-width)
+    );
+
+  margin: 0 auto;
+
+  display: grid;
+
+  grid-template-columns:
+    auto
+    minmax(0, 1fr)
+    auto;
+
+  align-items: center;
+
+  gap: clamp(22px, 3vw, 42px);
+}
+
+.home-section-nav-current {
+  display: flex;
+
+  align-items: baseline;
+
+  gap: 12px;
+
+  min-width: max-content;
+
+  white-space: nowrap;
+}
+
+.home-section-nav-current-number {
+  font-family: var(--font-mono);
+
+  font-size: .64rem;
+
+  letter-spacing: .08em;
+
+  opacity: .42;
+}
+
+.home-section-nav-current-label {
+  font-size: .68rem;
+
+  font-weight: 600;
+
+  letter-spacing: .08em;
+}
+
+.home-section-nav-route {
+  position: relative;
+
+  min-width: 0;
+
+  height: 44px;
+
+  display: flex;
+
+  align-items: center;
+}
+
+.home-section-nav-route-line {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  top: 50%;
+
+  height: 1px;
+
+  background: rgba(7, 27, 58, .13);
+
+  transform:
+    translateY(-50%);
+
+  pointer-events: none;
+}
+
+.home-section-nav-route-progress {
+  position: absolute;
+
+  left: 0;
+  top: 50%;
+
+  width: 0;
+  height: 1px;
+
+  background: var(--navy);
+
+  transform:
+    translateY(-50%);
+
+  pointer-events: none;
+
+  transition:
+    width 650ms var(--ease);
+}
+
+.home-section-nav-route-point {
+  position: absolute;
+
+  left: 0;
+  top: 50%;
+
+  width: 10px;
+  height: 10px;
+
+  border: 1px solid var(--navy);
+
+  border-radius: 50%;
+
+  background: var(--paper);
+
+  transform:
+    translate(-50%, -50%);
+
+  z-index: 3;
+
+  pointer-events: none;
+
+  transition:
+    left 650ms var(--ease);
+}
+
+.home-section-nav-route-point::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 3px;
+
+  border-radius: 50%;
+
+  background: var(--navy);
+}
+
+.home-section-nav-items {
+  position: relative;
+
+  z-index: 5;
+
+  width: 100%;
+  height: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(10, minmax(26px, 1fr));
+
+  align-items: center;
+}
+
+.home-section-nav-item {
+  position: relative;
+
+  height: 44px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  color: var(--navy);
+
+  opacity: .30;
+
+  text-decoration: none;
+
+  transition:
+    opacity 250ms ease,
+    transform 300ms var(--ease);
+}
+
+.home-section-nav-item:hover {
+  opacity: .82;
+
+  transform:
+    translateY(-2px);
+}
+
+.home-section-nav-item.is-active {
+  opacity: 1;
+}
+
+.home-section-nav-item:focus-visible {
+  outline:
+    1px solid var(--navy);
+
+  outline-offset: 4px;
+}
+
+.home-section-nav-number {
+  font-family: var(--font-mono);
+
+  font-size: .58rem;
+
+  line-height: 1;
+
+  letter-spacing: .04em;
+
+  transition:
+    transform 300ms var(--ease);
+}
+
+.home-section-nav-item.is-active
+.home-section-nav-number {
+  transform:
+    scale(1.16);
+}
+
+.home-section-nav-label {
+  position: absolute;
+
+  left: 50%;
+  top: calc(50% + 17px);
+
+  width: max-content;
+
+  max-width: 140px;
+
+  font-size: .46rem;
+
+  font-weight: 600;
+
+  line-height: 1.1;
+
+  letter-spacing: .05em;
+
+  text-align: center;
+
+  opacity: 0;
+
+  transform:
+    translate(-50%, 5px);
+
+  pointer-events: none;
+
+  transition:
+    opacity 220ms ease,
+    transform 220ms var(--ease);
+}
+
+.home-section-nav-item:hover
+.home-section-nav-label,
+.home-section-nav-item.is-active
+.home-section-nav-label {
+  opacity: 1;
+
+  transform:
+    translate(-50%, 0);
+}
+
+.home-section-nav-total {
+  min-width: max-content;
+
+  font-family: var(--font-mono);
+
+  font-size: .62rem;
+
+  letter-spacing: .08em;
+
+  opacity: .4;
+}
+
+.home-section-nav-total::before {
+  content: "/";
+
+  margin-right: 5px;
+}
+
+
+/* =========================================================
+   12 — GENERIC SECTIONS
+   ========================================================= */
+
+.home-section {
+  position: relative;
+
+  width: 100%;
+
+  min-height: 100svh;
+
+  display: flex;
+
+  align-items: center;
+
+  overflow: hidden;
+
+  isolation: isolate;
+}
+
+.home-section--dark {
+  background: var(--navy);
+
+  color: var(--paper);
+}
+
+.home-section--paper {
+  background: var(--paper);
+
+  color: var(--ink);
+}
+
+.section-inner {
+  position: relative;
+
+  z-index: 3;
+
+  width:
+    min(
+      calc(100% - (var(--page-padding) * 2)),
+      var(--content-width)
+    );
+
+  margin: 0 auto;
+
+  padding:
+    var(--section-space)
+    0;
+}
+
+.section-index {
+  position: absolute;
+
+  top:
+    clamp(36px, 5vw, 72px);
+
+  left: 0;
+
+  font-family: var(--font-mono);
+
+  font-size: .58rem;
+
+  letter-spacing: .1em;
+
+  opacity: .42;
+}
+
+.section-kicker {
+  margin: 0 0 24px;
+
+  font-family: var(--font-mono);
+
+  font-size: .62rem;
+
+  font-weight: 500;
+
+  letter-spacing: .15em;
+
+  text-transform: uppercase;
+
+  opacity: .52;
+}
+
+.editorial-heading {
+  max-width: 1050px;
+}
+
+.editorial-heading h2 {
+  margin: 0;
+
+  font-size:
+    clamp(
+      2.8rem,
+      7vw,
+      8.2rem
+    );
+
+  line-height: .91;
+
+  letter-spacing: -.055em;
+
+  font-weight: 500;
+}
+
+.editorial-copy {
+  max-width: var(--copy-width);
+
+  font-size:
+    clamp(
+      1rem,
+      1.35vw,
+      1.35rem
+    );
+
+  line-height: 1.62;
+}
+
+.editorial-copy p {
+  margin:
+    0 0 1.5em;
+}
+
+.editorial-copy p:last-child {
+  margin-bottom: 0;
+}
+
+.editorial-copy strong {
+  font-weight: 650;
+}
+
+.editorial-question {
+  max-width: 1050px;
+
+  margin-top:
+    clamp(55px, 8vw, 120px);
+
+  font-size:
+    clamp(
+      1.5rem,
+      3vw,
+      3.5rem
+    );
+
+  line-height: 1.08;
+
+  letter-spacing: -.035em;
+}
+
+.editorial-question p {
+  margin: 0;
+}
+
+
+/* =========================================================
+   13 — SECTION ATMOSPHERE
+   ========================================================= */
+
+.section-atmosphere {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 1;
+
+  overflow: hidden;
+
+  pointer-events: none;
+}
+
+.section-orbit {
+  position: absolute;
+
+  left: 68%;
+  top: 48%;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, .1);
+
+  border-radius: 50%;
+
+  transform:
+    translate(-50%, -50%)
+    scale(var(--trajectory-scale));
+
+  opacity:
+    var(--trajectory-opacity);
+
+  transition:
+    transform 700ms var(--ease),
+    opacity 700ms ease;
+}
+
+.section-orbit-a {
+  width: 44vw;
+  height: 44vw;
+}
+
+.section-orbit-b {
+  width: 65vw;
+  height: 28vw;
+
+  transform:
+    translate(-50%, -50%)
+    rotate(24deg)
+    scale(var(--trajectory-scale));
+}
+
+.section-orbit-c {
+  width: 78vw;
+  height: 78vw;
+
+  border-color:
+    rgba(255, 255, 255, .055);
+}
+
+.section-trace {
+  position: absolute;
+
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, .22),
+      transparent
+    );
+
+  transform-origin: center;
+}
+
+.section-trace-a {
+  width: 90vw;
+
+  left: 8vw;
+  top: 52%;
+
+  transform:
+    rotate(-15deg)
+    translateX(var(--trajectory-drift));
+}
+
+.section-trace-b {
+  width: 75vw;
+
+  left: 16vw;
+  top: 42%;
+
+  transform:
+    rotate(27deg)
+    translateX(calc(var(--trajectory-drift) * -.6));
+}
+
+.section-node {
+  position: absolute;
+
+  width: 8px;
+  height: 8px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, .65);
+
+  border-radius: 50%;
+
+  background: var(--navy);
+}
+
+.section-node-a {
+  left: 68%;
+  top: 48%;
+}
+
+.section-node-b {
+  left: 35%;
+  top: 67%;
+}
+
+
+/* =========================================================
+   14 — HERO
+   ========================================================= */
+
+.home-section--hero {
+  min-height:
+    max(
+      720px,
+      100svh
+    );
+
+  background:
+    radial-gradient(
+      circle at 72% 48%,
+      rgba(18, 58, 112, .32),
+      transparent 36%
+    ),
+    var(--navy);
+}
+
+.section-inner--hero {
+  min-height: 100svh;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.35fr)
+    minmax(260px, .65fr);
+
+  grid-template-rows:
+    auto
+    1fr
+    auto;
+
+  column-gap:
+    clamp(40px, 9vw, 170px);
+
+  align-items: end;
+}
+
+.section-inner--hero
+.section-index {
+  top: clamp(34px, 5vw, 72px);
+}
+
+.hero-copy {
+  grid-column: 1;
+
+  align-self: center;
+
+  max-width: 1100px;
+}
+
+.hero-kicker {
+  margin: 0 0 30px;
+
+  font-family: var(--font-mono);
+
+  font-size: .68rem;
+
+  letter-spacing: .16em;
+
+  opacity: .5;
+}
+
+.hero-title {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: .02em;
+
+  margin: 0;
+
+  font-size:
+    clamp(
+      4rem,
+      11vw,
+      13.5rem
+    );
+
+  line-height: .8;
+
+  letter-spacing: -.07em;
+
+  font-weight: 500;
+}
+
+.hero-title span:last-child {
+  padding-left:
+    clamp(
+      30px,
+      7vw,
+      120px
+    );
+}
+
+.hero-intro {
+  max-width: 580px;
+
+  margin-top:
+    clamp(42px, 7vw, 100px);
+
+  padding-left:
+    clamp(
+      2px,
+      5vw,
+      80px
+    );
+
+  font-size:
+    clamp(
+      1.05rem,
+      1.7vw,
+      1.7rem
+    );
+
+  line-height: 1.25;
+}
+
+.hero-intro p {
+  margin: 0 0 .55em;
+}
+
+.hero-body {
+  grid-column: 2;
+
+  align-self: end;
+
+  padding-bottom:
+    clamp(20px, 6vw, 80px);
+}
+
+
+/* =========================================================
+   15 — CENTRO
+   ========================================================= */
+
+.section-inner--editorial {
+  display: grid;
+
+  grid-template-columns:
+    minmax(180px, .35fr)
+    minmax(0, 1.65fr);
+
+  column-gap:
+    clamp(40px, 8vw, 150px);
+
+  align-items: start;
+}
+
+.section-inner--editorial
+.editorial-heading {
+  grid-column: 2;
+}
+
+.section-inner--editorial
+.editorial-question {
+  grid-column: 2;
+
+  max-width: 1000px;
+}
+
+.section-inner--editorial
+.editorial-copy {
+  grid-column: 2;
+
+  margin-top:
+    clamp(55px, 8vw, 120px);
+}
+
+.section-inner--editorial
+.editorial-copy--wide {
+  max-width: 960px;
+}
+
+
+/* =========================================================
+   16 — CINQUE DIREZIONI
+   ========================================================= */
+
+.section-inner--directions {
+  width:
+    min(
+      calc(100% - (var(--page-padding) * 2)),
+      var(--content-width)
+    );
+}
+
+.directions-heading {
+  max-width: 1100px;
+
+  margin-left:
+    clamp(80px, 13vw, 220px);
+}
+
+.directions-lead {
+  max-width: 700px;
+
+  margin:
+    48px 0 0;
+
+  font-size:
+    clamp(
+      1.2rem,
+      2vw,
+      2rem
+    );
+
+  line-height: 1.25;
+}
+
+.directions-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+
+  gap: 1px;
+
+  margin-top:
+    clamp(70px, 10vw, 150px);
+
+  border-top: 1px solid var(--line-dark);
+  border-bottom: 1px solid var(--line-dark);
+}
+
+.direction-card {
+  min-height: 500px;
+
+  padding:
+    30px
+    26px
+    34px;
+
+  border-right:
+    1px solid var(--line-dark);
+
+  transition:
+    background 450ms var(--ease),
+    transform 500ms var(--ease);
+}
+
+.direction-card:last-child {
+  border-right: 0;
+}
+
+.direction-card:hover {
+  background:
+    rgba(255, 255, 255, .035);
+}
+
+.direction-card-number {
+  display: block;
+
+  margin-bottom: 70px;
+
+  font-family: var(--font-mono);
+
+  font-size: .58rem;
+
+  letter-spacing: .1em;
+
+  opacity: .42;
+}
+
+.direction-card h3 {
+  margin: 0 0 18px;
+
+  font-size:
+    clamp(
+      1.1rem,
+      1.5vw,
+      1.5rem
+    );
+
+  line-height: 1;
+
+  letter-spacing: -.025em;
+
+  font-weight: 500;
+}
+
+.direction-card-intro {
+  margin: 0 0 20px;
+
+  opacity: .7;
+}
+
+.direction-card p {
+  margin:
+    0 0 1.1em;
+
+  font-size: .92rem;
+
+  line-height: 1.6;
+
+  opacity: .74;
+}
+
+.direction-card p:last-child {
+  margin-bottom: 0;
+}
+
+.directions-ending {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 18px;
+
+  flex-wrap: wrap;
+
+  margin-top:
+    clamp(65px, 9vw, 130px);
+
+  font-size:
+    clamp(
+      1rem,
+      1.5vw,
+      1.5rem
+    );
+}
+
+.directions-cp-mark {
+  display: grid;
+  place-items: center;
+
+  width: 100px;
+  height: 100px;
+
+  margin-left: 10px;
+
+  border-radius: 50%;
+
+  background: var(--paper);
+}
+
+.directions-cp-mark img {
+  width: 78%;
+  height: 78%;
+
+  object-fit: contain;
+}
+
+
+/* =========================================================
+   17 — LA DIREZIONE
+   ========================================================= */
+
+.section-inner--direction {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(320px, .85fr);
+
+  gap:
+    clamp(50px, 9vw, 150px);
+
+  align-items: center;
+}
+
+.direction-copy {
+  max-width: 820px;
+}
+
+.direction-visual {
+  min-height: 620px;
+
+  display: grid;
+  place-items: center;
+}
+
+.direction-visual-field {
+  position: relative;
+
+  width: min(42vw, 620px);
+  aspect-ratio: 1;
+}
+
+.direction-visual-axis {
+  position: absolute;
+
+  background: rgba(255, 255, 255, .12);
+}
+
+.direction-visual-axis-x {
+  left: 0;
+  right: 0;
+  top: 50%;
+
+  height: 1px;
+}
+
+.direction-visual-axis-y {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+
+  width: 1px;
+}
+
+.direction-visual-orbit {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  border: 1px solid rgba(255, 255, 255, .16);
+
+  border-radius: 50%;
+
+  transform:
+    translate(-50%, -50%);
+}
+
+.direction-visual-orbit-a {
+  width: 72%;
+  height: 72%;
+
+  transform:
+    translate(-50%, -50%)
+    rotate(28deg);
+}
+
+.direction-visual-orbit-b {
+  width: 44%;
+  height: 84%;
+
+  transform:
+    translate(-50%, -50%)
+    rotate(-38deg);
+}
+
+.direction-visual-vector {
+  position: absolute;
+
+  left: 20%;
+  top: 66%;
+
+  width: 65%;
+
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, .18),
+      rgba(255, 255, 255, .9)
+    );
+
+  transform:
+    rotate(-24deg);
+
+  transform-origin: left center;
+}
+
+.direction-visual-vector::after {
+  content: "";
+
+  position: absolute;
+
+  right: -3px;
+  top: 50%;
+
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+
+  background: var(--paper);
+
+  transform:
+    translate(50%, -50%);
+}
+
+.direction-visual-point {
+  position: absolute;
+
+  left: 20%;
+  top: 66%;
+
+  width: 10px;
+  height: 10px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, .8);
+
+  border-radius: 50%;
+
+  background: var(--navy);
+
+  transform:
+    translate(-50%, -50%);
+}
+
+
+/* =========================================================
+   18 — LE TRACCE
+   ========================================================= */
+
+.section-inner--traces {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(320px, .9fr);
+
+  gap:
+    clamp(50px, 9vw, 150px);
+
+  align-items: center;
+}
+
+.traces-content {
+  max-width: 800px;
+}
+
+.traces-visual {
+  position: relative;
+
+  min-height: 560px;
+
+  display: grid;
+  place-items: center;
+
+  /*
+   * IMPORTANT:
+   * Visual is independent from text.
+   */
+  isolation: isolate;
+}
+
+.traces-visual-field {
+  position: relative;
+
+  width: min(40vw, 620px);
+  aspect-ratio: 1;
+}
+
+.trace-line {
+  position: absolute;
+
+  height: 1px;
+
+  background:
+    rgba(7, 27, 58, .18);
+
+  transform-origin: left center;
+}
+
+.trace-line-a {
+  width: 94%;
+
+  left: 2%;
+  top: 30%;
+
+  transform:
+    rotate(21deg);
+}
+
+.trace-line-b {
+  width: 82%;
+
+  left: 12%;
+  top: 62%;
+
+  transform:
+    rotate(-16deg);
+}
+
+.trace-line-c {
+  width: 60%;
+
+  left: 18%;
+  top: 48%;
+
+  transform:
+    rotate(67deg);
+}
+
+.trace-orbit {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  border: 1px solid rgba(7, 27, 58, .16);
+
+  border-radius: 50%;
+
+  transform:
+    translate(-50%, -50%);
+}
+
+.trace-orbit-a {
+  width: 68%;
+  height: 68%;
+}
+
+.trace-orbit-b {
+  width: 42%;
+  height: 88%;
+
+  transform:
+    translate(-50%, -50%)
+    rotate(32deg);
+}
+
+.trace-node {
+  position: absolute;
+
+  width: 9px;
+  height: 9px;
+
+  border: 1px solid var(--navy);
+
+  border-radius: 50%;
+
+  background: var(--paper);
+
+  transform:
+    translate(-50%, -50%);
+}
+
+.trace-node-a {
+  left: 22%;
+  top: 70%;
+}
+
+.trace-node-b {
+  left: 76%;
+  top: 34%;
+}
+
+.trace-node-c {
+  left: 53%;
+  top: 53%;
+}
+
+.trace-axis {
+  position: absolute;
+
+  background: rgba(7, 27, 58, .08);
+}
+
+.trace-axis-x {
+  left: 0;
+  right: 0;
+  top: 50%;
+
+  height: 1px;
+}
+
+.trace-axis-y {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+
+  width: 1px;
+}
+
+
+/* =========================================================
+   19 — TERRITORIO
+   ========================================================= */
+
+.section-inner--territory {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.1fr)
+    minmax(300px, .9fr);
+
+  gap:
+    clamp(50px, 9vw, 160px);
+
+  align-items: center;
+}
+
+.territory-content {
+  max-width: 880px;
+}
+
+.territory-place {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+
+  margin:
+    clamp(55px, 8vw, 100px)
+    0
+    50px;
+}
+
+.territory-place-label {
+  font-family: var(--font-mono);
+
+  font-size: .6rem;
+
+  letter-spacing: .13em;
+
+  opacity: .42;
+}
+
+.territory-place strong {
+  font-size:
+    clamp(
+      3rem,
+      8vw,
+      8rem
+    );
+
+  line-height: .85;
+
+  letter-spacing: -.06em;
+
+  font-weight: 500;
+}
+
+.territory-visual {
+  position: relative;
+
+  min-height: 560px;
+
+  display: grid;
+  place-items: center;
+}
+
+.territory-ring {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, .13);
+
+  border-radius: 50%;
+
+  transform:
+    translate(-50%, -50%);
+}
+
+.territory-ring-a {
+  width: 240px;
+  height: 240px;
+}
+
+.territory-ring-b {
+  width: 380px;
+  height: 380px;
+}
+
+.territory-ring-c {
+  width: 520px;
+  height: 520px;
+
+  border-color:
+    rgba(255, 255, 255, .07);
+}
+
+.territory-point {
+  position: relative;
+
+  z-index: 3;
+
+  width: 18px;
+  height: 18px;
+
+  border:
+    1px solid
+    var(--paper);
+
+  border-radius: 50%;
+
+  background: var(--navy);
+
+  box-shadow:
+    0 0 0 12px rgba(255, 255, 255, .06);
+}
+
+.territory-trace {
+  position: absolute;
+
+  width: 80%;
+
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, .6),
+      transparent
+    );
+
+  transform:
+    rotate(-32deg);
+}
+
+
+/* =========================================================
+   20 — VISITOR
+   ========================================================= */
+
+.section-inner--visitor {
+  display: grid;
+
+  grid-template-columns:
+    minmax(180px, .35fr)
+    minmax(0, 1.65fr);
+
+  column-gap:
+    clamp(40px, 8vw, 150px);
+
+  align-items: start;
+}
+
+.visitor-content {
+  grid-column: 2;
+
+  max-width: 980px;
+}
+
+.visitor-content
+.editorial-copy {
+  margin-top:
+    clamp(55px, 8vw, 100px);
+}
+
+
+/* =========================================================
+   21 — YOUR DIRECTION
+   ========================================================= */
+
+.section-inner--your-direction {
+  display: grid;
+
+  grid-template-columns:
+    minmax(180px, .35fr)
+    minmax(0, 1.65fr);
+
+  column-gap:
+    clamp(40px, 8vw, 150px);
+
+  align-items: start;
+}
+
+.your-direction-content {
+  grid-column: 2;
+
+  max-width: 1080px;
+}
+
+.your-direction-content
+.editorial-copy {
+  margin-top:
+    clamp(55px, 8vw, 100px);
+}
+
+.direction-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 7px;
+
+  margin-top:
+    clamp(60px, 9vw, 120px);
+
+  font-size:
+    clamp(
+      1.5rem,
+      3vw,
+      3.5rem
+    );
+
+  line-height: 1;
+
+  letter-spacing: -.035em;
+}
+
+.direction-list span {
+  display: block;
+
+  opacity: .72;
+
+  transition:
+    opacity 300ms ease,
+    transform 400ms var(--ease);
+}
+
+.direction-list span:hover {
+  opacity: 1;
+
+  transform:
+    translateX(12px);
+}
+
+.direction-question {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 7px;
+
+  margin-top:
+    clamp(70px, 11vw, 160px);
+}
+
+.direction-question span {
+  font-family: var(--font-mono);
+
+  font-size: .62rem;
+
+  letter-spacing: .1em;
+
+  opacity: .46;
+}
+
+.direction-question strong {
+  display: block;
+
+  margin-top: 12px;
+
+  font-size:
+    clamp(
+      3rem,
+      8vw,
+      9rem
+    );
+
+  line-height: .83;
+
+  letter-spacing: -.07em;
+
+  font-weight: 500;
+}
+
+
+/* =========================================================
+   22 — CONTACT
+   ========================================================= */
+
+.section-inner--contact {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(300px, .75fr);
+
+  gap:
+    clamp(50px, 9vw, 160px);
+
+  align-items: center;
+}
+
+.contact-content {
+  max-width: 820px;
+}
+
+.contact-content
+.editorial-copy {
+  margin-top:
+    clamp(55px, 8vw, 100px);
+}
+
+.contact-cta {
+  position: relative;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 26px;
+
+  margin-top:
+    clamp(55px, 8vw, 100px);
+
+  color: var(--navy);
+}
+
+.contact-cta-label {
+  font-size:
+    clamp(
+      2rem,
+      4vw,
+      4.8rem
+    );
+
+  line-height: .9;
+
+  letter-spacing: -.055em;
+
+  font-weight: 500;
+}
+
+.contact-cta-trace {
+  position: relative;
+
+  width: 90px;
+  height: 20px;
+}
+
+.contact-cta-trace-line {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  top: 50%;
+
+  height: 1px;
+
+  background: var(--navy);
+
+  transform:
+    translateY(-50%);
+
+  transition:
+    transform 450ms var(--ease);
+}
+
+.contact-cta-trace-point {
+  position: absolute;
+
+  right: 0;
+  top: 50%;
+
+  width: 9px;
+  height: 9px;
+
+  border-radius: 50%;
+
+  background: var(--navy);
+
+  transform:
+    translateY(-50%);
+
+  transition:
+    transform 450ms var(--ease);
+}
+
+.contact-cta:hover
+.contact-cta-trace-line {
+  transform:
+    translateY(-50%)
+    scaleX(1.14);
+}
+
+.contact-cta:hover
+.contact-cta-trace-point {
+  transform:
+    translateY(-50%)
+    scale(1.35);
+}
+
+.contact-logo-area {
+  position: relative;
+
+  min-height: 600px;
+
+  display: grid;
+
+  place-items: center;
+
+  /*
+   * Visual is independent.
+   * Nothing is allowed to cover the logo.
+   */
+  isolation: isolate;
+}
+
+.contact-logo-disc {
+  position: relative;
+
+  display: grid;
+  place-items: center;
+
+  width:
+    clamp(
+      270px,
+      31vw,
+      500px
+    );
+
+  aspect-ratio: 1;
+
+  border-radius: 50%;
+
+  background: var(--paper-bright);
+
+  box-shadow:
+    0 25px 80px rgba(7, 27, 58, .08);
+
+  overflow: visible;
+}
+
+.contact-logo-disc::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 10px;
+
+  border:
+    1px solid
+    rgba(7, 27, 58, .11);
+
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+.contact-logo {
+  position: relative;
+
+  z-index: 10;
+
+  width: 70%;
+  height: 70%;
+
+  object-fit: contain;
+
+  filter: none;
+}
+
+.contact-logo-orbit {
+  position: absolute;
+
+  z-index: 1;
+
+  left: 50%;
+  top: 50%;
+
+  border:
+    1px solid
+    rgba(7, 27, 58, .14);
+
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+.contact-logo-orbit-a {
+  width: 120%;
+  height: 54%;
+
+  transform:
+    translate(-50%, -50%)
+    rotate(28deg);
+}
+
+.contact-logo-orbit-b {
+  width: 76%;
+  height: 128%;
+
+  transform:
+    translate(-50%, -50%)
+    rotate(-24deg);
+}
+
+.contact-logo-trace {
+  position: absolute;
+
+  z-index: 2;
+
+  left: -8%;
+  top: 52%;
+
+  width: 116%;
+
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(7, 27, 58, .22),
+      transparent
+    );
+
+  transform:
+    rotate(-12deg);
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   23 — FOOTER
+   STRICT
+   ========================================================= */
+
+.site-footer {
+  position: relative;
+
+  z-index: 20;
+
+  width: 100%;
+
+  background: var(--navy);
+
+  color: var(--paper);
+
+  border-top:
+    1px solid
+    rgba(255, 255, 255, .12);
+}
+
+.footer-main {
+  width:
+    min(
+      calc(100% - (var(--page-padding) * 2)),
+      var(--content-width)
+    );
+
+  min-height: 230px;
+
+  margin: 0 auto;
+
+  padding:
+    28px 0;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(160px, 1fr)
+    minmax(250px, 1fr)
+    minmax(160px, 1fr);
+
+  align-items: center;
+
+  gap: 30px;
+}
+
+.footer-brand {
+  display: flex;
+
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.footer-brand img {
+  width:
+    clamp(
+      160px,
+      12vw,
+      220px
+    );
+
+  height:
+    clamp(
+      160px,
+      12vw,
+      220px
+    );
+
+  object-fit: contain;
+
+  filter: none;
+}
+
+.footer-identity {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+}
+
+.footer-motto {
+  font-family: var(--font-mono);
+
+  font-size:
+    clamp(
+      .7rem,
+      1vw,
+      .9rem
+    );
+
+  letter-spacing: .1em;
+}
+
+.footer-copyright {
+  display: flex;
+
+  justify-content: flex-end;
+
+  font-family: var(--font-mono);
+
+  font-size: .58rem;
+
+  letter-spacing: .08em;
+
+  opacity: .5;
+
+  text-align: right;
+}
+
+
+/* =========================================================
+   24 — REVEAL
+   ========================================================= */
+
+.reveal {
+  opacity: 0;
+
+  transform:
+    translateY(32px);
+
+  transition:
+    opacity 900ms var(--ease),
+    transform 900ms var(--ease);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+
+  transform:
+    translateY(0);
+}
+
+
+/* =========================================================
+   25 — TRAJECTORY SYSTEM
+   ========================================================= */
+
+.home-section::after {
+  content: "";
+
+  position: absolute;
+
+  z-index: 2;
+
+  left: 0;
+
+  top:
+    calc(
+      50% +
+      var(--section-drift)
+    );
+
+  width:
+    clamp(
+      100px,
+      16vw,
+      260px
+    );
+
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      currentColor,
+      transparent
+    );
+
+  opacity:
+    calc(
+      .05 +
+      (
+        var(--trajectory-opacity) * .12
+      )
+    );
+
+  transform:
+    translateX(
+      calc(
+        var(--trajectory-progress) * 100vw
+      )
+    )
+    rotate(-12deg);
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   26 — DARK / LIGHT TRAJECTORY ADAPTATION
+   ========================================================= */
+
+.home-section--dark::after {
+  color: var(--paper);
+}
+
+.home-section--paper::after {
+  color: var(--navy);
+}
+
+
+/* =========================================================
+   27 — TABLET
+   ========================================================= */
+
+@media (max-width: 1180px) {
+
+  .directions-grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+
+  .direction-card:nth-child(3) {
+    border-right: 0;
+  }
+
+  .direction-card:nth-child(4),
+  .direction-card:nth-child(5) {
+    border-top: 1px solid var(--line-dark);
+  }
+
+  .direction-card:nth-child(5) {
+    grid-column: 2;
+  }
+
+  .site-header-logo {
+    width: 130px;
+    height: 112px;
+  }
+
+  .section-inner--hero {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(220px, .55fr);
+  }
+
+  .direction-visual {
+    min-height: 480px;
+  }
+
+  .traces-visual {
+    min-height: 480px;
+  }
+
+  .contact-logo-area {
+    min-height: 480px;
+  }
+}
+
+
+/* =========================================================
+   28 — MOBILE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  :root {
+    --header-height: 104px;
+    --page-padding: 20px;
+    --section-space: 105px;
+  }
+
+
+  /* Header */
+
+  .site-header {
+    min-height: var(--header-height);
+
+    padding:
+      10px
+      var(--page-padding);
+
+    gap: 18px;
+  }
+
+  .site-header-brand {
+    gap: 12px;
+  }
+
+  .site-header-logo {
+    width: 92px;
+    height: 78px;
+  }
+
+  .site-header-brand-copy {
+    gap: 3px;
+  }
+
+  .site-header-name {
+    font-size: .68rem;
+
+    letter-spacing: .09em;
+  }
+
+  .site-header-motto {
+    font-size: .48rem;
+
+    letter-spacing: .05em;
+  }
+
+  .site-header-meta {
+    gap: 12px;
+  }
+
+  .site-header-section-counter {
+    display: none;
+  }
+
+
+  /* -------------------------------------------------------
+     Section Navigation
+     NORMAL FLOW — NEVER FIXED/STICKY
+     ------------------------------------------------------- */
+
+  .home-section-nav {
+    position: relative;
+
+    inset: auto;
+
+    padding:
+      14px 0 16px;
+
+    overflow: hidden;
+  }
+
+  .home-section-nav-inner {
+    width: 100%;
+
+    display: block;
+  }
+
+  .home-section-nav-current {
+    padding:
+      0
+      var(--page-padding)
+      11px;
+  }
+
+  .home-section-nav-route {
+    width: 100%;
+
+    height: 44px;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    scrollbar-width: none;
+
+    -webkit-overflow-scrolling: touch;
+
+    overscroll-behavior-x: contain;
+  }
+
+  .home-section-nav-route::-webkit-scrollbar {
+    display: none;
+  }
+
+  .home-section-nav-items {
+    display: flex;
+
+    width: max-content;
+
+    min-width: 100%;
+
+    height: 44px;
+
+    padding:
+      0
+      var(--page-padding);
+
+    gap: 22px;
+  }
+
+  .home-section-nav-item {
+    flex:
+      0 0 30px;
+
+    width: 30px;
+    height: 44px;
+  }
+
+  .home-section-nav-label,
+  .home-section-nav-total {
+    display: none;
+  }
+
+  .home-section-nav-route-line,
+  .home-section-nav-route-progress {
+    left: var(--page-padding);
+    right: var(--page-padding);
+  }
+
+
+  /* Sections */
+
+  .home-section {
+    min-height:
+      auto;
+  }
+
+  .section-inner {
+    padding:
+      110px
+      0;
+  }
+
+  .section-index {
+    top: 32px;
+  }
+
+
+  /* Hero */
+
+  .home-section--hero {
+    min-height:
+      calc(
+        100svh -
+        var(--header-height)
+      );
+  }
+
+  .section-inner--hero {
+    min-height:
+      calc(
+        100svh -
+        var(--header-height)
+      );
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: stretch;
+  }
+
+  .hero-title {
+    font-size:
+      clamp(
+        3.8rem,
+        16vw,
+        7.2rem
+      );
+  }
+
+  .hero-title span:last-child {
+    padding-left: 12vw;
+  }
+
+  .hero-intro {
+    padding-left: 4vw;
+
+    margin-top: 48px;
+
+    font-size: 1rem;
+  }
+
+  .hero-body {
+    margin-top: 60px;
+
+    padding-bottom: 0;
+
+    max-width: 620px;
+  }
+
+
+  /* Editorial */
+
+  .section-inner--editorial,
+  .section-inner--visitor,
+  .section-inner--your-direction {
+    display: block;
+  }
+
+  .section-inner--editorial
+  .editorial-question {
+    margin-top: 55px;
+  }
+
+  .section-inner--editorial
+  .editorial-copy {
+    margin-top: 60px;
+  }
+
+
+  /* Directions */
+
+  .directions-heading {
+    margin-left: 0;
+  }
+
+  .directions-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 0;
+
+    margin-top: 65px;
+  }
+
+  .direction-card {
+    min-height: auto;
+
+    padding:
+      26px 20px
+      34px;
+
+    border-right: 1px solid var(--line-dark);
+    border-bottom: 1px solid var(--line-dark);
+  }
+
+  .direction-card:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .direction-card:nth-child(4),
+  .direction-card:nth-child(5) {
+    border-top: 0;
+  }
+
+  .direction-card:nth-child(5) {
+    grid-column: auto;
+  }
+
+  .direction-card-number {
+    margin-bottom: 45px;
+  }
+
+  .directions-ending {
+    justify-content: flex-start;
+  }
+
+
+  /* Direction */
+
+  .section-inner--direction,
+  .section-inner--traces,
+  .section-inner--territory,
+  .section-inner--contact {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: stretch;
+
+    gap: 60px;
+  }
+
+  .direction-visual,
+  .traces-visual,
+  .territory-visual,
+  .contact-logo-area {
+    min-height: 420px;
+  }
+
+  .direction-visual-field,
+  .traces-visual-field {
+    width:
+      min(
+        82vw,
+        500px
+      );
+  }
+
+
+  /* Territory */
+
+  .territory-place {
+    margin:
+      55px 0 45px;
+  }
+
+  .territory-place strong {
+    font-size:
+      clamp(
+        3.8rem,
+        17vw,
+        7rem
+      );
+  }
+
+  .territory-ring-c {
+    width: 420px;
+    height: 420px;
+  }
+
+
+  /* Your direction */
+
+  .direction-list {
+    font-size:
+      clamp(
+        1.5rem,
+        7vw,
+        3rem
+      );
+  }
+
+  .direction-question strong {
+    font-size:
+      clamp(
+        3.4rem,
+        15vw,
+        7rem
+      );
+  }
+
+
+  /* Contact */
+
+  .contact-logo-disc {
+    width:
+      min(
+        78vw,
+        420px
+      );
+  }
+
+
+  /* Footer */
+
+  .footer-main {
+    min-height: 0;
+
+    padding:
+      30px 0 36px;
+
+    grid-template-columns:
+      1fr
+      1fr;
+
+    gap: 30px;
+  }
+
+  .footer-brand {
+    justify-content: flex-start;
+  }
+
+  .footer-brand img {
+    width: 160px;
+    height: 160px;
+  }
+
+  .footer-identity {
+    justify-content: flex-end;
+
+    text-align: right;
+  }
+
+  .footer-copyright {
+    grid-column: 1 / -1;
+
+    justify-content: flex-start;
+
+    padding-top: 8px;
+
+    text-align: left;
+  }
+
+
+  /* Menu */
+
+  .site-menu-inner {
+    width: 100%;
+
+    padding:
+      calc(var(--header-height) + 25px)
+      22px
+      25px;
+  }
+
+  .site-menu-item {
+    grid-template-columns:
+      38px
+      minmax(0, 1fr)
+      72px;
+
+    min-height: 60px;
+  }
+
+  .site-menu-item-title {
+    font-size:
+      clamp(
+        .9rem,
+        4vw,
+        1.2rem
+      );
+  }
+
+  .site-menu-footer {
+    flex-direction: column;
+
+    gap: 7px;
+  }
+}
+
+
+/* =========================================================
+   29 — SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 520px) {
+
+  :root {
+    --page-padding: 18px;
+  }
+
+  .site-header-logo {
+    width: 82px;
+    height: 72px;
+  }
+
+  .site-header-name {
+    font-size: .61rem;
+  }
+
+  .site-header-motto {
+    display: none;
+  }
+
+  .menu-trigger-label {
+    font-size: .58rem;
+  }
+
+  .menu-trigger-line {
+    width: 28px;
+  }
+
+  .hero-title {
+    font-size:
+      clamp(
+        3.3rem,
+        17vw,
+        5.8rem
+      );
+  }
+
+  .editorial-heading h2 {
+    font-size:
+      clamp(
+        2.6rem,
+        12vw,
+        5rem
+      );
+  }
+
+  .directions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .direction-card {
+    border-right: 0;
+
+    border-bottom: 1px solid var(--line-dark);
+  }
+
+  .direction-card:last-child {
+    border-bottom: 0;
+  }
+
+  .directions-cp-mark {
+    width: 84px;
+    height: 84px;
+  }
+
+  .territory-ring-a {
+    width: 180px;
+    height: 180px;
+  }
+
+  .territory-ring-b {
+    width: 290px;
+    height: 290px;
+  }
+
+  .territory-ring-c {
+    width: 380px;
+    height: 380px;
+  }
+
+  .contact-logo-disc {
+    width: 82vw;
+  }
+
+  .footer-main {
+    grid-template-columns:
+      1fr;
+  }
+
+  .footer-brand {
+    justify-content: flex-start;
+  }
+
+  .footer-identity {
+    justify-content: flex-start;
+
+    text-align: left;
+  }
+
+  .footer-copyright {
+    grid-column: auto;
+  }
+}
+
+
+/* =========================================================
+   30 — REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+
+    transition-duration: .01ms !important;
+
+    scroll-behavior: auto !important;
+  }
+
+  .reveal {
+    opacity: 1;
+
+    transform: none;
+  }
+
+  .home-section::after {
+    transform: none;
+  }
+}
+
+
+/* =========================================================
+   31 — HIGH CONTRAST
+   ========================================================= */
+
+@media (prefers-contrast: more) {
+
+  .home-section-nav {
+    border-color: currentColor;
+  }
+
+  .home-section-nav-route-line,
+  .home-section-nav-route-progress,
+  .site-menu-item-trace-line {
+    background: currentColor;
+  }
+
+  .editorial-copy,
+  .direction-card p,
+  .site-menu-intro {
+    opacity: 1;
+  }
+
+  .section-orbit,
+  .trace-orbit,
+  .territory-ring {
+    border-color: currentColor;
+  }
+}
+
+
+/* =========================================================
+   32 — PRINT
+   ========================================================= */
+
+@media print {
+
+  .page-loader,
+  .page-transition,
+  .standby-screen,
+  .custom-cursor,
+  .scroll-progress,
+  .menu-trigger,
+  .site-menu,
+  .home-section-nav {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+
+    color: #000;
+  }
+
+  .site-header,
+  .home-section,
+  .site-footer {
+    color: #000;
+
+    background: #fff;
+  }
+
+  .home-section {
+    min-height: auto;
+
+    page-break-inside: avoid;
+  }
+
+  .section-atmosphere,
+  .direction-visual,
+  .traces-visual,
+  .territory-visual,
+  .contact-logo-area {
+    display: none;
+  }
+
+  .reveal {
+    opacity: 1;
+
+    transform: none;
+  }
+}
