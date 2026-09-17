@@ -24,8 +24,11 @@
     "(pointer: fine)"
   );
 
-  const isReducedMotion = () => reducedMotionQuery.matches;
-  const hasFinePointer = () => finePointerQuery.matches;
+  const isReducedMotion = () =>
+    reducedMotionQuery.matches;
+
+  const hasFinePointer = () =>
+    finePointerQuery.matches;
 
   const $ = (selector, scope = document) =>
     scope.querySelector(selector);
@@ -43,10 +46,12 @@
 
   const loader = $(".site-loader");
   const header = $("#site-header");
+
   const menu = $("#site-menu");
   const menuToggle = $("#menu-toggle");
   const menuClose = $(".menu-close");
   const menuBackdrop = $(".menu-backdrop");
+
   const scrollProgress = $("#scroll-progress");
   const sectionIndex = $("#section-index");
 
@@ -54,21 +59,33 @@
     "main > section[id]"
   );
 
-  const revealItems = $$("[data-reveal]");
+  const revealItems = $$(
+    "[data-reveal]"
+  );
 
   const hero = $("#inizio");
-  const heroTitle = $("#hero-title");
 
-  const directionItems = $$(".direction-item");
-  const directionDoors = $$(".direction-door");
+  const directionItems = $$(
+    ".direction-item"
+  );
 
-  const magneticItems = $$("[data-magnetic]");
+  const directionDoors = $$(
+    ".direction-door"
+  );
+
+  const magneticItems = $$(
+    "[data-magnetic]"
+  );
+
+  const navigationLinks = $$(
+    "a[href]"
+  );
 
   let previousScrollY = window.scrollY;
-  let currentScrollY = window.scrollY;
 
   let ticking = false;
   let menuOpen = false;
+
   let lastFocusedElement = null;
 
   let heroPointerX = 0;
@@ -78,7 +95,8 @@
 
   let standbyTimer = null;
   let standbyActive = false;
-  let lastInteraction = performance.now();
+
+  let activityScheduled = false;
 
   const STANDBY_DELAY = 30000;
 
@@ -87,44 +105,78 @@
      02 — LOADER
      ========================================================== */
 
+  let loaderHidden = false;
+
   const hideLoader = () => {
-    if (!loader) return;
+    if (!loader || loaderHidden) return;
+
+    loaderHidden = true;
 
     loader.classList.add("is-hidden");
 
     window.setTimeout(() => {
-      loader.setAttribute("aria-hidden", "true");
+      loader.setAttribute(
+        "aria-hidden",
+        "true"
+      );
     }, 1000);
   };
 
+  /*
+    The loader must never be able to block
+    the website indefinitely.
+  */
+
   if (loader) {
-    window.addEventListener("load", () => {
-      const delay = isReducedMotion() ? 250 : 900;
 
-      window.setTimeout(hideLoader, delay);
-    });
+    window.addEventListener(
+      "load",
+      () => {
 
-    /* Safety fallback */
-    window.setTimeout(hideLoader, 3800);
+        const delay =
+          isReducedMotion()
+            ? 180
+            : 700;
+
+        window.setTimeout(
+          hideLoader,
+          delay
+        );
+
+      },
+      { once: true }
+    );
+
+    window.setTimeout(
+      hideLoader,
+      3500
+    );
   }
 
 
   /* ==========================================================
-     03 — HEADER STATE
+     03 — HEADER
      ========================================================== */
 
   const updateHeader = () => {
+
     if (!header) return;
 
-    const y = window.scrollY;
+    const y =
+      window.scrollY;
 
     if (y > 30) {
-      header.classList.add("is-scrolled");
+      header.classList.add(
+        "is-scrolled"
+      );
     } else {
-      header.classList.remove("is-scrolled");
+      header.classList.remove(
+        "is-scrolled"
+      );
     }
 
-    const delta = y - previousScrollY;
+    const delta =
+      y - previousScrollY;
 
     if (
       delta > 8 &&
@@ -132,11 +184,20 @@
       !menuOpen &&
       !standbyActive
     ) {
-      header.classList.add("is-hidden");
+      header.classList.add(
+        "is-hidden"
+      );
     }
 
-    if (delta < -4 || y < 80 || menuOpen) {
-      header.classList.remove("is-hidden");
+    if (
+      delta < -4 ||
+      y < 80 ||
+      menuOpen ||
+      standbyActive
+    ) {
+      header.classList.remove(
+        "is-hidden"
+      );
     }
 
     previousScrollY = y;
@@ -148,6 +209,7 @@
      ========================================================== */
 
   const updateScrollProgress = () => {
+
     if (!scrollProgress) return;
 
     const documentHeight =
@@ -155,14 +217,23 @@
       window.innerHeight;
 
     if (documentHeight <= 0) {
-      scrollProgress.style.height = "0%";
+
+      scrollProgress.style.height =
+        "0%";
+
       return;
     }
 
     const progress =
-      clamp(window.scrollY / documentHeight, 0, 1) * 100;
+      clamp(
+        window.scrollY /
+          documentHeight,
+        0,
+        1
+      ) * 100;
 
-    scrollProgress.style.height = `${progress}%`;
+    scrollProgress.style.height =
+      `${progress}%`;
   };
 
 
@@ -171,45 +242,84 @@
      ========================================================== */
 
   const updateSectionIndex = () => {
-    if (!sectionIndex || !sections.length) return;
 
-    const viewportCenter = window.innerHeight * 0.45;
-
-    let activeSection = sections[0];
-
-    for (const section of sections) {
-      const rect = section.getBoundingClientRect();
-
-      if (
-        rect.top <= viewportCenter &&
-        rect.bottom >= viewportCenter
-      ) {
-        activeSection = section;
-        break;
-      }
+    if (
+      !sectionIndex ||
+      !sections.length
+    ) {
+      return;
     }
 
-    const index =
-      sections.indexOf(activeSection) + 1;
+    const viewportCenter =
+      window.innerHeight * 0.42;
 
-    const formatted =
-      String(index).padStart(2, "0");
+    let activeIndex = 0;
 
-    /*
-      Compatible with:
-      <span class="index-current">01</span>
-      <span class="index-separator">/</span>
-      <span class="index-total">10</span>
-    */
+    let smallestDistance =
+      Infinity;
 
-    const current = $(".index-current", sectionIndex);
+    sections.forEach(
+      (section, index) => {
+
+        const rect =
+          section.getBoundingClientRect();
+
+        const sectionCenter =
+          rect.top +
+          rect.height / 2;
+
+        const distance =
+          Math.abs(
+            sectionCenter -
+            viewportCenter
+          );
+
+        if (
+          distance <
+          smallestDistance
+        ) {
+          smallestDistance =
+            distance;
+
+          activeIndex =
+            index;
+        }
+
+      }
+    );
+
+    const formattedCurrent =
+      String(
+        activeIndex + 1
+      ).padStart(2, "0");
+
+    const formattedTotal =
+      String(
+        sections.length
+      ).padStart(2, "0");
+
+    const current =
+      $(".index-current", sectionIndex);
+
+    const total =
+      $(".index-total", sectionIndex);
 
     if (current) {
-      current.textContent = formatted;
-    } else {
-      sectionIndex.textContent =
-        `${formatted} / ${String(sections.length).padStart(2, "0")}`;
+      current.textContent =
+        formattedCurrent;
     }
+
+    if (total) {
+      total.textContent =
+        formattedTotal;
+    }
+
+    /*
+      Important:
+      never replace the entire #section-index
+      because that would destroy its internal
+      navigation structure.
+    */
   };
 
 
@@ -218,9 +328,8 @@
      ========================================================== */
 
   const updateScrollState = () => {
-    ticking = false;
 
-    currentScrollY = window.scrollY;
+    ticking = false;
 
     updateHeader();
     updateScrollProgress();
@@ -235,17 +344,25 @@
     }
   };
 
+
   const requestScrollUpdate = () => {
+
     if (ticking) return;
 
     ticking = true;
-    requestAnimationFrame(updateScrollState);
+
+    window.requestAnimationFrame(
+      updateScrollState
+    );
   };
+
 
   window.addEventListener(
     "scroll",
     requestScrollUpdate,
-    { passive: true }
+    {
+      passive: true
+    }
   );
 
 
@@ -253,35 +370,94 @@
      07 — REVEAL SYSTEM
      ========================================================== */
 
+  let revealObserver = null;
+
   const prepareRevealSystem = () => {
+
     if (
-      !revealItems.length ||
-      isReducedMotion()
+      !revealItems.length
     ) {
       return;
     }
 
-    root.classList.add("reveal-ready");
+    if (
+      isReducedMotion()
+    ) {
 
-    const observer = new IntersectionObserver(
-      (entries, obs) => {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting) return;
+      root.classList.remove(
+        "reveal-ready"
+      );
 
-          entry.target.classList.add("is-visible");
+      revealItems.forEach(
+        item => {
+          item.classList.add(
+            "is-visible"
+          );
+        }
+      );
 
-          obs.unobserve(entry.target);
-        });
-      },
-      {
-        threshold: 0.12,
-        rootMargin: "0px 0px -8% 0px"
-      }
+      return;
+    }
+
+    root.classList.add(
+      "reveal-ready"
     );
 
-    revealItems.forEach(item => {
-      observer.observe(item);
-    });
+    if (
+      revealObserver
+    ) {
+      revealObserver.disconnect();
+    }
+
+    revealObserver =
+      new IntersectionObserver(
+        entries => {
+
+          entries.forEach(
+            entry => {
+
+              if (
+                !entry.isIntersecting
+              ) {
+                return;
+              }
+
+              entry.target.classList.add(
+                "is-visible"
+              );
+
+              revealObserver.unobserve(
+                entry.target
+              );
+
+            }
+          );
+
+        },
+        {
+          threshold: 0.12,
+          rootMargin:
+            "0px 0px -8% 0px"
+        }
+      );
+
+    revealItems.forEach(
+      item => {
+
+        /*
+          Avoid forcing elements into
+          awkward overlapping states.
+        */
+
+        item.style.removeProperty(
+          "transform"
+        );
+
+        revealObserver.observe(
+          item
+        );
+      }
+    );
   };
 
 
@@ -290,13 +466,20 @@
      ========================================================== */
 
   const updateHeroParallax = () => {
+
     if (!hero) return;
 
     heroPointerX +=
-      (heroTargetX - heroPointerX) * 0.075;
+      (
+        heroTargetX -
+        heroPointerX
+      ) * 0.075;
 
     heroPointerY +=
-      (heroTargetY - heroPointerY) * 0.075;
+      (
+        heroTargetY -
+        heroPointerY
+      ) * 0.075;
 
     hero.style.setProperty(
       "--hero-x",
@@ -309,7 +492,9 @@
     );
   };
 
+
   const handleHeroPointer = event => {
+
     if (
       !hero ||
       !hasFinePointer() ||
@@ -318,28 +503,55 @@
       return;
     }
 
-    const rect = hero.getBoundingClientRect();
+    const rect =
+      hero.getBoundingClientRect();
+
+    if (
+      rect.width <= 0 ||
+      rect.height <= 0
+    ) {
+      return;
+    }
 
     const x =
-      (event.clientX - rect.left) / rect.width - 0.5;
+      (
+        event.clientX -
+        rect.left
+      ) /
+        rect.width -
+      0.5;
 
     const y =
-      (event.clientY - rect.top) / rect.height - 0.5;
+      (
+        event.clientY -
+        rect.top
+      ) /
+        rect.height -
+      0.5;
 
-    heroTargetX = x * 18;
-    heroTargetY = y * 18;
+    heroTargetX =
+      x * 18;
+
+    heroTargetY =
+      y * 18;
   };
 
+
   const resetHeroPointer = () => {
+
     heroTargetX = 0;
     heroTargetY = 0;
   };
 
+
   if (hero) {
+
     hero.addEventListener(
       "pointermove",
       handleHeroPointer,
-      { passive: true }
+      {
+        passive: true
+      }
     );
 
     hero.addEventListener(
@@ -354,7 +566,10 @@
      ========================================================== */
 
   const getFocusableMenuElements = () => {
-    if (!menu) return [];
+
+    if (!menu) {
+      return [];
+    }
 
     return $$(
       `
@@ -366,28 +581,51 @@
       [tabindex]:not([tabindex="-1"])
       `,
       menu
-    ).filter(el => {
-      const style =
-        window.getComputedStyle(el);
+    ).filter(
+      element => {
 
-      return (
-        style.display !== "none" &&
-        style.visibility !== "hidden"
-      );
-    });
+        const style =
+          window.getComputedStyle(
+            element
+          );
+
+        return (
+          style.display !== "none" &&
+          style.visibility !== "hidden"
+        );
+      }
+    );
   };
 
+
   const openMenu = () => {
-    if (!menu || !menuToggle) return;
 
-    if (menuOpen) return;
+    if (
+      !menu ||
+      !menuToggle ||
+      menuOpen
+    ) {
+      return;
+    }
 
-    lastFocusedElement = document.activeElement;
+    lastFocusedElement =
+      document.activeElement;
 
     menuOpen = true;
 
-    menu.classList.add("is-open");
-    body.classList.add("menu-open");
+    /*
+      Stop ambient mode immediately.
+    */
+
+    stopStandby();
+
+    menu.classList.add(
+      "is-open"
+    );
+
+    body.classList.add(
+      "menu-open"
+    );
 
     menuToggle.setAttribute(
       "aria-expanded",
@@ -399,31 +637,54 @@
       "false"
     );
 
-    header?.classList.remove("is-hidden");
+    header?.classList.remove(
+      "is-hidden"
+    );
 
-    stopStandby();
+    root.classList.add(
+      "navigation-active"
+    );
 
     const focusable =
       getFocusableMenuElements();
 
     if (focusable.length) {
-      window.setTimeout(() => {
-        focusable[0].focus();
-      }, 250);
+
+      window.setTimeout(
+        () => {
+          focusable[0].focus();
+        },
+        180
+      );
     }
   };
+
 
   const closeMenu = ({
     restoreFocus = true
   } = {}) => {
-    if (!menu || !menuToggle) return;
 
-    if (!menuOpen) return;
+    if (
+      !menu ||
+      !menuToggle ||
+      !menuOpen
+    ) {
+      return;
+    }
 
     menuOpen = false;
 
-    menu.classList.remove("is-open");
-    body.classList.remove("menu-open");
+    menu.classList.remove(
+      "is-open"
+    );
+
+    body.classList.remove(
+      "menu-open"
+    );
+
+    root.classList.remove(
+      "navigation-active"
+    );
 
     menuToggle.setAttribute(
       "aria-expanded",
@@ -438,184 +699,323 @@
     if (
       restoreFocus &&
       lastFocusedElement &&
-      typeof lastFocusedElement.focus === "function"
+      typeof lastFocusedElement.focus ===
+        "function"
     ) {
-      window.setTimeout(() => {
-        lastFocusedElement.focus();
-      }, 350);
+
+      window.setTimeout(
+        () => {
+
+          try {
+            lastFocusedElement.focus();
+          } catch {}
+
+        },
+        250
+      );
     }
 
-    lastFocusedElement = null;
+    lastFocusedElement =
+      null;
 
     restartStandbyTimer();
   };
 
+
   if (menuToggle) {
+
     menuToggle.addEventListener(
       "click",
       () => {
-        menuOpen ? closeMenu() : openMenu();
+
+        if (menuOpen) {
+          closeMenu();
+        } else {
+          openMenu();
+        }
+
       }
     );
   }
 
+
   if (menuClose) {
+
     menuClose.addEventListener(
       "click",
-      () => closeMenu()
+      () => {
+        closeMenu();
+      }
     );
   }
 
+
   if (menuBackdrop) {
+
     menuBackdrop.addEventListener(
       "click",
-      () => closeMenu()
+      () => {
+        closeMenu();
+      }
     );
   }
 
 
   /* ==========================================================
-     10 — MENU KEYBOARD / FOCUS TRAP
+     10 — KEYBOARD NAVIGATION
      ========================================================== */
 
-  document.addEventListener("keydown", event => {
+  document.addEventListener(
+    "keydown",
+    event => {
 
-    if (event.key === "Escape") {
+      if (
+        event.key === "Escape"
+      ) {
 
-      if (menuOpen) {
-        closeMenu();
+        if (menuOpen) {
+          closeMenu();
+          return;
+        }
+
+        if (standbyActive) {
+          wakeFromStandby();
+        }
+
         return;
       }
 
-      if (standbyActive) {
-        wakeFromStandby();
+      if (
+        event.key !== "Tab" ||
+        !menuOpen
+      ) {
+        return;
       }
 
-      return;
+      const focusable =
+        getFocusableMenuElements();
+
+      if (!focusable.length) {
+        return;
+      }
+
+      const first =
+        focusable[0];
+
+      const last =
+        focusable[
+          focusable.length - 1
+        ];
+
+      if (
+        event.shiftKey &&
+        document.activeElement === first
+      ) {
+
+        event.preventDefault();
+
+        last.focus();
+
+        return;
+      }
+
+      if (
+        !event.shiftKey &&
+        document.activeElement === last
+      ) {
+
+        event.preventDefault();
+
+        first.focus();
+      }
     }
-
-    if (
-      event.key !== "Tab" ||
-      !menuOpen
-    ) {
-      return;
-    }
-
-    const focusable =
-      getFocusableMenuElements();
-
-    if (!focusable.length) return;
-
-    const first = focusable[0];
-    const last =
-      focusable[focusable.length - 1];
-
-    if (
-      event.shiftKey &&
-      document.activeElement === first
-    ) {
-      event.preventDefault();
-      last.focus();
-    }
-
-    if (
-      !event.shiftKey &&
-      document.activeElement === last
-    ) {
-      event.preventDefault();
-      first.focus();
-    }
-  });
-
-
-  /* ==========================================================
-     11 — MENU LINKS
-     ========================================================== */
-
-  const menuLinks = $$(
-    ".primary-nav a"
   );
 
-  menuLinks.forEach(link => {
-
-    link.addEventListener("click", () => {
-
-      const href =
-        link.getAttribute("href") || "";
-
-      if (href.startsWith("#")) {
-        closeMenu({
-          restoreFocus: false
-        });
-      }
-
-    });
-
-  });
-
 
   /* ==========================================================
-     12 — SAME-PAGE SMOOTH NAVIGATION
+     11 — SECTION NAVIGATION
      ========================================================== */
+
+  const getSectionFromHash = hash => {
+
+    if (
+      !hash ||
+      hash === "#"
+    ) {
+      return null;
+    }
+
+    try {
+      return document.querySelector(
+        hash
+      );
+    } catch {
+      return null;
+    }
+  };
+
+
+  const scrollToSection = (
+    target,
+    updateHistory = true
+  ) => {
+
+    if (!target) return;
+
+    const headerOffset =
+      header?.offsetHeight || 0;
+
+    const targetY =
+      target.getBoundingClientRect().top +
+      window.scrollY -
+      headerOffset -
+      18;
+
+    window.scrollTo({
+      top: Math.max(
+        targetY,
+        0
+      ),
+      behavior:
+        isReducedMotion()
+          ? "auto"
+          : "smooth"
+    });
+
+    if (
+      updateHistory &&
+      history.pushState
+    ) {
+
+      history.pushState(
+        null,
+        "",
+        `#${target.id}`
+      );
+    }
+
+    /*
+      Update navigation immediately,
+      then again during the scroll.
+    */
+
+    window.setTimeout(
+      updateSectionIndex,
+      isReducedMotion()
+        ? 0
+        : 250
+    );
+  };
+
 
   const anchorLinks = $$(
     'a[href^="#"]'
   );
 
-  anchorLinks.forEach(link => {
 
-    link.addEventListener("click", event => {
+  anchorLinks.forEach(
+    link => {
 
-      const href =
-        link.getAttribute("href");
+      link.addEventListener(
+        "click",
+        event => {
 
-      if (
-        !href ||
-        href === "#" ||
-        href.length <= 1
-      ) {
-        return;
-      }
+          const href =
+            link.getAttribute(
+              "href"
+            );
 
-      const target =
-        document.querySelector(href);
+          const target =
+            getSectionFromHash(
+              href
+            );
 
-      if (!target) return;
+          if (!target) {
+            return;
+          }
 
-      event.preventDefault();
+          event.preventDefault();
 
-      const headerOffset =
-        header?.offsetHeight || 0;
+          if (menuOpen) {
 
-      const targetY =
-        target.getBoundingClientRect().top +
-        window.scrollY -
-        headerOffset;
+            closeMenu({
+              restoreFocus: false
+            });
+          }
 
-      window.scrollTo({
-        top: Math.max(targetY, 0),
-        behavior:
-          isReducedMotion()
-            ? "auto"
-            : "smooth"
-      });
+          scrollToSection(
+            target,
+            true
+          );
 
-      if (history.pushState) {
-        history.pushState(
-          null,
-          "",
-          href
-        );
-      }
+          /*
+            Temporary visual feedback.
+          */
 
-      if (menuOpen) {
-        closeMenu({
-          restoreFocus: false
-        });
-      }
-    });
+          link.classList.add(
+            "is-navigating"
+          );
 
-  });
+          window.setTimeout(
+            () => {
+              link.classList.remove(
+                "is-navigating"
+              );
+            },
+            700
+          );
+
+        }
+      );
+
+    }
+  );
+
+
+  /* ==========================================================
+     12 — SECTION INDEX CLICKABLE NAVIGATION
+     ========================================================== */
+
+  const sectionIndexLinks =
+    $$(
+      "[data-section-link]"
+    );
+
+
+  sectionIndexLinks.forEach(
+    link => {
+
+      link.addEventListener(
+        "click",
+        event => {
+
+          const targetId =
+            link.dataset.sectionLink;
+
+          if (!targetId) {
+            return;
+          }
+
+          const target =
+            document.getElementById(
+              targetId
+            );
+
+          if (!target) {
+            return;
+          }
+
+          event.preventDefault();
+
+          scrollToSection(
+            target,
+            true
+          );
+
+        }
+      );
+    }
+  );
 
 
   /* ==========================================================
@@ -623,76 +1023,145 @@
      ========================================================== */
 
   const clearDirectionStates = () => {
-    directionItems.forEach(item => {
-      item.classList.remove("is-active");
-    });
 
-    directionDoors.forEach(item => {
-      item.classList.remove("is-active");
-    });
+    directionItems.forEach(
+      item => {
+
+        item.classList.remove(
+          "is-active"
+        );
+      }
+    );
+
+    directionDoors.forEach(
+      item => {
+
+        item.classList.remove(
+          "is-active"
+        );
+      }
+    );
   };
+
 
   const activateDirection = item => {
 
+    if (!item) return;
+
     clearDirectionStates();
 
-    item.classList.add("is-active");
+    item.classList.add(
+      "is-active"
+    );
 
     const direction =
       item.dataset.direction;
 
-    if (!direction) return;
+    if (!direction) {
+      return;
+    }
 
-    directionItems.forEach(other => {
-      if (
-        other.dataset.direction === direction
-      ) {
-        other.classList.add("is-active");
+    directionItems.forEach(
+      other => {
+
+        if (
+          other.dataset.direction ===
+          direction
+        ) {
+
+          other.classList.add(
+            "is-active"
+          );
+        }
       }
-    });
+    );
+
+    directionDoors.forEach(
+      other => {
+
+        if (
+          other.dataset.direction ===
+          direction
+        ) {
+
+          other.classList.add(
+            "is-active"
+          );
+        }
+      }
+    );
   };
 
-  directionItems.forEach(item => {
 
-    item.addEventListener(
-      "mouseenter",
-      () => {
-        if (!hasFinePointer()) return;
-        activateDirection(item);
-      }
-    );
+  directionItems.forEach(
+    item => {
 
-    item.addEventListener(
-      "focusin",
-      () => activateDirection(item)
-    );
+      item.addEventListener(
+        "mouseenter",
+        () => {
 
-  });
+          if (
+            !hasFinePointer()
+          ) {
+            return;
+          }
 
-  directionDoors.forEach(item => {
+          activateDirection(
+            item
+          );
+        }
+      );
 
-    item.addEventListener(
-      "mouseenter",
-      () => {
-        if (!hasFinePointer()) return;
+      item.addEventListener(
+        "focusin",
+        () => {
+          activateDirection(
+            item
+          );
+        }
+      );
+    }
+  );
 
-        activateDirection(item);
-      }
-    );
 
-    item.addEventListener(
-      "focusin",
-      () => activateDirection(item)
-    );
+  directionDoors.forEach(
+    item => {
 
-  });
+      item.addEventListener(
+        "mouseenter",
+        () => {
+
+          if (
+            !hasFinePointer()
+          ) {
+            return;
+          }
+
+          activateDirection(
+            item
+          );
+        }
+      );
+
+      item.addEventListener(
+        "focusin",
+        () => {
+          activateDirection(
+            item
+          );
+        }
+      );
+    }
+  );
 
 
   /* ==========================================================
      14 — MAGNETIC INTERACTIONS
      ========================================================== */
 
-  const magneticStates = new WeakMap();
+  const magneticStates =
+    new WeakMap();
+
 
   const setupMagnetic = item => {
 
@@ -703,38 +1172,60 @@
       return;
     }
 
-    magneticStates.set(item, {
+    const state = {
       x: 0,
       y: 0,
       targetX: 0,
       targetY: 0,
       raf: null
-    });
+    };
 
-    const state =
-      magneticStates.get(item);
+    magneticStates.set(
+      item,
+      state
+    );
+
 
     const render = () => {
 
       state.x +=
-        (state.targetX - state.x) * .18;
+        (
+          state.targetX -
+          state.x
+        ) * 0.18;
 
       state.y +=
-        (state.targetY - state.y) * .18;
+        (
+          state.targetY -
+          state.y
+        ) * 0.18;
 
       item.style.transform =
         `translate3d(${state.x}px, ${state.y}px, 0)`;
 
+
       if (
-        Math.abs(state.targetX - state.x) > .01 ||
-        Math.abs(state.targetY - state.y) > .01
+        Math.abs(
+          state.targetX -
+          state.x
+        ) > 0.01 ||
+        Math.abs(
+          state.targetY -
+          state.y
+        ) > 0.01
       ) {
+
         state.raf =
-          requestAnimationFrame(render);
+          requestAnimationFrame(
+            render
+          );
+
       } else {
+
         state.raf = null;
       }
     };
+
 
     item.addEventListener(
       "pointermove",
@@ -743,23 +1234,49 @@
         const rect =
           item.getBoundingClientRect();
 
+        if (
+          rect.width <= 0 ||
+          rect.height <= 0
+        ) {
+          return;
+        }
+
         const strength =
-          Number(item.dataset.magneticStrength) || 12;
+          Number(
+            item.dataset
+              .magneticStrength
+          ) || 10;
 
         state.targetX =
-          ((event.clientX - rect.left) / rect.width - .5)
-          * strength;
+          (
+            (
+              event.clientX -
+              rect.left
+            ) /
+              rect.width -
+            0.5
+          ) * strength;
 
         state.targetY =
-          ((event.clientY - rect.top) / rect.height - .5)
-          * strength;
+          (
+            (
+              event.clientY -
+              rect.top
+            ) /
+              rect.height -
+            0.5
+          ) * strength;
 
         if (!state.raf) {
+
           state.raf =
-            requestAnimationFrame(render);
+            requestAnimationFrame(
+              render
+            );
         }
       }
     );
+
 
     item.addEventListener(
       "pointerleave",
@@ -769,14 +1286,20 @@
         state.targetY = 0;
 
         if (!state.raf) {
+
           state.raf =
-            requestAnimationFrame(render);
+            requestAnimationFrame(
+              render
+            );
         }
       }
     );
   };
 
-  magneticItems.forEach(setupMagnetic);
+
+  magneticItems.forEach(
+    setupMagnetic
+  );
 
 
   /* ==========================================================
@@ -784,22 +1307,27 @@
      ========================================================== */
 
   /*
-    STATES
-
     ACTIVE
-      normal interaction
-
-    QUIET
-      no input for a while
-
+       ↓
+    30 seconds without interaction
+       ↓
     STANDBY
-      ambient visual mode
 
+    Any interaction
+       ↓
     AWAKEN
-      first interaction restores active state
+       ↓
+    ACTIVE
   */
 
+
   const startStandbyTimer = () => {
+
+    clearTimeout(
+      standbyTimer
+    );
+
+    standbyTimer = null;
 
     if (
       isReducedMotion() ||
@@ -809,8 +1337,6 @@
       return;
     }
 
-    clearTimeout(standbyTimer);
-
     standbyTimer =
       window.setTimeout(
         enterStandby,
@@ -818,17 +1344,6 @@
       );
   };
 
-  const restartStandbyTimer = () => {
-
-    lastInteraction =
-      performance.now();
-
-    if (standbyActive) {
-      wakeFromStandby();
-    }
-
-    startStandbyTimer();
-  };
 
   const enterStandby = () => {
 
@@ -851,15 +1366,15 @@
       "standby-mode"
     );
 
+    /*
+      The header remains visible.
+      Standby is an atmosphere,
+      NOT a lock screen.
+    */
+
     header?.classList.remove(
       "is-hidden"
     );
-
-    /*
-      Keep the state deliberately subtle.
-      The CSS layer remains responsible for
-      the actual visual atmosphere.
-    */
 
     body.dispatchEvent(
       new CustomEvent(
@@ -868,10 +1383,19 @@
     );
   };
 
+
   const wakeFromStandby = () => {
 
+    clearTimeout(
+      standbyTimer
+    );
+
+    standbyTimer = null;
+
     if (!standbyActive) {
-      restartStandbyTimer();
+
+      startStandbyTimer();
+
       return;
     }
 
@@ -891,15 +1415,15 @@
       )
     );
 
-    lastInteraction =
-      performance.now();
-
     startStandbyTimer();
   };
 
+
   const stopStandby = () => {
 
-    clearTimeout(standbyTimer);
+    clearTimeout(
+      standbyTimer
+    );
 
     standbyTimer = null;
 
@@ -908,52 +1432,75 @@
     }
   };
 
-  /*
-    Activity signals.
-    Pointermove is throttled because it can fire
-    hundreds of times per second.
-  */
 
-  let activityScheduled = false;
+  const restartStandbyTimer = () => {
+
+    if (standbyActive) {
+      wakeFromStandby();
+      return;
+    }
+
+    startStandbyTimer();
+  };
+
+
+  /* ==========================================================
+     16 — ACTIVITY DETECTION
+     ========================================================== */
 
   const registerActivity = () => {
 
-    if (activityScheduled) return;
+    if (activityScheduled) {
+      return;
+    }
 
     activityScheduled = true;
 
-    requestAnimationFrame(() => {
+    requestAnimationFrame(
+      () => {
 
-      activityScheduled = false;
+        activityScheduled =
+          false;
 
-      lastInteraction =
-        performance.now();
+        if (
+          standbyActive
+        ) {
 
-      if (standbyActive) {
-        wakeFromStandby();
-      } else if (!menuOpen) {
-        startStandbyTimer();
+          wakeFromStandby();
+
+          return;
+        }
+
+        if (
+          !menuOpen &&
+          !document.hidden
+        ) {
+
+          startStandbyTimer();
+        }
       }
-
-    });
+    );
   };
+
 
   [
     "pointerdown",
     "wheel",
     "touchstart",
     "keydown"
-  ].forEach(type => {
+  ].forEach(
+    type => {
 
-    window.addEventListener(
-      type,
-      registerActivity,
-      {
-        passive: true
-      }
-    );
+      window.addEventListener(
+        type,
+        registerActivity,
+        {
+          passive: true
+        }
+      );
+    }
+  );
 
-  });
 
   window.addEventListener(
     "pointermove",
@@ -965,91 +1512,117 @@
 
 
   /* ==========================================================
-     16 — VISIBILITY
+     17 — VISIBILITY
      ========================================================== */
 
   document.addEventListener(
     "visibilitychange",
     () => {
 
-      if (document.hidden) {
+      if (
+        document.hidden
+      ) {
+
         stopStandby();
+
         return;
       }
 
-      restartStandbyTimer();
-
+      startStandbyTimer();
     }
   );
 
 
   /* ==========================================================
-     17 — MEDIA QUERY CHANGES
+     18 — MOTION PREFERENCE
      ========================================================== */
 
-  const handleMotionPreferenceChange = () => {
+  const handleMotionPreferenceChange =
+    () => {
 
-    if (isReducedMotion()) {
+      if (
+        isReducedMotion()
+      ) {
 
-      stopStandby();
+        stopStandby();
 
-      root.classList.remove(
-        "reveal-ready"
-      );
-
-      revealItems.forEach(item => {
-        item.classList.add(
-          "is-visible"
+        root.classList.remove(
+          "reveal-ready"
         );
-      });
 
-    } else {
+        revealItems.forEach(
+          item => {
 
-      prepareRevealSystem();
-      restartStandbyTimer();
+            item.classList.add(
+              "is-visible"
+            );
+          }
+        );
 
-    }
-  };
+      } else {
+
+        prepareRevealSystem();
+
+        startStandbyTimer();
+      }
+    };
+
 
   if (
     typeof reducedMotionQuery.addEventListener ===
     "function"
   ) {
+
     reducedMotionQuery.addEventListener(
       "change",
       handleMotionPreferenceChange
     );
+
   } else {
+
     reducedMotionQuery.addListener(
       handleMotionPreferenceChange
     );
   }
 
 
-  const handlePointerCapabilityChange = () => {
+  /* ==========================================================
+     19 — POINTER CAPABILITY
+     ========================================================== */
 
-    if (!hasFinePointer()) {
+  const handlePointerCapabilityChange =
+    () => {
 
-      heroTargetX = 0;
-      heroTargetY = 0;
+      if (
+        !hasFinePointer()
+      ) {
 
-      magneticItems.forEach(item => {
-        item.style.transform = "";
-      });
+        heroTargetX = 0;
+        heroTargetY = 0;
 
-    }
+        magneticItems.forEach(
+          item => {
 
-  };
+            item.style.transform =
+              "";
+          }
+        );
+      }
+    };
+
 
   if (
     typeof finePointerQuery.addEventListener ===
     "function"
   ) {
+
     finePointerQuery.addEventListener(
       "change",
       handlePointerCapabilityChange
     );
+
   } else {
+
     finePointerQuery.addListener(
       handlePointerCapabilityChange
     );
@@ -1057,7 +1630,7 @@
 
 
   /* ==========================================================
-     18 — INITIAL HASH
+     20 — INITIAL HASH
      ========================================================== */
 
   const handleInitialHash = () => {
@@ -1065,56 +1638,91 @@
     const hash =
       window.location.hash;
 
-    if (!hash) return;
+    if (!hash) {
+      return;
+    }
 
     const target =
-      document.querySelector(hash);
+      getSectionFromHash(
+        hash
+      );
 
-    if (!target) return;
+    if (!target) {
+      return;
+    }
 
-    window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(
+      () => {
 
-      const offset =
-        header?.offsetHeight || 0;
+        window.setTimeout(
+          () => {
 
-      window.scrollTo({
-        top:
-          target.getBoundingClientRect().top +
-          window.scrollY -
-          offset,
-        behavior: "auto"
-      });
+            scrollToSection(
+              target,
+              false
+            );
 
-    });
-
+          },
+          60
+        );
+      }
+    );
   };
 
 
+  window.addEventListener(
+    "popstate",
+    () => {
+
+      const target =
+        getSectionFromHash(
+          window.location.hash
+        );
+
+      if (target) {
+
+        scrollToSection(
+          target,
+          false
+        );
+      }
+    }
+  );
+
+
   /* ==========================================================
-     19 — RESIZE
+     21 — RESIZE
      ========================================================== */
 
   let resizeTimer = null;
+
 
   window.addEventListener(
     "resize",
     () => {
 
-      clearTimeout(resizeTimer);
+      clearTimeout(
+        resizeTimer
+      );
 
       resizeTimer =
-        window.setTimeout(() => {
+        window.setTimeout(
+          () => {
 
-          updateScrollProgress();
-          updateSectionIndex();
+            updateScrollProgress();
+            updateSectionIndex();
 
-          if (!hasFinePointer()) {
-            heroTargetX = 0;
-            heroTargetY = 0;
-          }
+            if (
+              !hasFinePointer()
+            ) {
 
-        }, 150);
+              heroTargetX = 0;
+              heroTargetY = 0;
+            }
 
+          },
+          150
+        );
     },
     {
       passive: true
@@ -1123,33 +1731,36 @@
 
 
   /* ==========================================================
-     20 — PAGE TRANSITIONS
+     22 — PAGE TRANSITIONS
      ========================================================== */
-
-  /*
-    Native View Transitions are used only when available.
-    No dependency is required.
-  */
 
   const supportsViewTransition =
     typeof document.startViewTransition ===
     "function";
 
-  const sameOrigin =
-    url => url.origin === window.location.origin;
+
+  const sameOrigin = url =>
+    url.origin ===
+    window.location.origin;
+
 
   const isDocumentNavigation =
     link => {
 
       const href =
-        link.getAttribute("href");
+        link.getAttribute(
+          "href"
+        );
 
-      if (!href) return false;
+      if (!href) {
+        return false;
+      }
 
       if (
         href.startsWith("#") ||
         href.startsWith("mailto:") ||
-        href.startsWith("tel:")
+        href.startsWith("tel:") ||
+        href.startsWith("javascript:")
       ) {
         return false;
       }
@@ -1169,73 +1780,84 @@
         );
 
       } catch {
+
         return false;
       }
-
     };
 
 
-  const navigationLinks =
-    $$("a[href]");
+  navigationLinks.forEach(
+    link => {
 
-  navigationLinks.forEach(link => {
+      link.addEventListener(
+        "click",
+        event => {
 
-    link.addEventListener(
-      "click",
-      event => {
+          if (
+            !supportsViewTransition ||
+            isReducedMotion() ||
+            !isDocumentNavigation(link)
+          ) {
+            return;
+          }
 
-        if (
-          !supportsViewTransition ||
-          isReducedMotion() ||
-          !isDocumentNavigation(link)
-        ) {
-          return;
-        }
+          if (
+            event.metaKey ||
+            event.ctrlKey ||
+            event.shiftKey ||
+            event.altKey
+          ) {
+            return;
+          }
 
-        /*
-          Do not hijack modified clicks.
-        */
+          const url =
+            new URL(
+              link.href,
+              window.location.href
+            );
 
-        if (
-          event.metaKey ||
-          event.ctrlKey ||
-          event.shiftKey ||
-          event.altKey
-        ) {
-          return;
-        }
+          event.preventDefault();
 
-        const url =
-          new URL(
-            link.href,
-            window.location.href
+          if (menuOpen) {
+
+            closeMenu({
+              restoreFocus: false
+            });
+          }
+
+          /*
+            Important:
+            don't put location.href directly
+            inside a complex animation callback
+            unless the browser supports the
+            exact MPA transition lifecycle.
+          */
+
+          root.classList.add(
+            "page-leaving"
           );
 
-        event.preventDefault();
+          window.setTimeout(
+            () => {
 
-        if (menuOpen) {
-          closeMenu({
-            restoreFocus: false
-          });
+              window.location.href =
+                url.href;
+
+            },
+            isReducedMotion()
+              ? 0
+              : 260
+          );
         }
-
-        document.startViewTransition(
-          () => {
-            window.location.href =
-              url.href;
-          }
-        );
-      }
-    );
-
-  });
+      );
+    }
+  );
 
 
-  /* ==========================================================
-     21 — PAGE TRANSITION CSS HOOKS
-     ========================================================== */
+  if (
+    supportsViewTransition
+  ) {
 
-  if (supportsViewTransition) {
     root.classList.add(
       "view-transitions"
     );
@@ -1243,41 +1865,48 @@
 
 
   /* ==========================================================
-     22 — CUSTOM EVENT BRIDGE
+     23 — STANDBY EVENT BRIDGE
      ========================================================== */
 
   body.addEventListener(
     "cp:standby-enter",
     () => {
+
       /*
-        Hook intentionally kept empty.
-        CSS can react to .standby-mode.
+        CSS owns the visual standby state.
+
+        JS only controls:
+        - state
+        - timing
+        - awakening
       */
     }
   );
 
+
   body.addEventListener(
     "cp:standby-wake",
     () => {
+
       /*
-        Hook intentionally kept empty.
-        CSS can react to removal of .standby-mode.
+        CSS removes the ambient state.
       */
     }
   );
 
 
   /* ==========================================================
-     23 — INITIALIZATION
+     24 — INITIALIZATION
      ========================================================== */
 
   const initialize = () => {
 
     /*
-      ARIA initial state
+      MENU
     */
 
     if (menu) {
+
       menu.setAttribute(
         "aria-hidden",
         "true"
@@ -1285,34 +1914,42 @@
     }
 
     if (menuToggle) {
+
       menuToggle.setAttribute(
         "aria-expanded",
         "false"
       );
     }
 
+
     /*
-      Initial visual state
+      INITIAL SCROLL STATE
     */
 
     updateScrollProgress();
     updateSectionIndex();
     updateHeader();
 
-    prepareRevealSystem();
 
     /*
-      Hash after layout has settled.
+      REVEAL
+    */
+
+    prepareRevealSystem();
+
+
+    /*
+      HASH
     */
 
     window.setTimeout(
       handleInitialHash,
-      80
+      100
     );
 
+
     /*
-      Standby starts only after the page
-      is fully initialized.
+      STANDBY
     */
 
     startStandbyTimer();
@@ -1323,6 +1960,7 @@
     document.readyState ===
     "loading"
   ) {
+
     document.addEventListener(
       "DOMContentLoaded",
       initialize,
@@ -1330,33 +1968,39 @@
         once: true
       }
     );
+
   } else {
+
     initialize();
   }
 
 
   /* ==========================================================
-     24 — DEBUG API
+     25 — DEBUG API
      ========================================================== */
 
-  /*
-    Intentionally non-invasive.
-    Useful during development without
-    requiring a framework.
-
-    window.CP = {
-      openMenu(),
-      closeMenu(),
-      enterStandby(),
-      wakeFromStandby()
-    }
-  */
-
   window.CP = Object.freeze({
+
     openMenu,
     closeMenu,
+
     enterStandby,
-    wakeFromStandby
+    wakeFromStandby,
+
+    scrollToSection,
+
+    get state() {
+
+      return Object.freeze({
+        menuOpen,
+        standbyActive,
+        reducedMotion:
+          isReducedMotion(),
+        finePointer:
+          hasFinePointer()
+      });
+    }
   });
+
 
 })();
