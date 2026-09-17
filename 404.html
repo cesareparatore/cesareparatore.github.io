@@ -1,1232 +1,768 @@
-/* =========================================================
-   CESARE PARATORE
-   MOVIMENTO / CON DIREZIONE.
-   script.js — interaction + motion system
-   ========================================================= */
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
 
-(() => {
-  "use strict";
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-  const root = document.documentElement;
-  const body = document.body;
+  <meta
+    name="robots"
+    content="noindex, nofollow"
+  >
 
-  root.classList.add("js");
+  <title>404 | Cesare Paratore</title>
 
-  /* =======================================================
-     01. UTILITIES
-     ======================================================= */
+  <meta
+    name="description"
+    content="La pagina richiesta non è disponibile. Torna all'inizio del percorso di Cesare Paratore."
+  >
 
-  const $ = (selector, scope = document) =>
-    scope.querySelector(selector);
+  <link rel="icon" href="/assets/images/cp-mark.png">
 
-  const $$ = (selector, scope = document) =>
-    Array.from(scope.querySelectorAll(selector));
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
 
-  const clamp = (value, min, max) =>
-    Math.min(Math.max(value, min), max);
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
 
-  const prefersReducedMotion = () =>
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
 
-  const isFinePointer = () =>
-    window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-
-  /* =======================================================
-     02. LOADER
-     ======================================================= */
-
-  const loader = $("#intro");
-
-  let loaderHidden = false;
-
-  const hideLoader = () => {
-    if (!loader || loaderHidden) return;
-
-    loaderHidden = true;
-    loader.classList.add("is-hidden");
-
-    window.setTimeout(() => {
-      loader.setAttribute("aria-hidden", "true");
-    }, 1000);
-  };
-
-  /*
-   * Il loader non deve mai bloccare il sito se un modulo
-   * successivo dovesse generare un errore.
-   */
-  window.addEventListener("load", () => {
-    window.setTimeout(hideLoader, 650);
-  }, { once: true });
-
-  /*
-   * Fail-safe assoluto.
-   */
-  window.setTimeout(hideLoader, 3800);
-
-
-  /* =======================================================
-     03. HEADER
-     ======================================================= */
-
-  const header = $(".site-header");
-
-  let lastScrollY = window.scrollY;
-  let tickingHeader = false;
-
-  const updateHeader = () => {
-    if (!header) return;
-
-    const currentY = window.scrollY;
-
-    if (currentY < 30) {
-      header.classList.remove("is-hidden");
-    } else if (
-      currentY > lastScrollY + 8 &&
-      !body.classList.contains("menu-open")
-    ) {
-      header.classList.add("is-hidden");
-    } else if (currentY < lastScrollY - 8) {
-      header.classList.remove("is-hidden");
+  <style>
+    :root {
+      --navy: #071b33;
+      --navy-2: #0d2949;
+      --navy-3: #173d63;
+      --white: #ffffff;
+      --paper: #f5f4ef;
+      --line: rgba(255,255,255,.16);
+      --gutter: clamp(20px, 4vw, 72px);
+      --ease: cubic-bezier(.16, 1, .3, 1);
     }
 
-    lastScrollY = currentY;
-    tickingHeader = false;
-  };
-
-  window.addEventListener("scroll", () => {
-    if (!tickingHeader) {
-      window.requestAnimationFrame(updateHeader);
-      tickingHeader = true;
-    }
-  }, { passive: true });
-
-
-  /* =======================================================
-     04. SCROLL PROGRESS
-     ======================================================= */
-
-  const updateScrollProgress = () => {
-    const maxScroll =
-      document.documentElement.scrollHeight - window.innerHeight;
-
-    const progress =
-      maxScroll > 0
-        ? clamp(window.scrollY / maxScroll, 0, 1)
-        : 0;
-
-    root.style.setProperty(
-      "--scroll-progress",
-      `${progress * 100}%`
-    );
-
-    root.style.setProperty(
-      "--mobile-progress",
-      `${progress * 100}%`
-    );
-  };
-
-  let progressTicking = false;
-
-  window.addEventListener("scroll", () => {
-    if (!progressTicking) {
-      window.requestAnimationFrame(() => {
-        updateScrollProgress();
-        progressTicking = false;
-      });
-
-      progressTicking = true;
-    }
-  }, { passive: true });
-
-  window.addEventListener("resize", updateScrollProgress);
-  updateScrollProgress();
-
-
-  /* =======================================================
-     05. SECTION INDEX
-     ======================================================= */
-
-  const sections = $$("main section[id]");
-  const sectionIndex = $("#section-index");
-  const indexCurrent = $(".index-current", sectionIndex || document);
-  const indexTotal = $(".index-total", sectionIndex || document);
-
-  const sectionEntries = sections.map((section, index) => ({
-    element: section,
-    number:
-      section.dataset.index ||
-      String(index + 1).padStart(2, "0")
-  }));
-
-  if (indexTotal && sectionEntries.length) {
-    indexTotal.textContent =
-      String(sectionEntries.length).padStart(2, "0");
-  }
-
-  let currentSection = null;
-
-  const setCurrentSection = (entry) => {
-    if (!entry || entry === currentSection) return;
-
-    currentSection = entry;
-
-    if (indexCurrent) {
-      indexCurrent.textContent = entry.number;
+    * {
+      box-sizing: border-box;
     }
 
-    root.style.setProperty(
-      "--active-section",
-      entry.number
-    );
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+    }
 
-    document.dispatchEvent(
-      new CustomEvent("cp:section-change", {
-        detail: {
-          id: entry.element.id,
-          number: entry.number
-        }
-      })
-    );
-  };
+    body {
+      min-width: 320px;
+      background: var(--navy);
+      color: var(--white);
+      font-family:
+        "Manrope",
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
 
-  if ("IntersectionObserver" in window && sectionEntries.length) {
-    const sectionObserver = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort(
-            (a, b) =>
-              b.intersectionRatio - a.intersectionRatio
-          );
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
 
-        if (!visible.length) return;
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
 
-        const target = sectionEntries.find(
-          (item) =>
-            item.element === visible[0].target
+    ::selection {
+      background: var(--white);
+      color: var(--navy);
+    }
+
+    .error-page {
+      position: relative;
+      min-height: 100svh;
+      min-height: 100dvh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    /* ---------------------------------------------
+       HEADER
+       --------------------------------------------- */
+
+    .error-header {
+      position: relative;
+      z-index: 10;
+      width: min(
+        calc(100% - (var(--gutter) * 2)),
+        1440px
+      );
+      margin-inline: auto;
+      padding-top: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .error-logo {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .error-logo img {
+      width: 74px;
+      height: 74px;
+      object-fit: contain;
+      transition:
+        transform 600ms var(--ease);
+    }
+
+    .error-logo:hover img {
+      transform: rotate(-4deg) scale(1.05);
+    }
+
+    .error-code {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+
+      font-family: "DM Mono", monospace;
+      font-size: 9px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+
+      color: rgba(255,255,255,.45);
+    }
+
+    .error-code::before {
+      content: "";
+      width: 28px;
+      height: 1px;
+      background: currentColor;
+    }
+
+    /* ---------------------------------------------
+       VISUAL FIELD
+       --------------------------------------------- */
+
+    .error-visual {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .grid {
+      position: absolute;
+      inset: 0;
+
+      background-image:
+        linear-gradient(
+          to right,
+          rgba(255,255,255,.045) 1px,
+          transparent 1px
+        ),
+        linear-gradient(
+          to bottom,
+          rgba(255,255,255,.045) 1px,
+          transparent 1px
         );
 
-        setCurrentSection(target);
-      },
-      {
-        threshold: [0.15, 0.3, 0.5, 0.7],
-        rootMargin: "-12% 0px -45% 0px"
+      background-size: 72px 72px;
+
+      mask-image:
+        linear-gradient(
+          to bottom,
+          transparent,
+          black 18%,
+          black 82%,
+          transparent
+        );
+
+      opacity: .8;
+    }
+
+    .glow {
+      position: absolute;
+      width: min(60vw, 900px);
+      aspect-ratio: 1;
+      left: 50%;
+      top: 48%;
+      transform: translate(-50%, -50%);
+
+      border-radius: 50%;
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(23,61,99,.52) 0%,
+          rgba(23,61,99,.18) 32%,
+          transparent 70%
+        );
+
+      filter: blur(12px);
+    }
+
+    .orbit {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+
+      width: min(62vw, 900px);
+      aspect-ratio: 1;
+
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 50%;
+
+      transform:
+        translate(-50%, -50%)
+        rotate(-12deg);
+
+      animation:
+        orbit 24s linear infinite;
+    }
+
+    .orbit::before,
+    .orbit::after {
+      content: "";
+      position: absolute;
+
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 50%;
+    }
+
+    .orbit::before {
+      inset: 10%;
+    }
+
+    .orbit::after {
+      inset: 23%;
+    }
+
+    .orbit-small {
+      width: min(37vw, 520px);
+      transform:
+        translate(-50%, -50%)
+        rotate(28deg)
+        scaleY(.48);
+
+      animation:
+        orbit-reverse 18s linear infinite;
+    }
+
+    .orbit-dot {
+      position: absolute;
+      left: 0;
+      top: 50%;
+
+      width: 7px;
+      height: 7px;
+
+      border-radius: 50%;
+      background: var(--white);
+
+      box-shadow:
+        0 0 0 7px rgba(255,255,255,.06);
+    }
+
+    @keyframes orbit {
+      to {
+        transform:
+          translate(-50%, -50%)
+          rotate(348deg);
       }
-    );
+    }
 
-    sectionEntries.forEach(({ element }) => {
-      sectionObserver.observe(element);
-    });
-  }
-
-
-  /* =======================================================
-     06. REVEAL SYSTEM
-     ======================================================= */
-
-  root.classList.add("reveal-ready");
-
-  const revealElements = $$("[data-reveal]");
-
-  if (
-    !prefersReducedMotion() &&
-    "IntersectionObserver" in window &&
-    revealElements.length
-  ) {
-    const revealObserver = new IntersectionObserver(
-      (entries, observer) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-
-          entry.target.classList.add("is-visible");
-          observer.unobserve(entry.target);
-        });
-      },
-      {
-        threshold: 0.08,
-        rootMargin: "0px 0px -8% 0px"
+    @keyframes orbit-reverse {
+      to {
+        transform:
+          translate(-50%, -50%)
+          rotate(-332deg)
+          scaleY(.48);
       }
-    );
+    }
 
-    revealElements.forEach((element) => {
-      revealObserver.observe(element);
-    });
-  } else {
-    revealElements.forEach((element) => {
-      element.classList.add("is-visible");
-    });
-  }
+    /* ---------------------------------------------
+       MAIN
+       --------------------------------------------- */
 
+    .error-main {
+      position: relative;
+      z-index: 5;
 
-  /* =======================================================
-     07. HERO PARALLAX
-     ======================================================= */
-
-  const heroVisual = $(".hero-visual");
-
-  if (
-    heroVisual &&
-    !prefersReducedMotion() &&
-    isFinePointer()
-  ) {
-    let targetX = 0;
-    let targetY = 0;
-    let currentX = 0;
-    let currentY = 0;
-    let raf = null;
-
-    const renderHero = () => {
-      currentX += (targetX - currentX) * 0.075;
-      currentY += (targetY - currentY) * 0.075;
-
-      heroVisual.style.transform =
-        `translate3d(${currentX}px, ${currentY}px, 0)`;
-
-      raf = window.requestAnimationFrame(renderHero);
-    };
-
-    window.addEventListener("pointermove", (event) => {
-      targetX =
-        (event.clientX / window.innerWidth - 0.5) * 22;
-
-      targetY =
-        (event.clientY / window.innerHeight - 0.5) * 18;
-
-      if (!raf) {
-        raf = window.requestAnimationFrame(renderHero);
-      }
-    }, { passive: true });
-
-    window.addEventListener("pointerleave", () => {
-      targetX = 0;
-      targetY = 0;
-    });
-
-    renderHero();
-  }
-
-
-  /* =======================================================
-     08. FULLSCREEN MENU
-     ======================================================= */
-
-  const menu = $("#site-menu");
-  const menuToggle = $("#menu-toggle");
-  const menuCloseElements = $$("[data-menu-close]");
-  const menuLinks = $$(".primary-nav a", menu || document);
-
-  let menuOpen = false;
-  let previousFocusedElement = null;
-
-  const getFocusable = () => {
-    if (!menu) return [];
-
-    return $$(
-      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
-      menu
-    ).filter((element) => {
-      const style = window.getComputedStyle(element);
-
-      return (
-        style.display !== "none" &&
-        style.visibility !== "hidden"
+      width: min(
+        calc(100% - (var(--gutter) * 2)),
+        1440px
       );
-    });
-  };
 
-  const openMenu = () => {
-    if (!menu || menuOpen) return;
+      margin-inline: auto;
 
-    menuOpen = true;
-    previousFocusedElement = document.activeElement;
+      display: grid;
+      grid-template-columns:
+        minmax(0, 1fr)
+        minmax(300px, .55fr);
 
-    body.classList.add("menu-open");
-
-    menu.setAttribute("aria-hidden", "false");
-
-    if (menuToggle) {
-      menuToggle.setAttribute("aria-expanded", "true");
+      gap: clamp(50px, 10vw, 170px);
+      align-items: center;
     }
 
-    const focusable = getFocusable();
-
-    window.setTimeout(() => {
-      if (focusable[0]) {
-        focusable[0].focus();
-      }
-    }, 250);
-  };
-
-  const closeMenu = (restoreFocus = true) => {
-    if (!menu || !menuOpen) return;
-
-    menuOpen = false;
-
-    body.classList.remove("menu-open");
-
-    menu.setAttribute("aria-hidden", "true");
-
-    if (menuToggle) {
-      menuToggle.setAttribute("aria-expanded", "false");
+    .error-copy {
+      max-width: 800px;
     }
 
-    if (
-      restoreFocus &&
-      previousFocusedElement &&
-      typeof previousFocusedElement.focus === "function"
-    ) {
-      previousFocusedElement.focus();
-    }
-  };
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 12px;
 
-  if (menuToggle) {
-    menuToggle.addEventListener("click", () => {
-      if (menuOpen) {
-        closeMenu();
-      } else {
-        openMenu();
-      }
-    });
-  }
+      margin-bottom: 30px;
 
-  menuCloseElements.forEach((element) => {
-    element.addEventListener("click", () => {
-      closeMenu();
-    });
-  });
+      font-family: "DM Mono", monospace;
+      font-size: 10px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
 
-  menuLinks.forEach((link) => {
-    link.addEventListener("click", () => {
-      closeMenu(false);
-    });
-  });
-
-  document.addEventListener("keydown", (event) => {
-    if (!menuOpen) return;
-
-    if (event.key === "Escape") {
-      event.preventDefault();
-      closeMenu();
-      return;
+      color: rgba(255,255,255,.48);
     }
 
-    if (event.key !== "Tab") return;
-
-    const focusable = getFocusable();
-
-    if (!focusable.length) return;
-
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (
-      !event.shiftKey &&
-      document.activeElement === last
-    ) {
-      event.preventDefault();
-      first.focus();
-    }
-  });
-
-
-  /* =======================================================
-     09. SAME-PAGE NAVIGATION
-     ======================================================= */
-
-  const getHeaderOffset = () => {
-    return header
-      ? header.getBoundingClientRect().height
-      : 0;
-  };
-
-  const scrollToTarget = (target, updateHash = true) => {
-    if (!target) return;
-
-    const top =
-      target.getBoundingClientRect().top +
-      window.scrollY -
-      getHeaderOffset() -
-      12;
-
-    window.scrollTo({
-      top: Math.max(0, top),
-      behavior: prefersReducedMotion()
-        ? "auto"
-        : "smooth"
-    });
-
-    if (updateHash && target.id) {
-      history.pushState(
-        null,
-        "",
-        `#${target.id}`
-      );
-    }
-  };
-
-  $$('a[href^="#"]').forEach((link) => {
-    link.addEventListener("click", (event) => {
-      const href = link.getAttribute("href");
-
-      if (!href || href === "#") return;
-
-      const target = $(href);
-
-      if (!target) return;
-
-      event.preventDefault();
-
-      closeMenu(false);
-
-      scrollToTarget(target);
-    });
-  });
-
-
-  /* =======================================================
-     10. SECTION NAVIGATION — CONTINUITY
-     ======================================================= */
-
-  const orderedSections = sectionEntries.map(
-    (entry) => entry.element
-  );
-
-  const navigateSection = (direction) => {
-    if (!orderedSections.length) return;
-
-    const current =
-      currentSection?.element ||
-      orderedSections[0];
-
-    let index =
-      orderedSections.indexOf(current);
-
-    if (index < 0) index = 0;
-
-    const nextIndex = clamp(
-      index + direction,
-      0,
-      orderedSections.length - 1
-    );
-
-    if (nextIndex === index) return;
-
-    scrollToTarget(
-      orderedSections[nextIndex],
-      true
-    );
-  };
-
-  /*
-   * Frecce da tastiera.
-   * Non interferiscono quando l'utente sta scrivendo.
-   */
-  document.addEventListener("keydown", (event) => {
-    const tag = event.target?.tagName;
-
-    if (
-      tag === "INPUT" ||
-      tag === "TEXTAREA" ||
-      tag === "SELECT" ||
-      event.metaKey ||
-      event.ctrlKey ||
-      event.altKey
-    ) {
-      return;
+    .eyebrow::before {
+      content: "";
+      width: 30px;
+      height: 1px;
+      background: currentColor;
     }
 
-    if (body.classList.contains("menu-open")) return;
+    .error-title {
+      margin: 0;
 
-    if (event.key === "ArrowDown") {
-      event.preventDefault();
-      navigateSection(1);
+      font-size:
+        clamp(4.4rem, 10vw, 11rem);
+
+      line-height: .78;
+      letter-spacing: -.075em;
+      font-weight: 600;
     }
 
-    if (event.key === "ArrowUp") {
-      event.preventDefault();
-      navigateSection(-1);
+    .error-title span {
+      display: block;
     }
-  });
 
+    .error-title span:last-child {
+      color: rgba(255,255,255,.34);
+    }
 
-  /* =======================================================
-     11. MOBILE SECTION NAV
-     ======================================================= */
+    .error-description {
+      width: min(540px, 100%);
+      margin-top: 50px;
 
-  let mobileNav = null;
+      font-size:
+        clamp(1.05rem, 1.45vw, 1.4rem);
 
-  const createMobileNav = () => {
-    if (mobileNav || orderedSections.length < 2) return;
+      line-height: 1.6;
+      color: rgba(255,255,255,.68);
+    }
 
-    mobileNav = document.createElement("nav");
-    mobileNav.className = "mobile-section-nav";
-    mobileNav.setAttribute(
-      "aria-label",
-      "Navigazione sezioni"
-    );
+    .error-actions {
+      margin-top: 38px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
 
-    mobileNav.innerHTML = `
-      <div class="mobile-section-nav-inner">
-        <button
-          type="button"
-          class="mobile-section-prev"
-          aria-label="Sezione precedente"
-        >←</button>
+    .error-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
 
-        <span
-          class="mobile-section-nav-label"
-          aria-live="polite"
-        >01</span>
+      padding: 15px 21px;
 
-        <button
-          type="button"
-          class="mobile-section-next"
-          aria-label="Sezione successiva"
-        >→</button>
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 999px;
 
-        <span
-          class="mobile-section-nav-progress"
-          aria-hidden="true"
-        ></span>
-      </div>
-    `;
+      font-family: "DM Mono", monospace;
+      font-size: 9px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
 
-    body.appendChild(mobileNav);
-
-    $(".mobile-section-prev", mobileNav)
-      ?.addEventListener("click", () => {
-        navigateSection(-1);
-      });
-
-    $(".mobile-section-next", mobileNav)
-      ?.addEventListener("click", () => {
-        navigateSection(1);
-      });
-
-    const updateMobileLabel = () => {
-      const label = $(".mobile-section-nav-label", mobileNav);
-
-      if (!label || !currentSection) return;
-
-      label.textContent =
-        `${currentSection.number} / ${String(
-          orderedSections.length
-        ).padStart(2, "0")}`;
-    };
-
-    document.addEventListener(
-      "cp:section-change",
-      updateMobileLabel
-    );
-
-    window.addEventListener(
-      "scroll",
-      () => {
-        if (window.scrollY > 250) {
-          mobileNav.classList.add("is-visible");
-        } else {
-          mobileNav.classList.remove("is-visible");
-        }
-      },
-      { passive: true }
-    );
-  };
-
-  if (window.matchMedia("(max-width: 760px)").matches) {
-    createMobileNav();
-  }
-
-  window
-    .matchMedia("(max-width: 760px)")
-    .addEventListener("change", (event) => {
-      if (event.matches) {
-        createMobileNav();
-      }
-    });
-
-
-  /* =======================================================
-     12. DIRECTION ITEMS
-     ======================================================= */
-
-  const directionItems = $$(".direction-item");
-
-  directionItems.forEach((item) => {
-    item.addEventListener("mouseenter", () => {
-      directionItems.forEach((other) => {
-        if (other !== item) {
-          other.classList.remove("is-active");
-        }
-      });
-
-      item.classList.add("is-active");
-    });
-
-    item.addEventListener("mouseleave", () => {
-      item.classList.remove("is-active");
-    });
-  });
-
-
-  /* =======================================================
-     13. MAGNETIC INTERACTIONS
-     ======================================================= */
-
-  if (!prefersReducedMotion() && isFinePointer()) {
-    const magneticItems = $$(
-      "[data-magnetic]"
-    );
-
-    magneticItems.forEach((element) => {
-      let frame = null;
-
-      const reset = () => {
-        if (frame) {
-          cancelAnimationFrame(frame);
-        }
-
-        element.style.transform = "";
-      };
-
-      element.addEventListener("pointermove", (event) => {
-        const rect =
-          element.getBoundingClientRect();
-
-        const x =
-          (event.clientX - rect.left) /
-          rect.width -
-          0.5;
-
-        const y =
-          (event.clientY - rect.top) /
-          rect.height -
-          0.5;
-
-        const strength =
-          Number(element.dataset.magnetic) || 12;
-
-        if (frame) {
-          cancelAnimationFrame(frame);
-        }
-
-        frame = requestAnimationFrame(() => {
-          element.style.transform =
-            `translate3d(${x * strength}px, ${y * strength}px, 0)`;
-        });
-      });
-
-      element.addEventListener(
-        "pointerleave",
-        reset
-      );
-    });
-  }
-
-
-  /* =======================================================
-     14. POINTER TRAIL / VISUAL CURSOR
-     ======================================================= */
-
-  if (
-    !prefersReducedMotion() &&
-    isFinePointer()
-  ) {
-    const cursor = document.createElement("div");
-
-    cursor.setAttribute("aria-hidden", "true");
-
-    Object.assign(cursor.style, {
-      position: "fixed",
-      left: "0",
-      top: "0",
-      width: "8px",
-      height: "8px",
-      borderRadius: "50%",
-      background: "var(--navy)",
-      pointerEvents: "none",
-      zIndex: "7000",
-      opacity: "0",
-      transform: "translate3d(-50%, -50%, 0)",
       transition:
-        "width 250ms ease, height 250ms ease, opacity 250ms ease"
-    });
+        background 350ms var(--ease),
+        border-color 350ms var(--ease),
+        transform 350ms var(--ease);
+    }
 
-    body.appendChild(cursor);
+    .error-button::after {
+      content: "↗";
+      font-size: 14px;
+    }
 
-    let cursorX = -100;
-    let cursorY = -100;
-    let renderX = cursorX;
-    let renderY = cursorY;
+    .error-button:hover {
+      background: var(--white);
+      color: var(--navy);
+      border-color: var(--white);
+      transform: translateY(-3px);
+    }
 
-    const renderCursor = () => {
-      renderX += (cursorX - renderX) * 0.2;
-      renderY += (cursorY - renderY) * 0.2;
+    /* ---------------------------------------------
+       CENTRAL VISUAL
+       --------------------------------------------- */
 
-      cursor.style.transform =
-        `translate3d(${renderX}px, ${renderY}px, 0)`;
+    .error-symbol {
+      position: relative;
 
-      requestAnimationFrame(renderCursor);
-    };
+      width: min(30vw, 390px);
+      aspect-ratio: 1;
 
-    window.addEventListener("pointermove", (event) => {
-      cursorX = event.clientX;
-      cursorY = event.clientY;
-      cursor.style.opacity = "1";
-    }, { passive: true });
+      margin-inline: auto;
 
-    window.addEventListener("pointerleave", () => {
-      cursor.style.opacity = "0";
-    });
+      display: grid;
+      place-items: center;
 
-    $$("a, button, [data-magnetic]").forEach(
-      (element) => {
-        element.addEventListener("mouseenter", () => {
-          cursor.style.width = "18px";
-          cursor.style.height = "18px";
-        });
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 50%;
+    }
 
-        element.addEventListener("mouseleave", () => {
-          cursor.style.width = "8px";
-          cursor.style.height = "8px";
-        });
+    .error-symbol::before,
+    .error-symbol::after {
+      content: "";
+      position: absolute;
+
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 50%;
+    }
+
+    .error-symbol::before {
+      inset: -34px;
+    }
+
+    .error-symbol::after {
+      inset: -78px;
+    }
+
+    .error-symbol img {
+      position: relative;
+      z-index: 3;
+
+      width: clamp(100px, 12vw, 160px);
+      height: clamp(100px, 12vw, 160px);
+
+      object-fit: contain;
+
+      transition:
+        transform 900ms var(--ease);
+    }
+
+    .error-symbol:hover img {
+      transform:
+        rotate(-5deg)
+        scale(1.07);
+    }
+
+    .error-coordinate {
+      position: absolute;
+      right: -30px;
+      bottom: 20px;
+
+      font-family: "DM Mono", monospace;
+      font-size: 9px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+
+      color: rgba(255,255,255,.3);
+
+      writing-mode: vertical-rl;
+    }
+
+    /* ---------------------------------------------
+       FOOTER
+       --------------------------------------------- */
+
+    .error-footer {
+      position: relative;
+      z-index: 10;
+
+      width: min(
+        calc(100% - (var(--gutter) * 2)),
+        1440px
+      );
+
+      margin-inline: auto;
+
+      padding-block: 22px 28px;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 30px;
+
+      border-top: 1px solid rgba(255,255,255,.14);
+    }
+
+    .footer-name,
+    .footer-direction {
+      font-family: "DM Mono", monospace;
+      font-size: 9px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .footer-name {
+      color: rgba(255,255,255,.65);
+    }
+
+    .footer-direction {
+      color: rgba(255,255,255,.32);
+      text-align: right;
+    }
+
+    /* ---------------------------------------------
+       MOBILE
+       --------------------------------------------- */
+
+    @media (max-width: 760px) {
+      .error-page {
+        min-height: 100svh;
       }
-    );
 
-    renderCursor();
-  }
+      .error-header {
+        padding-top: 12px;
+      }
 
+      .error-logo img {
+        width: 60px;
+        height: 60px;
+      }
 
-  /* =======================================================
-     15. STANDBY SYSTEM
-     ======================================================= */
+      .error-main {
+        grid-template-columns: 1fr;
+        gap: 70px;
 
-  const STANDBY_DELAY = 30000;
-  const STANDBY_WAKE_DELAY = 1200;
+        padding-block:
+          70px
+          80px;
+      }
 
-  let standbyTimer = null;
-  let standbyScreen = null;
-  let standbyActive = false;
+      .error-copy {
+        max-width: none;
+      }
 
-  const createStandbyScreen = () => {
-    if (standbyScreen) return;
+      .error-title {
+        font-size:
+          clamp(4rem, 18vw, 7rem);
+      }
 
-    standbyScreen = document.createElement("div");
+      .error-description {
+        margin-top: 35px;
+      }
 
-    standbyScreen.className = "standby-screen";
-    standbyScreen.setAttribute(
-      "aria-hidden",
-      "true"
-    );
+      .error-symbol {
+        width: min(68vw, 310px);
+      }
 
-    standbyScreen.innerHTML = `
-      <div class="standby-screen-inner">
+      .error-symbol::before {
+        inset: -24px;
+      }
+
+      .error-symbol::after {
+        inset: -52px;
+      }
+
+      .error-coordinate {
+        right: -20px;
+      }
+
+      .grid {
+        background-size: 44px 44px;
+      }
+
+      .orbit {
+        width: 110vw;
+      }
+
+      .orbit-small {
+        width: 70vw;
+      }
+
+      .error-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .footer-direction {
+        text-align: left;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .error-code {
+        font-size: 8px;
+      }
+
+      .error-title {
+        font-size: 3.7rem;
+      }
+
+      .error-description {
+        font-size: 1rem;
+      }
+
+      .error-symbol {
+        width: 62vw;
+      }
+    }
+
+    /* ---------------------------------------------
+       REDUCED MOTION
+       --------------------------------------------- */
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .001ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="error-page">
+
+    <!-- HEADER -->
+
+    <header class="error-header">
+
+      <a
+        class="error-logo"
+        href="/"
+        aria-label="Torna alla homepage di Cesare Paratore"
+      >
         <img
-          class="standby-logo"
-          src="assets/images/cp-mark.png"
-          alt=""
-          width="150"
-          height="150"
+          src="/assets/images/cp-mark.png"
+          alt="Cesare Paratore"
+          width="74"
+          height="74"
         >
+      </a>
 
-        <div class="standby-kicker">
-          MOVIMENTO / CON DIREZIONE.
+      <div class="error-code">
+        ERROR / 404
+      </div>
+
+    </header>
+
+
+    <!-- VISUAL FIELD -->
+
+    <div
+      class="error-visual"
+      aria-hidden="true"
+    >
+
+      <div class="grid"></div>
+
+      <div class="glow"></div>
+
+      <div class="orbit">
+        <span class="orbit-dot"></span>
+      </div>
+
+      <div class="orbit orbit-small">
+        <span class="orbit-dot"></span>
+      </div>
+
+    </div>
+
+
+    <!-- CONTENT -->
+
+    <section class="error-main">
+
+      <div class="error-copy">
+
+        <div class="eyebrow">
+          IL PERCORSO CONTINUA
         </div>
 
-        <h2 class="standby-title">
-          IN ATTESA.
-        </h2>
+        <h1 class="error-title">
+          <span>QUESTA STRADA</span>
+          <span>NON ESISTE.</span>
+        </h1>
 
-        <p class="standby-subtitle">
-          Il percorso continua quando torni.
+        <p class="error-description">
+          La pagina che stai cercando non è disponibile.
+          Può essere stata spostata, rimossa oppure
+          l'indirizzo potrebbe non essere corretto.
+          Ma il percorso continua.
         </p>
 
-        <button
-          class="standby-wake"
-          type="button"
-        >
-          Riprendi il percorso
-        </button>
+        <div class="error-actions">
+
+          <a
+            class="error-button"
+            href="/"
+          >
+            Riparti dall'inizio
+          </a>
+
+        </div>
+
       </div>
-    `;
 
-    body.appendChild(standbyScreen);
 
-    $(".standby-wake", standbyScreen)
-      ?.addEventListener("click", wakeFromStandby);
-  };
+      <!-- VISUAL SEPARATO DAL TESTO -->
 
-  const enterStandby = () => {
-    if (
-      standbyActive ||
-      body.classList.contains("menu-open")
-    ) {
-      return;
-    }
+      <div class="error-symbol">
 
-    createStandbyScreen();
+        <img
+          src="/assets/images/cp-mark.png"
+          alt=""
+          width="160"
+          height="160"
+        >
 
-    standbyActive = true;
+        <span class="error-coordinate">
+          MOVIMENTO / CON DIREZIONE.
+        </span>
 
-    body.classList.add("standby-active");
-    root.classList.add("standby-mode");
+      </div>
 
-    standbyScreen.setAttribute(
-      "aria-hidden",
-      "false"
-    );
+    </section>
 
-    document.dispatchEvent(
-      new CustomEvent("cp:standby-enter")
-    );
-  };
 
-  const wakeFromStandby = () => {
-    if (!standbyActive) return;
+    <!-- FOOTER -->
 
-    standbyActive = false;
+    <footer class="error-footer">
 
-    body.classList.remove("standby-active");
-    root.classList.remove("standby-mode");
+      <div class="footer-name">
+        CESARE PARATORE
+      </div>
 
-    if (standbyScreen) {
-      standbyScreen.setAttribute(
-        "aria-hidden",
-        "true"
-      );
-    }
+      <div class="footer-direction">
+        MOVIMENTO / CON DIREZIONE.
+      </div>
 
-    window.clearTimeout(standbyTimer);
+    </footer>
 
-    document.dispatchEvent(
-      new CustomEvent("cp:standby-wake")
-    );
+  </main>
 
-    scheduleStandby();
-  };
-
-  const scheduleStandby = () => {
-    window.clearTimeout(standbyTimer);
-
-    if (
-      document.hidden ||
-      prefersReducedMotion()
-    ) {
-      return;
-    }
-
-    standbyTimer = window.setTimeout(
-      enterStandby,
-      STANDBY_DELAY
-    );
-  };
-
-  const activityEvents = [
-    "pointermove",
-    "pointerdown",
-    "wheel",
-    "touchstart",
-    "keydown",
-    "scroll"
-  ];
-
-  activityEvents.forEach((eventName) => {
-    window.addEventListener(
-      eventName,
-      () => {
-        if (standbyActive) {
-          wakeFromStandby();
-        } else {
-          scheduleStandby();
-        }
-      },
-      {
-        passive:
-          eventName !== "keydown"
-      }
-    );
-  });
-
-  document.addEventListener(
-    "visibilitychange",
-    () => {
-      if (document.hidden) {
-        window.clearTimeout(standbyTimer);
-      } else {
-        scheduleStandby();
-      }
-    }
-  );
-
-  document.addEventListener(
-    "keydown",
-    (event) => {
-      if (!standbyActive) return;
-
-      if (
-        event.key === "Escape" ||
-        event.key === "Enter" ||
-        event.key === " "
-      ) {
-        event.preventDefault();
-        wakeFromStandby();
-      }
-    }
-  );
-
-  createStandbyScreen();
-  scheduleStandby();
-
-
-  /* =======================================================
-     16. PAGE TRANSITIONS
-     ======================================================= */
-
-  const supportsViewTransition =
-    typeof document.startViewTransition === "function";
-
-  const createPageTransition = () => {
-    if ($(".page-transition")) return;
-
-    const transition = document.createElement("div");
-
-    transition.className = "page-transition";
-    transition.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-
-    body.appendChild(transition);
-  };
-
-  createPageTransition();
-
-  const navigateToPage = (url) => {
-    if (!url) return;
-
-    const href = url.href;
-
-    /*
-     * Link esterno / nuova tab / download:
-     * nessuna manipolazione.
-     */
-    if (
-      url.origin !== window.location.origin ||
-      url.protocol === "mailto:" ||
-      url.protocol === "tel:"
-    ) {
-      return;
-    }
-
-    if (supportsViewTransition) {
-      try {
-        document.startViewTransition(() => {
-          window.location.href = href;
-        });
-
-        return;
-      } catch {
-        /* fallback below */
-      }
-    }
-
-    root.classList.add("is-page-leaving");
-
-    window.setTimeout(() => {
-      window.location.href = href;
-    }, 520);
-  };
-
-  $$("a[href]").forEach((link) => {
-    link.addEventListener("click", (event) => {
-      if (
-        event.defaultPrevented ||
-        event.button !== 0 ||
-        event.metaKey ||
-        event.ctrlKey ||
-        event.shiftKey ||
-        event.altKey ||
-        link.target === "_blank" ||
-        link.hasAttribute("download")
-      ) {
-        return;
-      }
-
-      const href = link.getAttribute("href");
-
-      if (
-        !href ||
-        href.startsWith("#") ||
-        href.startsWith("mailto:") ||
-        href.startsWith("tel:")
-      ) {
-        return;
-      }
-
-      let url;
-
-      try {
-        url = new URL(
-          href,
-          window.location.href
-        );
-      } catch {
-        return;
-      }
-
-      if (
-        url.origin !== window.location.origin ||
-        url.pathname === window.location.pathname
-      ) {
-        return;
-      }
-
-      event.preventDefault();
-
-      closeMenu(false);
-      navigateToPage(url);
-    });
-  });
-
-
-  /* =======================================================
-     17. INITIAL PAGE ENTRY
-     ======================================================= */
-
-  window.addEventListener("pageshow", () => {
-    root.classList.add("page-ready");
-    root.classList.remove("is-page-leaving");
-  });
-
-  window.addEventListener("load", () => {
-    root.classList.add("page-ready");
-  });
-
-
-  /* =======================================================
-     18. INITIAL HASH
-     ======================================================= */
-
-  const initialHash = window.location.hash;
-
-  if (initialHash) {
-    window.setTimeout(() => {
-      const target = $(initialHash);
-
-      if (target) {
-        scrollToTarget(target, false);
-      }
-    }, 500);
-  }
-
-
-  /* =======================================================
-     19. RESIZE
-     ======================================================= */
-
-  let resizeTimer = null;
-
-  window.addEventListener("resize", () => {
-    window.clearTimeout(resizeTimer);
-
-    resizeTimer = window.setTimeout(() => {
-      updateScrollProgress();
-
-      /*
-       * Evita che il menu resti aperto in uno stato
-       * incoerente durante un cambio drastico di viewport.
-       */
-      if (
-        window.innerWidth > 760 &&
-        mobileNav
-      ) {
-        mobileNav.classList.remove(
-          "is-visible"
-        );
-      }
-    }, 150);
-  });
-
-
-  /* =======================================================
-     20. ORIENTATION / MEDIA QUERY
-     ======================================================= */
-
-  const reducedMotionQuery =
-    window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    );
-
-  reducedMotionQuery.addEventListener?.(
-    "change",
-    () => {
-      if (reducedMotionQuery.matches) {
-        root.classList.add("reduced-motion");
-      } else {
-        root.classList.remove("reduced-motion");
-      }
-    }
-  );
-
-  if (reducedMotionQuery.matches) {
-    root.classList.add("reduced-motion");
-  }
-
-
-  /* =======================================================
-     21. PAGE VISIBILITY
-     ======================================================= */
-
-  document.addEventListener(
-    "visibilitychange",
-    () => {
-      if (document.hidden) {
-        root.classList.add("page-hidden");
-      } else {
-        root.classList.remove("page-hidden");
-      }
-    }
-  );
-
-
-  /* =======================================================
-     22. DEBUG API
-     ======================================================= */
-
-  window.CP = {
-    version: "2026.09",
-    sections: sectionEntries.map(
-      ({ element, number }) => ({
-        id: element.id,
-        number
-      })
-    ),
-    menu: {
-      open: openMenu,
-      close: closeMenu
-    },
-    standby: {
-      enter: enterStandby,
-      wake: wakeFromStandby
-    },
-    navigation: {
-      next: () => navigateSection(1),
-      previous: () => navigateSection(-1)
-    }
-  };
-
-
-  /* =======================================================
-     23. FINAL INITIALIZATION
-     ======================================================= */
-
-  updateHeader();
-  updateScrollProgress();
-
-  if (sectionEntries.length) {
-    setCurrentSection(sectionEntries[0]);
-  }
-
-})();
+</body>
+</html>
