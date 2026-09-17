@@ -2,11 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Cesare Paratore | Scienze Motorie e Sport | Partinico e oltre</title>
 
@@ -15,84 +11,29 @@
     content="Cesare Paratore, professionista delle Scienze Motorie e dello Sport, con una formazione che integra competenze motorie, sportive, educative, manageriali e digitali. Con base a Partinico, il suo percorso è aperto al territorio e alle collaborazioni online."
   >
 
-  <meta name="author" content="Cesare Paratore">
-
-  <meta
-    name="robots"
-    content="index, follow, max-image-preview:large"
-  >
+  <meta name="theme-color" content="#071b3a">
+  <meta name="robots" content="index, follow">
 
   <link rel="canonical" href="https://www.cesareparatore.it/">
 
-  <meta name="theme-color" content="#071b33">
-
   <link rel="icon" type="image/png" href="/assets/images/cp-mark.png">
-
-  <meta
-    property="og:type"
-    content="website"
-  >
-
-  <meta
-    property="og:title"
-    content="Cesare Paratore | Scienze Motorie e Sport | Partinico e oltre"
-  >
-
-  <meta
-    property="og:description"
-    content="Scienze Motorie, Sport, Educazione, Management e Digitale. Un percorso in movimento, con direzione."
-  >
-
-  <meta
-    property="og:url"
-    content="https://www.cesareparatore.it/"
-  >
-
-  <meta
-    property="og:image"
-    content="https://www.cesareparatore.it/assets/images/cp-mark.png"
-  >
-
-  <meta
-    name="twitter:card"
-    content="summary_large_image"
-  >
-
-  <meta
-    name="twitter:title"
-    content="Cesare Paratore | Scienze Motorie e Sport"
-  >
-
-  <meta
-    name="twitter:description"
-    content="Un percorso tra Scienze Motorie, Sport, Educazione, Management e Digitale."
-  >
-
   <link rel="stylesheet" href="/css/style.css">
-
-  <script>
-    document.documentElement.classList.add("js");
-  </script>
 </head>
 
 <body>
 
   <!-- =========================================================
        PAGE LOADER
-       ========================================================= -->
+  ========================================================== -->
 
-  <div
-    id="page-loader"
-    class="page-loader"
-    aria-hidden="true"
-  >
+  <div id="page-loader" class="page-loader" aria-hidden="true">
     <div class="page-loader-inner">
-      <div class="page-loader-logo">
+      <div class="page-loader-logo page-loader-logo--large">
         <img
           src="/assets/images/cp-mark.png"
-          alt="CP"
-          width="120"
-          height="120"
+          alt="Cesare Paratore"
+          width="150"
+          height="150"
         >
       </div>
     </div>
@@ -101,37 +42,29 @@
 
   <!-- =========================================================
        PAGE TRANSITION
-       ========================================================= -->
+  ========================================================== -->
 
-  <div
-    class="page-transition"
-    aria-hidden="true"
-  >
-    <div class="page-transition-inner">
-      <div class="page-transition-logo">
-        <img
-          src="/assets/images/cp-mark.png"
-          alt=""
-          width="90"
-          height="90"
-        >
-      </div>
+  <div class="page-transition" aria-hidden="true">
+    <div class="page-transition-circle">
+      <img
+        src="/assets/images/cp-mark.png"
+        alt=""
+        width="150"
+        height="150"
+      >
     </div>
   </div>
 
 
   <!-- =========================================================
        STANDBY
-       Si attiva dopo inattività.
-       Si riattiva con movimento / scroll / swipe.
-       ========================================================= -->
+  ========================================================== -->
 
   <div
     class="standby-screen"
     aria-hidden="true"
   >
-
-    <div class="standby-atmosphere" aria-hidden="true">
+    <div class="standby-atmosphere">
       <span class="standby-orbit standby-orbit-a"></span>
       <span class="standby-orbit standby-orbit-b"></span>
       <span class="standby-orbit standby-orbit-c"></span>
@@ -143,12 +76,12 @@
 
     <div class="standby-center">
 
-      <div class="standby-logo-circle">
+      <div class="standby-logo-circle standby-logo-circle--large">
         <img
           src="/assets/images/cp-mark.png"
-          alt="CP"
-          width="220"
-          height="220"
+          alt="Cesare Paratore"
+          width="210"
+          height="210"
         >
       </div>
 
@@ -156,805 +89,727 @@
         <span class="standby-label">IN ATTESA</span>
       </div>
 
-    </div>
+      <button
+        class="standby-wake"
+        type="button"
+        aria-label="Riattiva la pagina"
+      >
+        RIATTIVA
+      </button>
 
+    </div>
   </div>
 
 
   <!-- =========================================================
-       SITE
-       ========================================================= -->
+       CUSTOM CURSOR
+  ========================================================== -->
 
-  <div id="site">
+  <div class="cursor cursor-dot" aria-hidden="true"></div>
+  <div class="cursor cursor-ring" aria-hidden="true"></div>
+
+
+  <!-- =========================================================
+       HEADER
+  ========================================================== -->
+
+  <header class="site-header">
+
+    <a
+      class="site-header-brand"
+      href="/"
+      aria-label="Cesare Paratore — Home"
+    >
+      <span class="site-header-logo site-header-logo--large">
+        <img
+          src="/assets/images/cp-mark.png"
+          alt="Cesare Paratore"
+          width="110"
+          height="110"
+        >
+      </span>
+
+      <span class="site-header-brand-copy">
+        <span class="site-header-name">
+          CESARE PARATORE
+        </span>
+
+        <span class="site-header-motto">
+          MOVIMENTO / CON DIREZIONE.
+        </span>
+      </span>
+    </a>
+
+    <div class="site-header-meta">
+      <span
+        class="site-header-section-counter"
+        aria-live="polite"
+      >
+        01 / 10
+      </span>
+
+      <button
+        class="menu-trigger"
+        type="button"
+        aria-expanded="false"
+        aria-controls="site-menu"
+      >
+        <span class="menu-trigger-label">MENU</span>
+        <span class="menu-trigger-line"></span>
+      </button>
+    </div>
+
+  </header>
+
+
+  <!-- =========================================================
+       SITE MENU
+       Solo architettura interna del sito.
+       NON contiene le 10 sezioni narrative della Home.
+  ========================================================== -->
+
+  <aside
+    id="site-menu"
+    class="site-menu"
+    aria-hidden="true"
+  >
+
+    <div class="site-menu-backdrop"></div>
+
+    <div class="site-menu-panel">
+
+      <div class="site-menu-header">
+
+        <div>
+          <span class="site-menu-kicker">
+            ARCHITETTURA
+          </span>
+
+          <h2 class="site-menu-title">
+            LE DIREZIONI.
+          </h2>
+        </div>
+
+        <button
+          class="site-menu-close"
+          type="button"
+          aria-label="Chiudi menu"
+        >
+          <span class="site-menu-close-mark"></span>
+        </button>
+
+      </div>
+
+
+      <nav
+        class="site-menu-nav"
+        aria-label="Navigazione principale"
+      >
+
+        <!-- 01 -->
+        <a
+          class="site-menu-link"
+          href="/chi-sono/"
+        >
+          <span class="site-menu-link-number">01</span>
+
+          <span class="site-menu-link-content">
+            <span class="site-menu-link-title">
+              CHI SONO
+            </span>
+
+            <span class="site-menu-trace">
+              <span class="site-menu-trace-line">
+                <span class="site-menu-trace-point"></span>
+              </span>
+            </span>
+          </span>
+        </a>
+
+
+        <!-- 02 -->
+        <a
+          class="site-menu-link"
+          href="/scienze-motorie/"
+        >
+          <span class="site-menu-link-number">02</span>
+
+          <span class="site-menu-link-content">
+            <span class="site-menu-link-title">
+              SCIENZE MOTORIE
+            </span>
+
+            <span class="site-menu-trace">
+              <span class="site-menu-trace-line">
+                <span class="site-menu-trace-point"></span>
+              </span>
+            </span>
+          </span>
+        </a>
+
+
+        <!-- 03 -->
+        <a
+          class="site-menu-link"
+          href="/sport/"
+        >
+          <span class="site-menu-link-number">03</span>
+
+          <span class="site-menu-link-content">
+            <span class="site-menu-link-title">
+              SPORT
+            </span>
+
+            <span class="site-menu-trace">
+              <span class="site-menu-trace-line">
+                <span class="site-menu-trace-point"></span>
+              </span>
+            </span>
+          </span>
+        </a>
+
+
+        <!-- 04 -->
+        <a
+          class="site-menu-link"
+          href="/corsa-running/"
+        >
+          <span class="site-menu-link-number">04</span>
+
+          <span class="site-menu-link-content">
+            <span class="site-menu-link-title">
+              CORSA / RUNNING
+            </span>
+
+            <span class="site-menu-trace">
+              <span class="site-menu-trace-line">
+                <span class="site-menu-trace-point"></span>
+              </span>
+            </span>
+          </span>
+        </a>
+
+
+        <!-- 05 -->
+        <a
+          class="site-menu-link"
+          href="/preparazione-atletica/"
+        >
+          <span class="site-menu-link-number">05</span>
+
+          <span class="site-menu-link-content">
+            <span class="site-menu-link-title">
+              PREPARAZIONE ATLETICA
+            </span>
+
+            <span class="site-menu-trace">
+              <span class="site-menu-trace-line">
+                <span class="site-menu-trace-point"></span>
+              </span>
+            </span>
+          </span>
+        </a>
+
+
+        <!-- 06 -->
+        <a
+          class="site-menu-link"
+          href="/educazione/"
+        >
+          <span class="site-menu-link-number">06</span>
+
+          <span class="site-menu-link-content">
+            <span class="site-menu-link-title">
+              EDUCAZIONE
+            </span>
+
+            <span class="site-menu-trace">
+              <span class="site-menu-trace-line">
+                <span class="site-menu-trace-point"></span>
+              </span>
+            </span>
+          </span>
+        </a>
+
+
+        <!-- 07 -->
+        <a
+          class="site-menu-link"
+          href="/management-dello-sport/"
+        >
+          <span class="site-menu-link-number">07</span>
+
+          <span class="site-menu-link-content">
+            <span class="site-menu-link-title">
+              MANAGEMENT DELLO SPORT
+            </span>
+
+            <span class="site-menu-trace">
+              <span class="site-menu-trace-line">
+                <span class="site-menu-trace-point"></span>
+              </span>
+            </span>
+          </span>
+        </a>
+
+
+        <!-- 08 -->
+        <a
+          class="site-menu-link"
+          href="/presenza-web/"
+        >
+          <span class="site-menu-link-number">08</span>
+
+          <span class="site-menu-link-content">
+            <span class="site-menu-link-title">
+              PRESENZA WEB
+            </span>
+
+            <span class="site-menu-trace">
+              <span class="site-menu-trace-line">
+                <span class="site-menu-trace-point"></span>
+              </span>
+            </span>
+          </span>
+        </a>
+
+
+        <!-- 09 -->
+        <a
+          class="site-menu-link"
+          href="/territorio/"
+        >
+          <span class="site-menu-link-number">09</span>
+
+          <span class="site-menu-link-content">
+            <span class="site-menu-link-title">
+              TERRITORIO
+            </span>
+
+            <span class="site-menu-trace">
+              <span class="site-menu-trace-line">
+                <span class="site-menu-trace-point"></span>
+              </span>
+            </span>
+          </span>
+        </a>
+
+
+        <!-- 10 -->
+        <a
+          class="site-menu-link"
+          href="/contatti/"
+        >
+          <span class="site-menu-link-number">10</span>
+
+          <span class="site-menu-link-content">
+            <span class="site-menu-link-title">
+              CONTATTI
+            </span>
+
+            <span class="site-menu-trace">
+              <span class="site-menu-trace-line">
+                <span class="site-menu-trace-point"></span>
+              </span>
+            </span>
+          </span>
+        </a>
+
+      </nav>
+
+
+      <div class="site-menu-footer">
+        <span>
+          CESARE PARATORE
+        </span>
+
+        <span>
+          MOVIMENTO / CON DIREZIONE.
+        </span>
+      </div>
+
+    </div>
+
+  </aside>
+
+
+  <!-- =========================================================
+       SCROLL PROGRESS
+  ========================================================== -->
+
+  <div
+    class="scroll-progress"
+    aria-hidden="true"
+  >
+    <span class="scroll-progress-bar"></span>
+  </div>
+
+
+  <!-- =========================================================
+       MAIN
+  ========================================================== -->
+
+  <main id="main-content">
+
 
     <!-- =======================================================
-         HEADER
-         INTERAMENTE PAPER
-         ======================================================= -->
+         01 — L'INIZIO
+    ======================================================== -->
 
-    <header class="site-header">
+    <section
+      id="inizio"
+      class="home-section home-section-dark home-section-hero"
+      data-section="01"
+      data-section-label="L'INIZIO"
+    >
 
-      <div class="header-main">
+      <div class="hero-atmosphere" aria-hidden="true">
+        <span class="hero-orbit hero-orbit-a"></span>
+        <span class="hero-orbit hero-orbit-b"></span>
+        <span class="hero-orbit hero-orbit-c"></span>
 
-        <a
-          class="site-brand"
-          href="/"
-          aria-label="Cesare Paratore — Home"
-        >
+        <span class="hero-trace hero-trace-a"></span>
+        <span class="hero-trace hero-trace-b"></span>
+      </div>
 
-          <span class="site-brand-mark">
+      <div class="section-inner hero-inner">
+
+        <div class="section-kicker reveal">
+          01 — L'INIZIO
+        </div>
+
+        <div class="hero-copy">
+
+          <div class="hero-identity reveal">
+            CESARE PARATORE
+          </div>
+
+          <h1 class="hero-title reveal">
+            <span>MOVIMENTO.</span>
+            <span>CON DIREZIONE.</span>
+          </h1>
+
+          <div class="hero-intro reveal">
+            <p>
+              Il movimento è ciò da cui tutto prende forma.
+            </p>
+
+            <p>
+              La direzione è ciò che gli dà senso.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="hero-text reveal">
+
+          <p>
+            Prima viene il movimento.
+            Il primo passo.
+            Il corpo che scopre uno spazio.
+            La corsa che diventa ritmo.
+            La fatica che diventa esperienza.
+            La pratica che diventa conoscenza.
+          </p>
+
+          <p>
+            È da qui che è iniziato il mio percorso.
+            Non sapevo ancora quante strade avrebbe preso.
+            Sapevo soltanto che volevo continuare a seguirlo.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =======================================================
+         02 — IL CENTRO
+    ======================================================== -->
+
+    <section
+      id="il-centro"
+      class="home-section home-section-light home-section-editorial"
+      data-section="02"
+      data-section-label="IL CENTRO"
+    >
+
+      <div class="section-inner editorial-grid">
+
+        <div class="section-kicker reveal">
+          02 — IL CENTRO
+        </div>
+
+        <div class="editorial-main">
+
+          <h2 class="section-title reveal">
+            TUTTO È PARTITO DA UNA DOMANDA.
+          </h2>
+
+          <p class="editorial-question reveal">
+            Cosa può diventare una persona quando impara davvero a muoversi?
+          </p>
+
+          <div class="editorial-body reveal">
+
+            <p>
+              Non soltanto più veloce.
+              Più consapevole.
+              Capace di conoscere il proprio corpo,
+              affrontare una difficoltà, stare dentro una squadra,
+              imparare attraverso l’esperienza.
+            </p>
+
+            <p>
+              Il movimento può essere allenamento.
+              Può essere educazione.
+              Può essere sport.
+              Può diventare metodo.
+            </p>
+
+            <p>
+              E, quando lo si osserva abbastanza a lungo,
+              racconta molto più del corpo.
+              Racconta come impariamo.
+              Come cambiamo.
+              Come scegliamo una direzione.
+            </p>
+
+            <p>
+              Per questo
+              <strong>Scienze Motorie e Sport</strong>
+              sono il centro del mio percorso.
+              Tutto il resto è nato da lì.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =======================================================
+         03 — CINQUE DIREZIONI
+    ======================================================== -->
+
+    <section
+      id="cinque-direzioni"
+      class="home-section home-section-dark home-section-directions"
+      data-section="03"
+      data-section-label="CINQUE DIREZIONI"
+    >
+
+      <div class="section-inner">
+
+        <div class="section-kicker reveal">
+          03 — CINQUE DIREZIONI
+        </div>
+
+        <div class="directions-heading">
+          <h2 class="section-title reveal">
+            A UN CERTO PUNTO,
+            IL PERCORSO SI È APERTO.
+          </h2>
+
+          <p class="directions-lead reveal">
+            Non in cinque percorsi diversi.
+            <strong>In cinque direzioni.</strong>
+          </p>
+        </div>
+
+
+        <div class="directions-grid">
+
+          <article class="direction-card reveal">
+            <span class="direction-number">01</span>
+            <h3>SCIENZE MOTORIE</h3>
+            <p>
+              Il punto di partenza.
+              Il corpo.
+              Il movimento.
+              Le capacità motorie.
+              La formazione.
+              Il metodo.
+              La base da cui tutto ha preso forma.
+            </p>
+          </article>
+
+          <article class="direction-card reveal">
+            <span class="direction-number">02</span>
+            <h3>SPORT</h3>
+            <p>
+              Poi arriva la pratica.
+              La corsa.
+              L’atletica.
+              L’allenamento.
+              La preparazione.
+              Ciò che studi incontra qualcosa di reale:
+              un corpo, una pista, un obiettivo.
+            </p>
+          </article>
+
+          <article class="direction-card reveal">
+            <span class="direction-number">03</span>
+            <h3>EDUCAZIONE</h3>
+            <p>
+              Poi arriva una domanda più grande.
+              Cosa succede quando il movimento non lo vivi soltanto,
+              ma lo insegni?
+              A scuola il corpo entra nella relazione.
+              Diventa esperienza.
+              Diventa apprendimento.
+              Diventa crescita.
+            </p>
+          </article>
+
+          <article class="direction-card reveal">
+            <span class="direction-number">04</span>
+            <h3>MANAGEMENT</h3>
+            <p>
+              E quando qualcosa deve essere costruito,
+              serve una visione.
+              Progettare.
+              Organizzare.
+              Comprendere.
+              Mettere in relazione persone,
+              idee e possibilità.
+            </p>
+          </article>
+
+          <article class="direction-card reveal">
+            <span class="direction-number">05</span>
+            <h3>DIGITALE</h3>
+            <p>
+              Infine, un altro spazio.
+              Quello in cui le idee possono incontrare persone
+              anche a distanza.
+              Il digitale non è il centro.
+              È uno strumento.
+              Per raccontare.
+              Progettare.
+              Creare presenza.
+            </p>
+          </article>
+
+        </div>
+
+        <div class="directions-ending reveal">
+          <span>Cinque direzioni.</span>
+          <span>Un solo punto di partenza.</span>
+          <strong class="directions-cp-mark">
             <img
               src="/assets/images/cp-mark.png"
               alt="CP"
-              width="84"
-              height="84"
+              width="110"
+              height="110"
             >
-          </span>
+          </strong>
+        </div>
 
-          <span class="site-brand-copy">
-            <span class="site-brand-name">
-              CESARE PARATORE
-            </span>
+      </div>
 
-            <span class="site-brand-motto">
-              MOVIMENTO / CON DIREZIONE.
-            </span>
-          </span>
-
-        </a>
+    </section>
 
 
-        <div class="header-status">
+    <!-- =======================================================
+         04 — LA PERSONA
+    ======================================================== -->
 
-          <span
-            class="header-section-counter"
-            aria-live="polite"
-          >
-            <span class="header-section-current">01</span>
-            <span class="header-section-divider">/</span>
-            <span class="header-section-total">10</span>
-          </span>
+    <section
+      id="la-persona"
+      class="home-section home-section-light home-section-person"
+      data-section="04"
+      data-section-label="LA PERSONA"
+    >
 
-          <button
-            class="menu-toggle"
-            type="button"
-            aria-controls="site-menu"
-            aria-expanded="false"
-          >
-            <span class="menu-toggle-label">MENU</span>
+      <div class="section-inner editorial-grid">
 
-            <span
-              class="menu-toggle-icon"
-              aria-hidden="true"
-            >
-              <span></span>
-              <span></span>
-            </span>
-          </button>
+        <div class="section-kicker reveal">
+          04 — LA PERSONA
+        </div>
+
+        <div class="editorial-main">
+
+          <h2 class="section-title reveal">
+            UN CURRICULUM DICE COSA HAI FATTO.
+          </h2>
+
+          <p class="editorial-question reveal">
+            Un percorso racconta
+            <strong>cosa quelle esperienze hanno fatto a te.</strong>
+          </p>
+
+          <div class="editorial-body reveal">
+
+            <p>
+              Le Scienze Motorie mi hanno dato un centro.
+              Lo sport mi ha insegnato la pratica.
+              La corsa mi ha insegnato che il tempo conta.
+              La scuola mi ha mostrato che ogni persona impara in modo diverso.
+              Il management mi ha insegnato a guardare oltre l’esecuzione.
+              Il digitale mi ha insegnato che anche una presenza può essere progettata.
+            </p>
+
+            <p>
+              Ogni esperienza ha lasciato una traccia.
+              Ma nessuna è rimasta dove l’avevo incontrata.
+              È passata nella successiva.
+              Si è trasformata.
+              Ha cambiato il modo in cui guardavo quella dopo ancora.
+            </p>
+
+            <p>
+              Forse è questo che significa crescere:
+              <strong>
+                non accumulare esperienze,
+                ma permettere loro di cambiarti.
+              </strong>
+            </p>
+
+          </div>
 
         </div>
 
       </div>
 
-    </header>
+    </section>
 
 
     <!-- =======================================================
-         MAIN MENU
-         SOLO PAGINE INTERNE
-         ======================================================= -->
+         05 — LA DIREZIONE
+    ======================================================== -->
 
-    <div
-      id="site-menu"
-      class="site-menu"
-      aria-hidden="true"
+    <section
+      id="la-direzione"
+      class="home-section home-section-dark home-section-direction"
+      data-section="05"
+      data-section-label="LA DIREZIONE"
     >
 
-      <div class="site-menu-backdrop"></div>
+      <div class="section-inner">
 
-      <div class="site-menu-panel">
-
-        <div class="site-menu-head">
-
-          <span class="site-menu-kicker">
-            NAVIGAZIONE
-          </span>
-
-          <button
-            class="site-menu-close"
-            type="button"
-            aria-label="Chiudi menu"
-          >
-            CHIUDI
-          </button>
-
+        <div class="section-kicker reveal">
+          05 — LA DIREZIONE
         </div>
 
+        <div class="direction-layout">
 
-        <nav
-          class="site-menu-nav"
-          aria-label="Navigazione principale"
-        >
+          <div class="direction-copy">
 
-          <a
-            class="site-menu-link"
-            href="/"
-            data-menu-link
-          >
-            <span class="site-menu-number">00</span>
-            <span class="site-menu-label">HOME</span>
-            <span class="site-menu-arrow">↗</span>
-          </a>
-
-          <a
-            class="site-menu-link"
-            href="/chi-sono/"
-            data-menu-link
-          >
-            <span class="site-menu-number">01</span>
-            <span class="site-menu-label">CHI SONO</span>
-            <span class="site-menu-arrow">↗</span>
-          </a>
-
-          <a
-            class="site-menu-link"
-            href="/scienze-motorie/"
-            data-menu-link
-          >
-            <span class="site-menu-number">02</span>
-            <span class="site-menu-label">SCIENZE MOTORIE</span>
-            <span class="site-menu-arrow">↗</span>
-          </a>
-
-          <a
-            class="site-menu-link"
-            href="/sport/"
-            data-menu-link
-          >
-            <span class="site-menu-number">03</span>
-            <span class="site-menu-label">SPORT</span>
-            <span class="site-menu-arrow">↗</span>
-          </a>
-
-          <a
-            class="site-menu-link"
-            href="/corsa-running/"
-            data-menu-link
-          >
-            <span class="site-menu-number">04</span>
-            <span class="site-menu-label">CORSA / RUNNING</span>
-            <span class="site-menu-arrow">↗</span>
-          </a>
-
-          <a
-            class="site-menu-link"
-            href="/preparazione-atletica/"
-            data-menu-link
-          >
-            <span class="site-menu-number">05</span>
-            <span class="site-menu-label">PREPARAZIONE ATLETICA</span>
-            <span class="site-menu-arrow">↗</span>
-          </a>
-
-          <a
-            class="site-menu-link"
-            href="/educazione/"
-            data-menu-link
-          >
-            <span class="site-menu-number">06</span>
-            <span class="site-menu-label">EDUCAZIONE</span>
-            <span class="site-menu-arrow">↗</span>
-          </a>
-
-          <a
-            class="site-menu-link"
-            href="/management-dello-sport/"
-            data-menu-link
-          >
-            <span class="site-menu-number">07</span>
-            <span class="site-menu-label">MANAGEMENT DELLO SPORT</span>
-            <span class="site-menu-arrow">↗</span>
-          </a>
-
-          <a
-            class="site-menu-link"
-            href="/presenza-web/"
-            data-menu-link
-          >
-            <span class="site-menu-number">08</span>
-            <span class="site-menu-label">PRESENZA WEB</span>
-            <span class="site-menu-arrow">↗</span>
-          </a>
-
-          <a
-            class="site-menu-link"
-            href="/territorio/"
-            data-menu-link
-          >
-            <span class="site-menu-number">09</span>
-            <span class="site-menu-label">TERRITORIO</span>
-            <span class="site-menu-arrow">↗</span>
-          </a>
-
-          <a
-            class="site-menu-link"
-            href="/contatti/"
-            data-menu-link
-          >
-            <span class="site-menu-number">10</span>
-            <span class="site-menu-label">CONTATTI</span>
-            <span class="site-menu-arrow">↗</span>
-          </a>
-
-        </nav>
-
-      </div>
-
-    </div>
-
-
-    <!-- =======================================================
-         SCROLL PROGRESS
-         ======================================================= -->
-
-    <div
-      class="scroll-progress"
-      aria-hidden="true"
-    >
-      <span class="scroll-progress-fill"></span>
-    </div>
-
-
-    <!-- =======================================================
-         HOME SECTION NAVIGATION
-         ORIZZONTALE / SINCRONIZZATA ALLO SCROLL
-         ======================================================= -->
-
-    <nav
-      class="home-section-nav"
-      aria-label="Sezioni della Home"
-    >
-
-      <div class="home-section-nav-track">
-
-        <a
-          class="home-section-nav-item is-active"
-          href="#section-01"
-          data-section-target="section-01"
-        >
-          <span class="home-section-nav-number">01</span>
-          <span class="home-section-nav-label">L'INIZIO</span>
-        </a>
-
-        <a
-          class="home-section-nav-item"
-          href="#section-02"
-          data-section-target="section-02"
-        >
-          <span class="home-section-nav-number">02</span>
-          <span class="home-section-nav-label">IL CENTRO</span>
-        </a>
-
-        <a
-          class="home-section-nav-item"
-          href="#section-03"
-          data-section-target="section-03"
-        >
-          <span class="home-section-nav-number">03</span>
-          <span class="home-section-nav-label">CINQUE DIREZIONI</span>
-        </a>
-
-        <a
-          class="home-section-nav-item"
-          href="#section-04"
-          data-section-target="section-04"
-        >
-          <span class="home-section-nav-number">04</span>
-          <span class="home-section-nav-label">LA PERSONA</span>
-        </a>
-
-        <a
-          class="home-section-nav-item"
-          href="#section-05"
-          data-section-target="section-05"
-        >
-          <span class="home-section-nav-number">05</span>
-          <span class="home-section-nav-label">LA DIREZIONE</span>
-        </a>
-
-        <a
-          class="home-section-nav-item"
-          href="#section-06"
-          data-section-target="section-06"
-        >
-          <span class="home-section-nav-number">06</span>
-          <span class="home-section-nav-label">LE TRACCE</span>
-        </a>
-
-        <a
-          class="home-section-nav-item"
-          href="#section-07"
-          data-section-target="section-07"
-        >
-          <span class="home-section-nav-number">07</span>
-          <span class="home-section-nav-label">IL PUNTO ZERO</span>
-        </a>
-
-        <a
-          class="home-section-nav-item"
-          href="#section-08"
-          data-section-target="section-08"
-        >
-          <span class="home-section-nav-number">08</span>
-          <span class="home-section-nav-label">ADESSO TOCCA A TE</span>
-        </a>
-
-        <a
-          class="home-section-nav-item"
-          href="#section-09"
-          data-section-target="section-09"
-        >
-          <span class="home-section-nav-number">09</span>
-          <span class="home-section-nav-label">LA TUA DIREZIONE</span>
-        </a>
-
-        <a
-          class="home-section-nav-item"
-          href="#section-10"
-          data-section-target="section-10"
-        >
-          <span class="home-section-nav-number">10</span>
-          <span class="home-section-nav-label">IL CONTATTO</span>
-        </a>
-
-      </div>
-
-    </nav>
-
-
-    <!-- =======================================================
-         MAIN
-         ======================================================= -->
-
-    <main id="main-content">
-
-
-      <!-- =====================================================
-           01 — L'INIZIO
-           NAVY
-           ===================================================== -->
-
-      <section
-        id="section-01"
-        class="home-section home-section-dark hero-section"
-        data-section="01"
-        data-section-label="L'INIZIO"
-      >
-
-        <div class="section-inner hero-layout">
-
-          <div class="editorial-copy reveal">
-
-            <p class="section-kicker">
-              01 — L'INIZIO
-            </p>
-
-            <p class="hero-name">
-              CESARE PARATORE
-            </p>
-
-            <h1 class="hero-title">
-              <span>MOVIMENTO.</span>
-              <span>CON DIREZIONE.</span>
-            </h1>
-
-            <p class="hero-lead">
-              Il movimento è ciò da cui tutto prende forma.
-              <br>
-              La direzione è ciò che gli dà senso.
-            </p>
-
-          </div>
-
-
-          <div class="hero-visual visual-field reveal" aria-hidden="true">
-
-            <span class="visual-grid"></span>
-            <span class="visual-orbit visual-orbit-a"></span>
-            <span class="visual-orbit visual-orbit-b"></span>
-            <span class="visual-line visual-line-a"></span>
-            <span class="visual-line visual-line-b"></span>
-
-            <div class="visual-core visual-core-paper">
-              <img
-                src="/assets/images/cp-mark.png"
-                alt=""
-                width="220"
-                height="220"
-              >
-            </div>
-
-          </div>
-
-        </div>
-
-        <div class="section-scroll-cue" aria-hidden="true">
-          <span>SCORRI</span>
-          <span class="section-scroll-line"></span>
-        </div>
-
-      </section>
-
-
-      <!-- =====================================================
-           02 — IL CENTRO
-           PAPER
-           ===================================================== -->
-
-      <section
-        id="section-02"
-        class="home-section home-section-light"
-        data-section="02"
-        data-section-label="IL CENTRO"
-      >
-
-        <div class="section-inner editorial-layout">
-
-          <div class="editorial-index reveal">
-            02
-          </div>
-
-          <div class="editorial-copy editorial-copy-wide reveal">
-
-            <p class="section-kicker">
-              IL CENTRO
-            </p>
-
-            <h2 class="section-title">
-              TUTTO È PARTITO DA UNA DOMANDA.
-            </h2>
-
-            <p class="section-question">
-              Cosa può diventare una persona quando impara davvero a muoversi?
-            </p>
-
-            <div class="editorial-body">
-
-              <p>
-                Non soltanto più veloce.
-                Più consapevole.
-                Capace di conoscere il proprio corpo,
-                affrontare una difficoltà,
-                stare dentro una squadra,
-                imparare attraverso l’esperienza.
-              </p>
-
-              <p>
-                Il movimento può essere allenamento.
-                Può essere educazione.
-                Può essere sport.
-                Può diventare metodo.
-              </p>
-
-              <p>
-                E, quando lo si osserva abbastanza a lungo,
-                racconta molto più del corpo.
-                Racconta come impariamo.
-                Come cambiamo.
-                Come scegliamo una direzione.
-              </p>
-
-              <p>
-                Per questo
-                <strong>Scienze Motorie e Sport</strong>
-                sono il centro del mio percorso.
-                Tutto il resto è nato da lì.
-              </p>
-
-            </div>
-
-          </div>
-
-          <div class="section-visual visual-field visual-field-light reveal" aria-hidden="true">
-
-            <span class="visual-grid"></span>
-            <span class="visual-crosshair"></span>
-            <span class="visual-line visual-line-a"></span>
-            <span class="visual-line visual-line-b"></span>
-
-            <div class="visual-word">
-              MOVIMENTO
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- =====================================================
-           03 — CINQUE DIREZIONI
-           NAVY
-           ===================================================== -->
-
-      <section
-        id="section-03"
-        class="home-section home-section-dark directions-section"
-        data-section="03"
-        data-section-label="CINQUE DIREZIONI"
-      >
-
-        <div class="section-inner">
-
-          <div class="section-heading reveal">
-
-            <p class="section-kicker">
-              03 — CINQUE DIREZIONI
-            </p>
-
-            <h2 class="section-title">
-              A UN CERTO PUNTO,
-              <br>
-              IL PERCORSO SI È APERTO.
-            </h2>
-
-            <p class="section-intro">
-              Non in cinque percorsi diversi.
-              <strong>In cinque direzioni.</strong>
-            </p>
-
-          </div>
-
-
-          <div class="directions-list">
-
-            <article class="direction-item reveal">
-              <span class="direction-number">01</span>
-
-              <div class="direction-copy">
-                <h3>SCIENZE MOTORIE</h3>
-
-                <p>
-                  Il punto di partenza.
-                  Il corpo.
-                  Il movimento.
-                  Le capacità motorie.
-                  La formazione.
-                  Il metodo.
-                  La base da cui tutto ha preso forma.
-                </p>
-              </div>
-            </article>
-
-
-            <article class="direction-item reveal">
-              <span class="direction-number">02</span>
-
-              <div class="direction-copy">
-                <h3>SPORT</h3>
-
-                <p>
-                  Poi arriva la pratica.
-                  La corsa.
-                  L’allenamento.
-                  La preparazione.
-                  Ciò che studi incontra qualcosa di reale:
-                  un corpo, una pista, un obiettivo.
-                  È lì che la conoscenza smette di essere soltanto teoria.
-                </p>
-              </div>
-            </article>
-
-
-            <article class="direction-item reveal">
-              <span class="direction-number">03</span>
-
-              <div class="direction-copy">
-                <h3>EDUCAZIONE</h3>
-
-                <p>
-                  Poi arriva una domanda più grande.
-                  <strong>
-                    Cosa succede quando il movimento non lo vivi soltanto,
-                    ma lo insegni?
-                  </strong>
-                  A scuola il corpo entra nella relazione.
-                  Diventa esperienza.
-                  Diventa apprendimento.
-                  Diventa crescita.
-                </p>
-              </div>
-            </article>
-
-
-            <article class="direction-item reveal">
-              <span class="direction-number">04</span>
-
-              <div class="direction-copy">
-                <h3>MANAGEMENT</h3>
-
-                <p>
-                  E quando qualcosa deve essere costruito,
-                  serve una visione.
-                  Progettare.
-                  Organizzare.
-                  Comprendere.
-                  Mettere in relazione persone,
-                  idee e possibilità.
-                  Dare forma a un’idea prima che diventi realtà.
-                </p>
-              </div>
-            </article>
-
-
-            <article class="direction-item reveal">
-              <span class="direction-number">05</span>
-
-              <div class="direction-copy">
-                <h3>DIGITALE</h3>
-
-                <p>
-                  Infine, un altro spazio.
-                  Quello in cui le idee possono incontrare persone
-                  anche a distanza.
-                  Il digitale non è il centro.
-                  È uno strumento.
-                  Per raccontare.
-                  Progettare.
-                  Creare presenza.
-                  Mettere in relazione mondi che altrimenti
-                  rimarrebbero lontani.
-                </p>
-              </div>
-            </article>
-
-          </div>
-
-
-          <div class="directions-end reveal">
-
-            <span>CINQUE DIREZIONI.</span>
-            <strong>UN SOLO PUNTO DI PARTENZA.</strong>
-
-            <div class="directions-core">
-              <img
-                src="/assets/images/cp-mark.png"
-                alt="CP"
-                width="160"
-                height="160"
-              >
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- =====================================================
-           04 — LA PERSONA
-           PAPER
-           ===================================================== -->
-
-      <section
-        id="section-04"
-        class="home-section home-section-light"
-        data-section="04"
-        data-section-label="LA PERSONA"
-      >
-
-        <div class="section-inner editorial-layout">
-
-          <div class="editorial-index reveal">
-            04
-          </div>
-
-          <div class="editorial-copy editorial-copy-wide reveal">
-
-            <p class="section-kicker">
-              LA PERSONA
-            </p>
-
-            <h2 class="section-title">
-              UN CURRICULUM DICE COSA HAI FATTO.
-            </h2>
-
-            <p class="section-question">
-              Un percorso racconta
-              <strong>cosa quelle esperienze hanno fatto a te.</strong>
-            </p>
-
-            <div class="editorial-body">
-
-              <p>
-                Le Scienze Motorie mi hanno dato un centro.
-                Lo sport mi ha insegnato la pratica.
-                La corsa mi ha insegnato che il tempo conta.
-              </p>
-
-              <p>
-                La scuola mi ha mostrato che ogni persona
-                impara in modo diverso.
-                Il management mi ha insegnato a guardare
-                oltre l’esecuzione.
-                Il digitale mi ha insegnato che anche una presenza
-                può essere progettata.
-              </p>
-
-              <p>
-                Ogni esperienza ha lasciato una traccia.
-                Ma nessuna è rimasta dove l’avevo incontrata.
-                È passata nella successiva.
-                Si è trasformata.
-                Ha cambiato il modo in cui guardavo quella dopo ancora.
-              </p>
-
-              <p>
-                Forse è questo che significa crescere:
-                <strong>
-                  non accumulare esperienze,
-                  ma permettere loro di cambiarti.
-                </strong>
-              </p>
-
-            </div>
-
-          </div>
-
-
-          <div class="section-visual visual-field visual-field-light reveal" aria-hidden="true">
-
-            <span class="visual-orbit visual-orbit-a"></span>
-            <span class="visual-orbit visual-orbit-b"></span>
-            <span class="visual-line visual-line-a"></span>
-            <span class="visual-line visual-line-b"></span>
-
-            <div class="visual-word visual-word-vertical">
-              TRACCE
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- =====================================================
-           05 — LA DIREZIONE
-           NAVY
-           ===================================================== -->
-
-      <section
-        id="section-05"
-        class="home-section home-section-dark direction-main-section"
-        data-section="05"
-        data-section-label="LA DIREZIONE"
-      >
-
-        <div class="section-inner editorial-layout">
-
-          <div class="editorial-copy editorial-copy-wide reveal">
-
-            <p class="section-kicker">
-              05 — LA DIREZIONE
-            </p>
-
-            <h2 class="section-title">
+            <h2 class="section-title reveal">
               MUOVERSI È FACILE.
             </h2>
 
-            <p class="section-question">
-              Basta partire.
-              <br>
-              La parte difficile viene dopo.
-            </p>
-
-            <div class="editorial-body">
+            <div class="direction-body reveal">
 
               <p>
+                Basta partire.
+                La parte difficile viene dopo.
                 Capire dove andare.
               </p>
 
@@ -983,84 +838,74 @@
                 provo a capire perché quella strada.
               </p>
 
-              <p class="editorial-emphasis">
-                Non tutto ciò che porta avanti
-                porta nella direzione giusta.
+              <p class="direction-final">
+                <strong>
+                  Non tutto ciò che porta avanti
+                  porta nella direzione giusta.
+                </strong>
               </p>
 
             </div>
 
           </div>
 
-
-          <div class="section-visual visual-field reveal" aria-hidden="true">
-
-            <span class="trajectory trajectory-a"></span>
-            <span class="trajectory trajectory-b"></span>
-            <span class="trajectory trajectory-c"></span>
-
-            <span class="visual-crosshair"></span>
-
-            <div class="visual-direction-marker">
-              →
-            </div>
-
+          <div
+            class="direction-visual"
+            aria-hidden="true"
+          >
+            <span class="direction-orbit direction-orbit-a"></span>
+            <span class="direction-orbit direction-orbit-b"></span>
+            <span class="direction-vector"></span>
+            <span class="direction-point"></span>
           </div>
 
         </div>
 
-      </section>
+      </div>
+
+    </section>
 
 
-      <!-- =====================================================
-           06 — LE TRACCE
-           PAPER
-           ===================================================== -->
+    <!-- =======================================================
+         06 — LE TRACCE
+         Visual separato dal testo: nessun clipping del titolo.
+    ======================================================== -->
 
-      <section
-        id="section-06"
-        class="home-section home-section-light"
-        data-section="06"
-        data-section-label="LE TRACCE"
-      >
+    <section
+      id="le-tracce"
+      class="home-section home-section-light home-section-traces"
+      data-section="06"
+      data-section-label="LE TRACCE"
+    >
 
-        <div class="section-inner editorial-layout">
+      <div class="section-inner">
 
-          <div class="editorial-index reveal">
-            06
-          </div>
+        <div class="section-kicker reveal">
+          06 — LE TRACCE
+        </div>
 
-          <div class="editorial-copy editorial-copy-wide reveal">
+        <div class="traces-layout">
 
-            <p class="section-kicker">
-              LE TRACCE
-            </p>
+          <div class="traces-copy">
 
-            <h2 class="section-title">
+            <h2 class="section-title reveal">
               ALCUNE COSE LE IMPARI STUDIANDO.
             </h2>
 
-            <p class="section-question">
-              Altre correndo.
-              <br>
-              Altre ancora insegnando.
-              <br>
-              E alcune soltanto dopo aver sbagliato.
-            </p>
+            <div class="traces-body reveal">
 
-            <div class="editorial-body">
+              <p>
+                Altre correndo.
+                Altre ancora insegnando.
+                E alcune soltanto dopo aver sbagliato.
+              </p>
 
               <p>
                 La formazione universitaria ha costruito le fondamenta.
                 Lo sport ha dato a quelle conoscenze un corpo.
                 La scuola ha aggiunto persone, relazioni, responsabilità.
-              </p>
-
-              <p>
-                Il management ha aperto la prospettiva
-                della progettazione.
-                Il digitale ha portato il percorso
-                in uno spazio nuovo.
+                Il management ha aperto la prospettiva della progettazione.
+                Il digitale ha portato il percorso in uno spazio nuovo.
               </p>
 
               <p>
@@ -1073,9 +918,6 @@
                 È così che un percorso cresce.
                 Non come una linea retta.
                 Più come una traiettoria.
-              </p>
-
-              <p>
                 A volte precisa.
                 A volte inattesa.
                 <strong>Ma sempre in movimento.</strong>
@@ -1086,65 +928,89 @@
           </div>
 
 
-          <div class="section-visual visual-field visual-field-light reveal" aria-hidden="true">
+          <!--
+            VISUAL COMPLETAMENTE SEPARATO DAL TESTO.
+            La safe-area viene gestita dal CSS.
+          -->
 
-            <span class="trace trace-a"></span>
-            <span class="trace trace-b"></span>
-            <span class="trace trace-c"></span>
-            <span class="trace trace-d"></span>
+          <div
+            class="traces-visual"
+            aria-hidden="true"
+          >
 
-            <div class="visual-word">
-              TRAIETTORIA
+            <div class="traces-visual-field">
+
+              <span class="trace-line trace-line-a"></span>
+              <span class="trace-line trace-line-b"></span>
+              <span class="trace-line trace-line-c"></span>
+
+              <span class="trace-orbit trace-orbit-a"></span>
+              <span class="trace-orbit trace-orbit-b"></span>
+
+              <span class="trace-node trace-node-a"></span>
+              <span class="trace-node trace-node-b"></span>
+              <span class="trace-node trace-node-c"></span>
+
+              <span class="trace-axis trace-axis-x"></span>
+              <span class="trace-axis trace-axis-y"></span>
+
             </div>
 
           </div>
 
         </div>
 
-      </section>
+      </div>
+
+    </section>
 
 
-      <!-- =====================================================
-           07 — IL PUNTO ZERO
-           NAVY
-           ===================================================== -->
+    <!-- =======================================================
+         07 — IL PUNTO ZERO
+    ======================================================== -->
 
-      <section
-        id="section-07"
-        class="home-section home-section-dark territory-section"
-        data-section="07"
-        data-section-label="IL PUNTO ZERO"
-      >
+    <section
+      id="il-punto-zero"
+      class="home-section home-section-dark home-section-territory"
+      data-section="07"
+      data-section-label="IL PUNTO ZERO"
+    >
 
-        <div class="section-inner editorial-layout">
+      <div class="section-inner">
 
-          <div class="editorial-copy editorial-copy-wide reveal">
+        <div class="section-kicker reveal">
+          07 — IL PUNTO ZERO
+        </div>
 
-            <p class="section-kicker">
-              07 — IL PUNTO ZERO
-            </p>
+        <div class="territory-layout">
 
-            <h2 class="section-title">
+          <div class="territory-copy">
+
+            <h2 class="section-title reveal">
               OGNI TRAIETTORIA HA BISOGNO
               DI UN PUNTO DI PARTENZA.
             </h2>
 
-            <p class="section-question">
-              Il mio è <strong>Partinico.</strong>
-            </p>
+            <div class="territory-body reveal">
 
-            <div class="editorial-body">
+              <p>
+                Il mio è <strong>Partinico.</strong>
+              </p>
 
               <p>
                 Un luogo preciso.
-                Un contesto fatto di sport,
-                persone, associazioni,
-                incontri e possibilità.
+                Un contesto fatto di sport, scuola,
+                persone, associazioni, incontri e possibilità.
               </p>
 
               <p>
                 È qui che alcune delle prime direzioni
                 hanno preso forma.
+              </p>
+
+              <p>
+                Oggi uno spazio che non ha più bisogno
+                di una distanza fisica per creare una connessione.
               </p>
 
               <p>
@@ -1159,9 +1025,8 @@
                 </strong>
               </p>
 
-              <p class="editorial-emphasis">
+              <p>
                 Partinico è il punto di partenza.
-                <br>
                 Non il punto di arrivo.
               </p>
 
@@ -1169,133 +1034,112 @@
 
           </div>
 
+          <div
+            class="territory-visual"
+            aria-hidden="true"
+          >
+            <span class="territory-circle"></span>
+            <span class="territory-point"></span>
+            <span class="territory-line"></span>
+          </div>
 
-          <div class="section-visual visual-field territory-visual reveal" aria-hidden="true">
+        </div>
 
-            <span class="territory-ring territory-ring-a"></span>
-            <span class="territory-ring territory-ring-b"></span>
-            <span class="territory-line territory-line-a"></span>
-            <span class="territory-line territory-line-b"></span>
+      </div>
 
-            <div class="territory-point">
-              <span class="territory-point-core"></span>
-              <span class="territory-point-label">
-                PARTINICO
-              </span>
-            </div>
+    </section>
+
+
+    <!-- =======================================================
+         08 — ADESSO TOCCA A TE
+    ======================================================== -->
+
+    <section
+      id="adesso-tocca-a-te"
+      class="home-section home-section-light home-section-visitor"
+      data-section="08"
+      data-section-label="ADESSO TOCCA A TE"
+    >
+
+      <div class="section-inner visitor-layout">
+
+        <div class="section-kicker reveal">
+          08 — ADESSO TOCCA A TE
+        </div>
+
+        <div class="visitor-copy">
+
+          <h2 class="section-title reveal">
+            FORSE SEI ARRIVATO QUI PER CASO.
+          </h2>
+
+          <div class="visitor-body reveal">
+
+            <p>
+              O forse stavi cercando qualcosa.
+            </p>
+
+            <p>
+              Un modo per allenarti.
+              Un’idea per un progetto.
+              Una prospettiva sullo sport.
+              Un’esperienza educativa.
+              Un modo diverso di costruire qualcosa.
+              Una presenza digitale che abbia finalmente un senso.
+            </p>
+
+            <p>
+              Non so ancora quale sia la tua domanda.
+              Ed è giusto così.
+            </p>
+
+            <p>
+              Non tutte le domande arrivano già formulate.
+              A volte bisogna prima fermarsi.
+              Guardare.
+              Mettere ordine.
+              Capire cosa conta davvero.
+            </p>
+
+            <p>
+              <strong>Poi scegliere.</strong>
+            </p>
 
           </div>
 
         </div>
 
-      </section>
+      </div>
+
+    </section>
 
 
-      <!-- =====================================================
-           08 — ADESSO TOCCA A TE
-           PAPER
-           ===================================================== -->
+    <!-- =======================================================
+         09 — LA TUA DIREZIONE
+    ======================================================== -->
 
-      <section
-        id="section-08"
-        class="home-section home-section-light visitor-section"
-        data-section="08"
-        data-section-label="ADESSO TOCCA A TE"
-      >
+    <section
+      id="la-tua-direzione"
+      class="home-section home-section-dark home-section-your-direction"
+      data-section="09"
+      data-section-label="LA TUA DIREZIONE"
+    >
 
-        <div class="section-inner visitor-layout">
+      <div class="section-inner">
 
-          <div class="visitor-copy reveal">
-
-            <p class="section-kicker">
-              08 — ADESSO TOCCA A TE
-            </p>
-
-            <h2 class="section-title">
-              FORSE SEI ARRIVATO QUI
-              PER CASO.
-            </h2>
-
-            <div class="editorial-body">
-
-              <p>
-                O forse stavi cercando qualcosa.
-              </p>
-
-              <p>
-                Un modo per allenarti.
-                Un’idea per un progetto.
-                Una prospettiva sullo sport.
-                Un’esperienza educativa.
-                Un modo diverso di costruire qualcosa.
-                Una presenza digitale che abbia finalmente un senso.
-              </p>
-
-              <p>
-                Non so ancora quale sia la tua domanda.
-                Ed è giusto così.
-              </p>
-
-              <p>
-                Non tutte le domande arrivano già formulate.
-                A volte bisogna prima fermarsi.
-                Guardare.
-                Mettere ordine.
-                Capire cosa conta davvero.
-              </p>
-
-              <p class="editorial-emphasis">
-                Poi scegliere.
-              </p>
-
-            </div>
-
-          </div>
-
-
-          <div class="visitor-visual visual-field visual-field-light reveal" aria-hidden="true">
-
-            <div class="visitor-word">
-              TU
-            </div>
-
-            <span class="visitor-orbit"></span>
-            <span class="visitor-line visitor-line-a"></span>
-            <span class="visitor-line visitor-line-b"></span>
-
-          </div>
-
+        <div class="section-kicker reveal">
+          09 — LA TUA DIREZIONE
         </div>
 
-      </section>
+        <div class="your-direction-layout">
 
+          <div class="your-direction-copy">
 
-      <!-- =====================================================
-           09 — LA TUA DIREZIONE
-           NAVY
-           ===================================================== -->
-
-      <section
-        id="section-09"
-        class="home-section home-section-dark your-direction-section"
-        data-section="09"
-        data-section-label="LA TUA DIREZIONE"
-      >
-
-        <div class="section-inner your-direction-layout">
-
-          <div class="your-direction-copy reveal">
-
-            <p class="section-kicker">
-              09 — LA TUA DIREZIONE
-            </p>
-
-            <h2 class="section-title">
-              NON ESISTE UN SOLO
-              PUNTO DI INGRESSO.
+            <h2 class="section-title reveal">
+              NON ESISTE UN SOLO PUNTO DI INGRESSO.
             </h2>
 
-            <div class="editorial-body">
+            <div class="your-direction-body reveal">
 
               <p>
                 Puoi arrivare dal movimento.
@@ -1316,15 +1160,12 @@
               <p>
                 Puoi sapere dove vuoi arrivare.
                 Oppure sapere soltanto che
-                <strong>
-                  non vuoi rimanere dove sei.
-                </strong>
+                <strong>non vuoi rimanere dove sei.</strong>
               </p>
 
               <p>
                 Non serve avere tutto chiaro.
-                Serve trovare il prossimo passo
-                che abbia senso.
+                Serve trovare il prossimo passo che abbia senso.
               </p>
 
             </div>
@@ -1332,74 +1173,65 @@
           </div>
 
 
-          <div class="direction-question reveal">
+          <div class="your-direction-fields reveal">
 
-            <div class="direction-question-list">
+            <span>Scienze Motorie e Sport.</span>
+            <span>Sport.</span>
+            <span>Educazione.</span>
+            <span>Management.</span>
+            <span>Digitale.</span>
 
-              <span>SCIENZE MOTORIE E SPORT.</span>
-              <span>SPORT.</span>
-              <span>EDUCAZIONE.</span>
-              <span>MANAGEMENT.</span>
-              <span>DIGITALE.</span>
+          </div>
 
-            </div>
+          <div class="your-direction-question reveal">
+            <span>Cinque direzioni.</span>
+            <strong>Una sola domanda.</strong>
 
-            <div class="direction-question-bottom">
-
-              <span>
-                CINQUE DIREZIONI.
-              </span>
-
-              <strong>
-                UNA SOLA DOMANDA.
-              </strong>
-
-              <span class="direction-question-final">
-                QUAL È LA TUA?
-              </span>
-
-            </div>
-
+            <span class="your-direction-question-mark">
+              QUAL È LA TUA?
+            </span>
           </div>
 
         </div>
 
-      </section>
+      </div>
+
+    </section>
 
 
-      <!-- =====================================================
-           10 — IL CONTATTO
-           PAPER
-           SEZIONE + FOOTER UNIFICATI
-           ===================================================== -->
+    <!-- =======================================================
+         10 — IL CONTATTO
+         Footer integrato nella stessa grande chiusura.
+         Il logo ha una safe-area dedicata.
+    ======================================================== -->
 
-      <section
-        id="section-10"
-        class="home-section home-section-light contact-section"
-        data-section="10"
-        data-section-label="IL CONTATTO"
-      >
+    <section
+      id="il-contatto"
+      class="home-section home-section-light home-section-contact"
+      data-section="10"
+      data-section-label="IL CONTATTO"
+    >
 
-        <div class="section-inner contact-layout">
+      <div class="section-inner contact-inner">
 
-          <div class="contact-copy reveal">
+        <div class="section-kicker reveal">
+          10 — IL CONTATTO
+        </div>
 
-            <p class="section-kicker">
-              10 — IL CONTATTO
-            </p>
 
-            <h2 class="section-title">
+        <div class="contact-layout">
+
+          <div class="contact-copy">
+
+            <h2 class="section-title reveal">
               HAI UN OBIETTIVO?
             </h2>
 
-            <div class="editorial-body">
+            <div class="contact-body reveal">
 
               <p>
                 Allora partiamo da quello.
                 Non dalla soluzione.
-              </p>
-
-              <p>
                 Dal punto in cui sei.
                 Da ciò che vuoi costruire.
                 Da quello che ancora non sai come chiamare.
@@ -1419,30 +1251,48 @@
             </div>
 
             <a
-              class="contact-cta"
+              class="contact-cta reveal"
               href="/contatti/"
             >
-              <span>PARLIAMONE.</span>
-              <span aria-hidden="true">→</span>
+              <span class="contact-cta-label">
+                PARLIAMONE.
+              </span>
+
+              <span
+                class="contact-cta-trace"
+                aria-hidden="true"
+              >
+                <span class="contact-cta-trace-line"></span>
+                <span class="contact-cta-trace-point"></span>
+              </span>
             </a>
 
           </div>
 
 
-          <div class="contact-visual visual-field visual-field-light reveal" aria-hidden="true">
+          <!--
+            LOGO FINALE:
+            grande, autonomo e protetto.
+            La section navigation NON deve attraversare questa area.
+          -->
 
-            <span class="contact-orbit contact-orbit-a"></span>
-            <span class="contact-orbit contact-orbit-b"></span>
-            <span class="contact-line contact-line-a"></span>
-            <span class="contact-line contact-line-b"></span>
+          <div class="contact-logo-area">
 
-            <div class="contact-mark">
+            <div
+              class="contact-logo-disc"
+              aria-hidden="true"
+            >
+              <span class="contact-logo-orbit contact-logo-orbit-a"></span>
+              <span class="contact-logo-orbit contact-logo-orbit-b"></span>
+
               <img
+                class="contact-logo"
                 src="/assets/images/cp-mark.png"
-                alt=""
-                width="180"
-                height="180"
+                alt="Cesare Paratore"
+                width="260"
+                height="260"
               >
+
             </div>
 
           </div>
@@ -1451,9 +1301,8 @@
 
 
         <!-- ===================================================
-             FINAL SIGNATURE / FOOTER
-             INTEGRATO NELLA SEZIONE 10
-             =================================================== -->
+             INTEGRATED FOOTER
+        ==================================================== -->
 
         <footer class="site-footer">
 
@@ -1462,11 +1311,25 @@
             <div class="footer-brand">
               <img
                 src="/assets/images/cp-mark.png"
-                alt="CP"
-                width="120"
-                height="120"
+                alt="Cesare Paratore"
+                width="180"
+                height="180"
               >
             </div>
+
+
+            <div class="footer-identity">
+
+              <span class="footer-name">
+                CESARE PARATORE
+              </span>
+
+              <span class="footer-directions">
+                Scienze Motorie · Sport · Educazione · Management · Digitale
+              </span>
+
+            </div>
+
 
             <div class="footer-copyright">
               © 2026 CESARE PARATORE
@@ -1476,25 +1339,133 @@
 
         </footer>
 
-      </section>
+      </div>
 
-    </main>
+    </section>
 
-  </div>
+  </main>
 
 
   <!-- =========================================================
-       MOBILE / ACCESSIBILITY FALLBACK
-       ========================================================= -->
+       SECTION TRAJECTORY NAVIGATION
+       NON FIXED.
+       Segue il flusso della pagina.
+       Su mobile diventa una traiettoria orizzontale.
+  ========================================================== -->
 
-  <div
-    class="cursor"
-    aria-hidden="true"
+  <nav
+    class="home-section-nav"
+    aria-label="Traiettoria delle sezioni"
   >
-    <span class="cursor-dot"></span>
-    <span class="cursor-ring"></span>
-  </div>
 
+    <div class="home-section-nav-inner">
+
+      <div class="home-section-nav-heading">
+        <span>TRAIETTORIA</span>
+      </div>
+
+      <div class="home-section-nav-track">
+
+        <a
+          class="home-section-nav-item is-active"
+          href="#inizio"
+          data-section-target="inizio"
+        >
+          <span class="home-section-nav-number">01</span>
+          <span class="home-section-nav-label">L'INIZIO</span>
+        </a>
+
+        <a
+          class="home-section-nav-item"
+          href="#il-centro"
+          data-section-target="il-centro"
+        >
+          <span class="home-section-nav-number">02</span>
+          <span class="home-section-nav-label">IL CENTRO</span>
+        </a>
+
+        <a
+          class="home-section-nav-item"
+          href="#cinque-direzioni"
+          data-section-target="cinque-direzioni"
+        >
+          <span class="home-section-nav-number">03</span>
+          <span class="home-section-nav-label">CINQUE DIREZIONI</span>
+        </a>
+
+        <a
+          class="home-section-nav-item"
+          href="#la-persona"
+          data-section-target="la-persona"
+        >
+          <span class="home-section-nav-number">04</span>
+          <span class="home-section-nav-label">LA PERSONA</span>
+        </a>
+
+        <a
+          class="home-section-nav-item"
+          href="#la-direzione"
+          data-section-target="la-direzione"
+        >
+          <span class="home-section-nav-number">05</span>
+          <span class="home-section-nav-label">LA DIREZIONE</span>
+        </a>
+
+        <a
+          class="home-section-nav-item"
+          href="#le-tracce"
+          data-section-target="le-tracce"
+        >
+          <span class="home-section-nav-number">06</span>
+          <span class="home-section-nav-label">LE TRACCE</span>
+        </a>
+
+        <a
+          class="home-section-nav-item"
+          href="#il-punto-zero"
+          data-section-target="il-punto-zero"
+        >
+          <span class="home-section-nav-number">07</span>
+          <span class="home-section-nav-label">IL PUNTO ZERO</span>
+        </a>
+
+        <a
+          class="home-section-nav-item"
+          href="#adesso-tocca-a-te"
+          data-section-target="adesso-tocca-a-te"
+        >
+          <span class="home-section-nav-number">08</span>
+          <span class="home-section-nav-label">ADESSO TOCCA A TE</span>
+        </a>
+
+        <a
+          class="home-section-nav-item"
+          href="#la-tua-direzione"
+          data-section-target="la-tua-direzione"
+        >
+          <span class="home-section-nav-number">09</span>
+          <span class="home-section-nav-label">LA TUA DIREZIONE</span>
+        </a>
+
+        <a
+          class="home-section-nav-item"
+          href="#il-contatto"
+          data-section-target="il-contatto"
+        >
+          <span class="home-section-nav-number">10</span>
+          <span class="home-section-nav-label">IL CONTATTO</span>
+        </a>
+
+      </div>
+
+    </div>
+
+  </nav>
+
+
+  <!-- =========================================================
+       SCRIPTS
+  ========================================================== -->
 
   <script src="/script.js" defer></script>
 
