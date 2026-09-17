@@ -8,13 +8,6 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>404 | Cesare Paratore</title>
-
-  <meta
-    name="description"
-    content="La pagina richiesta non è disponibile. Riparti dalla traiettoria di Cesare Paratore."
-  >
-
   <meta
     name="robots"
     content="noindex, follow"
@@ -24,6 +17,8 @@
     name="theme-color"
     content="#071b3a"
   >
+
+  <title>404 | Cesare Paratore</title>
 
   <link
     rel="icon"
@@ -37,53 +32,56 @@
       --navy-deep: #041225;
       --paper: #f3f0e8;
       --paper-bright: #faf8f2;
-      --line: rgba(243, 240, 232, .16);
-      --line-dark: rgba(7, 27, 58, .14);
-
-      --ease: cubic-bezier(.22, .8, .24, 1);
-      --ease-soft: cubic-bezier(.16, 1, .3, 1);
-
+      --ink: #101820;
+      --line: rgba(243, 240, 232, .18);
+      --line-strong: rgba(243, 240, 232, .34);
       --page-padding: clamp(22px, 4vw, 72px);
+      --content-width: 1680px;
+
+      --ease:
+        cubic-bezier(.22, .61, .36, 1);
+
+      --ease-slow:
+        cubic-bezier(.16, 1, .3, 1);
     }
 
     * {
       box-sizing: border-box;
     }
 
-    html,
-    body {
-      margin: 0;
-      min-width: 320px;
-      min-height: 100%;
-    }
-
     html {
+      min-height: 100%;
       background: var(--navy);
+      scroll-behavior: smooth;
     }
 
     body {
-      overflow-x: hidden;
+      min-height: 100vh;
+      margin: 0;
 
-      background: var(--navy);
+      background:
+        radial-gradient(
+          circle at 50% 42%,
+          rgba(30, 73, 126, .18),
+          transparent 34%
+        ),
+        var(--navy);
+
       color: var(--paper);
 
       font-family:
-        "Helvetica Neue",
         Helvetica,
         Arial,
         sans-serif;
 
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
-    }
-
-    ::selection {
-      background: var(--paper);
-      color: var(--navy);
+      overflow-x: hidden;
     }
 
     a {
       color: inherit;
+      text-decoration: none;
     }
 
     button {
@@ -91,13 +89,11 @@
     }
 
     .page {
-      position: relative;
-      min-height: 100svh;
-
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
-
-      overflow: hidden;
+      position: relative;
+      isolation: isolate;
     }
 
 
@@ -106,134 +102,63 @@
        ===================================================== */
 
     .atmosphere {
-      position: absolute;
+      position: fixed;
       inset: 0;
-
-      overflow: hidden;
-
+      z-index: -1;
       pointer-events: none;
+      overflow: hidden;
     }
 
-    .orbit {
+    .atmosphere::before {
+      content: "";
       position: absolute;
+      width: min(70vw, 900px);
+      aspect-ratio: 1;
+      left: 50%;
+      top: 46%;
+      transform: translate(-50%, -50%);
 
-      border: 1px solid var(--line);
+      border: 1px solid rgba(243, 240, 232, .07);
       border-radius: 50%;
 
-      transform-origin: center;
-    }
-
-    .orbit-a {
-      width: 72vw;
-      height: 72vw;
-
-      top: 50%;
-      right: -24vw;
-
-      transform:
-        translateY(-50%)
-        rotate(-18deg);
-
       animation:
-        orbit-a 34s linear infinite;
+        atmosphere-pulse 9s
+        var(--ease-slow)
+        infinite;
     }
 
-    .orbit-b {
-      width: 48vw;
-      height: 86vw;
-
-      top: 50%;
-      right: 7vw;
-
-      transform:
-        translateY(-50%)
-        rotate(32deg);
-
-      opacity: .55;
-
-      animation:
-        orbit-b 42s linear infinite reverse;
-    }
-
-    .orbit-c {
-      width: 90vw;
-      height: 38vw;
-
-      left: -22vw;
-      top: 43%;
-
-      transform: rotate(-12deg);
-
-      opacity: .45;
-
-      animation:
-        orbit-c 48s linear infinite;
-    }
-
-    .trajectory {
+    .atmosphere::after {
+      content: "";
       position: absolute;
+      width: min(44vw, 600px);
+      aspect-ratio: 1;
+      left: 50%;
+      top: 46%;
+      transform: translate(-50%, -50%);
 
-      height: 1px;
+      border: 1px solid rgba(243, 240, 232, .09);
+      border-radius: 50%;
 
-      background:
-        linear-gradient(
-          90deg,
-          transparent,
-          rgba(243, 240, 232, .3),
-          transparent
-        );
-
-      transform-origin: center;
+      animation:
+        atmosphere-pulse 7s
+        var(--ease-slow)
+        infinite reverse;
     }
 
-    .trajectory-a {
-      width: 85vw;
-
-      top: 29%;
-      left: -8vw;
-
-      transform: rotate(-11deg);
-    }
-
-    .trajectory-b {
-      width: 70vw;
-
-      top: 69%;
-      right: -12vw;
-
-      transform: rotate(9deg);
-    }
-
-    .trajectory-c {
-      width: 55vw;
-
-      top: 53%;
-      left: 24vw;
-
-      opacity: .45;
-
-      transform: rotate(-27deg);
-    }
-
-    @keyframes orbit-a {
-      to {
+    @keyframes atmosphere-pulse {
+      0%,
+      100% {
         transform:
-          translateY(-50%)
-          rotate(342deg);
+          translate(-50%, -50%)
+          scale(.96);
+        opacity: .55;
       }
-    }
 
-    @keyframes orbit-b {
-      to {
+      50% {
         transform:
-          translateY(-50%)
-          rotate(-328deg);
-      }
-    }
-
-    @keyframes orbit-c {
-      to {
-        transform: rotate(348deg);
+          translate(-50%, -50%)
+          scale(1.04);
+        opacity: 1;
       }
     }
 
@@ -243,84 +168,92 @@
        ===================================================== */
 
     .site-header {
-      position: relative;
-      z-index: 5;
-
       width: 100%;
+      min-height: 128px;
 
-      min-height: 108px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
 
       padding:
         18px
         var(--page-padding);
 
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      border-bottom:
+        1px solid
+        var(--line);
 
-      gap: 30px;
+      position: relative;
+      z-index: 5;
     }
 
-    .brand {
-      display: flex;
+    .site-header-brand {
+      display: inline-flex;
       align-items: center;
+      gap: 22px;
 
-      gap: 20px;
-
-      text-decoration: none;
+      min-width: 0;
     }
 
-    .brand-logo {
-      width: clamp(88px, 7vw, 118px);
-      aspect-ratio: 1;
+    .site-header-logo {
+      width: clamp(84px, 7vw, 118px);
+      height: clamp(84px, 7vw, 118px);
 
       display: grid;
       place-items: center;
+
+      flex: 0 0 auto;
     }
 
-    .brand-logo img {
+    .site-header-logo img {
       width: 100%;
       height: 100%;
 
       object-fit: contain;
+
+      display: block;
     }
 
-    .brand-copy {
+    .site-header-brand-copy {
       display: grid;
       gap: 5px;
     }
 
-    .brand-name {
-      font-size: .76rem;
+    .site-header-name {
+      font-size:
+        clamp(12px, 1vw, 15px);
+
       font-weight: 700;
-
-      letter-spacing: .12em;
+      letter-spacing: .16em;
+      line-height: 1;
     }
 
-    .brand-motto {
-      font-family:
-        "SFMono-Regular",
-        Consolas,
-        monospace;
+    .site-header-motto {
+      color:
+        rgba(243, 240, 232, .66);
 
-      font-size: .59rem;
+      font-size:
+        clamp(10px, .8vw, 13px);
+
       letter-spacing: .1em;
-
-      opacity: .58;
+      line-height: 1.2;
     }
 
-    .status {
+    .site-header-code {
       font-family:
-        "SFMono-Regular",
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
         Consolas,
         monospace;
 
-      font-size: .62rem;
-      letter-spacing: .09em;
+      font-size: 11px;
+      letter-spacing: .16em;
 
-      opacity: .58;
-
-      white-space: nowrap;
+      color:
+        rgba(243, 240, 232, .52);
     }
 
 
@@ -328,32 +261,34 @@
        MAIN
        ===================================================== */
 
-    .main {
-      position: relative;
-      z-index: 2;
-
+    main {
       flex: 1;
 
-      width: min(
-        calc(100% - (var(--page-padding) * 2)),
-        1680px
-      );
+      width: 100%;
+      max-width: var(--content-width);
 
       margin: 0 auto;
 
+      padding:
+        clamp(80px, 11vw, 170px)
+        var(--page-padding)
+        clamp(100px, 13vw, 190px);
+    }
+
+    .error-layout {
+      min-height:
+        min(720px, 72vh);
+
       display: grid;
+
       grid-template-columns:
         minmax(0, 1fr)
         minmax(340px, .8fr);
 
       align-items: center;
 
-      gap: clamp(50px, 9vw, 160px);
-
-      padding:
-        clamp(60px, 8vw, 120px)
-        0
-        clamp(80px, 10vw, 140px);
+      gap:
+        clamp(50px, 9vw, 150px);
     }
 
 
@@ -361,375 +296,442 @@
        COPY
        ===================================================== */
 
-    .copy {
-      max-width: 850px;
+    .error-copy {
+      position: relative;
+      z-index: 2;
     }
 
-    .kicker {
-      display: block;
+    .error-kicker {
+      display: flex;
+      align-items: center;
+      gap: 14px;
 
-      margin-bottom: 26px;
+      margin-bottom: 28px;
 
       font-family:
-        "SFMono-Regular",
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
         Consolas,
         monospace;
 
-      font-size: .64rem;
-      letter-spacing: .13em;
+      font-size: 11px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
 
-      opacity: .52;
+      color:
+        rgba(243, 240, 232, .58);
     }
 
-    h1 {
+    .error-kicker::before {
+      content: "";
+
+      width: 38px;
+      height: 1px;
+
+      background:
+        rgba(243, 240, 232, .5);
+    }
+
+    .error-title {
       margin: 0;
 
       font-size:
-        clamp(
-          4.5rem,
-          11vw,
-          12rem
-        );
+        clamp(72px, 12vw, 190px);
 
-      line-height: .79;
+      line-height: .8;
+      letter-spacing: -.07em;
 
-      letter-spacing: -.075em;
-
-      font-weight: 600;
+      font-weight: 700;
     }
 
-    h1 span {
+    .error-title span {
       display: block;
     }
 
-    h1 span:last-child {
-      padding-left:
-        clamp(28px, 8vw, 150px);
+    .error-title span:last-child {
+      margin-left:
+        clamp(26px, 7vw, 110px);
+
+      color:
+        rgba(243, 240, 232, .62);
     }
 
-    .intro {
-      max-width: 650px;
+    .error-description {
+      max-width: 570px;
 
       margin:
-        clamp(42px, 5vw, 70px)
+        clamp(36px, 5vw, 62px)
         0
         0;
 
-      font-size:
-        clamp(
-          1rem,
-          1.45vw,
-          1.3rem
-        );
-
-      line-height: 1.5;
-
       color:
         rgba(243, 240, 232, .72);
+
+      font-size:
+        clamp(16px, 1.35vw, 21px);
+
+      line-height: 1.65;
     }
 
-    .cta {
+    .error-description strong {
+      color: var(--paper);
+      font-weight: 600;
+    }
+
+    .error-action {
       display: inline-flex;
       align-items: center;
+      gap: 18px;
 
-      gap: 26px;
+      margin-top: 40px;
 
-      margin-top: 48px;
+      padding-bottom: 10px;
 
-      color: var(--paper);
+      border-bottom:
+        1px solid
+        rgba(243, 240, 232, .6);
 
-      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+
+      letter-spacing: .16em;
+      text-transform: uppercase;
+
+      transition:
+        gap .45s var(--ease),
+        border-color .45s var(--ease);
     }
 
-    .cta-label {
-      font-family:
-        "SFMono-Regular",
-        Consolas,
-        monospace;
+    .error-action:hover {
+      gap: 30px;
 
-      font-size: .68rem;
-      letter-spacing: .1em;
+      border-color:
+        var(--paper);
     }
 
-    .cta-trace {
-      position: relative;
-
-      width: 110px;
-      height: 20px;
-    }
-
-    .cta-line {
-      position: absolute;
-
-      left: 0;
-      top: 50%;
-
-      width: 100%;
+    .error-action-mark {
+      width: 30px;
       height: 1px;
 
       background: currentColor;
+
+      position: relative;
     }
 
-    .cta-point {
+    .error-action-mark::after {
+      content: "";
+
       position: absolute;
 
-      left: 0;
-      top: 50%;
-
-      width: 9px;
-      height: 9px;
-
-      border:
-        1px solid
-        currentColor;
+      width: 5px;
+      height: 5px;
 
       border-radius: 50%;
 
-      background: var(--navy);
+      background: currentColor;
+
+      right: 0;
+      top: 50%;
 
       transform:
-        translate(-50%, -50%);
-
-      transition:
-        left 500ms var(--ease),
-        transform 350ms ease;
-    }
-
-    .cta:hover .cta-point {
-      left: 100%;
-
-      transform:
-        translate(-50%, -50%)
-        scale(1.4);
+        translateY(-50%);
     }
 
 
     /* =====================================================
-       VISUAL
+       TRAJECTORY VISUAL
        ===================================================== */
 
-    .visual {
-      position: relative;
-
-      width: min(
-        42vw,
-        620px
-      );
-
-      aspect-ratio: 1;
-
-      margin-left: auto;
+    .error-visual {
+      min-height: 540px;
 
       display: grid;
       place-items: center;
+
+      position: relative;
     }
 
-    .visual-orbit {
+    .error-field {
+      width: min(100%, 520px);
+      aspect-ratio: 1;
+
+      position: relative;
+    }
+
+    .error-field::before,
+    .error-field::after {
+      content: "";
+
       position: absolute;
+
+      left: 50%;
+      top: 50%;
+
+      transform:
+        translate(-50%, -50%);
 
       border:
         1px solid
-        rgba(243, 240, 232, .18);
+        rgba(243, 240, 232, .13);
 
       border-radius: 50%;
     }
 
-    .visual-orbit-a {
-      inset: 4%;
-
-      transform:
-        rotate(18deg)
-        scaleX(.76);
-
-      animation:
-        visual-orbit-a
-        25s
-        linear
-        infinite;
+    .error-field::before {
+      width: 72%;
+      height: 72%;
     }
 
-    .visual-orbit-b {
-      inset: 17% -3%;
-
-      transform:
-        rotate(-28deg)
-        scaleY(.65);
-
-      animation:
-        visual-orbit-b
-        31s
-        linear
-        infinite
-        reverse;
+    .error-field::after {
+      width: 46%;
+      height: 46%;
     }
 
-    .visual-orbit-c {
-      inset: 28% 8%;
 
-      transform:
-        rotate(47deg)
-        scaleX(1.2);
+    /* orbit */
 
-      opacity: .55;
-
-      animation:
-        visual-orbit-c
-        22s
-        linear
-        infinite;
-    }
-
-    .visual-cross-x,
-    .visual-cross-y {
+    .orbit {
       position: absolute;
-
-      background:
-        rgba(243, 240, 232, .14);
-    }
-
-    .visual-cross-x {
-      left: 5%;
-      right: 5%;
-
-      top: 50%;
-
-      height: 1px;
-    }
-
-    .visual-cross-y {
-      top: 5%;
-      bottom: 5%;
 
       left: 50%;
+      top: 50%;
 
-      width: 1px;
-    }
-
-    .visual-point {
-      position: absolute;
-
-      width: 13px;
-      height: 13px;
+      width: 78%;
+      height: 38%;
 
       border:
         1px solid
+        rgba(243, 240, 232, .28);
+
+      border-radius: 50%;
+
+      transform:
+        translate(-50%, -50%)
+        rotate(-28deg);
+
+      animation:
+        orbit-drift 11s
+        linear
+        infinite;
+    }
+
+    .orbit--inner {
+      width: 55%;
+      height: 24%;
+
+      border-color:
+        rgba(243, 240, 232, .16);
+
+      transform:
+        translate(-50%, -50%)
+        rotate(42deg);
+
+      animation-duration: 8s;
+      animation-direction: reverse;
+    }
+
+    @keyframes orbit-drift {
+      from {
+        transform:
+          translate(-50%, -50%)
+          rotate(-28deg);
+      }
+
+      to {
+        transform:
+          translate(-50%, -50%)
+          rotate(332deg);
+      }
+    }
+
+
+    /* trajectory */
+
+    .trajectory {
+      position: absolute;
+
+      left: 6%;
+      right: 4%;
+      top: 50%;
+
+      height: 1px;
+
+      background:
+        linear-gradient(
+          90deg,
+          transparent,
+          rgba(243, 240, 232, .28) 12%,
+          rgba(243, 240, 232, .62) 50%,
+          rgba(243, 240, 232, .16) 88%,
+          transparent
+        );
+
+      transform:
+        rotate(-17deg);
+    }
+
+    .trajectory-point {
+      position: absolute;
+
+      width: 10px;
+      height: 10px;
+
+      border-radius: 50%;
+
+      background:
+        var(--paper);
+
+      box-shadow:
+        0 0 0 7px
+        rgba(243, 240, 232, .08),
+        0 0 30px
+        rgba(243, 240, 232, .22);
+
+      top: 50%;
+      left: 62%;
+
+      transform:
+        translate(-50%, -50%);
+
+      animation:
+        trajectory-point 4.5s
+        var(--ease)
+        infinite;
+    }
+
+    @keyframes trajectory-point {
+      0%,
+      100% {
+        left: 34%;
+      }
+
+      50% {
+        left: 72%;
+      }
+    }
+
+
+    /* =====================================================
+       CENTER LOGO
+       ===================================================== */
+
+    .error-logo-disc {
+      position: absolute;
+
+      left: 50%;
+      top: 50%;
+
+      width: clamp(150px, 22vw, 250px);
+      aspect-ratio: 1;
+
+      transform:
+        translate(-50%, -50%);
+
+      display: grid;
+      place-items: center;
+
+      background:
         var(--paper);
 
       border-radius: 50%;
 
-      background: var(--navy);
-
       box-shadow:
-        0 0 0 10px
-        rgba(243, 240, 232, .05);
+        0 30px 80px
+        rgba(0, 0, 0, .22);
 
-      animation:
-        visual-point 3.8s
-        ease-in-out
-        infinite;
-    }
-
-    .visual-point-a {
-      left: 19%;
-      top: 29%;
-    }
-
-    .visual-point-b {
-      right: 16%;
-      bottom: 25%;
-
-      animation-delay: -1.4s;
-    }
-
-    .visual-center {
-      position: relative;
       z-index: 5;
+    }
 
-      width:
-        clamp(
-          190px,
-          23vw,
-          330px
-        );
+    .error-logo-disc img {
+      width: 64%;
+      height: 64%;
 
-      aspect-ratio: 1;
+      object-fit: contain;
 
-      display: grid;
-      place-items: center;
+      display: block;
+    }
 
-      padding:
-        clamp(
-          30px,
-          4vw,
-          52px
-        );
 
-      background: var(--paper);
+    /* crosshair */
+
+    .crosshair {
+      position: absolute;
+
+      left: 50%;
+      top: 50%;
+
+      width: 92%;
+      height: 92%;
+
+      transform:
+        translate(-50%, -50%);
+
+      pointer-events: none;
+    }
+
+    .crosshair::before,
+    .crosshair::after {
+      content: "";
+
+      position: absolute;
+
+      left: 50%;
+      top: 50%;
+
+      background:
+        rgba(243, 240, 232, .13);
+    }
+
+    .crosshair::before {
+      width: 100%;
+      height: 1px;
+
+      transform:
+        translate(-50%, -50%);
+    }
+
+    .crosshair::after {
+      width: 1px;
+      height: 100%;
+
+      transform:
+        translate(-50%, -50%);
+    }
+
+
+    /* nodes */
+
+    .node {
+      position: absolute;
+
+      width: 7px;
+      height: 7px;
 
       border-radius: 50%;
 
+      background:
+        rgba(243, 240, 232, .62);
+
       box-shadow:
-        0 30px 100px
-        rgba(0,0,0,.24);
-
-      animation:
-        visual-breathe
-        5s
-        ease-in-out
-        infinite;
+        0 0 0 6px
+        rgba(243, 240, 232, .05);
     }
 
-    .visual-center img {
-      width: 100%;
-      height: 100%;
-
-      object-fit: contain;
+    .node--a {
+      left: 10%;
+      top: 25%;
     }
 
-    @keyframes visual-orbit-a {
-      to {
-        transform:
-          rotate(378deg)
-          scaleX(.76);
-      }
+    .node--b {
+      right: 7%;
+      top: 66%;
     }
 
-    @keyframes visual-orbit-b {
-      to {
-        transform:
-          rotate(-388deg)
-          scaleY(.65);
-      }
-    }
-
-    @keyframes visual-orbit-c {
-      to {
-        transform:
-          rotate(407deg)
-          scaleX(1.2);
-      }
-    }
-
-    @keyframes visual-point {
-      0%,
-      100% {
-        transform: scale(1);
-      }
-
-      50% {
-        transform: scale(1.3);
-      }
-    }
-
-    @keyframes visual-breathe {
-      0%,
-      100% {
-        transform: scale(1);
-      }
-
-      50% {
-        transform: scale(1.025);
-      }
+    .node--c {
+      left: 31%;
+      bottom: 5%;
     }
 
 
@@ -738,68 +740,103 @@
        ===================================================== */
 
     .site-footer {
-      position: relative;
-      z-index: 5;
-
       width: 100%;
 
+      border-top:
+        1px solid
+        var(--line);
+
+      position: relative;
+      z-index: 5;
+    }
+
+    .footer-main {
+      width: 100%;
+      max-width: var(--content-width);
+
+      margin: 0 auto;
+
       padding:
-        24px
-        var(--page-padding)
-        30px;
+        28px
+        var(--page-padding);
 
       display: grid;
 
       grid-template-columns:
         1fr
-        1fr
+        auto
         1fr;
 
       align-items: center;
 
       gap: 30px;
-
-      border-top:
-        1px solid
-        rgba(243, 240, 232, .14);
     }
 
-    .footer-logo {
+    .footer-brand {
       display: flex;
+      align-items: center;
       justify-content: flex-start;
     }
 
-    .footer-logo img {
-      width: 105px;
-      height: auto;
+    .footer-brand img {
+      width:
+        clamp(90px, 8vw, 135px);
+
+      height:
+        clamp(90px, 8vw, 135px);
 
       object-fit: contain;
+
+      display: block;
+    }
+
+    .footer-identity {
+      text-align: center;
     }
 
     .footer-motto {
-      text-align: center;
+      font-size:
+        clamp(11px, .9vw, 14px);
 
-      font-family:
-        "SFMono-Regular",
-        Consolas,
-        monospace;
+      font-weight: 700;
 
-      font-size: .62rem;
-      letter-spacing: .1em;
+      letter-spacing: .14em;
+
+      white-space: nowrap;
     }
 
-    .footer-copy {
-      text-align: right;
+    .footer-copyright {
+      justify-self: end;
 
       font-family:
-        "SFMono-Regular",
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
         Consolas,
         monospace;
 
-      font-size: .6rem;
-      letter-spacing: .08em;
+      font-size: 10px;
 
-      opacity: .62;
+      letter-spacing: .13em;
+
+      color:
+        rgba(243, 240, 232, .52);
+
+      white-space: nowrap;
+    }
+
+
+    /* =====================================================
+       ACCESSIBILITY
+       ===================================================== */
+
+    :focus-visible {
+      outline:
+        2px solid
+        var(--paper);
+
+      outline-offset: 6px;
     }
 
 
@@ -810,120 +847,125 @@
     @media (max-width: 900px) {
 
       .site-header {
-        min-height: 90px;
+        min-height: 104px;
       }
 
-      .status {
+      .site-header-logo {
+        width: 78px;
+        height: 78px;
+      }
+
+      .site-header-brand {
+        gap: 15px;
+      }
+
+      .site-header-motto {
         display: none;
       }
 
-      .main {
-        grid-template-columns: 1fr;
-
-        align-items: start;
-
-        padding-top: 70px;
+      .site-header-code {
+        display: none;
       }
 
-      .copy {
+      main {
+        padding-top: 80px;
+      }
+
+      .error-layout {
+        min-height: auto;
+
+        grid-template-columns: 1fr;
+
+        gap: 70px;
+      }
+
+      .error-copy {
         max-width: 760px;
       }
 
-      .visual {
-        width:
-          min(
-            78vw,
-            520px
-          );
-
-        margin:
-          20px auto
-          20px;
+      .error-visual {
+        min-height: 430px;
       }
 
-      .site-footer {
+      .footer-main {
         grid-template-columns:
           1fr
           1fr;
+
+        gap: 22px;
       }
 
-      .footer-motto {
+      .footer-identity {
         text-align: right;
       }
 
-      .footer-copy {
+      .footer-copyright {
         grid-column: 1 / -1;
-
-        text-align: left;
+        justify-self: start;
       }
     }
 
 
-    @media (max-width: 560px) {
+    @media (max-width: 600px) {
 
-      :root {
-        --page-padding: 18px;
+      .site-header {
+        min-height: 92px;
+        padding-top: 14px;
+        padding-bottom: 14px;
       }
 
-      .brand {
-        gap: 12px;
+      .site-header-logo {
+        width: 68px;
+        height: 68px;
       }
 
-      .brand-logo {
-        width: 76px;
+      .site-header-name {
+        font-size: 10px;
       }
 
-      .brand-name {
-        font-size: .62rem;
+      main {
+        padding-top: 62px;
+        padding-bottom: 90px;
       }
 
-      .brand-motto {
-        font-size: .48rem;
-      }
-
-      .main {
-        padding-top: 48px;
-        padding-bottom: 65px;
-      }
-
-      h1 {
+      .error-title {
         font-size:
-          clamp(
-            4rem,
-            20vw,
-            6.2rem
-          );
+          clamp(68px, 22vw, 110px);
       }
 
-      h1 span:last-child {
-        padding-left: 18px;
+      .error-description {
+        font-size: 16px;
+        line-height: 1.6;
       }
 
-      .intro {
-        font-size: 1rem;
+      .error-visual {
+        min-height: 350px;
       }
 
-      .visual {
-        width: 84vw;
+      .error-field {
+        width: 100%;
       }
 
-      .visual-center {
-        width: 55vw;
-        min-width: 190px;
+      .error-logo-disc {
+        width: 155px;
       }
 
-      .site-footer {
-        padding:
-          22px 18px 28px;
+      .footer-main {
+        grid-template-columns: 1fr;
+        padding-top: 24px;
+        padding-bottom: 24px;
       }
 
-      .footer-logo img {
-        width: 90px;
+      .footer-brand {
+        justify-content: flex-start;
       }
 
-      .footer-motto,
-      .footer-copy {
-        font-size: .54rem;
+      .footer-identity {
+        text-align: left;
+      }
+
+      .footer-copyright {
+        grid-column: auto;
       }
     }
 
@@ -933,6 +975,10 @@
        ===================================================== */
 
     @media (prefers-reduced-motion: reduce) {
+
+      html {
+        scroll-behavior: auto;
+      }
 
       *,
       *::before,
@@ -950,11 +996,17 @@
 
     @media (prefers-contrast: more) {
 
-      .trajectory,
-      .orbit,
-      .visual-orbit,
+      .site-header,
       .site-footer {
-        opacity: 1;
+        border-color:
+          rgba(243, 240, 232, .42);
+      }
+
+      .error-description,
+      .site-header-motto,
+      .footer-copyright {
+        color:
+          var(--paper);
       }
     }
 
@@ -966,26 +1018,25 @@
     @media print {
 
       body {
-        background: white;
-        color: black;
+        background: #fff;
+        color: #000;
       }
 
-      .page {
-        min-height: auto;
-      }
-
-      .atmosphere {
+      .atmosphere,
+      .error-visual {
         display: none;
       }
 
       .site-header,
       .site-footer {
-        color: black;
+        border-color: #000;
       }
 
-      .visual-center {
-        background: white;
-        border: 1px solid black;
+      .error-title span:last-child,
+      .error-description,
+      .site-header-motto,
+      .footer-copyright {
+        color: #000;
       }
     }
   </style>
@@ -995,37 +1046,29 @@
 
   <div class="page">
 
-    <!-- =================================================
+    <!-- ===================================================
          ATMOSPHERE
-         ================================================= -->
+         =================================================== -->
 
     <div
       class="atmosphere"
       aria-hidden="true"
-    >
-      <span class="orbit orbit-a"></span>
-      <span class="orbit orbit-b"></span>
-      <span class="orbit orbit-c"></span>
-
-      <span class="trajectory trajectory-a"></span>
-      <span class="trajectory trajectory-b"></span>
-      <span class="trajectory trajectory-c"></span>
-    </div>
+    ></div>
 
 
-    <!-- =================================================
+    <!-- ===================================================
          HEADER
-         ================================================= -->
+         =================================================== -->
 
     <header class="site-header">
 
       <a
-        class="brand"
+        class="site-header-brand"
         href="/"
         aria-label="Cesare Paratore — Home"
       >
 
-        <span class="brand-logo">
+        <span class="site-header-logo">
           <img
             src="/assets/images/cp-mark.png"
             alt="Cesare Paratore"
@@ -1034,100 +1077,122 @@
           >
         </span>
 
-        <span class="brand-copy">
-          <span class="brand-name">
+        <span class="site-header-brand-copy">
+
+          <span class="site-header-name">
             CESARE PARATORE
           </span>
 
-          <span class="brand-motto">
+          <span class="site-header-motto">
             MOVIMENTO / CON DIREZIONE.
           </span>
+
         </span>
 
       </a>
 
-      <span class="status">
-        404 — TRAIETTORIA NON TROVATA
+      <span class="site-header-code">
+        404 / FUORI TRAIETTORIA
       </span>
 
     </header>
 
 
-    <!-- =================================================
+    <!-- ===================================================
          MAIN
-         ================================================= -->
+         =================================================== -->
 
-    <main class="main">
+    <main>
 
-      <section
-        class="copy"
-        aria-labelledby="error-title"
-      >
+      <div class="error-layout">
 
-        <span class="kicker">
-          404 / FUORI TRAIETTORIA
-        </span>
 
-        <h1 id="error-title">
-          <span>QUESTA</span>
-          <span>STRADA.</span>
-        </h1>
+        <!-- ===============================================
+             COPY
+             =============================================== -->
 
-        <p class="intro">
-          La pagina che stai cercando non è
-          disponibile.
-          Ma un percorso non finisce quando
-          una strada non porta dove pensavi.
-          Si cambia direzione.
-        </p>
-
-        <a
-          class="cta"
-          href="/"
+        <section
+          class="error-copy"
+          aria-labelledby="error-title"
         >
-          <span class="cta-label">
-            RIPARTI DALL'INIZIO
-          </span>
 
-          <span
-            class="cta-trace"
-            aria-hidden="true"
+          <div class="error-kicker">
+            404 / FUORI TRAIETTORIA
+          </div>
+
+          <h1
+            class="error-title"
+            id="error-title"
           >
-            <span class="cta-line"></span>
-            <span class="cta-point"></span>
-          </span>
-        </a>
+            <span>QUESTA</span>
+            <span>STRADA.</span>
+          </h1>
 
-      </section>
+          <p class="error-description">
+            La pagina che stai cercando non è disponibile.
+            Ma un percorso non finisce quando una strada
+            non porta dove pensavi.
+            <strong>Si cambia direzione.</strong>
+          </p>
 
-
-      <!-- =================================================
-           VISUAL
-           ================================================= -->
-
-      <div
-        class="visual"
-        aria-hidden="true"
-      >
-
-        <span class="visual-orbit visual-orbit-a"></span>
-        <span class="visual-orbit visual-orbit-b"></span>
-        <span class="visual-orbit visual-orbit-c"></span>
-
-        <span class="visual-cross-x"></span>
-        <span class="visual-cross-y"></span>
-
-        <span class="visual-point visual-point-a"></span>
-        <span class="visual-point visual-point-b"></span>
-
-        <div class="visual-center">
-
-          <img
-            src="/assets/images/cp-mark.png"
-            alt=""
-            width="330"
-            height="330"
+          <a
+            class="error-action"
+            href="/"
           >
+            <span>RIPARTI DALL'INIZIO</span>
+
+            <span
+              class="error-action-mark"
+              aria-hidden="true"
+            ></span>
+          </a>
+
+        </section>
+
+
+        <!-- ===============================================
+             VISUAL
+             =============================================== -->
+
+        <div
+          class="error-visual"
+          aria-hidden="true"
+        >
+
+          <div class="error-field">
+
+            <span class="crosshair"></span>
+
+            <span class="orbit"></span>
+
+            <span class="orbit orbit--inner"></span>
+
+            <span class="trajectory"></span>
+
+            <span class="trajectory-point"></span>
+
+            <span class="node node--a"></span>
+            <span class="node node--b"></span>
+            <span class="node node--c"></span>
+
+            <!--
+              The logo remains the original asset.
+              No filter.
+              No recoloring.
+              No plain "CP" replacement.
+            -->
+            <div class="error-logo-disc">
+
+              <img
+                src="/assets/images/cp-mark.png"
+                alt=""
+                width="250"
+                height="250"
+              >
+
+            </div>
+
+          </div>
 
         </div>
 
@@ -1136,27 +1201,37 @@
     </main>
 
 
-    <!-- =================================================
+    <!-- ===================================================
          FOOTER
-         ================================================= -->
+         =================================================== -->
 
     <footer class="site-footer">
 
-      <div class="footer-logo">
-        <img
-          src="/assets/images/cp-mark.png"
-          alt="Cesare Paratore"
-          width="105"
-          height="105"
-        >
-      </div>
+      <div class="footer-main">
 
-      <div class="footer-motto">
-        MOVIMENTO / CON DIREZIONE.
-      </div>
+        <div class="footer-brand">
 
-      <div class="footer-copy">
-        © CESARE PARATORE
+          <img
+            src="/assets/images/cp-mark.png"
+            alt="Cesare Paratore"
+            width="135"
+            height="135"
+          >
+
+        </div>
+
+        <div class="footer-identity">
+
+          <span class="footer-motto">
+            MOVIMENTO / CON DIREZIONE.
+          </span>
+
+        </div>
+
+        <div class="footer-copyright">
+          © CESARE PARATORE
+        </div>
+
       </div>
 
     </footer>
