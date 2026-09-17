@@ -1,34 +1,20 @@
-/* ============================================================
+/* =========================================================
    CESARE PARATORE
    MOVIMENTO / CON DIREZIONE.
-   MASTER INTERACTION SYSTEM — 2026
-   ============================================================ */
+   script.js — interaction + motion system
+   ========================================================= */
 
 (() => {
   "use strict";
-
-  /* ==========================================================
-     00 — ROOT / CAPABILITIES
-     ========================================================== */
 
   const root = document.documentElement;
   const body = document.body;
 
   root.classList.add("js");
 
-  const reducedMotionQuery = window.matchMedia(
-    "(prefers-reduced-motion: reduce)"
-  );
-
-  const finePointerQuery = window.matchMedia(
-    "(pointer: fine)"
-  );
-
-  const isReducedMotion = () =>
-    reducedMotionQuery.matches;
-
-  const hasFinePointer = () =>
-    finePointerQuery.matches;
+  /* =======================================================
+     01. UTILITIES
+     ======================================================= */
 
   const $ = (selector, scope = document) =>
     scope.querySelector(selector);
@@ -39,71 +25,17 @@
   const clamp = (value, min, max) =>
     Math.min(Math.max(value, min), max);
 
+  const prefersReducedMotion = () =>
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* ==========================================================
-     01 — ELEMENT REFERENCES
-     ========================================================== */
+  const isFinePointer = () =>
+    window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-  const loader = $(".site-loader");
-  const header = $("#site-header");
+  /* =======================================================
+     02. LOADER
+     ======================================================= */
 
-  const menu = $("#site-menu");
-  const menuToggle = $("#menu-toggle");
-  const menuClose = $(".menu-close");
-  const menuBackdrop = $(".menu-backdrop");
-
-  const scrollProgress = $("#scroll-progress");
-  const sectionIndex = $("#section-index");
-
-  const sections = $$(
-    "main > section[id]"
-  );
-
-  const revealItems = $$(
-    "[data-reveal]"
-  );
-
-  const hero = $("#inizio");
-
-  const directionItems = $$(
-    ".direction-item"
-  );
-
-  const directionDoors = $$(
-    ".direction-door"
-  );
-
-  const magneticItems = $$(
-    "[data-magnetic]"
-  );
-
-  const navigationLinks = $$(
-    "a[href]"
-  );
-
-  let previousScrollY = window.scrollY;
-
-  let ticking = false;
-  let menuOpen = false;
-
-  let lastFocusedElement = null;
-
-  let heroPointerX = 0;
-  let heroPointerY = 0;
-  let heroTargetX = 0;
-  let heroTargetY = 0;
-
-  let standbyTimer = null;
-  let standbyActive = false;
-
-  let activityScheduled = false;
-
-  const STANDBY_DELAY = 30000;
-
-
-  /* ==========================================================
-     02 — LOADER
-     ========================================================== */
+  const loader = $("#intro");
 
   let loaderHidden = false;
 
@@ -111,1896 +43,1190 @@
     if (!loader || loaderHidden) return;
 
     loaderHidden = true;
-
     loader.classList.add("is-hidden");
 
     window.setTimeout(() => {
-      loader.setAttribute(
-        "aria-hidden",
-        "true"
-      );
+      loader.setAttribute("aria-hidden", "true");
     }, 1000);
   };
 
   /*
-    The loader must never be able to block
-    the website indefinitely.
-  */
+   * Il loader non deve mai bloccare il sito se un modulo
+   * successivo dovesse generare un errore.
+   */
+  window.addEventListener("load", () => {
+    window.setTimeout(hideLoader, 650);
+  }, { once: true });
 
-  if (loader) {
-
-    window.addEventListener(
-      "load",
-      () => {
-
-        const delay =
-          isReducedMotion()
-            ? 180
-            : 700;
-
-        window.setTimeout(
-          hideLoader,
-          delay
-        );
-
-      },
-      { once: true }
-    );
-
-    window.setTimeout(
-      hideLoader,
-      3500
-    );
-  }
+  /*
+   * Fail-safe assoluto.
+   */
+  window.setTimeout(hideLoader, 3800);
 
 
-  /* ==========================================================
-     03 — HEADER
-     ========================================================== */
+  /* =======================================================
+     03. HEADER
+     ======================================================= */
+
+  const header = $(".site-header");
+
+  let lastScrollY = window.scrollY;
+  let tickingHeader = false;
 
   const updateHeader = () => {
-
     if (!header) return;
 
-    const y =
-      window.scrollY;
+    const currentY = window.scrollY;
 
-    if (y > 30) {
-      header.classList.add(
-        "is-scrolled"
-      );
-    } else {
-      header.classList.remove(
-        "is-scrolled"
-      );
-    }
-
-    const delta =
-      y - previousScrollY;
-
-    if (
-      delta > 8 &&
-      y > 180 &&
-      !menuOpen &&
-      !standbyActive
+    if (currentY < 30) {
+      header.classList.remove("is-hidden");
+    } else if (
+      currentY > lastScrollY + 8 &&
+      !body.classList.contains("menu-open")
     ) {
-      header.classList.add(
-        "is-hidden"
-      );
+      header.classList.add("is-hidden");
+    } else if (currentY < lastScrollY - 8) {
+      header.classList.remove("is-hidden");
     }
 
-    if (
-      delta < -4 ||
-      y < 80 ||
-      menuOpen ||
-      standbyActive
-    ) {
-      header.classList.remove(
-        "is-hidden"
-      );
-    }
-
-    previousScrollY = y;
+    lastScrollY = currentY;
+    tickingHeader = false;
   };
 
+  window.addEventListener("scroll", () => {
+    if (!tickingHeader) {
+      window.requestAnimationFrame(updateHeader);
+      tickingHeader = true;
+    }
+  }, { passive: true });
 
-  /* ==========================================================
-     04 — SCROLL PROGRESS
-     ========================================================== */
+
+  /* =======================================================
+     04. SCROLL PROGRESS
+     ======================================================= */
 
   const updateScrollProgress = () => {
-
-    if (!scrollProgress) return;
-
-    const documentHeight =
-      document.documentElement.scrollHeight -
-      window.innerHeight;
-
-    if (documentHeight <= 0) {
-
-      scrollProgress.style.height =
-        "0%";
-
-      return;
-    }
+    const maxScroll =
+      document.documentElement.scrollHeight - window.innerHeight;
 
     const progress =
-      clamp(
-        window.scrollY /
-          documentHeight,
-        0,
-        1
-      ) * 100;
+      maxScroll > 0
+        ? clamp(window.scrollY / maxScroll, 0, 1)
+        : 0;
 
-    scrollProgress.style.height =
-      `${progress}%`;
-  };
-
-
-  /* ==========================================================
-     05 — SECTION INDEX
-     ========================================================== */
-
-  const updateSectionIndex = () => {
-
-    if (
-      !sectionIndex ||
-      !sections.length
-    ) {
-      return;
-    }
-
-    const viewportCenter =
-      window.innerHeight * 0.42;
-
-    let activeIndex = 0;
-
-    let smallestDistance =
-      Infinity;
-
-    sections.forEach(
-      (section, index) => {
-
-        const rect =
-          section.getBoundingClientRect();
-
-        const sectionCenter =
-          rect.top +
-          rect.height / 2;
-
-        const distance =
-          Math.abs(
-            sectionCenter -
-            viewportCenter
-          );
-
-        if (
-          distance <
-          smallestDistance
-        ) {
-          smallestDistance =
-            distance;
-
-          activeIndex =
-            index;
-        }
-
-      }
+    root.style.setProperty(
+      "--scroll-progress",
+      `${progress * 100}%`
     );
 
-    const formattedCurrent =
-      String(
-        activeIndex + 1
-      ).padStart(2, "0");
-
-    const formattedTotal =
-      String(
-        sections.length
-      ).padStart(2, "0");
-
-    const current =
-      $(".index-current", sectionIndex);
-
-    const total =
-      $(".index-total", sectionIndex);
-
-    if (current) {
-      current.textContent =
-        formattedCurrent;
-    }
-
-    if (total) {
-      total.textContent =
-        formattedTotal;
-    }
-
-    /*
-      Important:
-      never replace the entire #section-index
-      because that would destroy its internal
-      navigation structure.
-    */
-  };
-
-
-  /* ==========================================================
-     06 — MASTER SCROLL LOOP
-     ========================================================== */
-
-  const updateScrollState = () => {
-
-    ticking = false;
-
-    updateHeader();
-    updateScrollProgress();
-    updateSectionIndex();
-
-    if (
-      hero &&
-      hasFinePointer() &&
-      !isReducedMotion()
-    ) {
-      updateHeroParallax();
-    }
-  };
-
-
-  const requestScrollUpdate = () => {
-
-    if (ticking) return;
-
-    ticking = true;
-
-    window.requestAnimationFrame(
-      updateScrollState
+    root.style.setProperty(
+      "--mobile-progress",
+      `${progress * 100}%`
     );
   };
 
+  let progressTicking = false;
 
-  window.addEventListener(
-    "scroll",
-    requestScrollUpdate,
-    {
-      passive: true
+  window.addEventListener("scroll", () => {
+    if (!progressTicking) {
+      window.requestAnimationFrame(() => {
+        updateScrollProgress();
+        progressTicking = false;
+      });
+
+      progressTicking = true;
     }
-  );
+  }, { passive: true });
+
+  window.addEventListener("resize", updateScrollProgress);
+  updateScrollProgress();
 
 
-  /* ==========================================================
-     07 — REVEAL SYSTEM
-     ========================================================== */
+  /* =======================================================
+     05. SECTION INDEX
+     ======================================================= */
 
-  let revealObserver = null;
+  const sections = $$("main section[id]");
+  const sectionIndex = $("#section-index");
+  const indexCurrent = $(".index-current", sectionIndex || document);
+  const indexTotal = $(".index-total", sectionIndex || document);
 
-  const prepareRevealSystem = () => {
+  const sectionEntries = sections.map((section, index) => ({
+    element: section,
+    number:
+      section.dataset.index ||
+      String(index + 1).padStart(2, "0")
+  }));
 
-    if (
-      !revealItems.length
-    ) {
-      return;
+  if (indexTotal && sectionEntries.length) {
+    indexTotal.textContent =
+      String(sectionEntries.length).padStart(2, "0");
+  }
+
+  let currentSection = null;
+
+  const setCurrentSection = (entry) => {
+    if (!entry || entry === currentSection) return;
+
+    currentSection = entry;
+
+    if (indexCurrent) {
+      indexCurrent.textContent = entry.number;
     }
 
-    if (
-      isReducedMotion()
-    ) {
-
-      root.classList.remove(
-        "reveal-ready"
-      );
-
-      revealItems.forEach(
-        item => {
-          item.classList.add(
-            "is-visible"
-          );
-        }
-      );
-
-      return;
-    }
-
-    root.classList.add(
-      "reveal-ready"
+    root.style.setProperty(
+      "--active-section",
+      entry.number
     );
 
-    if (
-      revealObserver
-    ) {
-      revealObserver.disconnect();
-    }
+    document.dispatchEvent(
+      new CustomEvent("cp:section-change", {
+        detail: {
+          id: entry.element.id,
+          number: entry.number
+        }
+      })
+    );
+  };
 
-    revealObserver =
-      new IntersectionObserver(
-        entries => {
-
-          entries.forEach(
-            entry => {
-
-              if (
-                !entry.isIntersecting
-              ) {
-                return;
-              }
-
-              entry.target.classList.add(
-                "is-visible"
-              );
-
-              revealObserver.unobserve(
-                entry.target
-              );
-
-            }
+  if ("IntersectionObserver" in window && sectionEntries.length) {
+    const sectionObserver = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort(
+            (a, b) =>
+              b.intersectionRatio - a.intersectionRatio
           );
 
-        },
-        {
-          threshold: 0.12,
-          rootMargin:
-            "0px 0px -8% 0px"
-        }
-      );
+        if (!visible.length) return;
 
-    revealItems.forEach(
-      item => {
-
-        /*
-          Avoid forcing elements into
-          awkward overlapping states.
-        */
-
-        item.style.removeProperty(
-          "transform"
+        const target = sectionEntries.find(
+          (item) =>
+            item.element === visible[0].target
         );
 
-        revealObserver.observe(
-          item
-        );
-      }
-    );
-  };
-
-
-  /* ==========================================================
-     08 — HERO PARALLAX
-     ========================================================== */
-
-  const updateHeroParallax = () => {
-
-    if (!hero) return;
-
-    heroPointerX +=
-      (
-        heroTargetX -
-        heroPointerX
-      ) * 0.075;
-
-    heroPointerY +=
-      (
-        heroTargetY -
-        heroPointerY
-      ) * 0.075;
-
-    hero.style.setProperty(
-      "--hero-x",
-      `${heroPointerX}px`
-    );
-
-    hero.style.setProperty(
-      "--hero-y",
-      `${heroPointerY}px`
-    );
-  };
-
-
-  const handleHeroPointer = event => {
-
-    if (
-      !hero ||
-      !hasFinePointer() ||
-      isReducedMotion()
-    ) {
-      return;
-    }
-
-    const rect =
-      hero.getBoundingClientRect();
-
-    if (
-      rect.width <= 0 ||
-      rect.height <= 0
-    ) {
-      return;
-    }
-
-    const x =
-      (
-        event.clientX -
-        rect.left
-      ) /
-        rect.width -
-      0.5;
-
-    const y =
-      (
-        event.clientY -
-        rect.top
-      ) /
-        rect.height -
-      0.5;
-
-    heroTargetX =
-      x * 18;
-
-    heroTargetY =
-      y * 18;
-  };
-
-
-  const resetHeroPointer = () => {
-
-    heroTargetX = 0;
-    heroTargetY = 0;
-  };
-
-
-  if (hero) {
-
-    hero.addEventListener(
-      "pointermove",
-      handleHeroPointer,
+        setCurrentSection(target);
+      },
       {
-        passive: true
+        threshold: [0.15, 0.3, 0.5, 0.7],
+        rootMargin: "-12% 0px -45% 0px"
       }
     );
 
-    hero.addEventListener(
-      "pointerleave",
-      resetHeroPointer
-    );
+    sectionEntries.forEach(({ element }) => {
+      sectionObserver.observe(element);
+    });
   }
 
 
-  /* ==========================================================
-     09 — MENU
-     ========================================================== */
+  /* =======================================================
+     06. REVEAL SYSTEM
+     ======================================================= */
 
-  const getFocusableMenuElements = () => {
+  root.classList.add("reveal-ready");
 
-    if (!menu) {
-      return [];
-    }
+  const revealElements = $$("[data-reveal]");
 
-    return $$(
-      `
-      a[href],
-      button:not([disabled]),
-      input:not([disabled]),
-      textarea:not([disabled]),
-      select:not([disabled]),
-      [tabindex]:not([tabindex="-1"])
-      `,
-      menu
-    ).filter(
-      element => {
+  if (
+    !prefersReducedMotion() &&
+    "IntersectionObserver" in window &&
+    revealElements.length
+  ) {
+    const revealObserver = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
 
-        const style =
-          window.getComputedStyle(
-            element
-          );
-
-        return (
-          style.display !== "none" &&
-          style.visibility !== "hidden"
-        );
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        });
+      },
+      {
+        threshold: 0.08,
+        rootMargin: "0px 0px -8% 0px"
       }
     );
-  };
 
+    revealElements.forEach((element) => {
+      revealObserver.observe(element);
+    });
+  } else {
+    revealElements.forEach((element) => {
+      element.classList.add("is-visible");
+    });
+  }
+
+
+  /* =======================================================
+     07. HERO PARALLAX
+     ======================================================= */
+
+  const heroVisual = $(".hero-visual");
+
+  if (
+    heroVisual &&
+    !prefersReducedMotion() &&
+    isFinePointer()
+  ) {
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    let raf = null;
+
+    const renderHero = () => {
+      currentX += (targetX - currentX) * 0.075;
+      currentY += (targetY - currentY) * 0.075;
+
+      heroVisual.style.transform =
+        `translate3d(${currentX}px, ${currentY}px, 0)`;
+
+      raf = window.requestAnimationFrame(renderHero);
+    };
+
+    window.addEventListener("pointermove", (event) => {
+      targetX =
+        (event.clientX / window.innerWidth - 0.5) * 22;
+
+      targetY =
+        (event.clientY / window.innerHeight - 0.5) * 18;
+
+      if (!raf) {
+        raf = window.requestAnimationFrame(renderHero);
+      }
+    }, { passive: true });
+
+    window.addEventListener("pointerleave", () => {
+      targetX = 0;
+      targetY = 0;
+    });
+
+    renderHero();
+  }
+
+
+  /* =======================================================
+     08. FULLSCREEN MENU
+     ======================================================= */
+
+  const menu = $("#site-menu");
+  const menuToggle = $("#menu-toggle");
+  const menuCloseElements = $$("[data-menu-close]");
+  const menuLinks = $$(".primary-nav a", menu || document);
+
+  let menuOpen = false;
+  let previousFocusedElement = null;
+
+  const getFocusable = () => {
+    if (!menu) return [];
+
+    return $$(
+      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      menu
+    ).filter((element) => {
+      const style = window.getComputedStyle(element);
+
+      return (
+        style.display !== "none" &&
+        style.visibility !== "hidden"
+      );
+    });
+  };
 
   const openMenu = () => {
-
-    if (
-      !menu ||
-      !menuToggle ||
-      menuOpen
-    ) {
-      return;
-    }
-
-    lastFocusedElement =
-      document.activeElement;
+    if (!menu || menuOpen) return;
 
     menuOpen = true;
+    previousFocusedElement = document.activeElement;
 
-    /*
-      Stop ambient mode immediately.
-    */
+    body.classList.add("menu-open");
 
-    stopStandby();
+    menu.setAttribute("aria-hidden", "false");
 
-    menu.classList.add(
-      "is-open"
-    );
-
-    body.classList.add(
-      "menu-open"
-    );
-
-    menuToggle.setAttribute(
-      "aria-expanded",
-      "true"
-    );
-
-    menu.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-    header?.classList.remove(
-      "is-hidden"
-    );
-
-    root.classList.add(
-      "navigation-active"
-    );
-
-    const focusable =
-      getFocusableMenuElements();
-
-    if (focusable.length) {
-
-      window.setTimeout(
-        () => {
-          focusable[0].focus();
-        },
-        180
-      );
+    if (menuToggle) {
+      menuToggle.setAttribute("aria-expanded", "true");
     }
+
+    const focusable = getFocusable();
+
+    window.setTimeout(() => {
+      if (focusable[0]) {
+        focusable[0].focus();
+      }
+    }, 250);
   };
 
-
-  const closeMenu = ({
-    restoreFocus = true
-  } = {}) => {
-
-    if (
-      !menu ||
-      !menuToggle ||
-      !menuOpen
-    ) {
-      return;
-    }
+  const closeMenu = (restoreFocus = true) => {
+    if (!menu || !menuOpen) return;
 
     menuOpen = false;
 
-    menu.classList.remove(
-      "is-open"
-    );
+    body.classList.remove("menu-open");
 
-    body.classList.remove(
-      "menu-open"
-    );
+    menu.setAttribute("aria-hidden", "true");
 
-    root.classList.remove(
-      "navigation-active"
-    );
-
-    menuToggle.setAttribute(
-      "aria-expanded",
-      "false"
-    );
-
-    menu.setAttribute(
-      "aria-hidden",
-      "true"
-    );
+    if (menuToggle) {
+      menuToggle.setAttribute("aria-expanded", "false");
+    }
 
     if (
       restoreFocus &&
-      lastFocusedElement &&
-      typeof lastFocusedElement.focus ===
-        "function"
+      previousFocusedElement &&
+      typeof previousFocusedElement.focus === "function"
     ) {
-
-      window.setTimeout(
-        () => {
-
-          try {
-            lastFocusedElement.focus();
-          } catch {}
-
-        },
-        250
-      );
+      previousFocusedElement.focus();
     }
-
-    lastFocusedElement =
-      null;
-
-    restartStandbyTimer();
   };
-
 
   if (menuToggle) {
-
-    menuToggle.addEventListener(
-      "click",
-      () => {
-
-        if (menuOpen) {
-          closeMenu();
-        } else {
-          openMenu();
-        }
-
-      }
-    );
-  }
-
-
-  if (menuClose) {
-
-    menuClose.addEventListener(
-      "click",
-      () => {
+    menuToggle.addEventListener("click", () => {
+      if (menuOpen) {
         closeMenu();
+      } else {
+        openMenu();
       }
-    );
+    });
   }
 
+  menuCloseElements.forEach((element) => {
+    element.addEventListener("click", () => {
+      closeMenu();
+    });
+  });
 
-  if (menuBackdrop) {
+  menuLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      closeMenu(false);
+    });
+  });
 
-    menuBackdrop.addEventListener(
-      "click",
-      () => {
-        closeMenu();
-      }
-    );
-  }
+  document.addEventListener("keydown", (event) => {
+    if (!menuOpen) return;
 
-
-  /* ==========================================================
-     10 — KEYBOARD NAVIGATION
-     ========================================================== */
-
-  document.addEventListener(
-    "keydown",
-    event => {
-
-      if (
-        event.key === "Escape"
-      ) {
-
-        if (menuOpen) {
-          closeMenu();
-          return;
-        }
-
-        if (standbyActive) {
-          wakeFromStandby();
-        }
-
-        return;
-      }
-
-      if (
-        event.key !== "Tab" ||
-        !menuOpen
-      ) {
-        return;
-      }
-
-      const focusable =
-        getFocusableMenuElements();
-
-      if (!focusable.length) {
-        return;
-      }
-
-      const first =
-        focusable[0];
-
-      const last =
-        focusable[
-          focusable.length - 1
-        ];
-
-      if (
-        event.shiftKey &&
-        document.activeElement === first
-      ) {
-
-        event.preventDefault();
-
-        last.focus();
-
-        return;
-      }
-
-      if (
-        !event.shiftKey &&
-        document.activeElement === last
-      ) {
-
-        event.preventDefault();
-
-        first.focus();
-      }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeMenu();
+      return;
     }
-  );
 
+    if (event.key !== "Tab") return;
 
-  /* ==========================================================
-     11 — SECTION NAVIGATION
-     ========================================================== */
+    const focusable = getFocusable();
 
-  const getSectionFromHash = hash => {
+    if (!focusable.length) return;
 
-    if (
-      !hash ||
-      hash === "#"
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (
+      !event.shiftKey &&
+      document.activeElement === last
     ) {
-      return null;
+      event.preventDefault();
+      first.focus();
     }
+  });
 
-    try {
-      return document.querySelector(
-        hash
-      );
-    } catch {
-      return null;
-    }
+
+  /* =======================================================
+     09. SAME-PAGE NAVIGATION
+     ======================================================= */
+
+  const getHeaderOffset = () => {
+    return header
+      ? header.getBoundingClientRect().height
+      : 0;
   };
 
-
-  const scrollToSection = (
-    target,
-    updateHistory = true
-  ) => {
-
+  const scrollToTarget = (target, updateHash = true) => {
     if (!target) return;
 
-    const headerOffset =
-      header?.offsetHeight || 0;
-
-    const targetY =
+    const top =
       target.getBoundingClientRect().top +
       window.scrollY -
-      headerOffset -
-      18;
+      getHeaderOffset() -
+      12;
 
     window.scrollTo({
-      top: Math.max(
-        targetY,
-        0
-      ),
-      behavior:
-        isReducedMotion()
-          ? "auto"
-          : "smooth"
+      top: Math.max(0, top),
+      behavior: prefersReducedMotion()
+        ? "auto"
+        : "smooth"
     });
 
-    if (
-      updateHistory &&
-      history.pushState
-    ) {
-
+    if (updateHash && target.id) {
       history.pushState(
         null,
         "",
         `#${target.id}`
       );
     }
-
-    /*
-      Update navigation immediately,
-      then again during the scroll.
-    */
-
-    window.setTimeout(
-      updateSectionIndex,
-      isReducedMotion()
-        ? 0
-        : 250
-    );
   };
 
+  $$('a[href^="#"]').forEach((link) => {
+    link.addEventListener("click", (event) => {
+      const href = link.getAttribute("href");
 
-  const anchorLinks = $$(
-    'a[href^="#"]'
+      if (!href || href === "#") return;
+
+      const target = $(href);
+
+      if (!target) return;
+
+      event.preventDefault();
+
+      closeMenu(false);
+
+      scrollToTarget(target);
+    });
+  });
+
+
+  /* =======================================================
+     10. SECTION NAVIGATION — CONTINUITY
+     ======================================================= */
+
+  const orderedSections = sectionEntries.map(
+    (entry) => entry.element
   );
 
+  const navigateSection = (direction) => {
+    if (!orderedSections.length) return;
 
-  anchorLinks.forEach(
-    link => {
+    const current =
+      currentSection?.element ||
+      orderedSections[0];
 
-      link.addEventListener(
-        "click",
-        event => {
+    let index =
+      orderedSections.indexOf(current);
 
-          const href =
-            link.getAttribute(
-              "href"
-            );
+    if (index < 0) index = 0;
 
-          const target =
-            getSectionFromHash(
-              href
-            );
-
-          if (!target) {
-            return;
-          }
-
-          event.preventDefault();
-
-          if (menuOpen) {
-
-            closeMenu({
-              restoreFocus: false
-            });
-          }
-
-          scrollToSection(
-            target,
-            true
-          );
-
-          /*
-            Temporary visual feedback.
-          */
-
-          link.classList.add(
-            "is-navigating"
-          );
-
-          window.setTimeout(
-            () => {
-              link.classList.remove(
-                "is-navigating"
-              );
-            },
-            700
-          );
-
-        }
-      );
-
-    }
-  );
-
-
-  /* ==========================================================
-     12 — SECTION INDEX CLICKABLE NAVIGATION
-     ========================================================== */
-
-  const sectionIndexLinks =
-    $$(
-      "[data-section-link]"
+    const nextIndex = clamp(
+      index + direction,
+      0,
+      orderedSections.length - 1
     );
 
+    if (nextIndex === index) return;
 
-  sectionIndexLinks.forEach(
-    link => {
-
-      link.addEventListener(
-        "click",
-        event => {
-
-          const targetId =
-            link.dataset.sectionLink;
-
-          if (!targetId) {
-            return;
-          }
-
-          const target =
-            document.getElementById(
-              targetId
-            );
-
-          if (!target) {
-            return;
-          }
-
-          event.preventDefault();
-
-          scrollToSection(
-            target,
-            true
-          );
-
-        }
-      );
-    }
-  );
-
-
-  /* ==========================================================
-     13 — FIVE DIRECTIONS
-     ========================================================== */
-
-  const clearDirectionStates = () => {
-
-    directionItems.forEach(
-      item => {
-
-        item.classList.remove(
-          "is-active"
-        );
-      }
-    );
-
-    directionDoors.forEach(
-      item => {
-
-        item.classList.remove(
-          "is-active"
-        );
-      }
+    scrollToTarget(
+      orderedSections[nextIndex],
+      true
     );
   };
-
-
-  const activateDirection = item => {
-
-    if (!item) return;
-
-    clearDirectionStates();
-
-    item.classList.add(
-      "is-active"
-    );
-
-    const direction =
-      item.dataset.direction;
-
-    if (!direction) {
-      return;
-    }
-
-    directionItems.forEach(
-      other => {
-
-        if (
-          other.dataset.direction ===
-          direction
-        ) {
-
-          other.classList.add(
-            "is-active"
-          );
-        }
-      }
-    );
-
-    directionDoors.forEach(
-      other => {
-
-        if (
-          other.dataset.direction ===
-          direction
-        ) {
-
-          other.classList.add(
-            "is-active"
-          );
-        }
-      }
-    );
-  };
-
-
-  directionItems.forEach(
-    item => {
-
-      item.addEventListener(
-        "mouseenter",
-        () => {
-
-          if (
-            !hasFinePointer()
-          ) {
-            return;
-          }
-
-          activateDirection(
-            item
-          );
-        }
-      );
-
-      item.addEventListener(
-        "focusin",
-        () => {
-          activateDirection(
-            item
-          );
-        }
-      );
-    }
-  );
-
-
-  directionDoors.forEach(
-    item => {
-
-      item.addEventListener(
-        "mouseenter",
-        () => {
-
-          if (
-            !hasFinePointer()
-          ) {
-            return;
-          }
-
-          activateDirection(
-            item
-          );
-        }
-      );
-
-      item.addEventListener(
-        "focusin",
-        () => {
-          activateDirection(
-            item
-          );
-        }
-      );
-    }
-  );
-
-
-  /* ==========================================================
-     14 — MAGNETIC INTERACTIONS
-     ========================================================== */
-
-  const magneticStates =
-    new WeakMap();
-
-
-  const setupMagnetic = item => {
-
-    if (
-      !hasFinePointer() ||
-      isReducedMotion()
-    ) {
-      return;
-    }
-
-    const state = {
-      x: 0,
-      y: 0,
-      targetX: 0,
-      targetY: 0,
-      raf: null
-    };
-
-    magneticStates.set(
-      item,
-      state
-    );
-
-
-    const render = () => {
-
-      state.x +=
-        (
-          state.targetX -
-          state.x
-        ) * 0.18;
-
-      state.y +=
-        (
-          state.targetY -
-          state.y
-        ) * 0.18;
-
-      item.style.transform =
-        `translate3d(${state.x}px, ${state.y}px, 0)`;
-
-
-      if (
-        Math.abs(
-          state.targetX -
-          state.x
-        ) > 0.01 ||
-        Math.abs(
-          state.targetY -
-          state.y
-        ) > 0.01
-      ) {
-
-        state.raf =
-          requestAnimationFrame(
-            render
-          );
-
-      } else {
-
-        state.raf = null;
-      }
-    };
-
-
-    item.addEventListener(
-      "pointermove",
-      event => {
-
-        const rect =
-          item.getBoundingClientRect();
-
-        if (
-          rect.width <= 0 ||
-          rect.height <= 0
-        ) {
-          return;
-        }
-
-        const strength =
-          Number(
-            item.dataset
-              .magneticStrength
-          ) || 10;
-
-        state.targetX =
-          (
-            (
-              event.clientX -
-              rect.left
-            ) /
-              rect.width -
-            0.5
-          ) * strength;
-
-        state.targetY =
-          (
-            (
-              event.clientY -
-              rect.top
-            ) /
-              rect.height -
-            0.5
-          ) * strength;
-
-        if (!state.raf) {
-
-          state.raf =
-            requestAnimationFrame(
-              render
-            );
-        }
-      }
-    );
-
-
-    item.addEventListener(
-      "pointerleave",
-      () => {
-
-        state.targetX = 0;
-        state.targetY = 0;
-
-        if (!state.raf) {
-
-          state.raf =
-            requestAnimationFrame(
-              render
-            );
-        }
-      }
-    );
-  };
-
-
-  magneticItems.forEach(
-    setupMagnetic
-  );
-
-
-  /* ==========================================================
-     15 — STANDBY SYSTEM
-     ========================================================== */
 
   /*
-    ACTIVE
-       ↓
-    30 seconds without interaction
-       ↓
-    STANDBY
+   * Frecce da tastiera.
+   * Non interferiscono quando l'utente sta scrivendo.
+   */
+  document.addEventListener("keydown", (event) => {
+    const tag = event.target?.tagName;
 
-    Any interaction
-       ↓
-    AWAKEN
-       ↓
-    ACTIVE
-  */
+    if (
+      tag === "INPUT" ||
+      tag === "TEXTAREA" ||
+      tag === "SELECT" ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.altKey
+    ) {
+      return;
+    }
+
+    if (body.classList.contains("menu-open")) return;
+
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      navigateSection(1);
+    }
+
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      navigateSection(-1);
+    }
+  });
 
 
-  const startStandbyTimer = () => {
+  /* =======================================================
+     11. MOBILE SECTION NAV
+     ======================================================= */
 
-    clearTimeout(
-      standbyTimer
+  let mobileNav = null;
+
+  const createMobileNav = () => {
+    if (mobileNav || orderedSections.length < 2) return;
+
+    mobileNav = document.createElement("nav");
+    mobileNav.className = "mobile-section-nav";
+    mobileNav.setAttribute(
+      "aria-label",
+      "Navigazione sezioni"
     );
 
-    standbyTimer = null;
+    mobileNav.innerHTML = `
+      <div class="mobile-section-nav-inner">
+        <button
+          type="button"
+          class="mobile-section-prev"
+          aria-label="Sezione precedente"
+        >←</button>
 
-    if (
-      isReducedMotion() ||
-      menuOpen ||
-      document.hidden
-    ) {
-      return;
-    }
+        <span
+          class="mobile-section-nav-label"
+          aria-live="polite"
+        >01</span>
 
-    standbyTimer =
-      window.setTimeout(
-        enterStandby,
-        STANDBY_DELAY
-      );
+        <button
+          type="button"
+          class="mobile-section-next"
+          aria-label="Sezione successiva"
+        >→</button>
+
+        <span
+          class="mobile-section-nav-progress"
+          aria-hidden="true"
+        ></span>
+      </div>
+    `;
+
+    body.appendChild(mobileNav);
+
+    $(".mobile-section-prev", mobileNav)
+      ?.addEventListener("click", () => {
+        navigateSection(-1);
+      });
+
+    $(".mobile-section-next", mobileNav)
+      ?.addEventListener("click", () => {
+        navigateSection(1);
+      });
+
+    const updateMobileLabel = () => {
+      const label = $(".mobile-section-nav-label", mobileNav);
+
+      if (!label || !currentSection) return;
+
+      label.textContent =
+        `${currentSection.number} / ${String(
+          orderedSections.length
+        ).padStart(2, "0")}`;
+    };
+
+    document.addEventListener(
+      "cp:section-change",
+      updateMobileLabel
+    );
+
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (window.scrollY > 250) {
+          mobileNav.classList.add("is-visible");
+        } else {
+          mobileNav.classList.remove("is-visible");
+        }
+      },
+      { passive: true }
+    );
   };
 
+  if (window.matchMedia("(max-width: 760px)").matches) {
+    createMobileNav();
+  }
+
+  window
+    .matchMedia("(max-width: 760px)")
+    .addEventListener("change", (event) => {
+      if (event.matches) {
+        createMobileNav();
+      }
+    });
+
+
+  /* =======================================================
+     12. DIRECTION ITEMS
+     ======================================================= */
+
+  const directionItems = $$(".direction-item");
+
+  directionItems.forEach((item) => {
+    item.addEventListener("mouseenter", () => {
+      directionItems.forEach((other) => {
+        if (other !== item) {
+          other.classList.remove("is-active");
+        }
+      });
+
+      item.classList.add("is-active");
+    });
+
+    item.addEventListener("mouseleave", () => {
+      item.classList.remove("is-active");
+    });
+  });
+
+
+  /* =======================================================
+     13. MAGNETIC INTERACTIONS
+     ======================================================= */
+
+  if (!prefersReducedMotion() && isFinePointer()) {
+    const magneticItems = $$(
+      "[data-magnetic]"
+    );
+
+    magneticItems.forEach((element) => {
+      let frame = null;
+
+      const reset = () => {
+        if (frame) {
+          cancelAnimationFrame(frame);
+        }
+
+        element.style.transform = "";
+      };
+
+      element.addEventListener("pointermove", (event) => {
+        const rect =
+          element.getBoundingClientRect();
+
+        const x =
+          (event.clientX - rect.left) /
+          rect.width -
+          0.5;
+
+        const y =
+          (event.clientY - rect.top) /
+          rect.height -
+          0.5;
+
+        const strength =
+          Number(element.dataset.magnetic) || 12;
+
+        if (frame) {
+          cancelAnimationFrame(frame);
+        }
+
+        frame = requestAnimationFrame(() => {
+          element.style.transform =
+            `translate3d(${x * strength}px, ${y * strength}px, 0)`;
+        });
+      });
+
+      element.addEventListener(
+        "pointerleave",
+        reset
+      );
+    });
+  }
+
+
+  /* =======================================================
+     14. POINTER TRAIL / VISUAL CURSOR
+     ======================================================= */
+
+  if (
+    !prefersReducedMotion() &&
+    isFinePointer()
+  ) {
+    const cursor = document.createElement("div");
+
+    cursor.setAttribute("aria-hidden", "true");
+
+    Object.assign(cursor.style, {
+      position: "fixed",
+      left: "0",
+      top: "0",
+      width: "8px",
+      height: "8px",
+      borderRadius: "50%",
+      background: "var(--navy)",
+      pointerEvents: "none",
+      zIndex: "7000",
+      opacity: "0",
+      transform: "translate3d(-50%, -50%, 0)",
+      transition:
+        "width 250ms ease, height 250ms ease, opacity 250ms ease"
+    });
+
+    body.appendChild(cursor);
+
+    let cursorX = -100;
+    let cursorY = -100;
+    let renderX = cursorX;
+    let renderY = cursorY;
+
+    const renderCursor = () => {
+      renderX += (cursorX - renderX) * 0.2;
+      renderY += (cursorY - renderY) * 0.2;
+
+      cursor.style.transform =
+        `translate3d(${renderX}px, ${renderY}px, 0)`;
+
+      requestAnimationFrame(renderCursor);
+    };
+
+    window.addEventListener("pointermove", (event) => {
+      cursorX = event.clientX;
+      cursorY = event.clientY;
+      cursor.style.opacity = "1";
+    }, { passive: true });
+
+    window.addEventListener("pointerleave", () => {
+      cursor.style.opacity = "0";
+    });
+
+    $$("a, button, [data-magnetic]").forEach(
+      (element) => {
+        element.addEventListener("mouseenter", () => {
+          cursor.style.width = "18px";
+          cursor.style.height = "18px";
+        });
+
+        element.addEventListener("mouseleave", () => {
+          cursor.style.width = "8px";
+          cursor.style.height = "8px";
+        });
+      }
+    );
+
+    renderCursor();
+  }
+
+
+  /* =======================================================
+     15. STANDBY SYSTEM
+     ======================================================= */
+
+  const STANDBY_DELAY = 30000;
+  const STANDBY_WAKE_DELAY = 1200;
+
+  let standbyTimer = null;
+  let standbyScreen = null;
+  let standbyActive = false;
+
+  const createStandbyScreen = () => {
+    if (standbyScreen) return;
+
+    standbyScreen = document.createElement("div");
+
+    standbyScreen.className = "standby-screen";
+    standbyScreen.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    standbyScreen.innerHTML = `
+      <div class="standby-screen-inner">
+        <img
+          class="standby-logo"
+          src="assets/images/cp-mark.png"
+          alt=""
+          width="150"
+          height="150"
+        >
+
+        <div class="standby-kicker">
+          MOVIMENTO / CON DIREZIONE.
+        </div>
+
+        <h2 class="standby-title">
+          IN ATTESA.
+        </h2>
+
+        <p class="standby-subtitle">
+          Il percorso continua quando torni.
+        </p>
+
+        <button
+          class="standby-wake"
+          type="button"
+        >
+          Riprendi il percorso
+        </button>
+      </div>
+    `;
+
+    body.appendChild(standbyScreen);
+
+    $(".standby-wake", standbyScreen)
+      ?.addEventListener("click", wakeFromStandby);
+  };
 
   const enterStandby = () => {
-
     if (
       standbyActive ||
-      isReducedMotion() ||
-      menuOpen ||
-      document.hidden
+      body.classList.contains("menu-open")
     ) {
       return;
     }
+
+    createStandbyScreen();
 
     standbyActive = true;
 
-    body.classList.add(
-      "standby-active"
+    body.classList.add("standby-active");
+    root.classList.add("standby-mode");
+
+    standbyScreen.setAttribute(
+      "aria-hidden",
+      "false"
     );
 
-    root.classList.add(
-      "standby-mode"
-    );
-
-    /*
-      The header remains visible.
-      Standby is an atmosphere,
-      NOT a lock screen.
-    */
-
-    header?.classList.remove(
-      "is-hidden"
-    );
-
-    body.dispatchEvent(
-      new CustomEvent(
-        "cp:standby-enter"
-      )
+    document.dispatchEvent(
+      new CustomEvent("cp:standby-enter")
     );
   };
 
-
   const wakeFromStandby = () => {
-
-    clearTimeout(
-      standbyTimer
-    );
-
-    standbyTimer = null;
-
-    if (!standbyActive) {
-
-      startStandbyTimer();
-
-      return;
-    }
+    if (!standbyActive) return;
 
     standbyActive = false;
 
-    body.classList.remove(
-      "standby-active"
-    );
-
-    root.classList.remove(
-      "standby-mode"
-    );
-
-    body.dispatchEvent(
-      new CustomEvent(
-        "cp:standby-wake"
-      )
-    );
-
-    startStandbyTimer();
-  };
-
-
-  const stopStandby = () => {
-
-    clearTimeout(
-      standbyTimer
-    );
-
-    standbyTimer = null;
-
-    if (standbyActive) {
-      wakeFromStandby();
-    }
-  };
-
-
-  const restartStandbyTimer = () => {
-
-    if (standbyActive) {
-      wakeFromStandby();
-      return;
-    }
-
-    startStandbyTimer();
-  };
-
-
-  /* ==========================================================
-     16 — ACTIVITY DETECTION
-     ========================================================== */
-
-  const registerActivity = () => {
-
-    if (activityScheduled) {
-      return;
-    }
-
-    activityScheduled = true;
-
-    requestAnimationFrame(
-      () => {
-
-        activityScheduled =
-          false;
-
-        if (
-          standbyActive
-        ) {
-
-          wakeFromStandby();
-
-          return;
-        }
-
-        if (
-          !menuOpen &&
-          !document.hidden
-        ) {
-
-          startStandbyTimer();
-        }
-      }
-    );
-  };
-
-
-  [
-    "pointerdown",
-    "wheel",
-    "touchstart",
-    "keydown"
-  ].forEach(
-    type => {
-
-      window.addEventListener(
-        type,
-        registerActivity,
-        {
-          passive: true
-        }
-      );
-    }
-  );
-
-
-  window.addEventListener(
-    "pointermove",
-    registerActivity,
-    {
-      passive: true
-    }
-  );
-
-
-  /* ==========================================================
-     17 — VISIBILITY
-     ========================================================== */
-
-  document.addEventListener(
-    "visibilitychange",
-    () => {
-
-      if (
-        document.hidden
-      ) {
-
-        stopStandby();
-
-        return;
-      }
-
-      startStandbyTimer();
-    }
-  );
-
-
-  /* ==========================================================
-     18 — MOTION PREFERENCE
-     ========================================================== */
-
-  const handleMotionPreferenceChange =
-    () => {
-
-      if (
-        isReducedMotion()
-      ) {
-
-        stopStandby();
-
-        root.classList.remove(
-          "reveal-ready"
-        );
-
-        revealItems.forEach(
-          item => {
-
-            item.classList.add(
-              "is-visible"
-            );
-          }
-        );
-
-      } else {
-
-        prepareRevealSystem();
-
-        startStandbyTimer();
-      }
-    };
-
-
-  if (
-    typeof reducedMotionQuery.addEventListener ===
-    "function"
-  ) {
-
-    reducedMotionQuery.addEventListener(
-      "change",
-      handleMotionPreferenceChange
-    );
-
-  } else {
-
-    reducedMotionQuery.addListener(
-      handleMotionPreferenceChange
-    );
-  }
-
-
-  /* ==========================================================
-     19 — POINTER CAPABILITY
-     ========================================================== */
-
-  const handlePointerCapabilityChange =
-    () => {
-
-      if (
-        !hasFinePointer()
-      ) {
-
-        heroTargetX = 0;
-        heroTargetY = 0;
-
-        magneticItems.forEach(
-          item => {
-
-            item.style.transform =
-              "";
-          }
-        );
-      }
-    };
-
-
-  if (
-    typeof finePointerQuery.addEventListener ===
-    "function"
-  ) {
-
-    finePointerQuery.addEventListener(
-      "change",
-      handlePointerCapabilityChange
-    );
-
-  } else {
-
-    finePointerQuery.addListener(
-      handlePointerCapabilityChange
-    );
-  }
-
-
-  /* ==========================================================
-     20 — INITIAL HASH
-     ========================================================== */
-
-  const handleInitialHash = () => {
-
-    const hash =
-      window.location.hash;
-
-    if (!hash) {
-      return;
-    }
-
-    const target =
-      getSectionFromHash(
-        hash
-      );
-
-    if (!target) {
-      return;
-    }
-
-    window.requestAnimationFrame(
-      () => {
-
-        window.setTimeout(
-          () => {
-
-            scrollToSection(
-              target,
-              false
-            );
-
-          },
-          60
-        );
-      }
-    );
-  };
-
-
-  window.addEventListener(
-    "popstate",
-    () => {
-
-      const target =
-        getSectionFromHash(
-          window.location.hash
-        );
-
-      if (target) {
-
-        scrollToSection(
-          target,
-          false
-        );
-      }
-    }
-  );
-
-
-  /* ==========================================================
-     21 — RESIZE
-     ========================================================== */
-
-  let resizeTimer = null;
-
-
-  window.addEventListener(
-    "resize",
-    () => {
-
-      clearTimeout(
-        resizeTimer
-      );
-
-      resizeTimer =
-        window.setTimeout(
-          () => {
-
-            updateScrollProgress();
-            updateSectionIndex();
-
-            if (
-              !hasFinePointer()
-            ) {
-
-              heroTargetX = 0;
-              heroTargetY = 0;
-            }
-
-          },
-          150
-        );
-    },
-    {
-      passive: true
-    }
-  );
-
-
-  /* ==========================================================
-     22 — PAGE TRANSITIONS
-     ========================================================== */
-
-  const supportsViewTransition =
-    typeof document.startViewTransition ===
-    "function";
-
-
-  const sameOrigin = url =>
-    url.origin ===
-    window.location.origin;
-
-
-  const isDocumentNavigation =
-    link => {
-
-      const href =
-        link.getAttribute(
-          "href"
-        );
-
-      if (!href) {
-        return false;
-      }
-
-      if (
-        href.startsWith("#") ||
-        href.startsWith("mailto:") ||
-        href.startsWith("tel:") ||
-        href.startsWith("javascript:")
-      ) {
-        return false;
-      }
-
-      try {
-
-        const url =
-          new URL(
-            href,
-            window.location.href
-          );
-
-        return (
-          sameOrigin(url) &&
-          url.pathname !==
-            window.location.pathname
-        );
-
-      } catch {
-
-        return false;
-      }
-    };
-
-
-  navigationLinks.forEach(
-    link => {
-
-      link.addEventListener(
-        "click",
-        event => {
-
-          if (
-            !supportsViewTransition ||
-            isReducedMotion() ||
-            !isDocumentNavigation(link)
-          ) {
-            return;
-          }
-
-          if (
-            event.metaKey ||
-            event.ctrlKey ||
-            event.shiftKey ||
-            event.altKey
-          ) {
-            return;
-          }
-
-          const url =
-            new URL(
-              link.href,
-              window.location.href
-            );
-
-          event.preventDefault();
-
-          if (menuOpen) {
-
-            closeMenu({
-              restoreFocus: false
-            });
-          }
-
-          /*
-            Important:
-            don't put location.href directly
-            inside a complex animation callback
-            unless the browser supports the
-            exact MPA transition lifecycle.
-          */
-
-          root.classList.add(
-            "page-leaving"
-          );
-
-          window.setTimeout(
-            () => {
-
-              window.location.href =
-                url.href;
-
-            },
-            isReducedMotion()
-              ? 0
-              : 260
-          );
-        }
-      );
-    }
-  );
-
-
-  if (
-    supportsViewTransition
-  ) {
-
-    root.classList.add(
-      "view-transitions"
-    );
-  }
-
-
-  /* ==========================================================
-     23 — STANDBY EVENT BRIDGE
-     ========================================================== */
-
-  body.addEventListener(
-    "cp:standby-enter",
-    () => {
-
-      /*
-        CSS owns the visual standby state.
-
-        JS only controls:
-        - state
-        - timing
-        - awakening
-      */
-    }
-  );
-
-
-  body.addEventListener(
-    "cp:standby-wake",
-    () => {
-
-      /*
-        CSS removes the ambient state.
-      */
-    }
-  );
-
-
-  /* ==========================================================
-     24 — INITIALIZATION
-     ========================================================== */
-
-  const initialize = () => {
-
-    /*
-      MENU
-    */
-
-    if (menu) {
-
-      menu.setAttribute(
+    body.classList.remove("standby-active");
+    root.classList.remove("standby-mode");
+
+    if (standbyScreen) {
+      standbyScreen.setAttribute(
         "aria-hidden",
         "true"
       );
     }
 
-    if (menuToggle) {
+    window.clearTimeout(standbyTimer);
 
-      menuToggle.setAttribute(
-        "aria-expanded",
-        "false"
-      );
-    }
-
-
-    /*
-      INITIAL SCROLL STATE
-    */
-
-    updateScrollProgress();
-    updateSectionIndex();
-    updateHeader();
-
-
-    /*
-      REVEAL
-    */
-
-    prepareRevealSystem();
-
-
-    /*
-      HASH
-    */
-
-    window.setTimeout(
-      handleInitialHash,
-      100
+    document.dispatchEvent(
+      new CustomEvent("cp:standby-wake")
     );
 
-
-    /*
-      STANDBY
-    */
-
-    startStandbyTimer();
+    scheduleStandby();
   };
 
+  const scheduleStandby = () => {
+    window.clearTimeout(standbyTimer);
 
-  if (
-    document.readyState ===
-    "loading"
-  ) {
+    if (
+      document.hidden ||
+      prefersReducedMotion()
+    ) {
+      return;
+    }
 
-    document.addEventListener(
-      "DOMContentLoaded",
-      initialize,
+    standbyTimer = window.setTimeout(
+      enterStandby,
+      STANDBY_DELAY
+    );
+  };
+
+  const activityEvents = [
+    "pointermove",
+    "pointerdown",
+    "wheel",
+    "touchstart",
+    "keydown",
+    "scroll"
+  ];
+
+  activityEvents.forEach((eventName) => {
+    window.addEventListener(
+      eventName,
+      () => {
+        if (standbyActive) {
+          wakeFromStandby();
+        } else {
+          scheduleStandby();
+        }
+      },
       {
-        once: true
+        passive:
+          eventName !== "keydown"
       }
     );
+  });
 
-  } else {
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+      if (document.hidden) {
+        window.clearTimeout(standbyTimer);
+      } else {
+        scheduleStandby();
+      }
+    }
+  );
 
-    initialize();
+  document.addEventListener(
+    "keydown",
+    (event) => {
+      if (!standbyActive) return;
+
+      if (
+        event.key === "Escape" ||
+        event.key === "Enter" ||
+        event.key === " "
+      ) {
+        event.preventDefault();
+        wakeFromStandby();
+      }
+    }
+  );
+
+  createStandbyScreen();
+  scheduleStandby();
+
+
+  /* =======================================================
+     16. PAGE TRANSITIONS
+     ======================================================= */
+
+  const supportsViewTransition =
+    typeof document.startViewTransition === "function";
+
+  const createPageTransition = () => {
+    if ($(".page-transition")) return;
+
+    const transition = document.createElement("div");
+
+    transition.className = "page-transition";
+    transition.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    body.appendChild(transition);
+  };
+
+  createPageTransition();
+
+  const navigateToPage = (url) => {
+    if (!url) return;
+
+    const href = url.href;
+
+    /*
+     * Link esterno / nuova tab / download:
+     * nessuna manipolazione.
+     */
+    if (
+      url.origin !== window.location.origin ||
+      url.protocol === "mailto:" ||
+      url.protocol === "tel:"
+    ) {
+      return;
+    }
+
+    if (supportsViewTransition) {
+      try {
+        document.startViewTransition(() => {
+          window.location.href = href;
+        });
+
+        return;
+      } catch {
+        /* fallback below */
+      }
+    }
+
+    root.classList.add("is-page-leaving");
+
+    window.setTimeout(() => {
+      window.location.href = href;
+    }, 520);
+  };
+
+  $$("a[href]").forEach((link) => {
+    link.addEventListener("click", (event) => {
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey ||
+        link.target === "_blank" ||
+        link.hasAttribute("download")
+      ) {
+        return;
+      }
+
+      const href = link.getAttribute("href");
+
+      if (
+        !href ||
+        href.startsWith("#") ||
+        href.startsWith("mailto:") ||
+        href.startsWith("tel:")
+      ) {
+        return;
+      }
+
+      let url;
+
+      try {
+        url = new URL(
+          href,
+          window.location.href
+        );
+      } catch {
+        return;
+      }
+
+      if (
+        url.origin !== window.location.origin ||
+        url.pathname === window.location.pathname
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+
+      closeMenu(false);
+      navigateToPage(url);
+    });
+  });
+
+
+  /* =======================================================
+     17. INITIAL PAGE ENTRY
+     ======================================================= */
+
+  window.addEventListener("pageshow", () => {
+    root.classList.add("page-ready");
+    root.classList.remove("is-page-leaving");
+  });
+
+  window.addEventListener("load", () => {
+    root.classList.add("page-ready");
+  });
+
+
+  /* =======================================================
+     18. INITIAL HASH
+     ======================================================= */
+
+  const initialHash = window.location.hash;
+
+  if (initialHash) {
+    window.setTimeout(() => {
+      const target = $(initialHash);
+
+      if (target) {
+        scrollToTarget(target, false);
+      }
+    }, 500);
   }
 
 
-  /* ==========================================================
-     25 — DEBUG API
-     ========================================================== */
+  /* =======================================================
+     19. RESIZE
+     ======================================================= */
 
-  window.CP = Object.freeze({
+  let resizeTimer = null;
 
-    openMenu,
-    closeMenu,
+  window.addEventListener("resize", () => {
+    window.clearTimeout(resizeTimer);
 
-    enterStandby,
-    wakeFromStandby,
+    resizeTimer = window.setTimeout(() => {
+      updateScrollProgress();
 
-    scrollToSection,
-
-    get state() {
-
-      return Object.freeze({
-        menuOpen,
-        standbyActive,
-        reducedMotion:
-          isReducedMotion(),
-        finePointer:
-          hasFinePointer()
-      });
-    }
+      /*
+       * Evita che il menu resti aperto in uno stato
+       * incoerente durante un cambio drastico di viewport.
+       */
+      if (
+        window.innerWidth > 760 &&
+        mobileNav
+      ) {
+        mobileNav.classList.remove(
+          "is-visible"
+        );
+      }
+    }, 150);
   });
 
+
+  /* =======================================================
+     20. ORIENTATION / MEDIA QUERY
+     ======================================================= */
+
+  const reducedMotionQuery =
+    window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    );
+
+  reducedMotionQuery.addEventListener?.(
+    "change",
+    () => {
+      if (reducedMotionQuery.matches) {
+        root.classList.add("reduced-motion");
+      } else {
+        root.classList.remove("reduced-motion");
+      }
+    }
+  );
+
+  if (reducedMotionQuery.matches) {
+    root.classList.add("reduced-motion");
+  }
+
+
+  /* =======================================================
+     21. PAGE VISIBILITY
+     ======================================================= */
+
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+      if (document.hidden) {
+        root.classList.add("page-hidden");
+      } else {
+        root.classList.remove("page-hidden");
+      }
+    }
+  );
+
+
+  /* =======================================================
+     22. DEBUG API
+     ======================================================= */
+
+  window.CP = {
+    version: "2026.09",
+    sections: sectionEntries.map(
+      ({ element, number }) => ({
+        id: element.id,
+        number
+      })
+    ),
+    menu: {
+      open: openMenu,
+      close: closeMenu
+    },
+    standby: {
+      enter: enterStandby,
+      wake: wakeFromStandby
+    },
+    navigation: {
+      next: () => navigateSection(1),
+      previous: () => navigateSection(-1)
+    }
+  };
+
+
+  /* =======================================================
+     23. FINAL INITIALIZATION
+     ======================================================= */
+
+  updateHeader();
+  updateScrollProgress();
+
+  if (sectionEntries.length) {
+    setCurrentSection(sectionEntries[0]);
+  }
 
 })();
