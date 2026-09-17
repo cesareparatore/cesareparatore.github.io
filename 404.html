@@ -1,254 +1,105 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
 
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1, viewport-fit=cover"
   >
 
-  <title>404 | Cesare Paratore | Movimento / Con Direzione.</title>
+  <title>404 | Cesare Paratore</title>
 
   <meta
     name="description"
-    content="La pagina che stai cercando non è disponibile. Il percorso continua."
+    content="La traiettoria richiesta non è disponibile. Torna all'inizio del percorso di Cesare Paratore."
   >
 
-  <meta
-    name="robots"
-    content="noindex, follow"
-  >
+  <meta name="robots" content="noindex, follow">
 
-  <link rel="icon" href="/assets/images/cp-mark.png">
+  <link rel="icon" type="image/png" href="/assets/images/cp-mark.png">
+  <link rel="apple-touch-icon" href="/assets/images/cp-mark.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link
-    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   >
 
   <style>
-
-    /* =====================================================
-       404 — CESARE PARATORE
-       MOVIMENTO / CON DIREZIONE.
-       ===================================================== */
-
     :root {
       --navy: #071b33;
-      --navy-2: #0b2440;
-      --navy-3: #12395d;
-
-      --white: #ffffff;
-      --paper: #f5f4ef;
-
-      --line: rgba(255,255,255,.12);
-      --line-soft: rgba(255,255,255,.07);
-
-      --gutter: clamp(20px, 4vw, 72px);
-
-      --ease-out: cubic-bezier(.16,1,.3,1);
-      --ease-in-out: cubic-bezier(.65,0,.35,1);
+      --navy-2: #0d2949;
+      --navy-3: #173d63;
+      --white: #fff;
+      --line: rgba(255,255,255,.16);
+      --line-soft: rgba(255,255,255,.08);
+      --mono: "DM Mono", monospace;
+      --sans: "Manrope", sans-serif;
+      --ease: cubic-bezier(.16,1,.3,1);
     }
 
-
-    /* =====================================================
-       RESET
-       ===================================================== */
-
-    *,
-    *::before,
-    *::after {
+    * {
       box-sizing: border-box;
     }
 
-    html,
-    body {
-      margin: 0;
-      min-width: 320px;
+    html {
       min-height: 100%;
+      background: var(--navy);
     }
 
     body {
-      min-height: 100svh;
-
-      overflow: hidden;
-
-      background: var(--navy);
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+      background:
+        radial-gradient(
+          circle at 50% 50%,
+          rgba(23,61,99,.30),
+          transparent 38%
+        ),
+        var(--navy);
       color: var(--white);
-
-      font-family:
-        "Manrope",
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
+      font-family: var(--sans);
     }
 
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    button {
-      font: inherit;
-    }
-
-    ::selection {
-      background: var(--white);
-      color: var(--navy);
-    }
-
-
-    /* =====================================================
-       PAGE
-       ===================================================== */
-
-    .error-page {
-      position: relative;
-
-      min-height: 100svh;
-      min-height: 100dvh;
-
-      display: grid;
-      grid-template-rows: auto 1fr auto;
-
-      overflow: hidden;
-    }
-
-
-    /* =====================================================
-       ATMOSPHERE
-       ===================================================== */
-
-    .error-atmosphere {
-      position: absolute;
+    body::before {
+      content: "";
+      position: fixed;
       inset: 0;
-
       pointer-events: none;
-      overflow: hidden;
-    }
-
-    .error-grid {
-      position: absolute;
-      inset: 0;
-
+      opacity: .45;
       background-image:
         linear-gradient(
-          to right,
           rgba(255,255,255,.035) 1px,
           transparent 1px
         ),
         linear-gradient(
-          to bottom,
+          90deg,
           rgba(255,255,255,.035) 1px,
           transparent 1px
         );
-
-      background-size:
-        clamp(48px, 6vw, 90px)
-        clamp(48px, 6vw, 90px);
-
-      mask-image:
-        radial-gradient(
-          circle at center,
-          black 15%,
-          transparent 78%
-        );
+      background-size: 72px 72px;
+      mask-image: linear-gradient(
+        to bottom,
+        black,
+        transparent 90%
+      );
     }
 
-    .error-orbit {
-      position: absolute;
-
-      width: min(72vw, 900px);
-      aspect-ratio: 1;
-
-      left: 50%;
-      top: 50%;
-
-      border:
-        1px solid rgba(255,255,255,.10);
-
-      border-radius: 50%;
-
-      transform:
-        translate(-50%, -50%)
-        rotate(-18deg);
+    a {
+      color: inherit;
     }
 
-    .error-orbit::before,
-    .error-orbit::after {
-      content: "";
-
-      position: absolute;
-
-      border:
-        1px solid rgba(255,255,255,.055);
-
-      border-radius: 50%;
+    .error-page {
+      position: relative;
+      min-height: 100svh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      isolation: isolate;
     }
-
-    .error-orbit::before {
-      inset: 12%;
-    }
-
-    .error-orbit::after {
-      inset: 27%;
-    }
-
-    .error-glow {
-      position: absolute;
-
-      width: min(60vw, 800px);
-      aspect-ratio: 1;
-
-      left: 50%;
-      top: 50%;
-
-      transform:
-        translate(-50%, -50%);
-
-      border-radius: 50%;
-
-      background:
-        radial-gradient(
-          circle,
-          rgba(18,57,93,.38),
-          transparent 68%
-        );
-
-      filter: blur(25px);
-    }
-
-    .error-line {
-      position: absolute;
-
-      width: 80vw;
-      height: 1px;
-
-      left: 50%;
-      top: 50%;
-
-      background:
-        linear-gradient(
-          90deg,
-          transparent,
-          rgba(255,255,255,.16),
-          transparent
-        );
-
-      transform:
-        translate(-50%, -50%)
-        rotate(-23deg);
-    }
-
 
     /* =====================================================
        HEADER
@@ -256,57 +107,55 @@
 
     .error-header {
       position: relative;
-      z-index: 5;
-
-      width:
-        min(
-          calc(100% - (var(--gutter) * 2)),
-          1480px
-        );
-
-      margin-inline: auto;
-
-      min-height: 86px;
+      z-index: 10;
 
       display: flex;
       align-items: center;
       justify-content: space-between;
 
-      border-bottom:
-        1px solid var(--line);
+      padding:
+        clamp(20px, 3vw, 42px)
+        clamp(20px, 4vw, 72px);
     }
 
-    .error-logo {
-      display: inline-flex;
+    .error-brand {
+      display: flex;
       align-items: center;
+      gap: 18px;
+      text-decoration: none;
     }
 
-    .error-logo img {
-      width: 60px;
-      height: 60px;
-
+    .error-brand img {
+      width: clamp(58px, 5vw, 76px);
+      height: clamp(58px, 5vw, 76px);
       object-fit: contain;
-
-      transition:
-        transform 600ms var(--ease-out);
+      display: block;
     }
 
-    .error-logo:hover img {
-      transform:
-        rotate(-4deg)
-        scale(1.06);
+    .error-brand-copy {
+      display: grid;
+      gap: 4px;
     }
 
-    .error-header-label {
-      font-family: "DM Mono", monospace;
-
-      font-size: .66rem;
-      letter-spacing: .11em;
-      text-transform: uppercase;
-
-      color: rgba(255,255,255,.42);
+    .error-brand-name {
+      font-size: .82rem;
+      font-weight: 800;
+      letter-spacing: .12em;
     }
 
+    .error-brand-tag {
+      font-family: var(--mono);
+      font-size: .58rem;
+      letter-spacing: .12em;
+      opacity: .58;
+    }
+
+    .error-code {
+      font-family: var(--mono);
+      font-size: .68rem;
+      letter-spacing: .16em;
+      opacity: .58;
+    }
 
     /* =====================================================
        MAIN
@@ -314,85 +163,70 @@
 
     .error-main {
       position: relative;
-      z-index: 3;
-
-      width:
-        min(
-          calc(100% - (var(--gutter) * 2)),
-          1480px
-        );
-
-      margin-inline: auto;
+      z-index: 2;
 
       display: grid;
-
       place-items: center;
 
-      padding-block: 50px;
+      padding:
+        50px
+        clamp(20px, 6vw, 100px);
     }
 
-    .error-content {
-      width: min(100%, 1100px);
-
+    .error-layout {
+      width: min(1400px, 100%);
       display: grid;
       grid-template-columns:
-        minmax(0, 1fr)
-        minmax(190px, .38fr);
+        minmax(0, .82fr)
+        minmax(360px, .98fr);
 
       align-items: center;
-
-      gap: clamp(45px, 9vw, 140px);
+      gap: clamp(60px, 10vw, 180px);
     }
 
-
-    /* =====================================================
-       COPY
-       ===================================================== */
+    .error-copy {
+      max-width: 650px;
+    }
 
     .error-kicker {
-      margin-bottom: 25px;
+      margin: 0 0 24px;
 
-      font-family: "DM Mono", monospace;
-
+      font-family: var(--mono);
       font-size: .68rem;
-      letter-spacing: .12em;
+      letter-spacing: .18em;
       text-transform: uppercase;
 
-      color: rgba(255,255,255,.38);
+      opacity: .56;
     }
 
     .error-title {
       margin: 0;
 
       font-size:
-        clamp(5rem, 13vw, 13rem);
+        clamp(4.8rem, 11vw, 11.5rem);
 
       line-height: .78;
-
-      letter-spacing: -.09em;
-
-      font-weight: 600;
+      letter-spacing: -.075em;
+      font-weight: 800;
     }
 
     .error-title span {
       display: block;
     }
 
-    .error-title span:last-child {
-      color: rgba(255,255,255,.27);
+    .error-title .accent {
+      margin-left: clamp(22px, 6vw, 90px);
     }
 
-    .error-copy {
+    .error-description {
       max-width: 560px;
-
-      margin-top: 45px;
+      margin: 48px 0 0;
 
       font-size:
-        clamp(1.05rem, 1.5vw, 1.35rem);
+        clamp(1.05rem, 1.55vw, 1.45rem);
 
-      line-height: 1.65;
-
-      color: rgba(255,255,255,.64);
+      line-height: 1.55;
+      color: rgba(255,255,255,.72);
     }
 
     .error-action {
@@ -400,151 +234,177 @@
       align-items: center;
       gap: 18px;
 
-      margin-top: 38px;
+      margin-top: 42px;
+      padding: 16px 22px;
 
-      padding: 16px 21px;
-
-      border:
-        1px solid rgba(255,255,255,.24);
-
+      border: 1px solid var(--line);
       border-radius: 999px;
 
-      font-family: "DM Mono", monospace;
+      text-decoration: none;
 
-      font-size: .65rem;
-      letter-spacing: .1em;
+      font-family: var(--mono);
+      font-size: .67rem;
+      letter-spacing: .12em;
       text-transform: uppercase;
 
       transition:
-        background 400ms var(--ease-out),
-        color 400ms var(--ease-out),
-        transform 400ms var(--ease-out);
+        background .5s var(--ease),
+        border-color .5s var(--ease),
+        transform .5s var(--ease);
     }
 
     .error-action::after {
       content: "↗";
-
-      font-size: 15px;
-
-      transition:
-        transform 400ms var(--ease-out);
+      font-size: .9rem;
+      transition: transform .5s var(--ease);
     }
 
     .error-action:hover {
-      background: var(--white);
-      color: var(--navy);
-
-      transform:
-        translateY(-4px);
+      background: rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.34);
+      transform: translateY(-3px);
     }
 
     .error-action:hover::after {
-      transform:
-        translate(4px, -4px);
+      transform: translate(3px,-3px);
     }
 
-
     /* =====================================================
-       CENTRAL VISUAL
+       VISUAL FIELD
        ===================================================== */
 
     .error-visual {
       position: relative;
-
-      width: min(100%, 380px);
+      width: min(620px, 80vw);
       aspect-ratio: 1;
-
-      margin-inline: auto;
+      justify-self: center;
 
       display: grid;
       place-items: center;
     }
 
-    .error-visual-ring {
-      position: absolute;
-      inset: 0;
-
-      border:
-        1px solid rgba(255,255,255,.13);
-
-      border-radius: 50%;
-
-      animation:
-        orbit 24s linear infinite;
-    }
-
-    .error-visual-ring::before {
+    .error-visual::before {
       content: "";
-
       position: absolute;
-
-      width: 8px;
-      height: 8px;
-
-      top: 10%;
-      left: 50%;
-
-      transform: translateX(-50%);
-
+      width: 70%;
+      height: 70%;
       border-radius: 50%;
 
-      background: var(--white);
+      background:
+        radial-gradient(
+          circle,
+          rgba(255,255,255,.11),
+          rgba(255,255,255,.025) 42%,
+          transparent 70%
+        );
 
-      box-shadow:
-        0 0 0 8px rgba(255,255,255,.06);
+      filter: blur(8px);
     }
 
-    .error-visual-ring-inner {
-      position: absolute;
-      inset: 16%;
-
-      border:
-        1px solid rgba(255,255,255,.09);
-
-      border-radius: 50%;
-    }
-
-    .error-visual-core {
+    .error-circle {
       position: relative;
       z-index: 3;
 
-      width: 46%;
+      width: clamp(170px, 25vw, 300px);
       aspect-ratio: 1;
 
       display: grid;
       place-items: center;
 
-      background: var(--paper);
-
       border-radius: 50%;
+
+      background: #f4f4ef;
 
       box-shadow:
-        0 0 0 1px rgba(255,255,255,.08),
-        0 35px 90px rgba(0,0,0,.22);
+        0 0 0 1px rgba(255,255,255,.3),
+        0 30px 100px rgba(0,0,0,.25);
     }
 
-    .error-visual-core::before {
-      content: "";
-
-      position: absolute;
-      inset: 13%;
-
-      border:
-        1px solid rgba(7,27,51,.10);
-
-      border-radius: 50%;
-    }
-
-    .error-visual-core img {
-      position: relative;
-      z-index: 2;
-
-      width: 62%;
-      height: 62%;
-
+    .error-circle img {
+      width: 56%;
+      height: 56%;
       object-fit: contain;
     }
 
+    .orbit {
+      position: absolute;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .orbit-a {
+      inset: 8%;
+      transform: rotate(-17deg) scaleY(.7);
+    }
+
+    .orbit-b {
+      inset: 18%;
+      transform: rotate(38deg) scaleY(.62);
+      border-color: rgba(255,255,255,.10);
+    }
+
+    .orbit-c {
+      inset: 1%;
+      transform: rotate(72deg) scaleY(.44);
+      border-color: rgba(255,255,255,.07);
+    }
+
+    .trajectory {
+      position: absolute;
+      width: 125%;
+      height: 1px;
+      left: -12.5%;
+      top: 50%;
+      background:
+        linear-gradient(
+          90deg,
+          transparent,
+          rgba(255,255,255,.22),
+          transparent
+        );
+      transform: rotate(-29deg);
+    }
+
+    .trajectory::after {
+      content: "";
+      position: absolute;
+      left: 58%;
+      top: 50%;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: white;
+      transform: translate(-50%,-50%);
+      box-shadow: 0 0 30px rgba(255,255,255,.6);
+    }
+
+    .crosshair {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      right: 13%;
+      top: 15%;
+    }
+
+    .crosshair::before,
+    .crosshair::after {
+      content: "";
+      position: absolute;
+      background: rgba(255,255,255,.35);
+    }
+
+    .crosshair::before {
+      width: 100%;
+      height: 1px;
+      top: 50%;
+    }
+
+    .crosshair::after {
+      width: 1px;
+      height: 100%;
+      left: 50%;
+    }
 
     /* =====================================================
        FOOTER
@@ -552,160 +412,179 @@
 
     .error-footer {
       position: relative;
-      z-index: 5;
-
-      width:
-        min(
-          calc(100% - (var(--gutter) * 2)),
-          1480px
-        );
-
-      margin-inline: auto;
-
-      min-height: 90px;
+      z-index: 10;
 
       display: grid;
-
-      grid-template-columns:
-        1fr
-        auto
-        1fr;
-
-      align-items: center;
-
+      grid-template-columns: 1fr auto 1fr;
+      align-items: end;
       gap: 30px;
 
-      border-top:
-        1px solid var(--line);
+      padding:
+        26px
+        clamp(20px, 4vw, 72px);
+
+      border-top: 1px solid var(--line-soft);
     }
 
-    .error-footer-left,
-    .error-footer-right,
-    .error-footer-center {
-      font-family: "DM Mono", monospace;
+    .error-footer > :last-child {
+      text-align: right;
+    }
 
-      font-size: .62rem;
-      letter-spacing: .09em;
+    .error-footer-item {
+      font-family: var(--mono);
+      font-size: .59rem;
+      letter-spacing: .12em;
+      opacity: .5;
+    }
+
+    .error-footer-center {
+      font-family: var(--mono);
+      font-size: .61rem;
+      letter-spacing: .16em;
       text-transform: uppercase;
     }
 
-    .error-footer-left {
-      color: rgba(255,255,255,.45);
-    }
-
-    .error-footer-center {
-      justify-self: center;
-
-      color: rgba(255,255,255,.58);
-
-      white-space: nowrap;
-    }
-
-    .error-footer-right {
-      justify-self: end;
-
-      color: rgba(255,255,255,.34);
-
-      white-space: nowrap;
-    }
-
-
     /* =====================================================
-       ANIMATION
+       MOTION
        ===================================================== */
 
-    .error-content {
-      animation:
-        error-enter 1100ms var(--ease-out) both;
+    @media (prefers-reduced-motion: no-preference) {
+      .error-circle {
+        animation:
+          errorFloat 7s ease-in-out infinite;
+      }
+
+      .orbit-a {
+        animation:
+          orbitA 18s linear infinite;
+      }
+
+      .orbit-b {
+        animation:
+          orbitB 24s linear infinite reverse;
+      }
+
+      .orbit-c {
+        animation:
+          orbitC 32s linear infinite;
+      }
+
+      .trajectory {
+        animation:
+          trajectory 9s ease-in-out infinite;
+      }
     }
 
-    .error-visual {
-      animation:
-        visual-enter 1400ms var(--ease-out) 150ms both;
+    @keyframes errorFloat {
+      0%,100% {
+        transform: translate3d(0,0,0);
+      }
+
+      50% {
+        transform: translate3d(0,-12px,0);
+      }
     }
 
-    @keyframes error-enter {
+    @keyframes orbitA {
       from {
-        opacity: 0;
-        transform:
-          translateY(35px);
+        transform: rotate(-17deg) scaleY(.7);
       }
 
       to {
-        opacity: 1;
-        transform:
-          translateY(0);
+        transform: rotate(343deg) scaleY(.7);
       }
     }
 
-    @keyframes visual-enter {
+    @keyframes orbitB {
       from {
-        opacity: 0;
-        transform:
-          scale(.88)
-          rotate(-8deg);
+        transform: rotate(38deg) scaleY(.62);
       }
 
       to {
-        opacity: 1;
-        transform:
-          scale(1)
-          rotate(0);
+        transform: rotate(-322deg) scaleY(.62);
       }
     }
 
-    @keyframes orbit {
+    @keyframes orbitC {
+      from {
+        transform: rotate(72deg) scaleY(.44);
+      }
+
       to {
-        transform:
-          rotate(360deg);
+        transform: rotate(432deg) scaleY(.44);
       }
     }
 
+    @keyframes trajectory {
+      0%,100% {
+        opacity: .45;
+        transform:
+          rotate(-29deg)
+          translateX(-3%);
+      }
+
+      50% {
+        opacity: .9;
+        transform:
+          rotate(-29deg)
+          translateX(3%);
+      }
+    }
+
+    /* =====================================================
+       TABLET
+       ===================================================== */
+
+    @media (max-width: 900px) {
+      .error-layout {
+        grid-template-columns: 1fr;
+        gap: 70px;
+      }
+
+      .error-copy {
+        max-width: 720px;
+      }
+
+      .error-visual {
+        width: min(520px, 78vw);
+      }
+    }
 
     /* =====================================================
        MOBILE
        ===================================================== */
 
-    @media (max-width: 760px) {
-
-      :root {
-        --gutter: 20px;
-      }
-
-      body {
-        overflow: auto;
-      }
-
-      .error-page {
-        min-height: 100svh;
-
-        grid-template-rows:
-          auto 1fr auto;
-      }
-
+    @media (max-width: 640px) {
       .error-header {
-        min-height: 72px;
+        padding: 18px 20px;
       }
 
-      .error-logo img {
-        width: 50px;
-        height: 50px;
+      .error-brand {
+        gap: 12px;
       }
 
-      .error-header-label {
-        font-size: .58rem;
+      .error-brand img {
+        width: 54px;
+        height: 54px;
+      }
+
+      .error-brand-name {
+        font-size: .7rem;
+      }
+
+      .error-brand-tag {
+        font-size: .5rem;
       }
 
       .error-main {
-        padding-block: 45px;
+        padding:
+          35px
+          20px
+          55px;
       }
 
-      .error-content {
-        grid-template-columns: 1fr;
-
+      .error-layout {
         gap: 55px;
-
-        text-align: center;
       }
 
       .error-kicker {
@@ -714,14 +593,11 @@
 
       .error-title {
         font-size:
-          clamp(5.2rem, 26vw, 8rem);
+          clamp(4rem, 22vw, 7rem);
       }
 
-      .error-copy {
-        margin-inline: auto;
-
-        margin-top: 32px;
-
+      .error-description {
+        margin-top: 34px;
         font-size: 1rem;
       }
 
@@ -730,203 +606,94 @@
       }
 
       .error-visual {
-        width: min(72vw, 310px);
+        width: min(420px, 94vw);
+      }
+
+      .error-circle {
+        width: 48vw;
+        min-width: 170px;
       }
 
       .error-footer {
-        min-height: 110px;
-
-        grid-template-columns:
-          1fr
-          auto;
-
-        grid-template-areas:
-          "left right"
-          "center center";
-
-        row-gap: 10px;
+        grid-template-columns: 1fr;
+        gap: 10px;
       }
 
-      .error-footer-left {
-        grid-area: left;
-      }
-
-      .error-footer-right {
-        grid-area: right;
+      .error-footer > :last-child {
+        text-align: left;
       }
 
       .error-footer-center {
-        grid-area: center;
-
-        justify-self: start;
-
-        white-space: normal;
-
-        line-height: 1.4;
+        order: -1;
       }
     }
-
-
-    /* =====================================================
-       SMALL MOBILE
-       ===================================================== */
-
-    @media (max-width: 430px) {
-
-      .error-main {
-        padding-block: 35px;
-      }
-
-      .error-title {
-        font-size: 5rem;
-      }
-
-      .error-visual {
-        width: 245px;
-      }
-
-      .error-footer {
-        font-size: .55rem;
-      }
-    }
-
-
-    /* =====================================================
-       LANDSCAPE
-       ===================================================== */
-
-    @media (max-height: 650px) and (orientation: landscape) {
-
-      .error-main {
-        padding-block: 25px;
-      }
-
-      .error-content {
-        grid-template-columns:
-          minmax(0, 1fr)
-          220px;
-
-        gap: 40px;
-      }
-
-      .error-title {
-        font-size:
-          clamp(4rem, 11vw, 7rem);
-      }
-
-      .error-copy {
-        margin-top: 20px;
-      }
-
-      .error-action {
-        margin-top: 20px;
-      }
-
-      .error-visual {
-        width: 220px;
-      }
-    }
-
-
-    /* =====================================================
-       REDUCED MOTION
-       ===================================================== */
 
     @media (prefers-reduced-motion: reduce) {
-
       *,
       *::before,
       *::after {
         animation-duration: .001ms !important;
         animation-iteration-count: 1 !important;
-        transition-duration: .001ms !important;
+        scroll-behavior: auto !important;
       }
     }
-
-
-    /* =====================================================
-       HIGH CONTRAST
-       ===================================================== */
-
-    @media (prefers-contrast: more) {
-
-      .error-copy {
-        color: var(--white);
-      }
-
-      .error-header,
-      .error-footer {
-        border-color:
-          rgba(255,255,255,.35);
-      }
-    }
-
   </style>
 </head>
 
-
 <body>
 
-  <main class="error-page">
-
-    <!-- ATMOSPHERE -->
-
-    <div
-      class="error-atmosphere"
-      aria-hidden="true"
-    >
-      <div class="error-grid"></div>
-      <div class="error-glow"></div>
-      <div class="error-orbit"></div>
-      <div class="error-line"></div>
-    </div>
-
-
-    <!-- HEADER -->
+  <div class="error-page">
 
     <header class="error-header">
 
       <a
-        class="error-logo"
+        class="error-brand"
         href="/"
-        aria-label="Torna alla home di Cesare Paratore"
+        aria-label="Cesare Paratore — torna alla home"
       >
         <img
           src="/assets/images/cp-mark.png"
           alt="Cesare Paratore"
-          width="60"
-          height="60"
         >
+
+        <span class="error-brand-copy">
+          <strong class="error-brand-name">
+            CESARE PARATORE
+          </strong>
+
+          <span class="error-brand-tag">
+            MOVIMENTO / CON DIREZIONE.
+          </span>
+        </span>
       </a>
 
-      <span class="error-header-label">
-        MOVIMENTO / CON DIREZIONE.
+      <span class="error-code">
+        404 / 00
       </span>
 
     </header>
 
 
-    <!-- MAIN -->
+    <main class="error-main">
 
-    <section class="error-main">
+      <div class="error-layout">
 
-      <div class="error-content">
+        <section class="error-copy">
 
-        <div class="error-copy-block">
-
-          <div class="error-kicker">
+          <p class="error-kicker">
             404 — TRAIETTORIA NON TROVATA
-          </div>
+          </p>
 
           <h1 class="error-title">
             <span>QUESTA</span>
-            <span>STRADA.</span>
+            <span class="accent">STRADA.</span>
           </h1>
 
-          <p class="error-copy">
-            La pagina che stai cercando non è
-            disponibile. Ma un percorso non finisce
-            quando una strada non porta dove pensavi.
+          <p class="error-description">
+            La pagina che stai cercando non è disponibile.
+            Ma un percorso non finisce quando una strada
+            non porta dove pensavi.
+            <br><br>
             Si cambia direzione.
           </p>
 
@@ -937,43 +704,38 @@
             Riparti dall'inizio
           </a>
 
-        </div>
+        </section>
 
-
-        <!-- VISUAL -->
 
         <div
           class="error-visual"
           aria-hidden="true"
         >
 
-          <div class="error-visual-ring">
-            <div class="error-visual-ring-inner"></div>
-          </div>
+          <span class="orbit orbit-a"></span>
+          <span class="orbit orbit-b"></span>
+          <span class="orbit orbit-c"></span>
 
-          <div class="error-visual-core">
+          <span class="trajectory"></span>
+          <span class="crosshair"></span>
 
+          <div class="error-circle">
             <img
               src="/assets/images/cp-mark.png"
               alt=""
-              width="180"
-              height="180"
             >
-
           </div>
 
         </div>
 
       </div>
 
-    </section>
+    </main>
 
-
-    <!-- FOOTER -->
 
     <footer class="error-footer">
 
-      <span class="error-footer-left">
+      <span class="error-footer-item">
         CESARE PARATORE
       </span>
 
@@ -981,33 +743,27 @@
         MOVIMENTO / CON DIREZIONE.
       </span>
 
-      <span class="error-footer-right">
+      <span class="error-footer-item">
         © 2026 CESARE PARATORE
       </span>
 
     </footer>
 
-  </main>
+  </div>
 
 
   <script>
     (() => {
-      const root = document.documentElement;
-
-      if (
-        window.matchMedia(
-          "(prefers-reduced-motion: reduce)"
-        ).matches
-      ) {
-        return;
-      }
+      "use strict";
 
       const visual =
         document.querySelector(".error-visual");
 
-      if (!visual) return;
-
       if (
+        !visual ||
+        window.matchMedia(
+          "(prefers-reduced-motion: reduce)"
+        ).matches ||
         window.matchMedia(
           "(pointer: coarse)"
         ).matches
@@ -1015,45 +771,38 @@
         return;
       }
 
-      let raf = null;
+      let x = 0;
+      let y = 0;
+      let targetX = 0;
+      let targetY = 0;
 
-      window.addEventListener(
-        "pointermove",
-        (event) => {
+      visual.addEventListener("pointermove", event => {
+        const rect =
+          visual.getBoundingClientRect();
 
-          if (raf) {
-            cancelAnimationFrame(raf);
-          }
+        targetX =
+          ((event.clientX - rect.left) / rect.width - .5) * 12;
 
-          raf = requestAnimationFrame(() => {
+        targetY =
+          ((event.clientY - rect.top) / rect.height - .5) * 12;
+      });
 
-            const x =
-              (event.clientX -
-                window.innerWidth / 2) *
-              0.012;
+      visual.addEventListener("pointerleave", () => {
+        targetX = 0;
+        targetY = 0;
+      });
 
-            const y =
-              (event.clientY -
-                window.innerHeight / 2) *
-              0.012;
+      const render = () => {
+        x += (targetX - x) * .06;
+        y += (targetY - y) * .06;
 
-            visual.style.transform =
-              `translate3d(${x}px, ${y}px, 0)`;
+        visual.style.transform =
+          `translate3d(${x}px,${y}px,0)`;
 
-          });
+        requestAnimationFrame(render);
+      };
 
-        },
-        { passive: true }
-      );
-
-      window.addEventListener(
-        "pointerleave",
-        () => {
-          visual.style.transform =
-            "translate3d(0,0,0)";
-        }
-      );
-
+      requestAnimationFrame(render);
     })();
   </script>
 
