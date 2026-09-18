@@ -1,1071 +1,2327 @@
-<!doctype html>
-<html lang="it">
-<head>
-  <meta charset="utf-8">
+/* =========================================================
+   CESARE PARATORE
+   MOVIMENTO / CON DIREZIONE.
+   MASTER INTERACTION SYSTEM — 2.3
+   ========================================================= */
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  >
+(() => {
+  "use strict";
 
-  <title>Cesare Paratore — Movimento / Con Direzione.</title>
 
-  <meta
-    name="description"
-    content="Cesare Paratore. Movimento / Con Direzione. Un percorso tra sport, scienze motorie, educazione, management e digitale."
-  >
+  const CONFIG = {
+    loaderMinimumTime: 5200,
+    loaderMaximumWait: 8000,
 
-  <meta
-    name="theme-color"
-    content="#F2EFE8"
-  >
+    revealThreshold: 0.12,
 
-  <meta
-    name="color-scheme"
-    content="light"
-  >
+    cursorLerp: 0.16,
 
-  <link
-    rel="canonical"
-    href="/"
-  >
+    resizeDebounce: 180,
 
-  <link
-    rel="icon"
-    href="/assets/images/favicon.ico"
-  >
+    scrollNavigationOffset: 18,
 
-  <link
-    rel="preconnect"
-    href="https://fonts.googleapis.com"
-  >
+    transitionDuration: 700,
 
-  <link
-    rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin
-  >
+    trajectoryLerp: 0.085,
+    trajectoryDrift: 18,
 
-  <link
-    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap"
-    rel="stylesheet"
-  >
+    magneticStrength: 0.12,
+    magneticRadius: 90,
 
-  <link
-    rel="stylesheet"
-    href="css/style.css"
-  >
+    standbyDelay: 30000
+  };
 
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Cesare Paratore",
-    "url": "/",
-    "jobTitle": "Professionista dello sport, dell'educazione, del management e del digitale"
+
+  const state = {
+    loaded: false,
+    menuOpen: false,
+    standby: false,
+
+    activeIndex: 0,
+
+    resizeTimer: null,
+    standbyTimer: null,
+    rafId: null,
+
+    reducedMotion: false,
+
+    standbyReturnFocus: null,
+
+    pointer: {
+      targetX: window.innerWidth / 2,
+      targetY: window.innerHeight / 2
+    },
+
+    cursor: {
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2
+    },
+
+    trajectory: {
+      progress: 0,
+      targetProgress: 0,
+      drift: 0,
+      targetDrift: 0
+    }
+  };
+
+
+  const dom = {
+
+    html: document.documentElement,
+    body: document.body,
+
+    loader:
+      document.querySelector(".page-loader"),
+
+    transition:
+      document.querySelector(".page-transition"),
+
+    cursor:
+      document.querySelector(".custom-cursor"),
+
+    cursorDot:
+      document.querySelector(".custom-cursor-dot"),
+
+    cursorRing:
+      document.querySelector(".custom-cursor-ring"),
+
+    header:
+      document.querySelector(".site-header"),
+
+    menu:
+      document.querySelector(".site-menu"),
+
+    menuTrigger:
+      document.querySelector(".menu-trigger"),
+
+    menuLinks:
+      Array.from(
+        document.querySelectorAll(".site-menu a")
+      ),
+
+    progressLabel:
+      document.querySelector("#progress-current"),
+
+    progressFill:
+      document.querySelector("#progress-fill"),
+
+    progressPoint:
+      document.querySelector("#progress-point"),
+
+    previousSection:
+      document.querySelector("#previous-section"),
+
+    previousLabel:
+      document.querySelector("#previous-section-label"),
+
+    nextSection:
+      document.querySelector("#next-section"),
+
+    nextLabel:
+      document.querySelector("#next-section-label"),
+
+    sections:
+      Array.from(
+        document.querySelectorAll(".home-section")
+      ),
+
+    reveals:
+      Array.from(
+        document.querySelectorAll(".reveal")
+      ),
+
+    narrativeLinks:
+      Array.from(
+        document.querySelectorAll(".narrative-link")
+      ),
+
+    magneticElements:
+      Array.from(
+        document.querySelectorAll(
+          ".site-brand, .menu-trigger, .contact-cta"
+        )
+      ),
+
+    transitionLinks:
+      Array.from(
+        document.querySelectorAll(
+          'a[href]:not([target="_blank"])'
+        )
+      ),
+
+    standby:
+      document.querySelector(".standby-screen"),
+
+    standbyWake:
+      document.querySelector(".standby-wake"),
+
+    ctaTrajectories:
+      Array.from(
+        document.querySelectorAll(".cta-trajectory")
+      ),
+
+    contactCtas:
+      Array.from(
+        document.querySelectorAll(".contact-cta")
+      ),
+
+    directionLinks:
+      Array.from(
+        document.querySelectorAll(
+          ".hero-direction[data-direction]"
+        )
+      ),
+
+    directionNodes:
+      Array.from(
+        document.querySelectorAll(
+          ".direction-node[data-direction]"
+        )
+      )
+  };
+
+
+  /* =======================================================
+     UTILITIES
+     ======================================================= */
+
+  const clamp = (
+    value,
+    min,
+    max
+  ) =>
+    Math.min(
+      Math.max(value, min),
+      max
+    );
+
+
+  const lerp = (
+    current,
+    target,
+    amount
+  ) =>
+    current +
+    (target - current) *
+    amount;
+
+
+  const getSectionNumber = index =>
+    String(index + 1).padStart(2, "0");
+
+
+  const getSectionByIndex = index => {
+
+    if (!dom.sections.length) {
+      return null;
+    }
+
+    return dom.sections[
+      clamp(
+        index,
+        0,
+        dom.sections.length - 1
+      )
+    ];
+  };
+
+
+  const getSectionTitle = section =>
+    section?.dataset.sectionTitle || "";
+
+
+  const isFinePointer = () =>
+    window.matchMedia(
+      "(pointer: fine)"
+    ).matches;
+
+
+  /* =======================================================
+     MOTION PREFERENCE
+     ======================================================= */
+
+  const initMotionPreference = () => {
+
+    const media =
+      window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      );
+
+
+    const apply = matches => {
+
+      state.reducedMotion = matches;
+
+      dom.html.classList.toggle(
+        "reduced-motion",
+        matches
+      );
+
+
+      dom.standby?.classList.toggle(
+        "is-reduced",
+        matches
+      );
+
+
+      if (!state.standby) {
+        resetStandbyTimer();
+      }
+
+    };
+
+
+    apply(media.matches);
+
+
+    if (
+      typeof media.addEventListener ===
+      "function"
+    ) {
+
+      media.addEventListener(
+        "change",
+        event =>
+          apply(event.matches)
+      );
+
+    }
+
+  };
+
+
+  /* =======================================================
+     LOADER
+     ======================================================= */
+
+  const initLoader = () => {
+
+    if (!dom.loader) {
+      state.loaded = true;
+      return;
+    }
+
+
+    const started =
+      performance.now();
+
+    let finishScheduled = false;
+
+
+    const finish = () => {
+
+      if (
+        state.loaded ||
+        finishScheduled
+      ) {
+        return;
+      }
+
+
+      finishScheduled = true;
+
+
+      const elapsed =
+        performance.now() - started;
+
+
+      const minimumTime =
+        state.reducedMotion
+          ? 700
+          : CONFIG.loaderMinimumTime;
+
+
+      const remaining =
+        Math.max(
+          0,
+          minimumTime - elapsed
+        );
+
+
+      window.setTimeout(
+        () => {
+
+          if (state.loaded) {
+            return;
+          }
+
+
+          state.loaded = true;
+
+
+          dom.loader.classList.add(
+            "is-hidden"
+          );
+
+
+          window.setTimeout(
+            () =>
+              dom.loader?.remove(),
+            950
+          );
+
+        },
+        remaining
+      );
+
+    };
+
+
+    if (
+      document.readyState ===
+      "complete"
+    ) {
+
+      finish();
+
+    } else {
+
+      window.addEventListener(
+        "load",
+        finish,
+        { once: true }
+      );
+
+    }
+
+
+    window.setTimeout(
+      finish,
+      CONFIG.loaderMaximumWait
+    );
+
+  };
+
+
+  /* =======================================================
+     PAGE TRANSITIONS
+     ======================================================= */
+
+  const initPageTransitions = () => {
+
+    if (!dom.transition) {
+      return;
+    }
+
+
+    dom.transitionLinks.forEach(
+      link => {
+
+        link.addEventListener(
+          "click",
+          event => {
+
+            const href =
+              link.getAttribute("href");
+
+
+            if (
+              !href ||
+              href.startsWith("#") ||
+              href.startsWith("mailto:") ||
+              href.startsWith("tel:") ||
+              link.hasAttribute("download") ||
+              link.target === "_blank"
+            ) {
+              return;
+            }
+
+
+            let url;
+
+
+            try {
+
+              url =
+                new URL(
+                  href,
+                  window.location.href
+                );
+
+            } catch {
+
+              return;
+
+            }
+
+
+            if (
+              url.origin !==
+              window.location.origin
+            ) {
+              return;
+            }
+
+
+            if (state.reducedMotion) {
+              return;
+            }
+
+
+            event.preventDefault();
+
+
+            dom.transition.classList.add(
+              "is-active"
+            );
+
+
+            window.setTimeout(
+              () => {
+                window.location.href =
+                  url.href;
+              },
+              CONFIG.transitionDuration
+            );
+
+          }
+        );
+
+      }
+    );
+
+
+    window.addEventListener(
+      "pageshow",
+      () => {
+
+        dom.transition?.classList.remove(
+          "is-active"
+        );
+
+      }
+    );
+
+  };
+
+
+  /* =======================================================
+     MENU
+     ======================================================= */
+
+  const openMenu = () => {
+
+    if (!dom.menu) {
+      return;
+    }
+
+
+    if (state.standby) {
+      exitStandby();
+    }
+
+
+    clearStandbyTimer();
+
+    state.menuOpen = true;
+
+
+    dom.menu.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
+
+    dom.menuTrigger?.setAttribute(
+      "aria-expanded",
+      "true"
+    );
+
+
+    dom.menuTrigger?.setAttribute(
+      "aria-label",
+      "Chiudi menu"
+    );
+
+
+    dom.body.classList.add(
+      "is-menu-open"
+    );
+
+
+    window.setTimeout(
+      () =>
+        dom.menuLinks[0]?.focus(),
+      state.reducedMotion ? 0 : 250
+    );
+
+  };
+
+
+  const closeMenu = (
+    returnFocus = true
+  ) => {
+
+    if (!dom.menu) {
+      return;
+    }
+
+
+    state.menuOpen = false;
+
+
+    dom.menu.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+
+    dom.menuTrigger?.setAttribute(
+      "aria-expanded",
+      "false"
+    );
+
+
+    dom.menuTrigger?.setAttribute(
+      "aria-label",
+      "Apri menu"
+    );
+
+
+    dom.body.classList.remove(
+      "is-menu-open"
+    );
+
+
+    if (
+      returnFocus &&
+      dom.menuTrigger &&
+      document.activeElement !==
+      dom.menuTrigger
+    ) {
+
+      dom.menuTrigger.focus();
+
+    }
+
+
+    resetStandbyTimer();
+
+  };
+
+
+  const initMenu = () => {
+
+    dom.menuTrigger?.addEventListener(
+      "click",
+      () =>
+        state.menuOpen
+          ? closeMenu()
+          : openMenu()
+    );
+
+
+    dom.menuLinks.forEach(
+      link =>
+        link.addEventListener(
+          "click",
+          () => closeMenu(false)
+        )
+    );
+
+
+    dom.menu?.addEventListener(
+      "click",
+      event => {
+
+        if (
+          event.target ===
+          dom.menu
+        ) {
+          closeMenu();
+        }
+
+      }
+    );
+
+
+    dom.menu?.addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          !state.menuOpen ||
+          event.key !== "Tab"
+        ) {
+          return;
+        }
+
+
+        const focusable =
+          dom.menuLinks.filter(
+            element =>
+              !element.hasAttribute(
+                "disabled"
+              )
+          );
+
+
+        if (!focusable.length) {
+          return;
+        }
+
+
+        const first =
+          focusable[0];
+
+        const last =
+          focusable[
+            focusable.length - 1
+          ];
+
+
+        if (
+          event.shiftKey &&
+          document.activeElement === first
+        ) {
+
+          event.preventDefault();
+
+          last.focus();
+
+        } else if (
+          !event.shiftKey &&
+          document.activeElement === last
+        ) {
+
+          event.preventDefault();
+
+          first.focus();
+
+        }
+
+      }
+    );
+
+
+    document.addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          event.key === "Escape" &&
+          state.menuOpen
+        ) {
+
+          closeMenu();
+
+        }
+
+      }
+    );
+
+  };
+
+
+  /* =======================================================
+     WOW
+     ======================================================= */
+
+  const updateWowHeader = index => {
+
+    const section =
+      getSectionByIndex(index);
+
+
+    if (!section) {
+      return;
+    }
+
+
+    const total =
+      dom.sections.length;
+
+
+    const progress =
+      total <= 1
+        ? 0
+        : index / (total - 1);
+
+
+    if (dom.progressLabel) {
+
+      dom.progressLabel.textContent =
+        getSectionTitle(section);
+
+    }
+
+
+    if (dom.progressFill) {
+
+      dom.progressFill.style.width =
+        `${progress * 100}%`;
+
+    }
+
+
+    if (dom.progressPoint) {
+
+      dom.progressPoint.style.left =
+        `${progress * 100}%`;
+
+    }
+
+
+    const isFirst =
+      index === 0;
+
+    const isLast =
+      index === total - 1;
+
+
+    if (isFirst) {
+
+      dom.previousSection?.classList.add(
+        "is-disabled"
+      );
+
+      dom.previousSection?.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+
+      dom.previousSection?.setAttribute(
+        "tabindex",
+        "-1"
+      );
+
+      if (dom.previousLabel) {
+        dom.previousLabel.textContent = "";
+      }
+
+    } else {
+
+      const previousNumber =
+        getSectionNumber(index - 1);
+
+
+      dom.previousSection?.classList.remove(
+        "is-disabled"
+      );
+
+      dom.previousSection?.removeAttribute(
+        "aria-hidden"
+      );
+
+      dom.previousSection?.removeAttribute(
+        "tabindex"
+      );
+
+
+      if (dom.previousSection) {
+
+        dom.previousSection.href =
+          `#${previousNumber}`;
+
+        dom.previousSection.setAttribute(
+          "aria-label",
+          `Vai alla sezione ${previousNumber}`
+        );
+
+      }
+
+
+      if (dom.previousLabel) {
+
+        dom.previousLabel.textContent =
+          previousNumber;
+
+      }
+
+    }
+
+
+    if (isLast) {
+
+      if (dom.nextSection) {
+
+        dom.nextSection.classList.add(
+          "is-home-return"
+        );
+
+        dom.nextSection.href =
+          "#01";
+
+        dom.nextSection.setAttribute(
+          "aria-label",
+          "Torna all'inizio"
+        );
+
+      }
+
+
+      if (dom.nextLabel) {
+
+        dom.nextLabel.textContent =
+          "01";
+
+      }
+
+
+      dom.nextSection
+        ?.querySelector(
+          ".section-jump-arrow"
+        )
+        ?.replaceChildren(
+          document.createTextNode("↑")
+        );
+
+    } else {
+
+      const nextNumber =
+        getSectionNumber(index + 1);
+
+
+      dom.nextSection?.classList.remove(
+        "is-home-return"
+      );
+
+
+      if (dom.nextSection) {
+
+        dom.nextSection.href =
+          `#${nextNumber}`;
+
+        dom.nextSection.setAttribute(
+          "aria-label",
+          `Vai alla sezione ${nextNumber}`
+        );
+
+      }
+
+
+      if (dom.nextLabel) {
+
+        dom.nextLabel.textContent =
+          nextNumber;
+
+      }
+
+
+      dom.nextSection
+        ?.querySelector(
+          ".section-jump-arrow"
+        )
+        ?.replaceChildren(
+          document.createTextNode("→")
+        );
+
+    }
+
+  };
+
+
+  /* =======================================================
+     SECTION NAVIGATION
+     ======================================================= */
+
+  const navigateToSection = index => {
+
+    const target =
+      getSectionByIndex(index);
+
+
+    if (!target) {
+      return;
+    }
+
+
+    const headerHeight =
+      dom.header
+        ? dom.header.offsetHeight
+        : 0;
+
+
+    const rect =
+      target.getBoundingClientRect();
+
+
+    const top =
+      window.scrollY +
+      rect.top -
+      headerHeight -
+      CONFIG.scrollNavigationOffset;
+
+
+    window.scrollTo({
+      top: Math.max(0, top),
+      behavior:
+        state.reducedMotion
+          ? "auto"
+          : "smooth"
+    });
+
+  };
+
+
+  const initWowNavigation = () => {
+
+    dom.previousSection?.addEventListener(
+      "click",
+      event => {
+
+        event.preventDefault();
+
+
+        if (
+          state.activeIndex > 0
+        ) {
+
+          navigateToSection(
+            state.activeIndex - 1
+          );
+
+        }
+
+      }
+    );
+
+
+    dom.nextSection?.addEventListener(
+      "click",
+      event => {
+
+        event.preventDefault();
+
+
+        const last =
+          dom.sections.length - 1;
+
+
+        navigateToSection(
+          state.activeIndex === last
+            ? 0
+            : state.activeIndex + 1
+        );
+
+      }
+    );
+
+  };
+
+
+  /* =======================================================
+     ACTIVE SECTION
+     ======================================================= */
+
+  const detectActiveSection = () => {
+
+    if (!dom.sections.length) {
+      return;
+    }
+
+
+    const reference =
+      window.innerHeight * .52;
+
+
+    let bestIndex =
+      state.activeIndex;
+
+
+    let bestDistance =
+      Infinity;
+
+
+    dom.sections.forEach(
+      (section, index) => {
+
+        const rect =
+          section.getBoundingClientRect();
+
+
+        const visible =
+          rect.bottom > 0 &&
+          rect.top < window.innerHeight;
+
+
+        if (!visible) {
+          return;
+        }
+
+
+        const distance =
+          Math.abs(
+            rect.top +
+            rect.height / 2 -
+            reference
+          );
+
+
+        if (
+          distance <
+          bestDistance
+        ) {
+
+          bestDistance =
+            distance;
+
+          bestIndex =
+            index;
+
+        }
+
+      }
+    );
+
+
+    if (
+      state.activeIndex !==
+      bestIndex
+    ) {
+
+      state.activeIndex =
+        bestIndex;
+
+
+      updateWowHeader(
+        bestIndex
+      );
+
+    }
+
+  };
+
+
+  /* =======================================================
+     REVEAL
+     ======================================================= */
+
+  const initRevealSystem = () => {
+
+    if (!dom.reveals.length) {
+      return;
+    }
+
+
+    if (
+      state.reducedMotion ||
+      !("IntersectionObserver" in window)
+    ) {
+
+      dom.reveals.forEach(
+        element =>
+          element.classList.add(
+            "is-visible"
+          )
+      );
+
+      return;
+    }
+
+
+    const observer =
+      new IntersectionObserver(
+        entries => {
+
+          entries.forEach(
+            entry => {
+
+              if (
+                !entry.isIntersecting
+              ) {
+                return;
+              }
+
+
+              entry.target.classList.add(
+                "is-visible"
+              );
+
+
+              observer.unobserve(
+                entry.target
+              );
+
+            }
+          );
+
+        },
+        {
+          threshold:
+            CONFIG.revealThreshold,
+
+          rootMargin:
+            "0px 0px -8% 0px"
+        }
+      );
+
+
+    dom.reveals.forEach(
+      element =>
+        observer.observe(element)
+    );
+
+  };
+
+
+  /* =======================================================
+     DIRECTION INTERACTIONS
+     ======================================================= */
+
+  const initDirectionInteractions = () => {
+
+    if (
+      !dom.directionLinks.length ||
+      !dom.directionNodes.length
+    ) {
+      return;
+    }
+
+
+    const setActive = (
+      key,
+      active
+    ) => {
+
+      dom.directionLinks
+        .filter(
+          element =>
+            element.dataset.direction === key
+        )
+        .forEach(
+          element =>
+            element.classList.toggle(
+              "is-active",
+              active
+            )
+        );
+
+
+      dom.directionNodes
+        .filter(
+          element =>
+            element.dataset.direction === key
+        )
+        .forEach(
+          element =>
+            element.classList.toggle(
+              "is-active",
+              active
+            )
+        );
+
+    };
+
+
+    dom.directionLinks.forEach(
+      link => {
+
+        const key =
+          link.dataset.direction;
+
+
+        link.addEventListener(
+          "pointerenter",
+          () => setActive(key, true)
+        );
+
+
+        link.addEventListener(
+          "pointerleave",
+          () => setActive(key, false)
+        );
+
+
+        link.addEventListener(
+          "focusin",
+          () => setActive(key, true)
+        );
+
+
+        link.addEventListener(
+          "focusout",
+          () => setActive(key, false)
+        );
+
+      }
+    );
+
+  };
+
+
+  /* =======================================================
+     TRAJECTORY
+     ======================================================= */
+
+  const updateTrajectoryTargets = () => {
+
+    if (
+      dom.sections.length < 2
+    ) {
+      return;
+    }
+
+
+    const first =
+      dom.sections[0];
+
+
+    const last =
+      dom.sections[
+        dom.sections.length - 1
+      ];
+
+
+    const firstRect =
+      first.getBoundingClientRect();
+
+
+    const lastRect =
+      last.getBoundingClientRect();
+
+
+    const start =
+      firstRect.top +
+      window.scrollY;
+
+
+    const end =
+      lastRect.bottom +
+      window.scrollY -
+      window.innerHeight;
+
+
+    const range =
+      end - start;
+
+
+    const progress =
+      range <= 0
+        ? 0
+        : clamp(
+            (
+              window.scrollY -
+              start
+            ) /
+            range,
+            0,
+            1
+          );
+
+
+    state.trajectory.targetProgress =
+      progress;
+
+
+    state.trajectory.targetDrift =
+      state.reducedMotion
+        ? 0
+        : Math.sin(
+            progress *
+            Math.PI *
+            2
+          ) *
+          CONFIG.trajectoryDrift;
+
+  };
+
+
+  const updateTrajectoryFrame = () => {
+
+    if (state.reducedMotion) {
+
+      state.trajectory.progress =
+        state.trajectory.targetProgress;
+
+      state.trajectory.drift = 0;
+
+    } else {
+
+      state.trajectory.progress =
+        lerp(
+          state.trajectory.progress,
+          state.trajectory.targetProgress,
+          CONFIG.trajectoryLerp
+        );
+
+
+      state.trajectory.drift =
+        lerp(
+          state.trajectory.drift,
+          state.trajectory.targetDrift,
+          CONFIG.trajectoryLerp
+        );
+
+    }
+
+
+    dom.html.style.setProperty(
+      "--trajectory-progress",
+      state.trajectory.progress.toFixed(4)
+    );
+
+
+    dom.html.style.setProperty(
+      "--trajectory-drift",
+      `${state.trajectory.drift.toFixed(2)}px`
+    );
+
+  };
+
+
+  /* =======================================================
+     NARRATIVE LINKS
+     ======================================================= */
+
+  const initNarrativeLinks = () => {
+
+    dom.narrativeLinks.forEach(
+      link => {
+
+        const node =
+          link.dataset.trajectoryNode;
+
+
+        if (!node) {
+          return;
+        }
+
+
+        const targets = [
+          ...document.querySelectorAll(
+            `.network-node[data-node="${node}"]`
+          ),
+          ...document.querySelectorAll(
+            `.direction-node[data-direction="${node}"]`
+          )
+        ];
+
+
+        if (!targets.length) {
+          return;
+        }
+
+
+        const activate = () => {
+
+          targets.forEach(
+            target =>
+              target.classList.add(
+                "is-linked"
+              )
+          );
+
+        };
+
+
+        const deactivate = () => {
+
+          targets.forEach(
+            target =>
+              target.classList.remove(
+                "is-linked"
+              )
+          );
+
+        };
+
+
+        link.addEventListener(
+          "pointerenter",
+          activate
+        );
+
+
+        link.addEventListener(
+          "pointerleave",
+          deactivate
+        );
+
+
+        link.addEventListener(
+          "focusin",
+          activate
+        );
+
+
+        link.addEventListener(
+          "focusout",
+          deactivate
+        );
+
+      }
+    );
+
+  };
+
+
+  /* =======================================================
+     CUSTOM CURSOR
+     ======================================================= */
+
+  const initCursor = () => {
+
+    if (
+      !dom.cursor ||
+      !dom.cursorDot ||
+      !dom.cursorRing ||
+      !isFinePointer() ||
+      state.reducedMotion
+    ) {
+      return;
+    }
+
+
+    document.addEventListener(
+      "pointermove",
+      event => {
+
+        state.pointer.targetX =
+          event.clientX;
+
+        state.pointer.targetY =
+          event.clientY;
+
+
+        dom.cursor.classList.add(
+          "is-visible"
+        );
+
+      },
+      {
+        passive: true
+      }
+    );
+
+
+    document
+      .querySelectorAll("a, button")
+      .forEach(
+        element => {
+
+          element.addEventListener(
+            "pointerenter",
+            () =>
+              dom.cursor.classList.add(
+                "is-hovering"
+              )
+          );
+
+
+          element.addEventListener(
+            "pointerleave",
+            () =>
+              dom.cursor.classList.remove(
+                "is-hovering"
+              )
+          );
+
+        }
+      );
+
+
+    window.addEventListener(
+      "pointerleave",
+      () => {
+
+        dom.cursor?.classList.remove(
+          "is-visible",
+          "is-hovering"
+        );
+
+      }
+    );
+
+
+    window.addEventListener(
+      "pointerenter",
+      () => {
+
+        dom.cursor?.classList.add(
+          "is-visible"
+        );
+
+      }
+    );
+
+  };
+
+
+  const updateCursorFrame = () => {
+
+    if (
+      !dom.cursor ||
+      !dom.cursorDot ||
+      !dom.cursorRing ||
+      !isFinePointer() ||
+      state.reducedMotion
+    ) {
+      return;
+    }
+
+
+    state.cursor.x =
+      lerp(
+        state.cursor.x,
+        state.pointer.targetX,
+        CONFIG.cursorLerp
+      );
+
+
+    state.cursor.y =
+      lerp(
+        state.cursor.y,
+        state.pointer.targetY,
+        CONFIG.cursorLerp
+      );
+
+
+    dom.cursorDot.style.transform =
+      `translate3d(
+        ${state.pointer.targetX}px,
+        ${state.pointer.targetY}px,
+        0
+      ) translate(-50%,-50%)`;
+
+
+    dom.cursorRing.style.transform =
+      `translate3d(
+        ${state.cursor.x}px,
+        ${state.cursor.y}px,
+        0
+      ) translate(-50%,-50%)`;
+
+  };
+
+
+  /* =======================================================
+     MAGNETIC ELEMENTS
+     ======================================================= */
+
+  const initMagneticElements = () => {
+
+    if (
+      !isFinePointer() ||
+      state.reducedMotion
+    ) {
+      return;
+    }
+
+
+    dom.magneticElements.forEach(
+      element => {
+
+        element.addEventListener(
+          "pointermove",
+          event => {
+
+            const rect =
+              element.getBoundingClientRect();
+
+
+            const dx =
+              event.clientX -
+              (
+                rect.left +
+                rect.width / 2
+              );
+
+
+            const dy =
+              event.clientY -
+              (
+                rect.top +
+                rect.height / 2
+              );
+
+
+            const distance =
+              Math.sqrt(
+                dx * dx +
+                dy * dy
+              );
+
+
+            if (
+              distance >
+              CONFIG.magneticRadius
+            ) {
+              return;
+            }
+
+
+            const strength =
+              CONFIG.magneticStrength *
+              (
+                1 -
+                distance /
+                CONFIG.magneticRadius
+              );
+
+
+            element.style.setProperty(
+              "--magnetic-x",
+              `${dx * strength}px`
+            );
+
+
+            element.style.setProperty(
+              "--magnetic-y",
+              `${dy * strength}px`
+            );
+
+          }
+        );
+
+
+        element.addEventListener(
+          "pointerleave",
+          () => {
+
+            element.style.setProperty(
+              "--magnetic-x",
+              "0px"
+            );
+
+
+            element.style.setProperty(
+              "--magnetic-y",
+              "0px"
+            );
+
+          }
+        );
+
+      }
+    );
+
+  };
+
+
+  /* =======================================================
+     CTA
+     ======================================================= */
+
+  const initCtaInteraction = () => {
+
+    if (
+      !dom.ctaTrajectories.length
+    ) {
+      return;
+    }
+
+
+    dom.ctaTrajectories.forEach(
+      container => {
+
+        const cta =
+          container.querySelector(
+            ".contact-cta"
+          );
+
+
+        if (!cta) {
+          return;
+        }
+
+
+        const engage = () => {
+
+          container.classList.add(
+            "is-engaged"
+          );
+
+        };
+
+
+        const disengage = () => {
+
+          container.classList.remove(
+            "is-engaged"
+          );
+
+        };
+
+
+        cta.addEventListener(
+          "pointerenter",
+          engage
+        );
+
+
+        cta.addEventListener(
+          "pointerleave",
+          disengage
+        );
+
+
+        cta.addEventListener(
+          "focusin",
+          engage
+        );
+
+
+        cta.addEventListener(
+          "focusout",
+          disengage
+        );
+
+
+        cta.addEventListener(
+          "pointerdown",
+          engage
+        );
+
+      }
+    );
+
+  };
+
+
+  /* =======================================================
+     STANDBY
+     ======================================================= */
+
+  const clearStandbyTimer = () => {
+
+    if (state.standbyTimer) {
+
+      window.clearTimeout(
+        state.standbyTimer
+      );
+
+      state.standbyTimer = null;
+
+    }
+
+  };
+
+
+  const enterStandby = () => {
+
+    if (
+      state.menuOpen ||
+      state.standby ||
+      !dom.standby
+    ) {
+      return;
+    }
+
+
+    state.standbyReturnFocus =
+      document.activeElement;
+
+
+    state.standby = true;
+
+
+    clearStandbyTimer();
+
+
+    dom.body.classList.add(
+      "is-standby"
+    );
+
+
+    dom.standby.classList.add(
+      "is-active"
+    );
+
+
+    dom.standby.classList.toggle(
+      "is-reduced",
+      state.reducedMotion
+    );
+
+
+    dom.standby.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
+
+    if ("inert" in dom.standby) {
+      dom.standby.inert = false;
+    } else {
+      dom.standby.removeAttribute(
+        "inert"
+      );
+    }
+
+
+    dom.standbyWake?.focus({
+      preventScroll: true
+    });
+
+  };
+
+
+  const exitStandby = () => {
+
+    if (!state.standby) {
+      return;
+    }
+
+
+    state.standby = false;
+
+
+    dom.body.classList.remove(
+      "is-standby"
+    );
+
+
+    dom.standby?.classList.remove(
+      "is-active"
+    );
+
+
+    dom.standby?.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+
+    if (dom.standby) {
+
+      if ("inert" in dom.standby) {
+
+        dom.standby.inert = true;
+
+      } else {
+
+        dom.standby.setAttribute(
+          "inert",
+          ""
+        );
+
+      }
+
+    }
+
+
+    const returnFocus =
+      state.standbyReturnFocus;
+
+
+    state.standbyReturnFocus = null;
+
+
+    if (
+      returnFocus &&
+      returnFocus !== document.body &&
+      typeof returnFocus.focus ===
+        "function" &&
+      document.contains(returnFocus)
+    ) {
+
+      window.requestAnimationFrame(
+        () => {
+
+          returnFocus.focus({
+            preventScroll: true
+          });
+
+        }
+      );
+
+    }
+
+
+    resetStandbyTimer();
+
+  };
+
+
+  const resetStandbyTimer = () => {
+
+    clearStandbyTimer();
+
+
+    if (
+      state.menuOpen ||
+      state.standby ||
+      document.hidden
+    ) {
+      return;
+    }
+
+
+    state.standbyTimer =
+      window.setTimeout(
+        enterStandby,
+        CONFIG.standbyDelay
+      );
+
+  };
+
+
+  const initStandby = () => {
+
+    if (!dom.standby) {
+      return;
+    }
+
+
+    if ("inert" in dom.standby) {
+
+      dom.standby.inert = true;
+
+    } else {
+
+      dom.standby.setAttribute(
+        "inert",
+        ""
+      );
+
+    }
+
+
+    dom.standbyWake?.addEventListener(
+      "click",
+      exitStandby
+    );
+
+
+    dom.standby?.addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          !state.standby ||
+          event.key !== "Tab"
+        ) {
+          return;
+        }
+
+
+        event.preventDefault();
+
+
+        dom.standbyWake?.focus({
+          preventScroll: true
+        });
+
+      }
+    );
+
+
+    [
+      "pointerdown",
+      "wheel",
+      "touchstart",
+      "keydown",
+      "scroll"
+    ].forEach(
+      eventName => {
+
+        window.addEventListener(
+          eventName,
+          event => {
+
+            if (state.standby) {
+
+              if (
+                eventName === "keydown" &&
+                event.key === "Escape"
+              ) {
+                return;
+              }
+
+              exitStandby();
+
+              return;
+
+            }
+
+
+            if (
+              eventName !== "scroll" ||
+              event.isTrusted
+            ) {
+              resetStandbyTimer();
+            }
+
+          },
+          {
+            passive:
+              eventName !== "keydown"
+          }
+        );
+
+      }
+    );
+
+
+    document.addEventListener(
+      "visibilitychange",
+      () => {
+
+        if (document.hidden) {
+
+          clearStandbyTimer();
+
+        } else {
+
+          resetStandbyTimer();
+
+        }
+
+      }
+    );
+
+  };
+
+
+  /* =======================================================
+     HASH NAVIGATION
+     ======================================================= */
+
+  const initHashNavigation = () => {
+
+    const hash =
+      window.location.hash;
+
+
+    if (!hash) {
+      return;
+    }
+
+
+    const index =
+      dom.sections.findIndex(
+        section =>
+          `#${section.id}` ===
+          hash
+      );
+
+
+    if (index < 0) {
+      return;
+    }
+
+
+    window.setTimeout(
+      () =>
+        navigateToSection(index),
+      500
+    );
+
+  };
+
+
+  /* =======================================================
+     KEYBOARD NAVIGATION
+     ======================================================= */
+
+  const initKeyboardNavigation = () => {
+
+    document.addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          state.menuOpen ||
+          state.standby
+        ) {
+          return;
+        }
+
+
+        if (
+          event.key !== "PageDown" &&
+          event.key !== "PageUp"
+        ) {
+          return;
+        }
+
+
+        event.preventDefault();
+
+
+        const direction =
+          event.key === "PageDown"
+            ? 1
+            : -1;
+
+
+        const nextIndex =
+          clamp(
+            state.activeIndex +
+            direction,
+            0,
+            dom.sections.length - 1
+          );
+
+
+        navigateToSection(
+          nextIndex
+        );
+
+      }
+    );
+
+  };
+
+
+  /* =======================================================
+     SCROLL
+     ======================================================= */
+
+  const handleScroll = () => {
+
+    detectActiveSection();
+
+    updateTrajectoryTargets();
+
+  };
+
+
+  /* =======================================================
+     RESIZE
+     ======================================================= */
+
+  const handleResize = () => {
+
+    window.clearTimeout(
+      state.resizeTimer
+    );
+
+
+    state.resizeTimer =
+      window.setTimeout(
+        () => {
+
+          detectActiveSection();
+
+          updateTrajectoryTargets();
+
+          updateWowHeader(
+            state.activeIndex
+          );
+
+        },
+        CONFIG.resizeDebounce
+      );
+
+  };
+
+
+  /* =======================================================
+     ANIMATION FRAME
+     ======================================================= */
+
+  const animationFrame = () => {
+
+    updateCursorFrame();
+
+    updateTrajectoryFrame();
+
+
+    state.rafId =
+      requestAnimationFrame(
+        animationFrame
+      );
+
+  };
+
+
+  /* =======================================================
+     INITIAL STATE
+     ======================================================= */
+
+  const setInitialState = () => {
+
+    if (!dom.sections.length) {
+      return;
+    }
+
+
+    state.activeIndex = 0;
+
+
+    updateWowHeader(0);
+
+    updateTrajectoryTargets();
+
+    resetStandbyTimer();
+
+  };
+
+
+  /* =======================================================
+     INIT
+     ======================================================= */
+
+  const init = () => {
+
+    initMotionPreference();
+
+    initLoader();
+
+    initPageTransitions();
+
+    initMenu();
+
+    initWowNavigation();
+
+    initRevealSystem();
+
+    initDirectionInteractions();
+
+    initNarrativeLinks();
+
+    initCursor();
+
+    initMagneticElements();
+
+    initCtaInteraction();
+
+    initStandby();
+
+    initHashNavigation();
+
+    initKeyboardNavigation();
+
+    setInitialState();
+
+    detectActiveSection();
+
+    updateTrajectoryTargets();
+
+
+    window.addEventListener(
+      "scroll",
+      handleScroll,
+      {
+        passive: true
+      }
+    );
+
+
+    window.addEventListener(
+      "resize",
+      handleResize,
+      {
+        passive: true
+      }
+    );
+
+
+    animationFrame();
+
+  };
+
+
+  if (
+    document.readyState ===
+    "loading"
+  ) {
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      init,
+      {
+        once: true
+      }
+    );
+
+  } else {
+
+    init();
+
   }
-  </script>
-</head>
 
-<body>
-
-  <!-- =====================================================
-       LOADER
-       ===================================================== -->
-
-  <div class="page-loader" aria-hidden="true">
-    <div class="page-loader-inner">
-
-      <div
-        class="loader-trajectory"
-        aria-hidden="true"
-      >
-        <span class="loader-point"></span>
-        <span class="loader-line"></span>
-      </div>
-
-      <p class="loader-motto">
-        <span>MOVIMENTO</span>
-        <span aria-hidden="true">/</span>
-        <span>CON DIREZIONE.</span>
-      </p>
-
-      <p class="loader-signature">
-        CESARE PARATORE
-      </p>
-
-    </div>
-  </div>
-
-
-  <!-- =====================================================
-       PAGE TRANSITION
-       ===================================================== -->
-
-  <div
-    class="page-transition"
-    aria-hidden="true"
-  ></div>
-
-
-  <!-- =====================================================
-       CUSTOM CURSOR
-       ===================================================== -->
-
-  <div
-    class="custom-cursor"
-    aria-hidden="true"
-  >
-    <span class="custom-cursor-dot"></span>
-    <span class="custom-cursor-ring"></span>
-  </div>
-
-
-  <!-- =====================================================
-       HEADER
-       ===================================================== -->
-
-  <header class="site-header">
-
-    <a
-      class="site-brand"
-      href="#01"
-      aria-label="Cesare Paratore — torna all'inizio"
-    >
-      <img
-        src="/assets/images/cp-logo.webp"
-        alt=""
-        width="48"
-        height="48"
-      >
-    </a>
-
-    <div class="wow-progress">
-
-      <div
-        id="progress-current"
-        class="progress-label"
-        aria-live="polite"
-      >
-        MOVIMENTO
-      </div>
-
-      <div class="progress-track" aria-hidden="true">
-        <span
-          id="progress-fill"
-          class="progress-fill"
-        ></span>
-
-        <span
-          id="progress-point"
-          class="progress-point"
-        ></span>
-      </div>
-
-      <nav
-        class="section-jump"
-        aria-label="Navigazione tra le sezioni"
-      >
-
-        <a
-          id="previous-section"
-          class="section-jump-link section-jump-link--previous is-disabled"
-          href="#01"
-          aria-label="Sezione precedente"
-          aria-hidden="true"
-          tabindex="-1"
-        >
-          <span aria-hidden="true">←</span>
-          <span id="previous-section-label"></span>
-        </a>
-
-        <a
-          id="next-section"
-          class="section-jump-link section-jump-link--next"
-          href="#02"
-          aria-label="Vai alla sezione 02"
-        >
-          <span id="next-section-label">02</span>
-          <span
-            class="section-jump-arrow"
-            aria-hidden="true"
-          >→</span>
-        </a>
-
-      </nav>
-
-    </div>
-
-    <button
-      class="menu-trigger"
-      type="button"
-      aria-expanded="false"
-      aria-controls="site-menu"
-      aria-label="Apri menu"
-    >
-      <span class="menu-trigger-label">MENU</span>
-
-      <span
-        class="menu-trigger-icon"
-        aria-hidden="true"
-      >
-        <span></span>
-        <span></span>
-      </span>
-    </button>
-
-  </header>
-
-
-  <!-- =====================================================
-       MENU
-       ===================================================== -->
-
-  <aside
-    id="site-menu"
-    class="site-menu"
-    aria-hidden="true"
-  >
-
-    <div class="site-menu-inner">
-
-      <nav
-        class="site-menu-nav"
-        aria-label="Navigazione principale"
-      >
-
-        <a href="/chi-sono/">
-          <span class="site-menu-number">01</span>
-          <span>CHI SONO</span>
-        </a>
-
-        <a href="/sport/">
-          <span class="site-menu-number">02</span>
-          <span>SPORT</span>
-        </a>
-
-        <a href="/scienze-motorie/">
-          <span class="site-menu-number">03</span>
-          <span>SCIENZE MOTORIE</span>
-        </a>
-
-        <a href="/educazione/">
-          <span class="site-menu-number">04</span>
-          <span>EDUCAZIONE</span>
-        </a>
-
-        <a href="/management-dello-sport/">
-          <span class="site-menu-number">05</span>
-          <span>MANAGEMENT</span>
-        </a>
-
-        <a href="/digitale/">
-          <span class="site-menu-number">06</span>
-          <span>DIGITALE</span>
-        </a>
-
-        <a href="/territorio/">
-          <span class="site-menu-number">07</span>
-          <span>TERRITORIO</span>
-        </a>
-
-        <a href="/contatti/">
-          <span class="site-menu-number">08</span>
-          <span>CONTATTI</span>
-        </a>
-
-      </nav>
-
-    </div>
-
-  </aside>
-
-
-  <main id="main-content">
-
-
-    <!-- ===================================================
-         01 — HERO
-         =================================================== -->
-
-    <section
-      id="01"
-      class="home-section home-section--hero"
-      data-section-title="MOVIMENTO"
-    >
-
-      <div class="section-inner section-inner--hero">
-
-        <h1 class="hero-title">
-          <span class="hero-title-line hero-title-line--identity">
-            <span class="hero-title-word">MOVIMENTO</span>
-            <span
-              class="identity-slash"
-              aria-hidden="true"
-            >/</span>
-          </span>
-
-          <span class="hero-title-line">
-            CON DIREZIONE.
-          </span>
-        </h1>
-
-        <div class="hero-intro editorial-copy editorial-copy--large reveal">
-          <p>
-            Tutto è iniziato da una domanda: dove può portarti il movimento?
-          </p>
-        </div>
-
-        <nav
-          class="hero-directions reveal"
-          aria-label="Le cinque direzioni"
-        >
-
-          <a
-            class="hero-direction"
-            href="/sport/"
-            data-direction="sport"
-          >
-            SPORT
-          </a>
-
-          <a
-            class="hero-direction"
-            href="/scienze-motorie/"
-            data-direction="scienze-motorie"
-          >
-            SCIENZE MOTORIE
-          </a>
-
-          <a
-            class="hero-direction"
-            href="/educazione/"
-            data-direction="educazione"
-          >
-            EDUCAZIONE
-          </a>
-
-          <a
-            class="hero-direction"
-            href="/management-dello-sport/"
-            data-direction="management"
-          >
-            MANAGEMENT
-          </a>
-
-          <a
-            class="hero-direction"
-            href="/digitale/"
-            data-direction="digitale"
-          >
-            DIGITALE
-          </a>
-
-        </nav>
-
-        <div
-          class="direction-trajectory"
-          aria-hidden="true"
-        >
-
-          <span class="direction-trajectory-line"></span>
-
-          <span
-            class="direction-node"
-            data-direction="sport"
-            style="left: 8%; top: 50%;"
-          >
-            <span class="direction-node-label">SPORT</span>
-          </span>
-
-          <span
-            class="direction-node"
-            data-direction="scienze-motorie"
-            style="left: 30%; top: 50%;"
-          >
-            <span class="direction-node-label">SCIENZE MOTORIE</span>
-          </span>
-
-          <span
-            class="direction-node"
-            data-direction="educazione"
-            style="left: 51%; top: 50%;"
-          >
-            <span class="direction-node-label">EDUCAZIONE</span>
-          </span>
-
-          <span
-            class="direction-node"
-            data-direction="management"
-            style="left: 73%; top: 50%;"
-          >
-            <span class="direction-node-label">MANAGEMENT</span>
-          </span>
-
-          <span
-            class="direction-node"
-            data-direction="digitale"
-            style="left: 94%; top: 50%;"
-          >
-            <span class="direction-node-label">DIGITALE</span>
-          </span>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         02 — LA DOMANDA
-         =================================================== -->
-
-    <section
-      id="02"
-      class="home-section home-section--question"
-      data-section-title="LA DOMANDA"
-    >
-
-      <div class="section-inner section-inner--narrow">
-
-        <p class="section-title reveal">
-          02 / LA DOMANDA
-        </p>
-
-        <div class="editorial-copy editorial-copy--large reveal">
-
-          <p>
-            La domanda è cambiata.
-          </p>
-
-          <p>
-            Prima c'era la <a
-              class="narrative-link"
-              href="/sport/"
-              data-trajectory-node="sport"
-            >corsa</a>.
-          </p>
-
-          <p>
-            Poi è arrivato l'<a
-              class="narrative-link"
-              href="https://www.fidal.it/atleta/Cesare-Paratore/h66RkpSkcWo="
-              target="_blank"
-              rel="noopener noreferrer"
-              data-trajectory-node="sport"
-            >atleta</a>.
-          </p>
-
-          <p>
-            E con lui il <a
-              class="narrative-link"
-              href="https://albotecnici.fidal.it/site/view?id=TP0833"
-              target="_blank"
-              rel="noopener noreferrer"
-              data-trajectory-node="sport"
-            >tecnico</a>.
-          </p>
-
-        </div>
-
-        <div class="editorial-sequence reveal">
-
-          <p>Una domanda sul movimento.</p>
-          <p>Una domanda sulla persona.</p>
-          <p>Una domanda su ciò che poteva diventare.</p>
-
-        </div>
-
-        <div class="editorial-copy reveal">
-
-          <p>
-            Le scienze motorie hanno dato profondità al movimento.
-          </p>
-
-          <p>
-            L'educazione mi ha insegnato a trasmetterlo.
-          </p>
-
-          <p>
-            Il management a costruire intorno ad esso.
-          </p>
-
-          <p>
-            Il digitale a connettere persone, idee e possibilità.
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         03 — LE STRADE
-         =================================================== -->
-
-    <section
-      id="03"
-      class="home-section home-section--directions"
-      data-section-title="LE STRADE"
-    >
-
-      <div class="section-inner">
-
-        <p class="section-title reveal">
-          03 / LE STRADE
-        </p>
-
-        <div class="editorial-copy editorial-copy--large reveal">
-
-          <p>
-            Una strada non era abbastanza.
-          </p>
-
-          <p>
-            L’educazione mi ha insegnato a trasmettere.<br>
-            Il management a costruire.<br>
-            Il digitale a connettere.<br>
-            E lo sport mi ha riportato sempre al punto di partenza.
-          </p>
-
-        </div>
-
-        <nav
-          class="five-directions reveal"
-          aria-label="Le cinque direzioni"
-        >
-
-          <a href="/sport/" data-trajectory-node="sport">
-            SPORT
-          </a>
-
-          <a href="/scienze-motorie/" data-trajectory-node="scienze-motorie">
-            SCIENZE MOTORIE
-          </a>
-
-          <a href="/educazione/" data-trajectory-node="educazione">
-            EDUCAZIONE
-          </a>
-
-          <a href="/management-dello-sport/" data-trajectory-node="management">
-            MANAGEMENT
-          </a>
-
-          <a href="/digitale/" data-trajectory-node="digitale">
-            DIGITALE
-          </a>
-
-        </nav>
-
-        <p class="editorial-emphasis reveal">
-          Il movimento.
-        </p>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         04 — LE CONNESSIONI
-         =================================================== -->
-
-    <section
-      id="04"
-      class="home-section home-section--network"
-      data-section-title="LE CONNESSIONI"
-    >
-
-      <div class="section-inner section-inner--split">
-
-        <div>
-
-          <p class="section-title reveal">
-            04 / LE CONNESSIONI
-          </p>
-
-          <div class="editorial-copy editorial-copy--large reveal">
-
-            <p>
-              Poi ho capito che non erano cinque strade.
-            </p>
-
-            <p>
-              Erano parti dello stesso percorso.
-            </p>
-
-          </div>
-
-        </div>
-
-        <div
-          class="network-visual reveal"
-          aria-hidden="true"
-        >
-
-          <span class="network-line network-line--a"></span>
-          <span class="network-line network-line--b"></span>
-          <span class="network-line network-line--c"></span>
-          <span class="network-line network-line--d"></span>
-          <span class="network-line network-line--e"></span>
-
-          <span
-            class="network-node network-node--sport"
-            data-node="sport"
-          ></span>
-
-          <span
-            class="network-node network-node--scienze-motorie"
-            data-node="scienze-motorie"
-          ></span>
-
-          <span
-            class="network-node network-node--educazione"
-            data-node="educazione"
-          ></span>
-
-          <span
-            class="network-node network-node--management"
-            data-node="management"
-          ></span>
-
-          <span
-            class="network-node network-node--digitale"
-            data-node="digitale"
-          ></span>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         05 — PAUSA
-         =================================================== -->
-
-    <section
-      id="05"
-      class="home-section home-section--pause"
-      data-section-title="PAUSA"
-    >
-
-      <div class="section-inner section-inner--narrow">
-
-        <p class="section-title reveal">
-          05 / PAUSA
-        </p>
-
-        <div class="editorial-copy editorial-copy--large reveal">
-
-          <p>
-            E le connessioni, a volte, passano anche da una pausa.
-          </p>
-
-        </div>
-
-        <div
-          class="pause-trajectory reveal"
-          aria-hidden="true"
-        >
-          <span class="pause-trajectory-line"></span>
-          <span class="pause-trajectory-point"></span>
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         06 — TERRITORIO
-         =================================================== -->
-
-    <section
-      id="06"
-      class="home-section home-section--territory"
-      data-section-title="TERRITORIO"
-    >
-
-      <div class="section-inner section-inner--territory">
-
-        <div>
-
-          <p class="section-title reveal">
-            06 / TERRITORIO
-          </p>
-
-          <div class="territory-location reveal">
-
-            <a
-              class="territory-card-place"
-              href="/territorio/"
-            >
-              PARTINICO
-            </a>
-
-            <span class="territory-location-name">
-              Stadio Comunale "Giuseppe La Franca"
-            </span>
-
-          </div>
-
-          <div class="territory-card reveal">
-
-            <span class="territory-card-title">
-              DA QUI, NON SOLO QUI.
-            </span>
-
-            <p>
-              È qui che ha la sua base il mio lavoro. In presenza, per chi parte da qui e per chi arriva dai territori vicini. Online, quando la distanza non deve essere un limite.
-            </p>
-
-            <p class="territory-card-note">
-              Perché una base non è un confine. È il punto che ti permette di sapere sempre da dove stai partendo.
-            </p>
-
-            <p>
-              <a href="/territorio/">territori vicini</a>
-            </p>
-
-          </div>
-
-        </div>
-
-        <div class="territory-map reveal">
-
-          <iframe
-            title="Stadio Comunale Giuseppe La Franca, Partinico — vista satellitare"
-            src="https://www.google.com/maps?q=Stadio+Comunale+Giuseppe+La+Franca%2C+Viale+Aldo+Moro%2C+Partinico%2C+PA%2C+Italy&layer=satellite&output=embed"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-            allowfullscreen
-          ></iframe>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         07 — PRESENTE
-         =================================================== -->
-
-    <section
-      id="07"
-      class="home-section home-section--present"
-      data-section-title="IL PRESENTE"
-    >
-
-      <div class="section-inner section-inner--split section-inner--present">
-
-        <div>
-
-          <p class="section-title reveal">
-            07 / IL PRESENTE
-          </p>
-
-          <div class="editorial-copy editorial-copy--large reveal">
-
-            <p>
-              Da qui, il percorso continua.
-            </p>
-
-            <p>
-              Oggi lavoro tra sport, scienze motorie, educazione, management e digitale.
-            </p>
-
-            <p>
-              Cinque prospettive che continuano a incontrarsi.
-            </p>
-
-            <p>
-              Nel lavoro con le persone.<br>
-              Nella costruzione dei progetti.<br>
-              Nella formazione.<br>
-              Nello sport.<br>
-              Nel digitale.
-            </p>
-
-            <p>
-              nel punto in cui una competenza smette di essere soltanto conoscenza e comincia a diventare possibilità.
-            </p>
-
-          </div>
-
-        </div>
-
-        <figure class="present-portrait reveal">
-
-          <img
-            src="/assets/images/cp-foto.webp"
-            width="753"
-            height="941"
-            alt="Cesare Paratore"
-            loading="lazy"
-          >
-
-        </figure>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         08 — POSSIBILITÀ
-         =================================================== -->
-
-    <section
-      id="08"
-      class="home-section home-section--possibility"
-      data-section-title="POSSIBILITÀ"
-    >
-
-      <div class="section-inner section-inner--narrow">
-
-        <p class="section-title reveal">
-          08 / POSSIBILITÀ
-        </p>
-
-        <div class="editorial-copy editorial-copy--large reveal">
-
-          <p>
-            Non è un punto di arrivo.
-          </p>
-
-          <p>
-            È il modo in cui quello che ho imparato continua a muoversi.
-          </p>
-
-          <p>
-            Una competenza incontra un'altra.<br>
-            Un'esperienza diventa uno strumento.<br>
-            Un punto di vista apre una possibilità.
-          </p>
-
-          <p>
-            Perché ogni percorso, prima o poi, ha bisogno di incontrare qualcosa di nuovo.
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         09 — DOMANDA AL LETTORE
-         =================================================== -->
-
-    <section
-      id="09"
-      class="home-section home-section--question-for-you"
-      data-section-title="LA TUA DIREZIONE"
-    >
-
-      <div class="section-inner section-inner--question-for-you">
-
-        <p class="section-title reveal">
-          09 / LA TUA DIREZIONE
-        </p>
-
-        <div class="editorial-copy editorial-copy--large reveal">
-
-          <p>
-            Finora ti ho raccontato da dove sono partito.
-          </p>
-
-          <p>
-            Adesso la domanda è un'altra.
-          </p>
-
-          <p>
-            Da dove parti?
-          </p>
-
-        </div>
-
-        <div class="reader-question reveal">
-
-          <h2>
-            DA DOVE
-            <span>PARTI?</span>
-          </h2>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         10 — CTA
-         =================================================== -->
-
-    <section
-      id="10"
-      class="home-section home-section--cta"
-      data-section-title="PARTIAMO"
-    >
-
-      <div class="section-inner section-inner--cta">
-
-        <p class="section-title reveal">
-          10 / PARTIAMO
-        </p>
-
-        <div class="editorial-copy editorial-copy--large reveal">
-
-          <p>
-            Non dalla soluzione.<br>
-            Da te.<br>
-            Da quello che hai davanti.<br>
-            Da quello che vuoi capire, costruire, migliorare o cambiare.
-          </p>
-
-          <p>
-            Se hai un obiettivo, partiamo da quello.<br>
-            Se hai un problema, partiamo da quello.<br>
-            Se hai un progetto, partiamo da quello.<br>
-            Se hai una domanda, partiamo da quella.
-          </p>
-
-          <p>
-            Perché forse il movimento non consiste nel sapere già dove arriverai.<br>
-            Forse consiste nel riconoscere il punto da cui vale la pena partire.
-          </p>
-
-          <p>
-            Io quel punto l'ho trovato nel movimento.<br>
-            E da lì ho costruito tutto il resto.
-          </p>
-
-          <p>
-            Adesso tocca a te.
-          </p>
-
-        </div>
-
-        <div class="cta-trajectory reveal">
-
-          <span
-            class="cta-trajectory-line"
-            aria-hidden="true"
-          ></span>
-
-          <span
-            class="cta-trajectory-point"
-            aria-hidden="true"
-          ></span>
-
-          <a
-            class="contact-cta"
-            href="/contatti/"
-          >
-            <span>Raccontami da dove vuoi partire</span>
-            <span aria-hidden="true">→</span>
-          </a>
-
-        </div>
-
-      </div>
-
-    </section>
-
-  </main>
-
-
-  <!-- =====================================================
-       STANDBY
-       ===================================================== -->
-
-  <aside
-    class="standby-screen"
-    aria-hidden="true"
-  >
-
-    <div
-      class="standby-atmosphere"
-      aria-hidden="true"
-    >
-      <span class="standby-path"></span>
-      <span class="standby-point"></span>
-    </div>
-
-    <div class="standby-center">
-
-      <div class="standby-copy">
-
-        <span class="standby-label">
-          RIPRENDI
-        </span>
-
-        <button
-          class="standby-wake"
-          type="button"
-          aria-label="Riprendi il percorso"
-        >
-          <span class="standby-touch">
-            TOCCA
-          </span>
-        </button>
-
-        <span class="standby-signature">
-          CESARE PARATORE
-        </span>
-
-      </div>
-
-    </div>
-
-  </aside>
-
-
-  <!-- =====================================================
-       FOOTER
-       ===================================================== -->
-
-  <footer class="site-footer">
-
-    <div class="footer-inner">
-
-      <div class="footer-mark">
-        <img
-          src="/assets/images/cp-logo.webp"
-          alt="CP"
-          width="72"
-          height="72"
-        >
-      </div>
-
-      <p class="footer-motto">
-        <span>MOVIMENTO</span>
-        <span aria-hidden="true">/</span>
-        <span>CON DIREZIONE.</span>
-      </p>
-
-      <p class="footer-signature">
-        CESARE PARATORE
-      </p>
-
-    </div>
-
-  </footer>
-
-
-  <script
-    src="/script.js"
-    defer
-  ></script>
-
-</body>
-</html>
+})();
