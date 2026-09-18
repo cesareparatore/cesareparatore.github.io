@@ -9,26 +9,26 @@
 
 
   const CONFIG = {
-    loaderMinimumTime: 450,
-    loaderMaximumWait: 4500,
+  loaderMinimumTime: 4200,
+  loaderMaximumWait: 6000,
 
-    revealThreshold: 0.12,
+  revealThreshold: 0.12,
 
-    cursorLerp: 0.16,
+  cursorLerp: 0.16,
 
-    resizeDebounce: 180,
+  resizeDebounce: 180,
 
-    scrollNavigationOffset: 18,
+  scrollNavigationOffset: 18,
 
-    transitionDuration: 700,
+  transitionDuration: 700,
 
-    trajectoryLerp: 0.085,
-    trajectoryDrift: 18,
+  trajectoryLerp: 0.085,
+  trajectoryDrift: 18,
 
-    magneticStrength: 0.12,
-    magneticRadius: 90,
+  magneticStrength: 0.12,
+  magneticRadius: 90,
 
-    standbyDelay: 30000
+  standbyDelay: 30000
   };
 
 
