@@ -1,2263 +1,1340 @@
-/* =========================================================
-   CESARE PARATORE
-   MOVIMENTO / CON DIREZIONE.
-   MASTER VISUAL SYSTEM — 2.3
-   ========================================================= */
-
-:root {
-  --ivory: #F2EFE8;
-  --ink: #11110F;
-  --terracotta: #A64232;
-  --sand: #C9C0AF;
-  --stone: #77736B;
-  --white: #FFFDF8;
-
-  --font-serif: "Instrument Serif", Georgia, serif;
-  --font-sans: "DM Sans", Arial, sans-serif;
-  --font-mono: "DM Mono", monospace;
-
-  --header-height: 108px;
-  --content-max: 1680px;
-  --copy-max: 760px;
-  --narrow-copy: 620px;
-
-  --space-1: 8px;
-  --space-2: 16px;
-  --space-3: 24px;
-  --space-4: 32px;
-  --space-5: 48px;
-  --space-6: 64px;
-  --space-7: 96px;
-  --space-8: 128px;
-  --space-9: 180px;
-
-  --ease-out: cubic-bezier(.16, 1, .3, 1);
-  --ease-in-out: cubic-bezier(.65, 0, .35, 1);
-
-  --trajectory-progress: 0;
-  --trajectory-drift: 0px;
-
-  --magnetic-x: 0px;
-  --magnetic-y: 0px;
-}
-
-
-/* =========================================================
-   RESET
-   ========================================================= */
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-  background: var(--ivory);
-}
-
-body {
-  margin: 0;
-  overflow-x: clip;
-  background: var(--ivory);
-  color: var(--ink);
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-body.is-menu-open,
-body.is-standby {
-  overflow: hidden;
-}
-
-img,
-svg,
-iframe {
-  display: block;
-  max-width: 100%;
-}
-
-button,
-input,
-textarea,
-select {
-  font: inherit;
-}
-
-button,
-a {
-  -webkit-tap-highlight-color: transparent;
-}
-
-a {
-  color: inherit;
-}
-
-:focus {
-  outline: none;
-}
-
-:focus-visible {
-  outline: 1px solid var(--terracotta);
-  outline-offset: 5px;
-}
-
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <title>Cesare Paratore — Movimento / Con direzione.</title>
 
-/* =========================================================
-   LOADER
-   ========================================================= */
-
-.page-loader {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
+  <meta
+    name="description"
+    content="Cesare Paratore. Sport, Scienze Motorie, educazione, management e digitale: un percorso costruito attraverso movimento, esperienza e connessioni."
+  >
 
-  display: grid;
-  place-items: center;
+  <meta name="theme-color" content="#F2EFE8">
+  <meta name="color-scheme" content="light">
 
-  background: var(--ivory);
-  color: var(--ink);
-
-  opacity: 1;
-  visibility: visible;
-
-  transition:
-    opacity .9s var(--ease-out),
-    visibility 0s linear 0s;
-}
-
-.page-loader.is-hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-
-  transition:
-    opacity .9s var(--ease-out),
-    visibility 0s linear .9s;
-}
-
-.page-loader-inner {
-  position: relative;
-
-  width: min(86vw, 720px);
-  min-height: 250px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.loader-trajectory {
-  position: relative;
-  width: min(360px, 68vw);
-  height: 42px;
-  margin-bottom: 48px;
-}
-
-.loader-line {
-  position: absolute;
-  left: 0;
-  top: 50%;
-
-  width: 100%;
-  height: 1px;
-
-  background: var(--ink);
-
-  transform-origin: left center;
-  transform: scaleX(0);
-
-  opacity: 0;
-
-  animation:
-    loaderLine
-    2.1s
-    var(--ease-out)
-    1.35s
-    forwards;
-}
-
-.loader-point {
-  position: absolute;
-  left: 0;
-  top: 50%;
-
-  width: 9px;
-  height: 9px;
-
-  border-radius: 50%;
-
-  background: var(--terracotta);
-
-  transform:
-    translate(-50%, -50%)
-    scale(0);
-
-  animation:
-    loaderPointAppear
-    .8s
-    var(--ease-out)
-    .15s
-    forwards;
-}
-
-.loader-motto {
-  display: flex;
-  align-items: center;
-  gap: .55em;
-
-  margin: 0;
-
-  color: var(--ink);
-
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: .13em;
-  line-height: 1.4;
-
-  text-align: center;
-
-  opacity: 0;
-  transform: translateY(12px);
-
-  animation:
-    loaderMotto
-    1.1s
-    var(--ease-out)
-    3.25s
-    forwards;
-}
-
-.loader-signature {
-  margin: 22px 0 0;
-
-  color: var(--stone);
-
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: .16em;
-  line-height: 1.2;
-
-  text-align: center;
-
-  opacity: 0;
-  transform: translateY(8px);
-
-  animation:
-    loaderSignature
-    .9s
-    var(--ease-out)
-    4.05s
-    forwards;
-}
-
-@keyframes loaderPointAppear {
-  0% {
-    opacity: 0;
-    transform:
-      translate(-50%, -50%)
-      scale(0);
-  }
-
-  65% {
-    opacity: 1;
-    transform:
-      translate(-50%, -50%)
-      scale(1.15);
-  }
-
-  100% {
-    opacity: 1;
-    transform:
-      translate(-50%, -50%)
-      scale(1);
-  }
-}
-
-@keyframes loaderLine {
-  0% {
-    opacity: 0;
-    transform: scaleX(0);
-  }
-
-  12% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 1;
-    transform: scaleX(1);
-  }
-}
-
-@keyframes loaderMotto {
-  0% {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes loaderSignature {
-  0% {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-
-/* =========================================================
-   PAGE TRANSITION
-   ========================================================= */
-
-.page-transition {
-  position: fixed;
-  inset: 0;
-  z-index: 950;
-
-  background: var(--ink);
-
-  transform: translateY(100%);
-  pointer-events: none;
-
-  transition:
-    transform .7s var(--ease-in-out);
-}
-
-.page-transition.is-active {
-  transform: translateY(0);
-}
-
-
-/* =========================================================
-   CUSTOM CURSOR
-   ========================================================= */
-
-.custom-cursor {
-  position: fixed;
-  inset: 0;
-
-  z-index: 900;
-
-  pointer-events: none;
-
-  opacity: 0;
-  transition: opacity .2s ease;
-}
-
-.custom-cursor.is-visible {
-  opacity: 1;
-}
-
-.custom-cursor-dot,
-.custom-cursor-ring {
-  position: fixed;
-
-  left: 0;
-  top: 0;
-
-  border-radius: 50%;
-
-  pointer-events: none;
-}
-
-.custom-cursor-dot {
-  width: 6px;
-  height: 6px;
-
-  background: var(--terracotta);
-}
-
-.custom-cursor-ring {
-  width: 30px;
-  height: 30px;
-
-  border: 1px solid var(--stone);
-
-  transition:
-    width .35s var(--ease-out),
-    height .35s var(--ease-out),
-    border-color .25s ease;
-}
-
-.custom-cursor.is-hovering .custom-cursor-ring {
-  width: 48px;
-  height: 48px;
-  border-color: var(--terracotta);
-}
-
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
-.site-header {
-  position: fixed;
-
-  top: 0;
-  left: 0;
-  right: 0;
-
-  z-index: 800;
-
-  height: var(--header-height);
-
-  display: grid;
-  grid-template-columns: 1fr minmax(280px, 560px) 1fr;
-  align-items: center;
-
-  padding:
-    0 clamp(20px, 4vw, 64px);
-
-  background: rgba(242, 239, 232, .92);
-
-  border-bottom: 1px solid rgba(17, 17, 15, .08);
-}
-
-.site-brand {
-  justify-self: start;
-
-  display: inline-flex;
-
-  transform:
-    translate(
-      var(--magnetic-x),
-      var(--magnetic-y)
-    );
-
-  transition:
-    transform .45s var(--ease-out);
-}
-
-.site-brand img {
-  width: 48px;
-  height: 48px;
-
-  object-fit: contain;
-}
-
-.menu-trigger {
-  justify-self: end;
-
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-
-  min-height: 44px;
-  padding: 8px 0;
-
-  border: 0;
-  background: transparent;
-
-  color: var(--ink);
-
-  cursor: pointer;
-
-  transform:
-    translate(
-      var(--magnetic-x),
-      var(--magnetic-y)
-    );
-
-  transition:
-    color .25s ease,
-    transform .45s var(--ease-out);
-}
-
-.menu-trigger:hover,
-.menu-trigger:focus-visible {
-  color: var(--terracotta);
-}
-
-.menu-trigger-label {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: .14em;
-}
-
-.menu-trigger-icon {
-  position: relative;
-
-  width: 28px;
-  height: 18px;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 6px;
-}
-
-.menu-trigger-icon span {
-  display: block;
-
-  width: 100%;
-  height: 1px;
-
-  background: currentColor;
-
-  transition:
-    transform .45s var(--ease-out);
-}
-
-body.is-menu-open .menu-trigger-icon span:first-child {
-  transform: translateY(3.5px) rotate(45deg);
-}
-
-body.is-menu-open .menu-trigger-icon span:last-child {
-  transform: translateY(-3.5px) rotate(-45deg);
-}
-
-
-/* =========================================================
-   WOW PROGRESS
-   ========================================================= */
-
-.wow-progress {
-  justify-self: center;
-
-  width: min(100%, 560px);
-}
-
-.progress-label {
-  margin-bottom: 12px;
-
-  color: var(--stone);
-
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: .1em;
-  line-height: 1.2;
-
-  text-align: center;
-  text-transform: uppercase;
-}
-
-.progress-track {
-  position: relative;
-
-  width: 100%;
-  height: 1px;
-
-  background: var(--sand);
-}
-
-.progress-fill {
-  position: absolute;
-
-  left: 0;
-  top: 0;
-
-  width: 0;
-  height: 100%;
-
-  background: var(--ink);
-}
-
-.progress-point {
-  position: absolute;
-
-  left: 0;
-  top: 50%;
-
-  width: 7px;
-  height: 7px;
-
-  border-radius: 50%;
-
-  background: var(--terracotta);
-
-  transform: translate(-50%, -50%);
-}
-
-.section-jump {
-  display: flex;
-  justify-content: space-between;
-
-  margin-top: 10px;
-}
-
-.section-jump-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-
-  min-height: 28px;
-
-  color: var(--stone);
-
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: .08em;
-
-  text-decoration: none;
-
-  transition:
-    color .25s ease,
-    transform .3s var(--ease-out);
-}
-
-.section-jump-link:hover,
-.section-jump-link:focus-visible {
-  color: var(--terracotta);
-}
-
-.section-jump-link--next:hover,
-.section-jump-link--next:focus-visible {
-  transform: translateX(3px);
-}
-
-.section-jump-link--previous:hover,
-.section-jump-link--previous:focus-visible {
-  transform: translateX(-3px);
-}
-
-.section-jump-link.is-disabled {
-  pointer-events: none;
-  opacity: 0;
-}
-
-
-/* =========================================================
-   MENU
-   ========================================================= */
-
-.site-menu {
-  position: fixed;
-  inset: 0;
-
-  z-index: 700;
-
-  background: var(--ink);
-  color: var(--ivory);
-
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-
-  transition:
-    opacity .55s var(--ease-out),
-    visibility 0s linear .55s;
-}
-
-.site-menu[aria-hidden="false"] {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-
-  transition:
-    opacity .55s var(--ease-out),
-    visibility 0s linear 0s;
-}
-
-.site-menu-inner {
-  width: min(
-    calc(100% - 40px),
-    var(--content-max)
-  );
-
-  min-height: 100%;
-
-  margin: 0 auto;
-
-  display: flex;
-  align-items: center;
-}
-
-.site-menu-nav {
-  width: 100%;
-
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-
-  gap:
-    clamp(10px, 1.8vw, 24px)
-    clamp(24px, 6vw, 100px);
-}
-
-.site-menu-nav a {
-  display: grid;
-  grid-template-columns: 38px 1fr;
-  align-items: baseline;
-
-  min-height: 52px;
-
-  color: var(--ivory);
-
-  font-family: var(--font-serif);
-  font-size: clamp(28px, 4vw, 62px);
-  line-height: .95;
-
-  text-decoration: none;
-
-  transition:
-    color .25s ease,
-    transform .45s var(--ease-out);
-}
-
-.site-menu-nav a:hover,
-.site-menu-nav a:focus-visible {
-  color: var(--terracotta);
-  transform: translateX(8px);
-}
-
-.site-menu-number {
-  color: var(--stone);
-
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: .08em;
-}
-
-
-/* =========================================================
-   GENERAL SECTIONS
-   ========================================================= */
-
-.home-section {
-  position: relative;
-
-  min-height: 100svh;
-
-  display: flex;
-  align-items: center;
-
-  padding:
-    calc(var(--header-height) + clamp(56px, 9vw, 140px))
-    clamp(20px, 5vw, 80px)
-    clamp(80px, 10vw, 150px);
-}
-
-.section-inner {
-  width: min(
-    100%,
-    var(--content-max)
-  );
-
-  margin: 0 auto;
-}
-
-.section-inner--narrow {
-  width: min(
-    100%,
-    var(--narrow-copy)
-  );
-}
-
-.section-inner--split {
-  display: grid;
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(320px, .9fr);
-
-  gap: clamp(60px, 10vw, 180px);
-
-  align-items: center;
-}
-
-.section-title {
-  margin-bottom: clamp(32px, 5vw, 72px);
-
-  color: var(--stone);
-
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 500;
-  letter-spacing: .12em;
-  line-height: 1.35;
-
-  text-transform: uppercase;
-}
-
-.editorial-copy {
-  width: min(100%, var(--copy-max));
-
-  font-size: 17px;
-  line-height: 1.8;
-}
-
-.editorial-copy--large {
-  font-size: clamp(18px, 1.5vw, 24px);
-  line-height: 1.7;
-}
-
-.editorial-copy p {
-  margin: 0 0 1.35em;
-}
-
-.editorial-copy p:last-child {
-  margin-bottom: 0;
-}
-
-.editorial-copy a,
-.territory-card a {
-  text-decoration-thickness: 1px;
-  text-underline-offset: .18em;
-
-  transition:
-    color .25s ease,
-    text-decoration-color .25s ease;
-}
-
-.editorial-copy a:hover,
-.editorial-copy a:focus-visible,
-.territory-card a:hover,
-.territory-card a:focus-visible {
-  color: var(--terracotta);
-}
-
-.editorial-copy strong {
-  font-weight: 600;
-}
-
-.editorial-emphasis {
-  font-family: var(--font-serif);
-  font-size: 1.35em;
-  line-height: 1.2;
-}
-
-.editorial-sequence {
-  margin:
-    clamp(48px, 7vw, 96px)
-    0;
-
-  padding-left: clamp(24px, 5vw, 72px);
-
-  border-left: 1px solid var(--sand);
-}
-
-.editorial-sequence p {
-  margin-bottom: .45em;
-
-  color: var(--stone);
-
-  font-family: var(--font-serif);
-  font-size: clamp(24px, 3vw, 42px);
-  line-height: 1.05;
-}
-
-
-/* =========================================================
-   BACKGROUNDS
-   ========================================================= */
-
-.home-section--hero {
-  background: var(--ivory);
-}
-
-.home-section--question {
-  background: var(--white);
-}
-
-.home-section--directions {
-  background: #EAE5DC;
-}
-
-.home-section--network {
-  background: var(--ivory);
-}
-
-.home-section--pause {
-  background: #DDD6C9;
-}
-
-.home-section--territory {
-  background: var(--white);
-}
-
-.home-section--present {
-  background: #E8E2D8;
-}
-
-.home-section--possibility {
-  background: var(--ivory);
-}
-
-.home-section--question-for-you,
-.home-section--cta {
-  background: var(--ink);
-  color: var(--ivory);
-}
-
-.site-footer {
-  background: var(--ivory);
-  color: var(--ink);
-}
-
-
-/* =========================================================
-   HERO
-   ========================================================= */
-
-.section-inner--hero {
-  position: relative;
-
-  min-height: calc(100svh - var(--header-height));
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.hero-title {
-  margin: 0;
-
-  font-family: var(--font-serif);
-  font-size: clamp(76px, 13vw, 220px);
-  font-weight: 400;
-  letter-spacing: -.045em;
-  line-height: .76;
-}
-
-.hero-title-line {
-  display: block;
-}
-
-.hero-title-line--identity {
-  display: flex;
-  align-items: baseline;
-  gap: .04em;
-}
-
-.hero-title-word {
-  display: inline-block;
-}
-
-.identity-slash {
-  color: var(--terracotta);
-
-  font-family: var(--font-mono);
-  font-size: .28em;
-  font-weight: 400;
-  letter-spacing: 0;
-}
-
-.hero-intro {
-  margin-top: clamp(50px, 7vw, 96px);
-  max-width: 520px;
-}
-
-.hero-directions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 28px;
-
-  margin-top: clamp(48px, 7vw, 92px);
-}
-
-.hero-direction {
-  position: relative;
-
-  color: var(--stone);
-
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: .08em;
-
-  text-decoration: none;
-
-  transition:
-    color .25s ease,
-    transform .4s var(--ease-out);
-}
-
-.hero-direction::after {
-  content: "";
-
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -5px;
-
-  height: 1px;
-
-  background: currentColor;
-
-  transform: scaleX(0);
-  transform-origin: left center;
-
-  transition:
-    transform .45s var(--ease-out);
-}
-
-.hero-direction:hover,
-.hero-direction:focus-visible,
-.hero-direction.is-active {
-  color: var(--terracotta);
-  transform: translateY(-2px);
-}
-
-.hero-direction:hover::after,
-.hero-direction:focus-visible::after,
-.hero-direction.is-active::after {
-  transform: scaleX(1);
-}
-
-.direction-trajectory {
-  position: relative;
-
-  width: 100%;
-  height: 130px;
-
-  margin-top: clamp(24px, 4vw, 50px);
-}
-
-.direction-trajectory-line {
-  position: absolute;
-
-  left: 3%;
-  right: 3%;
-  top: 50%;
-
-  height: 1px;
-
-  background: var(--sand);
-
-  transform:
-    translateY(var(--trajectory-drift))
-    rotate(-2deg);
-
-  transform-origin: left center;
-}
-
-.direction-node {
-  position: absolute;
-
-  width: 9px;
-  height: 9px;
-
-  border-radius: 50%;
-
-  background: var(--ink);
-
-  transform: translate(-50%, -50%);
-
-  transition:
-    background-color .3s ease,
-    transform .45s var(--ease-out),
-    box-shadow .35s ease;
-}
-
-.direction-node-label {
-  position: absolute;
-
-  left: 50%;
-  top: 17px;
-
-  white-space: nowrap;
-
-  color: var(--stone);
-
-  font-family: var(--font-mono);
-  font-size: 8px;
-  letter-spacing: .08em;
-
-  transform: translateX(-50%);
-
-  transition: color .25s ease;
-}
-
-.direction-node.is-active,
-.direction-node.is-linked {
-  background: var(--terracotta);
-
-  transform:
-    translate(-50%, -50%)
-    scale(1.55);
-
-  box-shadow:
-    0 0 0 7px rgba(166, 66, 50, .08);
-}
-
-.direction-node.is-active .direction-node-label,
-.direction-node.is-linked .direction-node-label {
-  color: var(--terracotta);
-}
-
-
-/* =========================================================
-   FIVE DIRECTIONS
-   ========================================================= */
-
-.five-directions {
-  display: grid;
-
-  grid-template-columns:
-    repeat(5, minmax(0, 1fr));
-
-  gap: 12px;
-
-  margin:
-    clamp(56px, 8vw, 110px)
-    0;
-}
-
-.five-directions a {
-  display: block;
-
-  padding-top: 14px;
-
-  border-top: 1px solid var(--sand);
-
-  color: var(--stone);
-
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: .08em;
-
-  text-decoration: none;
-
-  transition:
-    color .25s ease,
-    border-color .25s ease,
-    transform .4s var(--ease-out);
-}
-
-.five-directions a:hover,
-.five-directions a:focus-visible,
-.five-directions a.is-linked {
-  color: var(--terracotta);
-  border-color: var(--terracotta);
-  transform: translateY(-4px);
-}
-
-
-/* =========================================================
-   NETWORK
-   ========================================================= */
-
-.network-visual {
-  position: relative;
-  min-height: 480px;
-}
-
-.network-line {
-  position: absolute;
-
-  height: 1px;
-
-  background: var(--sand);
-
-  transform-origin: left center;
-}
-
-.network-line--a {
-  left: 16%;
-  top: 32%;
-  width: 62%;
-  transform: rotate(13deg);
-}
-
-.network-line--b {
-  left: 28%;
-  top: 58%;
-  width: 48%;
-  transform: rotate(-17deg);
-}
-
-.network-line--c {
-  left: 22%;
-  top: 35%;
-  width: 58%;
-  transform: rotate(29deg);
-}
-
-.network-line--d {
-  left: 35%;
-  top: 65%;
-  width: 43%;
-  transform: rotate(-30deg);
-}
-
-.network-line--e {
-  left: 12%;
-  top: 52%;
-  width: 71%;
-  transform: rotate(2deg);
-}
-
-.network-node {
-  position: absolute;
-
-  width: 14px;
-  height: 14px;
-
-  border-radius: 50%;
-
-  background: var(--ink);
-
-  transform: translate(-50%, -50%);
-
-  transition:
-    background-color .3s ease,
-    transform .45s var(--ease-out),
-    box-shadow .35s ease;
-}
-
-.network-node--sport {
-  left: 16%;
-  top: 32%;
-}
-
-.network-node--scienze-motorie {
-  left: 28%;
-  top: 58%;
-}
-
-.network-node--educazione {
-  left: 66%;
-  top: 35%;
-}
-
-.network-node--management {
-  left: 57%;
-  top: 68%;
-}
-
-.network-node--digitale {
-  left: 78%;
-  top: 48%;
-}
-
-.network-node.is-linked {
-  background: var(--terracotta);
-
-  transform:
-    translate(-50%, -50%)
-    scale(1.6);
-
-  box-shadow:
-    0 0 0 8px rgba(166, 66, 50, .08);
-}
-
-
-/* =========================================================
-   PAUSE
-   ========================================================= */
-
-.pause-trajectory {
-  position: relative;
-
-  width: 100%;
-  min-height: 360px;
-}
-
-.pause-trajectory-line {
-  position: absolute;
-
-  left: 8%;
-  right: 8%;
-  top: 50%;
-
-  height: 1px;
-
-  background: var(--stone);
-
-  transform:
-    translateY(var(--trajectory-drift))
-    rotate(-8deg);
-
-  transform-origin: left center;
-}
-
-.pause-trajectory-point {
-  position: absolute;
-
-  left: 50%;
-  top: 50%;
-
-  width: 18px;
-  height: 18px;
-
-  border-radius: 50%;
-
-  background: var(--terracotta);
-
-  transform:
-    translate(-50%, -50%);
-
-  box-shadow:
-    0 0 0 12px rgba(166, 66, 50, .08);
-}
-
-
-/* =========================================================
-   TERRITORY
-   ========================================================= */
-
-.section-inner--territory {
-  display: grid;
-
-  grid-template-columns:
-    minmax(300px, .8fr)
-    minmax(420px, 1.2fr);
-
-  gap: clamp(50px, 8vw, 130px);
-
-  align-items: center;
-}
-
-.territory-location {
-  margin-bottom: 40px;
-}
-
-.territory-card-place {
-  display: inline-block;
-
-  margin-bottom: 8px;
-
-  color: var(--stone);
-
-  font-family: var(--font-mono);
-  font-size: 18px;
-  font-weight: 500;
-  letter-spacing: .08em;
-  line-height: 1.1;
-
-  text-decoration: none;
-
-  transition:
-    color .25s ease,
-    letter-spacing .3s var(--ease-out);
-}
-
-.territory-card-place:hover,
-.territory-card-place:focus-visible {
-  color: var(--terracotta);
-  letter-spacing: .1em;
-}
-
-.territory-location-name {
-  display: block;
-
-  margin-top: 8px;
-
-  color: var(--stone);
-
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: .12em;
-  line-height: 1.2;
-
-  text-transform: uppercase;
-}
-
-.territory-card {
-  max-width: 560px;
-}
-
-.territory-card-title {
-  display: block;
-
-  margin-bottom: 22px;
-
-  color: var(--ink);
-
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: .12em;
-}
-
-.territory-card p {
-  margin: 0 0 24px;
-
-  font-size: 17px;
-  line-height: 1.7;
-}
-
-.territory-card-note {
-  color: var(--stone);
-
-  font-family: var(--font-serif);
-  font-size: 24px !important;
-  line-height: 1.2 !important;
-}
-
-.territory-map {
-  position: relative;
-
-  min-height: 560px;
-
-  overflow: hidden;
-
-  background: var(--sand);
-}
-
-.territory-map iframe {
-  width: 100%;
-  height: 100%;
-
-  min-height: 560px;
-
-  border: 0;
-}
-
-
-/* =========================================================
-   PRESENT
-   ========================================================= */
-
-.section-inner--present {
-  align-items: start;
-}
-
-.present-portrait {
-  position: relative;
-
-  margin: 0;
-
-  overflow: hidden;
-
-  background: var(--sand);
-}
-
-.present-portrait img {
-  width: 100%;
-  height: auto;
-
-  aspect-ratio: 753 / 941;
-
-  object-fit: cover;
-
-  filter: saturate(.82) contrast(.96);
-}
-
-
-/* =========================================================
-   QUESTION FOR YOU
-   ========================================================= */
-
-.section-inner--question-for-you {
-  width: min(
-    100%,
-    var(--content-max)
-  );
-}
-
-.reader-question {
-  min-height: 50vh;
-
-  display: flex;
-  align-items: center;
-}
-
-.reader-question h2 {
-  margin: 0;
-
-  font-family: var(--font-serif);
-  font-size: clamp(82px, 16vw, 250px);
-  font-weight: 400;
-  letter-spacing: -.055em;
-  line-height: .78;
-}
-
-.reader-question h2 span {
-  display: block;
-
-  margin-left: clamp(8%, 15vw, 24%);
-
-  color: var(--terracotta);
-}
-
-
-/* =========================================================
-   FINAL CTA
-   ========================================================= */
-
-.section-inner--cta {
-  width: min(
-    100%,
-    1180px
-  );
-}
-
-.home-section--cta .section-title {
-  color: rgba(242, 239, 232, .48);
-}
-
-.home-section--cta .editorial-copy {
-  color: var(--ivory);
-}
-
-.cta-trajectory {
-  position: relative;
-
-  width: min(100%, 1080px);
-  min-height: 190px;
-
-  margin-top: 88px;
-}
-
-.cta-trajectory-line {
-  position: absolute;
-
-  left: 0;
-  right: 7%;
-  top: 42%;
-
-  height: 1px;
-
-  background: rgba(242, 239, 232, .38);
-
-  transform:
-    translateY(var(--trajectory-drift))
-    rotate(-3deg);
-
-  transform-origin: left center;
-
-  transition:
-    background-color .45s ease,
-    transform .7s var(--ease-out);
-}
-
-.cta-trajectory-point {
-  position: absolute;
-
-  right: 6.5%;
-  top: 42%;
-
-  width: 14px;
-  height: 14px;
-
-  border-radius: 50%;
-
-  background: var(--terracotta);
-
-  transform:
-    translate(50%, -50%);
-
-  transition:
-    transform .55s var(--ease-out),
-    box-shadow .45s ease;
-}
-
-.contact-cta {
-  position: absolute;
-
-  right: 0;
-  top: calc(42% + 48px);
-
-  display: inline-flex;
-  align-items: center;
-  gap: 18px;
-
-  min-height: 52px;
-  padding: 8px 0;
-
-  color: var(--ivory);
-
-  font-family: var(--font-mono);
-  font-size: clamp(13px, 1.15vw, 16px);
-  font-weight: 500;
-  letter-spacing: .035em;
-  line-height: 1.3;
-
-  text-decoration: none;
-
-  transform:
-    translate(
-      var(--magnetic-x),
-      var(--magnetic-y)
-    );
-
-  transition:
-    color .3s ease,
-    gap .45s var(--ease-out);
-}
-
-.contact-cta::after {
-  content: "";
-
-  position: absolute;
-
-  left: 0;
-  right: 0;
-  bottom: 0;
-
-  height: 1px;
-
-  background: currentColor;
-
-  transform: scaleX(.35);
-  transform-origin: left center;
-
-  transition:
-    transform .5s var(--ease-out);
-}
-
-.contact-cta span:last-child {
-  display: inline-block;
-
-  font-size: 1.35em;
-  line-height: 1;
-
-  transition:
-    transform .45s var(--ease-out);
-}
-
-.contact-cta:hover,
-.contact-cta:focus-visible,
-.cta-trajectory.is-engaged .contact-cta {
-  color: var(--terracotta);
-  gap: 24px;
-}
-
-.contact-cta:hover::after,
-.contact-cta:focus-visible::after,
-.cta-trajectory.is-engaged .contact-cta::after {
-  transform: scaleX(1);
-}
-
-.contact-cta:hover span:last-child,
-.contact-cta:focus-visible span:last-child,
-.cta-trajectory.is-engaged .contact-cta span:last-child {
-  transform: translateX(6px);
-}
-
-.cta-trajectory.is-engaged .cta-trajectory-point {
-  transform:
-    translate(50%, -50%)
-    scale(1.65);
-
-  box-shadow:
-    0 0 0 8px rgba(166, 66, 50, .08);
-}
-
-.cta-trajectory.is-engaged .cta-trajectory-line {
-  background: var(--terracotta);
-
-  transform:
-    translateY(var(--trajectory-drift))
-    rotate(-3deg)
-    scaleX(1.015);
-}
-
-.home-section--cta .cta-trajectory-line {
-  background: rgba(242, 239, 232, .38);
-}
-
-
-/* =========================================================
-   REVEAL
-   ========================================================= */
-
-.reveal {
-  opacity: 0;
-
-  transform: translateY(30px);
-
-  transition:
-    opacity .9s var(--ease-out),
-    transform .9s var(--ease-out);
-}
-
-.reveal.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-
-/* =========================================================
-   STANDBY
-   ========================================================= */
-
-.standby-screen {
-  position: fixed;
-  inset: 0;
-
-  z-index: 850;
-
-  display: grid;
-  place-items: center;
-
-  background: var(--ivory);
-  color: var(--ink);
-
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-
-  transition:
-    opacity .75s var(--ease-out),
-    visibility 0s linear .75s;
-}
-
-.standby-screen.is-active {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-
-  transition:
-    opacity .75s var(--ease-out),
-    visibility 0s linear 0s;
-}
-
-.standby-atmosphere {
-  position: absolute;
-  inset: 0;
-
-  pointer-events: none;
-}
-
-.standby-path {
-  position: absolute;
-
-  left: 10%;
-  right: 10%;
-  top: 50%;
-
-  height: 1px;
-
-  background: var(--sand);
-
-  transform: rotate(-4deg);
-}
-
-.standby-point {
-  position: absolute;
-
-  left: 50%;
-  top: 50%;
-
-  width: 12px;
-  height: 12px;
-
-  border-radius: 50%;
-
-  background: var(--terracotta);
-
-  transform: translate(-50%, -50%);
-
-  box-shadow:
-    0 0 0 10px rgba(166, 66, 50, .07);
-}
-
-.standby-center {
-  position: relative;
-  z-index: 1;
-}
-
-.standby-copy {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.standby-label {
-  display: block;
-
-  color: var(--ink);
-
-  font-family: var(--font-serif);
-  font-size: clamp(38px, 6vw, 72px);
-  line-height: .95;
-}
-
-.standby-wake {
-  position: relative;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  min-width: 120px;
-  min-height: 52px;
-
-  margin-top: 30px;
-  padding: 8px 20px;
-
-  border: 0;
-  background: transparent;
-
-  color: var(--terracotta);
-
-  font: inherit;
-
-  cursor: pointer;
-}
-
-.standby-touch {
-  position: relative;
-
-  display: inline-block;
-
-  padding-bottom: 7px;
-
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: .16em;
-}
-
-.standby-touch::after {
-  content: "";
-
-  position: absolute;
-
-  left: 0;
-  right: 0;
-  bottom: 0;
-
-  height: 1px;
-
-  background: currentColor;
-
-  transform: scaleX(.35);
-  transform-origin: center;
-
-  transition: transform .45s var(--ease-out);
-}
-
-.standby-wake:hover .standby-touch::after,
-.standby-wake:focus-visible .standby-touch::after {
-  transform: scaleX(1);
-}
-
-.standby-wake:focus-visible {
-  outline: 1px solid var(--terracotta);
-  outline-offset: 8px;
-}
-
-.standby-signature {
-  display: block;
-
-  margin-top: 28px;
-
-  color: var(--stone);
-
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: .16em;
-}
-
-
-/* =========================================================
-   FOOTER
-   ========================================================= */
-
-.site-footer {
-  min-height: 360px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding:
-    80px 24px;
-}
-
-.footer-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  text-align: center;
-}
-
-.footer-mark img {
-  width: 72px;
-  height: 72px;
-
-  object-fit: contain;
-}
-
-.footer-motto {
-  display: flex;
-  align-items: center;
-  gap: .55em;
-
-  margin: 32px 0 0;
-
-  color: var(--ink);
-
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: .12em;
-}
-
-.footer-signature {
-  margin: 18px 0 0;
-
-  color: var(--stone);
-
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: .16em;
-}
-
-
-/* =========================================================
-   RESPONSIVE — 1280
-   ========================================================= */
-
-@media (max-width: 1280px) {
-
-  :root {
-    --header-height: 92px;
-  }
-
-  .site-header {
-    grid-template-columns: 1fr minmax(240px, 440px) 1fr;
-  }
-
-  .hero-title {
-    font-size: clamp(72px, 13vw, 170px);
-  }
-
-  .network-visual {
-    min-height: 420px;
-  }
-
-  .territory-map,
-  .territory-map iframe {
-    min-height: 480px;
-  }
-
-}
-
-
-/* =========================================================
-   RESPONSIVE — 820
-   ========================================================= */
-
-@media (max-width: 820px) {
-
-  :root {
-    --header-height: 76px;
-  }
-
-  .site-header {
-    grid-template-columns: auto 1fr auto;
-    padding: 0 20px;
-  }
-
-  .site-brand img {
-    width: 38px;
-    height: 38px;
-  }
-
-  .wow-progress {
-    width: min(100%, 280px);
-  }
-
-  .progress-label {
-    font-size: 8px;
-  }
-
-  .site-menu-nav {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  .site-menu-nav a {
-    font-size: clamp(32px, 9vw, 56px);
-  }
-
-  .home-section {
-    min-height: auto;
-
-    padding:
-      calc(var(--header-height) + 72px)
-      20px
-      100px;
-  }
-
-  .section-inner--hero {
-    min-height:
-      calc(100svh - var(--header-height));
-  }
-
-  .hero-title {
-    font-size: clamp(62px, 16vw, 118px);
-  }
-
-  .hero-directions {
-    gap: 12px 20px;
-  }
-
-  .direction-trajectory {
-    height: 100px;
-  }
-
-  .direction-node-label {
-    font-size: 7px;
-  }
-
-  .section-inner--split,
-  .section-inner--territory {
-    grid-template-columns: 1fr;
-    gap: 64px;
-  }
-
-  .network-visual {
-    min-height: 360px;
-  }
-
-  .five-directions {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-
-    gap: 18px 14px;
-  }
-
-  .territory-map,
-  .territory-map iframe {
-    min-height: 420px;
-  }
-
-  .reader-question h2 {
-    font-size: clamp(72px, 18vw, 150px);
-  }
-
-  .cta-trajectory {
-    min-height: 170px;
-    margin-top: 64px;
-  }
-
-  .cta-trajectory-line {
-    right: 9%;
-    top: 38%;
-  }
-
-  .cta-trajectory-point {
-    right: 8.5%;
-    top: 38%;
-  }
-
-  .contact-cta {
-    right: 0;
-    top: calc(38% + 42px);
-
-    max-width: 88%;
-
-    font-size: 12px;
-  }
-
-}
-
-
-/* =========================================================
-   RESPONSIVE — 420
-   ========================================================= */
-
-@media (max-width: 420px) {
-
-  .site-header {
-    padding: 0 16px;
-  }
-
-  .wow-progress {
-    display: none;
-  }
-
-  .hero-title {
-    font-size: clamp(56px, 17vw, 82px);
-    line-height: .8;
-  }
-
-  .hero-directions {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 13px;
-  }
-
-  .direction-trajectory {
-    height: 90px;
-  }
-
-  .direction-node-label {
-    display: none;
-  }
-
-  .five-directions {
-    grid-template-columns: 1fr;
-  }
-
-  .network-visual {
-    min-height: 300px;
-  }
-
-  .territory-map,
-  .territory-map iframe {
-    min-height: 340px;
-  }
-
-  .territory-card-note {
-    font-size: 21px !important;
-  }
-
-  .reader-question {
-    min-height: 45vh;
-  }
-
-  .reader-question h2 {
-    font-size: clamp(60px, 20vw, 100px);
-  }
-
-  .cta-trajectory {
-    min-height: 190px;
-    margin-top: 54px;
-  }
-
-  .cta-trajectory-line {
-    right: 13%;
-  }
-
-  .cta-trajectory-point {
-    right: 12.5%;
-  }
-
-  .contact-cta {
-    right: 0;
-    top: calc(38% + 38px);
-
-    max-width: 94%;
-
-    align-items: flex-start;
-    gap: 12px;
-
-    font-size: 11px;
-  }
-
-  .page-loader-inner {
-    width: min(88vw, 720px);
-    min-height: 210px;
-  }
-
-  .loader-trajectory {
-    width: min(280px, 72vw);
-    margin-bottom: 38px;
-  }
-
-  .loader-motto {
-    font-size: 10px;
-    letter-spacing: .1em;
-  }
-
-  .loader-signature {
-    margin-top: 18px;
-    font-size: 8px;
-  }
-
-}
-
-
-/* =========================================================
-   COARSE POINTER
-   ========================================================= */
-
-@media (pointer: coarse) {
-
-  .custom-cursor {
-    display: none;
-  }
-
-  .contact-cta,
-  .site-brand,
-  .menu-trigger {
-    transform: none;
-  }
-
-}
-
-
-/* =========================================================
-   REDUCED MOTION
-   ========================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-
-  html {
-    scroll-behavior: auto;
-  }
-
-  *,
-  *::before,
-  *::after {
-    animation-duration: .001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: .001ms !important;
-    scroll-behavior: auto !important;
-  }
-
-  .reveal {
-    opacity: 1;
-    transform: none;
-  }
-
-}
-
-.reduced-motion .page-loader .loader-point,
-.reduced-motion .page-loader .loader-line,
-.reduced-motion .page-loader .loader-motto,
-.reduced-motion .page-loader .loader-signature {
-  animation: none;
-  opacity: 1;
-  transform: none;
-}
-
-.reduced-motion .page-loader .loader-point {
-  transform: translate(-50%, -50%);
-}
-
-.reduced-motion .page-loader .loader-line {
-  transform: scaleX(1);
-}
-
-.reduced-motion .reveal {
-  opacity: 1;
-  transform: none;
-}
-
-.reduced-motion .contact-cta,
-.reduced-motion .site-brand,
-.reduced-motion .menu-trigger {
-  transform: none;
-}
-
-
-/* =========================================================
-   PRINT
-   ========================================================= */
-
-@media print {
-
-  .page-loader,
-  .page-transition,
-  .custom-cursor,
-  .site-header,
-  .site-menu,
-  .standby-screen {
-    display: none !important;
-  }
-
-  body {
-    overflow: visible;
-    background: white;
-    color: black;
-  }
-
-  .home-section {
-    min-height: auto;
-    padding: 40px 0;
-    break-inside: avoid;
-  }
-
-  .reveal {
-    opacity: 1;
-    transform: none;
-  }
-
-}
+  <link
+    rel="canonical"
+    href="https://www.cesareparatore.it/"
+  >
+
+  <link
+    rel="icon"
+    type="image/png"
+    href="/assets/images/cp-mark.png"
+  >
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="/css/style.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://www.cesareparatore.it/#website",
+        "url": "https://www.cesareparatore.it/",
+        "name": "Cesare Paratore",
+        "description": "Movimento / con direzione."
+      },
+      {
+        "@type": "Person",
+        "@id": "https://www.cesareparatore.it/#person",
+        "name": "Cesare Paratore",
+        "url": "https://www.cesareparatore.it/"
+      }
+    ]
+  }
+  </script>
+</head>
+
+<body>
+
+  <!-- =====================================================
+       EDITORIAL LOADER
+       PUNTO → LINEA → DIREZIONE
+       ===================================================== -->
+
+  <div class="page-loader" aria-hidden="true">
+
+    <div class="page-loader-inner">
+
+      <div class="loader-trajectory" aria-hidden="true">
+        <span class="loader-point"></span>
+        <span class="loader-line"></span>
+      </div>
+
+      <p class="loader-motto">
+        <span>MOVIMENTO</span>
+        <span aria-hidden="true">/</span>
+        <span>CON DIREZIONE.</span>
+      </p>
+
+      <p class="loader-signature">
+        CESARE PARATORE
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       PAGE TRANSITION
+       ===================================================== -->
+
+  <div class="page-transition" aria-hidden="true"></div>
+
+
+  <!-- =====================================================
+       CUSTOM CURSOR
+       ===================================================== -->
+
+  <div class="custom-cursor" aria-hidden="true">
+    <span class="custom-cursor-dot"></span>
+    <span class="custom-cursor-ring"></span>
+  </div>
+
+
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
+
+  <header class="site-header">
+
+    <a
+      class="site-brand"
+      href="#01"
+      aria-label="Cesare Paratore — torna all'inizio"
+    >
+      <img
+        src="/assets/images/cp-mark.png"
+        alt="Cesare Paratore"
+        width="48"
+        height="48"
+      >
+    </a>
+
+
+    <div
+      class="wow-progress"
+      aria-label="Navigazione del percorso"
+    >
+
+      <div
+        class="progress-label"
+        id="progress-current"
+        aria-live="polite"
+      >
+        IL MOVIMENTO È SOLO L'INIZIO.
+      </div>
+
+      <div
+        class="progress-track"
+        aria-hidden="true"
+      >
+        <span
+          class="progress-fill"
+          id="progress-fill"
+        ></span>
+
+        <span
+          class="progress-point"
+          id="progress-point"
+        ></span>
+      </div>
+
+      <div class="section-jump">
+
+        <a
+          id="previous-section"
+          class="section-jump-link section-jump-link--previous is-disabled"
+          href="#01"
+          aria-label="Sezione precedente"
+          aria-hidden="true"
+          tabindex="-1"
+        >
+          <span
+            class="section-jump-arrow"
+            aria-hidden="true"
+          >←</span>
+
+          <span id="previous-section-label"></span>
+        </a>
+
+
+        <a
+          id="next-section"
+          class="section-jump-link section-jump-link--next"
+          href="#02"
+          aria-label="Vai alla sezione 02"
+        >
+          <span id="next-section-label">02</span>
+
+          <span
+            class="section-jump-arrow"
+            aria-hidden="true"
+          >→</span>
+        </a>
+
+      </div>
+
+    </div>
+
+
+    <button
+      class="menu-trigger"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-menu"
+      aria-label="Apri menu"
+    >
+      <span class="menu-trigger-label">MENU</span>
+
+      <span
+        class="menu-trigger-icon"
+        aria-hidden="true"
+      >
+        <span></span>
+        <span></span>
+      </span>
+    </button>
+
+  </header>
+
+
+  <!-- =====================================================
+       MENU
+       ===================================================== -->
+
+  <aside
+    class="site-menu"
+    id="site-menu"
+    aria-hidden="true"
+  >
+
+    <div class="site-menu-inner">
+
+      <nav
+        class="site-menu-nav"
+        aria-label="Navigazione principale"
+      >
+
+        <a href="/chi-sono/">
+          <span class="site-menu-number">01</span>
+          <span>CHI SONO</span>
+        </a>
+
+        <a href="/sport/">
+          <span class="site-menu-number">02</span>
+          <span>SPORT</span>
+        </a>
+
+        <a href="/scienze-motorie/">
+          <span class="site-menu-number">03</span>
+          <span>SCIENZE MOTORIE</span>
+        </a>
+
+        <a href="/educazione/">
+          <span class="site-menu-number">04</span>
+          <span>EDUCAZIONE</span>
+        </a>
+
+        <a href="/management-dello-sport/">
+          <span class="site-menu-number">05</span>
+          <span>MANAGEMENT</span>
+        </a>
+
+        <a href="/digitale/">
+          <span class="site-menu-number">06</span>
+          <span>DIGITALE</span>
+        </a>
+
+        <a href="/territorio/">
+          <span class="site-menu-number">07</span>
+          <span>TERRITORIO</span>
+        </a>
+
+        <a href="/contatti/">
+          <span class="site-menu-number">08</span>
+          <span>CONTATTI</span>
+        </a>
+
+      </nav>
+
+    </div>
+
+  </aside>
+
+
+  <!-- =====================================================
+       MAIN
+       ===================================================== -->
+
+  <main id="main-content">
+
+
+    <!-- =====================================================
+         01 — ORIGINE
+         ===================================================== -->
+
+    <section
+      class="home-section home-section--hero"
+      id="01"
+      data-section-title="IL MOVIMENTO È SOLO L'INIZIO."
+    >
+
+      <div class="section-inner section-inner--hero">
+
+        <div class="section-title reveal">
+          IL MOVIMENTO È SOLO L'INIZIO.
+        </div>
+
+
+        <h1 class="hero-title reveal">
+
+          <span class="hero-title-line hero-title-line--identity">
+            <span class="hero-title-word">MOVIMENTO</span>
+
+            <span
+              class="identity-slash"
+              aria-hidden="true"
+            >/</span>
+          </span>
+
+          <span class="hero-title-line">
+            CON DIREZIONE.
+          </span>
+
+        </h1>
+
+
+        <div class="hero-intro editorial-copy reveal">
+          <p>
+            Tutto è iniziato da una domanda:
+            dove può portarti il movimento?
+          </p>
+        </div>
+
+
+        <div class="hero-directions reveal">
+
+          <a
+            class="hero-direction"
+            href="/sport/"
+            data-direction="sport"
+          >
+            SPORT
+          </a>
+
+          <a
+            class="hero-direction"
+            href="/scienze-motorie/"
+            data-direction="scienze-motorie"
+          >
+            SCIENZE MOTORIE
+          </a>
+
+          <a
+            class="hero-direction"
+            href="/educazione/"
+            data-direction="educazione"
+          >
+            EDUCAZIONE
+          </a>
+
+          <a
+            class="hero-direction"
+            href="/management-dello-sport/"
+            data-direction="management"
+          >
+            MANAGEMENT
+          </a>
+
+          <a
+            class="hero-direction"
+            href="/digitale/"
+            data-direction="digitale"
+          >
+            DIGITALE
+          </a>
+
+        </div>
+
+
+        <div
+          class="direction-trajectory reveal"
+          aria-hidden="true"
+        >
+
+          <span class="direction-trajectory-line"></span>
+
+
+          <span
+            class="direction-node"
+            data-direction="sport"
+            style="left: 8%; top: 54%;"
+          >
+            <span class="direction-node-label">SPORT</span>
+          </span>
+
+
+          <span
+            class="direction-node"
+            data-direction="scienze-motorie"
+            style="left: 29%; top: 42%;"
+          >
+            <span class="direction-node-label">
+              SCIENZE MOTORIE
+            </span>
+          </span>
+
+
+          <span
+            class="direction-node"
+            data-direction="educazione"
+            style="left: 50%; top: 50%;"
+          >
+            <span class="direction-node-label">
+              EDUCAZIONE
+            </span>
+          </span>
+
+
+          <span
+            class="direction-node"
+            data-direction="management"
+            style="left: 71%; top: 39%;"
+          >
+            <span class="direction-node-label">
+              MANAGEMENT
+            </span>
+          </span>
+
+
+          <span
+            class="direction-node"
+            data-direction="digitale"
+            style="left: 92%; top: 48%;"
+          >
+            <span class="direction-node-label">
+              DIGITALE
+            </span>
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         02 — DOMANDA
+         ===================================================== -->
+
+    <section
+      class="home-section home-section--question"
+      id="02"
+      data-section-title="LA DOMANDA È CAMBIATA."
+    >
+
+      <div class="section-inner section-inner--narrow">
+
+        <div class="section-title reveal">
+          LA DOMANDA È CAMBIATA.
+        </div>
+
+
+        <div class="editorial-copy editorial-copy--large reveal">
+
+          <p>
+            Il movimento è stato il punto di partenza.
+          </p>
+
+          <p>
+            Poi è arrivato
+            <a
+              class="narrative-link"
+              href="/sport/"
+              data-trajectory-node="sport"
+            >lo sport</a>.
+          </p>
+
+          <p>
+            E dentro lo sport ho trovato
+            <a
+              class="narrative-link"
+              href="/sport/"
+              data-trajectory-node="sport"
+            >la corsa</a>.
+            Prima come
+            <a
+              class="narrative-link"
+              href="https://www.fidal.it/atleta/Cesare-Paratore/h66RkpSkcWo="
+              target="_blank"
+              rel="noopener noreferrer"
+            >atleta</a>.
+            Poi come
+            <a
+              class="narrative-link"
+              href="https://albotecnici.fidal.it/site/view?id=TP0833"
+              target="_blank"
+              rel="noopener noreferrer"
+            >tecnico</a>.
+          </p>
+
+
+          <div
+            class="editorial-sequence"
+            aria-label="Le tappe della pratica"
+          >
+            <p>La pratica.</p>
+            <p>L’allenamento.</p>
+            <p>La fatica.</p>
+            <p>Il confronto con il limite.</p>
+          </div>
+
+
+          <p>
+            Prima ancora di studiare il movimento,
+            ho iniziato a viverlo.
+          </p>
+
+          <p>
+            E più mi avvicinavo a quel limite,
+            più sentivo il bisogno di capire cosa ci fosse oltre.
+          </p>
+
+          <p>
+            Le
+            <a
+              class="narrative-link"
+              href="/scienze-motorie/"
+              data-trajectory-node="scienze-motorie"
+            >Scienze Motorie</a>
+            sono arrivate anche da qui:
+            dal desiderio di comprendere ciò che stavo vivendo.
+          </p>
+
+          <p>
+            Studiare il movimento mi ha dato strumenti.
+            Lo sport mi ha dato esperienza.
+            La corsa mi ha insegnato a misurarmi con il tempo,
+            con la distanza e con me stesso.
+            L'allenamento mi ha insegnato la continuità.
+            La fatica mi ha insegnato che il cambiamento ha un costo.
+            Il limite mi ha insegnato che non sempre basta spingere più forte.
+          </p>
+
+          <p>
+            E a quel punto la domanda è cambiata.
+          </p>
+
+          <p class="editorial-emphasis">
+            Se il movimento può cambiare un corpo,
+            <strong>che cosa può cambiare una persona?</strong>
+          </p>
+
+          <p>
+            La risposta non poteva stare tutta in una disciplina.
+          </p>
+
+          <p>
+            Così ho iniziato a guardare oltre.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         03 — CINQUE STRADE
+         ===================================================== -->
+
+    <section
+      class="home-section home-section--directions"
+      id="03"
+      data-section-title="UNA STRADA NON ERA ABBASTANZA."
+    >
+
+      <div class="section-inner section-inner--narrow">
+
+        <div class="section-title reveal">
+          UNA STRADA NON ERA ABBASTANZA.
+        </div>
+
+
+        <div class="editorial-copy editorial-copy--large reveal">
+
+          <p>
+            Ho incontrato
+            <a
+              class="narrative-link"
+              href="/educazione/"
+              data-trajectory-node="educazione"
+            >l'educazione</a>.
+            Per capire cosa succede quando ciò che hai imparato
+            diventa esperienza per qualcun altro.
+          </p>
+
+          <p>
+            Ho incontrato
+            <a
+              class="narrative-link"
+              href="/management-dello-sport/"
+              data-trajectory-node="management"
+            >il management</a>.
+            Per capire cosa succede quando un'idea
+            deve diventare organizzazione, progetto, realtà.
+          </p>
+
+          <p>
+            Ho incontrato
+            <a
+              class="narrative-link"
+              href="/digitale/"
+              data-trajectory-node="digitale"
+            >il digitale</a>.
+            Per capire come strumenti e connessioni
+            possano aprire nuove possibilità.
+          </p>
+
+          <p>
+            E sono tornato allo
+            <a
+              class="narrative-link"
+              href="/sport/"
+              data-trajectory-node="sport"
+            >sport</a>.
+            Con occhi diversi.
+          </p>
+
+          <p>
+            A quel punto le strade erano diventate cinque:
+          </p>
+
+        </div>
+
+
+        <div class="five-directions reveal">
+
+          <a
+            href="/sport/"
+            class="narrative-link"
+            data-trajectory-node="sport"
+          >
+            SPORT
+          </a>
+
+          <a
+            href="/scienze-motorie/"
+            class="narrative-link"
+            data-trajectory-node="scienze-motorie"
+          >
+            SCIENZE MOTORIE
+          </a>
+
+          <a
+            href="/educazione/"
+            class="narrative-link"
+            data-trajectory-node="educazione"
+          >
+            EDUCAZIONE
+          </a>
+
+          <a
+            href="/management-dello-sport/"
+            class="narrative-link"
+            data-trajectory-node="management"
+          >
+            MANAGEMENT
+          </a>
+
+          <a
+            href="/digitale/"
+            class="narrative-link"
+            data-trajectory-node="digitale"
+          >
+            DIGITALE
+          </a>
+
+        </div>
+
+
+        <div class="editorial-copy editorial-copy--large reveal">
+
+          <p>
+            Sembravano direzioni diverse.
+            Ma continuavano a partire dallo stesso punto.
+            <strong>Il movimento.</strong>
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         04 — CONNESSIONI
+         ===================================================== -->
+
+    <section
+      class="home-section home-section--network"
+      id="04"
+      data-section-title="POI HO CAPITO CHE NON ERANO CINQUE STRADE."
+    >
+
+      <div class="section-inner section-inner--split">
+
+        <div class="section-content">
+
+          <div class="section-title reveal">
+            POI HO CAPITO CHE NON ERANO CINQUE STRADE.
+          </div>
+
+
+          <div class="editorial-copy editorial-copy--large reveal">
+
+            <p>
+              Erano cinque modi di guardare la stessa realtà.
+            </p>
+
+            <p>
+              <a
+                class="narrative-link"
+                href="/sport/"
+                data-trajectory-node="sport"
+              >Lo sport</a>
+              mi ha insegnato a misurarmi.
+              Le
+              <a
+                class="narrative-link"
+                href="/scienze-motorie/"
+                data-trajectory-node="scienze-motorie"
+              >Scienze Motorie</a>
+              mi hanno insegnato a comprendere.
+              <a
+                class="narrative-link"
+                href="/educazione/"
+                data-trajectory-node="educazione"
+              >L'educazione</a>
+              mi ha insegnato a trasferire.
+              <a
+                class="narrative-link"
+                href="/management-dello-sport/"
+                data-trajectory-node="management"
+              >Il management</a>
+              mi ha insegnato a progettare.
+              <a
+                class="narrative-link"
+                href="/digitale/"
+                data-trajectory-node="digitale"
+              >Il digitale</a>
+              mi ha insegnato a connettere.
+            </p>
+
+            <p>
+              E nessuna di queste esperienze è rimasta uguale
+              dopo aver incontrato le altre.
+            </p>
+
+            <p>
+              È questo che un curriculum non riesce a raccontare.
+              Può dire dove sei stato.
+              Non può dire
+              <strong>come ogni tappa ha cambiato quella successiva.</strong>
+            </p>
+
+            <p>
+              Per questo il mio percorso non lo vedo come un elenco.
+              Lo vedo come una rete di connessioni.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="network-visual"
+          aria-hidden="true"
+        >
+
+          <span class="network-line network-line--a"></span>
+          <span class="network-line network-line--b"></span>
+          <span class="network-line network-line--c"></span>
+          <span class="network-line network-line--d"></span>
+          <span class="network-line network-line--e"></span>
+
+
+          <span
+            class="network-node network-node--sport"
+            data-node="sport"
+          ></span>
+
+          <span
+            class="network-node network-node--scienze-motorie"
+            data-node="scienze-motorie"
+          ></span>
+
+          <span
+            class="network-node network-node--educazione"
+            data-node="educazione"
+          ></span>
+
+          <span
+            class="network-node network-node--management"
+            data-node="management"
+          ></span>
+
+          <span
+            class="network-node network-node--digitale"
+            data-node="digitale"
+          ></span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         05 — PAUSA
+         ===================================================== -->
+
+    <section
+      class="home-section home-section--pause"
+      id="05"
+      data-section-title="E LE CONNESSIONI, A VOLTE, PASSANO ANCHE DA UNA PAUSA."
+    >
+
+      <div class="section-inner section-inner--split">
+
+        <div class="section-content">
+
+          <div class="section-title reveal">
+            E LE CONNESSIONI, A VOLTE, PASSANO ANCHE DA UNA PAUSA.
+          </div>
+
+
+          <div class="editorial-copy editorial-copy--large reveal">
+
+            <p>
+              Ho imparato che muoversi non significa necessariamente andare avanti.
+              A volte significa fermarsi.
+              Guardare meglio.
+              Accorgersi che la domanda era sbagliata.
+              Cambiare direzione.
+              Riconoscere un errore.
+              Ricominciare.
+            </p>
+
+            <p>
+              È forse la parte più difficile del movimento:
+              <strong>capire quando continuare e quando cambiare.</strong>
+            </p>
+
+            <p>
+              Per questo oggi cerco di non partire dalla soluzione.
+              Parto da ciò che ho davanti.
+              Prima capire.
+              Poi costruire.
+              Infine muoversi.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="pause-trajectory"
+          aria-hidden="true"
+        >
+          <span class="pause-trajectory-line"></span>
+          <span class="pause-trajectory-point"></span>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         06 — RADICAMENTO
+         ===================================================== -->
+
+    <section
+      class="home-section home-section--territory"
+      id="06"
+      data-section-title="OGGI SO ANCHE DA DOVE PARTO."
+    >
+
+      <div class="section-inner section-inner--territory">
+
+        <div class="territory-copy">
+
+          <div class="section-title reveal">
+            OGGI SO ANCHE DA DOVE PARTO.
+          </div>
+
+
+          <div class="territory-location reveal">
+
+            <a
+              class="territory-card-place"
+              href="/territorio/"
+            >
+              PARTINICO
+            </a>
+
+            <span class="territory-location-name">
+              Stadio Comunale "Giuseppe La Franca"
+            </span>
+
+          </div>
+
+
+          <div class="territory-card reveal">
+
+            <span class="territory-card-title">
+              DA QUI, NON SOLO QUI.
+            </span>
+
+            <p>
+              È qui che ha la sua base il mio lavoro.
+              In presenza, per chi parte da qui e per chi arriva
+              dai
+              <a
+                class="territory-inline-link"
+                href="/territorio/"
+              >territori vicini</a>.
+              Online, quando la distanza non deve essere un limite.
+            </p>
+
+            <p class="territory-card-note">
+              Perché una base non è un confine.
+              È il punto che ti permette di sapere sempre
+              da dove stai partendo.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="territory-map reveal">
+
+          <iframe
+            title="Stadio Comunale Giuseppe La Franca, Partinico — vista satellitare"
+            src="https://www.google.com/maps?q=Stadio+Comunale+Giuseppe+La+Franca%2C+Viale+Aldo+Moro%2C+Partinico%2C+PA%2C+Italy&layer=satellite&output=embed"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen
+          ></iframe>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         07 — PRESENTE
+         ===================================================== -->
+
+    <section
+      class="home-section home-section--present"
+      id="07"
+      data-section-title="DA QUI, IL PERCORSO CONTINUA."
+    >
+
+      <div class="section-inner section-inner--split section-inner--present">
+
+        <div class="section-content">
+
+          <div class="section-title reveal">
+            DA QUI, IL PERCORSO CONTINUA.
+          </div>
+
+
+          <div class="editorial-copy editorial-copy--large reveal">
+
+            <p>
+              Oggi quelle esperienze convivono.
+            </p>
+
+            <p>
+              <strong>
+                <a
+                  class="narrative-link"
+                  href="/sport/"
+                  data-trajectory-node="sport"
+                >Sport.</a>
+              </strong><br>
+              Il punto da cui è iniziato tutto.
+            </p>
+
+            <p>
+              <strong>
+                <a
+                  class="narrative-link"
+                  href="/scienze-motorie/"
+                  data-trajectory-node="scienze-motorie"
+                >Scienze Motorie.</a>
+              </strong><br>
+              Il modo di comprendere ciò che accade nel movimento.
+            </p>
+
+            <p>
+              <strong>
+                <a
+                  class="narrative-link"
+                  href="/educazione/"
+                  data-trajectory-node="educazione"
+                >Educazione.</a>
+              </strong><br>
+              Il passaggio dalla propria esperienza a quella degli altri.
+            </p>
+
+            <p>
+              <strong>
+                <a
+                  class="narrative-link"
+                  href="/management-dello-sport/"
+                  data-trajectory-node="management"
+                >Management.</a>
+              </strong><br>
+              Il modo di trasformare idee e competenze in progetti.
+            </p>
+
+            <p>
+              <strong>
+                <a
+                  class="narrative-link"
+                  href="/digitale/"
+                  data-trajectory-node="digitale"
+                >Digitale.</a>
+              </strong><br>
+              Uno spazio per connettere, costruire e aprire nuove possibilità.
+            </p>
+
+            <p>
+              Non provo a farle entrare tutte dentro una definizione.
+            </p>
+
+            <p>
+              Cerco piuttosto il punto in cui possono diventare utili.
+              A una persona.
+              A un progetto.
+              A un problema.
+              A un'idea che deve ancora trovare la sua forma.
+            </p>
+
+            <p>
+              È lì che mi interessa lavorare:
+            </p>
+
+            <p class="editorial-emphasis">
+              <strong>
+                nel punto in cui una competenza smette di essere soltanto
+                conoscenza e comincia a diventare possibilità.
+              </strong>
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <figure class="present-portrait reveal">
+
+          <img
+            src="/assets/images/cp-foto.webp"
+            alt="Cesare Paratore"
+            width="753"
+            height="941"
+            loading="lazy"
+            decoding="async"
+          >
+
+        </figure>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         08 — POSSIBILITÀ
+         ===================================================== -->
+
+    <section
+      class="home-section home-section--possibility"
+      id="08"
+      data-section-title="NON È UN PUNTO DI ARRIVO."
+    >
+
+      <div class="section-inner section-inner--narrow">
+
+        <div class="section-title reveal">
+          NON È UN PUNTO DI ARRIVO.
+        </div>
+
+
+        <div class="editorial-copy editorial-copy--large reveal">
+
+          <p>
+            Quello che hai letto fin qui
+            non è un curriculum.
+          </p>
+
+          <p>
+            È il modo in cui sono arrivato a guardare le cose.
+          </p>
+
+          <p>
+            E questo sito nasce per la stessa ragione:
+          </p>
+
+          <p>
+            per mettere ordine,
+            creare connessioni,
+            e trasformare ciò che so
+            in qualcosa che possa essere utile.
+          </p>
+
+          <p class="editorial-emphasis">
+            <strong>
+              Perché ogni percorso, prima o poi,
+              ha bisogno di incontrare qualcosa di nuovo.
+            </strong>
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         09 — VISITATORE
+         ===================================================== -->
+
+    <section
+      class="home-section home-section--question-for-you"
+      id="09"
+      data-section-title="FORSE È QUI CHE LA STORIA CAMBIA."
+    >
+
+      <div class="section-inner section-inner--question-for-you">
+
+        <div class="section-title reveal">
+          FORSE È QUI CHE LA STORIA CAMBIA.
+        </div>
+
+
+        <div class="reader-question reveal">
+
+          <h2>
+            DA DOVE
+            <span>PARTI?</span>
+          </h2>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         10 — CTA
+         ===================================================== -->
+
+    <section
+      class="home-section home-section--cta"
+      id="10"
+      data-section-title="PARTIAMO DA QUELLO."
+    >
+
+      <div class="section-inner section-inner--cta">
+
+        <div class="section-title reveal">
+          PARTIAMO DA QUELLO.
+        </div>
+
+
+        <div class="editorial-copy editorial-copy--large reveal">
+
+          <p>
+            Non dalla soluzione.
+            Da te.
+            Da quello che hai davanti.
+            Da quello che vuoi capire, costruire, migliorare o cambiare.
+          </p>
+
+          <p>
+            Se hai un obiettivo, partiamo da quello.
+            Se hai un problema, partiamo da quello.
+            Se hai un progetto, partiamo da quello.
+            Se hai una domanda, partiamo da quella.
+          </p>
+
+          <p>
+            Perché forse il movimento non consiste
+            nel sapere già dove arriverai.
+            Forse consiste nel riconoscere il punto
+            da cui vale la pena partire.
+          </p>
+
+          <p>
+            Io quel punto l'ho trovato nel movimento.
+            E da lì ho costruito tutto il resto.
+          </p>
+
+          <p class="editorial-emphasis">
+            <strong>Adesso tocca a te.</strong>
+          </p>
+
+        </div>
+
+
+        <div class="cta-trajectory reveal">
+
+          <span class="cta-trajectory-line"></span>
+
+          <span
+            class="cta-trajectory-point"
+            aria-hidden="true"
+          ></span>
+
+          <a
+            class="contact-cta"
+            href="/contatti/"
+          >
+            <span>Raccontami da dove vuoi partire</span>
+            <span aria-hidden="true">→</span>
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =====================================================
+       STANDBY — PAUSA NARRATIVA
+       ===================================================== -->
+
+  <div
+    class="standby-screen"
+    aria-hidden="true"
+  >
+
+    <div
+      class="standby-atmosphere"
+      aria-hidden="true"
+    >
+      <span class="standby-path"></span>
+      <span class="standby-point"></span>
+    </div>
+
+
+    <div class="standby-center">
+
+      <div class="standby-copy">
+
+        <span class="standby-label">
+          RIPRENDI
+        </span>
+
+
+        <button
+          class="standby-wake"
+          type="button"
+          aria-label="Riprendi il percorso"
+        >
+          <span class="standby-touch">
+            TOCCA
+          </span>
+        </button>
+
+
+        <span class="standby-signature">
+          CESARE PARATORE
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       FOOTER
+       ===================================================== -->
+
+  <footer class="site-footer">
+
+    <div class="footer-inner">
+
+      <div class="footer-mark">
+
+        <img
+          src="/assets/images/cp-mark.png"
+          alt="Cesare Paratore"
+          width="96"
+          height="96"
+          loading="lazy"
+        >
+
+      </div>
+
+
+      <p class="footer-motto">
+        <span>MOVIMENTO</span>
+        <span aria-hidden="true">/</span>
+        <span>CON DIREZIONE.</span>
+      </p>
+
+
+      <p class="footer-signature">
+        CESARE PARATORE
+      </p>
+
+    </div>
+
+  </footer>
+
+
+  <script src="/script.js" defer></script>
+
+</body>
+</html>
