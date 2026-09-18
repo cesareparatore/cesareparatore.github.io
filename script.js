@@ -1,2022 +1,2263 @@
 /* =========================================================
    CESARE PARATORE
    MOVIMENTO / CON DIREZIONE.
-   MASTER INTERACTION SYSTEM — V5.1
+   MASTER VISUAL SYSTEM — 2.3
    ========================================================= */
 
-(() => {
-  "use strict";
+:root {
+  --ivory: #F2EFE8;
+  --ink: #11110F;
+  --terracotta: #A64232;
+  --sand: #C9C0AF;
+  --stone: #77736B;
+  --white: #FFFDF8;
+
+  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-sans: "DM Sans", Arial, sans-serif;
+  --font-mono: "DM Mono", monospace;
+
+  --header-height: 108px;
+  --content-max: 1680px;
+  --copy-max: 760px;
+  --narrow-copy: 620px;
+
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 48px;
+  --space-6: 64px;
+  --space-7: 96px;
+  --space-8: 128px;
+  --space-9: 180px;
+
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --ease-in-out: cubic-bezier(.65, 0, .35, 1);
+
+  --trajectory-progress: 0;
+  --trajectory-drift: 0px;
+
+  --magnetic-x: 0px;
+  --magnetic-y: 0px;
+}
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--ivory);
+}
+
+body {
+  margin: 0;
+  overflow-x: clip;
+  background: var(--ivory);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body.is-menu-open,
+body.is-standby {
+  overflow: hidden;
+}
+
+img,
+svg,
+iframe {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: inherit;
+}
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 1px solid var(--terracotta);
+  outline-offset: 5px;
+}
+
+
+/* =========================================================
+   LOADER
+   ========================================================= */
+
+.page-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
 
+  display: grid;
+  place-items: center;
 
-  const CONFIG = {
-    loaderMinimumTime: 450,
-    loaderMaximumWait: 4500,
+  background: var(--ivory);
+  color: var(--ink);
 
-    revealThreshold: 0.12,
+  opacity: 1;
+  visibility: visible;
 
-    cursorLerp: 0.16,
+  transition:
+    opacity .9s var(--ease-out),
+    visibility 0s linear 0s;
+}
 
-    resizeDebounce: 180,
+.page-loader.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 
-    scrollNavigationOffset: 18,
+  transition:
+    opacity .9s var(--ease-out),
+    visibility 0s linear .9s;
+}
 
-    transitionDuration: 700,
+.page-loader-inner {
+  position: relative;
 
-    trajectoryLerp: 0.085,
-    trajectoryDrift: 18,
+  width: min(86vw, 720px);
+  min-height: 250px;
 
-    magneticStrength: 0.12,
-    magneticRadius: 90,
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 
-    standbyDelay: 30000
-  };
+.loader-trajectory {
+  position: relative;
+  width: min(360px, 68vw);
+  height: 42px;
+  margin-bottom: 48px;
+}
 
-
-  const state = {
-    loaded: false,
-    menuOpen: false,
-    standby: false,
-
-    activeIndex: 0,
-
-    resizeTimer: null,
-    standbyTimer: null,
-    rafId: null,
-
-    reducedMotion: false,
-
-    pointer: {
-      targetX: window.innerWidth / 2,
-      targetY: window.innerHeight / 2
-    },
-
-    cursor: {
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2
-    },
-
-    trajectory: {
-      progress: 0,
-      targetProgress: 0,
-      drift: 0,
-      targetDrift: 0
-    }
-  };
-
-
-  const dom = {
-
-    html: document.documentElement,
-    body: document.body,
-
-    loader:
-      document.querySelector(".page-loader"),
-
-    transition:
-      document.querySelector(".page-transition"),
-
-    cursor:
-      document.querySelector(".custom-cursor"),
-
-    cursorDot:
-      document.querySelector(".custom-cursor-dot"),
-
-    cursorRing:
-      document.querySelector(".custom-cursor-ring"),
-
-    header:
-      document.querySelector(".site-header"),
-
-    menu:
-      document.querySelector(".site-menu"),
-
-    menuTrigger:
-      document.querySelector(".menu-trigger"),
-
-    menuLinks:
-      Array.from(
-        document.querySelectorAll(".site-menu a")
-      ),
-
-    progressLabel:
-      document.querySelector("#progress-current"),
-
-    progressFill:
-      document.querySelector("#progress-fill"),
-
-    progressPoint:
-      document.querySelector("#progress-point"),
-
-    previousSection:
-      document.querySelector("#previous-section"),
-
-    previousLabel:
-      document.querySelector("#previous-section-label"),
-
-    nextSection:
-      document.querySelector("#next-section"),
-
-    nextLabel:
-      document.querySelector("#next-section-label"),
-
-    sections:
-      Array.from(
-        document.querySelectorAll(".home-section")
-      ),
-
-    reveals:
-      Array.from(
-        document.querySelectorAll(".reveal")
-      ),
-
-    narrativeLinks:
-      Array.from(
-        document.querySelectorAll(".narrative-link")
-      ),
-
-    magneticElements:
-      Array.from(
-        document.querySelectorAll(
-          ".menu-trigger, .contact-cta"
-        )
-      ),
-
-    transitionLinks:
-      Array.from(
-        document.querySelectorAll(
-          'a[href]:not([target="_blank"])'
-        )
-      ),
-
-    standby:
-      document.querySelector(".standby-screen"),
-
-    standbyWake:
-      document.querySelector(".standby-wake"),
-
-    directionLinks:
-      Array.from(
-        document.querySelectorAll(
-          ".hero-direction[data-direction]"
-        )
-      ),
-
-    directionNodes:
-      Array.from(
-        document.querySelectorAll(
-          ".direction-node[data-direction]"
-        )
-      )
-  };
-
-
-  /* =======================================================
-     UTILITIES
-     ======================================================= */
-
-  const clamp = (
-    value,
-    min,
-    max
-  ) =>
-    Math.min(
-      Math.max(value, min),
-      max
-    );
-
-
-  const lerp = (
-    current,
-    target,
-    amount
-  ) =>
-    current +
-    (target - current) *
-    amount;
-
-
-  const getSectionNumber = index =>
-    String(index + 1).padStart(2, "0");
-
-
-  const getSectionByIndex = index => {
-
-    if (!dom.sections.length) {
-      return null;
-    }
-
-    return dom.sections[
-      clamp(
-        index,
-        0,
-        dom.sections.length - 1
-      )
-    ];
-  };
-
-
-  const getSectionTitle = section =>
-    section?.dataset.sectionTitle || "";
-
-
-  const isFinePointer = () =>
-    window.matchMedia(
-      "(pointer: fine)"
-    ).matches;
-
-
-  /* =======================================================
-     MOTION PREFERENCE
-     ======================================================= */
-
-  const initMotionPreference = () => {
-
-    const media =
-      window.matchMedia(
-        "(prefers-reduced-motion: reduce)"
-      );
-
-
-    const apply = matches => {
-
-      state.reducedMotion = matches;
-
-      dom.html.classList.toggle(
-        "reduced-motion",
-        matches
-      );
-
-
-      if (state.standby) {
-        dom.standby?.classList.toggle(
-          "is-reduced",
-          matches
-        );
-      }
-
-
-      if (state.standby) {
-        clearStandbyTimer();
-      } else {
-        resetStandbyTimer();
-      }
-
-    };
-
-
-    apply(media.matches);
-
-
-    if (
-      typeof media.addEventListener ===
-      "function"
-    ) {
-
-      media.addEventListener(
-        "change",
-        event =>
-          apply(event.matches)
-      );
-
-    }
-
-  };
-
-
-  /* =======================================================
-     LOADER
-     ======================================================= */
-
-  const initLoader = () => {
-
-    if (!dom.loader) {
-      state.loaded = true;
-      return;
-    }
-
-
-    const started =
-      performance.now();
-
-
-    const finish = () => {
-
-      if (state.loaded) {
-        return;
-      }
-
-
-      const elapsed =
-        performance.now() - started;
-
-
-      const remaining =
-        Math.max(
-          0,
-          CONFIG.loaderMinimumTime -
-          elapsed
-        );
-
-
-      window.setTimeout(
-        () => {
-
-          if (state.loaded) {
-            return;
-          }
-
-
-          state.loaded = true;
-
-          dom.loader.classList.add(
-            "is-hidden"
-          );
-
-
-          window.setTimeout(
-            () =>
-              dom.loader?.remove(),
-            800
-          );
-
-        },
-        remaining
-      );
-
-    };
-
-
-    if (
-      document.readyState ===
-      "complete"
-    ) {
-
-      finish();
-
-    } else {
-
-      window.addEventListener(
-        "load",
-        finish,
-        { once: true }
-      );
-
-    }
-
-
-    window.setTimeout(
-      finish,
-      CONFIG.loaderMaximumWait
-    );
-
-  };
-
-
-  /* =======================================================
-     PAGE TRANSITIONS
-     ======================================================= */
-
-  const initPageTransitions = () => {
-
-    if (!dom.transition) {
-      return;
-    }
-
-
-    dom.transitionLinks.forEach(
-      link => {
-
-        link.addEventListener(
-          "click",
-          event => {
-
-            const href =
-              link.getAttribute("href");
-
-
-            if (
-              !href ||
-              href.startsWith("#") ||
-              href.startsWith("mailto:") ||
-              href.startsWith("tel:") ||
-              link.hasAttribute("download") ||
-              link.target === "_blank"
-            ) {
-              return;
-            }
-
-
-            let url;
-
-
-            try {
-
-              url =
-                new URL(
-                  href,
-                  window.location.href
-                );
-
-            } catch {
-
-              return;
-
-            }
-
-
-            if (
-              url.origin !==
-              window.location.origin
-            ) {
-              return;
-            }
-
-
-            if (state.reducedMotion) {
-              return;
-            }
-
-
-            event.preventDefault();
-
-
-            dom.transition.classList.add(
-              "is-active"
-            );
-
-
-            window.setTimeout(
-              () => {
-                window.location.href =
-                  url.href;
-              },
-              CONFIG.transitionDuration
-            );
-
-          }
-        );
-
-      }
-    );
-
-
-    window.addEventListener(
-      "pageshow",
-      () => {
-
-        dom.transition?.classList.remove(
-          "is-active"
-        );
-
-      }
-    );
-
-  };
-
-
-  /* =======================================================
-     MENU
-     ======================================================= */
-
-  const openMenu = () => {
-
-    if (!dom.menu) {
-      return;
-    }
-
-
-    clearStandbyTimer();
-
-    state.menuOpen = true;
-
-
-    dom.menu.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-
-    dom.menuTrigger?.setAttribute(
-      "aria-expanded",
-      "true"
-    );
-
-
-    dom.body.classList.add(
-      "is-menu-open"
-    );
-
-
-    window.setTimeout(
-      () =>
-        dom.menuLinks[0]?.focus(),
-      state.reducedMotion ? 0 : 250
-    );
-
-  };
-
-
-  const closeMenu = (
-    returnFocus = true
-  ) => {
-
-    if (!dom.menu) {
-      return;
-    }
-
-
-    state.menuOpen = false;
-
-
-    dom.menu.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-
-
-    dom.menuTrigger?.setAttribute(
-      "aria-expanded",
-      "false"
-    );
-
-
-    dom.body.classList.remove(
-      "is-menu-open"
-    );
-
-
-    if (
-      returnFocus &&
-      document.activeElement !==
-      dom.menuTrigger
-    ) {
-
-      dom.menuTrigger?.focus();
-
-    }
-
-
-    resetStandbyTimer();
-
-  };
-
-
-  const initMenu = () => {
-
-    dom.menuTrigger?.addEventListener(
-      "click",
-      () =>
-        state.menuOpen
-          ? closeMenu()
-          : openMenu()
-    );
-
-
-    dom.menuLinks.forEach(
-      link =>
-        link.addEventListener(
-          "click",
-          () => closeMenu(false)
-        )
-    );
-
-
-    dom.menu?.addEventListener(
-      "click",
-      event => {
-
-        if (
-          event.target ===
-          dom.menu
-        ) {
-          closeMenu();
-        }
-
-      }
-    );
-
-
-    document.addEventListener(
-      "keydown",
-      event => {
-
-        if (
-          event.key === "Escape" &&
-          state.menuOpen
-        ) {
-
-          closeMenu();
-
-        }
-
-      }
-    );
-
-  };
-
-
-  /* =======================================================
-     WOW
-     ======================================================= */
-
-  const updateWowHeader = index => {
-
-    const section =
-      getSectionByIndex(index);
-
-
-    if (!section) {
-      return;
-    }
-
-
-    const total =
-      dom.sections.length;
-
-
-    const progress =
-      total <= 1
-        ? 0
-        : index / (total - 1);
-
-
-    if (dom.progressLabel) {
-
-      dom.progressLabel.textContent =
-        getSectionTitle(section);
-
-    }
-
-
-    if (dom.progressFill) {
-
-      dom.progressFill.style.width =
-        `${progress * 100}%`;
-
-    }
-
-
-    if (dom.progressPoint) {
-
-      dom.progressPoint.style.left =
-        `${progress * 100}%`;
-
-    }
-
-
-    const isFirst =
-      index === 0;
-
-    const isLast =
-      index === total - 1;
-
-
-    if (isFirst) {
-
-      dom.previousSection?.classList.add(
-        "is-disabled"
-      );
-
-      dom.previousSection?.setAttribute(
-        "aria-hidden",
-        "true"
-      );
-
-      dom.previousSection?.setAttribute(
-        "tabindex",
-        "-1"
-      );
-
-      if (dom.previousLabel) {
-        dom.previousLabel.textContent = "";
-      }
-
-    } else {
-
-      const previousNumber =
-        getSectionNumber(index - 1);
-
-
-      dom.previousSection?.classList.remove(
-        "is-disabled"
-      );
-
-      dom.previousSection?.removeAttribute(
-        "aria-hidden"
-      );
-
-      dom.previousSection?.removeAttribute(
-        "tabindex"
-      );
-
-
-      if (dom.previousSection) {
-
-        dom.previousSection.href =
-          `#${previousNumber}`;
-
-        dom.previousSection.setAttribute(
-          "aria-label",
-          `Vai alla sezione ${previousNumber}`
-        );
-
-      }
-
-
-      if (dom.previousLabel) {
-
-        dom.previousLabel.textContent =
-          previousNumber;
-
-      }
-
-    }
-
-
-    if (isLast) {
-
-      if (dom.nextSection) {
-
-        dom.nextSection.classList.add(
-          "is-home-return"
-        );
-
-        dom.nextSection.href =
-          "#01";
-
-        dom.nextSection.setAttribute(
-          "aria-label",
-          "Torna all'inizio"
-        );
-
-      }
-
-
-      if (dom.nextLabel) {
-
-        dom.nextLabel.textContent =
-          "INIZIO";
-
-      }
-
-
-      dom.nextSection
-        ?.querySelector(
-          ".section-jump-arrow"
-        )
-        ?.replaceChildren(
-          document.createTextNode("↑")
-        );
-
-    } else {
-
-      const nextNumber =
-        getSectionNumber(index + 1);
-
-
-      dom.nextSection?.classList.remove(
-        "is-home-return"
-      );
-
-
-      if (dom.nextSection) {
-
-        dom.nextSection.href =
-          `#${nextNumber}`;
-
-        dom.nextSection.setAttribute(
-          "aria-label",
-          `Vai alla sezione ${nextNumber}`
-        );
-
-      }
-
-
-      if (dom.nextLabel) {
-
-        dom.nextLabel.textContent =
-          nextNumber;
-
-      }
-
-
-      dom.nextSection
-        ?.querySelector(
-          ".section-jump-arrow"
-        )
-        ?.replaceChildren(
-          document.createTextNode("→")
-        );
-
-    }
-
-  };
-
-
-  /* =======================================================
-     SECTION NAVIGATION
-     ======================================================= */
-
-  const navigateToSection = index => {
-
-    const target =
-      getSectionByIndex(index);
-
-
-    if (!target) {
-      return;
-    }
-
-
-    const headerHeight =
-      dom.header
-        ? dom.header.offsetHeight
-        : 0;
-
-
-    const top =
-      window.scrollY +
-      target.getBoundingClientRect().top -
-      headerHeight -
-      CONFIG.scrollNavigationOffset;
-
-
-    window.scrollTo({
-      top: Math.max(0, top),
-      behavior:
-        state.reducedMotion
-          ? "auto"
-          : "smooth"
-    });
-
-  };
-
-
-  const initWowNavigation = () => {
-
-    dom.previousSection?.addEventListener(
-      "click",
-      event => {
-
-        event.preventDefault();
-
-
-        if (
-          state.activeIndex > 0
-        ) {
-
-          navigateToSection(
-            state.activeIndex - 1
-          );
-
-        }
-
-      }
-    );
-
-
-    dom.nextSection?.addEventListener(
-      "click",
-      event => {
-
-        event.preventDefault();
-
-
-        const last =
-          dom.sections.length - 1;
-
-
-        navigateToSection(
-          state.activeIndex === last
-            ? 0
-            : state.activeIndex + 1
-        );
-
-      }
-    );
-
-  };
-
-
-  /* =======================================================
-     ACTIVE SECTION
-     ======================================================= */
-
-  const detectActiveSection = () => {
-
-    if (!dom.sections.length) {
-      return;
-    }
-
-
-    const reference =
-      window.innerHeight * .52;
-
-
-    let bestIndex =
-      state.activeIndex;
-
-
-    let bestDistance =
-      Infinity;
-
-
-    dom.sections.forEach(
-      (section, index) => {
-
-        const rect =
-          section.getBoundingClientRect();
-
-
-        const visible =
-          rect.bottom > 0 &&
-          rect.top < window.innerHeight;
-
-
-        if (!visible) {
-          return;
-        }
-
-
-        const distance =
-          Math.abs(
-            rect.top +
-            rect.height / 2 -
-            reference
-          );
-
-
-        if (
-          distance <
-          bestDistance
-        ) {
-
-          bestDistance =
-            distance;
-
-          bestIndex =
-            index;
-
-        }
-
-      }
-    );
-
-
-    if (
-      state.activeIndex !==
-      bestIndex
-    ) {
-
-      state.activeIndex =
-        bestIndex;
-
-
-      updateWowHeader(
-        bestIndex
-      );
-
-    }
-
-  };
-
-
-  /* =======================================================
-     REVEAL
-     ======================================================= */
-
-  const initRevealSystem = () => {
-
-    if (!dom.reveals.length) {
-      return;
-    }
-
-
-    if (
-      state.reducedMotion ||
-      !("IntersectionObserver" in window)
-    ) {
-
-      dom.reveals.forEach(
-        element =>
-          element.classList.add(
-            "is-visible"
-          )
-      );
-
-      return;
-    }
-
-
-    const observer =
-      new IntersectionObserver(
-        entries => {
-
-          entries.forEach(
-            entry => {
-
-              if (
-                !entry.isIntersecting
-              ) {
-                return;
-              }
-
-
-              entry.target.classList.add(
-                "is-visible"
-              );
-
-
-              observer.unobserve(
-                entry.target
-              );
-
-            }
-          );
-
-        },
-        {
-          threshold:
-            CONFIG.revealThreshold,
-
-          rootMargin:
-            "0px 0px -8% 0px"
-        }
-      );
-
-
-    dom.reveals.forEach(
-      element =>
-        observer.observe(element)
-    );
-
-  };
-
-
-  /* =======================================================
-     DIRECTION INTERACTIONS
-     ======================================================= */
-
-  const initDirectionInteractions = () => {
-
-    if (
-      !dom.directionLinks.length ||
-      !dom.directionNodes.length
-    ) {
-      return;
-    }
-
-
-    const setActive = (
-      key,
-      active
-    ) => {
-
-      dom.directionLinks
-        .filter(
-          element =>
-            element.dataset.direction === key
-        )
-        .forEach(
-          element =>
-            element.classList.toggle(
-              "is-active",
-              active
-            )
-        );
-
-
-      dom.directionNodes
-        .filter(
-          element =>
-            element.dataset.direction === key
-        )
-        .forEach(
-          element =>
-            element.classList.toggle(
-              "is-active",
-              active
-            )
-        );
-
-    };
-
-
-    dom.directionLinks.forEach(
-      link => {
-
-        const key =
-          link.dataset.direction;
-
-
-        link.addEventListener(
-          "mouseenter",
-          () => setActive(key, true)
-        );
-
-
-        link.addEventListener(
-          "mouseleave",
-          () => setActive(key, false)
-        );
-
-
-        link.addEventListener(
-          "focusin",
-          () => setActive(key, true)
-        );
-
-
-        link.addEventListener(
-          "focusout",
-          () => setActive(key, false)
-        );
-
-      }
-    );
-
-
-    dom.directionNodes.forEach(
-      node => {
-
-        const key =
-          node.dataset.direction;
-
-
-        node.addEventListener(
-          "mouseenter",
-          () => setActive(key, true)
-        );
-
-
-        node.addEventListener(
-          "mouseleave",
-          () => setActive(key, false)
-        );
-
-      }
-    );
-
-  };
-
-
-  /* =======================================================
-     TRAJECTORY
-     ======================================================= */
-
-  const updateTrajectoryTargets = () => {
-
-    if (
-      dom.sections.length < 2
-    ) {
-      return;
-    }
-
-
-    const first =
-      dom.sections[0];
-
-
-    const last =
-      dom.sections[
-        dom.sections.length - 1
-      ];
-
-
-    const start =
-      first.offsetTop;
-
-
-    const end =
-      last.offsetTop +
-      last.offsetHeight -
-      window.innerHeight;
-
-
-    const progress =
-      end <= start
-        ? 0
-        : clamp(
-            (
-              window.scrollY -
-              start
-            ) /
-            (
-              end -
-              start
-            ),
-            0,
-            1
-          );
-
-
-    state.trajectory.targetProgress =
-      progress;
-
-
-    state.trajectory.targetDrift =
-      state.reducedMotion
-        ? 0
-        : Math.sin(
-            progress *
-            Math.PI *
-            2
-          ) *
-          CONFIG.trajectoryDrift;
-
-  };
-
-
-  const updateTrajectoryFrame = () => {
-
-    if (state.reducedMotion) {
-
-      state.trajectory.progress =
-        state.trajectory.targetProgress;
-
-      state.trajectory.drift = 0;
-
-    } else {
-
-      state.trajectory.progress =
-        lerp(
-          state.trajectory.progress,
-          state.trajectory.targetProgress,
-          CONFIG.trajectoryLerp
-        );
-
-      state.trajectory.drift =
-        lerp(
-          state.trajectory.drift,
-          state.trajectory.targetDrift,
-          CONFIG.trajectoryLerp
-        );
-
-    }
-
-
-    dom.html.style.setProperty(
-      "--trajectory-progress",
-      state.trajectory.progress.toFixed(4)
-    );
-
-
-    dom.html.style.setProperty(
-      "--trajectory-drift",
-      `${state.trajectory.drift.toFixed(2)}px`
-    );
-
-  };
-
-
-  /* =======================================================
-     NARRATIVE LINKS
-     ======================================================= */
-
-  const initNarrativeLinks = () => {
-
-    dom.narrativeLinks.forEach(
-      link => {
-
-        const node =
-          link.dataset.trajectoryNode;
-
-
-        if (!node) {
-          return;
-        }
-
-
-        const nodes =
-          document.querySelectorAll(
-            `.trajectory-node--${node},
-             .network-node--${node},
-             .direction-node--${node}`
-          );
-
-
-        if (!nodes.length) {
-          return;
-        }
-
-
-        const activate = () => {
-
-          nodes.forEach(
-            target =>
-              target.classList.add(
-                "is-linked"
-              )
-          );
-
-        };
-
-
-        const deactivate = () => {
-
-          nodes.forEach(
-            target =>
-              target.classList.remove(
-                "is-linked"
-              )
-          );
-
-        };
-
-
-        link.addEventListener(
-          "pointerenter",
-          activate
-        );
-
-
-        link.addEventListener(
-          "pointerleave",
-          deactivate
-        );
-
-
-        link.addEventListener(
-          "focusin",
-          activate
-        );
-
-
-        link.addEventListener(
-          "focusout",
-          deactivate
-        );
-
-      }
-    );
-
-  };
-
-
-  /* =======================================================
-     CUSTOM CURSOR
-     ======================================================= */
-
-  const initCursor = () => {
-
-    if (
-      !dom.cursor ||
-      !dom.cursorDot ||
-      !dom.cursorRing ||
-      !isFinePointer() ||
-      state.reducedMotion
-    ) {
-      return;
-    }
-
-
-    document.addEventListener(
-      "pointermove",
-      event => {
-
-        state.pointer.targetX =
-          event.clientX;
-
-        state.pointer.targetY =
-          event.clientY;
-
-      },
-      {
-        passive: true
-      }
-    );
-
-
-    document
-      .querySelectorAll("a, button")
-      .forEach(
-        element => {
-
-          element.addEventListener(
-            "pointerenter",
-            () =>
-              dom.cursor.classList.add(
-                "is-hovering"
-              )
-          );
-
-
-          element.addEventListener(
-            "pointerleave",
-            () =>
-              dom.cursor.classList.remove(
-                "is-hovering"
-              )
-          );
-
-        }
-      );
-
-  };
-
-
-  const updateCursorFrame = () => {
-
-    if (
-      !dom.cursor ||
-      !dom.cursorDot ||
-      !dom.cursorRing ||
-      !isFinePointer() ||
-      state.reducedMotion
-    ) {
-      return;
-    }
-
-
-    state.cursor.x =
-      lerp(
-        state.cursor.x,
-        state.pointer.targetX,
-        CONFIG.cursorLerp
-      );
-
-
-    state.cursor.y =
-      lerp(
-        state.cursor.y,
-        state.pointer.targetY,
-        CONFIG.cursorLerp
-      );
-
-
-    dom.cursorDot.style.transform =
-      `translate3d(
-        ${state.pointer.targetX}px,
-        ${state.pointer.targetY}px,
-        0
-      ) translate(-50%,-50%)`;
-
-
-    dom.cursorRing.style.transform =
-      `translate3d(
-        ${state.cursor.x}px,
-        ${state.cursor.y}px,
-        0
-      ) translate(-50%,-50%)`;
-
-  };
-
-
-  /* =======================================================
-     MAGNETIC ELEMENTS
-     ======================================================= */
-
-  const initMagneticElements = () => {
-
-    if (
-      !isFinePointer() ||
-      state.reducedMotion
-    ) {
-      return;
-    }
-
-
-    dom.magneticElements.forEach(
-      element => {
-
-        element.addEventListener(
-          "pointermove",
-          event => {
-
-            const rect =
-              element.getBoundingClientRect();
-
-
-            const dx =
-              event.clientX -
-              (
-                rect.left +
-                rect.width / 2
-              );
-
-
-            const dy =
-              event.clientY -
-              (
-                rect.top +
-                rect.height / 2
-              );
-
-
-            const distance =
-              Math.sqrt(
-                dx * dx +
-                dy * dy
-              );
-
-
-            if (
-              distance >
-              CONFIG.magneticRadius
-            ) {
-              return;
-            }
-
-
-            const strength =
-              CONFIG.magneticStrength *
-              (
-                1 -
-                distance /
-                CONFIG.magneticRadius
-              );
-
-
-            element.style.setProperty(
-              "--magnetic-x",
-              `${dx * strength}px`
-            );
-
-
-            element.style.setProperty(
-              "--magnetic-y",
-              `${dy * strength}px`
-            );
-
-          }
-        );
-
-
-        element.addEventListener(
-          "pointerleave",
-          () => {
-
-            element.style.setProperty(
-              "--magnetic-x",
-              "0px"
-            );
-
-
-            element.style.setProperty(
-              "--magnetic-y",
-              "0px"
-            );
-
-          }
-        );
-
-      }
-    );
-
-  };
-
-
-  /* =======================================================
-     STANDBY
-     PUNTO → LINEA → MOVIMENTO
-     ======================================================= */
-
-  const clearStandbyTimer = () => {
-
-    if (state.standbyTimer) {
-
-      window.clearTimeout(
-        state.standbyTimer
-      );
-
-      state.standbyTimer = null;
-
-    }
-
-  };
-
-
-  const enterStandby = () => {
-
-    if (
-      state.menuOpen ||
-      !dom.standby
-    ) {
-      return;
-    }
-
-
-    state.standby = true;
-
-
-    clearStandbyTimer();
-
-
-    dom.body.classList.add(
-      "is-standby"
-    );
-
-
-    dom.standby.classList.add(
-      "is-active"
-    );
-
-
-    dom.standby.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-
-    dom.standby.classList.toggle(
-      "is-reduced",
-      state.reducedMotion
-    );
-
-
-    dom.standbyWake?.focus({
-      preventScroll: true
-    });
-
-  };
-
-
-  const exitStandby = () => {
-
-    if (!state.standby) {
-      return;
-    }
-
-
-    state.standby = false;
-
-
-    dom.body.classList.remove(
-      "is-standby"
-    );
-
-
-    dom.standby?.classList.remove(
-      "is-active"
-    );
-
-
-    dom.standby?.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-
-
-    resetStandbyTimer();
-
-  };
-
-
-  const resetStandbyTimer = () => {
-
-    clearStandbyTimer();
-
-
-    if (
-      state.menuOpen ||
-      state.standby ||
-      document.hidden
-    ) {
-      return;
-    }
-
-
-    state.standbyTimer =
-      window.setTimeout(
-        enterStandby,
-        CONFIG.standbyDelay
-      );
-
-  };
-
-
-  const initStandby = () => {
-
-    if (!dom.standby) {
-      return;
-    }
-
-
-    dom.standbyWake?.addEventListener(
-      "click",
-      exitStandby
-    );
-
-
-    [
-      "pointermove",
-      "pointerdown",
-      "wheel",
-      "touchstart",
-      "touchmove",
-      "keydown",
-      "scroll"
-    ].forEach(
-      eventName => {
-
-        window.addEventListener(
-          eventName,
-          event => {
-
-            if (state.standby) {
-
-              if (
-                eventName === "keydown" &&
-                event.key === "Escape"
-              ) {
-                return;
-              }
-
-              exitStandby();
-
-              return;
-
-            }
-
-
-            resetStandbyTimer();
-
-          },
-          {
-            passive:
-              eventName !== "keydown"
-          }
-        );
-
-      }
-    );
-
-
-    document.addEventListener(
-      "visibilitychange",
-      () => {
-
-        if (document.hidden) {
-
-          clearStandbyTimer();
-
-        } else {
-
-          resetStandbyTimer();
-
-        }
-
-      }
-    );
-
-  };
-
-
-  /* =======================================================
-     HASH NAVIGATION
-     ======================================================= */
-
-  const initHashNavigation = () => {
-
-    const hash =
-      window.location.hash;
-
-
-    if (!hash) {
-      return;
-    }
-
-
-    const index =
-      dom.sections.findIndex(
-        section =>
-          `#${section.id}` ===
-          hash
-      );
-
-
-    if (index < 0) {
-      return;
-    }
-
-
-    window.setTimeout(
-      () =>
-        navigateToSection(index),
-      500
-    );
-
-  };
-
-
-  /* =======================================================
-     KEYBOARD NAVIGATION
-     ======================================================= */
-
-  const initKeyboardNavigation = () => {
-
-    document.addEventListener(
-      "keydown",
-      event => {
-
-        if (
-          state.menuOpen ||
-          state.standby
-        ) {
-          return;
-        }
-
-
-        if (
-          event.key !== "PageDown" &&
-          event.key !== "PageUp"
-        ) {
-          return;
-        }
-
-
-        event.preventDefault();
-
-
-        const direction =
-          event.key === "PageDown"
-            ? 1
-            : -1;
-
-
-        const nextIndex =
-          clamp(
-            state.activeIndex +
-            direction,
-            0,
-            dom.sections.length - 1
-          );
-
-
-        navigateToSection(
-          nextIndex
-        );
-
-      }
-    );
-
-  };
-
-
-  /* =======================================================
-     SCROLL
-     ======================================================= */
-
-  const handleScroll = () => {
-
-    detectActiveSection();
-
-    updateTrajectoryTargets();
-
-  };
-
-
-  /* =======================================================
-     RESIZE
-     ======================================================= */
-
-  const handleResize = () => {
-
-    window.clearTimeout(
-      state.resizeTimer
-    );
-
-
-    state.resizeTimer =
-      window.setTimeout(
-        () => {
-
-          detectActiveSection();
-
-          updateTrajectoryTargets();
-
-          updateWowHeader(
-            state.activeIndex
-          );
-
-        },
-        CONFIG.resizeDebounce
-      );
-
-  };
-
-
-  /* =======================================================
-     ANIMATION FRAME
-     ======================================================= */
-
-  const animationFrame = () => {
-
-    updateCursorFrame();
-
-    updateTrajectoryFrame();
-
-
-    state.rafId =
-      requestAnimationFrame(
-        animationFrame
-      );
-
-  };
-
-
-  /* =======================================================
-     INITIAL STATE
-     ======================================================= */
-
-  const setInitialState = () => {
-
-    if (!dom.sections.length) {
-      return;
-    }
-
-
-    state.activeIndex = 0;
-
-
-    updateWowHeader(0);
-
-    updateTrajectoryTargets();
-
-    resetStandbyTimer();
-
-  };
-
-
-  /* =======================================================
-     INIT
-     ======================================================= */
-
-  const init = () => {
-
-    initMotionPreference();
-
-    initLoader();
-
-    initPageTransitions();
-
-    initMenu();
-
-    initWowNavigation();
-
-    initRevealSystem();
-
-    initDirectionInteractions();
-
-    initNarrativeLinks();
-
-    initCursor();
-
-    initMagneticElements();
-
-    initStandby();
-
-    initHashNavigation();
-
-    initKeyboardNavigation();
-
-    setInitialState();
-
-    detectActiveSection();
-
-    updateTrajectoryTargets();
-
-
-    window.addEventListener(
-      "scroll",
-      handleScroll,
-      {
-        passive: true
-      }
-    );
-
-
-    window.addEventListener(
-      "resize",
-      handleResize,
-      {
-        passive: true
-      }
-    );
-
-
-    animationFrame();
-
-  };
-
-
-  if (
-    document.readyState ===
-    "loading"
-  ) {
-
-    document.addEventListener(
-      "DOMContentLoaded",
-      init,
-      {
-        once: true
-      }
-    );
-
-  } else {
-
-    init();
-
+.loader-line {
+  position: absolute;
+  left: 0;
+  top: 50%;
+
+  width: 100%;
+  height: 1px;
+
+  background: var(--ink);
+
+  transform-origin: left center;
+  transform: scaleX(0);
+
+  opacity: 0;
+
+  animation:
+    loaderLine
+    2.1s
+    var(--ease-out)
+    1.35s
+    forwards;
+}
+
+.loader-point {
+  position: absolute;
+  left: 0;
+  top: 50%;
+
+  width: 9px;
+  height: 9px;
+
+  border-radius: 50%;
+
+  background: var(--terracotta);
+
+  transform:
+    translate(-50%, -50%)
+    scale(0);
+
+  animation:
+    loaderPointAppear
+    .8s
+    var(--ease-out)
+    .15s
+    forwards;
+}
+
+.loader-motto {
+  display: flex;
+  align-items: center;
+  gap: .55em;
+
+  margin: 0;
+
+  color: var(--ink);
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .13em;
+  line-height: 1.4;
+
+  text-align: center;
+
+  opacity: 0;
+  transform: translateY(12px);
+
+  animation:
+    loaderMotto
+    1.1s
+    var(--ease-out)
+    3.25s
+    forwards;
+}
+
+.loader-signature {
+  margin: 22px 0 0;
+
+  color: var(--stone);
+
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .16em;
+  line-height: 1.2;
+
+  text-align: center;
+
+  opacity: 0;
+  transform: translateY(8px);
+
+  animation:
+    loaderSignature
+    .9s
+    var(--ease-out)
+    4.05s
+    forwards;
+}
+
+@keyframes loaderPointAppear {
+  0% {
+    opacity: 0;
+    transform:
+      translate(-50%, -50%)
+      scale(0);
   }
 
-})();
+  65% {
+    opacity: 1;
+    transform:
+      translate(-50%, -50%)
+      scale(1.15);
+  }
+
+  100% {
+    opacity: 1;
+    transform:
+      translate(-50%, -50%)
+      scale(1);
+  }
+}
+
+@keyframes loaderLine {
+  0% {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes loaderMotto {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes loaderSignature {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* =========================================================
+   PAGE TRANSITION
+   ========================================================= */
+
+.page-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 950;
+
+  background: var(--ink);
+
+  transform: translateY(100%);
+  pointer-events: none;
+
+  transition:
+    transform .7s var(--ease-in-out);
+}
+
+.page-transition.is-active {
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   CUSTOM CURSOR
+   ========================================================= */
+
+.custom-cursor {
+  position: fixed;
+  inset: 0;
+
+  z-index: 900;
+
+  pointer-events: none;
+
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+
+.custom-cursor.is-visible {
+  opacity: 1;
+}
+
+.custom-cursor-dot,
+.custom-cursor-ring {
+  position: fixed;
+
+  left: 0;
+  top: 0;
+
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+.custom-cursor-dot {
+  width: 6px;
+  height: 6px;
+
+  background: var(--terracotta);
+}
+
+.custom-cursor-ring {
+  width: 30px;
+  height: 30px;
+
+  border: 1px solid var(--stone);
+
+  transition:
+    width .35s var(--ease-out),
+    height .35s var(--ease-out),
+    border-color .25s ease;
+}
+
+.custom-cursor.is-hovering .custom-cursor-ring {
+  width: 48px;
+  height: 48px;
+  border-color: var(--terracotta);
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.site-header {
+  position: fixed;
+
+  top: 0;
+  left: 0;
+  right: 0;
+
+  z-index: 800;
+
+  height: var(--header-height);
+
+  display: grid;
+  grid-template-columns: 1fr minmax(280px, 560px) 1fr;
+  align-items: center;
+
+  padding:
+    0 clamp(20px, 4vw, 64px);
+
+  background: rgba(242, 239, 232, .92);
+
+  border-bottom: 1px solid rgba(17, 17, 15, .08);
+}
+
+.site-brand {
+  justify-self: start;
+
+  display: inline-flex;
+
+  transform:
+    translate(
+      var(--magnetic-x),
+      var(--magnetic-y)
+    );
+
+  transition:
+    transform .45s var(--ease-out);
+}
+
+.site-brand img {
+  width: 48px;
+  height: 48px;
+
+  object-fit: contain;
+}
+
+.menu-trigger {
+  justify-self: end;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+
+  min-height: 44px;
+  padding: 8px 0;
+
+  border: 0;
+  background: transparent;
+
+  color: var(--ink);
+
+  cursor: pointer;
+
+  transform:
+    translate(
+      var(--magnetic-x),
+      var(--magnetic-y)
+    );
+
+  transition:
+    color .25s ease,
+    transform .45s var(--ease-out);
+}
+
+.menu-trigger:hover,
+.menu-trigger:focus-visible {
+  color: var(--terracotta);
+}
+
+.menu-trigger-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .14em;
+}
+
+.menu-trigger-icon {
+  position: relative;
+
+  width: 28px;
+  height: 18px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+}
+
+.menu-trigger-icon span {
+  display: block;
+
+  width: 100%;
+  height: 1px;
+
+  background: currentColor;
+
+  transition:
+    transform .45s var(--ease-out);
+}
+
+body.is-menu-open .menu-trigger-icon span:first-child {
+  transform: translateY(3.5px) rotate(45deg);
+}
+
+body.is-menu-open .menu-trigger-icon span:last-child {
+  transform: translateY(-3.5px) rotate(-45deg);
+}
+
+
+/* =========================================================
+   WOW PROGRESS
+   ========================================================= */
+
+.wow-progress {
+  justify-self: center;
+
+  width: min(100%, 560px);
+}
+
+.progress-label {
+  margin-bottom: 12px;
+
+  color: var(--stone);
+
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .1em;
+  line-height: 1.2;
+
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.progress-track {
+  position: relative;
+
+  width: 100%;
+  height: 1px;
+
+  background: var(--sand);
+}
+
+.progress-fill {
+  position: absolute;
+
+  left: 0;
+  top: 0;
+
+  width: 0;
+  height: 100%;
+
+  background: var(--ink);
+}
+
+.progress-point {
+  position: absolute;
+
+  left: 0;
+  top: 50%;
+
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: var(--terracotta);
+
+  transform: translate(-50%, -50%);
+}
+
+.section-jump {
+  display: flex;
+  justify-content: space-between;
+
+  margin-top: 10px;
+}
+
+.section-jump-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  min-height: 28px;
+
+  color: var(--stone);
+
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .08em;
+
+  text-decoration: none;
+
+  transition:
+    color .25s ease,
+    transform .3s var(--ease-out);
+}
+
+.section-jump-link:hover,
+.section-jump-link:focus-visible {
+  color: var(--terracotta);
+}
+
+.section-jump-link--next:hover,
+.section-jump-link--next:focus-visible {
+  transform: translateX(3px);
+}
+
+.section-jump-link--previous:hover,
+.section-jump-link--previous:focus-visible {
+  transform: translateX(-3px);
+}
+
+.section-jump-link.is-disabled {
+  pointer-events: none;
+  opacity: 0;
+}
+
+
+/* =========================================================
+   MENU
+   ========================================================= */
+
+.site-menu {
+  position: fixed;
+  inset: 0;
+
+  z-index: 700;
+
+  background: var(--ink);
+  color: var(--ivory);
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transition:
+    opacity .55s var(--ease-out),
+    visibility 0s linear .55s;
+}
+
+.site-menu[aria-hidden="false"] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+
+  transition:
+    opacity .55s var(--ease-out),
+    visibility 0s linear 0s;
+}
+
+.site-menu-inner {
+  width: min(
+    calc(100% - 40px),
+    var(--content-max)
+  );
+
+  min-height: 100%;
+
+  margin: 0 auto;
+
+  display: flex;
+  align-items: center;
+}
+
+.site-menu-nav {
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap:
+    clamp(10px, 1.8vw, 24px)
+    clamp(24px, 6vw, 100px);
+}
+
+.site-menu-nav a {
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  align-items: baseline;
+
+  min-height: 52px;
+
+  color: var(--ivory);
+
+  font-family: var(--font-serif);
+  font-size: clamp(28px, 4vw, 62px);
+  line-height: .95;
+
+  text-decoration: none;
+
+  transition:
+    color .25s ease,
+    transform .45s var(--ease-out);
+}
+
+.site-menu-nav a:hover,
+.site-menu-nav a:focus-visible {
+  color: var(--terracotta);
+  transform: translateX(8px);
+}
+
+.site-menu-number {
+  color: var(--stone);
+
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .08em;
+}
+
+
+/* =========================================================
+   GENERAL SECTIONS
+   ========================================================= */
+
+.home-section {
+  position: relative;
+
+  min-height: 100svh;
+
+  display: flex;
+  align-items: center;
+
+  padding:
+    calc(var(--header-height) + clamp(56px, 9vw, 140px))
+    clamp(20px, 5vw, 80px)
+    clamp(80px, 10vw, 150px);
+}
+
+.section-inner {
+  width: min(
+    100%,
+    var(--content-max)
+  );
+
+  margin: 0 auto;
+}
+
+.section-inner--narrow {
+  width: min(
+    100%,
+    var(--narrow-copy)
+  );
+}
+
+.section-inner--split {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(320px, .9fr);
+
+  gap: clamp(60px, 10vw, 180px);
+
+  align-items: center;
+}
+
+.section-title {
+  margin-bottom: clamp(32px, 5vw, 72px);
+
+  color: var(--stone);
+
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: .12em;
+  line-height: 1.35;
+
+  text-transform: uppercase;
+}
+
+.editorial-copy {
+  width: min(100%, var(--copy-max));
+
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.editorial-copy--large {
+  font-size: clamp(18px, 1.5vw, 24px);
+  line-height: 1.7;
+}
+
+.editorial-copy p {
+  margin: 0 0 1.35em;
+}
+
+.editorial-copy p:last-child {
+  margin-bottom: 0;
+}
+
+.editorial-copy a,
+.territory-card a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: .18em;
+
+  transition:
+    color .25s ease,
+    text-decoration-color .25s ease;
+}
+
+.editorial-copy a:hover,
+.editorial-copy a:focus-visible,
+.territory-card a:hover,
+.territory-card a:focus-visible {
+  color: var(--terracotta);
+}
+
+.editorial-copy strong {
+  font-weight: 600;
+}
+
+.editorial-emphasis {
+  font-family: var(--font-serif);
+  font-size: 1.35em;
+  line-height: 1.2;
+}
+
+.editorial-sequence {
+  margin:
+    clamp(48px, 7vw, 96px)
+    0;
+
+  padding-left: clamp(24px, 5vw, 72px);
+
+  border-left: 1px solid var(--sand);
+}
+
+.editorial-sequence p {
+  margin-bottom: .45em;
+
+  color: var(--stone);
+
+  font-family: var(--font-serif);
+  font-size: clamp(24px, 3vw, 42px);
+  line-height: 1.05;
+}
+
+
+/* =========================================================
+   BACKGROUNDS
+   ========================================================= */
+
+.home-section--hero {
+  background: var(--ivory);
+}
+
+.home-section--question {
+  background: var(--white);
+}
+
+.home-section--directions {
+  background: #EAE5DC;
+}
+
+.home-section--network {
+  background: var(--ivory);
+}
+
+.home-section--pause {
+  background: #DDD6C9;
+}
+
+.home-section--territory {
+  background: var(--white);
+}
+
+.home-section--present {
+  background: #E8E2D8;
+}
+
+.home-section--possibility {
+  background: var(--ivory);
+}
+
+.home-section--question-for-you,
+.home-section--cta {
+  background: var(--ink);
+  color: var(--ivory);
+}
+
+.site-footer {
+  background: var(--ivory);
+  color: var(--ink);
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.section-inner--hero {
+  position: relative;
+
+  min-height: calc(100svh - var(--header-height));
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.hero-title {
+  margin: 0;
+
+  font-family: var(--font-serif);
+  font-size: clamp(76px, 13vw, 220px);
+  font-weight: 400;
+  letter-spacing: -.045em;
+  line-height: .76;
+}
+
+.hero-title-line {
+  display: block;
+}
+
+.hero-title-line--identity {
+  display: flex;
+  align-items: baseline;
+  gap: .04em;
+}
+
+.hero-title-word {
+  display: inline-block;
+}
+
+.identity-slash {
+  color: var(--terracotta);
+
+  font-family: var(--font-mono);
+  font-size: .28em;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.hero-intro {
+  margin-top: clamp(50px, 7vw, 96px);
+  max-width: 520px;
+}
+
+.hero-directions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+
+  margin-top: clamp(48px, 7vw, 92px);
+}
+
+.hero-direction {
+  position: relative;
+
+  color: var(--stone);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .08em;
+
+  text-decoration: none;
+
+  transition:
+    color .25s ease,
+    transform .4s var(--ease-out);
+}
+
+.hero-direction::after {
+  content: "";
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -5px;
+
+  height: 1px;
+
+  background: currentColor;
+
+  transform: scaleX(0);
+  transform-origin: left center;
+
+  transition:
+    transform .45s var(--ease-out);
+}
+
+.hero-direction:hover,
+.hero-direction:focus-visible,
+.hero-direction.is-active {
+  color: var(--terracotta);
+  transform: translateY(-2px);
+}
+
+.hero-direction:hover::after,
+.hero-direction:focus-visible::after,
+.hero-direction.is-active::after {
+  transform: scaleX(1);
+}
+
+.direction-trajectory {
+  position: relative;
+
+  width: 100%;
+  height: 130px;
+
+  margin-top: clamp(24px, 4vw, 50px);
+}
+
+.direction-trajectory-line {
+  position: absolute;
+
+  left: 3%;
+  right: 3%;
+  top: 50%;
+
+  height: 1px;
+
+  background: var(--sand);
+
+  transform:
+    translateY(var(--trajectory-drift))
+    rotate(-2deg);
+
+  transform-origin: left center;
+}
+
+.direction-node {
+  position: absolute;
+
+  width: 9px;
+  height: 9px;
+
+  border-radius: 50%;
+
+  background: var(--ink);
+
+  transform: translate(-50%, -50%);
+
+  transition:
+    background-color .3s ease,
+    transform .45s var(--ease-out),
+    box-shadow .35s ease;
+}
+
+.direction-node-label {
+  position: absolute;
+
+  left: 50%;
+  top: 17px;
+
+  white-space: nowrap;
+
+  color: var(--stone);
+
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: .08em;
+
+  transform: translateX(-50%);
+
+  transition: color .25s ease;
+}
+
+.direction-node.is-active,
+.direction-node.is-linked {
+  background: var(--terracotta);
+
+  transform:
+    translate(-50%, -50%)
+    scale(1.55);
+
+  box-shadow:
+    0 0 0 7px rgba(166, 66, 50, .08);
+}
+
+.direction-node.is-active .direction-node-label,
+.direction-node.is-linked .direction-node-label {
+  color: var(--terracotta);
+}
+
+
+/* =========================================================
+   FIVE DIRECTIONS
+   ========================================================= */
+
+.five-directions {
+  display: grid;
+
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+
+  gap: 12px;
+
+  margin:
+    clamp(56px, 8vw, 110px)
+    0;
+}
+
+.five-directions a {
+  display: block;
+
+  padding-top: 14px;
+
+  border-top: 1px solid var(--sand);
+
+  color: var(--stone);
+
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .08em;
+
+  text-decoration: none;
+
+  transition:
+    color .25s ease,
+    border-color .25s ease,
+    transform .4s var(--ease-out);
+}
+
+.five-directions a:hover,
+.five-directions a:focus-visible,
+.five-directions a.is-linked {
+  color: var(--terracotta);
+  border-color: var(--terracotta);
+  transform: translateY(-4px);
+}
+
+
+/* =========================================================
+   NETWORK
+   ========================================================= */
+
+.network-visual {
+  position: relative;
+  min-height: 480px;
+}
+
+.network-line {
+  position: absolute;
+
+  height: 1px;
+
+  background: var(--sand);
+
+  transform-origin: left center;
+}
+
+.network-line--a {
+  left: 16%;
+  top: 32%;
+  width: 62%;
+  transform: rotate(13deg);
+}
+
+.network-line--b {
+  left: 28%;
+  top: 58%;
+  width: 48%;
+  transform: rotate(-17deg);
+}
+
+.network-line--c {
+  left: 22%;
+  top: 35%;
+  width: 58%;
+  transform: rotate(29deg);
+}
+
+.network-line--d {
+  left: 35%;
+  top: 65%;
+  width: 43%;
+  transform: rotate(-30deg);
+}
+
+.network-line--e {
+  left: 12%;
+  top: 52%;
+  width: 71%;
+  transform: rotate(2deg);
+}
+
+.network-node {
+  position: absolute;
+
+  width: 14px;
+  height: 14px;
+
+  border-radius: 50%;
+
+  background: var(--ink);
+
+  transform: translate(-50%, -50%);
+
+  transition:
+    background-color .3s ease,
+    transform .45s var(--ease-out),
+    box-shadow .35s ease;
+}
+
+.network-node--sport {
+  left: 16%;
+  top: 32%;
+}
+
+.network-node--scienze-motorie {
+  left: 28%;
+  top: 58%;
+}
+
+.network-node--educazione {
+  left: 66%;
+  top: 35%;
+}
+
+.network-node--management {
+  left: 57%;
+  top: 68%;
+}
+
+.network-node--digitale {
+  left: 78%;
+  top: 48%;
+}
+
+.network-node.is-linked {
+  background: var(--terracotta);
+
+  transform:
+    translate(-50%, -50%)
+    scale(1.6);
+
+  box-shadow:
+    0 0 0 8px rgba(166, 66, 50, .08);
+}
+
+
+/* =========================================================
+   PAUSE
+   ========================================================= */
+
+.pause-trajectory {
+  position: relative;
+
+  width: 100%;
+  min-height: 360px;
+}
+
+.pause-trajectory-line {
+  position: absolute;
+
+  left: 8%;
+  right: 8%;
+  top: 50%;
+
+  height: 1px;
+
+  background: var(--stone);
+
+  transform:
+    translateY(var(--trajectory-drift))
+    rotate(-8deg);
+
+  transform-origin: left center;
+}
+
+.pause-trajectory-point {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width: 18px;
+  height: 18px;
+
+  border-radius: 50%;
+
+  background: var(--terracotta);
+
+  transform:
+    translate(-50%, -50%);
+
+  box-shadow:
+    0 0 0 12px rgba(166, 66, 50, .08);
+}
+
+
+/* =========================================================
+   TERRITORY
+   ========================================================= */
+
+.section-inner--territory {
+  display: grid;
+
+  grid-template-columns:
+    minmax(300px, .8fr)
+    minmax(420px, 1.2fr);
+
+  gap: clamp(50px, 8vw, 130px);
+
+  align-items: center;
+}
+
+.territory-location {
+  margin-bottom: 40px;
+}
+
+.territory-card-place {
+  display: inline-block;
+
+  margin-bottom: 8px;
+
+  color: var(--stone);
+
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  line-height: 1.1;
+
+  text-decoration: none;
+
+  transition:
+    color .25s ease,
+    letter-spacing .3s var(--ease-out);
+}
+
+.territory-card-place:hover,
+.territory-card-place:focus-visible {
+  color: var(--terracotta);
+  letter-spacing: .1em;
+}
+
+.territory-location-name {
+  display: block;
+
+  margin-top: 8px;
+
+  color: var(--stone);
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .12em;
+  line-height: 1.2;
+
+  text-transform: uppercase;
+}
+
+.territory-card {
+  max-width: 560px;
+}
+
+.territory-card-title {
+  display: block;
+
+  margin-bottom: 22px;
+
+  color: var(--ink);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .12em;
+}
+
+.territory-card p {
+  margin: 0 0 24px;
+
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.territory-card-note {
+  color: var(--stone);
+
+  font-family: var(--font-serif);
+  font-size: 24px !important;
+  line-height: 1.2 !important;
+}
+
+.territory-map {
+  position: relative;
+
+  min-height: 560px;
+
+  overflow: hidden;
+
+  background: var(--sand);
+}
+
+.territory-map iframe {
+  width: 100%;
+  height: 100%;
+
+  min-height: 560px;
+
+  border: 0;
+}
+
+
+/* =========================================================
+   PRESENT
+   ========================================================= */
+
+.section-inner--present {
+  align-items: start;
+}
+
+.present-portrait {
+  position: relative;
+
+  margin: 0;
+
+  overflow: hidden;
+
+  background: var(--sand);
+}
+
+.present-portrait img {
+  width: 100%;
+  height: auto;
+
+  aspect-ratio: 753 / 941;
+
+  object-fit: cover;
+
+  filter: saturate(.82) contrast(.96);
+}
+
+
+/* =========================================================
+   QUESTION FOR YOU
+   ========================================================= */
+
+.section-inner--question-for-you {
+  width: min(
+    100%,
+    var(--content-max)
+  );
+}
+
+.reader-question {
+  min-height: 50vh;
+
+  display: flex;
+  align-items: center;
+}
+
+.reader-question h2 {
+  margin: 0;
+
+  font-family: var(--font-serif);
+  font-size: clamp(82px, 16vw, 250px);
+  font-weight: 400;
+  letter-spacing: -.055em;
+  line-height: .78;
+}
+
+.reader-question h2 span {
+  display: block;
+
+  margin-left: clamp(8%, 15vw, 24%);
+
+  color: var(--terracotta);
+}
+
+
+/* =========================================================
+   FINAL CTA
+   ========================================================= */
+
+.section-inner--cta {
+  width: min(
+    100%,
+    1180px
+  );
+}
+
+.home-section--cta .section-title {
+  color: rgba(242, 239, 232, .48);
+}
+
+.home-section--cta .editorial-copy {
+  color: var(--ivory);
+}
+
+.cta-trajectory {
+  position: relative;
+
+  width: min(100%, 1080px);
+  min-height: 190px;
+
+  margin-top: 88px;
+}
+
+.cta-trajectory-line {
+  position: absolute;
+
+  left: 0;
+  right: 7%;
+  top: 42%;
+
+  height: 1px;
+
+  background: rgba(242, 239, 232, .38);
+
+  transform:
+    translateY(var(--trajectory-drift))
+    rotate(-3deg);
+
+  transform-origin: left center;
+
+  transition:
+    background-color .45s ease,
+    transform .7s var(--ease-out);
+}
+
+.cta-trajectory-point {
+  position: absolute;
+
+  right: 6.5%;
+  top: 42%;
+
+  width: 14px;
+  height: 14px;
+
+  border-radius: 50%;
+
+  background: var(--terracotta);
+
+  transform:
+    translate(50%, -50%);
+
+  transition:
+    transform .55s var(--ease-out),
+    box-shadow .45s ease;
+}
+
+.contact-cta {
+  position: absolute;
+
+  right: 0;
+  top: calc(42% + 48px);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+
+  min-height: 52px;
+  padding: 8px 0;
+
+  color: var(--ivory);
+
+  font-family: var(--font-mono);
+  font-size: clamp(13px, 1.15vw, 16px);
+  font-weight: 500;
+  letter-spacing: .035em;
+  line-height: 1.3;
+
+  text-decoration: none;
+
+  transform:
+    translate(
+      var(--magnetic-x),
+      var(--magnetic-y)
+    );
+
+  transition:
+    color .3s ease,
+    gap .45s var(--ease-out);
+}
+
+.contact-cta::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 1px;
+
+  background: currentColor;
+
+  transform: scaleX(.35);
+  transform-origin: left center;
+
+  transition:
+    transform .5s var(--ease-out);
+}
+
+.contact-cta span:last-child {
+  display: inline-block;
+
+  font-size: 1.35em;
+  line-height: 1;
+
+  transition:
+    transform .45s var(--ease-out);
+}
+
+.contact-cta:hover,
+.contact-cta:focus-visible,
+.cta-trajectory.is-engaged .contact-cta {
+  color: var(--terracotta);
+  gap: 24px;
+}
+
+.contact-cta:hover::after,
+.contact-cta:focus-visible::after,
+.cta-trajectory.is-engaged .contact-cta::after {
+  transform: scaleX(1);
+}
+
+.contact-cta:hover span:last-child,
+.contact-cta:focus-visible span:last-child,
+.cta-trajectory.is-engaged .contact-cta span:last-child {
+  transform: translateX(6px);
+}
+
+.cta-trajectory.is-engaged .cta-trajectory-point {
+  transform:
+    translate(50%, -50%)
+    scale(1.65);
+
+  box-shadow:
+    0 0 0 8px rgba(166, 66, 50, .08);
+}
+
+.cta-trajectory.is-engaged .cta-trajectory-line {
+  background: var(--terracotta);
+
+  transform:
+    translateY(var(--trajectory-drift))
+    rotate(-3deg)
+    scaleX(1.015);
+}
+
+.home-section--cta .cta-trajectory-line {
+  background: rgba(242, 239, 232, .38);
+}
+
+
+/* =========================================================
+   REVEAL
+   ========================================================= */
+
+.reveal {
+  opacity: 0;
+
+  transform: translateY(30px);
+
+  transition:
+    opacity .9s var(--ease-out),
+    transform .9s var(--ease-out);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   STANDBY
+   ========================================================= */
+
+.standby-screen {
+  position: fixed;
+  inset: 0;
+
+  z-index: 850;
+
+  display: grid;
+  place-items: center;
+
+  background: var(--ivory);
+  color: var(--ink);
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transition:
+    opacity .75s var(--ease-out),
+    visibility 0s linear .75s;
+}
+
+.standby-screen.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+
+  transition:
+    opacity .75s var(--ease-out),
+    visibility 0s linear 0s;
+}
+
+.standby-atmosphere {
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+}
+
+.standby-path {
+  position: absolute;
+
+  left: 10%;
+  right: 10%;
+  top: 50%;
+
+  height: 1px;
+
+  background: var(--sand);
+
+  transform: rotate(-4deg);
+}
+
+.standby-point {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width: 12px;
+  height: 12px;
+
+  border-radius: 50%;
+
+  background: var(--terracotta);
+
+  transform: translate(-50%, -50%);
+
+  box-shadow:
+    0 0 0 10px rgba(166, 66, 50, .07);
+}
+
+.standby-center {
+  position: relative;
+  z-index: 1;
+}
+
+.standby-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.standby-label {
+  display: block;
+
+  color: var(--ink);
+
+  font-family: var(--font-serif);
+  font-size: clamp(38px, 6vw, 72px);
+  line-height: .95;
+}
+
+.standby-wake {
+  position: relative;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 120px;
+  min-height: 52px;
+
+  margin-top: 30px;
+  padding: 8px 20px;
+
+  border: 0;
+  background: transparent;
+
+  color: var(--terracotta);
+
+  font: inherit;
+
+  cursor: pointer;
+}
+
+.standby-touch {
+  position: relative;
+
+  display: inline-block;
+
+  padding-bottom: 7px;
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .16em;
+}
+
+.standby-touch::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 1px;
+
+  background: currentColor;
+
+  transform: scaleX(.35);
+  transform-origin: center;
+
+  transition: transform .45s var(--ease-out);
+}
+
+.standby-wake:hover .standby-touch::after,
+.standby-wake:focus-visible .standby-touch::after {
+  transform: scaleX(1);
+}
+
+.standby-wake:focus-visible {
+  outline: 1px solid var(--terracotta);
+  outline-offset: 8px;
+}
+
+.standby-signature {
+  display: block;
+
+  margin-top: 28px;
+
+  color: var(--stone);
+
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .16em;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.site-footer {
+  min-height: 360px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding:
+    80px 24px;
+}
+
+.footer-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  text-align: center;
+}
+
+.footer-mark img {
+  width: 72px;
+  height: 72px;
+
+  object-fit: contain;
+}
+
+.footer-motto {
+  display: flex;
+  align-items: center;
+  gap: .55em;
+
+  margin: 32px 0 0;
+
+  color: var(--ink);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .12em;
+}
+
+.footer-signature {
+  margin: 18px 0 0;
+
+  color: var(--stone);
+
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .16em;
+}
+
+
+/* =========================================================
+   RESPONSIVE — 1280
+   ========================================================= */
+
+@media (max-width: 1280px) {
+
+  :root {
+    --header-height: 92px;
+  }
+
+  .site-header {
+    grid-template-columns: 1fr minmax(240px, 440px) 1fr;
+  }
+
+  .hero-title {
+    font-size: clamp(72px, 13vw, 170px);
+  }
+
+  .network-visual {
+    min-height: 420px;
+  }
+
+  .territory-map,
+  .territory-map iframe {
+    min-height: 480px;
+  }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — 820
+   ========================================================= */
+
+@media (max-width: 820px) {
+
+  :root {
+    --header-height: 76px;
+  }
+
+  .site-header {
+    grid-template-columns: auto 1fr auto;
+    padding: 0 20px;
+  }
+
+  .site-brand img {
+    width: 38px;
+    height: 38px;
+  }
+
+  .wow-progress {
+    width: min(100%, 280px);
+  }
+
+  .progress-label {
+    font-size: 8px;
+  }
+
+  .site-menu-nav {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .site-menu-nav a {
+    font-size: clamp(32px, 9vw, 56px);
+  }
+
+  .home-section {
+    min-height: auto;
+
+    padding:
+      calc(var(--header-height) + 72px)
+      20px
+      100px;
+  }
+
+  .section-inner--hero {
+    min-height:
+      calc(100svh - var(--header-height));
+  }
+
+  .hero-title {
+    font-size: clamp(62px, 16vw, 118px);
+  }
+
+  .hero-directions {
+    gap: 12px 20px;
+  }
+
+  .direction-trajectory {
+    height: 100px;
+  }
+
+  .direction-node-label {
+    font-size: 7px;
+  }
+
+  .section-inner--split,
+  .section-inner--territory {
+    grid-template-columns: 1fr;
+    gap: 64px;
+  }
+
+  .network-visual {
+    min-height: 360px;
+  }
+
+  .five-directions {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 18px 14px;
+  }
+
+  .territory-map,
+  .territory-map iframe {
+    min-height: 420px;
+  }
+
+  .reader-question h2 {
+    font-size: clamp(72px, 18vw, 150px);
+  }
+
+  .cta-trajectory {
+    min-height: 170px;
+    margin-top: 64px;
+  }
+
+  .cta-trajectory-line {
+    right: 9%;
+    top: 38%;
+  }
+
+  .cta-trajectory-point {
+    right: 8.5%;
+    top: 38%;
+  }
+
+  .contact-cta {
+    right: 0;
+    top: calc(38% + 42px);
+
+    max-width: 88%;
+
+    font-size: 12px;
+  }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — 420
+   ========================================================= */
+
+@media (max-width: 420px) {
+
+  .site-header {
+    padding: 0 16px;
+  }
+
+  .wow-progress {
+    display: none;
+  }
+
+  .hero-title {
+    font-size: clamp(56px, 17vw, 82px);
+    line-height: .8;
+  }
+
+  .hero-directions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 13px;
+  }
+
+  .direction-trajectory {
+    height: 90px;
+  }
+
+  .direction-node-label {
+    display: none;
+  }
+
+  .five-directions {
+    grid-template-columns: 1fr;
+  }
+
+  .network-visual {
+    min-height: 300px;
+  }
+
+  .territory-map,
+  .territory-map iframe {
+    min-height: 340px;
+  }
+
+  .territory-card-note {
+    font-size: 21px !important;
+  }
+
+  .reader-question {
+    min-height: 45vh;
+  }
+
+  .reader-question h2 {
+    font-size: clamp(60px, 20vw, 100px);
+  }
+
+  .cta-trajectory {
+    min-height: 190px;
+    margin-top: 54px;
+  }
+
+  .cta-trajectory-line {
+    right: 13%;
+  }
+
+  .cta-trajectory-point {
+    right: 12.5%;
+  }
+
+  .contact-cta {
+    right: 0;
+    top: calc(38% + 38px);
+
+    max-width: 94%;
+
+    align-items: flex-start;
+    gap: 12px;
+
+    font-size: 11px;
+  }
+
+  .page-loader-inner {
+    width: min(88vw, 720px);
+    min-height: 210px;
+  }
+
+  .loader-trajectory {
+    width: min(280px, 72vw);
+    margin-bottom: 38px;
+  }
+
+  .loader-motto {
+    font-size: 10px;
+    letter-spacing: .1em;
+  }
+
+  .loader-signature {
+    margin-top: 18px;
+    font-size: 8px;
+  }
+
+}
+
+
+/* =========================================================
+   COARSE POINTER
+   ========================================================= */
+
+@media (pointer: coarse) {
+
+  .custom-cursor {
+    display: none;
+  }
+
+  .contact-cta,
+  .site-brand,
+  .menu-trigger {
+    transform: none;
+  }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+}
+
+.reduced-motion .page-loader .loader-point,
+.reduced-motion .page-loader .loader-line,
+.reduced-motion .page-loader .loader-motto,
+.reduced-motion .page-loader .loader-signature {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+
+.reduced-motion .page-loader .loader-point {
+  transform: translate(-50%, -50%);
+}
+
+.reduced-motion .page-loader .loader-line {
+  transform: scaleX(1);
+}
+
+.reduced-motion .reveal {
+  opacity: 1;
+  transform: none;
+}
+
+.reduced-motion .contact-cta,
+.reduced-motion .site-brand,
+.reduced-motion .menu-trigger {
+  transform: none;
+}
+
+
+/* =========================================================
+   PRINT
+   ========================================================= */
+
+@media print {
+
+  .page-loader,
+  .page-transition,
+  .custom-cursor,
+  .site-header,
+  .site-menu,
+  .standby-screen {
+    display: none !important;
+  }
+
+  body {
+    overflow: visible;
+    background: white;
+    color: black;
+  }
+
+  .home-section {
+    min-height: auto;
+    padding: 40px 0;
+    break-inside: avoid;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+}
