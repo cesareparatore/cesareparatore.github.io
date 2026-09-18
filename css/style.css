@@ -1251,7 +1251,19 @@ main {
   font-size: 10px;
   letter-spacing: .08em;
 }
+.territory-location-name {
+  display: block;
 
+  margin-top: 8px;
+
+  color: var(--stone);
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .12em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
 .territory-card-title {
   display: block;
 
