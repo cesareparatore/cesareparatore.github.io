@@ -23,7 +23,11 @@
     href="https://www.cesareparatore.it/"
   >
 
-  <link rel="icon" href="/assets/images/cp-mark.png">
+  <link
+    rel="icon"
+    type="image/png"
+    href="/assets/images/cp-mark.png"
+  >
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,6 +36,9 @@
     href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap"
     rel="stylesheet"
   >
+
+  <!-- SITE CSS -->
+  <link rel="stylesheet" href="/style.css">
 
   <script type="application/ld+json">
   {
@@ -57,6 +64,10 @@
 
 <body>
 
+  <!-- =====================================================
+       LOADER
+       ===================================================== -->
+
   <div class="page-loader" aria-hidden="true">
     <div class="page-loader-inner">
       <img
@@ -68,12 +79,27 @@
     </div>
   </div>
 
+
+  <!-- =====================================================
+       PAGE TRANSITION
+       ===================================================== -->
+
   <div class="page-transition" aria-hidden="true"></div>
+
+
+  <!-- =====================================================
+       CUSTOM CURSOR
+       ===================================================== -->
 
   <div class="custom-cursor" aria-hidden="true">
     <span class="custom-cursor-dot"></span>
     <span class="custom-cursor-ring"></span>
   </div>
+
+
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
 
   <header class="site-header">
 
@@ -90,7 +116,11 @@
       >
     </a>
 
-    <div class="wow-progress" aria-label="Navigazione del percorso">
+
+    <div
+      class="wow-progress"
+      aria-label="Navigazione del percorso"
+    >
 
       <div
         class="progress-label"
@@ -100,7 +130,11 @@
         IL MOVIMENTO È SOLO L'INIZIO.
       </div>
 
-      <div class="progress-track" aria-hidden="true">
+      <div
+        class="progress-track"
+        aria-hidden="true"
+      >
+
         <span
           class="progress-fill"
           id="progress-fill"
@@ -110,6 +144,7 @@
           class="progress-point"
           id="progress-point"
         ></span>
+
       </div>
 
       <div class="section-jump">
@@ -122,13 +157,16 @@
           aria-hidden="true"
           tabindex="-1"
         >
+
           <span
             class="section-jump-arrow"
             aria-hidden="true"
           >←</span>
 
           <span id="previous-section-label"></span>
+
         </a>
+
 
         <a
           id="next-section"
@@ -136,16 +174,20 @@
           href="#02"
           aria-label="Vai alla sezione 02"
         >
+
           <span id="next-section-label">02</span>
 
           <span
             class="section-jump-arrow"
             aria-hidden="true"
           >→</span>
+
         </a>
 
       </div>
+
     </div>
+
 
     <button
       class="menu-trigger"
@@ -154,15 +196,27 @@
       aria-controls="site-menu"
       aria-label="Apri menu"
     >
-      <span class="menu-trigger-label">MENU</span>
-      <span class="menu-trigger-icon" aria-hidden="true">
+
+      <span class="menu-trigger-label">
+        MENU
+      </span>
+
+      <span
+        class="menu-trigger-icon"
+        aria-hidden="true"
+      >
         <span></span>
         <span></span>
       </span>
+
     </button>
 
   </header>
 
+
+  <!-- =====================================================
+       MENU
+       ===================================================== -->
 
   <aside
     class="site-menu"
@@ -224,6 +278,10 @@
   </aside>
 
 
+  <!-- =====================================================
+       MAIN
+       ===================================================== -->
+
   <main id="main-content">
 
 
@@ -243,6 +301,7 @@
           IL MOVIMENTO È SOLO L'INIZIO.
         </div>
 
+
         <h1 class="hero-title reveal">
 
           <span class="hero-title-line hero-title-line--identity">
@@ -258,17 +317,21 @@
 
           </span>
 
+
           <span class="hero-title-line">
             CON DIREZIONE.
           </span>
 
         </h1>
 
+
         <div class="hero-intro editorial-copy reveal">
+
           <p>
             Tutto è iniziato da una domanda:
             dove può portarti il movimento?
           </p>
+
         </div>
 
 
@@ -324,6 +387,7 @@
 
           <span class="direction-trajectory-line"></span>
 
+
           <span
             class="direction-node"
             data-direction="sport"
@@ -333,6 +397,7 @@
               SPORT
             </span>
           </span>
+
 
           <span
             class="direction-node"
@@ -344,6 +409,7 @@
             </span>
           </span>
 
+
           <span
             class="direction-node"
             data-direction="educazione"
@@ -354,6 +420,7 @@
             </span>
           </span>
 
+
           <span
             class="direction-node"
             data-direction="management"
@@ -363,6 +430,7 @@
               MANAGEMENT
             </span>
           </span>
+
 
           <span
             class="direction-node"
@@ -397,6 +465,7 @@
           LA DOMANDA È CAMBIATA.
         </div>
 
+
         <div class="editorial-copy editorial-copy--large reveal">
 
           <p>
@@ -413,12 +482,19 @@
             Poi come tecnico.
           </p>
 
-          <div class="editorial-sequence" aria-label="Le tappe della pratica">
+
+          <div
+            class="editorial-sequence"
+            aria-label="Le tappe della pratica"
+          >
+
             <p>La pratica.</p>
             <p>L’allenamento.</p>
             <p>La fatica.</p>
             <p>Il confronto con il limite.</p>
+
           </div>
+
 
           <p>
             Prima ancora di studiare il movimento,
@@ -485,6 +561,7 @@
           UNA STRADA NON ERA ABBASTANZA.
         </div>
 
+
         <div class="editorial-copy editorial-copy--large reveal">
 
           <p>
@@ -516,29 +593,51 @@
 
         </div>
 
+
         <div class="five-directions reveal">
 
-          <a href="/sport/" class="narrative-link" data-trajectory-node="sport">
+          <a
+            href="/sport/"
+            class="narrative-link"
+            data-trajectory-node="sport"
+          >
             SPORT
           </a>
 
-          <a href="/scienze-motorie/" class="narrative-link" data-trajectory-node="scienze-motorie">
+          <a
+            href="/scienze-motorie/"
+            class="narrative-link"
+            data-trajectory-node="scienze-motorie"
+          >
             SCIENZE MOTORIE
           </a>
 
-          <a href="/educazione/" class="narrative-link" data-trajectory-node="educazione">
+          <a
+            href="/educazione/"
+            class="narrative-link"
+            data-trajectory-node="educazione"
+          >
             EDUCAZIONE
           </a>
 
-          <a href="/management-dello-sport/" class="narrative-link" data-trajectory-node="management">
+          <a
+            href="/management-dello-sport/"
+            class="narrative-link"
+            data-trajectory-node="management"
+          >
             MANAGEMENT
           </a>
 
-          <a href="/presenza-web/" class="narrative-link" data-trajectory-node="digitale">
+          <a
+            href="/presenza-web/"
+            class="narrative-link"
+            data-trajectory-node="digitale"
+          >
             DIGITALE
           </a>
 
         </div>
+
 
         <div class="editorial-copy editorial-copy--large reveal">
 
@@ -572,6 +671,7 @@
           <div class="section-title reveal">
             POI HO CAPITO CHE NON ERANO CINQUE STRADE.
           </div>
+
 
           <div class="editorial-copy editorial-copy--large reveal">
 
@@ -619,6 +719,7 @@
           <span class="network-line network-line--c"></span>
           <span class="network-line network-line--d"></span>
           <span class="network-line network-line--e"></span>
+
 
           <span
             class="network-node network-node--sport"
@@ -670,6 +771,7 @@
             E LE CONNESSIONI, A VOLTE, PASSANO ANCHE DA UNA PAUSA.
           </div>
 
+
           <div class="editorial-copy editorial-copy--large reveal">
 
             <p>
@@ -704,8 +806,10 @@
           class="pause-trajectory"
           aria-hidden="true"
         >
+
           <span class="pause-trajectory-line"></span>
           <span class="pause-trajectory-point"></span>
+
         </div>
 
       </div>
@@ -731,6 +835,7 @@
             OGGI SO ANCHE DA DOVE PARTO.
           </div>
 
+
           <div class="editorial-copy editorial-copy--large reveal">
 
             <p>
@@ -738,6 +843,7 @@
             </p>
 
           </div>
+
 
           <div class="territory-card reveal">
 
@@ -811,6 +917,7 @@
           <div class="section-title reveal">
             DA QUI, IL PERCORSO CONTINUA.
           </div>
+
 
           <div class="editorial-copy editorial-copy--large reveal">
 
@@ -905,6 +1012,7 @@
           NON È UN PUNTO DI ARRIVO.
         </div>
 
+
         <div class="editorial-copy editorial-copy--large reveal">
 
           <p>
@@ -957,6 +1065,7 @@
           FORSE È QUI CHE LA STORIA CAMBIA.
         </div>
 
+
         <div class="reader-question reveal">
 
           <span class="reader-question-label">
@@ -990,6 +1099,7 @@
         <div class="section-title reveal">
           PARTIAMO DA QUELLO.
         </div>
+
 
         <div class="editorial-copy editorial-copy--large reveal">
 
@@ -1052,9 +1162,9 @@
   </main>
 
 
-  <!-- =======================================================
+  <!-- =====================================================
        STANDBY — PAUSA NARRATIVA
-       ======================================================= -->
+       ===================================================== -->
 
   <div
     class="standby-screen"
@@ -1069,6 +1179,7 @@
       <span class="standby-point"></span>
     </div>
 
+
     <div class="standby-center">
 
       <img
@@ -1078,6 +1189,7 @@
         width="72"
         height="72"
       >
+
 
       <div class="standby-copy">
 
@@ -1091,6 +1203,7 @@
 
       </div>
 
+
       <button
         class="standby-wake"
         type="button"
@@ -1103,11 +1216,16 @@
   </div>
 
 
+  <!-- =====================================================
+       FOOTER
+       ===================================================== -->
+
   <footer class="site-footer">
 
     <div class="footer-inner">
 
       <div class="footer-mark">
+
         <img
           src="/assets/images/cp-mark.png"
           alt="Cesare Paratore"
@@ -1115,7 +1233,9 @@
           height="96"
           loading="lazy"
         >
+
       </div>
+
 
       <p class="footer-motto">
 
@@ -1127,6 +1247,7 @@
 
       </p>
 
+
       <p class="footer-signature">
         CESARE PARATORE
       </p>
@@ -1135,6 +1256,10 @@
 
   </footer>
 
+
+  <!-- =====================================================
+       SITE JS
+       ===================================================== -->
 
   <script src="/script.js" defer></script>
 
