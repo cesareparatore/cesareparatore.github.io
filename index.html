@@ -37,7 +37,6 @@
     rel="stylesheet"
   >
 
-  <!-- SITE CSS -->
   <link rel="stylesheet" href="/css/style.css">
 
   <script type="application/ld+json">
@@ -65,18 +64,36 @@
 <body>
 
   <!-- =====================================================
-       LOADER
+       EDITORIAL LOADER
+       PUNTO → LINEA → DIREZIONE
        ===================================================== -->
 
   <div class="page-loader" aria-hidden="true">
+
     <div class="page-loader-inner">
-      <img
-        src="/assets/images/cp-mark.png"
-        alt=""
-        width="64"
-        height="64"
-      >
+
+      <div class="loader-mark">
+        <img
+          src="/assets/images/cp-mark.png"
+          alt=""
+          width="64"
+          height="64"
+        >
+      </div>
+
+      <div class="loader-trajectory" aria-hidden="true">
+        <span class="loader-point"></span>
+        <span class="loader-line"></span>
+      </div>
+
+      <p class="loader-motto">
+        <span>MOVIMENTO</span>
+        <span aria-hidden="true">/</span>
+        <span>CON DIREZIONE.</span>
+      </p>
+
     </div>
+
   </div>
 
 
@@ -134,7 +151,6 @@
         class="progress-track"
         aria-hidden="true"
       >
-
         <span
           class="progress-fill"
           id="progress-fill"
@@ -144,7 +160,6 @@
           class="progress-point"
           id="progress-point"
         ></span>
-
       </div>
 
       <div class="section-jump">
@@ -157,14 +172,12 @@
           aria-hidden="true"
           tabindex="-1"
         >
-
           <span
             class="section-jump-arrow"
             aria-hidden="true"
           >←</span>
 
           <span id="previous-section-label"></span>
-
         </a>
 
 
@@ -174,14 +187,12 @@
           href="#02"
           aria-label="Vai alla sezione 02"
         >
-
           <span id="next-section-label">02</span>
 
           <span
             class="section-jump-arrow"
             aria-hidden="true"
           >→</span>
-
         </a>
 
       </div>
@@ -196,10 +207,7 @@
       aria-controls="site-menu"
       aria-label="Apri menu"
     >
-
-      <span class="menu-trigger-label">
-        MENU
-      </span>
+      <span class="menu-trigger-label">MENU</span>
 
       <span
         class="menu-trigger-icon"
@@ -208,7 +216,6 @@
         <span></span>
         <span></span>
       </span>
-
     </button>
 
   </header>
@@ -305,18 +312,13 @@
         <h1 class="hero-title reveal">
 
           <span class="hero-title-line hero-title-line--identity">
-
-            <span class="hero-title-word">
-              MOVIMENTO
-            </span>
+            <span class="hero-title-word">MOVIMENTO</span>
 
             <span
               class="identity-slash"
               aria-hidden="true"
             >/</span>
-
           </span>
-
 
           <span class="hero-title-line">
             CON DIREZIONE.
@@ -326,12 +328,10 @@
 
 
         <div class="hero-intro editorial-copy reveal">
-
           <p>
             Tutto è iniziato da una domanda:
             dove può portarti il movimento?
           </p>
-
         </div>
 
 
@@ -393,9 +393,7 @@
             data-direction="sport"
             style="left: 8%; top: 54%;"
           >
-            <span class="direction-node-label">
-              SPORT
-            </span>
+            <span class="direction-node-label">SPORT</span>
           </span>
 
 
@@ -474,7 +472,11 @@
 
           <p>
             Poi è arrivato
-            <a class="narrative-link" href="/sport/">lo sport</a>.
+            <a
+              class="narrative-link"
+              href="/sport/"
+              data-trajectory-node="sport"
+            >lo sport</a>.
           </p>
 
           <p>
@@ -488,12 +490,10 @@
             class="editorial-sequence"
             aria-label="Le tappe della pratica"
           >
-
             <p>La pratica.</p>
             <p>L’allenamento.</p>
             <p>La fatica.</p>
             <p>Il confronto con il limite.</p>
-
           </div>
 
 
@@ -509,9 +509,11 @@
 
           <p>
             Le
-            <a class="narrative-link" href="/scienze-motorie/">
-              Scienze Motorie
-            </a>
+            <a
+              class="narrative-link"
+              href="/scienze-motorie/"
+              data-trajectory-node="scienze-motorie"
+            >Scienze Motorie</a>
             sono arrivate anche da qui:
             dal desiderio di comprendere ciò che stavo vivendo.
           </p>
@@ -571,29 +573,44 @@
 
           <p>
             Ho incontrato
-            <a class="narrative-link" href="/educazione/">l'educazione</a>.
+            <a
+              class="narrative-link"
+              href="/educazione/"
+              data-trajectory-node="educazione"
+            >l'educazione</a>.
             Per capire cosa succede quando ciò che hai imparato
             diventa esperienza per qualcun altro.
           </p>
 
           <p>
             Ho incontrato
-            <a class="narrative-link" href="/management-dello-sport/">
-              il management
-            </a>.
+            <a
+              class="narrative-link"
+              href="/management-dello-sport/"
+              data-trajectory-node="management"
+            >il management</a>.
             Per capire cosa succede quando un'idea
             deve diventare organizzazione, progetto, realtà.
           </p>
 
           <p>
             Ho incontrato
-            <a class="narrative-link" href="/digitale/">il digitale</a>.
+            <a
+              class="narrative-link"
+              href="/digitale/"
+              data-trajectory-node="digitale"
+            >il digitale</a>.
             Per capire come strumenti e connessioni
             possano aprire nuove possibilità.
           </p>
 
           <p>
-            E sono tornato allo sport.
+            E sono tornato allo
+            <a
+              class="narrative-link"
+              href="/sport/"
+              data-trajectory-node="sport"
+            >sport</a>.
             Con occhi diversi.
           </p>
 
@@ -690,24 +707,36 @@
             </p>
 
             <p>
-              <a class="narrative-link" href="/sport/">Lo sport</a>
+              <a
+                class="narrative-link"
+                href="/sport/"
+                data-trajectory-node="sport"
+              >Lo sport</a>
               mi ha insegnato a misurarmi.
               Le
-              <a class="narrative-link" href="/scienze-motorie/">
-                Scienze Motorie
-              </a>
+              <a
+                class="narrative-link"
+                href="/scienze-motorie/"
+                data-trajectory-node="scienze-motorie"
+              >Scienze Motorie</a>
               mi hanno insegnato a comprendere.
-              <a class="narrative-link" href="/educazione/">
-                L'educazione
-              </a>
+              <a
+                class="narrative-link"
+                href="/educazione/"
+                data-trajectory-node="educazione"
+              >L'educazione</a>
               mi ha insegnato a trasferire.
-              <a class="narrative-link" href="/management-dello-sport/">
-                Il management
-              </a>
+              <a
+                class="narrative-link"
+                href="/management-dello-sport/"
+                data-trajectory-node="management"
+              >Il management</a>
               mi ha insegnato a progettare.
-              <a class="narrative-link" href="/digitale/">
-                Il digitale
-              </a>
+              <a
+                class="narrative-link"
+                href="/digitale/"
+                data-trajectory-node="digitale"
+              >Il digitale</a>
               mi ha insegnato a connettere.
             </p>
 
@@ -830,10 +859,8 @@
           class="pause-trajectory"
           aria-hidden="true"
         >
-
           <span class="pause-trajectory-line"></span>
           <span class="pause-trajectory-point"></span>
-
         </div>
 
       </div>
@@ -941,43 +968,55 @@
 
             <p>
               <strong>
-                <a class="narrative-link" href="/sport/">Sport.</a>
+                <a
+                  class="narrative-link"
+                  href="/sport/"
+                  data-trajectory-node="sport"
+                >Sport.</a>
               </strong><br>
               Il punto da cui è iniziato tutto.
             </p>
 
             <p>
               <strong>
-                <a class="narrative-link" href="/scienze-motorie/">
-                  Scienze Motorie.
-                </a>
+                <a
+                  class="narrative-link"
+                  href="/scienze-motorie/"
+                  data-trajectory-node="scienze-motorie"
+                >Scienze Motorie.</a>
               </strong><br>
               Il modo di comprendere ciò che accade nel movimento.
             </p>
 
             <p>
               <strong>
-                <a class="narrative-link" href="/educazione/">
-                  Educazione.
-                </a>
+                <a
+                  class="narrative-link"
+                  href="/educazione/"
+                  data-trajectory-node="educazione"
+                >Educazione.</a>
               </strong><br>
               Il passaggio dalla propria esperienza a quella degli altri.
             </p>
 
             <p>
               <strong>
-                <a class="narrative-link" href="/management-dello-sport/">
-                  Management.
-                </a>
+                <a
+                  class="narrative-link"
+                  href="/management-dello-sport/"
+                  data-trajectory-node="management"
+                >Management.</a>
               </strong><br>
               Il modo di trasformare idee e competenze in progetti.
             </p>
 
             <p>
               <strong>
-                <a class="narrative-link" href="/digitale/">
-                  Digitale.
-                </a>
+                <a
+                  class="narrative-link"
+                  href="/digitale/"
+                  data-trajectory-node="digitale"
+                >Digitale.</a>
               </strong><br>
               Uno spazio per connettere, costruire e aprire nuove possibilità.
             </p>
@@ -1099,10 +1138,6 @@
 
 
         <div class="reader-question reveal">
-
-          <span class="reader-question-label">
-            FORSE È QUI CHE LA STORIA CAMBIA.
-          </span>
 
           <h2>
             DA DOVE
@@ -1270,13 +1305,9 @@
 
 
       <p class="footer-motto">
-
         <span>MOVIMENTO</span>
-
         <span aria-hidden="true">/</span>
-
         <span>CON DIREZIONE.</span>
-
       </p>
 
 
@@ -1288,10 +1319,6 @@
 
   </footer>
 
-
-  <!-- =====================================================
-       SITE JS
-       ===================================================== -->
 
   <script src="/script.js" defer></script>
 
