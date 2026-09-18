@@ -41,11 +41,13 @@
 
     resizeTimer: null,
     standbyTimer: null,
+    loaderTimer: null,
     rafId: null,
 
     reducedMotion: false,
 
     standbyReturnFocus: null,
+    standbyUnderlying: [],
 
     pointer: {
       targetX: window.innerWidth / 2,
@@ -88,6 +90,12 @@
 
     header:
       document.querySelector(".site-header"),
+
+    main:
+      document.querySelector("#main-content"),
+
+    footer:
+      document.querySelector(".site-footer"),
 
     menu:
       document.querySelector(".site-menu"),
@@ -159,11 +167,6 @@
     ctaTrajectories:
       Array.from(
         document.querySelectorAll(".cta-trajectory")
-      ),
-
-    contactCtas:
-      Array.from(
-        document.querySelectorAll(".contact-cta")
       ),
 
     directionLinks:
@@ -306,30 +309,65 @@
     const started =
       performance.now();
 
-    let finishScheduled = false;
+
+    const minimumTime =
+      Math.max(
+        5000,
+        CONFIG.loaderMinimumTime
+      );
 
 
-    const finish = () => {
+    const complete = () => {
 
-      if (
-        state.loaded ||
-        finishScheduled
-      ) {
+      if (state.loaded) {
         return;
       }
 
 
-      finishScheduled = true;
+      state.loaded = true;
+
+
+      if (state.loaderTimer) {
+        window.clearTimeout(
+          state.loaderTimer
+        );
+
+        state.loaderTimer = null;
+      }
+
+
+      dom.loader.classList.add(
+        "is-hidden"
+      );
+
+
+      window.setTimeout(
+        () =>
+          dom.loader?.remove(),
+        950
+      );
+
+    };
+
+
+    const finish = force => {
+
+      if (state.loaded) {
+        return;
+      }
+
+
+      if (force) {
+
+        complete();
+
+        return;
+
+      }
 
 
       const elapsed =
         performance.now() - started;
-
-
-      const minimumTime =
-        state.reducedMotion
-          ? 700
-          : CONFIG.loaderMinimumTime;
 
 
       const remaining =
@@ -339,31 +377,16 @@
         );
 
 
-      window.setTimeout(
-        () => {
-
-          if (state.loaded) {
-            return;
-          }
+      if (state.loaderTimer) {
+        return;
+      }
 
 
-          state.loaded = true;
-
-
-          dom.loader.classList.add(
-            "is-hidden"
-          );
-
-
-          window.setTimeout(
-            () =>
-              dom.loader?.remove(),
-            950
-          );
-
-        },
-        remaining
-      );
+      state.loaderTimer =
+        window.setTimeout(
+          complete,
+          remaining
+        );
 
     };
 
@@ -373,13 +396,13 @@
       "complete"
     ) {
 
-      finish();
+      finish(false);
 
     } else {
 
       window.addEventListener(
         "load",
-        finish,
+        () => finish(false),
         { once: true }
       );
 
@@ -387,8 +410,11 @@
 
 
     window.setTimeout(
-      finish,
-      CONFIG.loaderMaximumWait
+      () => finish(true),
+      Math.max(
+        CONFIG.loaderMaximumWait,
+        minimumTime + 100
+      )
     );
 
   };
@@ -500,6 +526,35 @@
      MENU
      ======================================================= */
 
+  const setMenuInert = inert => {
+
+    if (!dom.menu) {
+      return;
+    }
+
+
+    if ("inert" in dom.menu) {
+
+      dom.menu.inert = inert;
+
+    } else if (inert) {
+
+      dom.menu.setAttribute(
+        "inert",
+        ""
+      );
+
+    } else {
+
+      dom.menu.removeAttribute(
+        "inert"
+      );
+
+    }
+
+  };
+
+
   const openMenu = () => {
 
     if (!dom.menu) {
@@ -515,6 +570,9 @@
     clearStandbyTimer();
 
     state.menuOpen = true;
+
+
+    setMenuInert(false);
 
 
     dom.menu.setAttribute(
@@ -567,6 +625,9 @@
     );
 
 
+    setMenuInert(true);
+
+
     dom.menuTrigger?.setAttribute(
       "aria-expanded",
       "false"
@@ -602,6 +663,9 @@
 
 
   const initMenu = () => {
+
+    setMenuInert(true);
+
 
     dom.menuTrigger?.addEventListener(
       "click",
@@ -641,9 +705,24 @@
       event => {
 
         if (
-          !state.menuOpen ||
-          event.key !== "Tab"
+          !state.menuOpen
         ) {
+          return;
+        }
+
+
+        if (event.key === "Escape") {
+
+          event.preventDefault();
+
+          closeMenu();
+
+          return;
+
+        }
+
+
+        if (event.key !== "Tab") {
           return;
         }
 
@@ -688,23 +767,6 @@
           event.preventDefault();
 
           first.focus();
-
-        }
-
-      }
-    );
-
-
-    document.addEventListener(
-      "keydown",
-      event => {
-
-        if (
-          event.key === "Escape" &&
-          state.menuOpen
-        ) {
-
-          closeMenu();
 
         }
 
@@ -1789,6 +1851,107 @@
   };
 
 
+  const setInert = (
+    element,
+    inert
+  ) => {
+
+    if (!element) {
+      return;
+    }
+
+
+    if ("inert" in element) {
+
+      element.inert = inert;
+
+    } else if (inert) {
+
+      element.setAttribute(
+        "inert",
+        ""
+      );
+
+    } else {
+
+      element.removeAttribute(
+        "inert"
+      );
+
+    }
+
+  };
+
+
+  const setUnderlyingInert = inert => {
+
+    const elements = [
+      dom.header,
+      dom.main,
+      dom.footer
+    ].filter(Boolean);
+
+
+    if (inert) {
+
+      state.standbyUnderlying =
+        elements.map(
+          element => ({
+            element,
+            hadInert:
+              element.hasAttribute("inert")
+          })
+        );
+
+
+      elements.forEach(
+        element =>
+          setInert(element, true)
+      );
+
+    } else {
+
+      state.standbyUnderlying.forEach(
+        record => {
+
+          if (!record.hadInert) {
+            setInert(
+              record.element,
+              false
+            );
+          }
+
+        }
+      );
+
+
+      state.standbyUnderlying = [];
+
+    }
+
+  };
+
+
+  const getStandbyFocusable = () => {
+
+    if (!dom.standby) {
+      return [];
+    }
+
+
+    return Array.from(
+      dom.standby.querySelectorAll(
+        'button, a[href], input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )
+    ).filter(
+      element =>
+        !element.hasAttribute("disabled") &&
+        element.getAttribute("aria-hidden") !== "true"
+    );
+
+  };
+
+
   const enterStandby = () => {
 
     if (
@@ -1815,6 +1978,15 @@
     );
 
 
+    setUnderlyingInert(true);
+
+
+    setInert(
+      dom.standby,
+      false
+    );
+
+
     dom.standby.classList.add(
       "is-active"
     );
@@ -1832,18 +2004,15 @@
     );
 
 
-    if ("inert" in dom.standby) {
-      dom.standby.inert = false;
-    } else {
-      dom.standby.removeAttribute(
-        "inert"
-      );
-    }
+    window.requestAnimationFrame(
+      () => {
 
+        dom.standbyWake?.focus({
+          preventScroll: true
+        });
 
-    dom.standbyWake?.focus({
-      preventScroll: true
-    });
+      }
+    );
 
   };
 
@@ -1874,22 +2043,13 @@
     );
 
 
-    if (dom.standby) {
+    setInert(
+      dom.standby,
+      true
+    );
 
-      if ("inert" in dom.standby) {
 
-        dom.standby.inert = true;
-
-      } else {
-
-        dom.standby.setAttribute(
-          "inert",
-          ""
-        );
-
-      }
-
-    }
+    setUnderlyingInert(false);
 
 
     const returnFocus =
@@ -1925,29 +2085,6 @@
   };
 
 
-  const resetStandbyTimer = () => {
-
-    clearStandbyTimer();
-
-
-    if (
-      state.menuOpen ||
-      state.standby ||
-      document.hidden
-    ) {
-      return;
-    }
-
-
-    state.standbyTimer =
-      window.setTimeout(
-        enterStandby,
-        CONFIG.standbyDelay
-      );
-
-  };
-
-
   const initStandby = () => {
 
     if (!dom.standby) {
@@ -1955,18 +2092,10 @@
     }
 
 
-    if ("inert" in dom.standby) {
-
-      dom.standby.inert = true;
-
-    } else {
-
-      dom.standby.setAttribute(
-        "inert",
-        ""
-      );
-
-    }
+    setInert(
+      dom.standby,
+      true
+    );
 
 
     dom.standbyWake?.addEventListener(
@@ -1979,20 +2108,68 @@
       "keydown",
       event => {
 
-        if (
-          !state.standby ||
-          event.key !== "Tab"
-        ) {
+        if (!state.standby) {
           return;
         }
 
 
-        event.preventDefault();
+        if (event.key === "Escape") {
+
+          event.preventDefault();
+
+          exitStandby();
+
+          return;
+
+        }
 
 
-        dom.standbyWake?.focus({
-          preventScroll: true
-        });
+        if (event.key !== "Tab") {
+          return;
+        }
+
+
+        const focusable =
+          getStandbyFocusable();
+
+
+        if (!focusable.length) {
+          return;
+        }
+
+
+        const first =
+          focusable[0];
+
+        const last =
+          focusable[
+            focusable.length - 1
+          ];
+
+
+        if (
+          event.shiftKey &&
+          document.activeElement === first
+        ) {
+
+          event.preventDefault();
+
+          last.focus({
+            preventScroll: true
+          });
+
+        } else if (
+          !event.shiftKey &&
+          document.activeElement === last
+        ) {
+
+          event.preventDefault();
+
+          first.focus({
+            preventScroll: true
+          });
+
+        }
 
       }
     );
@@ -2016,6 +2193,15 @@
               if (
                 eventName === "keydown" &&
                 event.key === "Escape"
+              ) {
+                return;
+              }
+
+              if (
+                eventName === "keydown" &&
+                dom.standby?.contains(
+                  event.target
+                )
               ) {
                 return;
               }
