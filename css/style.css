@@ -196,7 +196,7 @@ button {
   transform: scaleX(0);
   transform-origin: left center;
 
-  animation: loaderLine 1.8s var(--ease-out) .45s forwards;
+  animation: loaderLine 2.6s var(--ease-out) .8s forwards;
 }
 
 .loader-point {
@@ -214,8 +214,8 @@ button {
   transform: translate(-50%, -50%) scale(.5);
 
   animation:
-    loaderPoint .7s var(--ease-out) .1s forwards,
-    loaderPointPulse 2.2s ease-in-out 1.4s infinite alternate;
+    loaderPoint 1s var(--ease-out) .15s forwards,
+    loaderPointPulse 2.8s ease-in-out 2.2s infinite alternate;
 }
 
 .loader-motto {
@@ -235,7 +235,7 @@ button {
   opacity: 0;
   transform: translateY(12px);
 
-  animation: loaderMotto 1.1s var(--ease-out) 1.35s forwards;
+  animation: loaderMotto 1.4s var(--ease-out) 2.5s forwards;
 }
 
 .loader-motto span:nth-child(2) {
