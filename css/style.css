@@ -1,1142 +1,2087 @@
-<!doctype html>
-<html lang="it">
-<head>
-  <meta charset="utf-8">
+/* =========================================================
+   CESARE PARATORE
+   MOVIMENTO / CON DIREZIONE.
+   MASTER VISUAL SYSTEM — V5.1
+   ========================================================= */
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  >
+:root {
+  --ivory: #F2EFE8;
+  --ink: #11110F;
+  --terracotta: #A64232;
+  --sand: #C9C0AF;
+  --stone: #77736B;
+  --white: #FFFDF8;
 
-  <title>Cesare Paratore — Movimento / Con direzione.</title>
+  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-sans: "DM Sans", Arial, sans-serif;
+  --font-mono: "DM Mono", monospace;
 
-  <meta
-    name="description"
-    content="Cesare Paratore. Sport, Scienze Motorie, educazione, management e digitale: un percorso costruito attraverso movimento, esperienza e connessioni."
-  >
+  --header-height: 108px;
 
-  <meta name="theme-color" content="#F2EFE8">
-  <meta name="color-scheme" content="light">
+  --content-max: 1680px;
+  --copy-max: 760px;
+  --narrow-copy: 620px;
 
-  <link
-    rel="canonical"
-    href="https://www.cesareparatore.it/"
-  >
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 48px;
+  --space-6: 64px;
+  --space-7: 96px;
+  --space-8: 128px;
+  --space-9: 180px;
 
-  <link rel="icon" href="/assets/images/cp-mark.png">
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --ease-in-out: cubic-bezier(.65, 0, .35, 1);
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  --trajectory-progress: 0;
+  --trajectory-drift: 0px;
 
-  <link
-    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap"
-    rel="stylesheet"
-  >
+  --magnetic-x: 0px;
+  --magnetic-y: 0px;
+}
 
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "WebSite",
-        "@id": "https://www.cesareparatore.it/#website",
-        "url": "https://www.cesareparatore.it/",
-        "name": "Cesare Paratore",
-        "description": "Movimento / con direzione."
-      },
-      {
-        "@type": "Person",
-        "@id": "https://www.cesareparatore.it/#person",
-        "name": "Cesare Paratore",
-        "url": "https://www.cesareparatore.it/"
-      }
-    ]
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+  background: var(--ivory);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-width: 320px;
+
+  background: var(--ivory);
+  color: var(--ink);
+
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+
+  overflow-x: hidden;
+}
+
+body.is-menu-open,
+body.is-standby {
+  overflow: hidden;
+}
+
+img,
+svg,
+iframe {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  border: 0;
+  background: none;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--terracotta);
+  outline-offset: 5px;
+}
+
+
+/* =========================================================
+   LOADER
+   ========================================================= */
+
+.page-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+
+  display: grid;
+  place-items: center;
+
+  background: var(--ink);
+  color: var(--ivory);
+
+  opacity: 1;
+  visibility: visible;
+
+  transition:
+    opacity .7s var(--ease-out),
+    visibility .7s;
+}
+
+.page-loader.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.page-loader-inner {
+  display: grid;
+  place-items: center;
+}
+
+.page-loader-inner img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+
+
+/* =========================================================
+   PAGE TRANSITION
+   ========================================================= */
+
+.page-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 950;
+
+  background: var(--ink);
+
+  transform: translateY(100%);
+  pointer-events: none;
+
+  transition:
+    transform .7s var(--ease-in-out);
+}
+
+.page-transition.is-active {
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   CUSTOM CURSOR
+   ========================================================= */
+
+.custom-cursor {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+
+  pointer-events: none;
+}
+
+.custom-cursor-dot,
+.custom-cursor-ring {
+  position: fixed;
+  left: 0;
+  top: 0;
+
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+.custom-cursor-dot {
+  width: 6px;
+  height: 6px;
+
+  background: var(--terracotta);
+}
+
+.custom-cursor-ring {
+  width: 30px;
+  height: 30px;
+
+  border: 1px solid rgba(17, 17, 15, .55);
+
+  transition:
+    width .3s var(--ease-out),
+    height .3s var(--ease-out),
+    border-color .3s ease;
+}
+
+.custom-cursor.is-hovering .custom-cursor-ring {
+  width: 48px;
+  height: 48px;
+  border-color: var(--terracotta);
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 800;
+
+  min-height: var(--header-height);
+
+  padding:
+    12px
+    28px
+    10px;
+
+  background: rgba(242, 239, 232, .9);
+  border-bottom: 1px solid rgba(17, 17, 15, .08);
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.site-brand {
+  position: absolute;
+  left: 28px;
+  top: 50%;
+
+  display: block;
+
+  width: 48px;
+  height: 48px;
+
+  transform:
+    translateY(-50%)
+    translate(
+      var(--magnetic-x),
+      var(--magnetic-y)
+    );
+}
+
+.site-brand img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+
+.menu-trigger {
+  position: absolute;
+  right: 28px;
+  top: 50%;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+
+  min-height: 44px;
+  padding: 8px 0;
+
+  cursor: pointer;
+
+  transform:
+    translateY(-50%)
+    translate(
+      var(--magnetic-x),
+      var(--magnetic-y)
+    );
+}
+
+.menu-trigger-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .08em;
+}
+
+.menu-trigger-icon {
+  display: grid;
+  gap: 5px;
+  width: 24px;
+}
+
+.menu-trigger-icon span {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: var(--ink);
+
+  transition:
+    transform .45s var(--ease-out);
+}
+
+body.is-menu-open .menu-trigger-icon span:first-child {
+  transform: translateY(3px) rotate(45deg);
+}
+
+body.is-menu-open .menu-trigger-icon span:last-child {
+  transform: translateY(-3px) rotate(-45deg);
+}
+
+
+/* =========================================================
+   WOW
+   ========================================================= */
+
+.wow-progress {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  width: min(860px, calc(100vw - 360px));
+
+  transform: translate(-50%, -50%);
+
+  text-align: center;
+}
+
+.progress-label {
+  min-height: 24px;
+  margin-bottom: 8px;
+
+  color: var(--ink);
+
+  font-family: var(--font-serif);
+  font-size: 17px;
+  line-height: 1.1;
+}
+
+.progress-track {
+  position: relative;
+
+  width: 100%;
+  height: 1px;
+
+  background: rgba(119, 115, 107, .28);
+}
+
+.progress-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+
+  width: 0;
+
+  background: var(--terracotta);
+}
+
+.progress-point {
+  position: absolute;
+  top: 50%;
+  left: 0;
+
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+  background: var(--terracotta);
+
+  transform: translate(-50%, -50%);
+
+  transition:
+    left .65s var(--ease-out);
+}
+
+.section-jump {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-top: 9px;
+
+  min-height: 18px;
+}
+
+.section-jump-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  min-width: 44px;
+  min-height: 24px;
+
+  color: var(--ink);
+
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .04em;
+
+  transition:
+    color .25s ease,
+    opacity .25s ease;
+}
+
+.section-jump-link:hover,
+.section-jump-link:focus-visible {
+  color: var(--terracotta);
+}
+
+.section-jump-link.is-disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.section-jump-arrow {
+  font-size: 12px;
+  line-height: 1;
+}
+
+.section-jump-link--next.is-home-return {
+  gap: 7px;
+}
+
+
+/* =========================================================
+   MENU
+   ========================================================= */
+
+.site-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 700;
+
+  display: flex;
+  align-items: center;
+
+  background: var(--ink);
+  color: var(--ivory);
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transition:
+    opacity .5s var(--ease-out),
+    visibility .5s;
+}
+
+.site-menu[aria-hidden="false"] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.site-menu-inner {
+  width: min(100%, var(--content-max));
+  margin: 0 auto;
+  padding: 140px 48px 80px;
+}
+
+.site-menu-nav {
+  display: grid;
+  gap: 7px;
+}
+
+.site-menu-nav a {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  align-items: baseline;
+
+  width: fit-content;
+
+  font-family: var(--font-serif);
+  font-size: clamp(34px, 5vw, 76px);
+  line-height: .98;
+
+  transition:
+    color .3s ease,
+    transform .45s var(--ease-out);
+}
+
+.site-menu-nav a:hover,
+.site-menu-nav a:focus-visible {
+  color: var(--terracotta);
+  transform: translateX(8px);
+}
+
+.site-menu-number {
+  color: var(--stone);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1;
+}
+
+
+/* =========================================================
+   MAIN / SECTIONS
+   ========================================================= */
+
+main {
+  position: relative;
+}
+
+.home-section {
+  position: relative;
+
+  min-height: 100svh;
+
+  overflow: hidden;
+}
+
+.section-inner {
+  position: relative;
+
+  width: min(
+    calc(100% - 96px),
+    var(--content-max)
+  );
+
+  min-height: 100svh;
+
+  margin: 0 auto;
+  padding-top: calc(var(--header-height) + 80px);
+  padding-bottom: 120px;
+}
+
+.section-inner--hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+}
+
+.section-inner--narrow {
+  width: min(
+    calc(100% - 96px),
+    var(--narrow-copy)
+  );
+
+  padding-top: calc(var(--header-height) + 110px);
+  padding-bottom: 150px;
+}
+
+.section-inner--split {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(320px, .78fr);
+  align-items: center;
+  gap: clamp(70px, 9vw, 170px);
+}
+
+.section-content {
+  min-width: 0;
+}
+
+.section-title {
+  margin-bottom: 38px;
+
+  color: var(--terracotta);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .075em;
+  line-height: 1.35;
+}
+
+
+/* =========================================================
+   EDITORIAL COPY
+   ========================================================= */
+
+.editorial-copy {
+  width: min(100%, var(--copy-max));
+
+  font-family: var(--font-sans);
+}
+
+.editorial-copy--large {
+  font-size: clamp(18px, 1.4vw, 22px);
+  line-height: 1.72;
+}
+
+.editorial-copy p {
+  margin: 0 0 34px;
+}
+
+.editorial-copy p:last-child {
+  margin-bottom: 0;
+}
+
+.editorial-copy strong {
+  font-weight: 600;
+}
+
+.editorial-emphasis {
+  max-width: 700px;
+
+  font-family: var(--font-serif);
+  font-size: clamp(28px, 3.3vw, 52px);
+  line-height: 1.05;
+}
+
+.editorial-sequence {
+  margin: 54px 0 62px;
+  padding-left: 28px;
+
+  border-left: 1px solid var(--terracotta);
+}
+
+.editorial-sequence p {
+  margin: 0 0 25px;
+
+  font-family: var(--font-serif);
+  font-size: clamp(27px, 3vw, 46px);
+  line-height: 1.15;
+}
+
+.editorial-sequence p:last-child {
+  margin-bottom: 0;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.hero-title {
+  width: 100%;
+  margin: 0;
+
+  font-family: var(--font-serif);
+  font-size: clamp(58px, 9vw, 148px);
+  font-weight: 400;
+  line-height: .84;
+  letter-spacing: -.035em;
+
+  text-align: center;
+}
+
+.hero-title-line {
+  display: block;
+  width: 100%;
+}
+
+.hero-title-line--identity {
+  display: flex;
+  width: 100%;
+
+  align-items: baseline;
+  justify-content: center;
+
+  gap: .08em;
+
+  padding-left: 0;
+
+  white-space: nowrap;
+}
+
+.identity-slash {
+  color: var(--terracotta);
+}
+
+.hero-intro {
+  max-width: 680px;
+  margin-top: 48px;
+
+  font-size: clamp(19px, 1.8vw, 27px);
+  line-height: 1.45;
+}
+
+.hero-intro p {
+  margin: 0;
+}
+
+.hero-directions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 30px;
+
+  margin-top: 62px;
+}
+
+.hero-direction {
+  position: relative;
+
+  color: var(--ink);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .06em;
+
+  transition:
+    color .25s ease,
+    opacity .25s ease;
+}
+
+.hero-direction::after {
+  content: "";
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -7px;
+
+  height: 1px;
+
+  background: var(--terracotta);
+
+  transform: scaleX(0);
+  transform-origin: center;
+
+  transition:
+    transform .4s var(--ease-out);
+}
+
+.hero-direction:hover,
+.hero-direction:focus-visible,
+.hero-direction.is-active {
+  color: var(--terracotta);
+}
+
+.hero-direction:hover::after,
+.hero-direction:focus-visible::after,
+.hero-direction.is-active::after {
+  transform: scaleX(1);
+}
+
+
+/* =========================================================
+   SECTION 01 — DIRECTION TRAJECTORY
+   ========================================================= */
+
+.direction-trajectory {
+  position: relative;
+
+  width: min(100%, 900px);
+  height: 170px;
+
+  margin-top: 56px;
+
+  flex-shrink: 0;
+}
+
+.direction-trajectory-line {
+  position: absolute;
+
+  top: 50%;
+  left: 2%;
+
+  width: 96%;
+  height: 1px;
+
+  background: rgba(201, 192, 175, .55);
+
+  transform:
+    translateY(var(--trajectory-drift))
+    rotate(-4deg);
+
+  transform-origin: center;
+
+  transition:
+    opacity .35s ease;
+}
+
+.direction-node {
+  position: absolute;
+
+  display: block;
+
+  width: 10px;
+  height: 10px;
+
+  border-radius: 50%;
+
+  background: var(--terracotta);
+
+  transform: translate(-50%, -50%);
+
+  transition:
+    transform .35s var(--ease-out),
+    background-color .25s ease,
+    box-shadow .35s ease,
+    opacity .25s ease;
+}
+
+.direction-node.is-active {
+  transform: translate(-50%, -50%) scale(1.55);
+  box-shadow: 0 0 0 5px rgba(166, 66, 50, .12);
+}
+
+.direction-node-label {
+  position: absolute;
+
+  top: 18px;
+  left: 50%;
+
+  width: max-content;
+  max-width: 150px;
+
+  color: var(--sand);
+
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .04em;
+  line-height: 1.3;
+  text-align: center;
+
+  transform: translateX(-50%);
+}
+
+
+/* =========================================================
+   FIVE DIRECTIONS
+   ========================================================= */
+
+.five-directions {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+
+  margin: 62px 0 72px;
+
+  border-top: 1px solid rgba(17, 17, 15, .14);
+  border-bottom: 1px solid rgba(17, 17, 15, .14);
+}
+
+.five-directions a {
+  position: relative;
+
+  min-height: 92px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px 12px;
+
+  color: var(--ink);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .045em;
+  text-align: center;
+
+  transition:
+    color .25s ease,
+    background-color .3s ease;
+}
+
+.five-directions a + a {
+  border-left: 1px solid rgba(17, 17, 15, .1);
+}
+
+.five-directions a:hover,
+.five-directions a:focus-visible {
+  color: var(--terracotta);
+  background: rgba(166, 66, 50, .035);
+}
+
+
+/* =========================================================
+   NETWORK
+   ========================================================= */
+
+.network-visual {
+  position: relative;
+
+  width: min(100%, 560px);
+  aspect-ratio: 1;
+
+  justify-self: end;
+}
+
+.network-line {
+  position: absolute;
+
+  height: 1px;
+
+  background: rgba(119, 115, 107, .34);
+
+  transform-origin: left center;
+}
+
+.network-line--a {
+  width: 68%;
+  left: 12%;
+  top: 29%;
+  transform: rotate(24deg);
+}
+
+.network-line--b {
+  width: 58%;
+  left: 20%;
+  top: 55%;
+  transform: rotate(-28deg);
+}
+
+.network-line--c {
+  width: 72%;
+  left: 14%;
+  top: 62%;
+  transform: rotate(14deg);
+}
+
+.network-line--d {
+  width: 46%;
+  left: 43%;
+  top: 42%;
+  transform: rotate(70deg);
+}
+
+.network-line--e {
+  width: 54%;
+  left: 27%;
+  top: 38%;
+  transform: rotate(-5deg);
+}
+
+.network-node {
+  position: absolute;
+
+  width: 11px;
+  height: 11px;
+
+  border-radius: 50%;
+
+  background: var(--terracotta);
+
+  transform: translate(-50%, -50%);
+
+  transition:
+    transform .35s var(--ease-out),
+    box-shadow .3s ease;
+}
+
+.network-node--sport {
+  left: 15%;
+  top: 32%;
+}
+
+.network-node--scienze-motorie {
+  left: 67%;
+  top: 22%;
+}
+
+.network-node--educazione {
+  left: 48%;
+  top: 55%;
+}
+
+.network-node--management {
+  left: 77%;
+  top: 72%;
+}
+
+.network-node--digitale {
+  left: 23%;
+  top: 77%;
+}
+
+.network-node.is-linked {
+  transform: translate(-50%, -50%) scale(1.55);
+  box-shadow: 0 0 0 5px rgba(166, 66, 50, .12);
+}
+
+
+/* =========================================================
+   PAUSE TRAJECTORY
+   ========================================================= */
+
+.pause-trajectory {
+  position: relative;
+
+  width: min(100%, 500px);
+  height: 260px;
+
+  justify-self: end;
+}
+
+.pause-trajectory-line {
+  position: absolute;
+
+  top: 50%;
+  left: 8%;
+
+  width: 78%;
+  height: 1px;
+
+  background: var(--sand);
+
+  transform:
+    translateY(var(--trajectory-drift))
+    rotate(-9deg);
+}
+
+.pause-trajectory-point {
+  position: absolute;
+
+  top: 50%;
+  right: 8%;
+
+  width: 11px;
+  height: 11px;
+
+  border-radius: 50%;
+
+  background: var(--terracotta);
+
+  transform: translateY(-50%);
+}
+
+
+/* =========================================================
+   TERRITORY
+   ========================================================= */
+
+.section-inner--territory {
+  display: grid;
+  grid-template-columns:
+    minmax(300px, .8fr)
+    minmax(420px, 1.2fr);
+
+  align-items: center;
+
+  gap: clamp(60px, 8vw, 140px);
+
+  padding-top: calc(var(--header-height) + 90px);
+  padding-bottom: 110px;
+}
+
+.territory-copy {
+  min-width: 0;
+}
+
+.territory-copy > .editorial-copy {
+  margin-bottom: 38px;
+}
+
+.territory-card {
+  max-width: 570px;
+
+  padding: 30px 0 0;
+
+  border-top: 1px solid rgba(17, 17, 15, .18);
+}
+
+.territory-card-place {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: var(--stone);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .08em;
+}
+
+.territory-card-title {
+  display: block;
+
+  margin-bottom: 25px;
+
+  font-family: var(--font-serif);
+  font-size: clamp(34px, 4vw, 58px);
+  line-height: .95;
+}
+
+.territory-card p {
+  margin: 0 0 22px;
+
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.territory-card-note {
+  color: var(--stone);
+}
+
+.territory-link {
+  display: inline-flex;
+
+  margin-top: 10px;
+
+  color: var(--terracotta);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .04em;
+
+  transition:
+    opacity .25s ease;
+}
+
+.territory-link:hover,
+.territory-link:focus-visible {
+  opacity: .7;
+}
+
+.territory-map {
+  position: relative;
+
+  width: 100%;
+  aspect-ratio: 1.25 / 1;
+
+  overflow: hidden;
+
+  background: var(--sand);
+}
+
+.territory-map iframe {
+  width: 100%;
+  height: 100%;
+
+  border: 0;
+}
+
+
+/* =========================================================
+   PRESENT
+   ========================================================= */
+
+.section-inner--present {
+  padding-top: calc(var(--header-height) + 90px);
+  padding-bottom: 110px;
+}
+
+.present-portrait {
+  position: relative;
+
+  width: min(100%, 520px);
+
+  margin: 0;
+
+  justify-self: end;
+
+  overflow: hidden;
+
+  background: var(--sand);
+}
+
+.present-portrait::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(17, 17, 15, .08);
+}
+
+.present-portrait img {
+  width: 100%;
+  height: 100%;
+
+  aspect-ratio: 4 / 5;
+
+  object-fit: cover;
+}
+
+
+/* =========================================================
+   QUESTION FOR YOU
+   ========================================================= */
+
+.section-inner--question-for-you {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  padding-top: calc(var(--header-height) + 70px);
+  padding-bottom: 100px;
+}
+
+.reader-question {
+  margin-top: 90px;
+}
+
+.reader-question-label {
+  display: block;
+
+  margin-bottom: 26px;
+
+  color: var(--stone);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .06em;
+}
+
+.reader-question h2 {
+  margin: 0;
+
+  font-family: var(--font-serif);
+  font-size: clamp(62px, 11vw, 170px);
+  font-weight: 400;
+  line-height: .82;
+  letter-spacing: -.04em;
+}
+
+.reader-question h2 span {
+  display: block;
+
+  margin-left: clamp(40px, 12vw, 180px);
+
+  color: var(--terracotta);
+}
+
+
+/* =========================================================
+   FINAL CTA
+   ========================================================= */
+
+.section-inner--cta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  padding-top: calc(var(--header-height) + 90px);
+  padding-bottom: 130px;
+}
+
+.section-inner--cta .editorial-copy {
+  max-width: 760px;
+}
+
+.cta-trajectory {
+  position: relative;
+
+  width: min(100%, 920px);
+  min-height: 150px;
+
+  margin-top: 80px;
+}
+
+.cta-trajectory-line {
+  position: absolute;
+
+  left: 0;
+  right: 6%;
+
+  top: 50%;
+
+  height: 1px;
+
+  background: var(--sand);
+
+  transform:
+    translateY(var(--trajectory-drift))
+    rotate(-3deg);
+
+  transform-origin: left center;
+}
+
+.cta-trajectory-point {
+  position: absolute;
+
+  right: 5.5%;
+  top: 50%;
+
+  width: 13px;
+  height: 13px;
+
+  border-radius: 50%;
+
+  background: var(--terracotta);
+
+  transform: translate(50%, -50%);
+
+  transition:
+    transform .45s var(--ease-out),
+    box-shadow .35s ease;
+}
+
+.contact-cta {
+  position: absolute;
+
+  right: 0;
+  top: calc(50% + 34px);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+
+  min-height: 44px;
+
+  color: var(--ink);
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .025em;
+
+  transform:
+    translate(
+      var(--magnetic-x),
+      var(--magnetic-y)
+    );
+
+  transition:
+    color .25s ease;
+}
+
+.contact-cta:hover,
+.contact-cta:focus-visible {
+  color: var(--terracotta);
+}
+
+.contact-cta:hover ~ .cta-trajectory-point,
+.contact-cta:focus-visible ~ .cta-trajectory-point {
+  transform: translate(50%, -50%) scale(1.6);
+}
+
+
+/* =========================================================
+   REVEAL
+   ========================================================= */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+
+  transition:
+    opacity .8s var(--ease-out),
+    transform .9s var(--ease-out);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.site-footer {
+  background: var(--ivory);
+  color: var(--ink);
+}
+
+.footer-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding:
+    150px
+    48px
+    90px;
+
+  text-align: center;
+}
+
+.footer-mark {
+  display: flex;
+  justify-content: center;
+}
+
+.footer-mark img {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+}
+
+.footer-motto {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  justify-content: center;
+
+  gap: .08em;
+
+  margin-top: 54px;
+
+  color: var(--ink);
+
+  font-family: var(--font-serif);
+  font-size: clamp(28px, 4vw, 58px);
+  line-height: 1;
+
+  white-space: nowrap;
+}
+
+.footer-signature {
+  margin: 22px 0 0;
+
+  color: var(--stone);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .08em;
+}
+
+
+/* =========================================================
+   STANDBY
+   ========================================================= */
+
+.standby-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 850;
+
+  display: grid;
+  place-items: center;
+
+  background: var(--ivory);
+  color: var(--ink);
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transition:
+    opacity .8s var(--ease-out),
+    visibility .8s;
+}
+
+.standby-screen.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.standby-atmosphere {
+  position: absolute;
+  inset: 0;
+
+  overflow: hidden;
+}
+
+.standby-path {
+  position: absolute;
+
+  left: 10%;
+  top: 50%;
+
+  width: 80%;
+  height: 1px;
+
+  background: var(--sand);
+
+  transform: rotate(-5deg);
+  transform-origin: left center;
+
+  animation:
+    standbyPath 7s var(--ease-in-out) infinite alternate;
+}
+
+.standby-point {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width: 11px;
+  height: 11px;
+
+  border-radius: 50%;
+
+  background: var(--terracotta);
+
+  transform: translate(-50%, -50%);
+
+  animation:
+    standbyPoint 5s ease-in-out infinite alternate;
+}
+
+.standby-center {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  text-align: center;
+}
+
+.standby-logo {
+  width: 72px;
+  height: 72px;
+
+  object-fit: contain;
+
+  margin-bottom: 36px;
+}
+
+.standby-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.standby-label {
+  font-family: var(--font-serif);
+  font-size: clamp(34px, 5vw, 68px);
+  line-height: .95;
+}
+
+.standby-subtitle {
+  color: var(--stone);
+
+  font-size: 15px;
+}
+
+.standby-wake {
+  margin-top: 38px;
+
+  min-height: 44px;
+  padding: 8px 0;
+
+  color: var(--terracotta);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .05em;
+
+  cursor: pointer;
+
+  transition:
+    opacity .25s ease;
+}
+
+.standby-wake:hover,
+.standby-wake:focus-visible {
+  opacity: .65;
+}
+
+@keyframes standbyPath {
+  from {
+    transform: translateX(-2%) rotate(-5deg);
   }
-  </script>
-</head>
-
-<body>
-
-  <div class="page-loader" aria-hidden="true">
-    <div class="page-loader-inner">
-      <img
-        src="/assets/images/cp-mark.png"
-        alt=""
-        width="64"
-        height="64"
-      >
-    </div>
-  </div>
-
-  <div class="page-transition" aria-hidden="true"></div>
-
-  <div class="custom-cursor" aria-hidden="true">
-    <span class="custom-cursor-dot"></span>
-    <span class="custom-cursor-ring"></span>
-  </div>
-
-  <header class="site-header">
-
-    <a
-      class="site-brand"
-      href="#01"
-      aria-label="Cesare Paratore — torna all'inizio"
-    >
-      <img
-        src="/assets/images/cp-mark.png"
-        alt="Cesare Paratore"
-        width="48"
-        height="48"
-      >
-    </a>
-
-    <div class="wow-progress" aria-label="Navigazione del percorso">
-
-      <div
-        class="progress-label"
-        id="progress-current"
-        aria-live="polite"
-      >
-        IL MOVIMENTO È SOLO L'INIZIO.
-      </div>
-
-      <div class="progress-track" aria-hidden="true">
-        <span
-          class="progress-fill"
-          id="progress-fill"
-        ></span>
-
-        <span
-          class="progress-point"
-          id="progress-point"
-        ></span>
-      </div>
-
-      <div class="section-jump">
-
-        <a
-          id="previous-section"
-          class="section-jump-link section-jump-link--previous is-disabled"
-          href="#01"
-          aria-label="Sezione precedente"
-          aria-hidden="true"
-          tabindex="-1"
-        >
-          <span
-            class="section-jump-arrow"
-            aria-hidden="true"
-          >←</span>
-
-          <span id="previous-section-label"></span>
-        </a>
-
-        <a
-          id="next-section"
-          class="section-jump-link section-jump-link--next"
-          href="#02"
-          aria-label="Vai alla sezione 02"
-        >
-          <span id="next-section-label">02</span>
-
-          <span
-            class="section-jump-arrow"
-            aria-hidden="true"
-          >→</span>
-        </a>
-
-      </div>
-    </div>
-
-    <button
-      class="menu-trigger"
-      type="button"
-      aria-expanded="false"
-      aria-controls="site-menu"
-      aria-label="Apri menu"
-    >
-      <span class="menu-trigger-label">MENU</span>
-      <span class="menu-trigger-icon" aria-hidden="true">
-        <span></span>
-        <span></span>
-      </span>
-    </button>
 
-  </header>
+  to {
+    transform: translateX(2%) rotate(-5deg);
+  }
+}
 
+@keyframes standbyPoint {
+  from {
+    transform: translate(-50%, -50%) scale(.9);
+  }
 
-  <aside
-    class="site-menu"
-    id="site-menu"
-    aria-hidden="true"
-  >
+  to {
+    transform: translate(-50%, -50%) scale(1.12);
+  }
+}
 
-    <div class="site-menu-inner">
 
-      <nav
-        class="site-menu-nav"
-        aria-label="Navigazione principale"
-      >
+/* =========================================================
+   RESPONSIVE — LARGE TABLET
+   ========================================================= */
 
-        <a href="/chi-sono/">
-          <span class="site-menu-number">01</span>
-          <span>CHI SONO</span>
-        </a>
+@media (max-width: 1280px) {
 
-        <a href="/sport/">
-          <span class="site-menu-number">02</span>
-          <span>SPORT</span>
-        </a>
+  .wow-progress {
+    width: min(700px, calc(100vw - 300px));
+  }
 
-        <a href="/scienze-motorie/">
-          <span class="site-menu-number">03</span>
-          <span>SCIENZE MOTORIE</span>
-        </a>
+  .section-inner {
+    width: min(
+      calc(100% - 72px),
+      var(--content-max)
+    );
+  }
 
-        <a href="/educazione/">
-          <span class="site-menu-number">04</span>
-          <span>EDUCAZIONE</span>
-        </a>
+  .section-inner--narrow {
+    width: min(
+      calc(100% - 72px),
+      var(--narrow-copy)
+    );
+  }
 
-        <a href="/management-dello-sport/">
-          <span class="site-menu-number">05</span>
-          <span>MANAGEMENT</span>
-        </a>
-
-        <a href="/presenza-web/">
-          <span class="site-menu-number">06</span>
-          <span>DIGITALE</span>
-        </a>
-
-        <a href="/territorio/">
-          <span class="site-menu-number">07</span>
-          <span>TERRITORIO</span>
-        </a>
-
-        <a href="/contatti/">
-          <span class="site-menu-number">08</span>
-          <span>CONTATTI</span>
-        </a>
-
-      </nav>
-
-    </div>
-
-  </aside>
-
-
-  <main id="main-content">
-
-
-    <!-- =====================================================
-         01 — ORIGINE
-         ===================================================== -->
-
-    <section
-      class="home-section home-section--hero"
-      id="01"
-      data-section-title="IL MOVIMENTO È SOLO L'INIZIO."
-    >
-
-      <div class="section-inner section-inner--hero">
-
-        <div class="section-title reveal">
-          IL MOVIMENTO È SOLO L'INIZIO.
-        </div>
-
-        <h1 class="hero-title reveal">
-
-          <span class="hero-title-line hero-title-line--identity">
-
-            <span class="hero-title-word">
-              MOVIMENTO
-            </span>
-
-            <span
-              class="identity-slash"
-              aria-hidden="true"
-            >/</span>
-
-          </span>
-
-          <span class="hero-title-line">
-            CON DIREZIONE.
-          </span>
-
-        </h1>
-
-        <div class="hero-intro editorial-copy reveal">
-          <p>
-            Tutto è iniziato da una domanda:
-            dove può portarti il movimento?
-          </p>
-        </div>
-
-
-        <div class="hero-directions reveal">
-
-          <a
-            class="hero-direction"
-            href="/sport/"
-            data-direction="sport"
-          >
-            SPORT
-          </a>
-
-          <a
-            class="hero-direction"
-            href="/scienze-motorie/"
-            data-direction="scienze-motorie"
-          >
-            SCIENZE MOTORIE
-          </a>
-
-          <a
-            class="hero-direction"
-            href="/educazione/"
-            data-direction="educazione"
-          >
-            EDUCAZIONE
-          </a>
-
-          <a
-            class="hero-direction"
-            href="/management-dello-sport/"
-            data-direction="management"
-          >
-            MANAGEMENT
-          </a>
-
-          <a
-            class="hero-direction"
-            href="/presenza-web/"
-            data-direction="digitale"
-          >
-            DIGITALE
-          </a>
-
-        </div>
-
-
-        <div
-          class="direction-trajectory reveal"
-          aria-hidden="true"
-        >
-
-          <span class="direction-trajectory-line"></span>
-
-          <span
-            class="direction-node"
-            data-direction="sport"
-            style="left: 8%; top: 54%;"
-          >
-            <span class="direction-node-label">
-              SPORT
-            </span>
-          </span>
-
-          <span
-            class="direction-node"
-            data-direction="scienze-motorie"
-            style="left: 29%; top: 42%;"
-          >
-            <span class="direction-node-label">
-              SCIENZE MOTORIE
-            </span>
-          </span>
-
-          <span
-            class="direction-node"
-            data-direction="educazione"
-            style="left: 50%; top: 50%;"
-          >
-            <span class="direction-node-label">
-              EDUCAZIONE
-            </span>
-          </span>
-
-          <span
-            class="direction-node"
-            data-direction="management"
-            style="left: 71%; top: 39%;"
-          >
-            <span class="direction-node-label">
-              MANAGEMENT
-            </span>
-          </span>
-
-          <span
-            class="direction-node"
-            data-direction="digitale"
-            style="left: 92%; top: 48%;"
-          >
-            <span class="direction-node-label">
-              DIGITALE
-            </span>
-          </span>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         02 — DOMANDA
-         ===================================================== -->
-
-    <section
-      class="home-section home-section--question"
-      id="02"
-      data-section-title="LA DOMANDA È CAMBIATA."
-    >
-
-      <div class="section-inner section-inner--narrow">
-
-        <div class="section-title reveal">
-          LA DOMANDA È CAMBIATA.
-        </div>
-
-        <div class="editorial-copy editorial-copy--large reveal">
-
-          <p>
-            Il movimento è stato il punto di partenza.
-          </p>
-
-          <p>
-            Poi è arrivato lo sport.
-          </p>
-
-          <p>
-            E dentro lo sport ho trovato la corsa.
-            Prima come atleta.
-            Poi come tecnico.
-          </p>
-
-          <div class="editorial-sequence" aria-label="Le tappe della pratica">
-            <p>La pratica.</p>
-            <p>L’allenamento.</p>
-            <p>La fatica.</p>
-            <p>Il confronto con il limite.</p>
-          </div>
-
-          <p>
-            Prima ancora di studiare il movimento,
-            ho iniziato a viverlo.
-          </p>
-
-          <p>
-            E più mi avvicinavo a quel limite,
-            più sentivo il bisogno di capire cosa ci fosse oltre.
-          </p>
-
-          <p>
-            Le Scienze Motorie sono arrivate anche da qui:
-            dal desiderio di comprendere ciò che stavo vivendo.
-          </p>
-
-          <p>
-            Studiare il movimento mi ha dato strumenti.
-            Lo sport mi ha dato esperienza.
-            La corsa mi ha insegnato a misurarmi con il tempo,
-            con la distanza e con me stesso.
-            L'allenamento mi ha insegnato la continuità.
-            La fatica mi ha insegnato che il cambiamento ha un costo.
-            Il limite mi ha insegnato che non sempre basta spingere più forte.
-          </p>
-
-          <p>
-            E a quel punto la domanda è cambiata.
-          </p>
-
-          <p class="editorial-emphasis">
-            Se il movimento può cambiare un corpo,
-            <strong>che cosa può cambiare una persona?</strong>
-          </p>
-
-          <p>
-            La risposta non poteva stare tutta in una disciplina.
-          </p>
-
-          <p>
-            Così ho iniziato a guardare oltre.
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         03 — CINQUE STRADE
-         ===================================================== -->
-
-    <section
-      class="home-section home-section--directions"
-      id="03"
-      data-section-title="UNA STRADA NON ERA ABBASTANZA."
-    >
-
-      <div class="section-inner section-inner--narrow">
-
-        <div class="section-title reveal">
-          UNA STRADA NON ERA ABBASTANZA.
-        </div>
-
-        <div class="editorial-copy editorial-copy--large reveal">
-
-          <p>
-            Ho incontrato l'educazione.
-            Per capire cosa succede quando ciò che hai imparato
-            diventa esperienza per qualcun altro.
-          </p>
-
-          <p>
-            Ho incontrato il management.
-            Per capire cosa succede quando un'idea
-            deve diventare organizzazione, progetto, realtà.
-          </p>
-
-          <p>
-            Ho incontrato il digitale.
-            Per capire come strumenti e connessioni
-            possano aprire nuove possibilità.
-          </p>
-
-          <p>
-            E sono tornato allo sport.
-            Con occhi diversi.
-          </p>
-
-          <p>
-            A quel punto le strade erano diventate cinque:
-          </p>
-
-        </div>
-
-        <div class="five-directions reveal">
-
-          <a href="/sport/" class="narrative-link" data-trajectory-node="sport">
-            SPORT
-          </a>
-
-          <a href="/scienze-motorie/" class="narrative-link" data-trajectory-node="scienze-motorie">
-            SCIENZE MOTORIE
-          </a>
-
-          <a href="/educazione/" class="narrative-link" data-trajectory-node="educazione">
-            EDUCAZIONE
-          </a>
-
-          <a href="/management-dello-sport/" class="narrative-link" data-trajectory-node="management">
-            MANAGEMENT
-          </a>
-
-          <a href="/presenza-web/" class="narrative-link" data-trajectory-node="digitale">
-            DIGITALE
-          </a>
-
-        </div>
-
-        <div class="editorial-copy editorial-copy--large reveal">
-
-          <p>
-            Sembravano direzioni diverse.
-            Ma continuavano a partire dallo stesso punto.
-            <strong>Il movimento.</strong>
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         04 — CONNESSIONI
-         ===================================================== -->
-
-    <section
-      class="home-section home-section--network"
-      id="04"
-      data-section-title="POI HO CAPITO CHE NON ERANO CINQUE STRADE."
-    >
-
-      <div class="section-inner section-inner--split">
-
-        <div class="section-content">
-
-          <div class="section-title reveal">
-            POI HO CAPITO CHE NON ERANO CINQUE STRADE.
-          </div>
-
-          <div class="editorial-copy editorial-copy--large reveal">
-
-            <p>
-              Erano cinque modi di guardare la stessa realtà.
-            </p>
-
-            <p>
-              Lo sport mi ha insegnato a misurarmi.
-              Le Scienze Motorie mi hanno insegnato a comprendere.
-              L'educazione mi ha insegnato a trasferire.
-              Il management mi ha insegnato a progettare.
-              Il digitale mi ha insegnato a connettere.
-            </p>
-
-            <p>
-              E nessuna di queste esperienze è rimasta uguale
-              dopo aver incontrato le altre.
-            </p>
-
-            <p>
-              È questo che un curriculum non riesce a raccontare.
-              Può dire dove sei stato.
-              Non può dire
-              <strong>come ogni tappa ha cambiato quella successiva.</strong>
-            </p>
-
-            <p>
-              Per questo il mio percorso non lo vedo come un elenco.
-              Lo vedo come una rete di connessioni.
-            </p>
-
-          </div>
-
-        </div>
-
-
-        <div
-          class="network-visual"
-          aria-hidden="true"
-        >
-
-          <span class="network-line network-line--a"></span>
-          <span class="network-line network-line--b"></span>
-          <span class="network-line network-line--c"></span>
-          <span class="network-line network-line--d"></span>
-          <span class="network-line network-line--e"></span>
-
-          <span
-            class="network-node network-node--sport"
-            data-node="sport"
-          ></span>
-
-          <span
-            class="network-node network-node--scienze-motorie"
-            data-node="scienze-motorie"
-          ></span>
-
-          <span
-            class="network-node network-node--educazione"
-            data-node="educazione"
-          ></span>
-
-          <span
-            class="network-node network-node--management"
-            data-node="management"
-          ></span>
-
-          <span
-            class="network-node network-node--digitale"
-            data-node="digitale"
-          ></span>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         05 — PAUSA
-         ===================================================== -->
-
-    <section
-      class="home-section home-section--pause"
-      id="05"
-      data-section-title="E LE CONNESSIONI, A VOLTE, PASSANO ANCHE DA UNA PAUSA."
-    >
-
-      <div class="section-inner section-inner--split">
-
-        <div class="section-content">
-
-          <div class="section-title reveal">
-            E LE CONNESSIONI, A VOLTE, PASSANO ANCHE DA UNA PAUSA.
-          </div>
-
-          <div class="editorial-copy editorial-copy--large reveal">
-
-            <p>
-              Ho imparato che muoversi non significa necessariamente andare avanti.
-              A volte significa fermarsi.
-              Guardare meglio.
-              Accorgersi che la domanda era sbagliata.
-              Cambiare direzione.
-              Riconoscere un errore.
-              Ricominciare.
-            </p>
-
-            <p>
-              È forse la parte più difficile del movimento:
-              <strong>capire quando continuare e quando cambiare.</strong>
-            </p>
-
-            <p>
-              Per questo oggi cerco di non partire dalla soluzione.
-              Parto da ciò che ho davanti.
-              Prima capire.
-              Poi costruire.
-              Infine muoversi.
-            </p>
+  .section-inner--split {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(280px, .65fr);
 
-          </div>
+    gap: 70px;
+  }
 
-        </div>
+  .network-visual {
+    width: min(100%, 430px);
+  }
 
+}
 
-        <div
-          class="pause-trajectory"
-          aria-hidden="true"
-        >
-          <span class="pause-trajectory-line"></span>
-          <span class="pause-trajectory-point"></span>
-        </div>
 
-      </div>
+/* =========================================================
+   RESPONSIVE — MOBILE
+   ========================================================= */
 
-    </section>
+@media (max-width: 820px) {
 
+  :root {
+    --header-height: 148px;
+  }
 
-    <!-- =====================================================
-         06 — RADICAMENTO
-         ===================================================== -->
+  .site-header {
+    min-height: var(--header-height);
 
-    <section
-      class="home-section home-section--territory"
-      id="06"
-      data-section-title="OGGI SO ANCHE DA DOVE PARTO."
-    >
+    padding:
+      10px
+      16px
+      12px;
+  }
 
-      <div class="section-inner section-inner--territory">
+  .site-brand {
+    left: 16px;
+    top: 16px;
 
-        <div class="territory-copy">
+    width: 40px;
+    height: 40px;
 
-          <div class="section-title reveal">
-            OGGI SO ANCHE DA DOVE PARTO.
-          </div>
+    transform: none;
+  }
 
-          <div class="editorial-copy editorial-copy--large reveal">
+  .menu-trigger {
+    right: 16px;
+    top: 14px;
 
-            <p>
-              <strong>Stadio Comunale di Partinico</strong>
-            </p>
+    transform: none;
+  }
 
-          </div>
+  .wow-progress {
+    top: 69px;
+    left: 16px;
 
-          <div class="territory-card reveal">
+    width: calc(100% - 32px);
 
-            <span class="territory-card-place">
-              PARTINICO
-            </span>
+    transform: none;
+  }
 
-            <span class="territory-card-title">
-              DA QUI, NON SOLO QUI.
-            </span>
+  .progress-label {
+    min-height: 22px;
 
-            <p>
-              È qui che ha la sua base il mio lavoro.
-              In presenza, per chi parte da qui e per chi arriva
-              dai territori vicini.
-              Online, quando la distanza non deve essere un limite.
-            </p>
-
-            <p class="territory-card-note">
-              Perché una base non è un confine.
-              È il punto che ti permette di sapere sempre
-              da dove stai partendo.
-            </p>
-
-            <a
-              class="territory-link narrative-link"
-              href="https://www.google.com/maps/search/?api=1&query=Stadio+Comunale+Giuseppe+La+Franca%2C+Viale+Aldo+Moro%2C+Partinico%2C+PA%2C+Italy"
-              target="_blank"
-              rel="noopener noreferrer"
-              data-trajectory-node="territorio"
-            >
-              APRI SU GOOGLE MAPS →
-            </a>
+    font-size: 15px;
+    line-height: 1.05;
+  }
 
-          </div>
+  .section-jump {
+    margin-top: 11px;
+  }
 
-        </div>
+  .section-inner,
+  .section-inner--narrow {
+    width: calc(100% - 40px);
 
+    padding-top: calc(var(--header-height) + 70px);
+    padding-bottom: 100px;
+  }
 
-        <div class="territory-map reveal">
-
-          <iframe
-            title="Stadio Comunale Giuseppe La Franca, Partinico — vista satellitare"
-            src="https://www.google.com/maps?q=Stadio+Comunale+Giuseppe+La+Franca%2C+Viale+Aldo+Moro%2C+Partinico%2C+PA%2C+Italy&layer=satellite&output=embed"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-            allowfullscreen
-          ></iframe>
+  .section-inner--split {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 70px;
+  }
 
-        </div>
+  .section-title {
+    margin-bottom: 30px;
 
-      </div>
+    font-size: 9px;
+  }
 
-    </section>
+  .editorial-copy--large {
+    font-size: 18px;
+    line-height: 1.72;
+  }
 
+  .editorial-copy p {
+    margin-bottom: 30px;
+  }
 
-    <!-- =====================================================
-         07 — PRESENTE
-         ===================================================== -->
+  .editorial-emphasis {
+    font-size: clamp(30px, 9vw, 46px);
+  }
 
-    <section
-      class="home-section home-section--present"
-      id="07"
-      data-section-title="DA QUI, IL PERCORSO CONTINUA."
-    >
+  .hero-title {
+    font-size: clamp(54px, 15vw, 104px);
+  }
 
-      <div class="section-inner section-inner--split section-inner--present">
+  .hero-title-line--identity {
+    gap: .07em;
+  }
 
-        <div class="section-content">
+  .hero-intro {
+    margin-top: 38px;
 
-          <div class="section-title reveal">
-            DA QUI, IL PERCORSO CONTINUA.
-          </div>
+    font-size: 19px;
+  }
 
-          <div class="editorial-copy editorial-copy--large reveal">
+  .hero-directions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 
-            <p>
-              Oggi quelle esperienze convivono.
-            </p>
+    width: 100%;
+    max-width: 500px;
 
-            <p>
-              <strong>Sport.</strong><br>
-              Il punto da cui è iniziato tutto.
-            </p>
+    gap: 18px 20px;
 
-            <p>
-              <strong>Scienze Motorie.</strong><br>
-              Il modo di comprendere ciò che accade nel movimento.
-            </p>
+    margin-top: 52px;
+  }
 
-            <p>
-              <strong>Educazione.</strong><br>
-              Il passaggio dalla propria esperienza a quella degli altri.
-            </p>
+  .hero-direction {
+    text-align: center;
+  }
 
-            <p>
-              <strong>Management.</strong><br>
-              Il modo di trasformare idee e competenze in progetti.
-            </p>
+  .direction-trajectory {
+    width: 100%;
+    height: 230px;
 
-            <p>
-              <strong>Digitale.</strong><br>
-              Uno spazio per connettere, costruire e aprire nuove possibilità.
-            </p>
+    margin-top: 34px;
+  }
 
-            <p>
-              Non provo a farle entrare tutte dentro una definizione.
-            </p>
+  .direction-trajectory-line {
+    left: 8%;
+    width: 84%;
 
-            <p>
-              Cerco piuttosto il punto in cui possono diventare utili.
-              A una persona.
-              A un progetto.
-              A un problema.
-              A un'idea che deve ancora trovare la sua forma.
-            </p>
+    transform:
+      translateY(var(--trajectory-drift))
+      rotate(72deg);
 
-            <p>
-              È lì che mi interessa lavorare:
-            </p>
+    transform-origin: center;
+  }
 
-            <p class="editorial-emphasis">
-              <strong>
-                nel punto in cui una competenza smette di essere soltanto
-                conoscenza e comincia a diventare possibilità.
-              </strong>
-            </p>
+  .direction-node-label {
+    top: 17px;
 
-          </div>
+    font-size: 8px;
+  }
 
-        </div>
+  .five-directions {
+    grid-template-columns: 1fr;
+  }
 
+  .five-directions a {
+    min-height: 64px;
+  }
 
-        <figure class="present-portrait reveal">
+  .five-directions a + a {
+    border-left: 0;
+    border-top: 1px solid rgba(17, 17, 15, .1);
+  }
 
-          <img
-            src="/assets/images/cp-foto.webp"
-            alt="Cesare Paratore"
-            width="753"
-            height="941"
-            loading="lazy"
-            decoding="async"
-          >
+  .network-visual {
+    width: min(100%, 480px);
 
-        </figure>
+    align-self: center;
+  }
 
-      </div>
+  .pause-trajectory {
+    width: 100%;
+    height: 180px;
 
-    </section>
+    align-self: center;
+  }
 
+  .pause-trajectory-line {
+    left: 5%;
+    width: 90%;
 
-    <!-- =====================================================
-         08 — POSSIBILITÀ
-         ===================================================== -->
+    transform:
+      translateY(var(--trajectory-drift))
+      rotate(-7deg);
+  }
 
-    <section
-      class="home-section home-section--possibility"
-      id="08"
-      data-section-title="NON È UN PUNTO DI ARRIVO."
-    >
+  .pause-trajectory-point {
+    right: 4%;
+  }
 
-      <div class="section-inner section-inner--narrow">
+  .section-inner--territory {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 60px;
 
-        <div class="section-title reveal">
-          NON È UN PUNTO DI ARRIVO.
-        </div>
+    width: calc(100% - 40px);
 
-        <div class="editorial-copy editorial-copy--large reveal">
+    padding-top: calc(var(--header-height) + 70px);
+    padding-bottom: 100px;
+  }
 
-          <p>
-            Quello che hai letto fin qui
-            non è un curriculum.
-          </p>
+  .territory-map {
+    aspect-ratio: 1 / .9;
+    order: 2;
+  }
 
-          <p>
-            È il modo in cui sono arrivato a guardare le cose.
-          </p>
+  .territory-copy {
+    order: 1;
+  }
 
-          <p>
-            E questo sito nasce per la stessa ragione:
-          </p>
+  .territory-card-title {
+    font-size: clamp(34px, 10vw, 52px);
+  }
 
-          <p>
-            per mettere ordine,
-            creare connessioni,
-            e trasformare ciò che so
-            in qualcosa che possa essere utile.
-          </p>
+  .section-inner--present {
+    width: calc(100% - 40px);
+  }
 
-          <p class="editorial-emphasis">
-            <strong>
-              Perché ogni percorso, prima o poi,
-              ha bisogno di incontrare qualcosa di nuovo.
-            </strong>
-          </p>
+  .present-portrait {
+    width: 100%;
+    max-width: 560px;
 
-        </div>
+    align-self: center;
+    justify-self: center;
+  }
 
-      </div>
+  .section-inner--question-for-you {
+    width: calc(100% - 40px);
 
-    </section>
+    padding-top: calc(var(--header-height) + 60px);
+  }
 
+  .reader-question {
+    margin-top: 64px;
+  }
 
-    <!-- =====================================================
-         09 — VISITATORE
-         ===================================================== -->
+  .reader-question h2 {
+    font-size: clamp(58px, 17vw, 112px);
+  }
 
-    <section
-      class="home-section home-section--question-for-you"
-      id="09"
-      data-section-title="FORSE È QUI CHE LA STORIA CAMBIA."
-    >
+  .reader-question h2 span {
+    margin-left: 12vw;
+  }
 
-      <div class="section-inner section-inner--question-for-you">
+  .section-inner--cta {
+    width: calc(100% - 40px);
 
-        <div class="section-title reveal">
-          FORSE È QUI CHE LA STORIA CAMBIA.
-        </div>
+    padding-top: calc(var(--header-height) + 70px);
+    padding-bottom: 100px;
+  }
 
-        <div class="reader-question reveal">
+  .cta-trajectory {
+    min-height: 190px;
 
-          <span class="reader-question-label">
-            FORSE È QUI CHE LA STORIA CAMBIA.
-          </span>
+    margin-top: 62px;
+  }
 
-          <h2>
-            DA DOVE
-            <span>TU PARTI?</span>
-          </h2>
+  .cta-trajectory-line {
+    left: 0;
+    right: 8%;
 
-        </div>
+    top: 38%;
 
-      </div>
+    transform:
+      translateY(var(--trajectory-drift))
+      rotate(-6deg);
+  }
 
-    </section>
+  .cta-trajectory-point {
+    right: 7.5%;
+    top: 38%;
+  }
 
+  .contact-cta {
+    left: 0;
+    right: auto;
+    top: calc(38% + 42px);
+  }
 
-    <!-- =====================================================
-         10 — CTA
-         ===================================================== -->
+  .footer-inner {
+    padding:
+      110px
+      20px
+      70px;
+  }
 
-    <section
-      class="home-section home-section--cta"
-      id="10"
-      data-section-title="PARTIAMO DA QUELLO."
-    >
+  .footer-mark img {
+    width: 80px;
+    height: 80px;
+  }
 
-      <div class="section-inner section-inner--cta">
+  .footer-motto {
+    flex-wrap: nowrap;
+    white-space: nowrap;
 
-        <div class="section-title reveal">
-          PARTIAMO DA QUELLO.
-        </div>
+    gap: .06em;
 
-        <div class="editorial-copy editorial-copy--large reveal">
+    margin-top: 42px;
 
-          <p>
-            Non dalla soluzione.
-            Da te.
-            Da quello che hai davanti.
-            Da quello che vuoi capire, costruire, migliorare o cambiare.
-          </p>
+    font-size: clamp(24px, 8vw, 34px);
+  }
 
-          <p>
-            Se hai un obiettivo, partiamo da quello.
-            Se hai un problema, partiamo da quello.
-            Se hai un progetto, partiamo da quello.
-            Se hai una domanda, partiamo da quella.
-          </p>
+  .footer-signature {
+    margin-top: 18px;
+  }
 
-          <p>
-            Perché forse il movimento non consiste
-            nel sapere già dove arriverai.
-            Forse consiste nel riconoscere il punto
-            da cui vale la pena partire.
-          </p>
+  .standby-label {
+    max-width: 330px;
 
-          <p>
-            Io quel punto l'ho trovato nel movimento.
-            E da lì ho costruito tutto il resto.
-          </p>
+    font-size: clamp(34px, 10vw, 54px);
+  }
 
-          <p class="editorial-emphasis">
-            <strong>Adesso tocca a te.</strong>
-          </p>
+  .standby-logo {
+    width: 60px;
+    height: 60px;
 
-        </div>
+    margin-bottom: 30px;
+  }
 
+}
 
-        <div class="cta-trajectory reveal">
 
-          <span class="cta-trajectory-line"></span>
+/* =========================================================
+   RESPONSIVE — NARROW
+   ========================================================= */
 
-          <span
-            class="cta-trajectory-point"
-            aria-hidden="true"
-          ></span>
+@media (max-width: 420px) {
 
-          <a
-            class="contact-cta"
-            href="/contatti/"
-          >
-            <span>Raccontami da dove vuoi partire</span>
-            <span aria-hidden="true">→</span>
-          </a>
+  :root {
+    --header-height: 146px;
+  }
 
-        </div>
+  .site-brand {
+    width: 36px;
+    height: 36px;
+  }
 
-      </div>
+  .menu-trigger {
+    right: 14px;
+  }
 
-    </section>
+  .wow-progress {
+    left: 14px;
+    width: calc(100% - 28px);
+  }
 
-  </main>
+  .progress-label {
+    font-size: 13px;
+  }
 
+  .section-inner,
+  .section-inner--narrow,
+  .section-inner--territory,
+  .section-inner--present,
+  .section-inner--question-for-you,
+  .section-inner--cta {
+    width: calc(100% - 32px);
+  }
 
-  <!-- =======================================================
-       STANDBY — PAUSA NARRATIVA
-       ======================================================= -->
+  .hero-title {
+    font-size: clamp(48px, 15vw, 78px);
+  }
 
-  <div
-    class="standby-screen"
-    aria-hidden="true"
-  >
+  .hero-title-line--identity {
+    gap: .055em;
+  }
 
-    <div
-      class="standby-atmosphere"
-      aria-hidden="true"
-    >
-      <span class="standby-path"></span>
-      <span class="standby-point"></span>
-    </div>
+  .hero-directions {
+    grid-template-columns: 1fr;
+  }
 
-    <div class="standby-center">
+  .direction-trajectory {
+    height: 210px;
+  }
 
-      <img
-        class="standby-logo"
-        src="/assets/images/cp-mark.png"
-        alt="Cesare Paratore"
-        width="72"
-        height="72"
-      >
+  .direction-node-label {
+    max-width: 100px;
+    font-size: 7px;
+  }
 
-      <div class="standby-copy">
+  .editorial-sequence {
+    padding-left: 20px;
+  }
 
-        <span class="standby-label">
-          ANCHE FERMARSI È MOVIMENTO.
-        </span>
+  .editorial-sequence p {
+    font-size: 29px;
+  }
 
-        <span class="standby-subtitle">
-          Il percorso continua da qui.
-        </span>
+  .reader-question h2 {
+    font-size: clamp(52px, 16vw, 78px);
+  }
 
-      </div>
+  .footer-motto {
+    flex-wrap: nowrap;
+    white-space: nowrap;
 
-      <button
-        class="standby-wake"
-        type="button"
-      >
-        RIPRENDI →
-      </button>
+    gap: .06em;
 
-    </div>
+    font-size: clamp(24px, 8.5vw, 32px);
+  }
 
-  </div>
+  .footer-signature {
+    font-size: 9px;
+  }
 
+}
 
-  <footer class="site-footer">
 
-    <div class="footer-inner">
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
 
-      <div class="footer-mark">
-        <img
-          src="/assets/images/cp-mark.png"
-          alt="Cesare Paratore"
-          width="96"
-          height="96"
-          loading="lazy"
-        >
-      </div>
+@media (prefers-reduced-motion: reduce) {
 
-      <p class="footer-motto">
+  html {
+    scroll-behavior: auto;
+  }
 
-        <span>MOVIMENTO</span>
+  *,
+  *::before,
+  *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
 
-        <span aria-hidden="true">/</span>
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
 
-        <span>CON DIREZIONE.</span>
+  .standby-path,
+  .standby-point {
+    animation: none !important;
+  }
 
-      </p>
+}
 
-      <p class="footer-signature">
-        CESARE PARATORE
-      </p>
 
-    </div>
+/* =========================================================
+   PRINT
+   ========================================================= */
 
-  </footer>
+@media print {
 
+  .site-header,
+  .site-menu,
+  .page-loader,
+  .page-transition,
+  .custom-cursor,
+  .standby-screen {
+    display: none !important;
+  }
 
-  <script src="/script.js" defer></script>
+  .home-section {
+    min-height: auto;
+    overflow: visible;
+    break-inside: avoid;
+  }
 
-</body>
-</html>
+  .section-inner,
+  .section-inner--narrow,
+  .section-inner--territory,
+  .section-inner--present,
+  .section-inner--question-for-you,
+  .section-inner--cta {
+    width: 100%;
+    min-height: auto;
+    padding: 40px 0;
+  }
+
+}
