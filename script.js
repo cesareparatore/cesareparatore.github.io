@@ -1,61 +1,35 @@
 /* =========================================================
    CESARE PARATORE
    MOVIMENTO / CON DIREZIONE.
-   MASTER INTERACTION SYSTEM — V3
+   MASTER INTERACTION SYSTEM — V4
    ========================================================= */
 
 (() => {
   "use strict";
 
-
-  /* =======================================================
-     01 — CONFIG
-     ======================================================= */
-
   const CONFIG = {
     loaderMinimumTime: 450,
     loaderMaximumWait: 4500,
-
     revealThreshold: 0.12,
-
     cursorLerp: 0.16,
-
     resizeDebounce: 180,
-
     scrollNavigationOffset: 18,
-
     transitionDuration: 700,
-
     trajectoryLerp: 0.085,
     trajectoryDrift: 18,
-
     magneticStrength: 0.12,
     magneticRadius: 90,
-
     standbyDelay: 30000
   };
 
-
-  /* =======================================================
-     02 — STATE
-     ======================================================= */
-
   const state = {
-
     loaded: false,
-
     menuOpen: false,
-
     standby: false,
-
     activeIndex: 0,
-
     resizeTimer: null,
-
     standbyTimer: null,
-
     rafId: null,
-
     reducedMotion: false,
 
     pointer: {
@@ -71,24 +45,17 @@
     trajectory: {
       progress: 0,
       targetProgress: 0,
-
       drift: 0,
       targetDrift: 0
     }
   };
 
 
-  /* =======================================================
-     03 — DOM
-     ======================================================= */
-
   const dom = {
 
-    html:
-      document.documentElement,
+    html: document.documentElement,
 
-    body:
-      document.body,
+    body: document.body,
 
     loader:
       document.querySelector(".page-loader"),
@@ -116,65 +83,43 @@
 
     menuLinks:
       Array.from(
-        document.querySelectorAll(
-          ".site-menu a"
-        )
+        document.querySelectorAll(".site-menu a")
       ),
 
     progressLabel:
-      document.querySelector(
-        "#progress-current"
-      ),
+      document.querySelector("#progress-current"),
 
     progressFill:
-      document.querySelector(
-        "#progress-fill"
-      ),
+      document.querySelector("#progress-fill"),
 
     progressPoint:
-      document.querySelector(
-        "#progress-point"
-      ),
+      document.querySelector("#progress-point"),
 
     previousSection:
-      document.querySelector(
-        "#previous-section"
-      ),
+      document.querySelector("#previous-section"),
 
     previousLabel:
-      document.querySelector(
-        "#previous-section-label"
-      ),
+      document.querySelector("#previous-section-label"),
 
     nextSection:
-      document.querySelector(
-        "#next-section"
-      ),
+      document.querySelector("#next-section"),
 
     nextLabel:
-      document.querySelector(
-        "#next-section-label"
-      ),
+      document.querySelector("#next-section-label"),
 
     sections:
       Array.from(
-        document.querySelectorAll(
-          ".home-section"
-        )
+        document.querySelectorAll(".home-section")
       ),
 
     reveals:
       Array.from(
-        document.querySelectorAll(
-          ".reveal"
-        )
+        document.querySelectorAll(".reveal")
       ),
 
     narrativeLinks:
       Array.from(
-        document.querySelectorAll(
-          ".narrative-link"
-        )
+        document.querySelectorAll(".narrative-link")
       ),
 
     magneticElements:
@@ -192,69 +137,40 @@
       ),
 
     standby:
-      document.querySelector(
-        ".standby-screen"
-      ),
+      document.querySelector(".standby-screen"),
 
     standbyWake:
-      document.querySelector(
-        ".standby-wake"
-      )
+      document.querySelector(".standby-wake")
   };
 
 
   /* =======================================================
-     04 — HELPERS
+     UTILITIES
      ======================================================= */
 
   const clamp = (
     value,
     min,
     max
-  ) => {
-    return Math.min(
+  ) =>
+    Math.min(
       Math.max(value, min),
       max
     );
-  };
 
 
   const lerp = (
     current,
     target,
     amount
-  ) => {
-    return current +
-      (target - current) *
-      amount;
-  };
+  ) =>
+    current +
+    (target - current) *
+    amount;
 
 
-  const isReducedMotion = () => {
-    return window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-  };
-
-
-  const isFinePointer = () => {
-    return window.matchMedia(
-      "(pointer: fine)"
-    ).matches;
-  };
-
-
-  const isMobile = () => {
-    return window.matchMedia(
-      "(max-width: 900px)"
-    ).matches;
-  };
-
-
-  const getSectionNumber = index => {
-    return String(index + 1)
-      .padStart(2, "0");
-  };
+  const getSectionNumber = index =>
+    String(index + 1).padStart(2, "0");
 
 
   const getSectionByIndex = index => {
@@ -273,13 +189,18 @@
   };
 
 
-  const getSectionTitle = section => {
-    return section?.dataset.sectionTitle || "";
-  };
+  const getSectionTitle = section =>
+    section?.dataset.sectionTitle || "";
+
+
+  const isFinePointer = () =>
+    window.matchMedia(
+      "(pointer: fine)"
+    ).matches;
 
 
   /* =======================================================
-     05 — MOTION PREFERENCE
+     MOTION PREFERENCE
      ======================================================= */
 
   const initMotionPreference = () => {
@@ -291,8 +212,7 @@
 
     const apply = matches => {
 
-      state.reducedMotion =
-        matches;
+      state.reducedMotion = matches;
 
       dom.html.classList.toggle(
         "reduced-motion",
@@ -310,21 +230,22 @@
 
     media.addEventListener(
       "change",
-      event => {
-        apply(event.matches);
-      }
+      event =>
+        apply(event.matches)
     );
   };
 
 
   /* =======================================================
-     06 — LOADER
+     LOADER
      ======================================================= */
 
   const initLoader = () => {
 
     if (!dom.loader) {
+
       state.loaded = true;
+
       return;
     }
 
@@ -338,8 +259,7 @@
       }
 
       const elapsed =
-        performance.now() -
-        started;
+        performance.now() - started;
 
       const remaining =
         Math.max(
@@ -350,24 +270,32 @@
 
       window.setTimeout(() => {
 
+        if (state.loaded) {
+          return;
+        }
+
         state.loaded = true;
 
         dom.loader.classList.add(
           "is-hidden"
         );
 
-        window.setTimeout(() => {
-          dom.loader?.remove();
-        }, 800);
+        window.setTimeout(
+          () => dom.loader?.remove(),
+          800
+        );
 
       }, remaining);
     };
+
 
     if (
       document.readyState ===
       "complete"
     ) {
+
       finish();
+
     } else {
 
       window.addEventListener(
@@ -375,7 +303,9 @@
         finish,
         { once: true }
       );
+
     }
+
 
     window.setTimeout(
       finish,
@@ -385,7 +315,7 @@
 
 
   /* =======================================================
-     07 — PAGE TRANSITIONS
+     PAGE TRANSITIONS
      ======================================================= */
 
   const initPageTransitions = () => {
@@ -409,11 +339,8 @@
                 "href"
               );
 
-            if (!href) {
-              return;
-            }
-
             if (
+              !href ||
               href.startsWith("#") ||
               href.startsWith("mailto:") ||
               href.startsWith("tel:")
@@ -422,7 +349,9 @@
             }
 
             if (
-              link.hasAttribute("download") ||
+              link.hasAttribute(
+                "download"
+              ) ||
               link.target === "_blank"
             ) {
               return;
@@ -431,12 +360,17 @@
             let url;
 
             try {
-              url = new URL(
-                href,
-                window.location.href
-              );
+
+              url =
+                new URL(
+                  href,
+                  window.location.href
+                );
+
             } catch {
+
               return;
+
             }
 
             if (
@@ -452,30 +386,33 @@
               "is-active"
             );
 
-            window.setTimeout(() => {
+            window.setTimeout(
+              () => {
+                window.location.href =
+                  url.href;
+              },
+              CONFIG.transitionDuration
+            );
 
-              window.location.href =
-                url.href;
-
-            }, CONFIG.transitionDuration);
           }
         );
+
       }
     );
 
+
     window.addEventListener(
       "pageshow",
-      () => {
+      () =>
         dom.transition?.classList.remove(
           "is-active"
-        );
-      }
+        )
     );
   };
 
 
   /* =======================================================
-     08 — MENU
+     MENU
      ======================================================= */
 
   const openMenu = () => {
@@ -483,6 +420,8 @@
     if (!dom.menu) {
       return;
     }
+
+    clearStandbyTimer();
 
     state.menuOpen = true;
 
@@ -500,9 +439,13 @@
       "is-menu-open"
     );
 
-    window.setTimeout(() => {
-      dom.menuLinks[0]?.focus();
-    }, state.reducedMotion ? 0 : 250);
+    window.setTimeout(
+      () =>
+        dom.menuLinks[0]?.focus(),
+      state.reducedMotion
+        ? 0
+        : 250
+    );
   };
 
 
@@ -535,8 +478,12 @@
       document.activeElement !==
       dom.menuTrigger
     ) {
+
       dom.menuTrigger?.focus();
+
     }
+
+    resetStandbyTimer();
   };
 
 
@@ -544,29 +491,19 @@
 
     dom.menuTrigger?.addEventListener(
       "click",
-      () => {
-
-        if (state.menuOpen) {
-          closeMenu();
-        } else {
-          openMenu();
-        }
-
-      }
+      () =>
+        state.menuOpen
+          ? closeMenu()
+          : openMenu()
     );
 
 
     dom.menuLinks.forEach(
-      link => {
-
+      link =>
         link.addEventListener(
           "click",
-          () => {
-            closeMenu(false);
-          }
-        );
-
-      }
+          () => closeMenu(false)
+        )
     );
 
 
@@ -602,7 +539,7 @@
 
 
   /* =======================================================
-     09 — WOW HEADER
+     WOW BAR
      ======================================================= */
 
   const updateWowHeader = index => {
@@ -620,13 +557,8 @@
     const progress =
       total <= 1
         ? 0
-        : index /
-          (total - 1);
+        : index / (total - 1);
 
-
-    /* -----------------------------------------------
-       CURRENT TITLE
-       ----------------------------------------------- */
 
     if (dom.progressLabel) {
 
@@ -636,16 +568,13 @@
     }
 
 
-    /* -----------------------------------------------
-       LINE + POINT
-       ----------------------------------------------- */
-
     if (dom.progressFill) {
 
       dom.progressFill.style.width =
         `${progress * 100}%`;
 
     }
+
 
     if (dom.progressPoint) {
 
@@ -655,131 +584,166 @@
     }
 
 
-    /* -----------------------------------------------
-       PREVIOUS PAGE
-       ----------------------------------------------- */
+    const previous =
+      dom.previousSection;
+
+    const previousLabel =
+      dom.previousLabel;
+
+    const next =
+      dom.nextSection;
+
+    const nextLabel =
+      dom.nextLabel;
+
+
+    /* -----------------------------------------------------
+       PREVIOUS
+       ----------------------------------------------------- */
 
     if (index === 0) {
 
-      dom.previousSection?.classList.add(
+      previous?.classList.add(
         "is-disabled"
       );
 
-      dom.previousSection?.setAttribute(
+      previous?.setAttribute(
         "aria-hidden",
         "true"
       );
 
-      dom.previousSection?.setAttribute(
+      previous?.setAttribute(
         "tabindex",
         "-1"
       );
 
-      if (dom.previousLabel) {
-        dom.previousLabel.textContent =
+      if (previousLabel) {
+        previousLabel.textContent =
           "";
       }
 
     } else {
 
-      const previous =
-        getSectionNumber(index - 1);
+      const previousNumber =
+        getSectionNumber(
+          index - 1
+        );
 
-      dom.previousSection?.classList.remove(
+      previous?.classList.remove(
         "is-disabled"
       );
 
-      dom.previousSection?.removeAttribute(
+      previous?.removeAttribute(
         "aria-hidden"
       );
 
-      dom.previousSection?.removeAttribute(
+      previous?.removeAttribute(
         "tabindex"
       );
 
-      if (dom.previousSection) {
-        dom.previousSection.href =
-          `#${previous}`;
+      if (previous) {
+
+        previous.href =
+          `#${previousNumber}`;
+
       }
 
-      if (dom.previousLabel) {
-        dom.previousLabel.textContent =
-          previous;
+      if (previousLabel) {
+
+        previousLabel.textContent =
+          previousNumber;
+
       }
+
+      previous?.setAttribute(
+        "aria-label",
+        `Vai alla sezione ${previousNumber}`
+      );
+
     }
 
 
-    /* -----------------------------------------------
-       NEXT PAGE
-       ----------------------------------------------- */
+    /* -----------------------------------------------------
+       NEXT
+       ----------------------------------------------------- */
 
     if (
-      index === total - 1
+      index ===
+      total - 1
     ) {
 
-      dom.nextSection?.classList.add(
+      next?.classList.add(
         "is-home-return"
       );
 
-      if (dom.nextSection) {
-        dom.nextSection.href =
-          "#01";
+      if (next) {
+        next.href = "#01";
       }
 
-      if (dom.nextLabel) {
-        dom.nextLabel.textContent =
+      if (nextLabel) {
+        nextLabel.textContent =
           "INIZIO";
       }
 
-      dom.nextSection?.setAttribute(
+      next?.setAttribute(
         "aria-label",
         "Torna all'inizio"
       );
 
-      const arrow =
-        dom.nextSection?.querySelector(
+      next
+        ?.querySelector(
           ".section-jump-arrow"
+        )
+        ?.replaceChildren(
+          document.createTextNode("↑")
         );
-
-      if (arrow) {
-        arrow.textContent = "↑";
-      }
 
     } else {
 
-      const next =
-        getSectionNumber(index + 1);
+      const nextNumber =
+        getSectionNumber(
+          index + 1
+        );
 
-      dom.nextSection?.classList.remove(
+      next?.classList.remove(
         "is-home-return"
       );
 
-      if (dom.nextSection) {
-        dom.nextSection.href =
-          `#${next}`;
+      if (next) {
+
+        next.href =
+          `#${nextNumber}`;
+
       }
 
-      if (dom.nextLabel) {
-        dom.nextLabel.textContent =
-          next;
+      if (nextLabel) {
+
+        nextLabel.textContent =
+          nextNumber;
+
       }
 
-      dom.nextSection?.setAttribute(
+      next?.setAttribute(
         "aria-label",
-        "Sezione successiva"
+        `Vai alla sezione ${nextNumber}`
       );
 
-      const arrow =
-        dom.nextSection?.querySelector(
+      next
+        ?.querySelector(
           ".section-jump-arrow"
+        )
+        ?.replaceChildren(
+          document.createTextNode("→")
         );
 
-      if (arrow) {
-        arrow.textContent = "→";
-      }
     }
+
   };
 
+
+  /* =======================================================
+     SECTION NAVIGATION
+     ======================================================= */
 
   const navigateToSection = index => {
 
@@ -801,13 +765,21 @@
       headerHeight -
       CONFIG.scrollNavigationOffset;
 
+
     window.scrollTo({
-      top: Math.max(0, top),
+
+      top: Math.max(
+        0,
+        top
+      ),
+
       behavior:
         state.reducedMotion
           ? "auto"
           : "smooth"
+
     });
+
   };
 
 
@@ -820,14 +792,15 @@
         event.preventDefault();
 
         if (
-          state.activeIndex <= 0
+          state.activeIndex > 0
         ) {
-          return;
+
+          navigateToSection(
+            state.activeIndex - 1
+          );
+
         }
 
-        navigateToSection(
-          state.activeIndex - 1
-        );
       }
     );
 
@@ -841,23 +814,20 @@
         const last =
           dom.sections.length - 1;
 
-        if (
-          state.activeIndex === last
-        ) {
-          navigateToSection(0);
-          return;
-        }
-
         navigateToSection(
-          state.activeIndex + 1
+          state.activeIndex === last
+            ? 0
+            : state.activeIndex + 1
         );
+
       }
     );
+
   };
 
 
   /* =======================================================
-     10 — ACTIVE SECTION
+     ACTIVE SECTION
      ======================================================= */
 
   const detectActiveSection = () => {
@@ -869,23 +839,22 @@
     const reference =
       window.innerHeight * 0.52;
 
-    let bestIndex = 0;
-    let bestDistance = Infinity;
+    let bestIndex =
+      state.activeIndex;
+
+    let bestDistance =
+      Infinity;
+
 
     dom.sections.forEach(
-      (section,index) => {
+      (section, index) => {
 
         const rect =
           section.getBoundingClientRect();
 
-        const center =
-          rect.top +
-          rect.height / 2;
-
         const visible =
           rect.bottom > 0 &&
-          rect.top <
-          window.innerHeight;
+          rect.top < window.innerHeight;
 
         if (!visible) {
           return;
@@ -893,7 +862,8 @@
 
         const distance =
           Math.abs(
-            center -
+            rect.top +
+            rect.height / 2 -
             reference
           );
 
@@ -907,7 +877,9 @@
 
           bestIndex =
             index;
+
         }
+
       }
     );
 
@@ -923,12 +895,14 @@
       updateWowHeader(
         bestIndex
       );
+
     }
+
   };
 
 
   /* =======================================================
-     11 — REVEALS
+     REVEAL SYSTEM
      ======================================================= */
 
   const initRevealSystem = () => {
@@ -937,17 +911,20 @@
       return;
     }
 
+
     if (
       state.reducedMotion ||
-      !("IntersectionObserver" in window)
+      !(
+        "IntersectionObserver"
+        in window
+      )
     ) {
 
       dom.reveals.forEach(
-        element => {
+        element =>
           element.classList.add(
             "is-visible"
-          );
-        }
+          )
       );
 
       return;
@@ -990,17 +967,15 @@
 
 
     dom.reveals.forEach(
-      element => {
-        observer.observe(
-          element
-        );
-      }
+      element =>
+        observer.observe(element)
     );
+
   };
 
 
   /* =======================================================
-     12 — TRAJECTORY
+     TRAJECTORY
      ======================================================= */
 
   const updateTrajectoryTargets = () => {
@@ -1027,6 +1002,7 @@
       last.offsetHeight -
       window.innerHeight;
 
+
     const progress =
       end <= start
         ? 0
@@ -1047,15 +1023,6 @@
     state.trajectory.targetProgress =
       progress;
 
-
-    /*
-     * Drift minimo.
-     *
-     * Non è un parallax scenografico.
-     * È una variazione fisica quasi impercettibile
-     * che mantiene la traiettoria viva.
-     */
-
     state.trajectory.targetDrift =
       Math.sin(
         progress *
@@ -1063,6 +1030,7 @@
         2
       ) *
       CONFIG.trajectoryDrift;
+
   };
 
 
@@ -1075,7 +1043,8 @@
       state.trajectory.progress =
         state.trajectory.targetProgress;
 
-      state.trajectory.drift = 0;
+      state.trajectory.drift =
+        0;
 
     } else {
 
@@ -1092,6 +1061,7 @@
           state.trajectory.targetDrift,
           CONFIG.trajectoryLerp
         );
+
     }
 
 
@@ -1100,15 +1070,17 @@
       state.trajectory.progress.toFixed(4)
     );
 
+
     dom.html.style.setProperty(
       "--trajectory-drift",
       `${state.trajectory.drift.toFixed(2)}px`
     );
+
   };
 
 
   /* =======================================================
-     13 — NARRATIVE LINKS
+     NARRATIVE LINKS
      ======================================================= */
 
   const initNarrativeLinks = () => {
@@ -1123,6 +1095,7 @@
           return;
         }
 
+
         const nodes =
           document.querySelectorAll(
             `.trajectory-node--${node},
@@ -1134,24 +1107,24 @@
         const activate = () => {
 
           nodes.forEach(
-            target => {
+            target =>
               target.classList.add(
                 "is-linked"
-              );
-            }
+              )
           );
+
         };
 
 
         const deactivate = () => {
 
           nodes.forEach(
-            target => {
+            target =>
               target.classList.remove(
                 "is-linked"
-              );
-            }
+              )
           );
+
         };
 
 
@@ -1177,11 +1150,12 @@
 
       }
     );
+
   };
 
 
   /* =======================================================
-     14 — CURSOR
+     CUSTOM CURSOR
      ======================================================= */
 
   const initCursor = () => {
@@ -1221,24 +1195,23 @@
 
           element.addEventListener(
             "pointerenter",
-            () => {
+            () =>
               dom.cursor.classList.add(
                 "is-hovering"
-              );
-            }
+              )
           );
 
           element.addEventListener(
             "pointerleave",
-            () => {
+            () =>
               dom.cursor.classList.remove(
                 "is-hovering"
-              );
-            }
+              )
           );
 
         }
       );
+
   };
 
 
@@ -1262,6 +1235,7 @@
         CONFIG.cursorLerp
       );
 
+
     state.cursor.y =
       lerp(
         state.cursor.y,
@@ -1284,11 +1258,12 @@
         ${state.cursor.y}px,
         0
       ) translate(-50%,-50%)`;
+
   };
 
 
   /* =======================================================
-     15 — MAGNETIC
+     MAGNETIC ELEMENTS
      ======================================================= */
 
   const initMagneticElements = () => {
@@ -1311,21 +1286,19 @@
             const rect =
               element.getBoundingClientRect();
 
-            const centerX =
-              rect.left +
-              rect.width / 2;
-
-            const centerY =
-              rect.top +
-              rect.height / 2;
-
             const dx =
               event.clientX -
-              centerX;
+              (
+                rect.left +
+                rect.width / 2
+              );
 
             const dy =
               event.clientY -
-              centerY;
+              (
+                rect.top +
+                rect.height / 2
+              );
 
             const distance =
               Math.sqrt(
@@ -1333,12 +1306,14 @@
                 dy * dy
               );
 
+
             if (
               distance >
               CONFIG.magneticRadius
             ) {
               return;
             }
+
 
             const strength =
               CONFIG.magneticStrength *
@@ -1348,15 +1323,18 @@
                 CONFIG.magneticRadius
               );
 
+
             element.style.setProperty(
               "--magnetic-x",
               `${dx * strength}px`
             );
 
+
             element.style.setProperty(
               "--magnetic-y",
               `${dy * strength}px`
             );
+
           }
         );
 
@@ -1380,11 +1358,14 @@
 
       }
     );
+
   };
 
 
   /* =======================================================
-     16 — STANDBY
+     STANDBY
+     NARRATIVE PAUSE:
+     PUNTO → LINEA → MOVIMENTO
      ======================================================= */
 
   const clearStandbyTimer = () => {
@@ -1396,7 +1377,9 @@
       );
 
       state.standbyTimer = null;
+
     }
+
   };
 
 
@@ -1409,6 +1392,7 @@
     ) {
       return;
     }
+
 
     state.standby = true;
 
@@ -1424,6 +1408,12 @@
       "aria-hidden",
       "false"
     );
+
+
+    dom.standbyWake?.focus({
+      preventScroll: true
+    });
+
   };
 
 
@@ -1432,6 +1422,7 @@
     if (!state.standby) {
       return;
     }
+
 
     state.standby = false;
 
@@ -1449,12 +1440,14 @@
     );
 
     resetStandbyTimer();
+
   };
 
 
   const resetStandbyTimer = () => {
 
     clearStandbyTimer();
+
 
     if (
       state.reducedMotion ||
@@ -1464,11 +1457,13 @@
       return;
     }
 
+
     state.standbyTimer =
       window.setTimeout(
         enterStandby,
         CONFIG.standbyDelay
       );
+
   };
 
 
@@ -1477,6 +1472,7 @@
     if (!dom.standby) {
       return;
     }
+
 
     dom.standbyWake?.addEventListener(
       "click",
@@ -1500,7 +1496,9 @@
           () => {
 
             if (state.standby) {
+
               exitStandby();
+
               return;
             }
 
@@ -1509,17 +1507,19 @@
           },
           {
             passive:
-              eventName !== "keydown"
+              eventName !==
+              "keydown"
           }
         );
 
       }
     );
+
   };
 
 
   /* =======================================================
-     17 — HASH NAVIGATION
+     HASH NAVIGATION
      ======================================================= */
 
   const initHashNavigation = () => {
@@ -1531,27 +1531,31 @@
       return;
     }
 
+
     const index =
       dom.sections.findIndex(
         section =>
-          `#${section.id}` === hash
+          `#${section.id}` ===
+          hash
       );
+
 
     if (index < 0) {
       return;
     }
 
+
     window.setTimeout(
-      () => {
-        navigateToSection(index);
-      },
+      () =>
+        navigateToSection(index),
       500
     );
+
   };
 
 
   /* =======================================================
-     18 — KEYBOARD NAVIGATION
+     KEYBOARD NAVIGATION
      ======================================================= */
 
   const initKeyboardNavigation = () => {
@@ -1567,6 +1571,7 @@
           return;
         }
 
+
         if (
           event.key !== "PageDown" &&
           event.key !== "PageUp"
@@ -1574,12 +1579,15 @@
           return;
         }
 
+
         event.preventDefault();
+
 
         const direction =
           event.key === "PageDown"
             ? 1
             : -1;
+
 
         const nextIndex =
           clamp(
@@ -1589,16 +1597,19 @@
             dom.sections.length - 1
           );
 
+
         navigateToSection(
           nextIndex
         );
+
       }
     );
+
   };
 
 
   /* =======================================================
-     19 — SCROLL
+     SCROLL
      ======================================================= */
 
   const handleScroll = () => {
@@ -1611,7 +1622,7 @@
 
 
   /* =======================================================
-     20 — RESIZE
+     RESIZE
      ======================================================= */
 
   const handleResize = () => {
@@ -1619,6 +1630,7 @@
     window.clearTimeout(
       state.resizeTimer
     );
+
 
     state.resizeTimer =
       window.setTimeout(
@@ -1635,11 +1647,12 @@
         },
         CONFIG.resizeDebounce
       );
+
   };
 
 
   /* =======================================================
-     21 — RAF
+     ANIMATION FRAME
      ======================================================= */
 
   const animationFrame = () => {
@@ -1652,11 +1665,12 @@
       requestAnimationFrame(
         animationFrame
       );
+
   };
 
 
   /* =======================================================
-     22 — INITIAL STATE
+     INITIAL STATE
      ======================================================= */
 
   const setInitialState = () => {
@@ -1665,6 +1679,7 @@
       return;
     }
 
+
     state.activeIndex = 0;
 
     updateWowHeader(0);
@@ -1672,11 +1687,12 @@
     updateTrajectoryTargets();
 
     resetStandbyTimer();
+
   };
 
 
   /* =======================================================
-     23 — INIT
+     INIT
      ======================================================= */
 
   const init = () => {
@@ -1711,6 +1727,7 @@
 
     updateTrajectoryTargets();
 
+
     window.addEventListener(
       "scroll",
       handleScroll,
@@ -1718,6 +1735,7 @@
         passive: true
       }
     );
+
 
     window.addEventListener(
       "resize",
@@ -1727,13 +1745,11 @@
       }
     );
 
+
     animationFrame();
+
   };
 
-
-  /* =======================================================
-     24 — START
-     ======================================================= */
 
   if (
     document.readyState ===
