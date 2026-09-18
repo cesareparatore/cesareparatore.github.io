@@ -1,2441 +1,1142 @@
-/* =========================================================
-   CESARE PARATORE
-   MOVIMENTO / CON DIREZIONE.
-   MASTER VISUAL SYSTEM — 2.3
-   ========================================================= */
-
-:root {
-  --ivory: #F2EFE8;
-  --ink: #11110F;
-  --terracotta: #A64232;
-  --sand: #C9C0AF;
-  --stone: #77736B;
-  --white: #FFFDF8;
-
-  --font-serif: "Instrument Serif", Georgia, serif;
-  --font-sans: "DM Sans", Arial, sans-serif;
-  --font-mono: "DM Mono", monospace;
-
-  --header-height: 108px;
-  --content-max: 1680px;
-  --copy-max: 760px;
-  --narrow-copy: 620px;
-
-  --ease-out: cubic-bezier(.16, 1, .3, 1);
-  --ease-in-out: cubic-bezier(.65, 0, .35, 1);
-
-  --trajectory-progress: 0;
-  --trajectory-drift: 0px;
-  --magnetic-x: 0px;
-  --magnetic-y: 0px;
-}
-
-
-/* =========================================================
-   RESET
-   ========================================================= */
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-html {
-  background: var(--ivory);
-  color: var(--ink);
-  scroll-behavior: smooth;
-}
-
-body {
-  margin: 0;
-  min-width: 320px;
-  background: var(--ivory);
-  color: var(--ink);
-  font-family: var(--font-sans);
-  overflow-x: clip;
-}
-
-body.is-standby {
-  overflow: hidden;
-}
-
-img {
-  display: block;
-  max-width: 100%;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-button,
-input,
-textarea,
-select {
-  font: inherit;
-}
-
-button {
-  color: inherit;
-}
-
-::selection {
-  background: var(--ink);
-  color: var(--ivory);
-}
-
-:focus {
-  outline: none;
-}
-
-:focus-visible {
-  outline: 2px solid var(--terracotta);
-  outline-offset: 6px;
-}
-
-
-/* =========================================================
-   LOADER
-   ========================================================= */
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <title>Cesare Paratore — Movimento / Con direzione.</title>
+
+  <meta
+    name="description"
+    content="Cesare Paratore. Sport, Scienze Motorie, educazione, management e digitale: un percorso costruito attraverso movimento, esperienza e connessioni."
+  >
+
+  <meta name="theme-color" content="#F2EFE8">
+  <meta name="color-scheme" content="light">
+
+  <link
+    rel="canonical"
+    href="https://www.cesareparatore.it/"
+  >
+
+  <link rel="icon" href="/assets/images/cp-mark.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap"
+    rel="stylesheet"
+  >
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://www.cesareparatore.it/#website",
+        "url": "https://www.cesareparatore.it/",
+        "name": "Cesare Paratore",
+        "description": "Movimento / con direzione."
+      },
+      {
+        "@type": "Person",
+        "@id": "https://www.cesareparatore.it/#person",
+        "name": "Cesare Paratore",
+        "url": "https://www.cesareparatore.it/"
+      }
+    ]
+  }
+  </script>
+</head>
+
+<body>
+
+  <div class="page-loader" aria-hidden="true">
+    <div class="page-loader-inner">
+      <img
+        src="/assets/images/cp-mark.png"
+        alt=""
+        width="64"
+        height="64"
+      >
+    </div>
+  </div>
+
+  <div class="page-transition" aria-hidden="true"></div>
+
+  <div class="custom-cursor" aria-hidden="true">
+    <span class="custom-cursor-dot"></span>
+    <span class="custom-cursor-ring"></span>
+  </div>
+
+  <header class="site-header">
+
+    <a
+      class="site-brand"
+      href="#01"
+      aria-label="Cesare Paratore — torna all'inizio"
+    >
+      <img
+        src="/assets/images/cp-mark.png"
+        alt="Cesare Paratore"
+        width="48"
+        height="48"
+      >
+    </a>
+
+    <div class="wow-progress" aria-label="Navigazione del percorso">
+
+      <div
+        class="progress-label"
+        id="progress-current"
+        aria-live="polite"
+      >
+        IL MOVIMENTO È SOLO L'INIZIO.
+      </div>
+
+      <div class="progress-track" aria-hidden="true">
+        <span
+          class="progress-fill"
+          id="progress-fill"
+        ></span>
+
+        <span
+          class="progress-point"
+          id="progress-point"
+        ></span>
+      </div>
+
+      <div class="section-jump">
+
+        <a
+          id="previous-section"
+          class="section-jump-link section-jump-link--previous is-disabled"
+          href="#01"
+          aria-label="Sezione precedente"
+          aria-hidden="true"
+          tabindex="-1"
+        >
+          <span
+            class="section-jump-arrow"
+            aria-hidden="true"
+          >←</span>
+
+          <span id="previous-section-label"></span>
+        </a>
+
+        <a
+          id="next-section"
+          class="section-jump-link section-jump-link--next"
+          href="#02"
+          aria-label="Vai alla sezione 02"
+        >
+          <span id="next-section-label">02</span>
+
+          <span
+            class="section-jump-arrow"
+            aria-hidden="true"
+          >→</span>
+        </a>
+
+      </div>
+    </div>
+
+    <button
+      class="menu-trigger"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-menu"
+      aria-label="Apri menu"
+    >
+      <span class="menu-trigger-label">MENU</span>
+      <span class="menu-trigger-icon" aria-hidden="true">
+        <span></span>
+        <span></span>
+      </span>
+    </button>
+
+  </header>
+
+
+  <aside
+    class="site-menu"
+    id="site-menu"
+    aria-hidden="true"
+  >
+
+    <div class="site-menu-inner">
+
+      <nav
+        class="site-menu-nav"
+        aria-label="Navigazione principale"
+      >
+
+        <a href="/chi-sono/">
+          <span class="site-menu-number">01</span>
+          <span>CHI SONO</span>
+        </a>
+
+        <a href="/sport/">
+          <span class="site-menu-number">02</span>
+          <span>SPORT</span>
+        </a>
+
+        <a href="/scienze-motorie/">
+          <span class="site-menu-number">03</span>
+          <span>SCIENZE MOTORIE</span>
+        </a>
+
+        <a href="/educazione/">
+          <span class="site-menu-number">04</span>
+          <span>EDUCAZIONE</span>
+        </a>
+
+        <a href="/management-dello-sport/">
+          <span class="site-menu-number">05</span>
+          <span>MANAGEMENT</span>
+        </a>
+
+        <a href="/presenza-web/">
+          <span class="site-menu-number">06</span>
+          <span>DIGITALE</span>
+        </a>
+
+        <a href="/territorio/">
+          <span class="site-menu-number">07</span>
+          <span>TERRITORIO</span>
+        </a>
+
+        <a href="/contatti/">
+          <span class="site-menu-number">08</span>
+          <span>CONTATTI</span>
+        </a>
+
+      </nav>
+
+    </div>
+
+  </aside>
+
+
+  <main id="main-content">
+
+
+    <!-- =====================================================
+         01 — ORIGINE
+         ===================================================== -->
+
+    <section
+      class="home-section home-section--hero"
+      id="01"
+      data-section-title="IL MOVIMENTO È SOLO L'INIZIO."
+    >
+
+      <div class="section-inner section-inner--hero">
+
+        <div class="section-title reveal">
+          IL MOVIMENTO È SOLO L'INIZIO.
+        </div>
+
+        <h1 class="hero-title reveal">
+
+          <span class="hero-title-line hero-title-line--identity">
+
+            <span class="hero-title-word">
+              MOVIMENTO
+            </span>
+
+            <span
+              class="identity-slash"
+              aria-hidden="true"
+            >/</span>
+
+          </span>
+
+          <span class="hero-title-line">
+            CON DIREZIONE.
+          </span>
+
+        </h1>
+
+        <div class="hero-intro editorial-copy reveal">
+          <p>
+            Tutto è iniziato da una domanda:
+            dove può portarti il movimento?
+          </p>
+        </div>
+
+
+        <div class="hero-directions reveal">
+
+          <a
+            class="hero-direction"
+            href="/sport/"
+            data-direction="sport"
+          >
+            SPORT
+          </a>
+
+          <a
+            class="hero-direction"
+            href="/scienze-motorie/"
+            data-direction="scienze-motorie"
+          >
+            SCIENZE MOTORIE
+          </a>
+
+          <a
+            class="hero-direction"
+            href="/educazione/"
+            data-direction="educazione"
+          >
+            EDUCAZIONE
+          </a>
+
+          <a
+            class="hero-direction"
+            href="/management-dello-sport/"
+            data-direction="management"
+          >
+            MANAGEMENT
+          </a>
+
+          <a
+            class="hero-direction"
+            href="/presenza-web/"
+            data-direction="digitale"
+          >
+            DIGITALE
+          </a>
+
+        </div>
+
+
+        <div
+          class="direction-trajectory reveal"
+          aria-hidden="true"
+        >
+
+          <span class="direction-trajectory-line"></span>
+
+          <span
+            class="direction-node"
+            data-direction="sport"
+            style="left: 8%; top: 54%;"
+          >
+            <span class="direction-node-label">
+              SPORT
+            </span>
+          </span>
+
+          <span
+            class="direction-node"
+            data-direction="scienze-motorie"
+            style="left: 29%; top: 42%;"
+          >
+            <span class="direction-node-label">
+              SCIENZE MOTORIE
+            </span>
+          </span>
+
+          <span
+            class="direction-node"
+            data-direction="educazione"
+            style="left: 50%; top: 50%;"
+          >
+            <span class="direction-node-label">
+              EDUCAZIONE
+            </span>
+          </span>
+
+          <span
+            class="direction-node"
+            data-direction="management"
+            style="left: 71%; top: 39%;"
+          >
+            <span class="direction-node-label">
+              MANAGEMENT
+            </span>
+          </span>
+
+          <span
+            class="direction-node"
+            data-direction="digitale"
+            style="left: 92%; top: 48%;"
+          >
+            <span class="direction-node-label">
+              DIGITALE
+            </span>
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         02 — DOMANDA
+         ===================================================== -->
+
+    <section
+      class="home-section home-section--question"
+      id="02"
+      data-section-title="LA DOMANDA È CAMBIATA."
+    >
+
+      <div class="section-inner section-inner--narrow">
+
+        <div class="section-title reveal">
+          LA DOMANDA È CAMBIATA.
+        </div>
+
+        <div class="editorial-copy editorial-copy--large reveal">
+
+          <p>
+            Il movimento è stato il punto di partenza.
+          </p>
+
+          <p>
+            Poi è arrivato lo sport.
+          </p>
+
+          <p>
+            E dentro lo sport ho trovato la corsa.
+            Prima come atleta.
+            Poi come tecnico.
+          </p>
+
+          <div class="editorial-sequence" aria-label="Le tappe della pratica">
+            <p>La pratica.</p>
+            <p>L’allenamento.</p>
+            <p>La fatica.</p>
+            <p>Il confronto con il limite.</p>
+          </div>
+
+          <p>
+            Prima ancora di studiare il movimento,
+            ho iniziato a viverlo.
+          </p>
+
+          <p>
+            E più mi avvicinavo a quel limite,
+            più sentivo il bisogno di capire cosa ci fosse oltre.
+          </p>
+
+          <p>
+            Le Scienze Motorie sono arrivate anche da qui:
+            dal desiderio di comprendere ciò che stavo vivendo.
+          </p>
+
+          <p>
+            Studiare il movimento mi ha dato strumenti.
+            Lo sport mi ha dato esperienza.
+            La corsa mi ha insegnato a misurarmi con il tempo,
+            con la distanza e con me stesso.
+            L'allenamento mi ha insegnato la continuità.
+            La fatica mi ha insegnato che il cambiamento ha un costo.
+            Il limite mi ha insegnato che non sempre basta spingere più forte.
+          </p>
+
+          <p>
+            E a quel punto la domanda è cambiata.
+          </p>
+
+          <p class="editorial-emphasis">
+            Se il movimento può cambiare un corpo,
+            <strong>che cosa può cambiare una persona?</strong>
+          </p>
+
+          <p>
+            La risposta non poteva stare tutta in una disciplina.
+          </p>
+
+          <p>
+            Così ho iniziato a guardare oltre.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         03 — CINQUE STRADE
+         ===================================================== -->
+
+    <section
+      class="home-section home-section--directions"
+      id="03"
+      data-section-title="UNA STRADA NON ERA ABBASTANZA."
+    >
+
+      <div class="section-inner section-inner--narrow">
+
+        <div class="section-title reveal">
+          UNA STRADA NON ERA ABBASTANZA.
+        </div>
+
+        <div class="editorial-copy editorial-copy--large reveal">
+
+          <p>
+            Ho incontrato l'educazione.
+            Per capire cosa succede quando ciò che hai imparato
+            diventa esperienza per qualcun altro.
+          </p>
+
+          <p>
+            Ho incontrato il management.
+            Per capire cosa succede quando un'idea
+            deve diventare organizzazione, progetto, realtà.
+          </p>
+
+          <p>
+            Ho incontrato il digitale.
+            Per capire come strumenti e connessioni
+            possano aprire nuove possibilità.
+          </p>
+
+          <p>
+            E sono tornato allo sport.
+            Con occhi diversi.
+          </p>
+
+          <p>
+            A quel punto le strade erano diventate cinque:
+          </p>
+
+        </div>
+
+        <div class="five-directions reveal">
+
+          <a href="/sport/" class="narrative-link" data-trajectory-node="sport">
+            SPORT
+          </a>
+
+          <a href="/scienze-motorie/" class="narrative-link" data-trajectory-node="scienze-motorie">
+            SCIENZE MOTORIE
+          </a>
+
+          <a href="/educazione/" class="narrative-link" data-trajectory-node="educazione">
+            EDUCAZIONE
+          </a>
+
+          <a href="/management-dello-sport/" class="narrative-link" data-trajectory-node="management">
+            MANAGEMENT
+          </a>
+
+          <a href="/presenza-web/" class="narrative-link" data-trajectory-node="digitale">
+            DIGITALE
+          </a>
+
+        </div>
+
+        <div class="editorial-copy editorial-copy--large reveal">
+
+          <p>
+            Sembravano direzioni diverse.
+            Ma continuavano a partire dallo stesso punto.
+            <strong>Il movimento.</strong>
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         04 — CONNESSIONI
+         ===================================================== -->
+
+    <section
+      class="home-section home-section--network"
+      id="04"
+      data-section-title="POI HO CAPITO CHE NON ERANO CINQUE STRADE."
+    >
+
+      <div class="section-inner section-inner--split">
+
+        <div class="section-content">
+
+          <div class="section-title reveal">
+            POI HO CAPITO CHE NON ERANO CINQUE STRADE.
+          </div>
+
+          <div class="editorial-copy editorial-copy--large reveal">
+
+            <p>
+              Erano cinque modi di guardare la stessa realtà.
+            </p>
+
+            <p>
+              Lo sport mi ha insegnato a misurarmi.
+              Le Scienze Motorie mi hanno insegnato a comprendere.
+              L'educazione mi ha insegnato a trasferire.
+              Il management mi ha insegnato a progettare.
+              Il digitale mi ha insegnato a connettere.
+            </p>
+
+            <p>
+              E nessuna di queste esperienze è rimasta uguale
+              dopo aver incontrato le altre.
+            </p>
+
+            <p>
+              È questo che un curriculum non riesce a raccontare.
+              Può dire dove sei stato.
+              Non può dire
+              <strong>come ogni tappa ha cambiato quella successiva.</strong>
+            </p>
+
+            <p>
+              Per questo il mio percorso non lo vedo come un elenco.
+              Lo vedo come una rete di connessioni.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="network-visual"
+          aria-hidden="true"
+        >
+
+          <span class="network-line network-line--a"></span>
+          <span class="network-line network-line--b"></span>
+          <span class="network-line network-line--c"></span>
+          <span class="network-line network-line--d"></span>
+          <span class="network-line network-line--e"></span>
+
+          <span
+            class="network-node network-node--sport"
+            data-node="sport"
+          ></span>
+
+          <span
+            class="network-node network-node--scienze-motorie"
+            data-node="scienze-motorie"
+          ></span>
+
+          <span
+            class="network-node network-node--educazione"
+            data-node="educazione"
+          ></span>
+
+          <span
+            class="network-node network-node--management"
+            data-node="management"
+          ></span>
+
+          <span
+            class="network-node network-node--digitale"
+            data-node="digitale"
+          ></span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         05 — PAUSA
+         ===================================================== -->
+
+    <section
+      class="home-section home-section--pause"
+      id="05"
+      data-section-title="E LE CONNESSIONI, A VOLTE, PASSANO ANCHE DA UNA PAUSA."
+    >
+
+      <div class="section-inner section-inner--split">
+
+        <div class="section-content">
+
+          <div class="section-title reveal">
+            E LE CONNESSIONI, A VOLTE, PASSANO ANCHE DA UNA PAUSA.
+          </div>
+
+          <div class="editorial-copy editorial-copy--large reveal">
+
+            <p>
+              Ho imparato che muoversi non significa necessariamente andare avanti.
+              A volte significa fermarsi.
+              Guardare meglio.
+              Accorgersi che la domanda era sbagliata.
+              Cambiare direzione.
+              Riconoscere un errore.
+              Ricominciare.
+            </p>
+
+            <p>
+              È forse la parte più difficile del movimento:
+              <strong>capire quando continuare e quando cambiare.</strong>
+            </p>
+
+            <p>
+              Per questo oggi cerco di non partire dalla soluzione.
+              Parto da ciò che ho davanti.
+              Prima capire.
+              Poi costruire.
+              Infine muoversi.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="pause-trajectory"
+          aria-hidden="true"
+        >
+          <span class="pause-trajectory-line"></span>
+          <span class="pause-trajectory-point"></span>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         06 — RADICAMENTO
+         ===================================================== -->
+
+    <section
+      class="home-section home-section--territory"
+      id="06"
+      data-section-title="OGGI SO ANCHE DA DOVE PARTO."
+    >
+
+      <div class="section-inner section-inner--territory">
+
+        <div class="territory-copy">
+
+          <div class="section-title reveal">
+            OGGI SO ANCHE DA DOVE PARTO.
+          </div>
+
+          <div class="editorial-copy editorial-copy--large reveal">
+
+            <p>
+              <strong>Stadio Comunale di Partinico</strong>
+            </p>
+
+          </div>
+
+          <div class="territory-card reveal">
+
+            <span class="territory-card-place">
+              PARTINICO
+            </span>
+
+            <span class="territory-card-title">
+              DA QUI, NON SOLO QUI.
+            </span>
+
+            <p>
+              È qui che ha la sua base il mio lavoro.
+              In presenza, per chi parte da qui e per chi arriva
+              dai territori vicini.
+              Online, quando la distanza non deve essere un limite.
+            </p>
+
+            <p class="territory-card-note">
+              Perché una base non è un confine.
+              È il punto che ti permette di sapere sempre
+              da dove stai partendo.
+            </p>
+
+            <a
+              class="territory-link narrative-link"
+              href="https://www.google.com/maps/search/?api=1&query=Stadio+Comunale+Giuseppe+La+Franca%2C+Viale+Aldo+Moro%2C+Partinico%2C+PA%2C+Italy"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-trajectory-node="territorio"
+            >
+              APRI SU GOOGLE MAPS →
+            </a>
+
+          </div>
+
+        </div>
+
+
+        <div class="territory-map reveal">
+
+          <iframe
+            title="Stadio Comunale Giuseppe La Franca, Partinico — vista satellitare"
+            src="https://www.google.com/maps?q=Stadio+Comunale+Giuseppe+La+Franca%2C+Viale+Aldo+Moro%2C+Partinico%2C+PA%2C+Italy&layer=satellite&output=embed"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen
+          ></iframe>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         07 — PRESENTE
+         ===================================================== -->
+
+    <section
+      class="home-section home-section--present"
+      id="07"
+      data-section-title="DA QUI, IL PERCORSO CONTINUA."
+    >
+
+      <div class="section-inner section-inner--split section-inner--present">
+
+        <div class="section-content">
+
+          <div class="section-title reveal">
+            DA QUI, IL PERCORSO CONTINUA.
+          </div>
+
+          <div class="editorial-copy editorial-copy--large reveal">
+
+            <p>
+              Oggi quelle esperienze convivono.
+            </p>
+
+            <p>
+              <strong>Sport.</strong><br>
+              Il punto da cui è iniziato tutto.
+            </p>
+
+            <p>
+              <strong>Scienze Motorie.</strong><br>
+              Il modo di comprendere ciò che accade nel movimento.
+            </p>
+
+            <p>
+              <strong>Educazione.</strong><br>
+              Il passaggio dalla propria esperienza a quella degli altri.
+            </p>
+
+            <p>
+              <strong>Management.</strong><br>
+              Il modo di trasformare idee e competenze in progetti.
+            </p>
+
+            <p>
+              <strong>Digitale.</strong><br>
+              Uno spazio per connettere, costruire e aprire nuove possibilità.
+            </p>
+
+            <p>
+              Non provo a farle entrare tutte dentro una definizione.
+            </p>
+
+            <p>
+              Cerco piuttosto il punto in cui possono diventare utili.
+              A una persona.
+              A un progetto.
+              A un problema.
+              A un'idea che deve ancora trovare la sua forma.
+            </p>
+
+            <p>
+              È lì che mi interessa lavorare:
+            </p>
+
+            <p class="editorial-emphasis">
+              <strong>
+                nel punto in cui una competenza smette di essere soltanto
+                conoscenza e comincia a diventare possibilità.
+              </strong>
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <figure class="present-portrait reveal">
+
+          <img
+            src="/assets/images/cp-foto.webp"
+            alt="Cesare Paratore"
+            width="753"
+            height="941"
+            loading="lazy"
+            decoding="async"
+          >
 
-.page-loader {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
+        </figure>
+
+      </div>
 
-  display: grid;
-  place-items: center;
+    </section>
 
-  background: var(--ivory);
 
-  opacity: 1;
-  visibility: visible;
+    <!-- =====================================================
+         08 — POSSIBILITÀ
+         ===================================================== -->
 
-  transition:
-    opacity .95s var(--ease-in-out),
-    visibility .95s;
-}
+    <section
+      class="home-section home-section--possibility"
+      id="08"
+      data-section-title="NON È UN PUNTO DI ARRIVO."
+    >
 
-.page-loader.is-hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
+      <div class="section-inner section-inner--narrow">
 
-.page-loader-inner {
-  min-height: 250px;
-  padding: 32px;
+        <div class="section-title reveal">
+          NON È UN PUNTO DI ARRIVO.
+        </div>
+
+        <div class="editorial-copy editorial-copy--large reveal">
+
+          <p>
+            Quello che hai letto fin qui
+            non è un curriculum.
+          </p>
+
+          <p>
+            È il modo in cui sono arrivato a guardare le cose.
+          </p>
+
+          <p>
+            E questo sito nasce per la stessa ragione:
+          </p>
+
+          <p>
+            per mettere ordine,
+            creare connessioni,
+            e trasformare ciò che so
+            in qualcosa che possa essere utile.
+          </p>
 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+          <p class="editorial-emphasis">
+            <strong>
+              Perché ogni percorso, prima o poi,
+              ha bisogno di incontrare qualcosa di nuovo.
+            </strong>
+          </p>
 
-  text-align: center;
-}
+        </div>
 
-.page-loader-logo {
-  width: clamp(74px, 9vw, 112px);
-  height: auto;
-  margin-bottom: clamp(36px, 5vw, 58px);
+      </div>
 
-  object-fit: contain;
+    </section>
+
+
+    <!-- =====================================================
+         09 — VISITATORE
+         ===================================================== -->
+
+    <section
+      class="home-section home-section--question-for-you"
+      id="09"
+      data-section-title="FORSE È QUI CHE LA STORIA CAMBIA."
+    >
 
-  opacity: 0;
-  animation: loaderLogoIn .9s var(--ease-out) .05s forwards;
-}
+      <div class="section-inner section-inner--question-for-you">
 
-.loader-trajectory {
-  position: relative;
+        <div class="section-title reveal">
+          FORSE È QUI CHE LA STORIA CAMBIA.
+        </div>
 
-  width: min(380px, 65vw);
-  height: 28px;
+        <div class="reader-question reveal">
 
-  margin-bottom: 42px;
-}
+          <span class="reader-question-label">
+            FORSE È QUI CHE LA STORIA CAMBIA.
+          </span>
 
-.loader-point {
-  position: absolute;
-  left: 0;
-  top: 50%;
+          <h2>
+            DA DOVE
+            <span>TU PARTI?</span>
+          </h2>
 
-  width: 9px;
-  height: 9px;
+        </div>
 
-  background: var(--ink);
-  border-radius: 50%;
+      </div>
 
-  transform: translateY(-50%);
+    </section>
 
-  opacity: 0;
-  animation: loaderPoint .45s var(--ease-out) .15s forwards;
-}
 
-.loader-line {
-  position: absolute;
-  left: 7px;
-  top: 50%;
+    <!-- =====================================================
+         10 — CTA
+         ===================================================== -->
 
-  width: calc(100% - 14px);
-  height: 1px;
+    <section
+      class="home-section home-section--cta"
+      id="10"
+      data-section-title="PARTIAMO DA QUELLO."
+    >
 
-  background: var(--ink);
+      <div class="section-inner section-inner--cta">
 
-  transform-origin: left center;
-  transform: scaleX(0);
+        <div class="section-title reveal">
+          PARTIAMO DA QUELLO.
+        </div>
 
-  animation: loaderLine 1.35s var(--ease-out) .55s forwards;
-}
+        <div class="editorial-copy editorial-copy--large reveal">
 
-.loader-motto {
-  display: flex;
-  gap: 10px;
+          <p>
+            Non dalla soluzione.
+            Da te.
+            Da quello che hai davanti.
+            Da quello che vuoi capire, costruire, migliorare o cambiare.
+          </p>
 
-  margin: 0 0 14px;
+          <p>
+            Se hai un obiettivo, partiamo da quello.
+            Se hai un problema, partiamo da quello.
+            Se hai un progetto, partiamo da quello.
+            Se hai una domanda, partiamo da quella.
+          </p>
 
-  color: var(--ink);
+          <p>
+            Perché forse il movimento non consiste
+            nel sapere già dove arriverai.
+            Forse consiste nel riconoscere il punto
+            da cui vale la pena partire.
+          </p>
 
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: .12em;
+          <p>
+            Io quel punto l'ho trovato nel movimento.
+            E da lì ho costruito tutto il resto.
+          </p>
 
-  opacity: 0;
-  animation: loaderCopy 1s var(--ease-out) 3.25s forwards;
-}
+          <p class="editorial-emphasis">
+            <strong>Adesso tocca a te.</strong>
+          </p>
 
-.loader-signature {
-  margin: 0;
+        </div>
 
-  color: var(--stone);
 
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: .18em;
+        <div class="cta-trajectory reveal">
 
-  opacity: 0;
-  animation: loaderCopy 1s var(--ease-out) 4.05s forwards;
-}
+          <span class="cta-trajectory-line"></span>
 
-@keyframes loaderLogoIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes loaderPoint {
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes loaderLine {
-  to {
-    transform: scaleX(1);
-  }
-}
-
-@keyframes loaderCopy {
-  to {
-    opacity: 1;
-  }
-}
-
-
-/* =========================================================
-   PAGE TRANSITION
-   ========================================================= */
-
-.page-transition {
-  position: fixed;
-  inset: 0;
-  z-index: 990;
-
-  background: var(--ink);
-
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-
-  transition:
-    opacity .7s var(--ease-in-out),
-    visibility .7s;
-}
-
-.page-transition.is-active {
-  opacity: 1;
-  visibility: visible;
-}
-
-
-/* =========================================================
-   CUSTOM CURSOR
-   ========================================================= */
-
-.custom-cursor {
-  position: fixed;
-  inset: 0;
-  z-index: 950;
-
-  pointer-events: none;
-
-  opacity: 0;
-  transition: opacity .2s ease;
-}
-
-.custom-cursor.is-visible {
-  opacity: 1;
-}
-
-.custom-cursor-dot,
-.custom-cursor-ring {
-  position: absolute;
-  left: 0;
-  top: 0;
-
-  border-radius: 50%;
-
-  pointer-events: none;
-}
-
-.custom-cursor-dot {
-  width: 5px;
-  height: 5px;
-
-  background: var(--ink);
-}
-
-.custom-cursor-ring {
-  width: 28px;
-  height: 28px;
-
-  border: 1px solid var(--ink);
-
-  transition:
-    width .25s var(--ease-out),
-    height .25s var(--ease-out),
-    border-color .25s ease;
-}
-
-.custom-cursor.is-hovering .custom-cursor-ring {
-  width: 42px;
-  height: 42px;
-  border-color: var(--terracotta);
-}
-
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
-.site-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-
-  z-index: 900;
-
-  height: var(--header-height);
-
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-
-  padding:
-    0
-    clamp(20px, 4vw, 64px);
-
-  background: rgba(242, 239, 232, .94);
-
-  border-bottom: 1px solid rgba(17, 17, 15, .08);
-
-  backdrop-filter: blur(8px);
-}
-
-.site-brand,
-.menu-trigger {
-  transform:
-    translate3d(
-      var(--magnetic-x),
-      var(--magnetic-y),
-      0
-    );
-}
-
-.site-brand {
-  justify-self: start;
-
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.site-brand-mark {
-  font-family: var(--font-serif);
-  font-size: 27px;
-  line-height: 1;
-}
-
-.site-brand-name {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: .12em;
-}
-
-.wow-progress {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-
-  color: var(--stone);
-
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 500;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-
-.progress-track {
-  position: relative;
-
-  width: min(180px, 18vw);
-  height: 1px;
-
-  background: var(--sand);
-}
-
-#progress-fill {
-  position: absolute;
-  left: 0;
-  top: 0;
-
-  width: 0;
-  height: 1px;
-
-  background: var(--ink);
-}
-
-#progress-point {
-  position: absolute;
-  left: 0;
-  top: 50%;
-
-  width: 7px;
-  height: 7px;
-
-  background: var(--terracotta);
-  border-radius: 50%;
-
-  transform: translate(-50%, -50%);
-}
-
-.menu-trigger {
-  justify-self: end;
-
-  min-height: 44px;
-
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  padding: 8px 0;
-
-  border: 0;
-  background: none;
-
-  cursor: pointer;
-
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: .12em;
-}
-
-.menu-trigger-lines {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.menu-trigger-lines i {
-  display: block;
-
-  width: 24px;
-  height: 1px;
-
-  background: var(--ink);
-}
-
-
-/* =========================================================
-   MENU
-   ========================================================= */
-
-.site-menu {
-  position: fixed;
-  inset: 0;
-  z-index: 880;
-
-  background: var(--ink);
-  color: var(--ivory);
-
-  visibility: hidden;
-  opacity: 0;
-  pointer-events: none;
-
-  transition:
-    opacity .5s var(--ease-in-out),
-    visibility .5s;
-}
-
-.site-menu[aria-hidden="false"] {
-  visibility: visible;
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.site-menu-inner {
-  min-height: 100%;
-
-  padding:
-    calc(var(--header-height) + 48px)
-    clamp(24px, 7vw, 112px)
-    48px;
-
-  display: flex;
-  flex-direction: column;
-}
-
-.menu-kicker {
-  margin: 0 0 48px;
-  color: var(--sand);
-
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: .12em;
-}
-
-.site-menu-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-
-  column-gap: 7vw;
-}
-
-.site-menu-grid a {
-  padding: 12px 0;
-
-  border-bottom: 1px solid rgba(242, 239, 232, .16);
-
-  font-family: var(--font-serif);
-  font-size: clamp(38px, 5.2vw, 86px);
-  line-height: 1.02;
-
-  transition: color .25s ease;
-}
-
-.site-menu-grid a:hover,
-.site-menu-grid a:focus-visible {
-  color: var(--terracotta);
-}
-
-.menu-footer {
-  margin:
-    auto
-    0
-    0;
-
-  color: var(--sand);
-
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: .12em;
-}
-
-
-/* =========================================================
-   SECTION JUMP
-   ========================================================= */
-
-.section-jump {
-  position: fixed;
-  top: 50%;
-  z-index: 700;
-
-  transform: translateY(-50%);
-
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 500;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-
-.section-jump--previous {
-  left: 18px;
-}
-
-.section-jump--next {
-  right: 18px;
-}
-
-.section-jump a {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  color: var(--stone);
-
-  transition: color .25s ease;
-}
-
-.section-jump--previous a {
-  flex-direction: row-reverse;
-}
-
-.section-jump a:hover,
-.section-jump a:focus-visible {
-  color: var(--terracotta);
-}
-
-.section-jump a.is-disabled {
-  visibility: hidden;
-  pointer-events: none;
-}
-
-
-/* =========================================================
-   GLOBAL SECTIONS
-   ========================================================= */
-
-.home-section {
-  position: relative;
-
-  min-height: 100svh;
-
-  padding:
-    calc(var(--header-height) + 70px)
-    clamp(24px, 7vw, 112px)
-    90px;
-
-  display: flex;
-  align-items: center;
-}
-
-.section-inner {
-  width: 100%;
-  max-width: var(--content-max);
-
-  margin: 0 auto;
-}
-
-.section-index {
-  position: absolute;
-  top: calc(var(--header-height) + 30px);
-  left: clamp(24px, 4vw, 64px);
-
-  margin: 0;
-
-  color: var(--stone);
-
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: .12em;
-}
-
-.section-content {
-  max-width: var(--copy-max);
-  margin-left: clamp(5vw, 12vw, 180px);
-}
-
-.narrow-copy {
-  max-width: var(--narrow-copy);
-}
-
-.split-layout {
-  display: grid;
-  grid-template-columns: 1fr minmax(0, var(--copy-max));
-  gap: 8vw;
-}
-
-.eyebrow {
-  margin: 0 0 26px;
-
-  color: var(--stone);
-
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: .12em;
-}
-
-.section-heading {
-  max-width: 1050px;
-
-  margin: 0 0 44px;
-
-  font-family: var(--font-serif);
-  font-size: clamp(52px, 7.5vw, 122px);
-  font-weight: 400;
-  line-height: .92;
-  letter-spacing: -.025em;
-}
-
-.large-copy {
-  max-width: 900px;
-
-  font-family: var(--font-serif);
-  font-size: clamp(30px, 4vw, 64px);
-  font-weight: 400;
-  line-height: 1.02;
-}
-
-.closing-line {
-  font-family: var(--font-serif);
-  font-size: clamp(28px, 3vw, 50px);
-  font-weight: 400;
-  line-height: 1.05;
-}
-
-.reveal {
-  opacity: 0;
-  transform: translateY(22px);
-
-  transition:
-    opacity .9s var(--ease-out),
-    transform .9s var(--ease-out);
-}
-
-.reveal.is-visible {
-  opacity: 1;
-  transform: none;
-}
-
-
-/* =========================================================
-   HERO
-   ========================================================= */
-
-.section-hero {
-  min-height: 100svh;
-
-  align-items: flex-start;
-
-  padding-top: calc(var(--header-height) + 15vh);
-}
-
-.hero-inner {
-  position: relative;
-
-  width: 100%;
-  max-width: var(--content-max);
-
-  margin: 0 auto;
-}
-
-.hero-copy {
-  max-width: 1250px;
-}
-
-.hero-title {
-  margin: 0;
-
-  font-family: var(--font-serif);
-  font-size: clamp(72px, 13.4vw, 238px);
-  font-weight: 400;
-  line-height: .78;
-  letter-spacing: -.045em;
-}
-
-.hero-title-line {
-  display: block;
-}
-
-.hero-title-line--identity {
-  display: flex;
-  align-items: baseline;
-  white-space: nowrap;
-}
-
-.identity-slash {
-  display: inline-block;
-
-  margin-left: clamp(10px, 1vw, 24px);
-
-  color: var(--terracotta);
-
-  transform:
-    translateY(-.05em)
-    rotate(-8deg);
-}
-
-.hero-intro {
-  max-width: 620px;
-
-  margin:
-    clamp(44px, 7vw, 88px)
-    0
-    0
-    clamp(2px, 4vw, 60px);
-
-  font-family: var(--font-serif);
-  font-size: clamp(25px, 3vw, 46px);
-  line-height: 1.05;
-}
-
-.hero-directions {
-  position: relative;
-
-  margin:
-    clamp(80px, 11vw, 150px)
-    0
-    0
-    clamp(2px, 4vw, 60px);
-
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
-
-  max-width: 1200px;
-}
-
-.hero-direction {
-  position: relative;
-
-  min-height: 44px;
-  padding: 10px 0;
-
-  border-top: 1px solid var(--sand);
-
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: .1em;
-
-  transition:
-    color .25s ease,
-    border-color .25s ease;
-}
-
-.hero-direction::after {
-  content: "";
-
-  position: absolute;
-  left: 0;
-  bottom: -1px;
-
-  width: 0;
-  height: 1px;
-
-  background: var(--terracotta);
-
-  transition: width .55s var(--ease-out);
-}
-
-.hero-direction:hover,
-.hero-direction:focus-visible,
-.hero-direction.is-active {
-  color: var(--terracotta);
-  border-color: var(--terracotta);
-}
-
-.hero-direction:hover::after,
-.hero-direction:focus-visible::after,
-.hero-direction.is-active::after {
-  width: 100%;
-}
-
-.hero-trajectory {
-  position: relative;
-
-  width: min(100%, 1250px);
-  height: 72px;
-
-  margin:
-    clamp(44px, 6vw, 82px)
-    0
-    0
-    clamp(2px, 4vw, 60px);
-}
-
-.trajectory-line {
-  position: absolute;
-
-  left: 0;
-  right: 0;
-  top: 50%;
-
-  height: 1px;
-
-  background:
-    linear-gradient(
-      to right,
-      var(--ink) 0%,
-      var(--ink) calc(var(--trajectory-progress) * 100%),
-      var(--sand) calc(var(--trajectory-progress) * 100%),
-      var(--sand) 100%
-    );
-
-  transform:
-    translateY(var(--trajectory-drift));
-
-  transform-origin: left center;
-}
-
-.direction-node {
-  position: absolute;
-  top: 50%;
-
-  width: 11px;
-  height: 11px;
-
-  background: var(--ivory);
-  border: 1px solid var(--ink);
-  border-radius: 50%;
-
-  transform:
-    translate(-50%, -50%)
-    translateY(var(--trajectory-drift));
-
-  transition:
-    background .3s ease,
-    border-color .3s ease,
-    box-shadow .3s ease;
-}
-
-.direction-node[data-direction="sport"] {
-  left: 10%;
-}
-
-.direction-node[data-direction="scienze-motorie"] {
-  left: 32%;
-}
-
-.direction-node[data-direction="educazione"] {
-  left: 53%;
-}
-
-.direction-node[data-direction="management"] {
-  left: 75%;
-}
-
-.direction-node[data-direction="digitale"] {
-  left: 94%;
-}
-
-.direction-node.is-linked,
-.direction-node.is-active {
-  background: var(--terracotta);
-  border-color: var(--terracotta);
-  box-shadow: 0 0 0 5px rgba(166, 66, 50, .10);
-}
-
-
-/* =========================================================
-   SECTION 02
-   ========================================================= */
-
-.section-question {
-  background: #EAE5DC;
-}
-
-.narrative-copy {
-  font-family: var(--font-serif);
-  font-size: clamp(30px, 4vw, 58px);
-  line-height: 1.03;
-}
-
-.narrative-copy p {
-  margin: 0 0 26px;
-}
-
-.narrative-link {
-  position: relative;
-
-  color: var(--ink);
-
-  border-bottom: 1px solid var(--terracotta);
-
-  transition:
-    color .25s ease,
-    border-color .25s ease;
-}
-
-.narrative-link:hover,
-.narrative-link:focus-visible,
-.narrative-link.is-linked {
-  color: var(--terracotta);
-  border-color: var(--terracotta);
-}
-
-
-/* =========================================================
-   SECTION 03
-   ========================================================= */
-
-.section-five-directions {
-  background: var(--ivory);
-}
-
-.five-directions-copy {
-  max-width: 800px;
-
-  margin-bottom: 72px;
-
-  font-family: var(--font-serif);
-  font-size: clamp(28px, 3.4vw, 50px);
-  line-height: 1.04;
-}
-
-.five-directions-copy p {
-  margin: 0 0 18px;
-}
-
-.direction-list {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-
-  border-top: 1px solid var(--sand);
-  border-bottom: 1px solid var(--sand);
-}
-
-.direction-list a {
-  min-height: 54px;
-
-  padding: 18px 12px 18px 0;
-
-  border-right: 1px solid var(--sand);
-
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: .08em;
-
-  transition:
-    color .25s ease,
-    padding-left .35s var(--ease-out);
-}
-
-.direction-list a:last-child {
-  border-right: 0;
-}
-
-.direction-list a:hover,
-.direction-list a:focus-visible {
-  color: var(--terracotta);
-  padding-left: 8px;
-}
-
-.section-five-directions .closing-line {
-  margin-top: 72px;
-}
-
-
-/* =========================================================
-   SECTION 04 — NETWORK
-   ========================================================= */
-
-.section-network {
-  background: #DDD6C9;
-}
-
-.network {
-  position: relative;
-
-  width: min(100%, 1080px);
-  height: min(58vw, 560px);
-
-  margin:
-    72px
-    auto
-    0;
-
-  min-height: 360px;
-}
-
-.network-node {
-  position: absolute;
-
-  z-index: 2;
-
-  padding: 8px 0;
-
-  font-family: var(--font-serif);
-  font-size: clamp(24px, 3vw, 42px);
-  line-height: 1;
-
-  transition:
-    color .3s ease,
-    transform .4s var(--ease-out);
-}
-
-.network-node.is-linked {
-  color: var(--terracotta);
-  transform: translateY(-4px);
-}
-
-.network-node--sport {
-  left: 4%;
-  top: 45%;
-}
-
-.network-node--scienze {
-  left: 26%;
-  top: 13%;
-}
-
-.network-node--educazione {
-  left: 49%;
-  top: 65%;
-}
-
-.network-node--management {
-  left: 66%;
-  top: 24%;
-}
-
-.network-node--digitale {
-  right: 2%;
-  top: 72%;
-}
-
-.network-line {
-  position: absolute;
-
-  height: 1px;
-
-  background: var(--ink);
-
-  transform-origin: left center;
-  opacity: .48;
-}
-
-.network-line--a {
-  left: 12%;
-  top: 47%;
-  width: 32%;
-  transform: rotate(-28deg);
-}
-
-.network-line--b {
-  left: 34%;
-  top: 23%;
-  width: 39%;
-  transform: rotate(8deg);
-}
-
-.network-line--c {
-  left: 52%;
-  top: 68%;
-  width: 29%;
-  transform: rotate(-54deg);
-}
-
-.network-line--d {
-  left: 73%;
-  top: 39%;
-  width: 24%;
-  transform: rotate(61deg);
-}
-
-
-/* =========================================================
-   SECTION 05 — PAUSE
-   ========================================================= */
-
-.section-pause {
-  background: #E8E2D8;
-}
-
-.pause-copy {
-  width: min(100%, 900px);
-  margin-left: clamp(5vw, 18vw, 280px);
-}
-
-.pause-text {
-  max-width: 650px;
-
-  margin: 64px 0 0;
-
-  color: var(--stone);
-
-  font-family: var(--font-serif);
-  font-size: clamp(25px, 3vw, 42px);
-  line-height: 1.05;
-}
-
-
-/* =========================================================
-   SECTION 06 — TERRITORY
-   ========================================================= */
-
-.section-territory {
-  background: #CFC6B8;
-}
-
-.territory-grid {
-  display: grid;
-  grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
-  align-items: center;
-  gap: clamp(48px, 8vw, 140px);
-}
-
-.territory-copy {
-  max-width: 650px;
-  margin-left: clamp(4vw, 10vw, 160px);
-}
-
-.territory-name {
-  display: inline-block;
-
-  margin: 0 0 18px;
-
-  font-family: var(--font-serif);
-  font-size: clamp(72px, 10vw, 170px);
-  line-height: .8;
-  letter-spacing: -.04em;
-
-  transition: color .25s ease;
-}
-
-.territory-name:hover,
-.territory-name:focus-visible {
-  color: var(--terracotta);
-}
-
-.territory-stadium {
-  margin: 24px 0 0;
-
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: .08em;
-}
-
-.territory-tag {
-  margin: 56px 0 0;
-
-  color: var(--terracotta);
-
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: .1em;
-}
-
-.territory-body {
-  max-width: 590px;
-
-  margin-top: 48px;
-
-  font-family: var(--font-serif);
-  font-size: clamp(24px, 2.8vw, 39px);
-  line-height: 1.07;
-}
-
-.territory-body p {
-  margin: 0 0 30px;
-}
-
-.territory-map {
-  width: 100%;
-  min-height: 520px;
-}
-
-.territory-map iframe {
-  display: block;
-
-  width: 100%;
-  height: 520px;
-
-  border: 0;
-}
-
-
-/* =========================================================
-   SECTION 07 — PRESENT
-   ========================================================= */
-
-.section-present {
-  background: var(--ivory);
-}
-
-.present-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, .72fr);
-  gap: clamp(56px, 9vw, 150px);
-  align-items: center;
-}
-
-.present-copy {
-  position: relative;
-  max-width: 760px;
-
-  padding-left: clamp(4vw, 9vw, 140px);
-}
-
-.present-copy .section-index {
-  position: static;
-  margin-bottom: 80px;
-}
-
-.present-body {
-  max-width: 680px;
-
-  font-family: var(--font-serif);
-  font-size: clamp(25px, 3vw, 43px);
-  line-height: 1.06;
-}
-
-.present-body p {
-  margin: 0 0 34px;
-}
-
-.present-image {
-  margin: 0;
-}
-
-.present-image img {
-  width: 100%;
-  height: auto;
-
-  aspect-ratio: 753 / 941;
-
-  object-fit: cover;
-}
-
-
-/* =========================================================
-   SECTION 08
-   ========================================================= */
-
-.section-arrival {
-  background: #EAE5DC;
-}
-
-.centered-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  text-align: center;
-}
-
-.centered-section .section-index {
-  left: clamp(24px, 4vw, 64px);
-}
-
-.centered-section .section-heading {
-  max-width: 1100px;
-}
-
-.section-arrival .large-copy {
-  margin: 40px auto 80px;
-}
-
-.section-arrival .closing-line {
-  max-width: 800px;
-}
-
-
-/* =========================================================
-   SECTION 09
-   ========================================================= */
-
-.section-question-for-you {
-  background: var(--ink);
-  color: var(--ivory);
-}
-
-.section-question-for-you .eyebrow {
-  color: var(--sand);
-}
-
-.question-copy {
-  max-width: 640px;
-
-  margin: 10px auto 70px;
-
-  font-family: var(--font-serif);
-  font-size: clamp(27px, 3vw, 44px);
-  line-height: 1.04;
-}
-
-.question-copy p {
-  margin: 0 0 12px;
-}
-
-.question-title {
-  margin: 0;
-
-  font-family: var(--font-serif);
-  font-size: clamp(90px, 17vw, 260px);
-  font-weight: 400;
-  line-height: .76;
-  letter-spacing: -.045em;
-}
-
-.question-title span {
-  color: var(--terracotta);
-}
-
-
-/* =========================================================
-   SECTION 10 — FINAL
-   ========================================================= */
-
-.section-final {
-  background: var(--ivory);
-}
-
-.final-inner {
-  padding-bottom: 40px;
-}
-
-.final-copy {
-  max-width: 900px;
-  margin-left: clamp(5vw, 12vw, 180px);
-}
-
-.final-copy .section-heading {
-  margin-bottom: 68px;
-}
-
-.final-copy p {
-  max-width: 850px;
-
-  margin: 0 0 34px;
-
-  font-family: var(--font-serif);
-  font-size: clamp(25px, 3vw, 43px);
-  line-height: 1.06;
-}
-
-.cta-trajectory {
-  position: relative;
-
-  width: min(100%, 1120px);
-
-  margin:
-    100px
-    0
-    0
-    auto;
-
-  padding:
-    90px
-    clamp(20px, 6vw, 90px)
-    20px 0;
-}
-
-.cta-thread {
-  position: absolute;
-
-  left: 0;
-  right: 18%;
-  top: 50%;
-
-  height: 1px;
-
-  background: var(--sand);
-
-  transform: translateY(-50%);
-}
-
-.cta-thread::after {
-  content: "";
-
-  position: absolute;
-
-  right: 0;
-  top: 50%;
-
-  width: 8px;
-  height: 8px;
-
-  background: var(--terracotta);
-  border-radius: 50%;
-
-  transform: translate(50%, -50%);
-}
-
-.contact-cta {
-  position: relative;
-  z-index: 2;
-
-  display: inline-flex;
-  align-items: center;
-  gap: 22px;
-
-  min-height: 72px;
-  padding: 12px 0;
-
-  background: var(--ivory);
-
-  font-family: var(--font-serif);
-  font-size: clamp(36px, 5vw, 76px);
-  line-height: .95;
-
-  transform:
-    translate3d(
-      var(--magnetic-x),
-      var(--magnetic-y),
-      0
-    );
-
-  transition:
-    color .25s ease,
-    gap .45s var(--ease-out);
-}
-
-.contact-cta span {
-  color: var(--terracotta);
-
-  transition:
-    transform .45s var(--ease-out);
-}
-
-.contact-cta:hover,
-.contact-cta:focus-visible,
-.contact-cta.is-engaged {
-  color: var(--terracotta);
-  gap: 32px;
-}
-
-.contact-cta:hover span,
-.contact-cta:focus-visible span,
-.contact-cta.is-engaged span {
-  transform: translateX(8px);
-}
-
-
-/* =========================================================
-   STANDBY
-   ========================================================= */
-
-.standby-screen {
-  position: fixed;
-  inset: 0;
-  z-index: 940;
-
-  display: grid;
-  place-items: center;
-
-  background: var(--ivory);
-  color: var(--ink);
-
-  visibility: hidden;
-  opacity: 0;
-  pointer-events: none;
-
-  transition:
-    opacity .9s var(--ease-in-out),
-    visibility .9s;
-}
-
-.standby-screen[aria-hidden="false"] {
-  visibility: visible;
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.standby-atmosphere {
-  position: absolute;
-  inset: 0;
-
-  pointer-events: none;
-}
-
-.standby-path {
-  position: absolute;
-
-  left: 12%;
-  right: 12%;
-  top: 52%;
-
-  height: 1px;
-
-  background: var(--sand);
-
-  transform: rotate(-4deg);
-}
-
-.standby-point {
-  position: absolute;
-
-  left: 12%;
-  top: 52%;
-
-  width: 8px;
-  height: 8px;
-
-  background: var(--terracotta);
-  border-radius: 50%;
-
-  transform: translate(-50%, -50%);
-}
-
-.standby-center {
-  position: relative;
-  z-index: 2;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  text-align: center;
-}
-
-.standby-logo {
-  width: clamp(78px, 9vw, 116px);
-  height: auto;
-
-  margin-bottom: clamp(44px, 6vw, 70px);
-}
-
-.standby-copy {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.standby-label {
-  margin-bottom: 28px;
-
-  font-family: var(--font-serif);
-  font-size: clamp(52px, 7vw, 100px);
-  line-height: .9;
-}
-
-.standby-wake {
-  min-width: 120px;
-  min-height: 52px;
-
-  margin: 0 0 50px;
-  padding: 10px 20px;
-
-  border: 0;
-  background: transparent;
-
-  cursor: pointer;
-
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: .18em;
-
-  transition:
-    color .25s ease,
-    border-color .25s ease;
-}
-
-.standby-wake:hover,
-.standby-wake:focus-visible {
-  color: var(--terracotta);
-}
-
-.standby-touch {
-  position: relative;
-}
-
-.standby-touch::after {
-  content: "";
-
-  position: absolute;
-  left: 50%;
-  bottom: -10px;
-
-  width: 28px;
-  height: 1px;
-
-  background: currentColor;
-
-  transform: translateX(-50%);
-}
-
-.standby-motto {
-  display: flex;
-  gap: 9px;
-
-  margin: 0 0 15px;
-
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: .12em;
-}
-
-.standby-signature {
-  color: var(--stone);
-
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: .18em;
-}
-
-
-/* =========================================================
-   FOOTER
-   ========================================================= */
-
-.site-footer {
-  padding: 70px 24px 54px;
-
-  background: var(--ivory);
-  color: var(--ink);
-
-  border-top: 1px solid rgba(17, 17, 15, .08);
-}
-
-.footer-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-
-  text-align: center;
-
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: .12em;
-}
-
-.footer-mark {
-  margin-bottom: 12px;
-
-  font-family: var(--font-serif);
-  font-size: 30px;
-  line-height: 1;
-}
-
-
-/* =========================================================
-   RESPONSIVE — 1280
-   ========================================================= */
-
-@media (max-width: 1280px) {
-
-  .site-header {
-    --header-height: 96px;
-  }
-
-  .section-heading {
-    font-size: clamp(50px, 7vw, 100px);
-  }
-
-  .hero-title {
-    font-size: clamp(70px, 12.8vw, 190px);
-  }
-
-  .territory-grid,
-  .present-grid {
-    gap: 6vw;
-  }
-
-  .section-jump {
-    display: none;
-  }
-
-}
-
-
-/* =========================================================
-   RESPONSIVE — 1024
-   ========================================================= */
-
-@media (max-width: 1024px) {
-
-  :root {
-    --header-height: 88px;
-  }
-
-  .site-header {
-    grid-template-columns: 1fr auto;
-  }
-
-  .wow-progress {
-    display: none;
-  }
-
-  .home-section {
-    padding:
-      calc(var(--header-height) + 60px)
-      7vw
-      72px;
-  }
-
-  .split-layout {
-    grid-template-columns: 1fr;
-    gap: 40px;
-  }
-
-  .section-content {
-    margin-left: 5vw;
-  }
-
-  .hero-directions {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .direction-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .direction-list a:nth-child(2n) {
-    border-right: 0;
-  }
-
-  .direction-list a:nth-child(n + 3) {
-    border-top: 1px solid var(--sand);
-  }
-
-  .territory-grid,
-  .present-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .territory-copy,
-  .present-copy {
-    margin-left: 5vw;
-    padding-left: 0;
-  }
-
-  .territory-map {
-    min-height: 440px;
-  }
-
-  .territory-map iframe {
-    height: 440px;
-  }
-
-  .network {
-    height: 500px;
-  }
-
-}
-
-
-/* =========================================================
-   RESPONSIVE — 820
-   ========================================================= */
-
-@media (max-width: 820px) {
-
-  :root {
-    --header-height: 78px;
-  }
-
-  .site-menu-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .site-menu-grid a {
-    font-size: clamp(40px, 10vw, 72px);
-  }
-
-  .site-menu-inner {
-    padding-top: calc(var(--header-height) + 32px);
-  }
-
-  .home-section {
-    min-height: auto;
-
-    padding:
-      calc(var(--header-height) + 54px)
-      24px
-      84px;
-  }
-
-  .section-hero {
-    min-height: 100svh;
-    padding-top: calc(var(--header-height) + 11vh);
-  }
-
-  .section-index {
-    position: static;
-    margin-bottom: 38px;
-  }
-
-  .section-content {
-    margin-left: 0;
-  }
-
-  .hero-title {
-    font-size: clamp(66px, 16vw, 135px);
-    line-height: .82;
-  }
-
-  .hero-title-line--identity {
-    white-space: normal;
-    flex-wrap: wrap;
-  }
-
-  .hero-intro {
-    margin-left: 0;
-    font-size: clamp(27px, 5vw, 42px);
-  }
-
-  .hero-directions {
-    grid-template-columns: 1fr 1fr;
-    margin-left: 0;
-  }
-
-  .hero-direction:last-child {
-    grid-column: 1 / -1;
-  }
-
-  .hero-trajectory {
-    margin-left: 0;
-  }
-
-  .direction-list {
-    grid-template-columns: 1fr;
-  }
-
-  .direction-list a {
-    border-right: 0;
-    border-bottom: 1px solid var(--sand);
-  }
-
-  .direction-list a:last-child {
-    border-bottom: 0;
-  }
-
-  .direction-list a:nth-child(n + 3) {
-    border-top: 0;
-  }
-
-  .network {
-    width: 100%;
-    height: 480px;
-    margin-top: 48px;
-  }
-
-  .network-node {
-    font-size: clamp(22px, 5vw, 34px);
-  }
-
-  .territory-copy,
-  .present-copy {
-    margin-left: 0;
-  }
-
-  .territory-name {
-    font-size: clamp(76px, 20vw, 150px);
-  }
-
-  .present-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .present-image {
-    order: 2;
-  }
-
-  .present-copy {
-    order: 1;
-  }
-
-  .question-title {
-    font-size: clamp(82px, 20vw, 170px);
-  }
-
-  .final-copy {
-    margin-left: 0;
-  }
-
-  .cta-trajectory {
-    margin-top: 70px;
-    padding-top: 70px;
-  }
-
-  .cta-thread {
-    right: 8%;
-  }
-
-  .contact-cta {
-    font-size: clamp(32px, 8vw, 58px);
-  }
-
-}
-
-
-/* =========================================================
-   RESPONSIVE — 430
-   ========================================================= */
-
-@media (max-width: 430px) {
-
-  :root {
-    --header-height: 72px;
-  }
-
-  .site-header {
-    padding: 0 18px;
-  }
-
-  .site-brand-name {
-    display: none;
-  }
-
-  .site-brand-mark {
-    font-size: 25px;
-  }
-
-  .page-loader-logo {
-    width: clamp(68px, 18vw, 92px);
-    margin-bottom: 34px;
-  }
-
-  .loader-trajectory {
-    width: 72vw;
-    margin-bottom: 34px;
-  }
-
-  .loader-motto {
-    gap: 7px;
-    font-size: 9px;
-  }
-
-  .loader-signature {
-    font-size: 8px;
-  }
-
-  .site-menu-inner {
-    padding:
-      calc(var(--header-height) + 24px)
-      20px
-      28px;
-  }
-
-  .menu-kicker {
-    margin-bottom: 30px;
-  }
-
-  .site-menu-grid a {
-    font-size: clamp(38px, 12vw, 56px);
-    padding: 10px 0;
-  }
-
-  .home-section {
-    padding:
-      calc(var(--header-height) + 40px)
-      20px
-      64px;
-  }
-
-  .section-hero {
-    padding-top: calc(var(--header-height) + 8vh);
-  }
-
-  .section-heading {
-    font-size: clamp(48px, 15vw, 74px);
-    margin-bottom: 34px;
-  }
-
-  .hero-title {
-    font-size: clamp(58px, 17vw, 86px);
-  }
-
-  .hero-intro {
-    margin-top: 38px;
-    font-size: 27px;
-  }
-
-  .hero-directions {
-    grid-template-columns: 1fr;
-    margin-top: 70px;
-  }
+          <span
+            class="cta-trajectory-point"
+            aria-hidden="true"
+          ></span>
 
-  .hero-direction:last-child {
-    grid-column: auto;
-  }
-
-  .hero-trajectory {
-    height: 54px;
-    margin-top: 34px;
-  }
-
-  .direction-node {
-    width: 9px;
-    height: 9px;
-  }
-
-  .narrative-copy {
-    font-size: 29px;
-  }
-
-  .five-directions-copy {
-    font-size: 28px;
-    margin-bottom: 48px;
-  }
-
-  .network {
-    height: 420px;
-    min-height: 0;
-  }
-
-  .network-node {
-    font-size: 22px;
-  }
-
-  .network-node--sport {
-    left: 0;
-    top: 42%;
-  }
-
-  .network-node--scienze {
-    left: 18%;
-    top: 5%;
-  }
-
-  .network-node--educazione {
-    left: 38%;
-    top: 66%;
-  }
-
-  .network-node--management {
-    left: 48%;
-    top: 28%;
-  }
-
-  .network-node--digitale {
-    right: 0;
-    top: 79%;
-  }
-
-  .network-line--a {
-    left: 10%;
-    width: 31%;
-  }
-
-  .network-line--b {
-    left: 30%;
-    width: 35%;
-  }
-
-  .network-line--c {
-    left: 43%;
-    width: 28%;
-  }
-
-  .network-line--d {
-    left: 67%;
-    width: 23%;
-  }
-
-  .pause-copy {
-    margin-left: 0;
-  }
-
-  .pause-text {
-    margin-top: 44px;
-    font-size: 27px;
-  }
-
-  .territory-name {
-    font-size: clamp(70px, 21vw, 100px);
-  }
-
-  .territory-body {
-    font-size: 26px;
-  }
-
-  .territory-map {
-    min-height: 320px;
-  }
-
-  .territory-map iframe {
-    height: 320px;
-  }
-
-  .present-body {
-    font-size: 26px;
-  }
-
-  .large-copy {
-    font-size: 31px;
-  }
-
-  .section-arrival .closing-line {
-    margin-top: 20px;
-    font-size: 29px;
-  }
-
-  .question-copy {
-    margin-bottom: 54px;
-    font-size: 28px;
-  }
-
-  .question-title {
-    font-size: clamp(70px, 21vw, 100px);
-  }
-
-  .final-copy p {
-    font-size: 27px;
-  }
-
-  .cta-trajectory {
-    margin-top: 50px;
-    padding-top: 60px;
-  }
-
-  .cta-thread {
-    right: 0;
-  }
-
-  .contact-cta {
-    min-height: 64px;
-    font-size: 34px;
-    gap: 14px;
-  }
-
-  .contact-cta:hover,
-  .contact-cta:focus-visible,
-  .contact-cta.is-engaged {
-    gap: 20px;
-  }
-
-  .standby-path {
-    left: 6%;
-    right: 6%;
-  }
-
-  .standby-point {
-    left: 6%;
-  }
-
-  .standby-logo {
-    width: 78px;
-    margin-bottom: 42px;
-  }
-
-  .standby-label {
-    font-size: 58px;
-  }
-
-}
-
-
-/* =========================================================
-   375
-   ========================================================= */
-
-@media (max-width: 375px) {
-
-  .hero-title {
-    font-size: 55px;
-  }
-
-  .hero-intro {
-    font-size: 25px;
-  }
-
-  .section-heading {
-    font-size: 46px;
-  }
-
-  .network {
-    height: 390px;
-  }
-
-  .network-node {
-    font-size: 20px;
-  }
-
-  .question-title {
-    font-size: 67px;
-  }
-
-  .final-copy p {
-    font-size: 25px;
-  }
-
-}
-
-
-/* =========================================================
-   360 / 320
-   ========================================================= */
-
-@media (max-width: 360px) {
-
-  .site-header {
-    padding: 0 15px;
-  }
-
-  .menu-trigger {
-    gap: 8px;
-    font-size: 9px;
-  }
-
-  .menu-trigger-lines i {
-    width: 21px;
-  }
-
-  .home-section {
-    padding-left: 18px;
-    padding-right: 18px;
-  }
-
-  .hero-title {
-    font-size: 52px;
-  }
-
-  .hero-intro {
-    font-size: 24px;
-  }
-
-  .section-heading {
-    font-size: 43px;
-  }
-
-  .territory-name {
-    font-size: 66px;
-  }
-
-  .question-title {
-    font-size: 62px;
-  }
-
-  .standby-motto {
-    font-size: 8px;
-  }
-
-}
+          <a
+            class="contact-cta"
+            href="/contatti/"
+          >
+            <span>Raccontami da dove vuoi partire</span>
+            <span aria-hidden="true">→</span>
+          </a>
 
-@media (max-width: 330px) {
+        </div>
 
-  .hero-title {
-    font-size: 49px;
-  }
+      </div>
 
-  .section-heading {
-    font-size: 40px;
-  }
+    </section>
 
-  .question-title {
-    font-size: 58px;
-  }
+  </main>
 
-}
 
+  <!-- =======================================================
+       STANDBY — PAUSA NARRATIVA
+       ======================================================= -->
 
-/* =========================================================
-   COARSE POINTER / TOUCH
-   ========================================================= */
+  <div
+    class="standby-screen"
+    aria-hidden="true"
+  >
 
-@media (pointer: coarse) {
+    <div
+      class="standby-atmosphere"
+      aria-hidden="true"
+    >
+      <span class="standby-path"></span>
+      <span class="standby-point"></span>
+    </div>
 
-  .custom-cursor {
-    display: none;
-  }
+    <div class="standby-center">
 
-  .hero-direction,
-  .direction-list a,
-  .narrative-link,
-  .territory-name,
-  .contact-cta,
-  .menu-trigger,
-  .standby-wake {
-    -webkit-tap-highlight-color: transparent;
-  }
+      <img
+        class="standby-logo"
+        src="/assets/images/cp-mark.png"
+        alt="Cesare Paratore"
+        width="72"
+        height="72"
+      >
 
-  .hero-direction,
-  .direction-list a {
-    min-height: 48px;
-  }
+      <div class="standby-copy">
 
-}
+        <span class="standby-label">
+          ANCHE FERMARSI È MOVIMENTO.
+        </span>
 
+        <span class="standby-subtitle">
+          Il percorso continua da qui.
+        </span>
 
-/* =========================================================
-   REDUCED MOTION
-   ========================================================= */
+      </div>
 
-html.reduced-motion {
-  scroll-behavior: auto;
-}
+      <button
+        class="standby-wake"
+        type="button"
+      >
+        RIPRENDI →
+      </button>
 
-html.reduced-motion *,
-html.reduced-motion *::before,
-html.reduced-motion *::after {
-  animation-duration: .001ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: .001ms !important;
-}
+    </div>
 
-html.reduced-motion .reveal {
-  opacity: 1;
-  transform: none;
-}
+  </div>
 
-@media (prefers-reduced-motion: reduce) {
 
-  html {
-    scroll-behavior: auto;
-  }
+  <footer class="site-footer">
 
-  .page-loader-logo {
-    animation: none;
-    opacity: 1;
-  }
+    <div class="footer-inner">
 
-  .loader-point,
-  .loader-line,
-  .loader-motto,
-  .loader-signature {
-    animation: none;
-    opacity: 1;
-  }
+      <div class="footer-mark">
+        <img
+          src="/assets/images/cp-mark.png"
+          alt="Cesare Paratore"
+          width="96"
+          height="96"
+          loading="lazy"
+        >
+      </div>
 
-  .reveal {
-    opacity: 1;
-    transform: none;
-  }
+      <p class="footer-motto">
 
-}
+        <span>MOVIMENTO</span>
 
+        <span aria-hidden="true">/</span>
 
-/* =========================================================
-   PRINT
-   ========================================================= */
+        <span>CON DIREZIONE.</span>
 
-@media print {
+      </p>
 
-  .page-loader,
-  .page-transition,
-  .custom-cursor,
-  .site-header,
-  .site-menu,
-  .section-jump,
-  .standby-screen {
-    display: none !important;
-  }
+      <p class="footer-signature">
+        CESARE PARATORE
+      </p>
 
-  .home-section {
-    min-height: auto;
-    padding: 48px 0;
-    break-inside: avoid;
-  }
+    </div>
 
-  .reveal {
-    opacity: 1;
-    transform: none;
-  }
+  </footer>
 
-  .territory-map {
-    display: none;
-  }
 
-  .site-footer {
-    padding: 32px 0;
-  }
+  <script src="/script.js" defer></script>
 
-}
+</body>
+</html>
