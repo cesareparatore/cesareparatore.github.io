@@ -1,1383 +1,3431 @@
-<!doctype html>
-<html lang="it">
-<head>
-  <meta charset="utf-8">
+/* =========================================================
+   CESARE PARATORE
+   MOVIMENTO / CON DIREZIONE.
+   MASTER STYLE SYSTEM — V4
+   ========================================================= */
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  >
 
-  <title>Cesare Paratore | Movimento / Con Direzione.</title>
+/* =========================================================
+   01 — DESIGN TOKENS
+   ========================================================= */
 
-  <meta
-    name="description"
-    content="Cesare Paratore. Movimento, sport, scienze motorie, educazione, management e digitale. Un percorso costruito attraverso connessioni, esperienza e nuove possibilità."
-  >
+:root {
 
-  <meta name="robots" content="index, follow">
-  <meta name="theme-color" content="#F2EFE8">
-  <meta name="color-scheme" content="light">
+  --ivory: #F2EFE8;
+  --ivory-bright: #FFFDF8;
+  --sand: #C9C0AF;
+  --stone: #77736B;
+  --ink: #11110F;
+  --terracotta: #A64232;
+  --white: #FFFFFF;
 
-  <link
-    rel="canonical"
-    href="https://www.cesareparatore.it/"
-  >
+  --page-bg: var(--ivory);
+  --page-fg: var(--ink);
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  --dark-bg: var(--ink);
+  --dark-fg: var(--ivory);
 
-  <link
-    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap"
-    rel="stylesheet"
-  >
+  --muted: rgba(17,17,15,.58);
+  --muted-dark: rgba(242,239,232,.58);
 
-  <link
-    rel="icon"
-    type="image/png"
-    href="/assets/images/cp-mark.png"
-  >
+  --line-light: rgba(17,17,15,.12);
+  --line-light-strong: rgba(17,17,15,.22);
 
-  <link
-    rel="stylesheet"
-    href="/css/style.css"
-  >
+  --line-dark: rgba(242,239,232,.14);
+  --line-dark-strong: rgba(242,239,232,.26);
 
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Cesare Paratore",
-    "url": "https://www.cesareparatore.it/",
-    "description": "Movimento / Con Direzione."
+  --terracotta-soft: rgba(166,66,50,.16);
+  --terracotta-faint: rgba(166,66,50,.08);
+
+  --serif:
+    "Instrument Serif",
+    Georgia,
+    serif;
+
+  --sans:
+    "DM Sans",
+    Helvetica,
+    Arial,
+    sans-serif;
+
+  --mono:
+    "DM Mono",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+
+  --page-padding: clamp(22px,4vw,72px);
+
+  --content-width: 1680px;
+  --reading-width: 760px;
+
+  --header-h: 108px;
+
+  --section-pad-y:
+    clamp(120px,15vw,240px);
+
+  --section-pad-mobile:
+    clamp(96px,18vw,150px);
+
+  --ease:
+    cubic-bezier(.22,.61,.36,1);
+
+  --ease-fast:
+    cubic-bezier(.16,1,.3,1);
+
+  --ease-editorial:
+    cubic-bezier(.19,1,.22,1);
+
+  --duration-fast: 240ms;
+  --duration: 650ms;
+  --duration-slow: 1000ms;
+
+  --trajectory-progress: 0;
+  --trajectory-drift: 0px;
+  --trajectory-scale: 1;
+  --trajectory-opacity: 1;
+}
+
+
+/* =========================================================
+   02 — RESET
+   ========================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+
+  background: var(--ivory);
+
+  scroll-behavior: smooth;
+
+  overflow-x: hidden;
+}
+
+body {
+  min-width: 320px;
+
+  margin: 0;
+
+  background: var(--ivory);
+  color: var(--ink);
+
+  font-family: var(--sans);
+
+  font-size: 16px;
+  line-height: 1.55;
+
+  text-rendering: optimizeLegibility;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body.is-menu-open,
+body.is-standby {
+  overflow: hidden;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  border: 0;
+  padding: 0;
+
+  background: none;
+  color: inherit;
+
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: var(--terracotta);
+  color: var(--ivory);
+}
+
+.sr-only {
+  position: absolute !important;
+
+  width: 1px;
+  height: 1px;
+
+  padding: 0;
+  margin: -1px;
+
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+
+  white-space: nowrap;
+
+  border: 0;
+}
+
+
+/* =========================================================
+   03 — ACCESSIBILITY
+   ========================================================= */
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--terracotta);
+  outline-offset: 5px;
+}
+
+@media (pointer: coarse) {
+
+  .custom-cursor {
+    display: none !important;
   }
-  </script>
 
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Cesare Paratore",
-    "url": "https://www.cesareparatore.it/"
+}
+
+
+/* =========================================================
+   04 — LOADER
+   ========================================================= */
+
+.page-loader {
+  position: fixed;
+  inset: 0;
+
+  z-index: 1000;
+
+  display: grid;
+  place-items: center;
+
+  background: var(--ink);
+
+  opacity: 1;
+  visibility: visible;
+
+  transition:
+    opacity 800ms var(--ease),
+    visibility 800ms var(--ease);
+
+  pointer-events: auto;
+}
+
+.page-loader.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.page-loader-logo {
+  display: grid;
+  place-items: center;
+
+  width: clamp(110px,13vw,180px);
+  aspect-ratio: 1;
+
+  border-radius: 50%;
+
+  background: var(--ivory);
+
+  animation:
+    loader-breathe 1800ms ease-in-out infinite;
+}
+
+.page-loader-logo img {
+  width: 70%;
+}
+
+@keyframes loader-breathe {
+
+  0%,
+  100% {
+    transform: scale(1);
   }
-  </script>
-</head>
-
-<body>
-
-  <!-- =====================================================
-       LOADER
-       ===================================================== -->
-
-  <div
-    class="page-loader"
-    aria-hidden="true"
-  >
-    <div class="page-loader-logo">
-      <img
-        src="/assets/images/cp-mark.png"
-        alt=""
-        width="120"
-        height="120"
-      >
-    </div>
-  </div>
-
-
-  <!-- =====================================================
-       PAGE TRANSITION
-       ===================================================== -->
-
-  <div
-    class="page-transition"
-    aria-hidden="true"
-  >
-    <div class="page-transition-circle">
-      <img
-        src="/assets/images/cp-mark.png"
-        alt=""
-        width="120"
-        height="120"
-      >
-    </div>
-  </div>
-
-
-  <!-- =====================================================
-       CUSTOM CURSOR
-       ===================================================== -->
-
-  <div
-    class="custom-cursor"
-    aria-hidden="true"
-  >
-    <span class="custom-cursor-dot"></span>
-    <span class="custom-cursor-ring"></span>
-  </div>
-
-
-  <!-- =====================================================
-       HEADER / WOW BAR
-       ===================================================== -->
-
-  <header class="site-header">
-
-    <a
-      class="brand"
-      href="#01"
-      aria-label="Cesare Paratore — torna all'inizio"
-    >
-      <img
-        src="/assets/images/cp-mark.png"
-        alt="Cesare Paratore"
-        width="48"
-        height="48"
-      >
-    </a>
-
-    <div class="wow-progress">
-
-      <div
-        class="progress-label"
-        id="progress-current"
-        aria-live="polite"
-      >
-        Il movimento è solo l'inizio.
-      </div>
-
-      <div
-        class="progress-track"
-        aria-hidden="true"
-      >
-        <div
-          class="progress-fill"
-          id="progress-fill"
-        ></div>
-
-        <div
-          class="progress-point"
-          id="progress-point"
-        ></div>
-      </div>
-
-      <nav
-        class="section-jump"
-        aria-label="Navigazione tra le sezioni"
-      >
-
-        <a
-          class="section-jump-link prev"
-          id="previous-section"
-          href="#01"
-          aria-label="Vai alla sezione precedente"
-        >
-          <span
-            class="section-jump-arrow"
-            aria-hidden="true"
-          >←</span>
-
-          <span
-            class="section-jump-number"
-            id="previous-section-label"
-          ></span>
-        </a>
-
-        <a
-          class="section-jump-link next"
-          id="next-section"
-          href="#02"
-          aria-label="Vai alla sezione successiva"
-        >
-          <span
-            class="section-jump-number"
-            id="next-section-label"
-          >02</span>
-
-          <span
-            class="section-jump-arrow"
-            aria-hidden="true"
-          >→</span>
-        </a>
-
-      </nav>
-
-    </div>
-
-    <button
-      class="menu-trigger"
-      type="button"
-      aria-expanded="false"
-      aria-controls="site-menu"
-    >
-      Menu
-    </button>
-
-  </header>
-
-
-  <!-- =====================================================
-       MENU
-       ===================================================== -->
-
-  <aside
-    class="site-menu"
-    id="site-menu"
-    aria-hidden="true"
-  >
-
-    <div class="site-menu-inner">
-
-      <div class="site-menu-header">
-
-        <span class="site-menu-kicker">
-          Mappa
-        </span>
-
-        <p class="site-menu-intro">
-          Otto direzioni.<br>
-          Un solo percorso.
-        </p>
-
-      </div>
-
-      <nav
-        class="site-menu-navigation"
-        aria-label="Navigazione principale"
-      >
-
-        <a
-          class="site-menu-item"
-          href="/chi-sono/"
-        >
-          <span class="site-menu-item-number">01</span>
-          <span class="site-menu-item-title">Chi sono</span>
-          <span class="site-menu-item-trace" aria-hidden="true"></span>
-        </a>
-
-        <a
-          class="site-menu-item"
-          href="/sport/"
-        >
-          <span class="site-menu-item-number">02</span>
-          <span class="site-menu-item-title">Sport</span>
-          <span class="site-menu-item-trace" aria-hidden="true"></span>
-        </a>
-
-        <a
-          class="site-menu-item"
-          href="/scienze-motorie/"
-        >
-          <span class="site-menu-item-number">03</span>
-          <span class="site-menu-item-title">Scienze Motorie</span>
-          <span class="site-menu-item-trace" aria-hidden="true"></span>
-        </a>
-
-        <a
-          class="site-menu-item"
-          href="/educazione/"
-        >
-          <span class="site-menu-item-number">04</span>
-          <span class="site-menu-item-title">Educazione</span>
-          <span class="site-menu-item-trace" aria-hidden="true"></span>
-        </a>
-
-        <a
-          class="site-menu-item"
-          href="/management-dello-sport/"
-        >
-          <span class="site-menu-item-number">05</span>
-          <span class="site-menu-item-title">Management</span>
-          <span class="site-menu-item-trace" aria-hidden="true"></span>
-        </a>
-
-        <a
-          class="site-menu-item"
-          href="/presenza-web/"
-        >
-          <span class="site-menu-item-number">06</span>
-          <span class="site-menu-item-title">Digitale</span>
-          <span class="site-menu-item-trace" aria-hidden="true"></span>
-        </a>
-
-        <a
-          class="site-menu-item"
-          href="/territorio/"
-        >
-          <span class="site-menu-item-number">07</span>
-          <span class="site-menu-item-title">Territorio</span>
-          <span class="site-menu-item-trace" aria-hidden="true"></span>
-        </a>
-
-        <a
-          class="site-menu-item"
-          href="/contatti/"
-        >
-          <span class="site-menu-item-number">08</span>
-          <span class="site-menu-item-title">Contatti</span>
-          <span class="site-menu-item-trace" aria-hidden="true"></span>
-        </a>
-
-      </nav>
-
-      <div class="site-menu-footer">
-        <span>CESARE PARATORE</span>
-        <span>MOVIMENTO / CON DIREZIONE.</span>
-      </div>
-
-    </div>
-
-  </aside>
-
-
-  <!-- =====================================================
-       MAIN
-       ===================================================== -->
-
-  <main>
-
-
-    <!-- ===================================================
-         01 — MOVIMENTO
-         =================================================== -->
-
-    <section
-      class="home-section home-section--dark home-section--hero"
-      id="01"
-      data-section-title="Il movimento è solo l'inizio."
-    >
-
-      <div
-        class="trajectory-layer"
-        aria-hidden="true"
-      >
-        <div class="trajectory-line trajectory-line--main"></div>
-        <div class="trajectory-line trajectory-line--secondary"></div>
-
-        <div class="trajectory-point trajectory-point--origin"></div>
-        <div class="trajectory-point trajectory-point--active"></div>
-      </div>
-
-      <div class="section-inner hero-inner">
-
-        <span class="section-index reveal">
-          01 / 10
-        </span>
-
-        <p class="section-title reveal">
-          01 — IL MOVIMENTO È SOLO L’INIZIO.
-        </p>
-
-        <h1
-          class="hero-title"
-          id="ldqqk3"
-        >
-
-          <span class="hero-title-line reveal">
-            MOVIMENTO
-          </span>
-
-          <span class="hero-title-line hero-title-line--identity reveal">
-
-            <span class="identity-slash">
-              /
-            </span>
-
-            <span>
-              CON DIREZIONE.
-            </span>
-
-          </span>
-
-        </h1>
-
-        <p class="hero-intro reveal">
-          Il movimento è stato il punto di partenza.
-        </p>
-
-        <nav
-          class="hero-directions reveal"
-          aria-label="Le cinque direzioni"
-        >
-
-          <a
-            class="hero-direction"
-            href="/sport/"
-          >
-            SPORT
-          </a>
-
-          <a
-            class="hero-direction"
-            href="/scienze-motorie/"
-          >
-            SCIENZE MOTORIE
-          </a>
-
-          <a
-            class="hero-direction"
-            href="/educazione/"
-          >
-            EDUCAZIONE
-          </a>
-
-          <a
-            class="hero-direction"
-            href="/management-dello-sport/"
-          >
-            MANAGEMENT
-          </a>
-
-          <a
-            class="hero-direction"
-            href="/presenza-web/"
-          >
-            DIGITALE
-          </a>
-
-        </nav>
-
-        <div
-          class="direction-trajectory reveal"
-          aria-hidden="true"
-        >
-
-          <div class="direction-trajectory-line"></div>
-
-          <span
-            class="direction-node direction-node--sport"
-            style="left:10%; top:50%;"
-          >
-            <span class="direction-node-label">SPORT</span>
-          </span>
-
-          <span
-            class="direction-node direction-node--scienze"
-            style="left:31%; top:35%;"
-          >
-            <span class="direction-node-label">SCIENZE MOTORIE</span>
-          </span>
-
-          <span
-            class="direction-node direction-node--educazione"
-            style="left:52%; top:62%;"
-          >
-            <span class="direction-node-label">EDUCAZIONE</span>
-          </span>
-
-          <span
-            class="direction-node direction-node--management"
-            style="left:73%; top:42%;"
-          >
-            <span class="direction-node-label">MANAGEMENT</span>
-          </span>
-
-          <span
-            class="direction-node direction-node--digitale"
-            style="left:91%; top:55%;"
-          >
-            <span class="direction-node-label">DIGITALE</span>
-          </span>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         02 — LA DOMANDA
-         =================================================== -->
-
-    <section
-      class="home-section home-section--paper"
-      id="02"
-      data-section-title="La domanda è cambiata."
-    >
-
-      <div class="section-inner">
-
-        <span class="section-index reveal">
-          02 / 10
-        </span>
-
-        <p class="section-title reveal">
-          02 — LA DOMANDA È CAMBIATA.
-        </p>
-
-        <h2
-          class="section-heading reveal"
-          id="section-02-heading"
-        >
-          <span>LA DOMANDA</span>
-          <span>È CAMBIATA.</span>
-        </h2>
-
-        <div class="editorial-copy">
-
-          <p class="reveal">
-            Il movimento è stato il punto di partenza.
-          </p>
-
-          <p class="reveal">
-            Poi è arrivato lo sport.
-          </p>
-
-          <p class="reveal">
-            E dentro lo sport ho trovato la
-            <a
-              class="narrative-link"
-              href="/corsa-running/"
-              data-trajectory-node="sport"
-            >corsa</a>.
-            Prima come atleta.
-            Poi come tecnico.
-          </p>
-
-          <div class="editorial-sequence reveal">
-
-            <p>
-              La pratica.
-            </p>
-
-            <p>
-              L’allenamento.
-            </p>
-
-            <p>
-              La fatica.
-            </p>
-
-            <p>
-              Il confronto con il limite.
-            </p>
-
-          </div>
-
-          <p class="reveal">
-            Prima ancora di studiare il movimento,
-            ho iniziato a viverlo.
-          </p>
-
-          <p class="reveal">
-            E più mi avvicinavo a quel limite,
-            più sentivo il bisogno di capire cosa ci fosse oltre.
-          </p>
-
-          <p class="reveal">
-            Le
-            <a
-              class="narrative-link"
-              href="/scienze-motorie/"
-              data-trajectory-node="scienze"
-            >Scienze Motorie</a>
-            sono arrivate anche da qui:
-            dal desiderio di comprendere ciò che stavo vivendo.
-          </p>
-
-          <p class="reveal">
-            Studiare il movimento mi ha dato strumenti.
-            Lo sport mi ha dato esperienza.
-            La corsa mi ha insegnato a misurarmi con il tempo, con la distanza e con me stesso.
-            L'allenamento mi ha insegnato la continuità.
-            La fatica mi ha insegnato che il cambiamento ha un costo.
-            Il limite mi ha insegnato che non sempre basta spingere più forte.
-          </p>
-
-          <div class="editorial-question reveal">
-
-            <p>
-              E a quel punto la domanda è cambiata.
-            </p>
-
-            <p>
-              Se il movimento può cambiare un corpo,
-              <strong>
-                che cosa può cambiare una persona?
-              </strong>
-            </p>
-
-          </div>
-
-          <p class="reveal">
-            La risposta non poteva stare tutta in una disciplina.
-          </p>
-
-          <p class="reveal">
-            Così ho iniziato a guardare oltre.
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         03 — CINQUE STRADE
-         =================================================== -->
-
-    <section
-      class="home-section home-section--dark"
-      id="03"
-      data-section-title="Una strada non era abbastanza."
-    >
-
-      <div class="section-inner">
-
-        <span class="section-index reveal">
-          03 / 10
-        </span>
-
-        <p class="section-title reveal">
-          03 — UNA STRADA NON ERA ABBASTANZA.
-        </p>
-
-        <h2 class="section-heading reveal">
-          <span>UNA STRADA</span>
-          <span>NON ERA</span>
-          <span>ABBASTANZA.</span>
-        </h2>
-
-        <div class="editorial-copy">
-
-          <p class="reveal">
-            Ho incontrato l'
-            <a
-              class="narrative-link"
-              href="/educazione/"
-              data-trajectory-node="educazione"
-            >educazione</a>.
-            Per capire cosa succede quando ciò che hai imparato diventa esperienza per qualcun altro.
-          </p>
-
-          <p class="reveal">
-            Ho incontrato il
-            <a
-              class="narrative-link"
-              href="/management-dello-sport/"
-              data-trajectory-node="management"
-            >management</a>.
-            Per capire cosa succede quando un'idea deve diventare organizzazione, progetto, realtà.
-          </p>
-
-          <p class="reveal">
-            Ho incontrato il
-            <a
-              class="narrative-link"
-              href="/presenza-web/"
-              data-trajectory-node="digitale"
-            >digitale</a>.
-            Per capire come strumenti e connessioni possano aprire nuove possibilità.
-          </p>
-
-          <p class="reveal">
-            E sono tornato allo sport.
-            Con occhi diversi.
-          </p>
-
-          <p class="reveal">
-            A quel punto le strade erano diventate cinque:
-          </p>
-
-          <div class="five-directions-list reveal">
-
-            <a
-              class="five-direction narrative-link"
-              href="/sport/"
-              data-trajectory-node="sport"
-            >
-              SPORT
-            </a>
-
-            <a
-              class="five-direction narrative-link"
-              href="/scienze-motorie/"
-              data-trajectory-node="scienze"
-            >
-              SCIENZE MOTORIE
-            </a>
-
-            <a
-              class="five-direction narrative-link"
-              href="/educazione/"
-              data-trajectory-node="educazione"
-            >
-              EDUCAZIONE
-            </a>
-
-            <a
-              class="five-direction narrative-link"
-              href="/management-dello-sport/"
-              data-trajectory-node="management"
-            >
-              MANAGEMENT
-            </a>
-
-            <a
-              class="five-direction narrative-link"
-              href="/presenza-web/"
-              data-trajectory-node="digitale"
-            >
-              DIGITALE
-            </a>
-
-          </div>
-
-          <p class="reveal">
-            Sembravano direzioni diverse.
-            Ma continuavano a partire dallo stesso punto.
-          </p>
-
-          <p class="editorial-emphasis reveal">
-            <strong>Il movimento.</strong>
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         04 — CONNESSIONI
-         =================================================== -->
-
-    <section
-      class="home-section home-section--paper"
-      id="04"
-      data-section-title="Poi ho capito che non erano cinque strade."
-    >
-
-      <div
-        class="network-visual"
-        aria-hidden="true"
-      >
-
-        <div class="network-center">
-          MOVIMENTO
-        </div>
-
-        <span class="network-node network-node--sport"></span>
-        <span class="network-node network-node--scienze"></span>
-        <span class="network-node network-node--educazione"></span>
-        <span class="network-node network-node--management"></span>
-        <span class="network-node network-node--digitale"></span>
-
-        <span class="network-line network-line--a"></span>
-        <span class="network-line network-line--b"></span>
-        <span class="network-line network-line--c"></span>
-        <span class="network-line network-line--d"></span>
-        <span class="network-line network-line--e"></span>
-
-      </div>
-
-      <div class="section-inner">
-
-        <span class="section-index reveal">
-          04 / 10
-        </span>
-
-        <p class="section-title reveal">
-          04 — POI HO CAPITO CHE NON ERANO CINQUE STRADE.
-        </p>
-
-        <h2 class="section-heading reveal">
-          <span>NON ERANO</span>
-          <span>CINQUE STRADE.</span>
-        </h2>
-
-        <div class="editorial-copy">
-
-          <p class="reveal">
-            Erano cinque modi di guardare la stessa realtà.
-          </p>
-
-          <p class="reveal">
-            Lo sport mi ha insegnato a misurarmi.
-            Le Scienze Motorie mi hanno insegnato a comprendere.
-            L'educazione mi ha insegnato a trasferire.
-            Il management mi ha insegnato a progettare.
-            Il digitale mi ha insegnato a connettere.
-          </p>
-
-          <p class="reveal">
-            E nessuna di queste esperienze è rimasta uguale dopo aver incontrato le altre.
-          </p>
-
-          <p class="reveal">
-            È questo che un curriculum non riesce a raccontare.
-            Può dire dove sei stato.
-            Non può dire
-            <strong>
-              come ogni tappa ha cambiato quella successiva.
-            </strong>
-          </p>
-
-          <p class="reveal">
-            Per questo il mio percorso non lo vedo come un elenco.
-            Lo vedo come una rete di connessioni.
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         05 — PAUSA
-         =================================================== -->
-
-    <section
-      class="home-section home-section--dark"
-      id="05"
-      data-section-title="E le connessioni, a volte, passano anche da una pausa."
-    >
-
-      <div
-        class="pause-trajectory"
-        aria-hidden="true"
-      >
-        <div class="pause-line"></div>
-        <div class="pause-point"></div>
-      </div>
-
-      <div class="section-inner">
-
-        <span class="section-index reveal">
-          05 / 10
-        </span>
-
-        <p class="section-title reveal">
-          05 — E LE CONNESSIONI, A VOLTE, PASSANO ANCHE DA UNA PAUSA.
-        </p>
-
-        <h2 class="section-heading reveal">
-          <span>ANCHE UNA PAUSA</span>
-          <span>FA PARTE</span>
-          <span>DEL MOVIMENTO.</span>
-        </h2>
-
-        <div class="editorial-copy">
-
-          <p class="reveal">
-            Ho imparato che muoversi non significa necessariamente andare avanti.
-            A volte significa fermarsi.
-            Guardare meglio.
-            Accorgersi che la domanda era sbagliata.
-            Cambiare direzione.
-            Riconoscere un errore.
-            Ricominciare.
-          </p>
-
-          <p class="reveal">
-            È forse la parte più difficile del movimento:
-            <strong>
-              capire quando continuare e quando cambiare.
-            </strong>
-          </p>
-
-          <p class="reveal">
-            Per questo oggi cerco di non partire dalla soluzione.
-            Parto da ciò che ho davanti.
-            Prima capire.
-            Poi costruire.
-            Infine muoversi.
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         06 — TERRITORIO
-         =================================================== -->
-
-    <section
-      class="home-section home-section--paper"
-      id="06"
-      data-section-title="Oggi so anche da dove parto."
-    >
-
-      <div class="section-inner">
-
-        <span class="section-index reveal">
-          06 / 10
-        </span>
-
-        <p class="section-title reveal">
-          06 — OGGI SO ANCHE DA DOVE PARTO.
-        </p>
-
-        <div class="territory-grid">
-
-          <div class="territory-copy">
-
-            <div class="territory-place reveal">
-
-              <span class="territory-place-label">
-                Base
-              </span>
-
-              <h2 class="territory-place-title">
-                PARTINICO
-              </h2>
-
-              <p class="territory-place-subtitle">
-                DA QUI, NON SOLO QUI.
-              </p>
-
-            </div>
-
-            <div class="editorial-copy">
-
-              <p class="reveal">
-                È qui che ha la sua base il mio lavoro.
-                In presenza, per chi parte da qui e per chi arriva dai territori vicini.
-                Online, quando la distanza non deve essere un limite.
-              </p>
-
-              <p class="reveal">
-                Perché una base non è un confine.
-                È il punto che ti permette di sapere sempre da dove stai partendo.
-              </p>
-
-            </div>
-
-          </div>
-
-          <div class="territory-media reveal">
-
-            <div
-              class="territory-image territory-image--placeholder"
-              role="img"
-              aria-label="Immagine del territorio di Partinico da sostituire con fotografia reale"
-            >
-              <span>
-                FOTOGRAFIA DEL TERRITORIO
-              </span>
-            </div>
-
-            <div class="territory-map">
-
-              <iframe
-                title="Stadio Comunale Giuseppe La Franca, Partinico"
-                src="https://www.google.com/maps?q=Stadio+Comunale+Giuseppe+La+Franca%2C+Viale+Aldo+Moro%2C+Partinico%2C+PA%2C+Italy&output=embed"
-                loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade"
-              ></iframe>
-
-            </div>
-
-            <a
-              class="territory-map-link"
-              href="https://www.google.com/maps/search/?api=1&query=Stadio+Comunale+Giuseppe+La+Franca%2C+Viale+Aldo+Moro%2C+Partinico%2C+PA%2C+Italy"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Apri la mappa
-            </a>
-
-            <p class="territory-caption">
-              Stadio Comunale “G. La Franca” — Viale Aldo Moro, Partinico.
-            </p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         07 — PRESENTE
-         =================================================== -->
-
-    <section
-      class="home-section home-section--dark"
-      id="07"
-      data-section-title="Da qui, il percorso continua."
-    >
-
-      <div class="section-inner">
-
-        <span class="section-index reveal">
-          07 / 10
-        </span>
-
-        <p class="section-title reveal">
-          07 — DA QUI, IL PERCORSO CONTINUA.
-        </p>
-
-        <div class="present-grid">
-
-          <div class="present-copy">
-
-            <div class="editorial-copy">
-
-              <p class="reveal">
-                Oggi quelle esperienze convivono.
-              </p>
-
-              <p class="reveal">
-                <strong>Sport.</strong><br>
-                Il punto da cui è iniziato tutto.
-              </p>
-
-              <p class="reveal">
-                <strong>Scienze Motorie.</strong><br>
-                Il modo di comprendere ciò che accade nel movimento.
-              </p>
-
-              <p class="reveal">
-                <strong>Educazione.</strong><br>
-                Il passaggio dalla propria esperienza a quella degli altri.
-              </p>
-
-              <p class="reveal">
-                <strong>Management.</strong><br>
-                Il modo di trasformare idee e competenze in progetti.
-              </p>
-
-              <p class="reveal">
-                <strong>Digitale.</strong><br>
-                Uno spazio per connettere, costruire e aprire nuove possibilità.
-              </p>
-
-              <p class="reveal">
-                Non provo a farle entrare tutte dentro una definizione.
-              </p>
-
-              <p class="reveal">
-                Cerco piuttosto il punto in cui possono diventare utili.
-                A una persona.
-                A un progetto.
-                A un problema.
-                A un'idea che deve ancora trovare la sua forma.
-              </p>
-
-              <p class="reveal">
-                È lì che mi interessa lavorare:
-              </p>
-
-              <p class="editorial-emphasis reveal">
-                <strong>
-                  nel punto in cui una competenza smette di essere soltanto conoscenza e comincia a diventare possibilità.
-                </strong>
-              </p>
-
-            </div>
-
-          </div>
-
-          <div
-            class="present-portrait reveal"
-            role="img"
-            aria-label="Ritratto professionale di Cesare Paratore da sostituire con fotografia reale"
-          >
-            <span>
-              RITRATTO PROFESSIONALE
-            </span>
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         08 — SOTTRAZIONE
-         =================================================== -->
-
-    <section
-      class="home-section home-section--paper"
-      id="08"
-      data-section-title="Non è un punto di arrivo."
-    >
-
-      <div class="section-inner">
-
-        <span class="section-index reveal">
-          08 / 10
-        </span>
-
-        <p class="section-title reveal">
-          08 — NON È UN PUNTO DI ARRIVO.
-        </p>
-
-        <div class="section-subtraction">
-
-          <h2 class="section-heading reveal">
-            <span>NON È UN</span>
-            <span>PUNTO DI ARRIVO.</span>
-          </h2>
-
-          <div class="editorial-copy">
-
-            <p class="reveal">
-              Quello che hai letto fin qui
-              non è un curriculum.
-            </p>
-
-            <p class="reveal">
-              È il modo in cui sono arrivato a guardare le cose.
-            </p>
-
-            <p class="reveal">
-              E questo sito nasce per la stessa ragione:
-            </p>
-
-            <p class="reveal">
-              per mettere ordine,
-              creare connessioni,
-              e trasformare ciò che so
-              in qualcosa che possa essere utile.
-            </p>
-
-            <p class="editorial-emphasis reveal">
-              <strong>
-                Perché ogni percorso, prima o poi,
-                ha bisogno di incontrare qualcosa di nuovo.
-              </strong>
-            </p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         09 — TU
-         =================================================== -->
-
-    <section
-      class="home-section home-section--dark"
-      id="09"
-      data-section-title="Forse è qui che la storia cambia."
-    >
-
-      <div class="section-inner">
-
-        <span class="section-index reveal">
-          09 / 10
-        </span>
-
-        <div class="reader-question">
-
-          <p class="reader-question-label reveal">
-            09 — FORSE È QUI CHE LA STORIA CAMBIA.
-          </p>
-
-          <p class="reader-question-intro reveal">
-            Finora ti ho raccontato da dove sono partito.
-            Adesso la domanda è un'altra.
-          </p>
-
-          <h2 class="reader-question-main reveal">
-            <span>DA DOVE</span><br>
-            <span>TU PARTI?</span>
-          </h2>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         10 — PARTIAMO
-         =================================================== -->
-
-    <section
-      class="home-section home-section--paper"
-      id="10"
-      data-section-title="Partiamo da quello."
-    >
-
-      <div class="section-inner">
-
-        <span class="section-index reveal">
-          10 / 10
-        </span>
-
-        <div class="final-page">
-
-          <p class="section-title reveal">
-            10 — PARTIAMO DA QUELLO.
-          </p>
-
-          <h2 class="section-heading reveal">
-            <span>PARTIAMO</span>
-            <span>DA QUELLO.</span>
-          </h2>
-
-          <div class="final-copy">
-
-            <div class="editorial-copy">
-
-              <p class="reveal">
-                Non dalla soluzione.
-                Da te.
-                Da quello che hai davanti.
-                Da quello che vuoi capire, costruire, migliorare o cambiare.
-              </p>
-
-              <p class="reveal">
-                Se hai un obiettivo, partiamo da quello.
-                Se hai un problema, partiamo da quello.
-                Se hai un progetto, partiamo da quello.
-                Se hai una domanda, partiamo da quella.
-              </p>
-
-              <p class="reveal">
-                Perché forse il movimento non consiste nel sapere già dove arriverai.
-                Forse consiste nel riconoscere il punto da cui vale la pena partire.
-              </p>
-
-              <p class="reveal">
-                Io quel punto l'ho trovato nel movimento.
-                E da lì ho costruito tutto il resto.
-              </p>
-
-              <p class="editorial-emphasis reveal">
-                <strong>
-                  Adesso tocca a te.
-                </strong>
-              </p>
-
-            </div>
-
-          </div>
-
-          <a
-            class="contact-cta reveal"
-            href="/contatti/"
-          >
-
-            <span>
-              Raccontami da dove vuoi partire →
-            </span>
-
-            <span
-              class="contact-cta-trace"
-              aria-hidden="true"
-            >
-              <span class="contact-cta-trace-line"></span>
-              <span class="contact-cta-trace-point"></span>
-            </span>
-
-          </a>
-
-        </div>
-
-      </div>
-
-    </section>
-
-  </main>
-
-
-  <!-- =====================================================
-       FOOTER
-       ===================================================== -->
-
-  <footer class="site-footer">
-
-    <div class="footer-main">
-
-      <div class="footer-brand">
-
-        <img
-          src="/assets/images/cp-mark.png"
-          alt="Cesare Paratore"
-          width="140"
-          height="140"
-        >
-
-      </div>
-
-      <div class="footer-motto">
-        <span>MOVIMENTO /</span>
-        <span>CON DIREZIONE.</span>
-      </div>
-
-      <div class="footer-name">
-        CESARE PARATORE
-      </div>
-
-    </div>
-
-  </footer>
-
-
-  <!-- =====================================================
-       STANDBY / NARRATIVE PAUSE
-       ===================================================== -->
-
-  <div
-    class="standby-screen"
-    aria-hidden="true"
-  >
-
-    <div
-      class="standby-atmosphere"
-      aria-hidden="true"
-    >
-      <span class="standby-path standby-path--a"></span>
-      <span class="standby-path standby-path--b"></span>
-      <span class="standby-path standby-path--c"></span>
-      <span class="standby-path standby-path--d"></span>
-
-      <span class="standby-point"></span>
-      <span class="standby-point standby-point--secondary"></span>
-    </div>
-
-    <div class="standby-center">
-
-      <div class="standby-copy">
-
-        <span class="standby-label">
-          LA PAUSA È PARTE DEL PERCORSO.
-        </span>
-
-        <span class="standby-subtitle">
-          RIPARTIRE È ANCORA MOVIMENTO.
-        </span>
-
-      </div>
-
-      <button
-        class="standby-wake"
-        type="button"
-      >
-        RIPRENDI →
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <script
-    src="/script.js"
-    defer
-  ></script>
-
-</body>
-</html>
+
+  50% {
+    transform: scale(1.025);
+  }
+
+}
+
+
+/* =========================================================
+   05 — PAGE TRANSITION
+   ========================================================= */
+
+.page-transition {
+  position: fixed;
+  inset: 0;
+
+  z-index: 990;
+
+  display: grid;
+  place-items: center;
+
+  background: var(--ink);
+
+  opacity: 0;
+  visibility: hidden;
+
+  pointer-events: none;
+
+  transition:
+    opacity 550ms var(--ease),
+    visibility 550ms var(--ease);
+}
+
+.page-transition.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.page-transition-circle {
+  display: grid;
+  place-items: center;
+
+  width: clamp(100px,11vw,170px);
+  aspect-ratio: 1;
+
+  border-radius: 50%;
+
+  background: var(--ivory);
+
+  transform: scale(.72);
+
+  transition:
+    transform 700ms var(--ease-editorial);
+}
+
+.page-transition.is-active .page-transition-circle {
+  transform: scale(1);
+}
+
+.page-transition-circle img {
+  width: 70%;
+}
+
+
+/* =========================================================
+   06 — HEADER / WOW BAR
+   ========================================================= */
+
+.site-header {
+  position: fixed;
+  inset: 0 0 auto;
+
+  z-index: 200;
+
+  min-height: var(--header-h);
+
+  padding: 12px 28px 10px;
+
+  display: grid;
+
+  grid-template-columns:
+    180px
+    minmax(0,1fr)
+    180px;
+
+  grid-template-rows:
+    1fr
+    auto;
+
+  column-gap: 24px;
+
+  background:
+    rgba(242,239,232,.94);
+
+  color: var(--ink);
+
+  border-bottom:
+    1px solid
+    rgba(17,17,15,.08);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.brand {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  position: relative;
+  z-index: 4;
+}
+
+.brand img {
+  width: 48px;
+  height: 48px;
+
+  object-fit: contain;
+}
+
+.wow-progress {
+  position: absolute;
+
+  left: 50%;
+  top: 12px;
+
+  width:
+    min(
+      860px,
+      calc(100vw - 420px)
+    );
+
+  transform: translateX(-50%);
+
+  display: grid;
+
+  grid-template-rows: auto 1px auto;
+
+  row-gap: 0;
+
+  min-width: 0;
+}
+
+.progress-label {
+  min-width: 0;
+
+  margin: 0 0 8px;
+
+  font-family: var(--serif);
+
+  font-size: 16px;
+  line-height: 1.05;
+
+  color: var(--ink);
+
+  text-align: center;
+
+  white-space: normal;
+
+  overflow: visible;
+  text-overflow: clip;
+
+  text-wrap: balance;
+}
+
+.progress-track {
+  position: relative;
+
+  width: 100%;
+  height: 1px;
+
+  background:
+    rgba(17,17,15,.18);
+}
+
+.progress-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+
+  width: 0;
+
+  background: var(--terracotta);
+
+  transition:
+    width 550ms var(--ease);
+}
+
+.progress-point {
+  position: absolute;
+
+  top: 50%;
+  left: 0;
+
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: var(--terracotta);
+
+  transform:
+    translate(-50%,-50%);
+
+  transition:
+    left 550ms var(--ease);
+}
+
+.section-jump {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+
+  padding-top: 8px;
+}
+
+.section-jump-link {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+
+  min-width: 30px;
+  min-height: 22px;
+
+  font-family: var(--mono);
+
+  font-size: 9px;
+  letter-spacing: .08em;
+
+  color: var(--ink);
+
+  text-transform: uppercase;
+
+  transition:
+    color 220ms ease,
+    transform 350ms var(--ease);
+}
+
+.section-jump-link:hover {
+  color: var(--terracotta);
+}
+
+.section-jump-link.prev:hover {
+  transform: translateX(-3px);
+}
+
+.section-jump-link.next:hover {
+  transform: translateX(3px);
+}
+
+.section-jump-link.is-disabled {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.section-jump-number {
+  min-width: 18px;
+
+  text-align: center;
+}
+
+.section-jump-arrow {
+  color: var(--terracotta);
+
+  font-size: 13px;
+  line-height: 1;
+}
+
+.section-jump-link.is-home-return {
+  gap: 8px;
+}
+
+.menu-trigger {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+
+  align-self: center;
+  justify-self: end;
+
+  position: relative;
+  z-index: 4;
+
+  padding: 8px 0;
+
+  font-family: var(--mono);
+
+  font-size: 10px;
+  letter-spacing: .08em;
+
+  text-transform: uppercase;
+
+  color: var(--ink);
+
+  transition:
+    color 220ms ease;
+}
+
+.menu-trigger:hover {
+  color: var(--terracotta);
+}
+
+
+/* =========================================================
+   07 — MENU
+   ========================================================= */
+
+.site-menu {
+  position: fixed;
+  inset: 0;
+
+  z-index: 180;
+
+  display: flex;
+  justify-content: flex-end;
+
+  background:
+    rgba(17,17,15,.34);
+
+  opacity: 0;
+  visibility: hidden;
+
+  pointer-events: none;
+
+  transition:
+    opacity 500ms var(--ease),
+    visibility 500ms var(--ease);
+}
+
+.site-menu[aria-hidden="false"] {
+  opacity: 1;
+  visibility: visible;
+
+  pointer-events: auto;
+}
+
+.site-menu-inner {
+  width: min(680px,94vw);
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  padding:
+    calc(var(--header-h) + 34px)
+    clamp(26px,5vw,72px)
+    34px;
+
+  background: var(--ivory);
+
+  transform: translateX(100%);
+
+  transition:
+    transform 700ms var(--ease-editorial);
+}
+
+.site-menu[aria-hidden="false"] .site-menu-inner {
+  transform: translateX(0);
+}
+
+.site-menu-header {
+  margin-bottom: 30px;
+}
+
+.site-menu-kicker {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: var(--stone);
+
+  font-family: var(--mono);
+
+  font-size: .58rem;
+  letter-spacing: .14em;
+
+  text-transform: uppercase;
+}
+
+.site-menu-intro {
+  margin: 0;
+
+  font-family: var(--serif);
+
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.site-menu-navigation {
+  display: flex;
+  flex-direction: column;
+
+  overflow-y: auto;
+}
+
+.site-menu-item {
+  position: relative;
+
+  display: grid;
+
+  grid-template-columns:
+    42px
+    minmax(0,1fr)
+    80px;
+
+  align-items: center;
+
+  min-height: 70px;
+
+  border-top:
+    1px solid
+    var(--line-light);
+
+  overflow: hidden;
+}
+
+.site-menu-item:last-child {
+  border-bottom:
+    1px solid
+    var(--line-light);
+}
+
+.site-menu-item-number {
+  color: var(--stone);
+
+  font-family: var(--mono);
+
+  font-size: .58rem;
+}
+
+.site-menu-item-title {
+  position: relative;
+  z-index: 2;
+
+  font-family: var(--sans);
+
+  font-size: clamp(1rem,2vw,1.35rem);
+  font-weight: 500;
+
+  letter-spacing: -.02em;
+
+  transition:
+    transform 450ms var(--ease),
+    color 250ms ease;
+}
+
+.site-menu-item-trace {
+  position: relative;
+
+  height: 24px;
+}
+
+.site-menu-item-trace::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  top: 50%;
+
+  height: 1px;
+
+  background: var(--line-light-strong);
+
+  transform-origin: left center;
+
+  transition:
+    transform 500ms var(--ease),
+    background 300ms ease;
+}
+
+.site-menu-item-trace::after {
+  content: "";
+
+  position: absolute;
+
+  left: 10px;
+  top: 50%;
+
+  width: 7px;
+  height: 7px;
+
+  border: 1px solid var(--ink);
+
+  border-radius: 50%;
+
+  background: var(--ivory);
+
+  transform:
+    translate(-50%,-50%);
+
+  transition:
+    left 500ms var(--ease),
+    background 300ms ease,
+    border-color 300ms ease;
+}
+
+.site-menu-item:hover .site-menu-item-title,
+.site-menu-item:focus-visible .site-menu-item-title {
+  color: var(--terracotta);
+  transform: translateX(7px);
+}
+
+.site-menu-item:hover .site-menu-item-trace::before,
+.site-menu-item:focus-visible .site-menu-item-trace::before {
+  background: var(--terracotta);
+  transform: scaleX(1.05);
+}
+
+.site-menu-item:hover .site-menu-item-trace::after,
+.site-menu-item:focus-visible .site-menu-item-trace::after {
+  left: 94%;
+
+  background: var(--terracotta);
+  border-color: var(--terracotta);
+}
+
+.site-menu-footer {
+  margin-top: auto;
+  padding-top: 28px;
+
+  display: flex;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  color: var(--stone);
+
+  font-family: var(--mono);
+
+  font-size: .56rem;
+  letter-spacing: .08em;
+}
+
+
+/* =========================================================
+   08 — PAGE / SECTIONS
+   ========================================================= */
+
+main {
+  position: relative;
+}
+
+.home-section {
+  position: relative;
+
+  width: 100%;
+  min-height: 100svh;
+
+  display: flex;
+  align-items: center;
+
+  overflow: hidden;
+
+  isolation: isolate;
+
+  scroll-margin-top: var(--header-h);
+}
+
+.home-section--dark {
+  background: var(--ink);
+  color: var(--ivory);
+}
+
+.home-section--paper {
+  background: var(--ivory);
+  color: var(--ink);
+}
+
+.section-inner {
+  position: relative;
+  z-index: 5;
+
+  width:
+    min(
+      calc(100% - (var(--page-padding) * 2)),
+      var(--content-width)
+    );
+
+  margin: 0 auto;
+
+  padding:
+    var(--section-pad-y)
+    0;
+}
+
+.section-index {
+  position: absolute;
+
+  top: clamp(34px,5vw,72px);
+  left: 0;
+
+  font-family: var(--mono);
+
+  font-size: .58rem;
+  letter-spacing: .1em;
+
+  opacity: .42;
+}
+
+.section-title {
+  position: relative;
+  z-index: 6;
+
+  max-width: 100%;
+
+  margin: 0 0 34px;
+
+  font-family: var(--mono);
+
+  font-size: .62rem;
+  font-weight: 400;
+
+  letter-spacing: .12em;
+
+  line-height: 1.45;
+
+  text-transform: uppercase;
+
+  opacity: .56;
+}
+
+.section-heading {
+  position: relative;
+  z-index: 6;
+
+  display: flex;
+  flex-direction: column;
+
+  max-width: 1100px;
+
+  margin: 0;
+
+  font-family: var(--serif);
+
+  font-size:
+    clamp(3.4rem,8vw,9rem);
+
+  font-weight: 400;
+
+  line-height: .91;
+
+  letter-spacing: -.045em;
+}
+
+.editorial-copy {
+  position: relative;
+  z-index: 6;
+
+  max-width: var(--reading-width);
+
+  margin-top:
+    clamp(70px,8vw,120px);
+
+  font-family: var(--sans);
+
+  font-size:
+    clamp(1rem,1.35vw,1.3rem);
+
+  line-height: 1.72;
+}
+
+.editorial-copy p {
+  margin: 0 0 1.55em;
+}
+
+.editorial-copy p:last-child {
+  margin-bottom: 0;
+}
+
+.editorial-copy strong {
+  font-weight: 600;
+}
+
+.editorial-emphasis {
+  font-family: var(--serif);
+
+  font-size:
+    clamp(1.8rem,3.3vw,3.8rem);
+
+  line-height: 1.08;
+
+  letter-spacing: -.025em;
+}
+
+.editorial-question {
+  position: relative;
+  z-index: 6;
+
+  max-width: 1000px;
+
+  margin-top:
+    clamp(76px,9vw,130px);
+
+  margin-bottom:
+    clamp(76px,9vw,130px);
+
+  font-family: var(--serif);
+
+  font-size:
+    clamp(2.2rem,4.8vw,5.8rem);
+
+  line-height: 1.04;
+
+  letter-spacing: -.035em;
+}
+
+.editorial-question p {
+  margin: 0 0 .65em;
+}
+
+.editorial-question strong {
+  display: block;
+
+  margin-top: .18em;
+
+  color: inherit;
+}
+
+.editorial-sequence {
+  position: relative;
+
+  margin:
+    clamp(62px,8vw,110px)
+    0;
+}
+
+.editorial-sequence::before {
+  content: "";
+
+  position: absolute;
+
+  left: -28px;
+  top: .5em;
+  bottom: .55em;
+
+  width: 1px;
+
+  background: var(--terracotta);
+
+  opacity: .7;
+}
+
+.editorial-sequence p {
+  margin-bottom: .7em;
+}
+
+.editorial-sequence p:last-child {
+  margin-bottom: 0;
+}
+
+
+/* =========================================================
+   09 — NARRATIVE LINKS
+   ========================================================= */
+
+.narrative-link {
+  position: relative;
+
+  display: inline;
+
+  color: inherit;
+
+  transition:
+    color 220ms ease;
+}
+
+.narrative-link::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: -.08em;
+
+  height: 1px;
+
+  background: var(--terracotta);
+
+  transform:
+    scaleX(.22);
+
+  transform-origin: left center;
+
+  transition:
+    transform 400ms var(--ease);
+}
+
+.narrative-link:hover,
+.narrative-link:focus-visible {
+  color: var(--terracotta);
+}
+
+.narrative-link:hover::after,
+.narrative-link:focus-visible::after {
+  transform: scaleX(1);
+}
+
+
+/* =========================================================
+   10 — HERO / IDENTITY
+   ========================================================= */
+
+.home-section--hero {
+  min-height:
+    max(760px,100svh);
+}
+
+.hero-inner {
+  min-height:
+    calc(100svh - var(--header-h));
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+}
+
+.hero-title {
+  position: relative;
+  z-index: 6;
+
+  max-width: 1200px;
+
+  margin: 0;
+
+  font-family: var(--serif);
+
+  font-size:
+    clamp(4.5rem,12vw,15rem);
+
+  font-weight: 400;
+
+  line-height: .82;
+
+  letter-spacing: -.065em;
+}
+
+.hero-title-line {
+  display: block;
+}
+
+.hero-title-line--identity {
+  display: inline-flex;
+
+  align-items: baseline;
+
+  gap: clamp(.35em,1.1vw,.65em);
+
+  padding-left:
+    clamp(24px,7vw,120px);
+
+  max-width: 100%;
+}
+
+.identity-slash {
+  display: inline-block;
+
+  flex: 0 0 auto;
+
+  color: var(--terracotta);
+}
+
+.hero-intro {
+  position: relative;
+  z-index: 6;
+
+  max-width: 620px;
+
+  margin-top:
+    clamp(54px,8vw,110px);
+
+  font-family: var(--serif);
+
+  font-size:
+    clamp(1.4rem,2.2vw,2.3rem);
+
+  line-height: 1.12;
+}
+
+.hero-directions {
+  position: relative;
+  z-index: 6;
+
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 10px 22px;
+
+  max-width: 900px;
+
+  margin-top: 38px;
+}
+
+.hero-direction {
+  font-family: var(--mono);
+
+  font-size: .66rem;
+  letter-spacing: .08em;
+
+  text-transform: uppercase;
+
+  transition:
+    color 220ms ease,
+    transform 350ms var(--ease);
+}
+
+.hero-direction:hover,
+.hero-direction:focus-visible {
+  color: var(--terracotta);
+
+  transform:
+    translateY(-2px);
+}
+
+
+/* =========================================================
+   11 — FIVE DIRECTIONS
+   ========================================================= */
+
+.direction-trajectory {
+  position: relative;
+
+  width: 100%;
+
+  min-height:
+    clamp(360px,42vw,600px);
+
+  margin-top:
+    clamp(80px,10vw,150px);
+}
+
+.direction-trajectory-line {
+  position: absolute;
+
+  left: 5%;
+  right: 5%;
+  top: 50%;
+
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      var(--terracotta),
+      transparent
+    );
+
+  transform:
+    translateY(-50%);
+}
+
+.direction-node {
+  position: absolute;
+
+  width: 12px;
+  height: 12px;
+
+  border:
+    1px solid
+    var(--terracotta);
+
+  border-radius: 50%;
+
+  background: var(--ink);
+
+  transform:
+    translate(-50%,-50%);
+
+  transition:
+    transform 450ms var(--ease),
+    background 250ms ease,
+    box-shadow 450ms var(--ease);
+}
+
+.direction-node.is-linked,
+.direction-node:focus-visible {
+  background: var(--terracotta);
+
+  transform:
+    translate(-50%,-50%)
+    scale(1.35);
+
+  box-shadow:
+    0 0 0 8px
+    rgba(166,66,50,.1);
+}
+
+.direction-node-label {
+  position: absolute;
+
+  left: 50%;
+  top: 22px;
+
+  white-space: nowrap;
+
+  font-family: var(--mono);
+
+  font-size: .62rem;
+  letter-spacing: .08em;
+
+  transform:
+    translateX(-50%);
+
+  transition: color 220ms ease;
+}
+
+.direction-node.is-linked .direction-node-label {
+  color: var(--terracotta);
+}
+
+
+/* =========================================================
+   12 — GENERIC TRAJECTORY
+   ========================================================= */
+
+.trajectory-layer {
+  position: absolute;
+  inset: 0;
+
+  z-index: 2;
+
+  pointer-events: none;
+
+  overflow: hidden;
+}
+
+.trajectory-line {
+  position: absolute;
+
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      var(--terracotta),
+      transparent
+    );
+
+  opacity:
+    calc(
+      .14 +
+      var(--trajectory-opacity) * .34
+    );
+
+  transform-origin: left center;
+}
+
+.trajectory-line--main {
+  width:
+    clamp(280px,60vw,1000px);
+
+  left:
+    calc(
+      -12vw +
+      var(--trajectory-drift)
+    );
+
+  top: 60%;
+
+  transform:
+    rotate(-11deg)
+    translateX(
+      calc(
+        var(--trajectory-progress) * 34vw
+      )
+    );
+}
+
+.trajectory-line--secondary {
+  width:
+    clamp(180px,42vw,700px);
+
+  left:
+    calc(
+      12vw -
+      var(--trajectory-drift)
+    );
+
+  top: 36%;
+
+  opacity: .12;
+
+  transform:
+    rotate(24deg);
+}
+
+.trajectory-point {
+  position: absolute;
+
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+
+  background: var(--terracotta);
+
+  box-shadow:
+    0 0 0 5px
+    rgba(166,66,50,.08);
+
+  transform:
+    translate(-50%,-50%)
+    scale(var(--trajectory-scale));
+
+  opacity: var(--trajectory-opacity);
+}
+
+.trajectory-point--origin {
+  left: 15%;
+  top: 62%;
+}
+
+.trajectory-point--active {
+  left:
+    calc(
+      15% +
+      var(--trajectory-progress) * 70%
+    );
+
+  top:
+    calc(
+      62% -
+      var(--trajectory-progress) * 20%
+    );
+}
+
+
+/* =========================================================
+   13 — SECTION 04 NETWORK
+   ========================================================= */
+
+.network-visual {
+  position: absolute;
+  inset: 0;
+
+  z-index: 1;
+
+  pointer-events: none;
+
+  opacity: .5;
+}
+
+.network-center {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  color: var(--terracotta);
+
+  font-family: var(--mono);
+
+  font-size: .55rem;
+  letter-spacing: .12em;
+
+  transform:
+    translate(-50%,-50%);
+}
+
+.network-node {
+  position: absolute;
+
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+
+  background: var(--terracotta);
+
+  transition:
+    transform 400ms var(--ease),
+    box-shadow 300ms ease;
+}
+
+.network-node.is-linked {
+  transform: scale(1.7);
+
+  box-shadow:
+    0 0 0 7px
+    rgba(166,66,50,.08);
+}
+
+.network-node--sport {
+  left: 24%;
+  top: 25%;
+}
+
+.network-node--scienze {
+  left: 76%;
+  top: 27%;
+}
+
+.network-node--educazione {
+  left: 20%;
+  top: 76%;
+}
+
+.network-node--management {
+  left: 78%;
+  top: 73%;
+}
+
+.network-node--digitale {
+  left: 50%;
+  top: 16%;
+}
+
+.network-line {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width: 34%;
+
+  height: 1px;
+
+  background:
+    rgba(166,66,50,.26);
+
+  transform-origin: left center;
+}
+
+.network-line--a {
+  transform: rotate(215deg);
+}
+
+.network-line--b {
+  transform: rotate(330deg);
+}
+
+.network-line--c {
+  transform: rotate(145deg);
+}
+
+.network-line--d {
+  transform: rotate(40deg);
+}
+
+.network-line--e {
+  transform: rotate(270deg);
+}
+
+
+/* =========================================================
+   14 — SECTION 03 LIST
+   ========================================================= */
+
+.five-directions-list {
+  position: relative;
+  z-index: 6;
+
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 12px 26px;
+
+  margin:
+    clamp(45px,7vw,90px)
+    0;
+}
+
+.five-direction {
+  font-family: var(--mono);
+
+  font-size: .66rem;
+  letter-spacing: .08em;
+
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   15 — SECTION 05 PAUSE
+   ========================================================= */
+
+.pause-trajectory {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  top: 50%;
+
+  z-index: 2;
+
+  height: 1px;
+
+  pointer-events: none;
+}
+
+.pause-line {
+  position: absolute;
+
+  left: 8%;
+  right: 8%;
+
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      var(--terracotta) 25%,
+      var(--terracotta) 75%,
+      transparent
+    );
+
+  opacity: .34;
+}
+
+.pause-point {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+
+  background: var(--terracotta);
+
+  transform:
+    translate(-50%,-50%);
+}
+
+
+/* =========================================================
+   16 — TERRITORY
+   ========================================================= */
+
+.territory-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0,1fr)
+    minmax(360px,.92fr);
+
+  gap:
+    clamp(50px,8vw,140px);
+
+  align-items: center;
+}
+
+.territory-copy {
+  max-width: 760px;
+}
+
+.territory-place {
+  margin:
+    clamp(55px,7vw,100px)
+    0
+    30px;
+}
+
+.territory-place-label {
+  display: block;
+
+  margin-bottom: 12px;
+
+  color: var(--stone);
+
+  font-family: var(--mono);
+
+  font-size: .6rem;
+  letter-spacing: .14em;
+
+  text-transform: uppercase;
+}
+
+.territory-place-title {
+  margin: 0;
+
+  font-family: var(--serif);
+
+  font-size:
+    clamp(4rem,8vw,9rem);
+
+  font-weight: 400;
+
+  line-height: .82;
+
+  letter-spacing: -.055em;
+}
+
+.territory-place-subtitle {
+  margin: 18px 0 0;
+
+  color: var(--stone);
+
+  font-family: var(--mono);
+
+  font-size: .7rem;
+  letter-spacing: .08em;
+}
+
+.territory-media {
+  position: relative;
+
+  min-width: 0;
+
+  isolation: isolate;
+}
+
+.territory-image {
+  position: relative;
+
+  width: 100%;
+
+  aspect-ratio: 3 / 2;
+
+  background: var(--sand);
+
+  overflow: hidden;
+}
+
+.territory-image--placeholder,
+.present-portrait {
+  display: grid;
+  place-items: center;
+
+  color: var(--stone);
+
+  font-family: var(--mono);
+
+  font-size: .58rem;
+  letter-spacing: .1em;
+
+  text-align: center;
+}
+
+.territory-image--placeholder span,
+.present-portrait span {
+  padding: 10px 14px;
+
+  border: 1px solid rgba(17,17,15,.16);
+}
+
+.territory-map {
+  position: relative;
+  z-index: 3;
+
+  width: 88%;
+
+  margin:
+    -70px
+    0
+    0
+    auto;
+
+  aspect-ratio: 16 / 10;
+
+  border:
+    1px solid
+    var(--line-light-strong);
+
+  background: var(--ivory-bright);
+
+  overflow: hidden;
+
+  box-shadow:
+    0 20px 70px
+    rgba(17,17,15,.08);
+}
+
+.territory-map iframe {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  border: 0;
+}
+
+.territory-map-link {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 8px;
+
+  margin-top: 16px;
+
+  color: var(--stone);
+
+  font-family: var(--mono);
+
+  font-size: .62rem;
+  letter-spacing: .08em;
+
+  text-transform: uppercase;
+}
+
+.territory-map-link::after {
+  content: "↗";
+
+  color: var(--terracotta);
+
+  transition:
+    transform 250ms var(--ease);
+}
+
+.territory-map-link:hover {
+  color: var(--terracotta);
+}
+
+.territory-map-link:hover::after {
+  transform:
+    translate(2px,-2px);
+}
+
+.territory-caption {
+  margin: 14px 0 0;
+
+  color: var(--stone);
+
+  font-family: var(--mono);
+
+  font-size: .55rem;
+
+  letter-spacing: .06em;
+}
+
+
+/* =========================================================
+   17 — PRESENT
+   ========================================================= */
+
+.present-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0,.9fr)
+    minmax(320px,.72fr);
+
+  gap:
+    clamp(50px,9vw,150px);
+
+  align-items: center;
+}
+
+.present-copy {
+  max-width: 800px;
+}
+
+.present-portrait {
+  width: 100%;
+  max-width: 620px;
+
+  margin-left: auto;
+
+  aspect-ratio: 4 / 5;
+
+  background: var(--sand);
+
+  overflow: hidden;
+}
+
+.home-section--dark .present-portrait span {
+  border-color:
+    rgba(242,239,232,.18);
+
+  color: var(--muted-dark);
+}
+
+
+/* =========================================================
+   18 — SECTION 08
+   ========================================================= */
+
+.section-subtraction {
+  max-width: 960px;
+
+  margin-left:
+    clamp(0px,12vw,200px);
+}
+
+.section-subtraction .editorial-copy {
+  margin-top:
+    clamp(60px,9vw,120px);
+}
+
+
+/* =========================================================
+   19 — SECTION 09
+   ========================================================= */
+
+.reader-question {
+  min-height:
+    calc(100svh - var(--header-h));
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+
+  max-width: 1200px;
+}
+
+.reader-question-label {
+  margin: 0 0 28px;
+
+  font-family: var(--mono);
+
+  font-size: .62rem;
+
+  line-height: 1.5;
+
+  letter-spacing: .12em;
+
+  opacity: .52;
+
+  text-transform: uppercase;
+}
+
+.reader-question-intro {
+  max-width: 620px;
+
+  margin: 0 0 50px;
+
+  font-family: var(--sans);
+
+  font-size:
+    clamp(1rem,1.6vw,1.35rem);
+
+  line-height: 1.65;
+}
+
+.reader-question-main {
+  margin: 0;
+
+  font-family: var(--serif);
+
+  font-size:
+    clamp(4rem,10vw,12rem);
+
+  font-weight: 400;
+
+  line-height: .86;
+
+  letter-spacing: -.065em;
+}
+
+.reader-question-main span:last-child {
+  color: var(--terracotta);
+}
+
+
+/* =========================================================
+   20 — SECTION 10 / CTA
+   ========================================================= */
+
+.final-page {
+  min-height:
+    calc(100svh - var(--header-h));
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+}
+
+.final-copy {
+  max-width: 900px;
+
+  margin-top:
+    clamp(55px,8vw,100px);
+}
+
+.contact-cta {
+  position: relative;
+  z-index: 6;
+
+  display: inline-flex;
+  align-items: center;
+
+  gap: 20px;
+
+  max-width: 100%;
+
+  margin-top:
+    clamp(60px,9vw,120px);
+
+  color: var(--ink);
+
+  font-family: var(--serif);
+
+  font-size:
+    clamp(2.2rem,4.5vw,5.2rem);
+
+  line-height: .95;
+
+  letter-spacing: -.045em;
+
+  transform:
+    translate3d(
+      var(--magnetic-x,0),
+      var(--magnetic-y,0),
+      0
+    );
+
+  transition:
+    color 220ms ease;
+}
+
+.contact-cta:hover,
+.contact-cta:focus-visible {
+  color: var(--terracotta);
+}
+
+.contact-cta-trace {
+  position: relative;
+
+  flex: 0 0 auto;
+
+  width: 90px;
+  height: 20px;
+}
+
+.contact-cta-trace-line {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  top: 50%;
+
+  height: 1px;
+
+  background: currentColor;
+
+  transform:
+    translateY(-50%);
+}
+
+.contact-cta-trace-point {
+  position: absolute;
+
+  right: 0;
+  top: 50%;
+
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+
+  background: currentColor;
+
+  transform:
+    translateY(-50%);
+
+  transition:
+    transform 450ms var(--ease);
+}
+
+.contact-cta:hover .contact-cta-trace-point,
+.contact-cta:focus-visible .contact-cta-trace-point {
+  transform:
+    translateY(-50%)
+    scale(1.3);
+}
+
+
+/* =========================================================
+   21 — FOOTER
+   ========================================================= */
+
+.site-footer {
+  position: relative;
+  z-index: 20;
+
+  min-height: 68svh;
+
+  display: flex;
+  align-items: center;
+
+  background: var(--ivory);
+  color: var(--ink);
+
+  border-top:
+    1px solid
+    var(--line-light);
+}
+
+.footer-main {
+  width:
+    min(
+      calc(100% - (var(--page-padding) * 2)),
+      var(--content-width)
+    );
+
+  min-height: 68svh;
+
+  margin: 0 auto;
+
+  padding: 90px 0;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+}
+
+.footer-brand {
+  display: grid;
+  place-items: center;
+}
+
+.footer-brand img {
+  width:
+    clamp(96px,9vw,140px);
+
+  height: auto;
+}
+
+.footer-motto {
+  display: inline-flex;
+
+  align-items: baseline;
+  justify-content: center;
+
+  flex-wrap: wrap;
+
+  gap: .35em;
+
+  margin-top: 42px;
+
+  font-family: var(--serif);
+
+  font-size:
+    clamp(1.6rem,3.2vw,3.5rem);
+
+  line-height: .98;
+
+  letter-spacing: -.025em;
+}
+
+.footer-motto span {
+  display: inline-block;
+}
+
+.footer-motto span:last-child {
+  white-space: nowrap;
+}
+
+.footer-name {
+  margin-top: 22px;
+
+  font-family: var(--mono);
+
+  font-size: .62rem;
+  letter-spacing: .14em;
+
+  text-transform: uppercase;
+
+  color: var(--stone);
+}
+
+
+/* =========================================================
+   22 — REVEAL
+   ========================================================= */
+
+.reveal {
+  opacity: 0;
+
+  transform:
+    translateY(28px);
+
+  clip-path:
+    inset(8% 0 0 0);
+
+  filter: blur(4px);
+
+  transition:
+    opacity 850ms var(--ease-editorial),
+    transform 1000ms var(--ease-editorial),
+    clip-path 1000ms var(--ease-editorial),
+    filter 1000ms var(--ease-editorial);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+
+  transform:
+    translateY(0);
+
+  clip-path:
+    inset(0);
+
+  filter: blur(0);
+}
+
+.reveal--soft {
+  transform:
+    translateY(18px);
+}
+
+.reveal--scale {
+  transform:
+    translateY(18px)
+    scale(.985);
+}
+
+.reveal--scale.is-visible {
+  transform:
+    translateY(0)
+    scale(1);
+}
+
+
+/* =========================================================
+   23 — STAGGER
+   ========================================================= */
+
+[data-delay="1"] {
+  transition-delay: 80ms;
+}
+
+[data-delay="2"] {
+  transition-delay: 160ms;
+}
+
+[data-delay="3"] {
+  transition-delay: 240ms;
+}
+
+[data-delay="4"] {
+  transition-delay: 320ms;
+}
+
+[data-delay="5"] {
+  transition-delay: 400ms;
+}
+
+
+/* =========================================================
+   24 — CUSTOM CURSOR
+   ========================================================= */
+
+.custom-cursor {
+  position: fixed;
+
+  left: 0;
+  top: 0;
+
+  z-index: 1100;
+
+  width: 1px;
+  height: 1px;
+
+  pointer-events: none;
+
+  mix-blend-mode: difference;
+}
+
+.custom-cursor-dot,
+.custom-cursor-ring {
+  position: absolute;
+
+  left: 0;
+  top: 0;
+
+  border-radius: 50%;
+
+  transform:
+    translate(-50%,-50%);
+}
+
+.custom-cursor-dot {
+  width: 5px;
+  height: 5px;
+
+  background: var(--white);
+}
+
+.custom-cursor-ring {
+  width: 28px;
+  height: 28px;
+
+  border:
+    1px solid
+    rgba(255,255,255,.72);
+
+  transition:
+    width 260ms var(--ease),
+    height 260ms var(--ease),
+    border-color 260ms ease;
+}
+
+.custom-cursor.is-hovering .custom-cursor-ring {
+  width: 46px;
+  height: 46px;
+
+  border-color: var(--white);
+}
+
+
+/* =========================================================
+   25 — STANDBY / NARRATIVE PAUSE
+   ========================================================= */
+
+.standby-screen {
+  position: fixed;
+  inset: 0;
+
+  z-index: 950;
+
+  display: grid;
+  place-items: center;
+
+  background: var(--ivory);
+  color: var(--ink);
+
+  opacity: 0;
+  visibility: hidden;
+
+  pointer-events: none;
+
+  transition:
+    opacity 900ms var(--ease),
+    visibility 900ms var(--ease);
+}
+
+.standby-screen.is-active {
+  opacity: 1;
+  visibility: visible;
+
+  pointer-events: auto;
+}
+
+.standby-atmosphere {
+  position: absolute;
+  inset: 0;
+
+  overflow: hidden;
+
+  pointer-events: none;
+}
+
+.standby-path {
+  position: absolute;
+
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      var(--terracotta),
+      transparent
+    );
+
+  transform-origin: left center;
+
+  opacity: .32;
+}
+
+.standby-path--a {
+  width: 62vw;
+
+  left: 8vw;
+  top: 48%;
+
+  transform: rotate(-9deg);
+
+  animation:
+    standby-path-a 5.5s var(--ease) infinite alternate;
+}
+
+.standby-path--b {
+  width: 36vw;
+
+  left: 45vw;
+  top: 55%;
+
+  transform: rotate(18deg);
+
+  opacity: .18;
+
+  animation:
+    standby-path-b 7s var(--ease) infinite alternate-reverse;
+}
+
+.standby-path--c {
+  width: 27vw;
+
+  left: 23vw;
+  top: 43%;
+
+  transform: rotate(4deg);
+
+  opacity: .12;
+}
+
+.standby-path--d {
+  width: 24vw;
+
+  left: 60vw;
+  top: 62%;
+
+  transform: rotate(-13deg);
+
+  opacity: .11;
+}
+
+@keyframes standby-path-a {
+
+  from {
+    transform:
+      translateX(-2vw)
+      rotate(-9deg);
+  }
+
+  to {
+    transform:
+      translateX(5vw)
+      rotate(-9deg);
+  }
+
+}
+
+@keyframes standby-path-b {
+
+  from {
+    transform:
+      translateX(2vw)
+      rotate(18deg);
+  }
+
+  to {
+    transform:
+      translateX(-4vw)
+      rotate(18deg);
+  }
+
+}
+
+.standby-point {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width: 10px;
+  height: 10px;
+
+  border-radius: 50%;
+
+  background: var(--terracotta);
+
+  box-shadow:
+    0 0 0 7px
+    rgba(166,66,50,.08);
+
+  transform:
+    translate(-50%,-50%);
+
+  animation:
+    standby-point-breathe 2400ms ease-in-out infinite;
+}
+
+.standby-point--secondary {
+  left: 63%;
+  top: 57%;
+
+  width: 5px;
+  height: 5px;
+
+  opacity: .5;
+
+  box-shadow: none;
+
+  animation-delay: 500ms;
+}
+
+@keyframes standby-point-breathe {
+
+  0%,
+  100% {
+    transform:
+      translate(-50%,-50%)
+      scale(1);
+  }
+
+  50% {
+    transform:
+      translate(-50%,-50%)
+      scale(1.18);
+  }
+
+}
+
+.standby-center {
+  position: relative;
+  z-index: 4;
+
+  width: min(720px, calc(100% - 44px));
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 34px;
+
+  text-align: center;
+}
+
+.standby-copy {
+  display: flex;
+  flex-direction: column;
+
+  gap: 14px;
+
+  max-width: 620px;
+}
+
+.standby-label {
+  font-family: var(--serif);
+
+  font-size:
+    clamp(2rem,4vw,4rem);
+
+  line-height: .98;
+
+  letter-spacing: -.025em;
+}
+
+.standby-subtitle {
+  color: var(--stone);
+
+  font-family: var(--mono);
+
+  font-size: .62rem;
+  letter-spacing: .13em;
+
+  text-transform: uppercase;
+}
+
+.standby-wake {
+  padding: 12px 20px;
+
+  border:
+    1px solid
+    rgba(17,17,15,.22);
+
+  color: var(--ink);
+
+  font-family: var(--mono);
+
+  font-size: .58rem;
+  letter-spacing: .12em;
+
+  text-transform: uppercase;
+
+  transition:
+    color 250ms ease,
+    border-color 250ms ease,
+    background 250ms ease,
+    transform 250ms var(--ease);
+}
+
+.standby-wake:hover {
+  color: var(--ivory);
+  border-color: var(--ink);
+  background: var(--ink);
+
+  transform: translateY(-2px);
+}
+
+
+/* =========================================================
+   26 — MAGNETIC
+   ========================================================= */
+
+.menu-trigger,
+.contact-cta {
+  will-change: transform;
+}
+
+.menu-trigger {
+  transform:
+    translate3d(
+      var(--magnetic-x,0),
+      var(--magnetic-y,0),
+      0
+    );
+}
+
+
+/* =========================================================
+   27 — TABLET
+   ========================================================= */
+
+@media (max-width:1180px) {
+
+  :root {
+    --page-padding:
+      clamp(24px,4vw,48px);
+  }
+
+  .site-header {
+    grid-template-columns:
+      150px
+      minmax(0,1fr)
+      150px;
+  }
+
+  .wow-progress {
+    width:
+      min(
+        760px,
+        calc(100vw - 340px)
+      );
+  }
+
+  .section-heading {
+    max-width: 900px;
+  }
+
+  .territory-grid,
+  .present-grid {
+    gap: 55px;
+  }
+
+}
+
+
+/* =========================================================
+   28 — MOBILE
+   ========================================================= */
+
+@media (max-width:900px) {
+
+  :root {
+    --header-h: 112px;
+    --page-padding: 20px;
+
+    --section-pad-y:
+      clamp(105px,17vw,145px);
+  }
+
+  .site-header {
+    min-height: var(--header-h);
+
+    padding:
+      9px
+      var(--page-padding)
+      8px;
+
+    display: block;
+  }
+
+  .brand {
+    position: absolute;
+
+    left: var(--page-padding);
+    top: 50%;
+
+    width: 44px;
+    height: 44px;
+
+    transform: translateY(-50%);
+  }
+
+  .brand img {
+    width: 44px;
+    height: 44px;
+  }
+
+  .menu-trigger {
+    position: absolute;
+
+    right: var(--page-padding);
+    top: 50%;
+
+    transform:
+      translate3d(
+        var(--magnetic-x,0),
+        calc(-50% + var(--magnetic-y,0px)),
+        0
+      );
+
+    font-size: 9px;
+  }
+
+  .wow-progress {
+    position: absolute;
+
+    left: 50%;
+    top: 10px;
+
+    width:
+      calc(
+        100vw -
+        (
+          (var(--page-padding) * 2)
+          + 108px
+        )
+      );
+
+    max-width: none;
+
+    transform: translateX(-50%);
+
+    display: grid;
+
+    grid-template-rows: auto 1px auto;
+  }
+
+  .progress-label {
+    min-height: 32px;
+
+    margin-bottom: 7px;
+
+    padding: 0 2px;
+
+    font-size:
+      clamp(12px,2.7vw,15px);
+
+    line-height: 1.05;
+
+    text-align: center;
+
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .section-jump {
+    padding-top: 7px;
+  }
+
+  .section-jump-link {
+    font-size: 8px;
+  }
+
+  .section-jump-number {
+    min-width: 18px;
+  }
+
+  .home-section {
+    min-height: auto;
+
+    scroll-margin-top: var(--header-h);
+  }
+
+  .section-inner {
+    width:
+      calc(
+        100% -
+        (var(--page-padding) * 2)
+      );
+
+    padding:
+      var(--section-pad-mobile)
+      0;
+  }
+
+  .section-index {
+    top: 30px;
+  }
+
+  .section-title {
+    max-width: 100%;
+
+    margin-bottom: 28px;
+
+    font-size: .58rem;
+
+    line-height: 1.55;
+  }
+
+  .section-heading {
+    font-size:
+      clamp(3.1rem,12vw,6rem);
+
+    line-height: .94;
+  }
+
+  .editorial-copy {
+    margin-top: 58px;
+
+    font-size:
+      clamp(1rem,4.2vw,1.18rem);
+
+    line-height: 1.72;
+  }
+
+  .editorial-copy p {
+    margin-bottom: 1.65em;
+  }
+
+  .editorial-question {
+    margin-top: 70px;
+    margin-bottom: 70px;
+
+    font-size:
+      clamp(2.2rem,9.2vw,4rem);
+
+    line-height: 1.04;
+  }
+
+  .editorial-sequence {
+    margin:
+      60px
+      0;
+  }
+
+
+  /* Hero */
+
+  .home-section--hero {
+    min-height:
+      calc(100svh - var(--header-h));
+  }
+
+  .hero-inner {
+    min-height:
+      calc(100svh - var(--header-h));
+  }
+
+  .hero-title {
+    font-size:
+      clamp(4rem,16vw,7.5rem);
+
+    line-height: .84;
+  }
+
+  .hero-title-line--identity {
+    gap: .22em;
+
+    padding-left: 10vw;
+
+    flex-wrap: nowrap;
+  }
+
+  .hero-intro {
+    margin-top: 48px;
+
+    font-size:
+      clamp(1.25rem,5vw,1.7rem);
+  }
+
+  .hero-directions {
+    gap: 12px 16px;
+
+    margin-top: 30px;
+  }
+
+
+  /* Five directions */
+
+  .direction-trajectory {
+    min-height: 560px;
+
+    margin-top: 60px;
+  }
+
+  .direction-trajectory-line {
+    left: 12%;
+    top: 6%;
+
+    width: 1px;
+    height: 88%;
+
+    background:
+      linear-gradient(
+        180deg,
+        transparent,
+        var(--terracotta),
+        transparent
+      );
+
+    transform: none;
+  }
+
+  .direction-node {
+    left: 12% !important;
+  }
+
+  .direction-node-label {
+    left: 30px;
+    top: 50%;
+
+    transform:
+      translateY(-50%);
+
+    font-size: .57rem;
+
+    text-align: left;
+  }
+
+
+  /* Network */
+
+  .network-visual {
+    opacity: .22;
+  }
+
+
+  /* Territory */
+
+  .territory-grid,
+  .present-grid {
+    grid-template-columns: 1fr;
+
+    gap: 65px;
+  }
+
+  .territory-place {
+    margin-top: 50px;
+  }
+
+  .territory-place-title {
+    font-size:
+      clamp(4rem,17vw,7rem);
+  }
+
+  .territory-image {
+    aspect-ratio: 4 / 3;
+  }
+
+  .territory-map {
+    width: 92%;
+
+    margin:
+      -45px
+      0
+      0
+      auto;
+
+    aspect-ratio: 4 / 3;
+  }
+
+  .territory-caption {
+    max-width: 92%;
+  }
+
+  .present-portrait {
+    max-width: 620px;
+
+    margin: 0 auto;
+  }
+
+
+  /* Reader */
+
+  .reader-question {
+    min-height:
+      calc(100svh - var(--header-h));
+  }
+
+  .reader-question-main {
+    font-size:
+      clamp(3.7rem,16vw,7.5rem);
+
+    line-height: .88;
+  }
+
+
+  /* Footer */
+
+  .site-footer,
+  .footer-main {
+    min-height: 72svh;
+  }
+
+  .footer-main {
+    padding: 80px 0;
+  }
+
+  .footer-brand img {
+    width: 105px;
+  }
+
+  .footer-motto {
+    gap: .35em;
+
+    font-size:
+      clamp(1.45rem,6vw,2.2rem);
+
+    line-height: 1;
+  }
+
+
+  /* Menu */
+
+  .site-menu-inner {
+    width: 100%;
+
+    padding:
+      calc(var(--header-h) + 25px)
+      var(--page-padding)
+      25px;
+  }
+
+  .site-menu-item {
+    grid-template-columns:
+      36px
+      minmax(0,1fr)
+      64px;
+
+    min-height: 62px;
+  }
+
+  .site-menu-item-title {
+    font-size:
+      clamp(1rem,4.5vw,1.25rem);
+  }
+
+  .site-menu-footer {
+    flex-direction: column;
+
+    gap: 7px;
+  }
+
+
+  /* Standby */
+
+  .standby-path--a {
+    width: 90vw;
+
+    left: -8vw;
+  }
+
+  .standby-path--b {
+    width: 65vw;
+
+    left: 42vw;
+  }
+
+  .standby-label {
+    font-size:
+      clamp(1.8rem,8vw,3rem);
+  }
+
+}
+
+
+/* =========================================================
+   29 — NARROW MOBILE
+   ========================================================= */
+
+@media (max-width:520px) {
+
+  :root {
+    --page-padding: 18px;
+    --header-h: 108px;
+  }
+
+  .brand {
+    left: var(--page-padding);
+  }
+
+  .brand img {
+    width: 38px;
+    height: 38px;
+  }
+
+  .menu-trigger {
+    right: var(--page-padding);
+
+    font-size: 8px;
+  }
+
+  .wow-progress {
+    width:
+      calc(
+        100vw -
+        (
+          (var(--page-padding) * 2)
+          + 88px
+        )
+      );
+
+    top: 9px;
+  }
+
+  .progress-label {
+    min-height: 30px;
+
+    font-size: 10.5px;
+
+    line-height: 1.06;
+  }
+
+  .section-jump-link {
+    font-size: 7px;
+  }
+
+  .hero-title {
+    font-size:
+      clamp(3.4rem,17vw,5.8rem);
+  }
+
+  .hero-title-line--identity {
+    gap: .2em;
+  }
+
+  .hero-intro {
+    font-size: 1.2rem;
+  }
+
+  .section-heading {
+    font-size:
+      clamp(2.8rem,13vw,5rem);
+  }
+
+  .editorial-copy {
+    line-height: 1.74;
+  }
+
+  .editorial-question {
+    font-size:
+      clamp(2rem,9vw,3.4rem);
+  }
+
+  .territory-place-title {
+    font-size:
+      clamp(3.7rem,18vw,6rem);
+  }
+
+  .territory-map {
+    width: 100%;
+
+    margin-top: 24px;
+
+    aspect-ratio: 4 / 3;
+  }
+
+  .contact-cta {
+    gap: 14px;
+
+    align-items: flex-start;
+
+    font-size:
+      clamp(2rem,9vw,3.2rem);
+
+    line-height: .98;
+  }
+
+  .contact-cta-trace {
+    width: 58px;
+
+    margin-top: .5em;
+  }
+
+  .site-menu-item {
+    grid-template-columns:
+      30px
+      minmax(0,1fr)
+      40px;
+  }
+
+  .site-menu-item-trace {
+    display: none;
+  }
+
+  .site-menu-item-title {
+    font-size: 1rem;
+  }
+
+  .footer-main {
+    min-height: 72svh;
+
+    padding: 70px 0;
+  }
+
+  .footer-motto {
+    max-width: 100%;
+
+    font-size:
+      clamp(1.35rem,7vw,2rem);
+  }
+
+  .footer-name {
+    font-size: .56rem;
+  }
+
+  .standby-center {
+    width:
+      calc(100% - 36px);
+  }
+
+  .standby-copy {
+    gap: 12px;
+  }
+
+  .standby-label {
+    font-size:
+      clamp(1.7rem,9vw,2.8rem);
+  }
+
+  .standby-subtitle {
+    font-size: .54rem;
+
+    line-height: 1.5;
+  }
+
+}
+
+
+/* =========================================================
+   30 — REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion:reduce) {
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+
+    transition-duration: .01ms !important;
+
+    scroll-behavior: auto !important;
+  }
+
+  .reveal,
+  .reveal--soft,
+  .reveal--scale {
+    opacity: 1;
+
+    transform: none;
+
+    clip-path: none;
+
+    filter: none;
+  }
+
+  .trajectory-line,
+  .trajectory-point,
+  .home-section::after {
+    transform: none;
+  }
+
+  .standby-screen {
+    display: none !important;
+  }
+
+  .custom-cursor {
+    display: none !important;
+  }
+
+}
+
+
+/* =========================================================
+   31 — HIGH CONTRAST
+   ========================================================= */
+
+@media (prefers-contrast:more) {
+
+  :root {
+    --muted: rgba(17,17,15,.9);
+    --muted-dark: rgba(242,239,232,.9);
+
+    --line-light: rgba(17,17,15,.32);
+    --line-dark: rgba(242,239,232,.32);
+  }
+
+  .editorial-copy,
+  .site-menu-intro,
+  .site-menu-item-title {
+    opacity: 1;
+  }
+
+}
+
+
+/* =========================================================
+   32 — PRINT
+   ========================================================= */
+
+@media print {
+
+  .page-loader,
+  .page-transition,
+  .standby-screen,
+  .custom-cursor,
+  .site-menu,
+  .menu-trigger,
+  .section-jump,
+  .trajectory-layer,
+  .network-visual,
+  .pause-trajectory {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  .site-header,
+  .home-section,
+  .site-footer {
+    background: #fff;
+    color: #000;
+  }
+
+  .site-header {
+    position: relative;
+    border: 0;
+  }
+
+  .home-section {
+    min-height: auto;
+
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .reveal,
+  .reveal--soft,
+  .reveal--scale {
+    opacity: 1;
+    transform: none;
+    clip-path: none;
+    filter: none;
+  }
+
+  .territory-map {
+    display: none;
+  }
+
+  .footer-main {
+    min-height: auto;
+  }
+
+}
+
+
+/* =========================================================
+   33 — COMPOSITION SAFETY
+   ========================================================= */
+
+.editorial-copy,
+.section-heading,
+.hero-title,
+.section-title,
+.section-index,
+.reader-question,
+.final-page,
+.final-copy {
+  position: relative;
+  z-index: 6;
+}
+
+.territory-media,
+.present-portrait {
+  isolation: isolate;
+}
+
+.trajectory-layer,
+.network-visual,
+.pause-trajectory,
+.section-atmosphere {
+  pointer-events: none;
+}
+
+.home-section::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+
+  top: 50%;
+
+  width: clamp(120px,18vw,280px);
+
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      currentColor,
+      transparent
+    );
+
+  opacity: .045;
+
+  pointer-events: none;
+
+  transform:
+    translateX(
+      calc(
+        var(--trajectory-progress) * 100vw
+      )
+    );
+}
+
+.home-section--dark::after {
+  color: var(--ivory);
+}
+
+.home-section--paper::after {
+  color: var(--ink);
+}
+
+
+/* =========================================================
+   34 — COMPOSITION GUARDS
+   ========================================================= */
+
+.hero-title,
+.hero-intro,
+.hero-directions,
+.direction-trajectory,
+.editorial-copy,
+.editorial-question,
+.five-directions-list,
+.territory-grid,
+.present-grid,
+.section-subtraction,
+.reader-question,
+.final-page {
+  overflow-wrap: break-word;
+}
+
+.hero-title-line--identity {
+  white-space: normal;
+}
+
+.progress-label {
+  overflow-wrap: normal;
+}
+
+@media (max-width:900px) {
+
+  .editorial-sequence::before {
+    left: -16px;
+  }
+
+  .direction-node-label {
+    white-space: normal;
+
+    width: min(170px, 42vw);
+  }
+
+}
