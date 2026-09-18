@@ -9,26 +9,26 @@
 
 
   const CONFIG = {
-  loaderMinimumTime: 4200,
-  loaderMaximumWait: 6000,
+    loaderMinimumTime: 5200,
+    loaderMaximumWait: 8000,
 
-  revealThreshold: 0.12,
+    revealThreshold: 0.12,
 
-  cursorLerp: 0.16,
+    cursorLerp: 0.16,
 
-  resizeDebounce: 180,
+    resizeDebounce: 180,
 
-  scrollNavigationOffset: 18,
+    scrollNavigationOffset: 18,
 
-  transitionDuration: 700,
+    transitionDuration: 700,
 
-  trajectoryLerp: 0.085,
-  trajectoryDrift: 18,
+    trajectoryLerp: 0.085,
+    trajectoryDrift: 18,
 
-  magneticStrength: 0.12,
-  magneticRadius: 90,
+    magneticStrength: 0.12,
+    magneticRadius: 90,
 
-  standbyDelay: 30000
+    standbyDelay: 30000
   };
 
 
@@ -44,6 +44,8 @@
     rafId: null,
 
     reducedMotion: false,
+
+    standbyReturnFocus: null,
 
     pointer: {
       targetX: window.innerWidth / 2,
@@ -154,6 +156,12 @@
     standbyWake:
       document.querySelector(".standby-wake"),
 
+    ctaTrajectory:
+      document.querySelector(".cta-trajectory"),
+
+    contactCta:
+      document.querySelector(".contact-cta"),
+
     directionLinks:
       Array.from(
         document.querySelectorAll(
@@ -253,10 +261,6 @@
       );
 
 
-      /*
-       * Reduced motion does not disable the conceptual standby.
-       * It only removes its animation.
-       */
       if (!state.standby) {
         resetStandbyTimer();
       }
@@ -298,12 +302,20 @@
     const started =
       performance.now();
 
+    let finishScheduled = false;
+
 
     const finish = () => {
 
-      if (state.loaded) {
+      if (
+        state.loaded ||
+        finishScheduled
+      ) {
         return;
       }
+
+
+      finishScheduled = true;
 
 
       const elapsed =
@@ -328,6 +340,7 @@
 
           state.loaded = true;
 
+
           dom.loader.classList.add(
             "is-hidden"
           );
@@ -336,7 +349,7 @@
           window.setTimeout(
             () =>
               dom.loader?.remove(),
-            800
+            950
           );
 
         },
@@ -608,6 +621,65 @@
     );
 
 
+    dom.menu?.addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          !state.menuOpen ||
+          event.key !== "Tab"
+        ) {
+          return;
+        }
+
+
+        const focusable =
+          dom.menuLinks.filter(
+            element =>
+              !element.hasAttribute(
+                "disabled"
+              )
+          );
+
+
+        if (!focusable.length) {
+          return;
+        }
+
+
+        const first =
+          focusable[0];
+
+        const last =
+          focusable[
+            focusable.length - 1
+          ];
+
+
+        if (
+          event.shiftKey &&
+          document.activeElement === first
+        ) {
+
+          event.preventDefault();
+
+          last.focus();
+
+        } else if (
+          !event.shiftKey &&
+          document.activeElement === last
+        ) {
+
+          event.preventDefault();
+
+          first.focus();
+
+        }
+
+      }
+    );
+
+
     document.addEventListener(
       "keydown",
       event => {
@@ -846,9 +918,13 @@
         : 0;
 
 
+    const rect =
+      target.getBoundingClientRect();
+
+
     const top =
       window.scrollY +
-      target.getBoundingClientRect().top -
+      rect.top -
       headerHeight -
       CONFIG.scrollNavigationOffset;
 
@@ -1122,13 +1198,13 @@
 
 
         link.addEventListener(
-          "mouseenter",
+          "pointerenter",
           () => setActive(key, true)
         );
 
 
         link.addEventListener(
-          "mouseleave",
+          "pointerleave",
           () => setActive(key, false)
         );
 
@@ -1141,28 +1217,6 @@
 
         link.addEventListener(
           "focusout",
-          () => setActive(key, false)
-        );
-
-      }
-    );
-
-
-    dom.directionNodes.forEach(
-      node => {
-
-        const key =
-          node.dataset.direction;
-
-
-        node.addEventListener(
-          "mouseenter",
-          () => setActive(key, true)
-        );
-
-
-        node.addEventListener(
-          "mouseleave",
           () => setActive(key, false)
         );
 
@@ -1195,28 +1249,38 @@
       ];
 
 
+    const firstRect =
+      first.getBoundingClientRect();
+
+
+    const lastRect =
+      last.getBoundingClientRect();
+
+
     const start =
-      first.offsetTop;
+      firstRect.top +
+      window.scrollY;
 
 
     const end =
-      last.offsetTop +
-      last.offsetHeight -
+      lastRect.bottom +
+      window.scrollY -
       window.innerHeight;
 
 
+    const range =
+      end - start;
+
+
     const progress =
-      end <= start
+      range <= 0
         ? 0
         : clamp(
             (
               window.scrollY -
               start
             ) /
-            (
-              end -
-              start
-            ),
+            range,
             0,
             1
           );
@@ -1256,6 +1320,7 @@
           state.trajectory.targetProgress,
           CONFIG.trajectoryLerp
         );
+
 
       state.trajectory.drift =
         lerp(
@@ -1299,22 +1364,24 @@
         }
 
 
-        const nodes =
-          document.querySelectorAll(
-            `.trajectory-node--${node},
-             .network-node--${node},
-             .direction-node--${node}`
-          );
+        const targets = [
+          ...document.querySelectorAll(
+            `.network-node[data-node="${node}"]`
+          ),
+          ...document.querySelectorAll(
+            `.direction-node[data-direction="${node}"]`
+          )
+        ];
 
 
-        if (!nodes.length) {
+        if (!targets.length) {
           return;
         }
 
 
         const activate = () => {
 
-          nodes.forEach(
+          targets.forEach(
             target =>
               target.classList.add(
                 "is-linked"
@@ -1326,7 +1393,7 @@
 
         const deactivate = () => {
 
-          nodes.forEach(
+          targets.forEach(
             target =>
               target.classList.remove(
                 "is-linked"
@@ -1392,6 +1459,11 @@
         state.pointer.targetY =
           event.clientY;
 
+
+        dom.cursor.classList.add(
+          "is-visible"
+        );
+
       },
       {
         passive: true
@@ -1423,6 +1495,31 @@
 
         }
       );
+
+
+    window.addEventListener(
+      "pointerleave",
+      () => {
+
+        dom.cursor?.classList.remove(
+          "is-visible",
+          "is-hovering"
+        );
+
+      }
+    );
+
+
+    window.addEventListener(
+      "pointerenter",
+      () => {
+
+        dom.cursor?.classList.add(
+          "is-visible"
+        );
+
+      }
+    );
 
   };
 
@@ -1579,6 +1676,67 @@
 
 
   /* =======================================================
+     CTA
+     ======================================================= */
+
+  const initCtaInteraction = () => {
+
+    if (!dom.ctaTrajectory || !dom.contactCta) {
+      return;
+    }
+
+
+    const engage = () => {
+
+      dom.ctaTrajectory.classList.add(
+        "is-engaged"
+      );
+
+    };
+
+
+    const disengage = () => {
+
+      dom.ctaTrajectory.classList.remove(
+        "is-engaged"
+      );
+
+    };
+
+
+    dom.contactCta.addEventListener(
+      "pointerenter",
+      engage
+    );
+
+
+    dom.contactCta.addEventListener(
+      "pointerleave",
+      disengage
+    );
+
+
+    dom.contactCta.addEventListener(
+      "focusin",
+      engage
+    );
+
+
+    dom.contactCta.addEventListener(
+      "focusout",
+      disengage
+    );
+
+
+    dom.contactCta.addEventListener(
+      "pointerdown",
+      engage
+    );
+
+  };
+
+
+  /* =======================================================
      STANDBY
      ======================================================= */
 
@@ -1608,6 +1766,10 @@
     }
 
 
+    state.standbyReturnFocus =
+      document.activeElement;
+
+
     state.standby = true;
 
 
@@ -1634,6 +1796,13 @@
       "aria-hidden",
       "false"
     );
+
+
+    if ("inert" in dom.standby) {
+      dom.standby.inert = false;
+    } else {
+      dom.standby.removeAttribute("inert");
+    }
 
 
     dom.standbyWake?.focus({
@@ -1667,6 +1836,46 @@
       "aria-hidden",
       "true"
     );
+
+
+    if (dom.standby) {
+      if ("inert" in dom.standby) {
+        dom.standby.inert = true;
+      } else {
+        dom.standby.setAttribute(
+          "inert",
+          ""
+        );
+      }
+    }
+
+
+    const returnFocus =
+      state.standbyReturnFocus;
+
+
+    state.standbyReturnFocus = null;
+
+
+    if (
+      returnFocus &&
+      returnFocus !== document.body &&
+      typeof returnFocus.focus ===
+        "function" &&
+      document.contains(returnFocus)
+    ) {
+
+      window.requestAnimationFrame(
+        () => {
+
+          returnFocus.focus({
+            preventScroll: true
+          });
+
+        }
+      );
+
+    }
 
 
     resetStandbyTimer();
@@ -1704,18 +1913,49 @@
     }
 
 
+    if ("inert" in dom.standby) {
+      dom.standby.inert = true;
+    } else {
+      dom.standby.setAttribute(
+        "inert",
+        ""
+      );
+    }
+
+
     dom.standbyWake?.addEventListener(
       "click",
       exitStandby
     );
 
 
+    dom.standby?.addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          !state.standby ||
+          event.key !== "Tab"
+        ) {
+          return;
+        }
+
+
+        event.preventDefault();
+
+
+        dom.standbyWake?.focus({
+          preventScroll: true
+        });
+
+      }
+    );
+
+
     [
-      "pointermove",
       "pointerdown",
       "wheel",
       "touchstart",
-      "touchmove",
       "keydown",
       "scroll"
     ].forEach(
@@ -1741,11 +1981,6 @@
             }
 
 
-            /*
-             * Do not constantly reset the timer because of
-             * scroll events while the browser is idle.
-             * User activity is still the reset mechanism.
-             */
             if (
               eventName !== "scroll" ||
               event.isTrusted
@@ -1985,6 +2220,8 @@
     initCursor();
 
     initMagneticElements();
+
+    initCtaInteraction();
 
     initStandby();
 
