@@ -4,19 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Cesare Paratore — Movimento / Con direzione.</title>
-
+  <title>404 — Questa strada non porta qui. | Cesare Paratore</title>
   <meta
     name="description"
-    content="Cesare Paratore. Sport, Scienze Motorie, Educazione, Management e Digitale: esperienze e connessioni costruite a partire dal movimento."
+    content="La traiettoria si è interrotta. Torna all'inizio e riparti da un nuovo punto."
   >
-  <meta name="author" content="Cesare Paratore">
+
   <meta name="theme-color" content="#F2EFE8">
-  <meta name="robots" content="index, follow">
-
-  <link rel="canonical" href="https://www.cesareparatore.it/">
-
-  <link rel="icon" type="image/png" href="/assets/images/cp-mark.png">
+  <meta name="color-scheme" content="light">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,1081 +20,670 @@
     rel="stylesheet"
   >
 
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "WebSite",
-        "@id": "https://www.cesareparatore.it/#website",
-        "url": "https://www.cesareparatore.it/",
-        "name": "Cesare Paratore",
-        "description": "Movimento / Con direzione."
-      },
-      {
-        "@type": "Person",
-        "@id": "https://www.cesareparatore.it/#person",
-        "name": "Cesare Paratore",
-        "url": "https://www.cesareparatore.it/"
+  <link rel="icon" href="/assets/images/cp-mark.png" type="image/png">
+
+  <style>
+    :root {
+      --ivory: #F2EFE8;
+      --ink: #11110F;
+      --terracotta: #A64232;
+      --sand: #C9C0AF;
+      --stone: #77736B;
+      --white: #FFFDF8;
+
+      --font-serif: "Instrument Serif", Georgia, serif;
+      --font-sans: "DM Sans", Arial, sans-serif;
+      --font-mono: "DM Mono", monospace;
+
+      --ease-out: cubic-bezier(.16, 1, .3, 1);
+      --ease-in-out: cubic-bezier(.65, 0, .35, 1);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      margin: 0;
+      padding: 0;
+      background: var(--ivory);
+    }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      background: var(--ivory);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button,
+    a {
+      font: inherit;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--terracotta);
+      outline-offset: 6px;
+    }
+
+    .error-page {
+      position: relative;
+      min-height: 100vh;
+      min-height: 100svh;
+
+      display: flex;
+      flex-direction: column;
+
+      overflow: hidden;
+    }
+
+    /* =====================================================
+       HEADER
+       ===================================================== */
+
+    .error-header {
+      position: relative;
+      z-index: 2;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      min-height: 108px;
+      padding: 12px 28px 10px;
+
+      border-bottom: 1px solid rgba(17, 17, 15, .08);
+    }
+
+    .error-brand {
+      display: block;
+
+      width: 48px;
+      height: 48px;
+    }
+
+    .error-brand img {
+      display: block;
+
+      width: 100%;
+      height: 100%;
+
+      object-fit: contain;
+    }
+
+    .error-context {
+      color: var(--stone);
+
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    /* =====================================================
+       MAIN
+       ===================================================== */
+
+    .error-main {
+      position: relative;
+      z-index: 1;
+
+      flex: 1;
+
+      display: flex;
+      align-items: center;
+
+      width: min(100%, 1680px);
+      margin: 0 auto;
+      padding: 90px 48px 110px;
+    }
+
+    .error-content {
+      position: relative;
+
+      width: 100%;
+      max-width: 1120px;
+    }
+
+    .error-number {
+      display: block;
+
+      margin-bottom: 26px;
+
+      color: var(--terracotta);
+
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .08em;
+    }
+
+    .error-title {
+      max-width: 980px;
+
+      margin: 0;
+
+      font-family: var(--font-serif);
+      font-size: clamp(64px, 9.5vw, 150px);
+      font-weight: 400;
+      line-height: .88;
+      letter-spacing: -.04em;
+    }
+
+    .error-title span {
+      display: block;
+    }
+
+    .error-title span:last-child {
+      margin-left: clamp(32px, 8vw, 140px);
+      color: var(--terracotta);
+    }
+
+    .error-description {
+      max-width: 620px;
+
+      margin: 54px 0 0;
+
+      font-size: clamp(17px, 1.45vw, 21px);
+      line-height: 1.65;
+    }
+
+    .error-restart {
+      max-width: 560px;
+
+      margin: 44px 0 0;
+
+      color: var(--stone);
+
+      font-family: var(--font-serif);
+      font-size: clamp(27px, 3vw, 44px);
+      line-height: 1.08;
+    }
+
+    /* =====================================================
+       TRAJECTORY
+       ===================================================== */
+
+    .error-trajectory {
+      position: absolute;
+
+      left: 48%;
+      right: -3%;
+
+      top: 57%;
+
+      height: 190px;
+
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .error-trajectory-line {
+      position: absolute;
+
+      left: 0;
+      top: 50%;
+
+      width: 88%;
+      height: 1px;
+
+      background: var(--sand);
+
+      transform:
+        translateY(-50%)
+        rotate(-9deg);
+
+      transform-origin: left center;
+    }
+
+    .error-trajectory-line::after {
+      content: "";
+
+      position: absolute;
+
+      left: 43%;
+      top: 0;
+
+      width: 38%;
+      height: 1px;
+
+      background: var(--sand);
+
+      transform: rotate(18deg);
+      transform-origin: left center;
+    }
+
+    .error-trajectory-point {
+      position: absolute;
+
+      left: 81%;
+      top: 47%;
+
+      width: 13px;
+      height: 13px;
+
+      border-radius: 50%;
+
+      background: var(--terracotta);
+
+      transform: translate(-50%, -50%);
+    }
+
+    .error-trajectory-end {
+      position: absolute;
+
+      left: 88%;
+      top: 59%;
+
+      width: 3px;
+      height: 3px;
+
+      border-radius: 50%;
+
+      background: var(--stone);
+    }
+
+    /* =====================================================
+       CTA
+       ===================================================== */
+
+    .error-actions {
+      margin-top: 58px;
+    }
+
+    .error-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 13px;
+
+      min-height: 48px;
+
+      color: var(--ink);
+
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: .035em;
+    }
+
+    .error-cta-arrow {
+      color: var(--terracotta);
+
+      font-size: 15px;
+
+      transition:
+        transform .4s var(--ease-out);
+    }
+
+    .error-cta:hover,
+    .error-cta:focus-visible {
+      color: var(--terracotta);
+    }
+
+    .error-cta:hover .error-cta-arrow,
+    .error-cta:focus-visible .error-cta-arrow {
+      transform: translateX(7px);
+    }
+
+    /* =====================================================
+       FOOTER
+       ===================================================== */
+
+    .error-footer {
+      position: relative;
+      z-index: 2;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      min-height: 76px;
+      padding: 20px 28px;
+
+      border-top: 1px solid rgba(17, 17, 15, .08);
+    }
+
+    .error-footer-mark {
+      color: var(--stone);
+
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: .08em;
+    }
+
+    .error-footer-copy {
+      color: var(--stone);
+
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    /* =====================================================
+       TABLET
+       ===================================================== */
+
+    @media (max-width: 1024px) {
+      .error-main {
+        padding:
+          80px 36px
+          100px;
       }
-    ]
-  }
-  </script>
+
+      .error-trajectory {
+        left: 42%;
+        right: -12%;
+        top: 60%;
+      }
+    }
+
+    /* =====================================================
+       MOBILE
+       ===================================================== */
+
+    @media (max-width: 820px) {
+      .error-page {
+        min-height: 100svh;
+      }
+
+      .error-header {
+        min-height: 82px;
+        padding: 12px 16px;
+      }
+
+      .error-brand {
+        width: 40px;
+        height: 40px;
+      }
+
+      .error-context {
+        font-size: 9px;
+      }
+
+      .error-main {
+        align-items: flex-start;
+
+        width: 100%;
+        padding:
+          72px 20px
+          90px;
+      }
+
+      .error-content {
+        width: 100%;
+      }
+
+      .error-number {
+        margin-bottom: 22px;
+        font-size: 9px;
+      }
+
+      .error-title {
+        max-width: 100%;
+
+        font-size: clamp(58px, 16vw, 100px);
+        line-height: .87;
+      }
+
+      .error-title span:last-child {
+        margin-left: 10vw;
+      }
+
+      .error-description {
+        max-width: 540px;
+
+        margin-top: 42px;
+
+        font-size: 17px;
+        line-height: 1.65;
+      }
+
+      .error-restart {
+        max-width: 500px;
+
+        margin-top: 36px;
+
+        font-size: clamp(28px, 8vw, 40px);
+      }
+
+      /*
+       * La traiettoria non viene eliminata:
+       * su mobile diventa un elemento laterale
+       * che accompagna il contenuto senza attraversarlo.
+       */
+      .error-trajectory {
+        position: relative;
+
+        left: auto;
+        right: auto;
+        top: auto;
+
+        width: 100%;
+        height: 100px;
+
+        margin-top: 48px;
+
+        z-index: 0;
+      }
+
+      .error-trajectory-line {
+        left: 4%;
+        top: 44%;
+
+        width: 82%;
+
+        transform:
+          translateY(-50%)
+          rotate(-6deg);
+      }
+
+      .error-trajectory-line::after {
+        left: 48%;
+        width: 32%;
+
+        transform: rotate(14deg);
+      }
+
+      .error-trajectory-point {
+        left: 80%;
+        top: 40%;
+      }
+
+      .error-trajectory-end {
+        left: 91%;
+        top: 61%;
+      }
+
+      .error-actions {
+        margin-top: 40px;
+      }
+
+      .error-footer {
+        min-height: 64px;
+        padding: 16px 20px;
+      }
+
+      .error-footer-copy {
+        text-align: right;
+      }
+    }
+
+    /* =====================================================
+       NARROW
+       ===================================================== */
+
+    @media (max-width: 420px) {
+      .error-header {
+        padding-inline: 14px;
+      }
+
+      .error-context {
+        max-width: 150px;
+        text-align: right;
+        line-height: 1.3;
+      }
+
+      .error-main {
+        padding:
+          58px 16px
+          76px;
+      }
+
+      .error-title {
+        font-size: clamp(52px, 16vw, 78px);
+      }
+
+      .error-title span:last-child {
+        margin-left: 8vw;
+      }
+
+      .error-description {
+        margin-top: 36px;
+        font-size: 16px;
+      }
+
+      .error-restart {
+        font-size: 29px;
+      }
+
+      .error-trajectory {
+        height: 82px;
+        margin-top: 38px;
+      }
+
+      .error-cta {
+        font-size: 10px;
+      }
+
+      .error-footer {
+        align-items: flex-end;
+        gap: 20px;
+      }
+
+      .error-footer-copy {
+        max-width: 150px;
+      }
+    }
+
+    /* =====================================================
+       REDUCED MOTION
+       ===================================================== */
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        transition-duration: .001ms !important;
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+
+    /* =====================================================
+       PRINT
+       ===================================================== */
+
+    @media print {
+      .error-page {
+        min-height: auto;
+      }
+
+      .error-main {
+        padding: 60px 0;
+      }
+
+      .error-trajectory {
+        display: none;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-  <!-- =====================================================
-       LOADER
-       ===================================================== -->
+  <div class="error-page">
 
-  <div class="page-loader" aria-hidden="true">
-    <div class="page-loader-inner">
-      <img
-        src="/assets/images/cp-mark.png"
-        alt=""
-        width="48"
-        height="48"
+    <header class="error-header">
+      <a
+        class="error-brand"
+        href="/"
+        aria-label="Cesare Paratore — torna all'inizio"
       >
-    </div>
-  </div>
-
-
-  <!-- =====================================================
-       PAGE TRANSITION
-       ===================================================== -->
-
-  <div class="page-transition" aria-hidden="true"></div>
-
-
-  <!-- =====================================================
-       CUSTOM CURSOR
-       ===================================================== -->
-
-  <div class="custom-cursor" aria-hidden="true">
-    <span class="custom-cursor-dot"></span>
-    <span class="custom-cursor-ring"></span>
-  </div>
-
-
-  <!-- =====================================================
-       HEADER
-       ===================================================== -->
-
-  <header class="site-header">
-
-    <a
-      class="site-brand"
-      href="#01"
-      aria-label="Cesare Paratore — torna all'inizio"
-    >
-      <img
-        src="/assets/images/cp-mark.png"
-        alt="Cesare Paratore"
-        width="48"
-        height="48"
-      >
-    </a>
-
-
-    <div class="wow-progress" aria-label="Navigazione della storia">
-
-      <div
-        class="progress-label"
-        id="progress-current"
-        aria-live="polite"
-      >
-        IL MOVIMENTO È SOLO L'INIZIO.
-      </div>
-
-      <div class="progress-track" aria-hidden="true">
-        <span class="progress-line"></span>
-        <span class="progress-fill" id="progress-fill"></span>
-        <span class="progress-point" id="progress-point"></span>
-      </div>
-
-      <div class="section-jump">
-
-        <a
-          id="previous-section"
-          class="section-jump-link section-jump-link--previous is-disabled"
-          href="#01"
-          aria-hidden="true"
-          tabindex="-1"
-        >
-          <span class="section-jump-arrow" aria-hidden="true">←</span>
-          <span id="previous-section-label"></span>
-        </a>
-
-        <a
-          id="next-section"
-          class="section-jump-link section-jump-link--next"
-          href="#02"
-          aria-label="Vai alla sezione 02"
-        >
-          <span id="next-section-label">02</span>
-          <span class="section-jump-arrow" aria-hidden="true">→</span>
-        </a>
-
-      </div>
-
-    </div>
-
-
-    <button
-      class="menu-trigger"
-      type="button"
-      aria-expanded="false"
-      aria-controls="site-menu"
-    >
-      <span class="menu-trigger-label">MENU</span>
-      <span class="menu-trigger-icon" aria-hidden="true">
-        <span></span>
-        <span></span>
-      </span>
-    </button>
-
-  </header>
-
-
-  <!-- =====================================================
-       MENU
-       ===================================================== -->
-
-  <aside
-    class="site-menu"
-    id="site-menu"
-    aria-hidden="true"
-  >
-
-    <nav class="site-menu-nav" aria-label="Menu principale">
-
-      <a href="/chi-sono/">
-        <span class="site-menu-number">01</span>
-        <span>CHI SONO</span>
-      </a>
-
-      <a href="/sport/">
-        <span class="site-menu-number">02</span>
-        <span>SPORT</span>
-      </a>
-
-      <a href="/scienze-motorie/">
-        <span class="site-menu-number">03</span>
-        <span>SCIENZE MOTORIE</span>
-      </a>
-
-      <a href="/educazione/">
-        <span class="site-menu-number">04</span>
-        <span>EDUCAZIONE</span>
-      </a>
-
-      <a href="/management-dello-sport/">
-        <span class="site-menu-number">05</span>
-        <span>MANAGEMENT</span>
-      </a>
-
-      <a href="/presenza-web/">
-        <span class="site-menu-number">06</span>
-        <span>DIGITALE</span>
-      </a>
-
-      <a href="/territorio/">
-        <span class="site-menu-number">07</span>
-        <span>TERRITORIO</span>
-      </a>
-
-      <a href="/contatti/">
-        <span class="site-menu-number">08</span>
-        <span>CONTATTI</span>
-      </a>
-
-    </nav>
-
-  </aside>
-
-
-  <!-- =====================================================
-       MAIN
-       ===================================================== -->
-
-  <main id="main-content">
-
-
-    <!-- ===================================================
-         01 — IL MOVIMENTO È SOLO L'INIZIO
-         =================================================== -->
-
-    <section
-      class="home-section hero-section"
-      id="01"
-      data-section-title="IL MOVIMENTO È SOLO L'INIZIO."
-    >
-
-      <div class="section-inner hero-inner">
-
-        <p class="section-title reveal">
-          IL MOVIMENTO È SOLO L'INIZIO.
-        </p>
-
-
-        <h1 class="hero-title reveal">
-
-          <span class="hero-title-line hero-title-line--identity">
-            <span class="hero-title-word">MOVIMENTO</span>
-            <span class="identity-slash" aria-hidden="true">/</span>
-          </span>
-
-          <span class="hero-title-line">
-            CON DIREZIONE.
-          </span>
-
-        </h1>
-
-
-        <p class="hero-intro reveal">
-          Tutto è iniziato da una domanda: dove può portarti il movimento?
-        </p>
-
-
-        <div class="hero-directions reveal">
-
-          <a
-            class="hero-direction"
-            data-direction="sport"
-            data-trajectory-node="sport"
-            href="/sport/"
-          >
-            <span class="hero-direction-number">01</span>
-            <span class="hero-direction-name">SPORT</span>
-          </a>
-
-          <a
-            class="hero-direction"
-            data-direction="scienze-motorie"
-            data-trajectory-node="scienze-motorie"
-            href="/scienze-motorie/"
-          >
-            <span class="hero-direction-number">02</span>
-            <span class="hero-direction-name">SCIENZE MOTORIE</span>
-          </a>
-
-          <a
-            class="hero-direction"
-            data-direction="educazione"
-            data-trajectory-node="educazione"
-            href="/educazione/"
-          >
-            <span class="hero-direction-number">03</span>
-            <span class="hero-direction-name">EDUCAZIONE</span>
-          </a>
-
-          <a
-            class="hero-direction"
-            data-direction="management"
-            data-trajectory-node="management"
-            href="/management-dello-sport/"
-          >
-            <span class="hero-direction-number">04</span>
-            <span class="hero-direction-name">MANAGEMENT</span>
-          </a>
-
-          <a
-            class="hero-direction"
-            data-direction="digitale"
-            data-trajectory-node="digitale"
-            href="/presenza-web/"
-          >
-            <span class="hero-direction-number">05</span>
-            <span class="hero-direction-name">DIGITALE</span>
-          </a>
-
-        </div>
-
-
-        <div
-          class="direction-trajectory reveal"
-          aria-hidden="true"
-        >
-
-          <span class="direction-trajectory-line"></span>
-
-          <span
-            class="direction-node direction-node--sport"
-            data-direction="sport"
-            style="left: 8%; top: 56%;"
-          >
-            <span class="direction-node-label">SPORT</span>
-          </span>
-
-          <span
-            class="direction-node direction-node--scienze-motorie"
-            data-direction="scienze-motorie"
-            style="left: 29%; top: 42%;"
-          >
-            <span class="direction-node-label">SCIENZE MOTORIE</span>
-          </span>
-
-          <span
-            class="direction-node direction-node--educazione"
-            data-direction="educazione"
-            style="left: 50%; top: 50%;"
-          >
-            <span class="direction-node-label">EDUCAZIONE</span>
-          </span>
-
-          <span
-            class="direction-node direction-node--management"
-            data-direction="management"
-            style="left: 71%; top: 38%;"
-          >
-            <span class="direction-node-label">MANAGEMENT</span>
-          </span>
-
-          <span
-            class="direction-node direction-node--digitale"
-            data-direction="digitale"
-            style="left: 92%; top: 30%;"
-          >
-            <span class="direction-node-label">DIGITALE</span>
-          </span>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         02 — LA DOMANDA È CAMBIATA
-         =================================================== -->
-
-    <section
-      class="home-section narrative-section"
-      id="02"
-      data-section-title="LA DOMANDA È CAMBIATA."
-    >
-
-      <div class="section-inner section-inner--narrow">
-
-        <p class="section-title reveal">
-          LA DOMANDA È CAMBIATA.
-        </p>
-
-        <div class="editorial-copy reveal">
-
-          <p>
-            Il movimento è stato il punto di partenza.
-          </p>
-
-          <p>
-            Poi è arrivato lo sport.
-          </p>
-
-          <p>
-            E dentro lo sport ho trovato la corsa.
-            Prima come atleta.
-            Poi come tecnico.
-          </p>
-
-          <div class="editorial-sequence" aria-label="Le tappe della pratica">
-
-            <p>La pratica.</p>
-            <p>L’allenamento.</p>
-            <p>La fatica.</p>
-            <p>Il confronto con il limite.</p>
-
-          </div>
-
-          <p>
-            Prima ancora di studiare il movimento,
-            ho iniziato a viverlo.
-          </p>
-
-          <p>
-            E più mi avvicinavo a quel limite,
-            più sentivo il bisogno di capire cosa ci fosse oltre.
-          </p>
-
-          <p>
-            Le Scienze Motorie sono arrivate anche da qui:
-            dal desiderio di comprendere ciò che stavo vivendo.
-          </p>
-
-          <p>
-            Studiare il movimento mi ha dato strumenti.
-            Lo sport mi ha dato esperienza.
-            La corsa mi ha insegnato a misurarmi con il tempo, con la distanza e con me stesso.
-            L'allenamento mi ha insegnato la continuità.
-            La fatica mi ha insegnato che il cambiamento ha un costo.
-            Il limite mi ha insegnato che non sempre basta spingere più forte.
-          </p>
-
-          <p>
-            E a quel punto la domanda è cambiata.
-          </p>
-
-          <p class="editorial-emphasis">
-            Se il movimento può cambiare un corpo,
-            <strong>che cosa può cambiare una persona?</strong>
-          </p>
-
-          <p>
-            La risposta non poteva stare tutta in una disciplina.
-          </p>
-
-          <p>
-            Così ho iniziato a guardare oltre.
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         03 — UNA STRADA NON ERA ABBASTANZA
-         =================================================== -->
-
-    <section
-      class="home-section narrative-section"
-      id="03"
-      data-section-title="UNA STRADA NON ERA ABBASTANZA."
-    >
-
-      <div class="section-inner section-inner--narrow">
-
-        <p class="section-title reveal">
-          UNA STRADA NON ERA ABBASTANZA.
-        </p>
-
-        <div class="editorial-copy reveal">
-
-          <p>
-            Ho incontrato l'educazione.
-            Per capire cosa succede quando ciò che hai imparato diventa esperienza per qualcun altro.
-          </p>
-
-          <p>
-            Ho incontrato il management.
-            Per capire cosa succede quando un'idea deve diventare organizzazione, progetto, realtà.
-          </p>
-
-          <p>
-            Ho incontrato il digitale.
-            Per capire come strumenti e connessioni possano aprire nuove possibilità.
-          </p>
-
-          <p>
-            E sono tornato allo sport.
-            Con occhi diversi.
-          </p>
-
-          <p>
-            A quel punto le strade erano diventate cinque:
-          </p>
-
-          <div class="five-directions" aria-label="Le cinque direzioni">
-
-            <a href="/sport/" class="narrative-link">
-              <span>SPORT</span>
-            </a>
-
-            <a href="/scienze-motorie/" class="narrative-link">
-              <span>SCIENZE MOTORIE</span>
-            </a>
-
-            <a href="/educazione/" class="narrative-link">
-              <span>EDUCAZIONE</span>
-            </a>
-
-            <a href="/management-dello-sport/" class="narrative-link">
-              <span>MANAGEMENT</span>
-            </a>
-
-            <a href="/presenza-web/" class="narrative-link">
-              <span>DIGITALE</span>
-            </a>
-
-          </div>
-
-          <p>
-            Sembravano direzioni diverse.
-            Ma continuavano a partire dallo stesso punto.
-            <strong>Il movimento.</strong>
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         04 — POI HO CAPITO CHE NON ERANO CINQUE STRADE
-         =================================================== -->
-
-    <section
-      class="home-section network-section"
-      id="04"
-      data-section-title="NON ERANO CINQUE STRADE."
-    >
-
-      <div class="section-inner network-inner">
-
-        <div class="network-copy">
-
-          <p class="section-title reveal">
-            POI HO CAPITO CHE NON ERANO CINQUE STRADE.
-          </p>
-
-          <div class="editorial-copy reveal">
-
-            <p>
-              Erano cinque modi di guardare la stessa realtà.
-            </p>
-
-            <p>
-              Lo sport mi ha insegnato a misurarmi.
-              Le Scienze Motorie mi hanno insegnato a comprendere.
-              L'educazione mi ha insegnato a trasferire.
-              Il management mi ha insegnato a progettare.
-              Il digitale mi ha insegnato a connettere.
-            </p>
-
-            <p>
-              E nessuna di queste esperienze è rimasta uguale dopo aver incontrato le altre.
-            </p>
-
-            <p>
-              È questo che un curriculum non riesce a raccontare.
-              Può dire dove sei stato.
-              Non può dire <strong>come ogni tappa ha cambiato quella successiva.</strong>
-            </p>
-
-            <p>
-              Per questo il mio percorso non lo vedo come un elenco.
-              Lo vedo come una rete di connessioni.
-            </p>
-
-          </div>
-
-        </div>
-
-
-        <div
-          class="network-visual reveal"
-          aria-hidden="true"
-        >
-
-          <span class="network-line network-line--a"></span>
-          <span class="network-line network-line--b"></span>
-          <span class="network-line network-line--c"></span>
-          <span class="network-line network-line--d"></span>
-
-          <span class="network-node network-node--sport">SPORT</span>
-          <span class="network-node network-node--scienze-motorie">SCIENZE MOTORIE</span>
-          <span class="network-node network-node--educazione">EDUCAZIONE</span>
-          <span class="network-node network-node--management">MANAGEMENT</span>
-          <span class="network-node network-node--digitale">DIGITALE</span>
-
-          <span class="network-origin">MOVIMENTO</span>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         05 — LA PAUSA
-         =================================================== -->
-
-    <section
-      class="home-section pause-section"
-      id="05"
-      data-section-title="LA PAUSA."
-    >
-
-      <div class="section-inner pause-inner">
-
-        <div class="pause-copy">
-
-          <p class="section-title reveal">
-            E LE CONNESSIONI, A VOLTE, PASSANO ANCHE DA UNA PAUSA.
-          </p>
-
-          <div class="editorial-copy reveal">
-
-            <p>
-              Ho imparato che muoversi non significa necessariamente andare avanti.
-              A volte significa fermarsi.
-              Guardare meglio.
-              Accorgersi che la domanda era sbagliata.
-              Cambiare direzione.
-              Riconoscere un errore.
-              Ricominciare.
-            </p>
-
-            <p class="editorial-emphasis">
-              È forse la parte più difficile del movimento:
-              <strong>capire quando continuare e quando cambiare.</strong>
-            </p>
-
-            <p>
-              Per questo oggi cerco di non partire dalla soluzione.
-              Parto da ciò che ho davanti.
-              Prima capire.
-              Poi costruire.
-              Infine muoversi.
-            </p>
-
-          </div>
-
-        </div>
-
-
-        <div
-          class="pause-trajectory reveal"
-          aria-hidden="true"
-        >
-          <span class="pause-trajectory-line"></span>
-          <span class="pause-trajectory-point"></span>
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         06 — PARTINICO
-         =================================================== -->
-
-    <section
-      class="home-section territory-section"
-      id="06"
-      data-section-title="OGGI SO ANCHE DA DOVE PARTO."
-    >
-
-      <div class="section-inner territory-inner">
-
-        <div class="territory-copy">
-
-          <p class="section-title reveal">
-            OGGI SO ANCHE DA DOVE PARTO.
-          </p>
-
-          <div class="territory-card reveal">
-
-            <p class="territory-location">
-              PARTINICO
-            </p>
-
-            <h2>
-              DA QUI, NON SOLO QUI.
-            </h2>
-
-            <div class="editorial-copy">
-
-              <p>
-                È qui che ha la sua base il mio lavoro.
-                In presenza, per chi parte da qui e per chi arriva dai territori vicini.
-                Online, quando la distanza non deve essere un limite.
-              </p>
-
-              <p>
-                Perché una base non è un confine.
-                È il punto che ti permette di sapere sempre da dove stai partendo.
-              </p>
-
-            </div>
-
-            <a
-              class="territory-map-link"
-              href="https://www.google.com/maps/search/?api=1&query=Stadio+Comunale+Giuseppe+La+Franca%2C+Viale+Aldo+Moro%2C+Partinico%2C+PA%2C+Italy"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              APRI LA MAPPA →
-            </a>
-
-          </div>
-
-        </div>
-
-
-        <div class="territory-map reveal">
-
-          <iframe
-            title="Stadio Comunale Giuseppe La Franca, Partinico"
-            src="https://www.google.com/maps?q=Stadio+Comunale+Giuseppe+La+Franca%2C+Viale+Aldo+Moro%2C+Partinico%2C+PA%2C+Italy&layer=satellite&output=embed"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-            allowfullscreen
-          ></iframe>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         07 — IL PERCORSO CONTINUA
-         =================================================== -->
-
-    <section
-      class="home-section present-section"
-      id="07"
-      data-section-title="DA QUI, IL PERCORSO CONTINUA."
-    >
-
-      <div class="section-inner present-inner">
-
-        <div class="present-copy">
-
-          <p class="section-title reveal">
-            DA QUI, IL PERCORSO CONTINUA.
-          </p>
-
-          <div class="editorial-copy reveal">
-
-            <p>
-              Oggi quelle esperienze convivono.
-            </p>
-
-            <p>
-              <strong>Sport.</strong>
-              Il punto da cui è iniziato tutto.
-            </p>
-
-            <p>
-              <strong>Scienze Motorie.</strong>
-              Il modo di comprendere ciò che accade nel movimento.
-            </p>
-
-            <p>
-              <strong>Educazione.</strong>
-              Il passaggio dalla propria esperienza a quella degli altri.
-            </p>
-
-            <p>
-              <strong>Management.</strong>
-              Il modo di trasformare idee e competenze in progetti.
-            </p>
-
-            <p>
-              <strong>Digitale.</strong>
-              Uno spazio per connettere, costruire e aprire nuove possibilità.
-            </p>
-
-            <p>
-              Non provo a farle entrare tutte dentro una definizione.
-            </p>
-
-            <p>
-              Cerco piuttosto il punto in cui possono diventare utili.
-              A una persona.
-              A un progetto.
-              A un problema.
-              A un'idea che deve ancora trovare la sua forma.
-            </p>
-
-            <p>
-              È lì che mi interessa lavorare:
-            </p>
-
-            <p class="editorial-emphasis">
-              <strong>
-                nel punto in cui una competenza smette di essere soltanto conoscenza e comincia a diventare possibilità.
-              </strong>
-            </p>
-
-          </div>
-
-        </div>
-
-
-        <figure class="present-image reveal">
-
-          <img
-            src="/assets/images/cp-foto.webp"
-            alt="Cesare Paratore"
-            width="753"
-            height="941"
-            loading="lazy"
-          >
-
-        </figure>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         08 — NON È UN PUNTO DI ARRIVO
-         =================================================== -->
-
-    <section
-      class="home-section threshold-section"
-      id="08"
-      data-section-title="NON È UN PUNTO DI ARRIVO."
-    >
-
-      <div class="section-inner section-inner--narrow">
-
-        <p class="section-title reveal">
-          NON È UN PUNTO DI ARRIVO.
-        </p>
-
-        <div class="editorial-copy reveal">
-
-          <p>
-            Quello che hai letto fin qui
-            non è un curriculum.
-          </p>
-
-          <p>
-            È il modo in cui sono arrivato a guardare le cose.
-          </p>
-
-          <p>
-            E questo sito nasce per la stessa ragione:
-          </p>
-
-          <p>
-            per mettere ordine,
-            creare connessioni,
-            e trasformare ciò che so
-            in qualcosa che possa essere utile.
-          </p>
-
-          <p class="editorial-emphasis">
-            <strong>
-              Perché ogni percorso, prima o poi,
-              ha bisogno di incontrare qualcosa di nuovo.
-            </strong>
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         09 — DA DOVE PARTI TU?
-         =================================================== -->
-
-    <section
-      class="home-section question-section"
-      id="09"
-      data-section-title="FORSE È QUI CHE LA STORIA CAMBIA."
-    >
-
-      <div class="section-inner question-inner">
-
-        <p class="section-title reveal">
-          FORSE È QUI CHE LA STORIA CAMBIA.
-        </p>
-
-        <div class="question-copy reveal">
-
-          <p>
-            Finora ti ho raccontato da dove sono partito.
-            Adesso la domanda è un'altra.
-          </p>
-
-          <h2>
-            DA DOVE<br>
-            <span>TU PARTI?</span>
-          </h2>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         10 — PARTIAMO DA QUELLO
-         =================================================== -->
-
-    <section
-      class="home-section contact-section"
-      id="10"
-      data-section-title="PARTIAMO DA QUELLO."
-    >
-
-      <div class="section-inner contact-inner">
-
-        <p class="section-title reveal">
-          PARTIAMO DA QUELLO.
-        </p>
-
-        <div class="contact-copy reveal">
-
-          <div class="editorial-copy">
-
-            <p>
-              Non dalla soluzione.
-              Da te.
-              Da quello che hai davanti.
-              Da quello che vuoi capire, costruire, migliorare o cambiare.
-            </p>
-
-            <p>
-              Se hai un obiettivo, partiamo da quello.
-              Se hai un problema, partiamo da quello.
-              Se hai un progetto, partiamo da quello.
-              Se hai una domanda, partiamo da quella.
-            </p>
-
-            <p>
-              Perché forse il movimento non consiste nel sapere già dove arriverai.
-              Forse consiste nel riconoscere il punto da cui vale la pena partire.
-            </p>
-
-            <p>
-              Io quel punto l'ho trovato nel movimento.
-              E da lì ho costruito tutto il resto.
-            </p>
-
-            <p class="editorial-emphasis">
-              <strong>Adesso tocca a te.</strong>
-            </p>
-
-          </div>
-
-
-          <div class="contact-cta-wrap">
-
-            <span
-              class="contact-trajectory"
-              aria-hidden="true"
-            >
-              <span class="contact-trajectory-line"></span>
-              <span class="contact-trajectory-point"></span>
-            </span>
-
-            <a
-              class="contact-cta"
-              href="/contatti/"
-            >
-              <span>Raccontami da dove vuoi partire</span>
-              <span aria-hidden="true">→</span>
-            </a>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-  </main>
-
-
-  <!-- =====================================================
-       FOOTER
-       ===================================================== -->
-
-  <footer class="site-footer">
-
-    <div class="footer-inner">
-
-      <div class="footer-logo">
         <img
           src="/assets/images/cp-mark.png"
           alt="Cesare Paratore"
-          width="96"
-          height="96"
-          loading="lazy"
+          width="48"
+          height="48"
         >
+      </a>
+
+      <span class="error-context">
+        MOVIMENTO / CON DIREZIONE.
+      </span>
+    </header>
+
+
+    <main class="error-main">
+      <div class="error-content">
+
+        <span class="error-number">404</span>
+
+        <h1 class="error-title">
+          <span>QUESTA STRADA</span>
+          <span>NON PORTA QUI.</span>
+        </h1>
+
+        <p class="error-description">
+          La traiettoria si è interrotta. La pagina che cercavi non esiste,
+          oppure ha cambiato direzione.
+        </p>
+
+        <p class="error-restart">
+          Non tutte le traiettorie arrivano dove pensavi.<br>
+          Ma ogni percorso ha un punto da cui ripartire.
+        </p>
+
+        <div class="error-trajectory" aria-hidden="true">
+          <span class="error-trajectory-line"></span>
+          <span class="error-trajectory-point"></span>
+          <span class="error-trajectory-end"></span>
+        </div>
+
+        <div class="error-actions">
+          <a class="error-cta" href="/">
+            <span>TORNA ALL'INIZIO</span>
+            <span class="error-cta-arrow" aria-hidden="true">→</span>
+          </a>
+        </div>
+
       </div>
+    </main>
 
-      <p class="footer-motto">
-        <span>MOVIMENTO</span>
-        <span aria-hidden="true">/</span>
-        <span>CON DIREZIONE.</span>
-      </p>
 
-      <p class="footer-signature">
+    <footer class="error-footer">
+      <span class="error-footer-mark">CP</span>
+
+      <span class="error-footer-copy">
         CESARE PARATORE
-      </p>
-
-    </div>
-
-  </footer>
-
-
-  <!-- =====================================================
-       STANDBY
-       ===================================================== -->
-
-  <div
-    class="standby-screen"
-    aria-hidden="true"
-  >
-
-    <div
-      class="standby-atmosphere"
-      aria-hidden="true"
-    >
-      <span class="standby-path"></span>
-      <span class="standby-point"></span>
-    </div>
-
-    <div class="standby-center">
-
-      <img
-        class="standby-logo"
-        src="/assets/images/cp-mark.png"
-        alt="Cesare Paratore"
-        width="72"
-        height="72"
-      >
-
-      <div class="standby-copy">
-
-        <span class="standby-label">
-          ANCHE FERMARSI È MOVIMENTO.
-        </span>
-
-        <span class="standby-subtitle">
-          Il percorso continua da qui.
-        </span>
-
-      </div>
-
-      <button
-        class="standby-wake"
-        type="button"
-      >
-        RIPRENDI →
-      </button>
-
-    </div>
+      </span>
+    </footer>
 
   </div>
-
-
-  <!-- =====================================================
-       SCRIPT
-       ===================================================== -->
-
-  <script src="/script.js" defer></script>
 
 </body>
 </html>
