@@ -1471,6 +1471,18 @@ main {
 }
 
 
+/* CTA — override su fondo Deep Ink */
+
+.home-section--cta .contact-cta {
+  color: var(--ivory);
+}
+
+.home-section--cta .contact-cta:hover,
+.home-section--cta .contact-cta:focus-visible {
+  color: var(--terracotta);
+}
+
+
 /* =========================================================
    REVEAL
    ========================================================= */
