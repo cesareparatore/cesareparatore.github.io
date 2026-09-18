@@ -1,7 +1,7 @@
 /* =========================================================
    CESARE PARATORE
    MOVIMENTO / CON DIREZIONE.
-   MASTER INTERACTION SYSTEM — V5.1
+   MASTER INTERACTION SYSTEM — 2.3
    ========================================================= */
 
 (() => {
@@ -137,7 +137,7 @@
     magneticElements:
       Array.from(
         document.querySelectorAll(
-          ".menu-trigger, .contact-cta"
+          ".site-brand, .menu-trigger, .contact-cta"
         )
       ),
 
@@ -247,17 +247,17 @@
       );
 
 
-      if (state.standby) {
-        dom.standby?.classList.toggle(
-          "is-reduced",
-          matches
-        );
-      }
+      dom.standby?.classList.toggle(
+        "is-reduced",
+        matches
+      );
 
 
-      if (state.standby) {
-        clearStandbyTimer();
-      } else {
+      /*
+       * Reduced motion does not disable the conceptual standby.
+       * It only removes its animation.
+       */
+      if (!state.standby) {
         resetStandbyTimer();
       }
 
@@ -502,6 +502,12 @@
     );
 
 
+    dom.menuTrigger?.setAttribute(
+      "aria-label",
+      "Chiudi menu"
+    );
+
+
     dom.body.classList.add(
       "is-menu-open"
     );
@@ -537,6 +543,12 @@
     dom.menuTrigger?.setAttribute(
       "aria-expanded",
       "false"
+    );
+
+
+    dom.menuTrigger?.setAttribute(
+      "aria-label",
+      "Apri menu"
     );
 
 
@@ -755,7 +767,7 @@
       if (dom.nextLabel) {
 
         dom.nextLabel.textContent =
-          "INIZIO";
+          "01";
 
       }
 
@@ -1568,7 +1580,6 @@
 
   /* =======================================================
      STANDBY
-     PUNTO → LINEA → MOVIMENTO
      ======================================================= */
 
   const clearStandbyTimer = () => {
@@ -1590,6 +1601,7 @@
 
     if (
       state.menuOpen ||
+      state.standby ||
       !dom.standby
     ) {
       return;
@@ -1612,15 +1624,15 @@
     );
 
 
-    dom.standby.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-
     dom.standby.classList.toggle(
       "is-reduced",
       state.reducedMotion
+    );
+
+
+    dom.standby.setAttribute(
+      "aria-hidden",
+      "false"
     );
 
 
@@ -1729,7 +1741,17 @@
             }
 
 
-            resetStandbyTimer();
+            /*
+             * Do not constantly reset the timer because of
+             * scroll events while the browser is idle.
+             * User activity is still the reset mechanism.
+             */
+            if (
+              eventName !== "scroll" ||
+              event.isTrusted
+            ) {
+              resetStandbyTimer();
+            }
 
           },
           {
