@@ -8,6 +8,10 @@
   "use strict";
 
 
+  /* =======================================================
+     CONFIG
+     ======================================================= */
+
   const CONFIG = {
     loaderMinimumTime: 5200,
     loaderMaximumWait: 8000,
@@ -32,8 +36,13 @@
   };
 
 
+  /* =======================================================
+     STATE
+     ======================================================= */
+
   const state = {
     loaded: false,
+
     menuOpen: false,
     standby: false,
 
@@ -43,6 +52,7 @@
     standbyTimer: null,
     loaderTimer: null,
     loaderFailsafeTimer: null,
+
     loaderStarted: null,
     loaderReady: false,
     loaderCompletionScheduled: false,
@@ -73,120 +83,89 @@
   };
 
 
-  const dom = {
+  /* =======================================================
+     DOM
+     ======================================================= */
 
+  const dom = {
     html: document.documentElement,
     body: document.body,
 
-    loader:
-      document.querySelector(".page-loader"),
+    loader: document.querySelector(".page-loader"),
+    transition: document.querySelector(".page-transition"),
 
-    transition:
-      document.querySelector(".page-transition"),
+    cursor: document.querySelector(".custom-cursor"),
+    cursorDot: document.querySelector(".custom-cursor-dot"),
+    cursorRing: document.querySelector(".custom-cursor-ring"),
 
-    cursor:
-      document.querySelector(".custom-cursor"),
+    header: document.querySelector(".site-header"),
+    main: document.querySelector("#main-content"),
+    footer: document.querySelector(".site-footer"),
 
-    cursorDot:
-      document.querySelector(".custom-cursor-dot"),
+    menu: document.querySelector(".site-menu"),
+    menuTrigger: document.querySelector(".menu-trigger"),
+    menuLinks: Array.from(
+      document.querySelectorAll(".site-menu a")
+    ),
 
-    cursorRing:
-      document.querySelector(".custom-cursor-ring"),
+    progressLabel: document.querySelector("#progress-current"),
+    progressFill: document.querySelector("#progress-fill"),
+    progressPoint: document.querySelector("#progress-point"),
 
-    header:
-      document.querySelector(".site-header"),
+    previousSection: document.querySelector("#previous-section"),
+    previousLabel: document.querySelector("#previous-section-label"),
 
-    main:
-      document.querySelector("#main-content"),
+    nextSection: document.querySelector("#next-section"),
+    nextLabel: document.querySelector("#next-section-label"),
 
-    footer:
-      document.querySelector(".site-footer"),
+    sections: Array.from(
+      document.querySelectorAll(".home-section")
+    ),
 
-    menu:
-      document.querySelector(".site-menu"),
+    reveals: Array.from(
+      document.querySelectorAll(".reveal")
+    ),
 
-    menuTrigger:
-      document.querySelector(".menu-trigger"),
+    narrativeLinks: Array.from(
+      document.querySelectorAll(".narrative-link")
+    ),
 
-    menuLinks:
-      Array.from(
-        document.querySelectorAll(".site-menu a")
-      ),
-
-    progressLabel:
-      document.querySelector("#progress-current"),
-
-    progressFill:
-      document.querySelector("#progress-fill"),
-
-    progressPoint:
-      document.querySelector("#progress-point"),
-
-    previousSection:
-      document.querySelector("#previous-section"),
-
-    previousLabel:
-      document.querySelector("#previous-section-label"),
-
-    nextSection:
-      document.querySelector("#next-section"),
-
-    nextLabel:
-      document.querySelector("#next-section-label"),
-
-    sections:
-      Array.from(
-        document.querySelectorAll(".home-section")
-      ),
-
-    reveals:
-      Array.from(
-        document.querySelectorAll(".reveal")
-      ),
-
-    narrativeLinks:
-      Array.from(
-        document.querySelectorAll(".narrative-link")
-      ),
-
-    magneticElements:
-      Array.from(
-        document.querySelectorAll(
-          ".site-brand, .menu-trigger, .contact-cta"
-        )
-      ),
-
-    transitionLinks:
-      Array.from(
-        document.querySelectorAll(
-          'a[href]:not([target="_blank"])'
-        )
-      ),
-
-    standby:
-      document.querySelector(".standby-screen"),
-
-    standbyWake:
-      document.querySelector(".standby-wake"),
-
-    ctaTrajectories:
-      Array.from(
-        document.querySelectorAll(".cta-trajectory")
-      ),
-
-    directionLinks:
-      Array.from(
-        document.querySelectorAll(
-          ".hero-direction[data-direction]"
-        )
-      ),
-
-    directionNodes:
-      Array.from(
-        document.querySelectorAll(
-          ".direction-node[data-direction]"
-        )
+    magneticElements: Array.from(
+      document.querySelectorAll(
+        ".site-brand, .menu-trigger, .contact-cta"
       )
+    ),
+
+    transitionLinks: Array.from(
+      document.querySelectorAll(
+        'a[href]:not([target="_blank"])'
+      )
+    ),
+
+    standby: document.querySelector(".standby-screen"),
+    standbyWake: document.querySelector(".standby-wake"),
+
+    ctaTrajectories: Array.from(
+      document.querySelectorAll(".cta-trajectory")
+    ),
+
+    directionLinks: Array.from(
+      document.querySelectorAll(
+        ".hero-direction[data-direction]"
+      )
+    ),
+
+    directionNodes: Array.from(
+      document.querySelectorAll(
+        ".direction-node[data-direction]"
+      )
+    ),
+
+    networkNodes: Array.from(
+      document.querySelectorAll(
+        ".network-node[data-node]"
+      )
+    )
   };
 
 
@@ -194,48 +173,25 @@
      UTILITIES
      ======================================================= */
 
-  const clamp = (
-    value,
-    min,
-    max
-  ) =>
-    Math.min(
-      Math.max(value, min),
-      max
-    );
+  const clamp = (value, min, max) =>
+    Math.min(Math.max(value, min), max);
 
 
-  const lerp = (
-    current,
-    target,
-    amount
-  ) =>
-    current +
-    (target - current) *
-    amount;
+  const lerp = (current, target, amount) =>
+    current + (target - current) * amount;
 
 
-  const getSectionNumber = index =>
+  const getSectionNumber = (index) =>
     String(index + 1).padStart(2, "0");
 
 
-  const getSectionByIndex = index => {
-
-    if (!dom.sections.length) {
-      return null;
-    }
-
-    return dom.sections[
-      clamp(
-        index,
-        0,
-        dom.sections.length - 1
-      )
+  const getSectionByIndex = (index) =>
+    dom.sections[
+      clamp(index, 0, dom.sections.length - 1)
     ];
-  };
 
 
-  const getSectionTitle = section =>
+  const getSectionTitle = (section) =>
     section?.dataset.sectionTitle || "";
 
 
@@ -245,57 +201,41 @@
     ).matches;
 
 
+  const prefersReducedMotion = () =>
+    window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+
   /* =======================================================
      MOTION PREFERENCE
      ======================================================= */
 
-  const initMotionPreference = () => {
+  const updateMotionPreference = () => {
+    state.reducedMotion = prefersReducedMotion();
 
-    const media =
-      window.matchMedia(
-        "(prefers-reduced-motion: reduce)"
-      );
+    dom.html.classList.toggle(
+      "reduced-motion",
+      state.reducedMotion
+    );
 
-
-    const apply = matches => {
-
-      state.reducedMotion = matches;
-
-      dom.html.classList.toggle(
-        "reduced-motion",
-        matches
-      );
-
-
-      dom.standby?.classList.toggle(
+    if (dom.standby) {
+      dom.standby.classList.toggle(
         "is-reduced",
-        matches
+        state.reducedMotion
       );
-
-
-      if (!state.standby) {
-        resetStandbyTimer();
-      }
-
-    };
-
-
-    apply(media.matches);
-
-
-    if (
-      typeof media.addEventListener ===
-      "function"
-    ) {
-
-      media.addEventListener(
-        "change",
-        event =>
-          apply(event.matches)
-      );
-
     }
 
+    if (state.reducedMotion) {
+      state.trajectory.targetDrift = 0;
+      state.trajectory.drift = 0;
+    }
+
+    if (state.standby) {
+      clearStandbyTimer();
+    } else {
+      resetStandbyTimer();
+    }
   };
 
 
@@ -303,322 +243,136 @@
      LOADER
      ======================================================= */
 
-  const initLoader = () => {
+  const ensureLoaderLogo = () => {
+    if (!dom.loader) return;
 
-    if (!dom.loader) {
-      state.loaded = true;
+    const inner =
+      dom.loader.querySelector(".page-loader-inner");
+
+    const trajectory =
+      dom.loader.querySelector(".loader-trajectory");
+
+    if (!inner || !trajectory) return;
+
+    if (
+      inner.querySelector(".page-loader-logo")
+    ) {
       return;
     }
 
+    const logo =
+      document.createElement("img");
 
-    state.loaderStarted =
-      performance.now();
+    logo.className = "page-loader-logo";
+    logo.src = "/assets/images/cp-mark.png";
+    logo.alt = "Cesare Paratore";
+    logo.setAttribute("aria-hidden", "true");
+
+    inner.insertBefore(
+      logo,
+      trajectory
+    );
+  };
 
 
-    const minimumTime =
+  const completeLoader = () => {
+    if (
+      !dom.loader ||
+      state.loaderCompletionScheduled
+    ) {
+      return;
+    }
+
+    state.loaderCompletionScheduled = true;
+
+    dom.loader.classList.add("is-ready");
+
+    window.setTimeout(() => {
+      dom.loader.classList.add("is-hidden");
+
+      window.setTimeout(() => {
+        dom.loader?.remove();
+      }, 950);
+
+    }, 120);
+  };
+
+
+  const tryCompleteLoader = () => {
+    if (!state.loaderReady) return;
+
+    const elapsed =
+      performance.now() - state.loaderStarted;
+
+    const minimum =
       Math.max(
         5000,
         CONFIG.loaderMinimumTime
       );
 
-
-    /*
-     * LOGO
-     *
-     * Il logo è parte del loader editoriale:
-     * viene posizionato sopra la traiettoria di caricamento.
-     *
-     * Se il markup è già presente, non viene duplicato.
-     */
-
-    const loaderInner =
-      dom.loader.querySelector(
-        ".page-loader-inner"
+    const remaining =
+      Math.max(
+        0,
+        minimum - elapsed
       );
 
+    window.clearTimeout(
+      state.loaderTimer
+    );
 
-    if (loaderInner) {
-
-      let logo =
-        loaderInner.querySelector(
-          ".page-loader-logo"
-        );
-
-
-      if (!logo) {
-
-        logo =
-          document.createElement("img");
-
-        logo.className =
-          "page-loader-logo";
-
-        logo.src =
-          "/assets/images/cp-mark.png";
-
-        logo.alt =
-          "Cesare Paratore";
-
-        logo.setAttribute(
-          "aria-hidden",
-          "true"
-        );
+    state.loaderTimer =
+      window.setTimeout(
+        completeLoader,
+        remaining
+      );
+  };
 
 
-        const trajectory =
-          loaderInner.querySelector(
-            ".loader-trajectory"
-          );
-
-
-        if (trajectory) {
-
-          loaderInner.insertBefore(
-            logo,
-            trajectory
-          );
-
-        } else {
-
-          loaderInner.prepend(
-            logo
-          );
-
-        }
-
-      }
-
+  const initLoader = () => {
+    if (!dom.loader) {
+      state.loaderReady = true;
+      state.loaderStarted = performance.now();
+      return;
     }
 
+    ensureLoaderLogo();
 
-    const complete = () => {
+    state.loaderStarted =
+      performance.now();
 
-      if (state.loaded) {
-        return;
-      }
-
-
-      state.loaded = true;
-
-
-      if (state.loaderTimer) {
-
-        window.clearTimeout(
-          state.loaderTimer
-        );
-
-        state.loaderTimer = null;
-
-      }
-
-
-      if (state.loaderFailsafeTimer) {
-
-        window.clearTimeout(
-          state.loaderFailsafeTimer
-        );
-
-        state.loaderFailsafeTimer = null;
-
-      }
-
-
-      state.loaderCompletionScheduled =
-        false;
-
-
-      /*
-       * Prima rendiamo esplicito lo stato finale.
-       * Poi lasciamo al CSS il tempo di eseguire
-       * l'eventuale dissolvenza editoriale.
-       */
-
-      dom.loader.classList.add(
-        "is-ready"
+    const minimum =
+      Math.max(
+        5000,
+        CONFIG.loaderMinimumTime
       );
 
-
-      window.setTimeout(
-        () => {
-
-          if (!dom.loader) {
-            return;
-          }
-
-
-          dom.loader.classList.add(
-            "is-hidden"
-          );
-
-
-          window.setTimeout(
-            () =>
-              dom.loader?.remove(),
-            950
-          );
-
-        },
-        120
+    const maximumWait =
+      Math.max(
+        CONFIG.loaderMaximumWait,
+        minimum + 500
       );
 
-    };
+    state.loaderReady =
+      document.readyState === "complete";
 
-
-    const completeWhenMinimumElapsed = () => {
-
-      if (
-        state.loaded ||
-        state.loaderCompletionScheduled
-      ) {
-        return;
-      }
-
-
-      const elapsed =
-        performance.now() -
-        state.loaderStarted;
-
-
-      const remaining =
-        Math.max(
-          0,
-          minimumTime - elapsed
-        );
-
-
-      state.loaderCompletionScheduled =
-        true;
-
-
-      state.loaderTimer =
-        window.setTimeout(
-          () => {
-
-            state.loaderTimer = null;
-
-            complete();
-
-          },
-          remaining
-        );
-
-    };
-
-
-    const markReady = () => {
-
-      if (state.loaded) {
-        return;
-      }
-
-
-      state.loaderReady = true;
-
-
-      completeWhenMinimumElapsed();
-
-    };
-
-
-    /*
-     * Se il documento è già completamente caricato,
-     * possiamo iniziare subito a contare il tempo minimo.
-     */
-
-    if (
-      document.readyState ===
-      "complete"
-    ) {
-
-      markReady();
-
+    if (state.loaderReady) {
+      tryCompleteLoader();
     } else {
-
       window.addEventListener(
         "load",
-        markReady,
-        {
-          once: true
-        }
+        () => {
+          state.loaderReady = true;
+          tryCompleteLoader();
+        },
+        { once: true }
       );
-
     }
 
-
-    /*
-     * FAILSAFE TECNICO.
-     *
-     * È indipendente dal timer principale:
-     * se il browser non emette load o qualcosa
-     * impedisce il completamento normale, il loader
-     * viene comunque rimosso.
-     *
-     * Il valore è sempre superiore al minimo di 5s.
-     */
-
-    const failsafeDelay =
-      Math.max(
-        8000,
-        minimumTime + 500
-      );
-
-
     state.loaderFailsafeTimer =
-      window.setTimeout(
-        () => {
-
-          if (state.loaded) {
-            return;
-          }
-
-
-          /*
-           * Il failsafe può chiudere solo dopo
-           * il tempo minimo garantito.
-           */
-
-          const elapsed =
-            performance.now() -
-            state.loaderStarted;
-
-
-          const remaining =
-            Math.max(
-              0,
-              minimumTime - elapsed
-            );
-
-
-          if (remaining > 0) {
-
-            state.loaderFailsafeTimer =
-              window.setTimeout(
-                () => {
-
-                  state.loaderFailsafeTimer =
-                    null;
-
-                  complete();
-
-                },
-                remaining
-              );
-
-            return;
-
-          }
-
-
-          state.loaderFailsafeTimer =
-            null;
-
-
-          complete();
-
-        },
-        failsafeDelay
-      );
-
+      window.setTimeout(() => {
+        state.loaderReady = true;
+        completeLoader();
+      }, maximumWait);
   };
 
 
@@ -626,101 +380,99 @@
      PAGE TRANSITIONS
      ======================================================= */
 
-  const initPageTransitions = () => {
+  const isInternalTransitionLink = (link) => {
+    if (!link) return false;
 
-    if (!dom.transition) {
+    const href =
+      link.getAttribute("href");
+
+    if (!href) return false;
+
+    if (
+      href.startsWith("#") ||
+      href.startsWith("mailto:") ||
+      href.startsWith("tel:")
+    ) {
+      return false;
+    }
+
+    if (link.hasAttribute("download")) {
+      return false;
+    }
+
+    if (
+      link.getAttribute("target") === "_blank"
+    ) {
+      return false;
+    }
+
+    try {
+      const url =
+        new URL(
+          href,
+          window.location.href
+        );
+
+      return (
+        url.origin ===
+        window.location.origin
+      );
+
+    } catch {
+      return false;
+    }
+  };
+
+
+  const runPageTransition = (event, link) => {
+    if (
+      state.reducedMotion ||
+      !dom.transition ||
+      !isInternalTransitionLink(link)
+    ) {
       return;
     }
 
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return;
+    }
 
+    const href =
+      link.href;
+
+    if (!href) return;
+
+    event.preventDefault();
+
+    closeMenu(false);
+
+    dom.transition.classList.add(
+      "is-active"
+    );
+
+    window.setTimeout(() => {
+      window.location.href = href;
+    }, CONFIG.transitionDuration);
+  };
+
+
+  const initPageTransitions = () => {
     dom.transitionLinks.forEach(
-      link => {
-
+      (link) => {
         link.addEventListener(
           "click",
-          event => {
-
-            const href =
-              link.getAttribute("href");
-
-
-            if (
-              !href ||
-              href.startsWith("#") ||
-              href.startsWith("mailto:") ||
-              href.startsWith("tel:") ||
-              link.hasAttribute("download") ||
-              link.target === "_blank"
-            ) {
-              return;
-            }
-
-
-            let url;
-
-
-            try {
-
-              url =
-                new URL(
-                  href,
-                  window.location.href
-                );
-
-            } catch {
-
-              return;
-
-            }
-
-
-            if (
-              url.origin !==
-              window.location.origin
-            ) {
-              return;
-            }
-
-
-            if (state.reducedMotion) {
-              return;
-            }
-
-
-            event.preventDefault();
-
-
-            dom.transition.classList.add(
-              "is-active"
-            );
-
-
-            window.setTimeout(
-              () => {
-                window.location.href =
-                  url.href;
-              },
-              CONFIG.transitionDuration
-            );
-
-          }
+          (event) =>
+            runPageTransition(event, link)
         );
-
       }
     );
-
-
-    window.addEventListener(
-      "pageshow",
-      () => {
-
-        dom.transition?.classList.remove(
-          "is-active"
-        );
-
-      }
-    );
-
   };
 
 
@@ -728,477 +480,305 @@
      MENU
      ======================================================= */
 
-  const setMenuInert = inert => {
-
-    if (!dom.menu) {
+  const setMenuState = (open, returnFocus = true) => {
+    if (!dom.menu || !dom.menuTrigger) {
       return;
     }
 
+    state.menuOpen = open;
 
-    if ("inert" in dom.menu) {
+    dom.menu.setAttribute(
+      "aria-hidden",
+      String(!open)
+    );
 
-      dom.menu.inert = inert;
+    dom.menuTrigger.setAttribute(
+      "aria-expanded",
+      String(open)
+    );
 
-    } else if (inert) {
+    dom.menuTrigger.setAttribute(
+      "aria-label",
+      open
+        ? "Chiudi menu"
+        : "Apri menu"
+    );
 
+    if (open) {
+      dom.menu.removeAttribute(
+        "inert"
+      );
+
+      dom.body.classList.add(
+        "menu-is-open"
+      );
+
+      window.setTimeout(() => {
+        dom.menuLinks[0]?.focus();
+      }, 250);
+
+    } else {
       dom.menu.setAttribute(
         "inert",
         ""
       );
 
-    } else {
-
-      dom.menu.removeAttribute(
-        "inert"
+      dom.body.classList.remove(
+        "menu-is-open"
       );
 
+      if (returnFocus) {
+        dom.menuTrigger.focus();
+      }
     }
-
   };
 
 
   const openMenu = () => {
-
-    if (!dom.menu) {
-      return;
-    }
-
-
-    if (state.standby) {
-      exitStandby();
-    }
-
-
-    clearStandbyTimer();
-
-    state.menuOpen = true;
-
-
-    setMenuInert(false);
-
-
-    dom.menu.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-
-    dom.menuTrigger?.setAttribute(
-      "aria-expanded",
-      "true"
-    );
-
-
-    dom.menuTrigger?.setAttribute(
-      "aria-label",
-      "Chiudi menu"
-    );
-
-
-    dom.body.classList.add(
-      "is-menu-open"
-    );
-
-
-    window.setTimeout(
-      () =>
-        dom.menuLinks[0]?.focus(),
-      state.reducedMotion ? 0 : 250
-    );
-
+    if (state.menuOpen) return;
+    setMenuState(true);
   };
 
 
   const closeMenu = (
     returnFocus = true
   ) => {
+    if (!state.menuOpen) return;
+    setMenuState(
+      false,
+      returnFocus
+    );
+  };
 
-    if (!dom.menu) {
+
+  const handleMenuKeydown = (event) => {
+    if (!state.menuOpen) return;
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeMenu();
       return;
     }
 
-
-    state.menuOpen = false;
-
-
-    dom.menu.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-
-
-    setMenuInert(true);
-
-
-    dom.menuTrigger?.setAttribute(
-      "aria-expanded",
-      "false"
-    );
-
-
-    dom.menuTrigger?.setAttribute(
-      "aria-label",
-      "Apri menu"
-    );
-
-
-    dom.body.classList.remove(
-      "is-menu-open"
-    );
-
-
-    if (
-      returnFocus &&
-      dom.menuTrigger &&
-      document.activeElement !==
-      dom.menuTrigger
-    ) {
-
-      dom.menuTrigger.focus();
-
+    if (event.key !== "Tab") {
+      return;
     }
 
+    const focusable =
+      dom.menuLinks.filter(
+        (link) =>
+          !link.hasAttribute(
+            "aria-disabled"
+          )
+      );
 
-    resetStandbyTimer();
+    if (!focusable.length) {
+      return;
+    }
 
+    const first =
+      focusable[0];
+
+    const last =
+      focusable[
+        focusable.length - 1
+      ];
+
+    if (
+      event.shiftKey &&
+      document.activeElement === first
+    ) {
+      event.preventDefault();
+      last.focus();
+
+    } else if (
+      !event.shiftKey &&
+      document.activeElement === last
+    ) {
+      event.preventDefault();
+      first.focus();
+    }
   };
 
 
   const initMenu = () => {
+    if (
+      !dom.menu ||
+      !dom.menuTrigger
+    ) {
+      return;
+    }
 
-    setMenuInert(true);
-
-
-    dom.menuTrigger?.addEventListener(
+    dom.menuTrigger.addEventListener(
       "click",
-      () =>
+      () => {
         state.menuOpen
           ? closeMenu()
-          : openMenu()
+          : openMenu();
+      }
     );
 
+    dom.menu.addEventListener(
+      "keydown",
+      handleMenuKeydown
+    );
 
     dom.menuLinks.forEach(
-      link =>
+      (link) => {
         link.addEventListener(
           "click",
           () => closeMenu(false)
-        )
-    );
-
-
-    dom.menu?.addEventListener(
-      "click",
-      event => {
-
-        if (
-          event.target ===
-          dom.menu
-        ) {
-          closeMenu();
-        }
-
+        );
       }
     );
-
-
-    dom.menu?.addEventListener(
-      "keydown",
-      event => {
-
-        if (
-          !state.menuOpen
-        ) {
-          return;
-        }
-
-
-        if (event.key === "Escape") {
-
-          event.preventDefault();
-
-          closeMenu();
-
-          return;
-
-        }
-
-
-        if (event.key !== "Tab") {
-          return;
-        }
-
-
-        const focusable =
-          dom.menuLinks.filter(
-            element =>
-              !element.hasAttribute(
-                "disabled"
-              )
-          );
-
-
-        if (!focusable.length) {
-          return;
-        }
-
-
-        const first =
-          focusable[0];
-
-        const last =
-          focusable[
-            focusable.length - 1
-          ];
-
-
-        if (
-          event.shiftKey &&
-          document.activeElement === first
-        ) {
-
-          event.preventDefault();
-
-          last.focus();
-
-        } else if (
-          !event.shiftKey &&
-          document.activeElement === last
-        ) {
-
-          event.preventDefault();
-
-          first.focus();
-
-        }
-
-      }
-    );
-
   };
 
 
   /* =======================================================
-     WOW
+     WOW HEADER
      ======================================================= */
 
-  const updateWowHeader = index => {
-
+  const updateWowHeader = (
+    index
+  ) => {
     const section =
       getSectionByIndex(index);
 
+    if (!section) return;
 
-    if (!section) {
-      return;
-    }
-
-
-    const total =
-      dom.sections.length;
-
-
-    const progress =
-      total <= 1
-        ? 0
-        : index / (total - 1);
-
+    const title =
+      getSectionTitle(section);
 
     if (dom.progressLabel) {
-
       dom.progressLabel.textContent =
-        getSectionTitle(section);
-
+        title;
     }
 
+    const total =
+      Math.max(
+        dom.sections.length - 1,
+        1
+      );
+
+    const progress =
+      index / total;
 
     if (dom.progressFill) {
-
       dom.progressFill.style.width =
         `${progress * 100}%`;
-
     }
-
 
     if (dom.progressPoint) {
-
       dom.progressPoint.style.left =
         `${progress * 100}%`;
-
     }
 
+    const previousIndex =
+      index - 1;
 
-    const isFirst =
-      index === 0;
+    const nextIndex =
+      index + 1;
 
-    const isLast =
-      index === total - 1;
-
-
-    if (isFirst) {
-
-      dom.previousSection?.classList.add(
-        "is-disabled"
-      );
-
-      dom.previousSection?.setAttribute(
-        "aria-hidden",
-        "true"
-      );
-
-      dom.previousSection?.setAttribute(
-        "tabindex",
-        "-1"
-      );
-
-      if (dom.previousLabel) {
-        dom.previousLabel.textContent = "";
-      }
-
-    } else {
-
-      const previousIndex =
-        index - 1;
-
-      const previousNumber =
-        getSectionNumber(
-          previousIndex
+    if (
+      dom.previousSection &&
+      dom.previousLabel
+    ) {
+      if (previousIndex < 0) {
+        dom.previousSection.classList.add(
+          "is-disabled"
         );
-
-      const previousSection =
-        getSectionByIndex(
-          previousIndex
-        );
-
-
-      dom.previousSection?.classList.remove(
-        "is-disabled"
-      );
-
-      dom.previousSection?.removeAttribute(
-        "aria-hidden"
-      );
-
-      dom.previousSection?.removeAttribute(
-        "tabindex"
-      );
-
-
-      if (dom.previousSection) {
-
-        dom.previousSection.href =
-          `#${previousNumber}`;
 
         dom.previousSection.setAttribute(
-          "aria-label",
-          `Vai a ${getSectionTitle(previousSection)}`
+          "aria-hidden",
+          "true"
         );
 
-      }
+        dom.previousSection.setAttribute(
+          "tabindex",
+          "-1"
+        );
 
-
-      if (dom.previousLabel) {
-
-        dom.previousLabel.textContent =
-          getSectionTitle(
-            previousSection
+      } else {
+        const previous =
+          getSectionByIndex(
+            previousIndex
           );
 
-      }
-
-    }
-
-
-    if (isLast) {
-
-      if (dom.nextSection) {
-
-        dom.nextSection.classList.add(
-          "is-home-return"
+        dom.previousSection.classList.remove(
+          "is-disabled"
         );
 
-        dom.nextSection.href =
-          "#01";
+        dom.previousSection.setAttribute(
+          "aria-hidden",
+          "false"
+        );
+
+        dom.previousSection.setAttribute(
+          "tabindex",
+          "0"
+        );
+
+        dom.previousSection.href =
+          `#${getSectionNumber(previousIndex)}`;
+
+        dom.previousLabel.textContent =
+          getSectionTitle(previous);
+      }
+    }
+
+    if (
+      dom.nextSection &&
+      dom.nextLabel
+    ) {
+      if (
+        nextIndex >=
+        dom.sections.length
+      ) {
+        dom.nextSection.href = "#01";
+        dom.nextLabel.textContent =
+          "Torna all'inizio";
 
         dom.nextSection.setAttribute(
           "aria-label",
           "Torna all'inizio"
         );
 
-      }
-
-
-      if (dom.nextLabel) {
-
-        dom.nextLabel.textContent =
-          getSectionTitle(
-            getSectionByIndex(0)
+        const arrow =
+          dom.nextSection.querySelector(
+            ".section-jump-arrow"
           );
 
-      }
+        if (arrow) {
+          arrow.textContent = "↑";
+        }
 
-
-      dom.nextSection
-        ?.querySelector(
-          ".section-jump-arrow"
-        )
-        ?.replaceChildren(
-          document.createTextNode("↑")
-        );
-
-    } else {
-
-      const nextIndex =
-        index + 1;
-
-      const nextNumber =
-        getSectionNumber(
-          nextIndex
-        );
-
-      const nextSection =
-        getSectionByIndex(
-          nextIndex
-        );
-
-
-      dom.nextSection?.classList.remove(
-        "is-home-return"
-      );
-
-
-      if (dom.nextSection) {
+      } else {
+        const next =
+          getSectionByIndex(
+            nextIndex
+          );
 
         dom.nextSection.href =
-          `#${nextNumber}`;
+          `#${getSectionNumber(nextIndex)}`;
+
+        dom.nextLabel.textContent =
+          getSectionTitle(next);
 
         dom.nextSection.setAttribute(
           "aria-label",
-          `Vai a ${getSectionTitle(nextSection)}`
+          `Vai a ${getSectionTitle(next)}`
         );
 
-      }
-
-
-      if (dom.nextLabel) {
-
-        dom.nextLabel.textContent =
-          getSectionTitle(
-            nextSection
+        const arrow =
+          dom.nextSection.querySelector(
+            ".section-jump-arrow"
           );
 
+        if (arrow) {
+          arrow.textContent = "→";
+        }
       }
-
-
-      dom.nextSection
-        ?.querySelector(
-          ".section-jump-arrow"
-        )
-        ?.replaceChildren(
-          document.createTextNode("→")
-        );
-
     }
-
   };
 
 
@@ -1206,33 +786,25 @@
      SECTION NAVIGATION
      ======================================================= */
 
-  const navigateToSection = index => {
-
-    const target =
+  const scrollToSection = (
+    index
+  ) => {
+    const section =
       getSectionByIndex(index);
 
-
-    if (!target) {
-      return;
-    }
-
+    if (!section) return;
 
     const headerHeight =
-      dom.header
-        ? dom.header.offsetHeight
-        : 0;
-
+      dom.header?.offsetHeight || 0;
 
     const rect =
-      target.getBoundingClientRect();
-
+      section.getBoundingClientRect();
 
     const top =
       window.scrollY +
       rect.top -
       headerHeight -
       CONFIG.scrollNavigationOffset;
-
 
     window.scrollTo({
       top: Math.max(0, top),
@@ -1241,53 +813,51 @@
           ? "auto"
           : "smooth"
     });
-
   };
 
 
-  const initWowNavigation = () => {
+  const initSectionNavigation = () => {
+    const links = [
+      dom.previousSection,
+      dom.nextSection
+    ].filter(Boolean);
 
-    dom.previousSection?.addEventListener(
-      "click",
-      event => {
+    links.forEach(
+      (link) => {
+        link.addEventListener(
+          "click",
+          (event) => {
+            const href =
+              link.getAttribute("href");
 
-        event.preventDefault();
+            if (
+              !href ||
+              !href.startsWith("#")
+            ) {
+              return;
+            }
 
+            const target =
+              document.querySelector(
+                href
+              );
 
-        if (
-          state.activeIndex > 0
-        ) {
+            if (!target) return;
 
-          navigateToSection(
-            state.activeIndex - 1
-          );
+            event.preventDefault();
 
-        }
+            const index =
+              dom.sections.indexOf(
+                target
+              );
 
-      }
-    );
+            if (index < 0) return;
 
-
-    dom.nextSection?.addEventListener(
-      "click",
-      event => {
-
-        event.preventDefault();
-
-
-        const last =
-          dom.sections.length - 1;
-
-
-        navigateToSection(
-          state.activeIndex === last
-            ? 0
-            : state.activeIndex + 1
+            scrollToSection(index);
+          }
         );
-
       }
     );
-
   };
 
 
@@ -1295,82 +865,53 @@
      ACTIVE SECTION
      ======================================================= */
 
-  const detectActiveSection = () => {
-
-    if (!dom.sections.length) {
-      return;
-    }
-
+  const updateActiveSection = () => {
+    if (!dom.sections.length) return;
 
     const reference =
-      window.innerHeight * .52;
+      window.innerHeight * 0.52;
 
-
-    let bestIndex =
-      state.activeIndex;
-
-
-    let bestDistance =
-      Infinity;
-
+    let closestIndex = 0;
+    let closestDistance = Infinity;
 
     dom.sections.forEach(
       (section, index) => {
-
         const rect =
           section.getBoundingClientRect();
 
-
-        const visible =
-          rect.bottom > 0 &&
-          rect.top < window.innerHeight;
-
-
-        if (!visible) {
-          return;
-        }
-
+        const center =
+          rect.top +
+          rect.height / 2;
 
         const distance =
           Math.abs(
-            rect.top +
-            rect.height / 2 -
-            reference
+            center - reference
           );
-
 
         if (
           distance <
-          bestDistance
+          closestDistance
         ) {
-
-          bestDistance =
+          closestDistance =
             distance;
 
-          bestIndex =
+          closestIndex =
             index;
-
         }
-
       }
     );
 
-
     if (
-      state.activeIndex !==
-      bestIndex
+      closestIndex !==
+      state.activeIndex
     ) {
-
       state.activeIndex =
-        bestIndex;
-
-
-      updateWowHeader(
-        bestIndex
-      );
-
+        closestIndex;
     }
 
+    updateWowHeader(
+      closestIndex
+    );
   };
 
 
@@ -1378,55 +919,40 @@
      REVEAL
      ======================================================= */
 
-  const initRevealSystem = () => {
-
-    if (!dom.reveals.length) {
-      return;
-    }
-
-
+  const initReveal = () => {
     if (
       state.reducedMotion ||
       !("IntersectionObserver" in window)
     ) {
-
       dom.reveals.forEach(
-        element =>
+        (element) => {
           element.classList.add(
             "is-visible"
-          )
+          );
+        }
       );
 
       return;
     }
 
-
     const observer =
       new IntersectionObserver(
-        entries => {
-
+        (entries) => {
           entries.forEach(
-            entry => {
-
-              if (
-                !entry.isIntersecting
-              ) {
+            (entry) => {
+              if (!entry.isIntersecting) {
                 return;
               }
-
 
               entry.target.classList.add(
                 "is-visible"
               );
 
-
               observer.unobserve(
                 entry.target
               );
-
             }
           );
-
         },
         {
           threshold:
@@ -1437,217 +963,189 @@
         }
       );
 
-
     dom.reveals.forEach(
-      element =>
+      (element) =>
         observer.observe(element)
     );
-
   };
 
 
   /* =======================================================
-     DIRECTION INTERACTIONS
+     DIRECTION INTERACTION
      ======================================================= */
 
-  const initDirectionInteractions = () => {
-
-    if (
-      !dom.directionLinks.length ||
-      !dom.directionNodes.length
-    ) {
-      return;
-    }
-
-
-    const setActive = (
-      key,
-      active
-    ) => {
-
-      dom.directionLinks
-        .filter(
-          element =>
-            element.dataset.direction === key
-        )
-        .forEach(
-          element =>
-            element.classList.toggle(
-              "is-active",
-              active
-            )
-        );
-
-
-      dom.directionNodes
-        .filter(
-          element =>
-            element.dataset.direction === key
-        )
-        .forEach(
-          element =>
-            element.classList.toggle(
-              "is-active",
-              active
-            )
-        );
-
-    };
-
-
+  const setDirectionState = (
+    direction,
+    active
+  ) => {
     dom.directionLinks.forEach(
-      link => {
-
-        const key =
-          link.dataset.direction;
-
-
-        link.addEventListener(
-          "pointerenter",
-          () => setActive(key, true)
+      (link) => {
+        link.classList.toggle(
+          "is-active",
+          active &&
+          link.dataset.direction ===
+            direction
         );
-
-
-        link.addEventListener(
-          "pointerleave",
-          () => setActive(key, false)
-        );
-
-
-        link.addEventListener(
-          "focusin",
-          () => setActive(key, true)
-        );
-
-
-        link.addEventListener(
-          "focusout",
-          () => setActive(key, false)
-        );
-
       }
     );
 
+    dom.directionNodes.forEach(
+      (node) => {
+        node.classList.toggle(
+          "is-active",
+          active &&
+          node.dataset.direction ===
+            direction
+        );
+      }
+    );
+
+    dom.networkNodes.forEach(
+      (node) => {
+        node.classList.toggle(
+          "is-linked",
+          active &&
+          node.dataset.node ===
+            direction
+        );
+      }
+    );
+  };
+
+
+  const initDirectionInteraction = () => {
+    dom.directionLinks.forEach(
+      (link) => {
+        const direction =
+          link.dataset.direction;
+
+        link.addEventListener(
+          "pointerenter",
+          () =>
+            setDirectionState(
+              direction,
+              true
+            )
+        );
+
+        link.addEventListener(
+          "pointerleave",
+          () =>
+            setDirectionState(
+              direction,
+              false
+            )
+        );
+
+        link.addEventListener(
+          "focusin",
+          () =>
+            setDirectionState(
+              direction,
+              true
+            )
+        );
+
+        link.addEventListener(
+          "focusout",
+          () =>
+            setDirectionState(
+              direction,
+              false
+            )
+        );
+      }
+    );
   };
 
 
   /* =======================================================
-     TRAJECTORY
+     GLOBAL TRAJECTORY
      ======================================================= */
 
-  const updateTrajectoryTargets = () => {
-
+  const updateTrajectoryTarget = () => {
     if (
       dom.sections.length < 2
     ) {
       return;
     }
 
-
     const first =
-      dom.sections[0];
-
+      dom.sections[0]
+        .getBoundingClientRect();
 
     const last =
       dom.sections[
         dom.sections.length - 1
-      ];
+      ].getBoundingClientRect();
 
-
-    const firstRect =
-      first.getBoundingClientRect();
-
-
-    const lastRect =
-      last.getBoundingClientRect();
-
-
-    const start =
-      firstRect.top +
+    const firstCenter =
+      first.top +
       window.scrollY;
 
+    const lastCenter =
+      last.top +
+      window.scrollY +
+      last.height;
 
-    const end =
-      lastRect.bottom +
-      window.scrollY -
-      window.innerHeight;
+    const current =
+      window.scrollY +
+      window.innerHeight / 2;
 
-
-    const range =
-      end - start;
-
-
-    const progress =
-      range <= 0
-        ? 0
-        : clamp(
-            (
-              window.scrollY -
-              start
-            ) /
-            range,
-            0,
-            1
-          );
-
+    const distance =
+      Math.max(
+        lastCenter - firstCenter,
+        1
+      );
 
     state.trajectory.targetProgress =
-      progress;
-
+      clamp(
+        (current - firstCenter) /
+          distance,
+        0,
+        1
+      );
 
     state.trajectory.targetDrift =
       state.reducedMotion
         ? 0
         : Math.sin(
-            progress *
+            state.trajectory.targetProgress *
             Math.PI *
             2
           ) *
           CONFIG.trajectoryDrift;
-
   };
 
 
-  const updateTrajectoryFrame = () => {
+  const renderTrajectory = () => {
+    state.trajectory.progress =
+      lerp(
+        state.trajectory.progress,
+        state.trajectory.targetProgress,
+        state.reducedMotion
+          ? 1
+          : CONFIG.trajectoryLerp
+      );
 
-    if (state.reducedMotion) {
-
-      state.trajectory.progress =
-        state.trajectory.targetProgress;
-
-      state.trajectory.drift = 0;
-
-    } else {
-
-      state.trajectory.progress =
-        lerp(
-          state.trajectory.progress,
-          state.trajectory.targetProgress,
-          CONFIG.trajectoryLerp
-        );
-
-
-      state.trajectory.drift =
-        lerp(
-          state.trajectory.drift,
-          state.trajectory.targetDrift,
-          CONFIG.trajectoryLerp
-        );
-
-    }
-
+    state.trajectory.drift =
+      lerp(
+        state.trajectory.drift,
+        state.trajectory.targetDrift,
+        state.reducedMotion
+          ? 1
+          : CONFIG.trajectoryLerp
+      );
 
     dom.html.style.setProperty(
       "--trajectory-progress",
-      state.trajectory.progress.toFixed(4)
+      state.trajectory.progress
     );
-
 
     dom.html.style.setProperty(
       "--trajectory-drift",
-      `${state.trajectory.drift.toFixed(2)}px`
+      `${state.trajectory.drift}px`
     );
-
   };
 
 
@@ -1655,192 +1153,188 @@
      NARRATIVE LINKS
      ======================================================= */
 
-  const initNarrativeLinks = () => {
-
+  const setNarrativeLinkState = (
+    direction,
+    active
+  ) => {
     dom.narrativeLinks.forEach(
-      link => {
+      (link) => {
+        if (
+          link.dataset.trajectoryNode !==
+          direction
+        ) {
+          return;
+        }
 
-        const node =
+        link.classList.toggle(
+          "is-linked",
+          active
+        );
+      }
+    );
+
+    dom.directionNodes.forEach(
+      (node) => {
+        if (
+          node.dataset.direction !==
+          direction
+        ) {
+          return;
+        }
+
+        node.classList.toggle(
+          "is-linked",
+          active
+        );
+      }
+    );
+
+    dom.networkNodes.forEach(
+      (node) => {
+        if (
+          node.dataset.node !==
+          direction
+        ) {
+          return;
+        }
+
+        node.classList.toggle(
+          "is-linked",
+          active
+        );
+      }
+    );
+  };
+
+
+  const initNarrativeLinks = () => {
+    dom.narrativeLinks.forEach(
+      (link) => {
+        const direction =
           link.dataset.trajectoryNode;
 
+        if (!direction) return;
 
-        if (!node) {
-          return;
-        }
-
-
-        const targets = [
-          ...document.querySelectorAll(
-            `.network-node[data-node="${node}"]`
-          ),
-          ...document.querySelectorAll(
-            `.direction-node[data-direction="${node}"]`
-          )
-        ];
-
-
-        if (!targets.length) {
-          return;
-        }
-
-
-        const activate = () => {
-
-          targets.forEach(
-            target =>
-              target.classList.add(
-                "is-linked"
-              )
+        const activate = () =>
+          setNarrativeLinkState(
+            direction,
+            true
           );
 
-        };
-
-
-        const deactivate = () => {
-
-          targets.forEach(
-            target =>
-              target.classList.remove(
-                "is-linked"
-              )
+        const deactivate = () =>
+          setNarrativeLinkState(
+            direction,
+            false
           );
-
-        };
-
 
         link.addEventListener(
           "pointerenter",
           activate
         );
 
-
         link.addEventListener(
           "pointerleave",
           deactivate
         );
-
 
         link.addEventListener(
           "focusin",
           activate
         );
 
-
         link.addEventListener(
           "focusout",
           deactivate
         );
-
       }
     );
-
   };
 
 
   /* =======================================================
-     CUSTOM CURSOR
+     CURSOR
      ======================================================= */
 
   const initCursor = () => {
-
     if (
       !dom.cursor ||
       !dom.cursorDot ||
       !dom.cursorRing ||
-      !isFinePointer() ||
-      state.reducedMotion
+      state.reducedMotion ||
+      !isFinePointer()
     ) {
       return;
     }
 
-
     document.addEventListener(
       "pointermove",
-      event => {
-
+      (event) => {
         state.pointer.targetX =
           event.clientX;
 
         state.pointer.targetY =
           event.clientY;
 
-
         dom.cursor.classList.add(
           "is-visible"
         );
-
-      },
-      {
-        passive: true
       }
     );
 
-
-    document
-      .querySelectorAll("a, button")
-      .forEach(
-        element => {
-
-          element.addEventListener(
-            "pointerenter",
-            () =>
-              dom.cursor.classList.add(
-                "is-hovering"
-              )
-          );
-
-
-          element.addEventListener(
-            "pointerleave",
-            () =>
-              dom.cursor.classList.remove(
-                "is-hovering"
-              )
-          );
-
-        }
-      );
-
-
-    window.addEventListener(
+    document.addEventListener(
       "pointerleave",
       () => {
-
-        dom.cursor?.classList.remove(
-          "is-visible",
-          "is-hovering"
-        );
-
-      }
-    );
-
-
-    window.addEventListener(
-      "pointerenter",
-      () => {
-
-        dom.cursor?.classList.add(
+        dom.cursor.classList.remove(
           "is-visible"
         );
-
       }
     );
 
+    const interactiveSelector =
+      "a, button, [role='button']";
+
+    document.addEventListener(
+      "pointerover",
+      (event) => {
+        if (
+          event.target.closest(
+            interactiveSelector
+          )
+        ) {
+          dom.cursor.classList.add(
+            "is-hovering"
+          );
+        }
+      }
+    );
+
+    document.addEventListener(
+      "pointerout",
+      (event) => {
+        if (
+          event.target.closest(
+            interactiveSelector
+          )
+        ) {
+          dom.cursor.classList.remove(
+            "is-hovering"
+          );
+        }
+      }
+    );
   };
 
 
-  const updateCursorFrame = () => {
-
+  const renderCursor = () => {
     if (
       !dom.cursor ||
       !dom.cursorDot ||
       !dom.cursorRing ||
-      !isFinePointer() ||
-      state.reducedMotion
+      state.reducedMotion ||
+      !isFinePointer()
     ) {
       return;
     }
-
 
     state.cursor.x =
       lerp(
@@ -1849,7 +1343,6 @@
         CONFIG.cursorLerp
       );
 
-
     state.cursor.y =
       lerp(
         state.cursor.y,
@@ -1857,22 +1350,11 @@
         CONFIG.cursorLerp
       );
 
-
     dom.cursorDot.style.transform =
-      `translate3d(
-        ${state.pointer.targetX}px,
-        ${state.pointer.targetY}px,
-        0
-      ) translate(-50%,-50%)`;
-
+      `translate3d(${state.pointer.targetX}px, ${state.pointer.targetY}px, 0) translate(-50%, -50%)`;
 
     dom.cursorRing.style.transform =
-      `translate3d(
-        ${state.cursor.x}px,
-        ${state.cursor.y}px,
-        0
-      ) translate(-50%,-50%)`;
-
+      `translate3d(${state.cursor.x}px, ${state.cursor.y}px, 0) translate(-50%, -50%)`;
   };
 
 
@@ -1880,8 +1362,22 @@
      MAGNETIC ELEMENTS
      ======================================================= */
 
-  const initMagneticElements = () => {
+  const resetMagneticElement = (
+    element
+  ) => {
+    element.style.setProperty(
+      "--magnetic-x",
+      "0px"
+    );
 
+    element.style.setProperty(
+      "--magnetic-y",
+      "0px"
+    );
+  };
+
+
+  const initMagneticElements = () => {
     if (
       !isFinePointer() ||
       state.reducedMotion
@@ -1889,94 +1385,74 @@
       return;
     }
 
-
     dom.magneticElements.forEach(
-      element => {
-
+      (element) => {
         element.addEventListener(
           "pointermove",
-          event => {
-
+          (event) => {
             const rect =
               element.getBoundingClientRect();
 
+            const centerX =
+              rect.left +
+              rect.width / 2;
 
-            const dx =
+            const centerY =
+              rect.top +
+              rect.height / 2;
+
+            const distanceX =
               event.clientX -
-              (
-                rect.left +
-                rect.width / 2
-              );
+              centerX;
 
-
-            const dy =
+            const distanceY =
               event.clientY -
-              (
-                rect.top +
-                rect.height / 2
-              );
-
+              centerY;
 
             const distance =
-              Math.sqrt(
-                dx * dx +
-                dy * dy
+              Math.hypot(
+                distanceX,
+                distanceY
               );
-
 
             if (
               distance >
               CONFIG.magneticRadius
             ) {
+              resetMagneticElement(
+                element
+              );
+
               return;
             }
 
-
             const strength =
-              CONFIG.magneticStrength *
-              (
-                1 -
+              (1 -
                 distance /
-                CONFIG.magneticRadius
-              );
-
+                  CONFIG.magneticRadius) *
+              CONFIG.magneticStrength;
 
             element.style.setProperty(
               "--magnetic-x",
-              `${dx * strength}px`
+              `${distanceX * strength}px`
             );
-
 
             element.style.setProperty(
               "--magnetic-y",
-              `${dy * strength}px`
+              `${distanceY * strength}px`
             );
-
           }
         );
-
 
         element.addEventListener(
           "pointerleave",
-          () => {
-
-            element.style.setProperty(
-              "--magnetic-x",
-              "0px"
-            );
-
-
-            element.style.setProperty(
-              "--magnetic-y",
-              "0px"
-            );
-
-          }
+          () =>
+            resetMagneticElement(
+              element
+            )
         );
-
       }
     );
-
   };
 
 
@@ -1984,79 +1460,52 @@
      CTA
      ======================================================= */
 
-  const initCtaInteraction = () => {
-
-    if (
-      !dom.ctaTrajectories.length
-    ) {
-      return;
-    }
-
-
+  const initCTA = () => {
     dom.ctaTrajectories.forEach(
-      container => {
-
+      (trajectory) => {
         const cta =
-          container.querySelector(
+          trajectory.querySelector(
             ".contact-cta"
           );
 
+        if (!cta) return;
 
-        if (!cta) {
-          return;
-        }
-
-
-        const engage = () => {
-
-          container.classList.add(
+        const engage = () =>
+          cta.classList.add(
             "is-engaged"
           );
 
-        };
-
-
-        const disengage = () => {
-
-          container.classList.remove(
+        const disengage = () =>
+          cta.classList.remove(
             "is-engaged"
           );
-
-        };
-
 
         cta.addEventListener(
           "pointerenter",
           engage
         );
 
-
         cta.addEventListener(
           "pointerleave",
           disengage
         );
-
 
         cta.addEventListener(
           "focusin",
           engage
         );
 
-
         cta.addEventListener(
           "focusout",
           disengage
         );
 
-
         cta.addEventListener(
           "pointerdown",
           engage
         );
-
       }
     );
-
   };
 
 
@@ -2065,441 +1514,246 @@
      ======================================================= */
 
   const clearStandbyTimer = () => {
+    window.clearTimeout(
+      state.standbyTimer
+    );
 
-    if (state.standbyTimer) {
-
-      window.clearTimeout(
-        state.standbyTimer
-      );
-
-      state.standbyTimer = null;
-
-    }
-
+    state.standbyTimer = null;
   };
 
 
   const resetStandbyTimer = () => {
-
     clearStandbyTimer();
 
-
     if (
-      state.standby ||
-      state.menuOpen ||
-      document.hidden ||
-      !dom.standby
+      state.reducedMotion ||
+      state.standby
     ) {
       return;
     }
-
 
     state.standbyTimer =
       window.setTimeout(
         enterStandby,
         CONFIG.standbyDelay
       );
-
   };
 
 
-  const setInert = (
-    element,
-    inert
-  ) => {
-
-    if (!element) {
-      return;
-    }
-
-
-    if ("inert" in element) {
-
-      element.inert = inert;
-
-    } else if (inert) {
-
-      element.setAttribute(
-        "inert",
-        ""
-      );
-
-    } else {
-
-      element.removeAttribute(
-        "inert"
-      );
-
-    }
-
-  };
-
-
-  const setUnderlyingInert = inert => {
-
-    const elements = [
+  const getStandbyUnderlying = () =>
+    [
       dom.header,
       dom.main,
       dom.footer
     ].filter(Boolean);
 
 
-    if (inert) {
-
-      state.standbyUnderlying =
-        elements.map(
-          element => ({
-            element,
-            hadInert:
-              element.hasAttribute("inert")
-          })
-        );
-
-
-      elements.forEach(
-        element =>
-          setInert(element, true)
-      );
-
-    } else {
-
-      state.standbyUnderlying.forEach(
-        record => {
-
-          if (!record.hadInert) {
-            setInert(
-              record.element,
-              false
-            );
-          }
-
-        }
-      );
-
-
-      state.standbyUnderlying = [];
-
-    }
-
-  };
-
-
-  const getStandbyFocusable = () => {
-
-    if (!dom.standby) {
-      return [];
-    }
-
-
-    return Array.from(
-      dom.standby.querySelectorAll(
-        'button, a[href], input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-      )
-    ).filter(
-      element =>
-        !element.hasAttribute("disabled") &&
-        element.getAttribute("aria-hidden") !== "true"
-    );
-
-  };
-
-
   const enterStandby = () => {
-
     if (
-      state.menuOpen ||
       state.standby ||
-      !dom.standby
+      !dom.standby ||
+      state.reducedMotion
     ) {
       return;
     }
 
-
-    state.standbyReturnFocus =
-      document.activeElement;
-
-
     state.standby = true;
-
 
     clearStandbyTimer();
 
+    state.standbyReturnFocus =
+      document.activeElement instanceof
+      HTMLElement
+        ? document.activeElement
+        : null;
+
+    state.standbyUnderlying =
+      getStandbyUnderlying();
+
+    state.standbyUnderlying.forEach(
+      (element) => {
+        element.setAttribute(
+          "inert",
+          ""
+        );
+      }
+    );
 
     dom.body.classList.add(
       "is-standby"
     );
 
-
-    setUnderlyingInert(true);
-
-
-    setInert(
-      dom.standby,
-      false
+    dom.standby.removeAttribute(
+      "inert"
     );
-
-
-    dom.standby.classList.add(
-      "is-active"
-    );
-
-
-    dom.standby.classList.toggle(
-      "is-reduced",
-      state.reducedMotion
-    );
-
 
     dom.standby.setAttribute(
       "aria-hidden",
       "false"
     );
 
-
-    window.requestAnimationFrame(
-      () => {
-
-        dom.standbyWake?.focus({
-          preventScroll: true
-        });
-
-      }
-    );
-
+    window.setTimeout(() => {
+      dom.standbyWake?.focus();
+    }, 150);
   };
 
 
-  const exitStandby = () => {
-
+  const exitStandby = ({
+    restoreFocus = true
+  } = {}) => {
     if (!state.standby) {
+      resetStandbyTimer();
       return;
     }
 
-
     state.standby = false;
-
-
-    dom.body.classList.remove(
-      "is-standby"
-    );
-
-
-    dom.standby?.classList.remove(
-      "is-active"
-    );
-
 
     dom.standby?.setAttribute(
       "aria-hidden",
       "true"
     );
 
-
-    setInert(
-      dom.standby,
-      true
+    dom.standby?.setAttribute(
+      "inert",
+      ""
     );
 
+    dom.body.classList.remove(
+      "is-standby"
+    );
 
-    setUnderlyingInert(false);
+    state.standbyUnderlying.forEach(
+      (element) => {
+        element.removeAttribute(
+          "inert"
+        );
+      }
+    );
 
+    state.standbyUnderlying = [];
 
-    const returnFocus =
-      state.standbyReturnFocus;
-
+    if (
+      restoreFocus &&
+      state.standbyReturnFocus &&
+      document.contains(
+        state.standbyReturnFocus
+      )
+    ) {
+      state.standbyReturnFocus.focus();
+    }
 
     state.standbyReturnFocus = null;
 
+    resetStandbyTimer();
+  };
 
-    if (
-      returnFocus &&
-      returnFocus !== document.body &&
-      typeof returnFocus.focus ===
-        "function" &&
-      document.contains(returnFocus)
-    ) {
 
-      window.requestAnimationFrame(
-        () => {
+  const handleStandbyKeydown = (
+    event
+  ) => {
+    if (!state.standby) return;
 
-          returnFocus.focus({
-            preventScroll: true
-          });
-
-        }
-      );
-
+    if (event.key === "Escape") {
+      event.preventDefault();
+      exitStandby();
+      return;
     }
 
+    if (event.key !== "Tab") {
+      exitStandby({
+        restoreFocus: false
+      });
+      return;
+    }
 
-    resetStandbyTimer();
+    event.preventDefault();
 
+    dom.standbyWake?.focus();
   };
 
 
   const initStandby = () => {
-
     if (!dom.standby) {
       return;
     }
 
-
-    setInert(
-      dom.standby,
-      true
-    );
-
-
     dom.standbyWake?.addEventListener(
       "click",
-      exitStandby
-    );
-
-
-    dom.standby?.addEventListener(
-      "keydown",
-      event => {
-
-        if (!state.standby) {
-          return;
-        }
-
-
-        if (event.key === "Escape") {
-
-          event.preventDefault();
-
-          exitStandby();
-
-          return;
-
-        }
-
-
-        if (event.key !== "Tab") {
-          return;
-        }
-
-
-        const focusable =
-          getStandbyFocusable();
-
-
-        if (!focusable.length) {
-          return;
-        }
-
-
-        const first =
-          focusable[0];
-
-        const last =
-          focusable[
-            focusable.length - 1
-          ];
-
-
-        if (
-          event.shiftKey &&
-          document.activeElement === first
-        ) {
-
-          event.preventDefault();
-
-          last.focus({
-            preventScroll: true
-          });
-
-        } else if (
-          !event.shiftKey &&
-          document.activeElement === last
-        ) {
-
-          event.preventDefault();
-
-          first.focus({
-            preventScroll: true
-          });
-
-        }
-
+      () => {
+        exitStandby();
       }
     );
 
-
-    [
+    document.addEventListener(
       "pointerdown",
-      "wheel",
-      "touchstart",
-      "keydown",
-      "scroll"
-    ].forEach(
-      eventName => {
-
-        window.addEventListener(
-          eventName,
-          event => {
-
-            if (state.standby) {
-
-              if (
-                eventName === "keydown" &&
-                event.key === "Escape"
-              ) {
-                return;
-              }
-
-              if (
-                eventName === "keydown" &&
-                dom.standby?.contains(
-                  event.target
-                )
-              ) {
-                return;
-              }
-
-              exitStandby();
-
-              return;
-
-            }
-
-
-            if (
-              eventName !== "scroll" ||
-              event.isTrusted
-            ) {
-              resetStandbyTimer();
-            }
-
-          },
-          {
-            passive:
-              eventName !== "keydown"
-          }
-        );
-
+      () => {
+        if (state.standby) {
+          exitStandby({
+            restoreFocus: false
+          });
+        }
       }
     );
 
+    document.addEventListener(
+      "wheel",
+      () => {
+        if (state.standby) {
+          exitStandby({
+            restoreFocus: false
+          });
+        }
+      },
+      {
+        passive: true
+      }
+    );
+
+    document.addEventListener(
+      "touchstart",
+      () => {
+        if (state.standby) {
+          exitStandby({
+            restoreFocus: false
+          });
+        }
+      },
+      {
+        passive: true
+      }
+    );
+
+    document.addEventListener(
+      "keydown",
+      handleStandbyKeydown
+    );
+
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (state.standby) {
+          exitStandby({
+            restoreFocus: false
+          });
+        }
+      },
+      {
+        passive: true
+      }
+    );
 
     document.addEventListener(
       "visibilitychange",
       () => {
-
-        if (document.hidden) {
-
+        if (
+          document.hidden
+        ) {
           clearStandbyTimer();
-
         } else {
-
           resetStandbyTimer();
-
         }
-
       }
     );
-
   };
 
 
@@ -2508,48 +1762,39 @@
      ======================================================= */
 
   const initHashNavigation = () => {
-
     const hash =
       window.location.hash;
 
+    if (!hash) return;
 
-    if (!hash) {
-      return;
-    }
-
-
-    const index =
-      dom.sections.findIndex(
-        section =>
-          `#${section.id}` ===
+    window.setTimeout(() => {
+      const target =
+        document.querySelector(
           hash
-      );
+        );
 
+      if (!target) return;
 
-    if (index < 0) {
-      return;
-    }
+      const index =
+        dom.sections.indexOf(
+          target
+        );
 
-
-    window.setTimeout(
-      () =>
-        navigateToSection(index),
-      500
-    );
-
+      if (index >= 0) {
+        scrollToSection(index);
+      }
+    }, 500);
   };
 
 
   /* =======================================================
-     KEYBOARD NAVIGATION
+     KEYBOARD SECTION NAVIGATION
      ======================================================= */
 
   const initKeyboardNavigation = () => {
-
     document.addEventListener(
       "keydown",
-      event => {
-
+      (event) => {
         if (
           state.menuOpen ||
           state.standby
@@ -2557,125 +1802,123 @@
           return;
         }
 
+        const target =
+          event.target;
 
         if (
-          event.key !== "PageDown" &&
-          event.key !== "PageUp"
+          target instanceof
+            HTMLInputElement ||
+          target instanceof
+            HTMLTextAreaElement ||
+          target instanceof
+            HTMLSelectElement ||
+          target?.isContentEditable
         ) {
           return;
         }
 
-
-        event.preventDefault();
-
-
-        const direction =
+        if (
           event.key === "PageDown"
-            ? 1
-            : -1;
+        ) {
+          event.preventDefault();
 
-
-        const nextIndex =
-          clamp(
-            state.activeIndex +
-            direction,
-            0,
-            dom.sections.length - 1
+          scrollToSection(
+            state.activeIndex + 1
           );
+        }
+
+        if (
+          event.key === "PageUp"
+        ) {
+          event.preventDefault();
+
+          scrollToSection(
+            state.activeIndex - 1
+          );
+        }
+      }
+    );
+  };
 
 
-        navigateToSection(
-          nextIndex
+  /* =======================================================
+     ACTIVITY / STANDBY
+     ======================================================= */
+
+  const initActivityTracking = () => {
+    const activityEvents = [
+      "pointermove",
+      "pointerdown",
+      "wheel",
+      "touchstart",
+      "keydown"
+    ];
+
+    const activity = () => {
+      if (!state.standby) {
+        resetStandbyTimer();
+      }
+    };
+
+    activityEvents.forEach(
+      (eventName) => {
+        document.addEventListener(
+          eventName,
+          activity,
+          {
+            passive:
+              eventName !== "keydown"
+          }
         );
-
       }
     );
 
+    window.addEventListener(
+      "scroll",
+      activity,
+      {
+        passive: true
+      }
+    );
   };
 
 
   /* =======================================================
-     SCROLL
+     SCROLL / RESIZE
      ======================================================= */
 
   const handleScroll = () => {
-
-    detectActiveSection();
-
-    updateTrajectoryTargets();
-
+    updateActiveSection();
+    updateTrajectoryTarget();
   };
 
 
-  /* =======================================================
-     RESIZE
-     ======================================================= */
-
   const handleResize = () => {
-
     window.clearTimeout(
       state.resizeTimer
     );
 
-
     state.resizeTimer =
-      window.setTimeout(
-        () => {
-
-          detectActiveSection();
-
-          updateTrajectoryTargets();
-
-          updateWowHeader(
-            state.activeIndex
-          );
-
-        },
-        CONFIG.resizeDebounce
-      );
-
+      window.setTimeout(() => {
+        updateMotionPreference();
+        updateActiveSection();
+        updateTrajectoryTarget();
+      }, CONFIG.resizeDebounce);
   };
 
 
   /* =======================================================
-     ANIMATION FRAME
+     RAF
      ======================================================= */
 
   const animationFrame = () => {
-
-    updateCursorFrame();
-
-    updateTrajectoryFrame();
-
+    renderCursor();
+    renderTrajectory();
 
     state.rafId =
-      requestAnimationFrame(
+      window.requestAnimationFrame(
         animationFrame
       );
-
-  };
-
-
-  /* =======================================================
-     INITIAL STATE
-     ======================================================= */
-
-  const setInitialState = () => {
-
-    if (!dom.sections.length) {
-      return;
-    }
-
-
-    state.activeIndex = 0;
-
-
-    updateWowHeader(0);
-
-    updateTrajectoryTargets();
-
-    resetStandbyTimer();
-
   };
 
 
@@ -2684,8 +1927,7 @@
      ======================================================= */
 
   const init = () => {
-
-    initMotionPreference();
+    updateMotionPreference();
 
     initLoader();
 
@@ -2693,11 +1935,11 @@
 
     initMenu();
 
-    initWowNavigation();
+    initSectionNavigation();
 
-    initRevealSystem();
+    initReveal();
 
-    initDirectionInteractions();
+    initDirectionInteraction();
 
     initNarrativeLinks();
 
@@ -2705,7 +1947,7 @@
 
     initMagneticElements();
 
-    initCtaInteraction();
+    initCTA();
 
     initStandby();
 
@@ -2713,12 +1955,10 @@
 
     initKeyboardNavigation();
 
-    setInitialState();
+    initActivityTracking();
 
-    detectActiveSection();
-
-    updateTrajectoryTargets();
-
+    updateActiveSection();
+    updateTrajectoryTarget();
 
     window.addEventListener(
       "scroll",
@@ -2728,7 +1968,6 @@
       }
     );
 
-
     window.addEventListener(
       "resize",
       handleResize,
@@ -2737,17 +1976,32 @@
       }
     );
 
+    window
+      .matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      )
+      .addEventListener(
+        "change",
+        updateMotionPreference
+      );
 
-    animationFrame();
+    state.rafId =
+      window.requestAnimationFrame(
+        animationFrame
+      );
 
+    state.loaded = true;
   };
 
+
+  /* =======================================================
+     START
+     ======================================================= */
 
   if (
     document.readyState ===
     "loading"
   ) {
-
     document.addEventListener(
       "DOMContentLoaded",
       init,
@@ -2755,11 +2009,8 @@
         once: true
       }
     );
-
   } else {
-
     init();
-
   }
 
 })();
