@@ -1331,7 +1331,7 @@ main {
   flex-wrap: nowrap;
   align-items: baseline;
   justify-content: center;
-  gap: .35em;
+  gap: .08em;
   margin-top: 54px;
   color: var(--ink);
   font-family: var(--font-serif);
@@ -1863,8 +1863,10 @@ main {
   }
 
   .footer-motto {
-    margin-top: 42px;
-    font-size: clamp(25px, 7vw, 42px);
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  gap: .06em;
+  font-size: clamp(24px, 8vw, 34px);
   }
 
   .standby-screen {
