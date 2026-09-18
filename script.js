@@ -1,7 +1,7 @@
 /* =========================================================
    CESARE PARATORE
    MOVIMENTO / CON DIREZIONE.
-   MASTER INTERACTION SYSTEM — V4
+   MASTER INTERACTION SYSTEM — V5
    ========================================================= */
 
 (() => {
@@ -21,6 +21,7 @@
     magneticRadius: 90,
     standbyDelay: 30000
   };
+
 
   const state = {
     loaded: false,
@@ -52,9 +53,7 @@
 
 
   const dom = {
-
     html: document.documentElement,
-
     body: document.body,
 
     loader:
@@ -210,6 +209,7 @@
         "(prefers-reduced-motion: reduce)"
       );
 
+
     const apply = matches => {
 
       state.reducedMotion = matches;
@@ -219,20 +219,40 @@
         matches
       );
 
+
       if (matches) {
+
         clearStandbyTimer();
+
+        if (state.standby) {
+          exitStandby();
+        }
+
       } else {
+
         resetStandbyTimer();
+
       }
+
     };
+
 
     apply(media.matches);
 
-    media.addEventListener(
-      "change",
-      event =>
-        apply(event.matches)
-    );
+
+    if (
+      typeof media.addEventListener ===
+      "function"
+    ) {
+
+      media.addEventListener(
+        "change",
+        event =>
+          apply(event.matches)
+      );
+
+    }
+
   };
 
 
@@ -243,14 +263,14 @@
   const initLoader = () => {
 
     if (!dom.loader) {
-
       state.loaded = true;
-
       return;
     }
 
+
     const started =
       performance.now();
+
 
     const finish = () => {
 
@@ -258,8 +278,10 @@
         return;
       }
 
+
       const elapsed =
         performance.now() - started;
+
 
       const remaining =
         Math.max(
@@ -268,24 +290,32 @@
           elapsed
         );
 
-      window.setTimeout(() => {
 
-        if (state.loaded) {
-          return;
-        }
+      window.setTimeout(
+        () => {
 
-        state.loaded = true;
+          if (state.loaded) {
+            return;
+          }
 
-        dom.loader.classList.add(
-          "is-hidden"
-        );
 
-        window.setTimeout(
-          () => dom.loader?.remove(),
-          800
-        );
+          state.loaded = true;
 
-      }, remaining);
+          dom.loader.classList.add(
+            "is-hidden"
+          );
+
+
+          window.setTimeout(
+            () =>
+              dom.loader?.remove(),
+            800
+          );
+
+        },
+        remaining
+      );
+
     };
 
 
@@ -311,6 +341,7 @@
       finish,
       CONFIG.loaderMaximumWait
     );
+
   };
 
 
@@ -320,12 +351,10 @@
 
   const initPageTransitions = () => {
 
-    if (
-      !dom.transition ||
-      state.reducedMotion
-    ) {
+    if (!dom.transition) {
       return;
     }
+
 
     dom.transitionLinks.forEach(
       link => {
@@ -335,29 +364,23 @@
           event => {
 
             const href =
-              link.getAttribute(
-                "href"
-              );
+              link.getAttribute("href");
+
 
             if (
               !href ||
               href.startsWith("#") ||
               href.startsWith("mailto:") ||
-              href.startsWith("tel:")
-            ) {
-              return;
-            }
-
-            if (
-              link.hasAttribute(
-                "download"
-              ) ||
+              href.startsWith("tel:") ||
+              link.hasAttribute("download") ||
               link.target === "_blank"
             ) {
               return;
             }
 
+
             let url;
+
 
             try {
 
@@ -373,6 +396,7 @@
 
             }
 
+
             if (
               url.origin !==
               window.location.origin
@@ -380,11 +404,19 @@
               return;
             }
 
+
+            if (state.reducedMotion) {
+              return;
+            }
+
+
             event.preventDefault();
+
 
             dom.transition.classList.add(
               "is-active"
             );
+
 
             window.setTimeout(
               () => {
@@ -403,11 +435,15 @@
 
     window.addEventListener(
       "pageshow",
-      () =>
+      () => {
+
         dom.transition?.classList.remove(
           "is-active"
-        )
+        );
+
+      }
     );
+
   };
 
 
@@ -421,31 +457,35 @@
       return;
     }
 
+
     clearStandbyTimer();
 
     state.menuOpen = true;
+
 
     dom.menu.setAttribute(
       "aria-hidden",
       "false"
     );
 
+
     dom.menuTrigger?.setAttribute(
       "aria-expanded",
       "true"
     );
 
+
     dom.body.classList.add(
       "is-menu-open"
     );
 
+
     window.setTimeout(
       () =>
         dom.menuLinks[0]?.focus(),
-      state.reducedMotion
-        ? 0
-        : 250
+      state.reducedMotion ? 0 : 250
     );
+
   };
 
 
@@ -457,21 +497,26 @@
       return;
     }
 
+
     state.menuOpen = false;
+
 
     dom.menu.setAttribute(
       "aria-hidden",
       "true"
     );
 
+
     dom.menuTrigger?.setAttribute(
       "aria-expanded",
       "false"
     );
 
+
     dom.body.classList.remove(
       "is-menu-open"
     );
+
 
     if (
       returnFocus &&
@@ -483,7 +528,9 @@
 
     }
 
+
     resetStandbyTimer();
+
   };
 
 
@@ -530,11 +577,14 @@
           event.key === "Escape" &&
           state.menuOpen
         ) {
+
           closeMenu();
+
         }
 
       }
     );
+
   };
 
 
@@ -547,12 +597,15 @@
     const section =
       getSectionByIndex(index);
 
+
     if (!section) {
       return;
     }
 
+
     const total =
       dom.sections.length;
+
 
     const progress =
       total <= 1
@@ -584,113 +637,103 @@
     }
 
 
-    const previous =
-      dom.previousSection;
+    const isFirst =
+      index === 0;
 
-    const previousLabel =
-      dom.previousLabel;
-
-    const next =
-      dom.nextSection;
-
-    const nextLabel =
-      dom.nextLabel;
+    const isLast =
+      index === total - 1;
 
 
-    /* -----------------------------------------------------
-       PREVIOUS
-       ----------------------------------------------------- */
+    if (isFirst) {
 
-    if (index === 0) {
-
-      previous?.classList.add(
+      dom.previousSection?.classList.add(
         "is-disabled"
       );
 
-      previous?.setAttribute(
+      dom.previousSection?.setAttribute(
         "aria-hidden",
         "true"
       );
 
-      previous?.setAttribute(
+      dom.previousSection?.setAttribute(
         "tabindex",
         "-1"
       );
 
-      if (previousLabel) {
-        previousLabel.textContent =
-          "";
+      if (dom.previousLabel) {
+        dom.previousLabel.textContent = "";
       }
 
     } else {
 
       const previousNumber =
-        getSectionNumber(
-          index - 1
-        );
+        getSectionNumber(index - 1);
 
-      previous?.classList.remove(
+
+      dom.previousSection?.classList.remove(
         "is-disabled"
       );
 
-      previous?.removeAttribute(
+      dom.previousSection?.removeAttribute(
         "aria-hidden"
       );
 
-      previous?.removeAttribute(
+      dom.previousSection?.removeAttribute(
         "tabindex"
       );
 
-      if (previous) {
 
-        previous.href =
+      if (dom.previousSection) {
+
+        dom.previousSection.href =
           `#${previousNumber}`;
+
+        dom.previousSection.setAttribute(
+          "aria-label",
+          `Vai alla sezione ${previousNumber}`
+        );
 
       }
 
-      if (previousLabel) {
 
-        previousLabel.textContent =
+      if (dom.previousLabel) {
+
+        dom.previousLabel.textContent =
           previousNumber;
 
       }
 
-      previous?.setAttribute(
-        "aria-label",
-        `Vai alla sezione ${previousNumber}`
-      );
-
     }
 
 
-    /* -----------------------------------------------------
-       NEXT
-       ----------------------------------------------------- */
+    if (isLast) {
 
-    if (
-      index ===
-      total - 1
-    ) {
+      if (dom.nextSection) {
 
-      next?.classList.add(
-        "is-home-return"
-      );
+        dom.nextSection.classList.add(
+          "is-home-return"
+        );
 
-      if (next) {
-        next.href = "#01";
+        dom.nextSection.href =
+          "#01";
+
+        dom.nextSection.setAttribute(
+          "aria-label",
+          "Torna all'inizio"
+        );
+
       }
 
-      if (nextLabel) {
-        nextLabel.textContent =
+
+      if (dom.nextLabel) {
+
+        dom.nextLabel.textContent =
           "INIZIO";
+
       }
 
-      next?.setAttribute(
-        "aria-label",
-        "Torna all'inizio"
-      );
 
-      next
+      dom.nextSection
         ?.querySelector(
           ".section-jump-arrow"
         )
@@ -701,34 +744,36 @@
     } else {
 
       const nextNumber =
-        getSectionNumber(
-          index + 1
-        );
+        getSectionNumber(index + 1);
 
-      next?.classList.remove(
+
+      dom.nextSection?.classList.remove(
         "is-home-return"
       );
 
-      if (next) {
 
-        next.href =
+      if (dom.nextSection) {
+
+        dom.nextSection.href =
           `#${nextNumber}`;
+
+        dom.nextSection.setAttribute(
+          "aria-label",
+          `Vai alla sezione ${nextNumber}`
+        );
 
       }
 
-      if (nextLabel) {
 
-        nextLabel.textContent =
+      if (dom.nextLabel) {
+
+        dom.nextLabel.textContent =
           nextNumber;
 
       }
 
-      next?.setAttribute(
-        "aria-label",
-        `Vai alla sezione ${nextNumber}`
-      );
 
-      next
+      dom.nextSection
         ?.querySelector(
           ".section-jump-arrow"
         )
@@ -750,14 +795,17 @@
     const target =
       getSectionByIndex(index);
 
+
     if (!target) {
       return;
     }
+
 
     const headerHeight =
       dom.header
         ? dom.header.offsetHeight
         : 0;
+
 
     const top =
       window.scrollY +
@@ -767,17 +815,11 @@
 
 
     window.scrollTo({
-
-      top: Math.max(
-        0,
-        top
-      ),
-
+      top: Math.max(0, top),
       behavior:
         state.reducedMotion
           ? "auto"
           : "smooth"
-
     });
 
   };
@@ -790,6 +832,7 @@
       event => {
 
         event.preventDefault();
+
 
         if (
           state.activeIndex > 0
@@ -811,8 +854,10 @@
 
         event.preventDefault();
 
+
         const last =
           dom.sections.length - 1;
+
 
         navigateToSection(
           state.activeIndex === last
@@ -836,11 +881,14 @@
       return;
     }
 
+
     const reference =
-      window.innerHeight * 0.52;
+      window.innerHeight * .52;
+
 
     let bestIndex =
       state.activeIndex;
+
 
     let bestDistance =
       Infinity;
@@ -852,13 +900,16 @@
         const rect =
           section.getBoundingClientRect();
 
+
         const visible =
           rect.bottom > 0 &&
           rect.top < window.innerHeight;
 
+
         if (!visible) {
           return;
         }
+
 
         const distance =
           Math.abs(
@@ -866,6 +917,7 @@
             rect.height / 2 -
             reference
           );
+
 
         if (
           distance <
@@ -892,6 +944,7 @@
       state.activeIndex =
         bestIndex;
 
+
       updateWowHeader(
         bestIndex
       );
@@ -914,10 +967,7 @@
 
     if (
       state.reducedMotion ||
-      !(
-        "IntersectionObserver"
-        in window
-      )
+      !("IntersectionObserver" in window)
     ) {
 
       dom.reveals.forEach(
@@ -944,9 +994,11 @@
                 return;
               }
 
+
               entry.target.classList.add(
                 "is-visible"
               );
+
 
               observer.unobserve(
                 entry.target
@@ -986,16 +1038,20 @@
       return;
     }
 
+
     const first =
       dom.sections[0];
+
 
     const last =
       dom.sections[
         dom.sections.length - 1
       ];
 
+
     const start =
       first.offsetTop;
+
 
     const end =
       last.offsetTop +
@@ -1023,28 +1079,28 @@
     state.trajectory.targetProgress =
       progress;
 
+
     state.trajectory.targetDrift =
-      Math.sin(
-        progress *
-        Math.PI *
-        2
-      ) *
-      CONFIG.trajectoryDrift;
+      state.reducedMotion
+        ? 0
+        : Math.sin(
+            progress *
+            Math.PI *
+            2
+          ) *
+          CONFIG.trajectoryDrift;
 
   };
 
 
   const updateTrajectoryFrame = () => {
 
-    if (
-      state.reducedMotion
-    ) {
+    if (state.reducedMotion) {
 
       state.trajectory.progress =
         state.trajectory.targetProgress;
 
-      state.trajectory.drift =
-        0;
+      state.trajectory.drift = 0;
 
     } else {
 
@@ -1091,6 +1147,7 @@
         const node =
           link.dataset.trajectoryNode;
 
+
         if (!node) {
           return;
         }
@@ -1133,15 +1190,18 @@
           activate
         );
 
+
         link.addEventListener(
           "pointerleave",
           deactivate
         );
 
+
         link.addEventListener(
           "focus",
           activate
         );
+
 
         link.addEventListener(
           "blur",
@@ -1189,7 +1249,7 @@
 
 
     document
-      .querySelectorAll("a,button")
+      .querySelectorAll("a, button")
       .forEach(
         element => {
 
@@ -1200,6 +1260,7 @@
                 "is-hovering"
               )
           );
+
 
           element.addEventListener(
             "pointerleave",
@@ -1286,6 +1347,7 @@
             const rect =
               element.getBoundingClientRect();
 
+
             const dx =
               event.clientX -
               (
@@ -1293,12 +1355,14 @@
                 rect.width / 2
               );
 
+
             const dy =
               event.clientY -
               (
                 rect.top +
                 rect.height / 2
               );
+
 
             const distance =
               Math.sqrt(
@@ -1348,6 +1412,7 @@
               "0px"
             );
 
+
             element.style.setProperty(
               "--magnetic-y",
               "0px"
@@ -1364,7 +1429,6 @@
 
   /* =======================================================
      STANDBY
-     NARRATIVE PAUSE:
      PUNTO → LINEA → MOVIMENTO
      ======================================================= */
 
@@ -1396,13 +1460,19 @@
 
     state.standby = true;
 
+
+    clearStandbyTimer();
+
+
     dom.body.classList.add(
       "is-standby"
     );
 
+
     dom.standby.classList.add(
       "is-active"
     );
+
 
     dom.standby.setAttribute(
       "aria-hidden",
@@ -1426,18 +1496,22 @@
 
     state.standby = false;
 
+
     dom.body.classList.remove(
       "is-standby"
     );
+
 
     dom.standby?.classList.remove(
       "is-active"
     );
 
+
     dom.standby?.setAttribute(
       "aria-hidden",
       "true"
     );
+
 
     resetStandbyTimer();
 
@@ -1452,7 +1526,8 @@
     if (
       state.reducedMotion ||
       state.menuOpen ||
-      state.standby
+      state.standby ||
+      document.hidden
     ) {
       return;
     }
@@ -1497,20 +1572,45 @@
 
             if (state.standby) {
 
-              exitStandby();
+              if (
+                eventName === "keydown" &&
+                event.key === "Escape"
+              ) {
+                return;
+              }
 
+              exitStandby();
               return;
+
             }
+
 
             resetStandbyTimer();
 
           },
           {
             passive:
-              eventName !==
-              "keydown"
+              eventName !== "keydown"
           }
         );
+
+      }
+    );
+
+
+    document.addEventListener(
+      "visibilitychange",
+      () => {
+
+        if (document.hidden) {
+
+          clearStandbyTimer();
+
+        } else {
+
+          resetStandbyTimer();
+
+        }
 
       }
     );
@@ -1526,6 +1626,7 @@
 
     const hash =
       window.location.hash;
+
 
     if (!hash) {
       return;
@@ -1661,6 +1762,7 @@
 
     updateTrajectoryFrame();
 
+
     state.rafId =
       requestAnimationFrame(
         animationFrame
@@ -1681,6 +1783,7 @@
 
 
     state.activeIndex = 0;
+
 
     updateWowHeader(0);
 
