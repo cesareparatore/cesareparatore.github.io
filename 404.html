@@ -12,15 +12,18 @@
 
   <meta
     name="description"
-    content="La traiettoria si è interrotta. Riparti dal punto giusto."
+    content="La traiettoria si è interrotta. Ma ogni percorso ha un punto da cui ripartire."
   >
 
   <meta name="theme-color" content="#F2EFE8">
   <meta name="robots" content="noindex, follow">
 
-  <link rel="canonical" href="https://www.cesareparatore.it/404.html">
+  <link
+    rel="icon"
+    type="image/png"
+    href="/assets/images/cp-mark.png"
+  >
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -29,21 +32,979 @@
     rel="stylesheet"
   >
 
-  <!-- Favicon -->
-  <link
-    rel="icon"
-    type="image/png"
-    href="/assets/images/cp-mark.png"
-  >
+  <style>
+    /* =========================================================
+       RESET
+       ========================================================= */
 
-  <!-- 404 Styles -->
-  <link rel="stylesheet" href="/css/404.css">
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: #F2EFE8;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background: #F2EFE8;
+      color: #11110F;
+      font-family: "DM Sans", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    ::selection {
+      color: #F2EFE8;
+      background: #A64232;
+    }
+
+
+    /* =========================================================
+       VARIABLES
+       ========================================================= */
+
+    :root {
+      --ivory: #F2EFE8;
+      --ink: #11110F;
+      --terracotta: #A64232;
+      --sand: #C9C0AF;
+      --stone: #77736B;
+      --white: #FFFDF8;
+
+      --header-height: 108px;
+
+      --ease: cubic-bezier(.22, .61, .36, 1);
+      --ease-sharp: cubic-bezier(.16, 1, .3, 1);
+    }
+
+
+    /* =========================================================
+       LOADER
+       ========================================================= */
+
+    .page-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+
+      display: grid;
+      place-items: center;
+
+      background: var(--ivory);
+
+      transition:
+        opacity .7s var(--ease),
+        visibility .7s var(--ease);
+    }
+
+    .page-loader img {
+      width: 72px;
+      height: 72px;
+
+      opacity: 0;
+
+      animation:
+        loaderMark .8s .15s var(--ease) forwards;
+    }
+
+    body.is-loaded .page-loader {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    @keyframes loaderMark {
+      from {
+        opacity: 0;
+        transform: scale(.9);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+
+    /* =========================================================
+       PAGE TRANSITION
+       ========================================================= */
+
+    .page-transition {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+
+      background: var(--terracotta);
+
+      clip-path: inset(100% 0 0 0);
+      pointer-events: none;
+
+      transition:
+        clip-path .7s var(--ease-sharp);
+    }
+
+    body.is-leaving .page-transition {
+      clip-path: inset(0 0 0 0);
+    }
+
+
+    /* =========================================================
+       HEADER
+       ========================================================= */
+
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+
+      min-height: var(--header-height);
+
+      display: grid;
+      grid-template-columns: 180px minmax(0, 1fr) 180px;
+      align-items: center;
+
+      padding: 12px 28px 10px;
+
+      background: rgba(242, 239, 232, .9);
+      border-bottom: 1px solid rgba(17, 17, 15, .12);
+
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+
+      width: max-content;
+
+      transition: transform .4s var(--ease);
+    }
+
+    .brand:hover {
+      transform: translateY(-2px);
+    }
+
+    .brand img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+    }
+
+    .error-index {
+      justify-self: center;
+
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+
+      color: var(--stone);
+      font-family: "DM Mono", monospace;
+      font-size: 10px;
+      line-height: 1;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .error-index__number {
+      color: var(--ink);
+      font-size: 12px;
+    }
+
+    .header-home {
+      justify-self: end;
+
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+
+      font-family: "DM Mono", monospace;
+      font-size: 10px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+
+      transition:
+        color .3s ease,
+        transform .4s var(--ease);
+    }
+
+    .header-home:hover {
+      color: var(--terracotta);
+      transform: translateY(-2px);
+    }
+
+    .header-home span:last-child {
+      font-size: 15px;
+      line-height: 1;
+    }
+
+
+    /* =========================================================
+       MAIN
+       ========================================================= */
+
+    main {
+      min-height: 100vh;
+    }
+
+    .error-hero {
+      position: relative;
+
+      min-height: 100vh;
+
+      display: grid;
+      grid-template-columns: minmax(0, .95fr) minmax(320px, 1.05fr);
+      align-items: center;
+      gap: clamp(60px, 9vw, 160px);
+
+      padding:
+        calc(var(--header-height) + 60px)
+        clamp(28px, 7vw, 120px)
+        100px;
+
+      overflow: hidden;
+    }
+
+
+    /* =========================================================
+       COPY
+       ========================================================= */
+
+    .error-copy {
+      position: relative;
+      z-index: 2;
+
+      width: min(100%, 720px);
+    }
+
+    .section-kicker {
+      margin: 0 0 30px;
+
+      color: var(--terracotta);
+
+      font-family: "DM Mono", monospace;
+      font-size: 11px;
+      line-height: 1;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .error-copy h1 {
+      max-width: 800px;
+
+      margin: 0;
+
+      font-family: "Instrument Serif", serif;
+      font-weight: 400;
+      font-size: clamp(62px, 8.2vw, 132px);
+      line-height: .82;
+      letter-spacing: -.045em;
+    }
+
+    .error-copy h1 span {
+      display: block;
+    }
+
+    .error-copy h1 span:last-child {
+      margin-left: clamp(24px, 5vw, 90px);
+      color: var(--terracotta);
+    }
+
+    .error-body {
+      max-width: 520px;
+
+      margin-top: clamp(45px, 6vw, 80px);
+
+      font-size: clamp(17px, 1.35vw, 20px);
+      line-height: 1.55;
+      color: #34322e;
+    }
+
+    .error-body p {
+      margin: 0;
+    }
+
+    .error-statement {
+      display: grid;
+      gap: 5px;
+
+      margin-top: 30px !important;
+
+      font-family: "Instrument Serif", serif;
+      font-size: clamp(24px, 2.4vw, 36px);
+      line-height: 1.05;
+      color: var(--ink);
+    }
+
+    .error-statement strong {
+      display: block;
+      font-weight: 400;
+    }
+
+    .error-statement strong:last-child {
+      color: var(--terracotta);
+    }
+
+
+    /* =========================================================
+       CTA
+       ========================================================= */
+
+    .error-cta {
+      position: relative;
+
+      display: inline-flex;
+      align-items: center;
+      gap: 18px;
+
+      margin-top: 55px;
+      padding-bottom: 10px;
+
+      color: var(--ink);
+
+      font-family: "DM Mono", monospace;
+      font-size: 11px;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+
+      border-bottom: 1px solid var(--ink);
+
+      transition:
+        color .3s ease,
+        border-color .3s ease,
+        gap .45s var(--ease);
+    }
+
+    .error-cta:hover,
+    .error-cta:focus-visible {
+      color: var(--terracotta);
+      border-color: var(--terracotta);
+      gap: 27px;
+    }
+
+    .error-cta span:last-child {
+      font-size: 17px;
+      line-height: 1;
+    }
+
+
+    /* =========================================================
+       TRAJECTORY
+       ========================================================= */
+
+    .error-visual {
+      position: relative;
+
+      min-height: 560px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      pointer-events: none;
+    }
+
+    .trajectory--404 {
+      position: relative;
+
+      width: min(100%, 760px);
+      height: 520px;
+
+      transform: rotate(-3deg);
+    }
+
+    .trajectory__origin {
+      position: absolute;
+
+      left: 7%;
+      top: 57%;
+
+      width: 11px;
+      height: 11px;
+
+      border-radius: 50%;
+      background: var(--terracotta);
+
+      box-shadow:
+        0 0 0 9px rgba(166, 66, 50, .08);
+
+      animation:
+        originPulse 3.5s ease-in-out infinite;
+    }
+
+    .trajectory__line {
+      position: absolute;
+
+      height: 1px;
+
+      transform-origin: left center;
+
+      background: var(--terracotta);
+
+      opacity: .95;
+    }
+
+    .trajectory__line--one {
+      left: 7%;
+      top: 57%;
+      width: 38%;
+
+      transform: rotate(-11deg);
+
+      animation:
+        drawLineOne 1.2s .35s var(--ease-sharp) both;
+    }
+
+    .trajectory__line--two {
+      left: 43%;
+      top: 49.8%;
+      width: 32%;
+
+      transform: rotate(21deg);
+
+      animation:
+        drawLineTwo 1.1s .8s var(--ease-sharp) both;
+    }
+
+    .trajectory__line--three {
+      left: 72%;
+      top: 61.5%;
+      width: 22%;
+
+      transform: rotate(-39deg);
+
+      animation:
+        drawLineThree 1s 1.25s var(--ease-sharp) both;
+    }
+
+    .trajectory__point--end {
+      position: absolute;
+
+      left: 90%;
+      top: 47%;
+
+      width: 13px;
+      height: 13px;
+
+      border: 1px solid var(--terracotta);
+      border-radius: 50%;
+
+      background: var(--ivory);
+
+      opacity: 0;
+
+      animation:
+        revealEndPoint .6s 2s var(--ease) forwards;
+    }
+
+    @keyframes drawLineOne {
+      from {
+        transform: rotate(-11deg) scaleX(0);
+      }
+
+      to {
+        transform: rotate(-11deg) scaleX(1);
+      }
+    }
+
+    @keyframes drawLineTwo {
+      from {
+        transform: rotate(21deg) scaleX(0);
+      }
+
+      to {
+        transform: rotate(21deg) scaleX(1);
+      }
+    }
+
+    @keyframes drawLineThree {
+      from {
+        transform: rotate(-39deg) scaleX(0);
+      }
+
+      to {
+        transform: rotate(-39deg) scaleX(1);
+      }
+    }
+
+    @keyframes revealEndPoint {
+      from {
+        opacity: 0;
+        transform: scale(.5);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes originPulse {
+      0%,
+      100% {
+        box-shadow:
+          0 0 0 8px rgba(166, 66, 50, .07);
+      }
+
+      50% {
+        box-shadow:
+          0 0 0 16px rgba(166, 66, 50, .02);
+      }
+    }
+
+
+    /* =========================================================
+       FOOTER
+       ========================================================= */
+
+    .site-footer {
+      min-height: 420px;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      padding: 90px 28px;
+
+      background: var(--ivory);
+
+      text-align: center;
+    }
+
+    .footer-logo {
+      display: inline-block;
+
+      margin-bottom: 42px;
+
+      transition: transform .5s var(--ease);
+    }
+
+    .footer-logo:hover {
+      transform: translateY(-5px);
+    }
+
+    .footer-logo img {
+      width: 72px;
+      height: 72px;
+    }
+
+    .footer-work,
+    .footer-signature {
+      margin: 0;
+    }
+
+    .footer-work {
+      font-family: "DM Sans", sans-serif;
+      font-size: 14px;
+      letter-spacing: .02em;
+    }
+
+    .footer-work span {
+      margin: 0 8px;
+      color: var(--terracotta);
+    }
+
+    .footer-signature {
+      margin-top: 10px;
+
+      font-family: "DM Mono", monospace;
+      font-size: 10px;
+      letter-spacing: .16em;
+      color: var(--stone);
+    }
+
+
+    /* =========================================================
+       STANDBY
+       ========================================================= */
+
+    .standby-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+
+      display: grid;
+      place-items: center;
+
+      background: var(--ivory);
+
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+
+      transition:
+        opacity .8s var(--ease),
+        visibility .8s var(--ease);
+    }
+
+    .standby-screen__inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 25px;
+
+      text-align: center;
+    }
+
+    .standby-screen img {
+      width: 56px;
+      height: 56px;
+
+      opacity: .85;
+    }
+
+    .standby-screen p {
+      margin: 0;
+
+      color: var(--stone);
+
+      font-family: "DM Mono", monospace;
+      font-size: 10px;
+      line-height: 1.7;
+      letter-spacing: .12em;
+    }
+
+    body.is-standby .standby-screen {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+
+    /* =========================================================
+       CUSTOM CURSOR
+       ========================================================= */
+
+    .custom-cursor {
+      position: fixed;
+      z-index: 10001;
+
+      top: 0;
+      left: 0;
+
+      width: 0;
+      height: 0;
+
+      pointer-events: none;
+    }
+
+    .custom-cursor__dot,
+    .custom-cursor__ring {
+      position: absolute;
+
+      top: 0;
+      left: 0;
+
+      border-radius: 50%;
+
+      transform: translate(-50%, -50%);
+    }
+
+    .custom-cursor__dot {
+      width: 5px;
+      height: 5px;
+
+      background: var(--terracotta);
+    }
+
+    .custom-cursor__ring {
+      width: 32px;
+      height: 32px;
+
+      border: 1px solid rgba(166, 66, 50, .45);
+
+      transition:
+        width .3s var(--ease),
+        height .3s var(--ease),
+        border-color .3s ease;
+    }
+
+    body.cursor-hover .custom-cursor__ring {
+      width: 52px;
+      height: 52px;
+
+      border-color: var(--terracotta);
+    }
+
+
+    /* =========================================================
+       FOCUS
+       ========================================================= */
+
+    :focus-visible {
+      outline: 2px solid var(--terracotta);
+      outline-offset: 5px;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 1000px) {
+
+      :root {
+        --header-height: 92px;
+      }
+
+      .site-header {
+        grid-template-columns: 70px minmax(0, 1fr) 70px;
+        padding: 10px 20px;
+      }
+
+      .brand img {
+        width: 44px;
+        height: 44px;
+      }
+
+      .error-index {
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .error-hero {
+        grid-template-columns: 1fr;
+
+        gap: 50px;
+
+        padding:
+          calc(var(--header-height) + 55px)
+          28px
+          80px;
+      }
+
+      .error-copy {
+        max-width: 720px;
+        margin-inline: auto;
+      }
+
+      .error-visual {
+        min-height: 360px;
+      }
+
+      .trajectory--404 {
+        height: 360px;
+      }
+    }
+
+
+    @media (max-width: 640px) {
+
+      :root {
+        --header-height: 82px;
+      }
+
+      .site-header {
+        grid-template-columns: 48px minmax(0, 1fr) 60px;
+
+        padding:
+          10px 16px
+          9px;
+      }
+
+      .brand img {
+        width: 40px;
+        height: 40px;
+      }
+
+      .error-index {
+        gap: 4px;
+
+        font-size: 8px;
+        letter-spacing: .08em;
+      }
+
+      .error-index__number {
+        font-size: 10px;
+      }
+
+      .header-home {
+        gap: 6px;
+
+        font-size: 8px;
+        letter-spacing: .08em;
+      }
+
+      .header-home span:last-child {
+        font-size: 13px;
+      }
+
+      .error-hero {
+        min-height: auto;
+
+        gap: 20px;
+
+        padding:
+          calc(var(--header-height) + 60px)
+          22px
+          70px;
+      }
+
+      .section-kicker {
+        margin-bottom: 25px;
+
+        font-size: 9px;
+      }
+
+      .error-copy h1 {
+        font-size: clamp(58px, 17vw, 100px);
+        line-height: .84;
+      }
+
+      .error-copy h1 span:last-child {
+        margin-left: 28px;
+      }
+
+      .error-body {
+        margin-top: 40px;
+
+        font-size: 16px;
+        line-height: 1.55;
+      }
+
+      .error-statement {
+        margin-top: 27px !important;
+
+        font-size: 27px;
+      }
+
+      .error-cta {
+        margin-top: 42px;
+      }
+
+      .error-visual {
+        min-height: 250px;
+
+        margin-top: 10px;
+      }
+
+      .trajectory--404 {
+        width: 100%;
+        height: 250px;
+      }
+
+      .trajectory__origin {
+        left: 3%;
+      }
+
+      .trajectory__line--one {
+        left: 3%;
+        width: 42%;
+      }
+
+      .trajectory__line--two {
+        left: 43%;
+        width: 31%;
+      }
+
+      .trajectory__line--three {
+        left: 70%;
+        width: 23%;
+      }
+
+      .trajectory__point--end {
+        left: 89%;
+      }
+
+      .site-footer {
+        min-height: 330px;
+
+        padding: 70px 22px;
+      }
+
+      .footer-logo img {
+        width: 58px;
+        height: 58px;
+      }
+
+      .footer-work {
+        font-size: 12px;
+      }
+    }
+
+
+    @media (max-width: 390px) {
+
+      .error-copy h1 {
+        font-size: 54px;
+      }
+
+      .error-copy h1 span:last-child {
+        margin-left: 18px;
+      }
+
+      .error-statement {
+        font-size: 24px;
+      }
+
+      .error-cta {
+        font-size: 9px;
+      }
+    }
+
+
+    /* =========================================================
+       REDUCED MOTION
+       ========================================================= */
+
+    @media (prefers-reduced-motion: reduce) {
+
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
+
+    html.reduced-motion *,
+    html.reduced-motion *::before,
+    html.reduced-motion *::after {
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important;
+    }
+  </style>
 </head>
+
 
 <body class="page-404">
 
   <!-- =========================================================
-       PAGE LOADER
+       LOADER
        ========================================================= -->
 
   <div
@@ -54,8 +1015,8 @@
     <img
       src="/assets/images/cp-mark.png"
       alt=""
-      width="80"
-      height="80"
+      width="72"
+      height="72"
     >
   </div>
 
@@ -95,6 +1056,7 @@
       class="brand"
       href="/"
       aria-label="Cesare Paratore — Torna alla home"
+      data-transition
     >
       <img
         src="/assets/images/cp-mark.png"
@@ -104,7 +1066,10 @@
       >
     </a>
 
-    <div class="error-index" aria-label="Pagina errore 404">
+    <div
+      class="error-index"
+      aria-label="Pagina 404"
+    >
       <span class="error-index__number">404</span>
       <span class="error-index__label">FUORI TRAIETTORIA</span>
     </div>
@@ -113,6 +1078,8 @@
       class="header-home"
       href="/"
       data-transition
+      data-magnetic
+      aria-label="Torna all'inizio"
     >
       <span>Inizio</span>
       <span aria-hidden="true">↑</span>
@@ -131,10 +1098,6 @@
       class="error-hero"
       aria-labelledby="error-title"
     >
-
-      <!-- =====================================================
-           NARRATIVE
-           ===================================================== -->
 
       <div class="error-copy">
 
@@ -220,6 +1183,7 @@
       class="footer-logo"
       href="/"
       aria-label="Cesare Paratore — Home"
+      data-transition
     >
       <img
         src="/assets/images/cp-mark.png"
@@ -268,10 +1232,441 @@
 
 
   <!-- =========================================================
-       SCRIPT
+       JAVASCRIPT
        ========================================================= -->
 
-  <script src="/js/404.js" defer></script>
+  <script>
+    (() => {
+      "use strict";
+
+      /* =======================================================
+         CONFIG
+         ======================================================= */
+
+      const CONFIG = {
+        loaderMinTime: 450,
+        loaderMaxTime: 4000,
+        transitionDuration: 700,
+        cursorLerp: 0.16,
+        magneticStrength: 0.12,
+        magneticRadius: 90,
+        standbyDelay: 30000
+      };
+
+
+      /* =======================================================
+         STATE
+         ======================================================= */
+
+      const state = {
+        loaded: false,
+        leaving: false,
+        standby: false,
+        lastActivity: Date.now(),
+        pointerX: window.innerWidth / 2,
+        pointerY: window.innerHeight / 2,
+        cursorX: window.innerWidth / 2,
+        cursorY: window.innerHeight / 2,
+        raf: null
+      };
+
+
+      /* =======================================================
+         DOM
+         ======================================================= */
+
+      const body = document.body;
+      const html = document.documentElement;
+
+      const loader = document.getElementById("page-loader");
+      const transition = document.getElementById("page-transition");
+
+      const cursor = document.getElementById("custom-cursor");
+      const cursorDot = cursor?.querySelector(".custom-cursor__dot");
+      const cursorRing = cursor?.querySelector(".custom-cursor__ring");
+
+      const standby = document.getElementById("standby-screen");
+
+      const transitionLinks = document.querySelectorAll(
+        "[data-transition]"
+      );
+
+      const magneticElements = document.querySelectorAll(
+        "[data-magnetic]"
+      );
+
+
+      /* =======================================================
+         REDUCED MOTION
+         ======================================================= */
+
+      const prefersReducedMotion =
+        window.matchMedia &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      if (prefersReducedMotion) {
+        html.classList.add("reduced-motion");
+      }
+
+
+      /* =======================================================
+         LOADER
+         ======================================================= */
+
+      const loaderStart = performance.now();
+
+      const finishLoading = () => {
+        if (state.loaded) return;
+
+        const elapsed = performance.now() - loaderStart;
+        const remaining = Math.max(
+          0,
+          CONFIG.loaderMinTime - elapsed
+        );
+
+        window.setTimeout(() => {
+          state.loaded = true;
+          body.classList.add("is-loaded");
+        }, remaining);
+      };
+
+      if (document.readyState === "complete") {
+        finishLoading();
+      } else {
+        window.addEventListener(
+          "load",
+          finishLoading,
+          { once: true }
+        );
+      }
+
+      window.setTimeout(
+        finishLoading,
+        CONFIG.loaderMaxTime
+      );
+
+
+      /* =======================================================
+         PAGE TRANSITIONS
+         ======================================================= */
+
+      const isInternalNavigation = (url) => {
+        if (!url) return false;
+
+        return (
+          url.origin === window.location.origin &&
+          url.pathname !== window.location.pathname
+        );
+      };
+
+      transitionLinks.forEach((link) => {
+
+        link.addEventListener("click", (event) => {
+
+          const href = link.getAttribute("href");
+
+          if (!href || href.startsWith("#")) {
+            return;
+          }
+
+          if (
+            event.metaKey ||
+            event.ctrlKey ||
+            event.shiftKey ||
+            event.altKey
+          ) {
+            return;
+          }
+
+          let url;
+
+          try {
+            url = new URL(
+              href,
+              window.location.href
+            );
+          } catch {
+            return;
+          }
+
+          if (!isInternalNavigation(url)) {
+            return;
+          }
+
+          event.preventDefault();
+
+          if (state.leaving) return;
+
+          state.leaving = true;
+
+          body.classList.remove("is-standby");
+          body.classList.add("is-leaving");
+
+          window.setTimeout(() => {
+            window.location.href = url.href;
+          }, CONFIG.transitionDuration);
+        });
+
+      });
+
+
+      /* =======================================================
+         ACTIVITY / STANDBY
+         ======================================================= */
+
+      const registerActivity = () => {
+
+        state.lastActivity = Date.now();
+
+        if (state.standby) {
+          state.standby = false;
+          body.classList.remove("is-standby");
+
+          if (standby) {
+            standby.setAttribute(
+              "aria-hidden",
+              "true"
+            );
+          }
+        }
+      };
+
+      [
+        "pointerdown",
+        "pointermove",
+        "wheel",
+        "touchstart",
+        "keydown",
+        "scroll"
+      ].forEach((eventName) => {
+
+        window.addEventListener(
+          eventName,
+          registerActivity,
+          { passive: true }
+        );
+
+      });
+
+      window.setInterval(() => {
+
+        if (
+          !state.standby &&
+          Date.now() - state.lastActivity >=
+            CONFIG.standbyDelay
+        ) {
+
+          state.standby = true;
+
+          body.classList.add("is-standby");
+
+          if (standby) {
+            standby.setAttribute(
+              "aria-hidden",
+              "false"
+            );
+          }
+        }
+
+      }, 1000);
+
+
+      /* =======================================================
+         CUSTOM CURSOR
+         ======================================================= */
+
+      const hasFinePointer =
+        window.matchMedia &&
+        window.matchMedia("(pointer: fine)").matches;
+
+      if (
+        hasFinePointer &&
+        !prefersReducedMotion &&
+        cursor
+      ) {
+
+        cursor.style.display = "block";
+
+        window.addEventListener(
+          "pointermove",
+          (event) => {
+
+            state.pointerX = event.clientX;
+            state.pointerY = event.clientY;
+
+          },
+          { passive: true }
+        );
+
+        const animateCursor = () => {
+
+          state.cursorX +=
+            (state.pointerX - state.cursorX) *
+            CONFIG.cursorLerp;
+
+          state.cursorY +=
+            (state.pointerY - state.cursorY) *
+            CONFIG.cursorLerp;
+
+          cursor.style.transform =
+            `translate3d(${state.cursorX}px, ${state.cursorY}px, 0)`;
+
+          state.raf = requestAnimationFrame(
+            animateCursor
+          );
+        };
+
+        animateCursor();
+
+        const interactiveElements =
+          document.querySelectorAll(
+            "a, button, [data-magnetic]"
+          );
+
+        interactiveElements.forEach((element) => {
+
+          element.addEventListener(
+            "mouseenter",
+            () => {
+              body.classList.add("cursor-hover");
+            }
+          );
+
+          element.addEventListener(
+            "mouseleave",
+            () => {
+              body.classList.remove("cursor-hover");
+            }
+          );
+
+        });
+
+      } else if (cursor) {
+
+        cursor.style.display = "none";
+
+      }
+
+
+      /* =======================================================
+         MAGNETIC ELEMENTS
+         ======================================================= */
+
+      if (
+        hasFinePointer &&
+        !prefersReducedMotion
+      ) {
+
+        magneticElements.forEach((element) => {
+
+          let rect;
+
+          element.addEventListener(
+            "pointerenter",
+            () => {
+              rect = element.getBoundingClientRect();
+            }
+          );
+
+          element.addEventListener(
+            "pointermove",
+            (event) => {
+
+              rect =
+                rect ||
+                element.getBoundingClientRect();
+
+              const centerX =
+                rect.left + rect.width / 2;
+
+              const centerY =
+                rect.top + rect.height / 2;
+
+              const dx =
+                event.clientX - centerX;
+
+              const dy =
+                event.clientY - centerY;
+
+              const distance =
+                Math.sqrt(dx * dx + dy * dy);
+
+              if (
+                distance >
+                CONFIG.magneticRadius
+              ) {
+                element.style.transform = "";
+                return;
+              }
+
+              element.style.transform =
+                `translate3d(
+                  ${dx * CONFIG.magneticStrength}px,
+                  ${dy * CONFIG.magneticStrength}px,
+                  0
+                )`;
+            }
+          );
+
+          element.addEventListener(
+            "pointerleave",
+            () => {
+              element.style.transform = "";
+              rect = null;
+            }
+          );
+
+        });
+
+      }
+
+
+      /* =======================================================
+         KEYBOARD
+         ======================================================= */
+
+      document.addEventListener(
+        "keydown",
+        (event) => {
+
+          if (event.key === "Escape") {
+            body.classList.remove("is-standby");
+            state.standby = false;
+          }
+
+          if (
+            event.key === "Home" &&
+            !event.metaKey &&
+            !event.ctrlKey &&
+            !event.altKey
+          ) {
+            event.preventDefault();
+
+            const home =
+              document.querySelector(
+                'a[href="/"]'
+              );
+
+            home?.focus();
+          }
+
+        }
+      );
+
+
+      /* =======================================================
+         INITIAL ACCESSIBILITY STATE
+         ======================================================= */
+
+      if (cursor) {
+        cursor.setAttribute(
+          "aria-hidden",
+          "true"
+        );
+      }
+
+    })();
+  </script>
 
 </body>
 </html>
