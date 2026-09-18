@@ -679,11 +679,11 @@ main {
 }
 
 .hero-title-line--identity {
-  display: flex;
-  width: 100%;
+  display: inline-flex;
+  width: auto;
   align-items: baseline;
   justify-content: center;
-  gap: .08em;
+  gap: .22em;
   padding-left: 0;
   white-space: nowrap;
 }
@@ -1331,7 +1331,7 @@ main {
   flex-wrap: nowrap;
   align-items: baseline;
   justify-content: center;
-  gap: .08em;
+  gap: .16em;
   margin-top: 54px;
   color: var(--ink);
   font-family: var(--font-serif);
@@ -1752,7 +1752,7 @@ main {
   }
 
   .hero-title-line--identity {
-    gap: .07em;
+    gap: .18em;
     white-space: nowrap;
   }
 
@@ -1863,10 +1863,10 @@ main {
   }
 
   .footer-motto {
-  flex-wrap: nowrap;
-  white-space: nowrap;
-  gap: .06em;
-  font-size: clamp(24px, 8vw, 34px);
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    gap: .10em;
+    font-size: clamp(24px, 8vw, 34px);
   }
 
   .standby-screen {
@@ -1968,7 +1968,7 @@ main {
   }
 
   .hero-title-line--identity {
-    gap: .055em;
+    gap: .14em;
   }
 
   .hero-intro {
@@ -2013,9 +2013,10 @@ main {
   }
 
   .footer-motto {
-    flex-wrap: wrap;
-    white-space: normal;
-    row-gap: 7px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    gap: .08em;
+    font-size: clamp(23px, 8.5vw, 32px);
   }
 
   .standby-label {
