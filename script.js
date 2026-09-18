@@ -1,24 +1,33 @@
 /* =========================================================
    CESARE PARATORE
    MOVIMENTO / CON DIREZIONE.
-   MASTER INTERACTION SYSTEM — V5
+   MASTER INTERACTION SYSTEM — V5.1
    ========================================================= */
 
 (() => {
   "use strict";
 
+
   const CONFIG = {
     loaderMinimumTime: 450,
     loaderMaximumWait: 4500,
+
     revealThreshold: 0.12,
+
     cursorLerp: 0.16,
+
     resizeDebounce: 180,
+
     scrollNavigationOffset: 18,
+
     transitionDuration: 700,
+
     trajectoryLerp: 0.085,
     trajectoryDrift: 18,
+
     magneticStrength: 0.12,
     magneticRadius: 90,
+
     standbyDelay: 30000
   };
 
@@ -27,10 +36,13 @@
     loaded: false,
     menuOpen: false,
     standby: false,
+
     activeIndex: 0,
+
     resizeTimer: null,
     standbyTimer: null,
     rafId: null,
+
     reducedMotion: false,
 
     pointer: {
@@ -53,6 +65,7 @@
 
 
   const dom = {
+
     html: document.documentElement,
     body: document.body,
 
@@ -139,7 +152,21 @@
       document.querySelector(".standby-screen"),
 
     standbyWake:
-      document.querySelector(".standby-wake")
+      document.querySelector(".standby-wake"),
+
+    directionLinks:
+      Array.from(
+        document.querySelectorAll(
+          ".hero-direction[data-direction]"
+        )
+      ),
+
+    directionNodes:
+      Array.from(
+        document.querySelectorAll(
+          ".direction-node[data-direction]"
+        )
+      )
   };
 
 
@@ -220,18 +247,18 @@
       );
 
 
-      if (matches) {
+      if (state.standby) {
+        dom.standby?.classList.toggle(
+          "is-reduced",
+          matches
+        );
+      }
 
+
+      if (state.standby) {
         clearStandbyTimer();
-
-        if (state.standby) {
-          exitStandby();
-        }
-
       } else {
-
         resetStandbyTimer();
-
       }
 
     };
@@ -589,7 +616,7 @@
 
 
   /* =======================================================
-     WOW BAR
+     WOW
      ======================================================= */
 
   const updateWowHeader = index => {
@@ -955,7 +982,7 @@
 
 
   /* =======================================================
-     REVEAL SYSTEM
+     REVEAL
      ======================================================= */
 
   const initRevealSystem = () => {
@@ -1021,6 +1048,113 @@
     dom.reveals.forEach(
       element =>
         observer.observe(element)
+    );
+
+  };
+
+
+  /* =======================================================
+     DIRECTION INTERACTIONS
+     ======================================================= */
+
+  const initDirectionInteractions = () => {
+
+    if (
+      !dom.directionLinks.length ||
+      !dom.directionNodes.length
+    ) {
+      return;
+    }
+
+
+    const setActive = (
+      key,
+      active
+    ) => {
+
+      dom.directionLinks
+        .filter(
+          element =>
+            element.dataset.direction === key
+        )
+        .forEach(
+          element =>
+            element.classList.toggle(
+              "is-active",
+              active
+            )
+        );
+
+
+      dom.directionNodes
+        .filter(
+          element =>
+            element.dataset.direction === key
+        )
+        .forEach(
+          element =>
+            element.classList.toggle(
+              "is-active",
+              active
+            )
+        );
+
+    };
+
+
+    dom.directionLinks.forEach(
+      link => {
+
+        const key =
+          link.dataset.direction;
+
+
+        link.addEventListener(
+          "mouseenter",
+          () => setActive(key, true)
+        );
+
+
+        link.addEventListener(
+          "mouseleave",
+          () => setActive(key, false)
+        );
+
+
+        link.addEventListener(
+          "focusin",
+          () => setActive(key, true)
+        );
+
+
+        link.addEventListener(
+          "focusout",
+          () => setActive(key, false)
+        );
+
+      }
+    );
+
+
+    dom.directionNodes.forEach(
+      node => {
+
+        const key =
+          node.dataset.direction;
+
+
+        node.addEventListener(
+          "mouseenter",
+          () => setActive(key, true)
+        );
+
+
+        node.addEventListener(
+          "mouseleave",
+          () => setActive(key, false)
+        );
+
+      }
     );
 
   };
@@ -1161,6 +1295,11 @@
           );
 
 
+        if (!nodes.length) {
+          return;
+        }
+
+
         const activate = () => {
 
           nodes.forEach(
@@ -1198,13 +1337,13 @@
 
 
         link.addEventListener(
-          "focus",
+          "focusin",
           activate
         );
 
 
         link.addEventListener(
-          "blur",
+          "focusout",
           deactivate
         );
 
@@ -1450,7 +1589,6 @@
   const enterStandby = () => {
 
     if (
-      state.reducedMotion ||
       state.menuOpen ||
       !dom.standby
     ) {
@@ -1477,6 +1615,12 @@
     dom.standby.setAttribute(
       "aria-hidden",
       "false"
+    );
+
+
+    dom.standby.classList.toggle(
+      "is-reduced",
+      state.reducedMotion
     );
 
 
@@ -1524,7 +1668,6 @@
 
 
     if (
-      state.reducedMotion ||
       state.menuOpen ||
       state.standby ||
       document.hidden
@@ -1568,7 +1711,7 @@
 
         window.addEventListener(
           eventName,
-          () => {
+          event => {
 
             if (state.standby) {
 
@@ -1580,6 +1723,7 @@
               }
 
               exitStandby();
+
               return;
 
             }
@@ -1811,6 +1955,8 @@
     initWowNavigation();
 
     initRevealSystem();
+
+    initDirectionInteractions();
 
     initNarrativeLinks();
 
