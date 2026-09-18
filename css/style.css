@@ -657,7 +657,8 @@ main {
 }
 
 .home-section--cta {
-  background: var(--ivory);
+  background: var(--ink);
+  color: var(--ivory);
 }
 
 .section-inner {
