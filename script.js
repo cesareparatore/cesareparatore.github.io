@@ -156,11 +156,15 @@
     standbyWake:
       document.querySelector(".standby-wake"),
 
-    ctaTrajectory:
-      document.querySelector(".cta-trajectory"),
+    ctaTrajectories:
+      Array.from(
+        document.querySelectorAll(".cta-trajectory")
+      ),
 
-    contactCta:
-      document.querySelector(".contact-cta"),
+    contactCtas:
+      Array.from(
+        document.querySelectorAll(".contact-cta")
+      ),
 
     directionLinks:
       Array.from(
@@ -322,11 +326,16 @@
         performance.now() - started;
 
 
+      const minimumTime =
+        state.reducedMotion
+          ? 700
+          : CONFIG.loaderMinimumTime;
+
+
       const remaining =
         Math.max(
           0,
-          CONFIG.loaderMinimumTime -
-          elapsed
+          minimumTime - elapsed
         );
 
 
@@ -498,6 +507,11 @@
     }
 
 
+    if (state.standby) {
+      exitStandby();
+    }
+
+
     clearStandbyTimer();
 
     state.menuOpen = true;
@@ -572,11 +586,12 @@
 
     if (
       returnFocus &&
+      dom.menuTrigger &&
       document.activeElement !==
       dom.menuTrigger
     ) {
 
-      dom.menuTrigger?.focus();
+      dom.menuTrigger.focus();
 
     }
 
@@ -1681,56 +1696,75 @@
 
   const initCtaInteraction = () => {
 
-    if (!dom.ctaTrajectory || !dom.contactCta) {
+    if (
+      !dom.ctaTrajectories.length
+    ) {
       return;
     }
 
 
-    const engage = () => {
+    dom.ctaTrajectories.forEach(
+      container => {
 
-      dom.ctaTrajectory.classList.add(
-        "is-engaged"
-      );
-
-    };
-
-
-    const disengage = () => {
-
-      dom.ctaTrajectory.classList.remove(
-        "is-engaged"
-      );
-
-    };
+        const cta =
+          container.querySelector(
+            ".contact-cta"
+          );
 
 
-    dom.contactCta.addEventListener(
-      "pointerenter",
-      engage
-    );
+        if (!cta) {
+          return;
+        }
 
 
-    dom.contactCta.addEventListener(
-      "pointerleave",
-      disengage
-    );
+        const engage = () => {
+
+          container.classList.add(
+            "is-engaged"
+          );
+
+        };
 
 
-    dom.contactCta.addEventListener(
-      "focusin",
-      engage
-    );
+        const disengage = () => {
+
+          container.classList.remove(
+            "is-engaged"
+          );
+
+        };
 
 
-    dom.contactCta.addEventListener(
-      "focusout",
-      disengage
-    );
+        cta.addEventListener(
+          "pointerenter",
+          engage
+        );
 
 
-    dom.contactCta.addEventListener(
-      "pointerdown",
-      engage
+        cta.addEventListener(
+          "pointerleave",
+          disengage
+        );
+
+
+        cta.addEventListener(
+          "focusin",
+          engage
+        );
+
+
+        cta.addEventListener(
+          "focusout",
+          disengage
+        );
+
+
+        cta.addEventListener(
+          "pointerdown",
+          engage
+        );
+
+      }
     );
 
   };
@@ -1801,7 +1835,9 @@
     if ("inert" in dom.standby) {
       dom.standby.inert = false;
     } else {
-      dom.standby.removeAttribute("inert");
+      dom.standby.removeAttribute(
+        "inert"
+      );
     }
 
 
@@ -1839,14 +1875,20 @@
 
 
     if (dom.standby) {
+
       if ("inert" in dom.standby) {
+
         dom.standby.inert = true;
+
       } else {
+
         dom.standby.setAttribute(
           "inert",
           ""
         );
+
       }
+
     }
 
 
@@ -1914,12 +1956,16 @@
 
 
     if ("inert" in dom.standby) {
+
       dom.standby.inert = true;
+
     } else {
+
       dom.standby.setAttribute(
         "inert",
         ""
       );
+
     }
 
 
