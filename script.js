@@ -42,6 +42,11 @@
     resizeTimer: null,
     standbyTimer: null,
     loaderTimer: null,
+    loaderFailsafeTimer: null,
+    loaderStarted: null,
+    loaderReady: false,
+    loaderCompletionScheduled: false,
+
     rafId: null,
 
     reducedMotion: false,
@@ -306,7 +311,7 @@
     }
 
 
-    const started =
+    state.loaderStarted =
       performance.now();
 
 
@@ -315,6 +320,75 @@
         5000,
         CONFIG.loaderMinimumTime
       );
+
+
+    /*
+     * LOGO
+     *
+     * Il logo è parte del loader editoriale:
+     * viene posizionato sopra la traiettoria di caricamento.
+     *
+     * Se il markup è già presente, non viene duplicato.
+     */
+
+    const loaderInner =
+      dom.loader.querySelector(
+        ".page-loader-inner"
+      );
+
+
+    if (loaderInner) {
+
+      let logo =
+        loaderInner.querySelector(
+          ".page-loader-logo"
+        );
+
+
+      if (!logo) {
+
+        logo =
+          document.createElement("img");
+
+        logo.className =
+          "page-loader-logo";
+
+        logo.src =
+          "/assets/images/cp-mark.png";
+
+        logo.alt =
+          "Cesare Paratore";
+
+        logo.setAttribute(
+          "aria-hidden",
+          "true"
+        );
+
+
+        const trajectory =
+          loaderInner.querySelector(
+            ".loader-trajectory"
+          );
+
+
+        if (trajectory) {
+
+          loaderInner.insertBefore(
+            logo,
+            trajectory
+          );
+
+        } else {
+
+          loaderInner.prepend(
+            logo
+          );
+
+        }
+
+      }
+
+    }
 
 
     const complete = () => {
@@ -328,46 +402,81 @@
 
 
       if (state.loaderTimer) {
+
         window.clearTimeout(
           state.loaderTimer
         );
 
         state.loaderTimer = null;
+
       }
 
 
+      if (state.loaderFailsafeTimer) {
+
+        window.clearTimeout(
+          state.loaderFailsafeTimer
+        );
+
+        state.loaderFailsafeTimer = null;
+
+      }
+
+
+      state.loaderCompletionScheduled =
+        false;
+
+
+      /*
+       * Prima rendiamo esplicito lo stato finale.
+       * Poi lasciamo al CSS il tempo di eseguire
+       * l'eventuale dissolvenza editoriale.
+       */
+
       dom.loader.classList.add(
-        "is-hidden"
+        "is-ready"
       );
 
 
       window.setTimeout(
-        () =>
-          dom.loader?.remove(),
-        950
+        () => {
+
+          if (!dom.loader) {
+            return;
+          }
+
+
+          dom.loader.classList.add(
+            "is-hidden"
+          );
+
+
+          window.setTimeout(
+            () =>
+              dom.loader?.remove(),
+            950
+          );
+
+        },
+        120
       );
 
     };
 
 
-    const finish = force => {
+    const completeWhenMinimumElapsed = () => {
 
-      if (state.loaded) {
+      if (
+        state.loaded ||
+        state.loaderCompletionScheduled
+      ) {
         return;
-      }
-
-
-      if (force) {
-
-        complete();
-
-        return;
-
       }
 
 
       const elapsed =
-        performance.now() - started;
+        performance.now() -
+        state.loaderStarted;
 
 
       const remaining =
@@ -377,45 +486,138 @@
         );
 
 
-      if (state.loaderTimer) {
-        return;
-      }
+      state.loaderCompletionScheduled =
+        true;
 
 
       state.loaderTimer =
         window.setTimeout(
-          complete,
+          () => {
+
+            state.loaderTimer = null;
+
+            complete();
+
+          },
           remaining
         );
 
     };
 
 
+    const markReady = () => {
+
+      if (state.loaded) {
+        return;
+      }
+
+
+      state.loaderReady = true;
+
+
+      completeWhenMinimumElapsed();
+
+    };
+
+
+    /*
+     * Se il documento è già completamente caricato,
+     * possiamo iniziare subito a contare il tempo minimo.
+     */
+
     if (
       document.readyState ===
       "complete"
     ) {
 
-      finish(false);
+      markReady();
 
     } else {
 
       window.addEventListener(
         "load",
-        () => finish(false),
-        { once: true }
+        markReady,
+        {
+          once: true
+        }
       );
 
     }
 
 
-    window.setTimeout(
-      () => finish(true),
+    /*
+     * FAILSAFE TECNICO.
+     *
+     * È indipendente dal timer principale:
+     * se il browser non emette load o qualcosa
+     * impedisce il completamento normale, il loader
+     * viene comunque rimosso.
+     *
+     * Il valore è sempre superiore al minimo di 5s.
+     */
+
+    const failsafeDelay =
       Math.max(
-        CONFIG.loaderMaximumWait,
-        minimumTime + 100
-      )
-    );
+        8000,
+        minimumTime + 500
+      );
+
+
+    state.loaderFailsafeTimer =
+      window.setTimeout(
+        () => {
+
+          if (state.loaded) {
+            return;
+          }
+
+
+          /*
+           * Il failsafe può chiudere solo dopo
+           * il tempo minimo garantito.
+           */
+
+          const elapsed =
+            performance.now() -
+            state.loaderStarted;
+
+
+          const remaining =
+            Math.max(
+              0,
+              minimumTime - elapsed
+            );
+
+
+          if (remaining > 0) {
+
+            state.loaderFailsafeTimer =
+              window.setTimeout(
+                () => {
+
+                  state.loaderFailsafeTimer =
+                    null;
+
+                  complete();
+
+                },
+                remaining
+              );
+
+            return;
+
+          }
+
+
+          state.loaderFailsafeTimer =
+            null;
+
+
+          complete();
+
+        },
+        failsafeDelay
+      );
 
   };
 
@@ -854,8 +1056,18 @@
 
     } else {
 
+      const previousIndex =
+        index - 1;
+
       const previousNumber =
-        getSectionNumber(index - 1);
+        getSectionNumber(
+          previousIndex
+        );
+
+      const previousSection =
+        getSectionByIndex(
+          previousIndex
+        );
 
 
       dom.previousSection?.classList.remove(
@@ -878,7 +1090,7 @@
 
         dom.previousSection.setAttribute(
           "aria-label",
-          `Vai alla sezione ${previousNumber}`
+          `Vai a ${getSectionTitle(previousSection)}`
         );
 
       }
@@ -887,7 +1099,9 @@
       if (dom.previousLabel) {
 
         dom.previousLabel.textContent =
-          previousNumber;
+          getSectionTitle(
+            previousSection
+          );
 
       }
 
@@ -916,7 +1130,9 @@
       if (dom.nextLabel) {
 
         dom.nextLabel.textContent =
-          "01";
+          getSectionTitle(
+            getSectionByIndex(0)
+          );
 
       }
 
@@ -931,8 +1147,18 @@
 
     } else {
 
+      const nextIndex =
+        index + 1;
+
       const nextNumber =
-        getSectionNumber(index + 1);
+        getSectionNumber(
+          nextIndex
+        );
+
+      const nextSection =
+        getSectionByIndex(
+          nextIndex
+        );
 
 
       dom.nextSection?.classList.remove(
@@ -947,7 +1173,7 @@
 
         dom.nextSection.setAttribute(
           "aria-label",
-          `Vai alla sezione ${nextNumber}`
+          `Vai a ${getSectionTitle(nextSection)}`
         );
 
       }
@@ -956,7 +1182,9 @@
       if (dom.nextLabel) {
 
         dom.nextLabel.textContent =
-          nextNumber;
+          getSectionTitle(
+            nextSection
+          );
 
       }
 
@@ -1847,6 +2075,30 @@
       state.standbyTimer = null;
 
     }
+
+  };
+
+
+  const resetStandbyTimer = () => {
+
+    clearStandbyTimer();
+
+
+    if (
+      state.standby ||
+      state.menuOpen ||
+      document.hidden ||
+      !dom.standby
+    ) {
+      return;
+    }
+
+
+    state.standbyTimer =
+      window.setTimeout(
+        enterStandby,
+        CONFIG.standbyDelay
+      );
 
   };
 
