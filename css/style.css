@@ -936,6 +936,8 @@ body.is-menu-open .menu-trigger-icon span:last-child {
 }
 
 .identity-slash {
+  flex: 0 0 auto;
+
   color: var(--terracotta);
 
   font-family: var(--font-mono);
@@ -1377,6 +1379,10 @@ body.is-menu-open .menu-trigger-icon span:last-child {
   line-height: 1.7;
 }
 
+.territory-card p:last-child {
+  margin-bottom: 0;
+}
+
 .territory-card-note {
   color: var(--stone);
 
@@ -1714,9 +1720,9 @@ body.is-menu-open .menu-trigger-icon span:last-child {
 .standby-path {
   position: absolute;
 
-  left: 10%;
-  right: 10%;
-  top: 50%;
+  left: 12%;
+  right: 12%;
+  top: 58%;
 
   height: 1px;
 
@@ -1729,7 +1735,7 @@ body.is-menu-open .menu-trigger-icon span:last-child {
   position: absolute;
 
   left: 50%;
-  top: 50%;
+  top: 58%;
 
   width: 12px;
   height: 12px;
@@ -1739,14 +1745,28 @@ body.is-menu-open .menu-trigger-icon span:last-child {
   background: var(--terracotta);
 
   transform: translate(-50%, -50%);
-
-  box-shadow:
-    0 0 0 10px rgba(166, 66, 50, .07);
 }
 
 .standby-center {
   position: relative;
   z-index: 1;
+
+  width: min(88vw, 720px);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  text-align: center;
+}
+
+.standby-logo {
+  width: clamp(74px, 9vw, 112px);
+  height: auto;
+
+  margin-bottom: clamp(48px, 7vw, 78px);
+
+  object-fit: contain;
 }
 
 .standby-copy {
@@ -1761,7 +1781,7 @@ body.is-menu-open .menu-trigger-icon span:last-child {
   color: var(--ink);
 
   font-family: var(--font-serif);
-  font-size: clamp(38px, 6vw, 72px);
+  font-size: clamp(48px, 7vw, 88px);
   line-height: .95;
 }
 
@@ -1775,7 +1795,7 @@ body.is-menu-open .menu-trigger-icon span:last-child {
   min-width: 120px;
   min-height: 52px;
 
-  margin-top: 30px;
+  margin-top: 28px;
   padding: 8px 20px;
 
   border: 0;
@@ -1830,10 +1850,26 @@ body.is-menu-open .menu-trigger-icon span:last-child {
   outline-offset: 8px;
 }
 
+.standby-motto {
+  display: flex;
+  align-items: center;
+  gap: .55em;
+
+  margin: 52px 0 0;
+
+  color: var(--ink);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .12em;
+  line-height: 1.4;
+}
+
 .standby-signature {
   display: block;
 
-  margin-top: 28px;
+  margin-top: 20px;
 
   color: var(--stone);
 
@@ -2045,6 +2081,24 @@ body.is-menu-open .menu-trigger-icon span:last-child {
     font-size: 12px;
   }
 
+  .standby-path {
+    left: 9%;
+    right: 9%;
+    top: 61%;
+  }
+
+  .standby-point {
+    top: 61%;
+  }
+
+  .standby-logo {
+    margin-bottom: 50px;
+  }
+
+  .standby-motto {
+    margin-top: 44px;
+  }
+
 }
 
 
@@ -2149,6 +2203,40 @@ body.is-menu-open .menu-trigger-icon span:last-child {
   .loader-signature {
     margin-top: 18px;
     font-size: 8px;
+  }
+
+  .standby-center {
+    width: min(90vw, 720px);
+  }
+
+  .standby-logo {
+    width: 76px;
+    margin-bottom: 42px;
+  }
+
+  .standby-label {
+    font-size: clamp(42px, 14vw, 64px);
+  }
+
+  .standby-motto {
+    margin-top: 40px;
+    font-size: 8px;
+    letter-spacing: .08em;
+  }
+
+  .standby-signature {
+    font-size: 8px;
+    margin-top: 16px;
+  }
+
+  .standby-path {
+    left: 6%;
+    right: 6%;
+    top: 64%;
+  }
+
+  .standby-point {
+    top: 64%;
   }
 
 }
