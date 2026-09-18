@@ -107,6 +107,7 @@ a {
 
 /* =========================================================
    LOADER
+   PUNTO → LINEA → DIREZIONE
    ========================================================= */
 
 .page-loader {
@@ -688,8 +689,7 @@ body.is-menu-open .menu-trigger-icon span:last-child {
 }
 
 .site-menu-nav a {
-  display: grid;
-  grid-template-columns: 38px 1fr;
+  display: inline-flex;
   align-items: baseline;
 
   min-height: 52px;
@@ -714,11 +714,7 @@ body.is-menu-open .menu-trigger-icon span:last-child {
 }
 
 .site-menu-number {
-  color: var(--stone);
-
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: .08em;
+  display: none;
 }
 
 
@@ -1021,7 +1017,7 @@ body.is-menu-open .menu-trigger-icon span:last-child {
 
   left: 3%;
   right: 3%;
-  top: 50%;
+  top: 62%;
 
   height: 1px;
 
@@ -1261,7 +1257,7 @@ body.is-menu-open .menu-trigger-icon span:last-child {
 
   left: 8%;
   right: 8%;
-  top: 50%;
+  top: 66%;
 
   height: 1px;
 
@@ -1278,7 +1274,7 @@ body.is-menu-open .menu-trigger-icon span:last-child {
   position: absolute;
 
   left: 50%;
-  top: 50%;
+  top: 66%;
 
   width: 18px;
   height: 18px;
@@ -1289,9 +1285,6 @@ body.is-menu-open .menu-trigger-icon span:last-child {
 
   transform:
     translate(-50%, -50%);
-
-  box-shadow:
-    0 0 0 12px rgba(166, 66, 50, .08);
 }
 
 
@@ -1396,8 +1389,6 @@ body.is-menu-open .menu-trigger-icon span:last-child {
 
   min-height: 560px;
 
-  overflow: hidden;
-
   background: var(--sand);
 }
 
@@ -1423,8 +1414,6 @@ body.is-menu-open .menu-trigger-icon span:last-child {
   position: relative;
 
   margin: 0;
-
-  overflow: hidden;
 
   background: var(--sand);
 }
@@ -1511,7 +1500,7 @@ body.is-menu-open .menu-trigger-icon span:last-child {
 
   left: 0;
   right: 7%;
-  top: 42%;
+  top: 36%;
 
   height: 1px;
 
@@ -1532,7 +1521,7 @@ body.is-menu-open .menu-trigger-icon span:last-child {
   position: absolute;
 
   right: 6.5%;
-  top: 42%;
+  top: 36%;
 
   width: 14px;
   height: 14px;
@@ -1545,15 +1534,14 @@ body.is-menu-open .menu-trigger-icon span:last-child {
     translate(50%, -50%);
 
   transition:
-    transform .55s var(--ease-out),
-    box-shadow .45s ease;
+    transform .55s var(--ease-out);
 }
 
 .contact-cta {
   position: absolute;
 
   right: 0;
-  top: calc(42% + 48px);
+  top: calc(36% + 52px);
 
   display: inline-flex;
   align-items: center;
@@ -1635,10 +1623,7 @@ body.is-menu-open .menu-trigger-icon span:last-child {
 .cta-trajectory.is-engaged .cta-trajectory-point {
   transform:
     translate(50%, -50%)
-    scale(1.65);
-
-  box-shadow:
-    0 0 0 8px rgba(166, 66, 50, .08);
+    scale(1.35);
 }
 
 .cta-trajectory.is-engaged .cta-trajectory-line {
@@ -1677,6 +1662,8 @@ body.is-menu-open .menu-trigger-icon span:last-child {
 
 /* =========================================================
    STANDBY
+   LOGO → RIPRENDI → TOCCA → MOVIMENTO / CON DIREZIONE.
+   → CESARE PARATORE
    ========================================================= */
 
 .standby-screen {
@@ -1720,31 +1707,49 @@ body.is-menu-open .menu-trigger-icon span:last-child {
 .standby-path {
   position: absolute;
 
-  left: 12%;
-  right: 12%;
-  top: 58%;
+  left: 8%;
+  right: 8%;
+  top: 78%;
 
   height: 1px;
 
   background: var(--sand);
 
   transform: rotate(-4deg);
+
+  opacity: 0;
+
+  animation:
+    standbyPathIn
+    1.2s
+    var(--ease-out)
+    2.4s
+    forwards;
 }
 
 .standby-point {
   position: absolute;
 
   left: 50%;
-  top: 58%;
+  top: 78%;
 
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
 
   border-radius: 50%;
 
   background: var(--terracotta);
 
   transform: translate(-50%, -50%);
+
+  opacity: 0;
+
+  animation:
+    standbyPointIn
+    .6s
+    var(--ease-out)
+    2.1s
+    forwards;
 }
 
 .standby-center {
@@ -1764,9 +1769,18 @@ body.is-menu-open .menu-trigger-icon span:last-child {
   width: clamp(74px, 9vw, 112px);
   height: auto;
 
-  margin-bottom: clamp(48px, 7vw, 78px);
+  margin-bottom: clamp(44px, 6vw, 70px);
 
   object-fit: contain;
+
+  opacity: 0;
+
+  animation:
+    standbyLogoIn
+    1s
+    var(--ease-out)
+    .15s
+    forwards;
 }
 
 .standby-copy {
@@ -1783,6 +1797,15 @@ body.is-menu-open .menu-trigger-icon span:last-child {
   font-family: var(--font-serif);
   font-size: clamp(48px, 7vw, 88px);
   line-height: .95;
+
+  opacity: 0;
+
+  animation:
+    standbyResumeIn
+    1s
+    var(--ease-out)
+    1.05s
+    forwards;
 }
 
 .standby-wake {
@@ -1806,6 +1829,15 @@ body.is-menu-open .menu-trigger-icon span:last-child {
   font: inherit;
 
   cursor: pointer;
+
+  opacity: 0;
+
+  animation:
+    standbyTouchIn
+    .9s
+    var(--ease-out)
+    1.85s
+    forwards;
 }
 
 .standby-touch {
@@ -1864,6 +1896,15 @@ body.is-menu-open .menu-trigger-icon span:last-child {
   font-weight: 500;
   letter-spacing: .12em;
   line-height: 1.4;
+
+  opacity: 0;
+
+  animation:
+    standbyMottoIn
+    .9s
+    var(--ease-out)
+    2.8s
+    forwards;
 }
 
 .standby-signature {
@@ -1876,6 +1917,91 @@ body.is-menu-open .menu-trigger-icon span:last-child {
   font-family: var(--font-mono);
   font-size: 9px;
   letter-spacing: .16em;
+
+  opacity: 0;
+
+  animation:
+    standbySignatureIn
+    .9s
+    var(--ease-out)
+    3.35s
+    forwards;
+}
+
+@keyframes standbyLogoIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes standbyResumeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes standbyTouchIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes standbyMottoIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes standbySignatureIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes standbyPointIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes standbyPathIn {
+  from {
+    opacity: 0;
+    transform: rotate(-4deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: rotate(-4deg);
+  }
 }
 
 
@@ -2027,6 +2153,10 @@ body.is-menu-open .menu-trigger-icon span:last-child {
     height: 100px;
   }
 
+  .direction-trajectory-line {
+    top: 66%;
+  }
+
   .direction-node-label {
     font-size: 7px;
   }
@@ -2058,37 +2188,41 @@ body.is-menu-open .menu-trigger-icon span:last-child {
   }
 
   .cta-trajectory {
-    min-height: 170px;
+    min-height: 180px;
     margin-top: 64px;
   }
 
   .cta-trajectory-line {
     right: 9%;
-    top: 38%;
+    top: 32%;
   }
 
   .cta-trajectory-point {
     right: 8.5%;
-    top: 38%;
+    top: 32%;
   }
 
   .contact-cta {
     right: 0;
-    top: calc(38% + 42px);
+    top: calc(32% + 46px);
 
     max-width: 88%;
 
     font-size: 12px;
   }
 
+  .standby-center {
+    width: min(88vw, 720px);
+  }
+
   .standby-path {
-    left: 9%;
-    right: 9%;
-    top: 61%;
+    left: 7%;
+    right: 7%;
+    top: 82%;
   }
 
   .standby-point {
-    top: 61%;
+    top: 82%;
   }
 
   .standby-logo {
@@ -2131,6 +2265,10 @@ body.is-menu-open .menu-trigger-icon span:last-child {
     height: 90px;
   }
 
+  .direction-trajectory-line {
+    top: 70%;
+  }
+
   .direction-node-label {
     display: none;
   }
@@ -2161,21 +2299,23 @@ body.is-menu-open .menu-trigger-icon span:last-child {
   }
 
   .cta-trajectory {
-    min-height: 190px;
+    min-height: 200px;
     margin-top: 54px;
   }
 
   .cta-trajectory-line {
     right: 13%;
+    top: 30%;
   }
 
   .cta-trajectory-point {
     right: 12.5%;
+    top: 30%;
   }
 
   .contact-cta {
     right: 0;
-    top: calc(38% + 38px);
+    top: calc(30% + 44px);
 
     max-width: 94%;
 
@@ -2218,6 +2358,10 @@ body.is-menu-open .menu-trigger-icon span:last-child {
     font-size: clamp(42px, 14vw, 64px);
   }
 
+  .standby-wake {
+    margin-top: 24px;
+  }
+
   .standby-motto {
     margin-top: 40px;
     font-size: 8px;
@@ -2230,13 +2374,13 @@ body.is-menu-open .menu-trigger-icon span:last-child {
   }
 
   .standby-path {
-    left: 6%;
-    right: 6%;
-    top: 64%;
+    left: 5%;
+    right: 5%;
+    top: 84%;
   }
 
   .standby-point {
-    top: 64%;
+    top: 84%;
   }
 
 }
@@ -2285,6 +2429,17 @@ body.is-menu-open .menu-trigger-icon span:last-child {
     transform: none;
   }
 
+  .standby-path,
+  .standby-point,
+  .standby-logo,
+  .standby-label,
+  .standby-wake,
+  .standby-motto,
+  .standby-signature {
+    opacity: 1;
+    transform: none;
+  }
+
 }
 
 .reduced-motion .page-loader .loader-point,
@@ -2312,6 +2467,18 @@ body.is-menu-open .menu-trigger-icon span:last-child {
 .reduced-motion .contact-cta,
 .reduced-motion .site-brand,
 .reduced-motion .menu-trigger {
+  transform: none;
+}
+
+.reduced-motion .standby-path,
+.reduced-motion .standby-point,
+.reduced-motion .standby-logo,
+.reduced-motion .standby-label,
+.reduced-motion .standby-wake,
+.reduced-motion .standby-motto,
+.reduced-motion .standby-signature {
+  animation: none;
+  opacity: 1;
   transform: none;
 }
 
