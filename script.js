@@ -7,15 +7,20 @@
 (() => {
   "use strict";
 
-  /*
-   * Progressive enhancement:
-   * viene applicato immediatamente, prima dell'inizializzazione
-   * DOMContentLoaded, così html.js è già disponibile quando
-   * il CSS viene valutato.
-   */
+
+  /* =======================================================
+     PROGRESSIVE ENHANCEMENT
+     ======================================================= */
+
   document.documentElement.classList.add("js");
 
+
+  /* =======================================================
+     CONFIGURATION
+     ======================================================= */
+
   const CONFIG = {
+
     loaderMinimumTime: 650,
     loaderMaximumWait: 3500,
 
@@ -26,6 +31,7 @@
     resizeDebounce: 180,
 
     scrollNavigationOffset: 18,
+
     transitionDuration: 500,
 
     trajectoryLerp: 0.085,
@@ -39,9 +45,16 @@
     activeSectionReference: 0.52,
 
     focusDelay: 120
+
   };
 
+
+  /* =======================================================
+     STATE
+     ======================================================= */
+
   const state = {
+
     loaded: false,
 
     menuOpen: false,
@@ -54,7 +67,6 @@
 
     resizeTimer: null,
     standbyTimer: null,
-
     loaderTimer: null,
 
     rafId: null,
@@ -82,95 +94,197 @@
       drift: 0,
       targetDrift: 0
     }
+
   };
 
+
+  /* =======================================================
+     DOM
+     ======================================================= */
+
   const dom = {
+
     html: document.documentElement,
     body: document.body,
 
-    loader: document.querySelector(".page-loader"),
-    transition: document.querySelector(".page-transition"),
+    loader:
+      document.querySelector(".page-loader"),
 
-    cursor: document.querySelector(".custom-cursor"),
-    cursorDot: document.querySelector(".custom-cursor-dot"),
-    cursorRing: document.querySelector(".custom-cursor-ring"),
+    transition:
+      document.querySelector(".page-transition"),
 
-    header: document.querySelector(".site-header"),
+    cursor:
+      document.querySelector(".custom-cursor"),
 
-    menu: document.querySelector(".site-menu"),
-    menuTrigger: document.querySelector(".menu-trigger"),
-    menuLinks: Array.from(
-      document.querySelectorAll(".site-menu a")
-    ),
+    cursorDot:
+      document.querySelector(".custom-cursor-dot"),
 
-    progressLabel: document.querySelector("#progress-current"),
-    progressFill: document.querySelector("#progress-fill"),
-    progressPoint: document.querySelector("#progress-point"),
+    cursorRing:
+      document.querySelector(".custom-cursor-ring"),
 
-    previousSection: document.querySelector("#previous-section"),
-    previousLabel: document.querySelector("#previous-section-label"),
+    header:
+      document.querySelector(".site-header"),
 
-    nextSection: document.querySelector("#next-section"),
-    nextLabel: document.querySelector("#next-section-label"),
+    menu:
+      document.querySelector(".site-menu"),
 
-    sections: Array.from(
-      document.querySelectorAll(".home-section")
-    ),
+    menuTrigger:
+      document.querySelector(".menu-trigger"),
 
-    reveals: Array.from(
-      document.querySelectorAll(".reveal")
-    ),
+    menuLinks:
+      Array.from(
+        document.querySelectorAll(
+          ".site-menu a"
+        )
+      ),
 
-    narrativeLinks: Array.from(
-      document.querySelectorAll(".narrative-link")
-    ),
+    progressLabel:
+      document.querySelector(
+        "#progress-current"
+      ),
 
-    magneticElements: Array.from(
-      document.querySelectorAll(
-        ".site-brand, .menu-trigger, .contact-cta"
+    progressFill:
+      document.querySelector(
+        "#progress-fill"
+      ),
+
+    progressPoint:
+      document.querySelector(
+        "#progress-point"
+      ),
+
+    previousSection:
+      document.querySelector(
+        "#previous-section"
+      ),
+
+    previousLabel:
+      document.querySelector(
+        "#previous-section-label"
+      ),
+
+    nextSection:
+      document.querySelector(
+        "#next-section"
+      ),
+
+    nextLabel:
+      document.querySelector(
+        "#next-section-label"
+      ),
+
+    sections:
+      Array.from(
+        document.querySelectorAll(
+          ".home-section"
+        )
+      ),
+
+    reveals:
+      Array.from(
+        document.querySelectorAll(
+          ".reveal"
+        )
+      ),
+
+    narrativeLinks:
+      Array.from(
+        document.querySelectorAll(
+          ".narrative-link"
+        )
+      ),
+
+    magneticElements:
+      Array.from(
+        document.querySelectorAll(
+          ".site-brand, .menu-trigger, .contact-cta"
+        )
+      ),
+
+    transitionLinks:
+      Array.from(
+        document.querySelectorAll(
+          'a[href]:not([target="_blank"])'
+        )
+      ),
+
+    standby:
+      document.querySelector(
+        ".standby-screen"
+      ),
+
+    standbyWake:
+      document.querySelector(
+        ".standby-wake"
+      ),
+
+    ctaTrajectory:
+      document.querySelector(
+        ".cta-trajectory"
+      ),
+
+    contactCta:
+      document.querySelector(
+        ".contact-cta"
+      ),
+
+    directionLinks:
+      Array.from(
+        document.querySelectorAll(
+          ".hero-direction[data-direction]"
+        )
+      ),
+
+    directionNodes:
+      Array.from(
+        document.querySelectorAll(
+          ".direction-node[data-direction]"
+        )
       )
-    ),
 
-    transitionLinks: Array.from(
-      document.querySelectorAll(
-        'a[href]:not([target="_blank"])'
-      )
-    ),
-
-    standby: document.querySelector(".standby-screen"),
-    standbyWake: document.querySelector(".standby-wake"),
-
-    ctaTrajectory: document.querySelector(".cta-trajectory"),
-    contactCta: document.querySelector(".contact-cta"),
-
-    directionLinks: Array.from(
-      document.querySelectorAll(
-        ".hero-direction[data-direction]"
-      )
-    ),
-
-    directionNodes: Array.from(
-      document.querySelectorAll(
-        ".direction-node[data-direction]"
-      )
-    )
   };
 
-  /* =========================================================
-     UTILITIES
-     ========================================================= */
 
-  const clamp = (value, min, max) =>
-    Math.min(Math.max(value, min), max);
+  /* =======================================================
+     HELPERS
+     ======================================================= */
 
-  const lerp = (current, target, amount) =>
-    current + (target - current) * amount;
+  const clamp = (
+    value,
+    min,
+    max
+  ) =>
+    Math.min(
+      Math.max(value, min),
+      max
+    );
+
+
+  const lerp = (
+    current,
+    target,
+    amount
+  ) =>
+    current +
+    (
+      target -
+      current
+    ) *
+    amount;
+
 
   const getSectionNumber = index =>
-    String(index + 1).padStart(2, "0");
+    String(index + 1).padStart(
+      2,
+      "0"
+    );
+
 
   const getSectionByIndex = index => {
-    if (!dom.sections.length) return null;
+
+    if (!dom.sections.length) {
+      return null;
+    }
 
     return dom.sections[
       clamp(
@@ -179,13 +293,17 @@
         dom.sections.length - 1
       )
     ];
+
   };
+
 
   const getSectionTitle = section =>
     section?.dataset.sectionTitle || "";
 
+
   const isFinePointer = () =>
     state.finePointer;
+
 
   const isModifiedClick = event =>
     event.button !== 0 ||
@@ -194,8 +312,12 @@
     event.shiftKey ||
     event.altKey;
 
+
   const isEditableElement = element => {
-    if (!element) return false;
+
+    if (!element) {
+      return false;
+    }
 
     return (
       element.matches?.(
@@ -203,10 +325,15 @@
       ) ||
       element.isContentEditable
     );
+
   };
 
+
   const getFocusableElements = container => {
-    if (!container) return [];
+
+    if (!container) {
+      return [];
+    }
 
     return Array.from(
       container.querySelectorAll(
@@ -220,38 +347,63 @@
         ].join(",")
       )
     ).filter(element => {
+
       const style =
-        window.getComputedStyle(element);
+        window.getComputedStyle(
+          element
+        );
 
       return (
         style.display !== "none" &&
         style.visibility !== "hidden" &&
         !element.hasAttribute("hidden")
       );
+
     });
+
   };
+
 
   const setStyleVariable = (
     element,
     property,
     value
   ) => {
-    element?.style.setProperty(property, value);
+
+    element?.style.setProperty(
+      property,
+      value
+    );
+
   };
 
-  /* =========================================================
-     PROGRESSIVE ENHANCEMENT
-     ========================================================= */
 
-  const initProgressiveEnhancement = () => {
-    dom.html.classList.add("js");
+  const cssEscape = value => {
+
+    if (
+      typeof window.CSS !== "undefined" &&
+      typeof window.CSS.escape === "function"
+    ) {
+      return window.CSS.escape(
+        value
+      );
+    }
+
+    return String(value)
+      .replace(
+        /[^a-zA-Z0-9_-]/g,
+        "\\$&"
+      );
+
   };
 
-  /* =========================================================
+
+  /* =======================================================
      PREFERENCES
-     ========================================================= */
+     ======================================================= */
 
   const initPreferences = () => {
+
     const motionMedia =
       window.matchMedia(
         "(prefers-reduced-motion: reduce)"
@@ -262,8 +414,11 @@
         "(pointer: fine)"
       );
 
+
     const applyMotion = matches => {
-      state.reducedMotion = matches;
+
+      state.reducedMotion =
+        matches;
 
       dom.html.classList.toggle(
         "reduced-motion",
@@ -275,7 +430,9 @@
         matches
       );
 
+
       if (matches) {
+
         state.trajectory.drift = 0;
         state.trajectory.targetDrift = 0;
 
@@ -285,86 +442,137 @@
         );
 
         stopAnimationLoop();
+
         clearStandbyTimer();
+
       } else {
+
         updateTrajectoryTargets();
+
         resetStandbyTimer();
+
         updateAnimationRequirement();
+
       }
+
     };
 
+
     const applyPointer = matches => {
-      state.finePointer = matches;
+
+      state.finePointer =
+        matches;
 
       dom.html.classList.toggle(
         "fine-pointer",
         matches
       );
 
+
       if (!matches) {
+
         dom.cursor?.classList.remove(
           "is-visible",
           "is-hovering"
         );
+
       }
 
       updateAnimationRequirement();
+
     };
 
-    applyMotion(motionMedia.matches);
-    applyPointer(pointerMedia.matches);
+
+    applyMotion(
+      motionMedia.matches
+    );
+
+    applyPointer(
+      pointerMedia.matches
+    );
+
 
     if (
       typeof motionMedia.addEventListener ===
       "function"
     ) {
+
       motionMedia.addEventListener(
         "change",
-        event => applyMotion(event.matches)
+        event =>
+          applyMotion(
+            event.matches
+          )
       );
+
     } else if (
       typeof motionMedia.addListener ===
       "function"
     ) {
+
       motionMedia.addListener(
-        event => applyMotion(event.matches)
+        event =>
+          applyMotion(
+            event.matches
+          )
       );
+
     }
+
 
     if (
       typeof pointerMedia.addEventListener ===
       "function"
     ) {
+
       pointerMedia.addEventListener(
         "change",
-        event => applyPointer(event.matches)
+        event =>
+          applyPointer(
+            event.matches
+          )
       );
+
     } else if (
       typeof pointerMedia.addListener ===
       "function"
     ) {
+
       pointerMedia.addListener(
-        event => applyPointer(event.matches)
+        event =>
+          applyPointer(
+            event.matches
+          )
       );
+
     }
+
   };
 
-  /* =========================================================
+
+  /* =======================================================
      LOADER
-     ========================================================= */
+     ======================================================= */
 
   const initLoader = () => {
+
     if (!dom.loader) {
+
       state.loaded = true;
+
       return;
+
     }
+
 
     const started =
       performance.now();
 
     let finished = false;
 
+
     const removeLoader = () => {
+
       if (
         finished ||
         state.loaded
@@ -374,9 +582,24 @@
 
       finished = true;
 
+
+      if (
+        state.loaderTimer !== null
+      ) {
+
+        window.clearTimeout(
+          state.loaderTimer
+        );
+
+        state.loaderTimer = null;
+
+      }
+
+
       const elapsed =
         performance.now() -
         started;
+
 
       const remaining =
         Math.max(
@@ -385,159 +608,229 @@
           elapsed
         );
 
-      window.setTimeout(() => {
-        if (state.loaded) return;
 
-        state.loaded = true;
+      window.setTimeout(
+        () => {
 
-        dom.loader.classList.add(
-          "is-hidden"
-        );
+          if (state.loaded) {
+            return;
+          }
 
-        window.setTimeout(
-          () => dom.loader?.remove(),
-          800
-        );
-      }, remaining);
+          state.loaded = true;
+
+          dom.loader?.classList.add(
+            "is-hidden"
+          );
+
+
+          window.setTimeout(
+            () => {
+              dom.loader?.remove();
+            },
+            800
+          );
+
+        },
+        remaining
+      );
+
     };
+
 
     if (
       document.readyState ===
       "complete"
     ) {
+
       removeLoader();
+
     } else {
+
       window.addEventListener(
         "load",
         removeLoader,
         { once: true }
       );
+
     }
+
 
     state.loaderTimer =
       window.setTimeout(
         removeLoader,
         CONFIG.loaderMaximumWait
       );
+
   };
 
-  /* =========================================================
+
+  /* =======================================================
      PAGE TRANSITIONS
-     ========================================================= */
+     ======================================================= */
 
   const initPageTransitions = () => {
-    if (!dom.transition) return;
 
-    dom.transitionLinks.forEach(link => {
-      link.addEventListener(
-        "click",
-        event => {
-          if (
-            isModifiedClick(event)
-          ) {
-            return;
-          }
+    if (!dom.transition) {
+      return;
+    }
 
-          if (
-            link.hasAttribute("download") ||
-            link.target &&
-            link.target !== "_self"
-          ) {
-            return;
-          }
 
-          const href =
-            link.getAttribute("href");
+    dom.transitionLinks.forEach(
+      link => {
 
-          if (
-            !href ||
-            href.startsWith("#") ||
-            href.startsWith("mailto:") ||
-            href.startsWith("tel:")
-          ) {
-            return;
-          }
+        link.addEventListener(
+          "click",
+          event => {
 
-          let url;
+            if (
+              isModifiedClick(event)
+            ) {
+              return;
+            }
 
-          try {
-            url = new URL(
-              href,
+
+            if (
+              link.hasAttribute(
+                "download"
+              ) ||
+              (
+                link.target &&
+                link.target !== "_self"
+              )
+            ) {
+              return;
+            }
+
+
+            const href =
+              link.getAttribute(
+                "href"
+              );
+
+
+            if (
+              !href ||
+              href.startsWith("#") ||
+              href.startsWith("mailto:") ||
+              href.startsWith("tel:")
+            ) {
+              return;
+            }
+
+
+            let url;
+
+            try {
+
+              url =
+                new URL(
+                  href,
+                  window.location.href
+                );
+
+            } catch {
+
+              return;
+
+            }
+
+
+            if (
+              url.origin !==
+              window.location.origin
+            ) {
+              return;
+            }
+
+
+            if (
+              url.href ===
               window.location.href
+            ) {
+              return;
+            }
+
+
+            if (
+              state.reducedMotion
+            ) {
+              return;
+            }
+
+
+            event.preventDefault();
+
+
+            dom.transition.classList.add(
+              "is-active"
             );
-          } catch {
-            return;
-          }
 
-          if (
-            url.origin !==
-            window.location.origin
-          ) {
-            return;
-          }
 
-          if (
-            url.href ===
-            window.location.href
-          ) {
-            return;
-          }
-
-          if (state.reducedMotion) {
-            return;
-          }
-
-          event.preventDefault();
-
-          dom.transition.classList.add(
-            "is-active"
-          );
-
-          window.setTimeout(() => {
-            window.location.assign(
-              url.href
+            window.setTimeout(
+              () => {
+                window.location.assign(
+                  url.href
+                );
+              },
+              CONFIG.transitionDuration
             );
-          }, CONFIG.transitionDuration);
-        }
-      );
-    });
+
+          }
+        );
+
+      }
+    );
+
 
     window.addEventListener(
       "pageshow",
       () => {
+
         dom.transition?.classList.remove(
           "is-active"
         );
+
       }
     );
+
 
     window.addEventListener(
       "pagehide",
       () => {
+
         dom.transition?.classList.remove(
           "is-active"
         );
+
       }
     );
+
   };
 
-  /* =========================================================
+
+  /* =======================================================
      MENU ACCESSIBILITY
-     ========================================================= */
+     ======================================================= */
 
   const setMenuAccessibility =
     isOpen => {
-      if (!dom.menu) return;
+
+      if (!dom.menu) {
+        return;
+      }
+
 
       dom.menu.setAttribute(
         "aria-hidden",
         String(!isOpen)
       );
 
+
       dom.menuTrigger?.setAttribute(
         "aria-expanded",
         String(isOpen)
       );
+
 
       dom.menuTrigger?.setAttribute(
         "aria-label",
@@ -546,23 +839,34 @@
           : "Apri menu"
       );
 
+
       if (
         "inert" in dom.menu
       ) {
-        dom.menu.inert = !isOpen;
+
+        dom.menu.inert =
+          !isOpen;
+
       } else if (isOpen) {
+
         dom.menu.removeAttribute(
           "inert"
         );
+
       } else {
+
         dom.menu.setAttribute(
           "inert",
           ""
         );
+
       }
+
     };
 
+
   const openMenu = () => {
+
     if (
       !dom.menu ||
       state.menuOpen ||
@@ -571,40 +875,60 @@
       return;
     }
 
+
     clearStandbyTimer();
+
 
     state.menuReturnFocus =
       document.activeElement;
 
+
     state.menuOpen = true;
 
-    setMenuAccessibility(true);
+
+    setMenuAccessibility(
+      true
+    );
+
 
     dom.body.classList.add(
       "is-menu-open"
     );
 
+
     const focusFirst = () => {
+
       getFocusableElements(
         dom.menu
       )[0]?.focus({
         preventScroll: true
       });
+
     };
 
-    if (state.reducedMotion) {
+
+    if (
+      state.reducedMotion
+    ) {
+
       focusFirst();
+
     } else {
+
       window.setTimeout(
         focusFirst,
         CONFIG.focusDelay
       );
+
     }
+
   };
+
 
   const closeMenu = (
     returnFocus = true
   ) => {
+
     if (
       !dom.menu ||
       !state.menuOpen
@@ -612,19 +936,28 @@
       return;
     }
 
+
     state.menuOpen = false;
 
-    setMenuAccessibility(false);
+
+    setMenuAccessibility(
+      false
+    );
+
 
     dom.body.classList.remove(
       "is-menu-open"
     );
 
+
     const returnTarget =
       state.menuReturnFocus ||
       dom.menuTrigger;
 
-    state.menuReturnFocus = null;
+
+    state.menuReturnFocus =
+      null;
+
 
     if (
       returnFocus &&
@@ -633,19 +966,27 @@
         "function" &&
       document.contains(returnTarget)
     ) {
+
       window.requestAnimationFrame(
         () => {
+
           returnTarget.focus({
             preventScroll: true
           });
+
         }
       );
+
     }
 
+
     resetStandbyTimer();
+
   };
 
+
   const trapMenuFocus = event => {
+
     if (
       !state.menuOpen ||
       event.key !== "Tab"
@@ -653,15 +994,21 @@
       return;
     }
 
+
     const focusable =
       getFocusableElements(
         dom.menu
       );
 
+
     if (!focusable.length) {
+
       event.preventDefault();
+
       return;
+
     }
+
 
     const first =
       focusable[0];
@@ -671,189 +1018,116 @@
         focusable.length - 1
       ];
 
+
     if (
       event.shiftKey &&
       document.activeElement === first
     ) {
+
       event.preventDefault();
+
       last.focus();
+
     } else if (
       !event.shiftKey &&
       document.activeElement === last
     ) {
+
       event.preventDefault();
+
       first.focus();
+
     }
+
   };
 
+
   const initMenu = () => {
-    setMenuAccessibility(false);
+
+    setMenuAccessibility(
+      false
+    );
+
 
     dom.menuTrigger?.addEventListener(
       "click",
       () => {
+
         if (state.menuOpen) {
+
           closeMenu();
+
         } else {
+
           openMenu();
+
         }
+
       }
     );
 
-    dom.menuLinks.forEach(link => {
-      link.addEventListener(
-        "click",
-        () => closeMenu(false)
-      );
-    });
+
+    dom.menuLinks.forEach(
+      link => {
+
+        link.addEventListener(
+          "click",
+          () => {
+            closeMenu(false);
+          }
+        );
+
+      }
+    );
+
 
     dom.menu?.addEventListener(
       "click",
       event => {
+
         if (
           event.target ===
           dom.menu
         ) {
+
           closeMenu();
+
         }
+
       }
     );
+
 
     dom.menu?.addEventListener(
       "keydown",
       trapMenuFocus
     );
 
+
     document.addEventListener(
       "keydown",
       event => {
+
         if (
           event.key === "Escape" &&
           state.menuOpen
         ) {
+
           event.preventDefault();
+
           closeMenu();
+
         }
+
       }
     );
+
   };
 
-  /* =========================================================
+
+  /* =======================================================
      SECTION HEADER / PROGRESS
-     ========================================================= */
-
-  const updateSectionHeader =
-    index => {
-      const section =
-        getSectionByIndex(index);
-
-      if (!section) return;
-
-      const total =
-        dom.sections.length;
-
-      const progress =
-        total <= 1
-          ? 0
-          : index / (total - 1);
-
-      const title =
-        getSectionTitle(section);
-
-      if (dom.progressLabel) {
-        dom.progressLabel.textContent =
-          title;
-
-        dom.progressLabel.setAttribute(
-          "aria-label",
-          `Sezione ${getSectionNumber(
-            index
-          )}: ${title}`
-        );
-      }
-
-      if (dom.progressFill) {
-        dom.progressFill.style.width =
-          `${progress * 100}%`;
-      }
-
-      if (dom.progressPoint) {
-        dom.progressPoint.style.left =
-          `${progress * 100}%`;
-      }
-
-      updateJumpControl(
-        dom.previousSection,
-        dom.previousLabel,
-        index - 1,
-        index === 0,
-        "precedente"
-      );
-
-      const isLast =
-        index === total - 1;
-
-      if (isLast) {
-        dom.nextSection?.classList.add(
-          "is-home-return"
-        );
-
-        if (dom.nextSection) {
-          dom.nextSection.href =
-            "#01";
-
-          dom.nextSection.setAttribute(
-            "aria-label",
-            "Torna all'inizio"
-          );
-        }
-
-        if (dom.nextLabel) {
-          dom.nextLabel.textContent =
-            "01";
-        }
-
-        dom.nextSection
-          ?.querySelector(
-            ".section-jump-arrow"
-          )
-          ?.replaceChildren(
-            document.createTextNode("↑")
-          );
-      } else {
-        const nextNumber =
-          getSectionNumber(
-            index + 1
-          );
-
-        dom.nextSection?.classList.remove(
-          "is-home-return"
-        );
-
-        if (dom.nextSection) {
-          dom.nextSection.href =
-            `#${nextNumber}`;
-
-          dom.nextSection.setAttribute(
-            "aria-label",
-            `Vai alla sezione ${nextNumber}`
-          );
-        }
-
-        if (dom.nextLabel) {
-          dom.nextLabel.textContent =
-            nextNumber;
-        }
-
-        dom.nextSection
-          ?.querySelector(
-            ".section-jump-arrow"
-          )
-          ?.replaceChildren(
-            document.createTextNode("→")
-          );
-      }
-    };
+     ======================================================= */
 
   const updateJumpControl = (
     control,
@@ -862,9 +1136,14 @@
     disabled,
     direction
   ) => {
-    if (!control) return;
+
+    if (!control) {
+      return;
+    }
+
 
     if (disabled) {
+
       control.classList.add(
         "is-disabled"
       );
@@ -879,62 +1158,241 @@
         "-1"
       );
 
+
       if (label) {
         label.textContent = "";
       }
 
+
       return;
+
     }
+
 
     const number =
       getSectionNumber(
         targetIndex
       );
 
+
     control.classList.remove(
       "is-disabled"
     );
+
 
     control.removeAttribute(
       "aria-hidden"
     );
 
+
     control.removeAttribute(
       "tabindex"
     );
 
+
     control.href =
       `#${number}`;
+
 
     control.setAttribute(
       "aria-label",
       `Vai alla sezione ${number}, ${direction}`
     );
 
+
     if (label) {
       label.textContent =
         number;
     }
+
   };
 
-  /* =========================================================
-     NAVIGATION
-     ========================================================= */
+
+  const updateSectionHeader =
+    index => {
+
+      const section =
+        getSectionByIndex(
+          index
+        );
+
+
+      if (!section) {
+        return;
+      }
+
+
+      const total =
+        dom.sections.length;
+
+
+      const progress =
+        total <= 1
+          ? 0
+          : index /
+            (total - 1);
+
+
+      const title =
+        getSectionTitle(
+          section
+        );
+
+
+      if (dom.progressLabel) {
+
+        dom.progressLabel.textContent =
+          title;
+
+        dom.progressLabel.setAttribute(
+          "aria-label",
+          `Sezione ${getSectionNumber(index)}: ${title}`
+        );
+
+      }
+
+
+      if (dom.progressFill) {
+
+        dom.progressFill.style.width =
+          `${progress * 100}%`;
+
+      }
+
+
+      if (dom.progressPoint) {
+
+        dom.progressPoint.style.left =
+          `${progress * 100}%`;
+
+      }
+
+
+      updateJumpControl(
+        dom.previousSection,
+        dom.previousLabel,
+        index - 1,
+        index === 0,
+        "precedente"
+      );
+
+
+      const isLast =
+        index === total - 1;
+
+
+      if (isLast) {
+
+        dom.nextSection?.classList.add(
+          "is-home-return"
+        );
+
+
+        if (dom.nextSection) {
+
+          dom.nextSection.href =
+            "#01";
+
+          dom.nextSection.setAttribute(
+            "aria-label",
+            "Torna all'inizio"
+          );
+
+        }
+
+
+        if (dom.nextLabel) {
+
+          dom.nextLabel.textContent =
+            "01";
+
+        }
+
+
+        dom.nextSection
+          ?.querySelector(
+            ".section-jump-arrow"
+          )
+          ?.replaceChildren(
+            document.createTextNode("↑")
+          );
+
+
+      } else {
+
+        const nextNumber =
+          getSectionNumber(
+            index + 1
+          );
+
+
+        dom.nextSection?.classList.remove(
+          "is-home-return"
+        );
+
+
+        if (dom.nextSection) {
+
+          dom.nextSection.href =
+            `#${nextNumber}`;
+
+          dom.nextSection.setAttribute(
+            "aria-label",
+            `Vai alla sezione ${nextNumber}`
+          );
+
+        }
+
+
+        if (dom.nextLabel) {
+
+          dom.nextLabel.textContent =
+            nextNumber;
+
+        }
+
+
+        dom.nextSection
+          ?.querySelector(
+            ".section-jump-arrow"
+          )
+          ?.replaceChildren(
+            document.createTextNode("→")
+          );
+
+      }
+
+    };
+
+
+  /* =======================================================
+     SECTION NAVIGATION
+     ======================================================= */
 
   const navigateToSection = (
     index,
     updateUrl = true
   ) => {
-    const target =
-      getSectionByIndex(index);
 
-    if (!target) return;
+    const target =
+      getSectionByIndex(
+        index
+      );
+
+
+    if (!target) {
+      return;
+    }
+
 
     const headerHeight =
-      dom.header?.offsetHeight || 0;
+      dom.header?.offsetHeight ||
+      0;
+
 
     const rect =
       target.getBoundingClientRect();
+
 
     const top =
       window.scrollY +
@@ -942,101 +1400,144 @@
       headerHeight -
       CONFIG.scrollNavigationOffset;
 
-    if (updateUrl && target.id) {
+
+    if (
+      updateUrl &&
+      target.id
+    ) {
+
       const hash =
         `#${target.id}`;
+
 
       if (
         window.location.hash !==
         hash
       ) {
+
         window.history.replaceState(
           null,
           "",
           hash
         );
+
       }
+
     }
 
+
     window.scrollTo({
-      top: Math.max(0, top),
+
+      top:
+        Math.max(
+          0,
+          top
+        ),
+
       behavior:
         state.reducedMotion
           ? "auto"
           : "smooth"
+
     });
+
   };
+
 
   const initSectionNavigation =
     () => {
+
       dom.previousSection?.addEventListener(
         "click",
         event => {
+
           if (
             isModifiedClick(event)
           ) {
             return;
           }
 
+
           event.preventDefault();
+
 
           if (
             state.activeIndex > 0
           ) {
+
             navigateToSection(
               state.activeIndex - 1
             );
+
           }
+
         }
       );
+
 
       dom.nextSection?.addEventListener(
         "click",
         event => {
+
           if (
             isModifiedClick(event)
           ) {
             return;
           }
 
+
           event.preventDefault();
+
 
           const last =
             dom.sections.length - 1;
 
+
           navigateToSection(
+
             state.activeIndex === last
               ? 0
               : state.activeIndex + 1
+
           );
+
         }
       );
+
     };
 
-  /* =========================================================
-     ACTIVE SECTION
-     ========================================================= */
+
+  /* =======================================================
+     ACTIVE SECTION DETECTION
+     ======================================================= */
 
   const detectActiveSection =
     () => {
+
       if (!dom.sections.length) {
         return;
       }
+
 
       const reference =
         window.innerHeight *
         CONFIG.activeSectionReference;
 
+
       let bestIndex =
         state.activeIndex;
+
 
       let bestDistance =
         Infinity;
 
+
       dom.sections.forEach(
         (section, index) => {
+
           const rect =
             section.getBoundingClientRect();
+
 
           if (
             rect.bottom <= 0 ||
@@ -1046,6 +1547,7 @@
             return;
           }
 
+
           const distance =
             Math.abs(
               rect.top +
@@ -1053,75 +1555,102 @@
               reference
             );
 
+
           if (
             distance <
             bestDistance
           ) {
+
             bestDistance =
               distance;
 
             bestIndex =
               index;
+
           }
+
         }
       );
+
 
       if (
         state.activeIndex !==
         bestIndex
       ) {
+
         state.activeIndex =
           bestIndex;
+
 
         updateSectionHeader(
           bestIndex
         );
+
       }
+
     };
 
-  /* =========================================================
+
+  /* =======================================================
      REVEAL SYSTEM
-     ========================================================= */
+     ======================================================= */
 
   const initRevealSystem = () => {
+
     if (!dom.reveals.length) {
       return;
     }
 
+
     if (
       state.reducedMotion ||
-      !("IntersectionObserver" in window)
+      !(
+        "IntersectionObserver" in
+        window
+      )
     ) {
+
       dom.reveals.forEach(
-        element =>
+        element => {
+
           element.classList.add(
             "is-visible"
-          )
+          );
+
+        }
       );
 
       return;
+
     }
+
 
     const observer =
       new IntersectionObserver(
         entries => {
+
           entries.forEach(
             entry => {
+
               if (
                 !entry.isIntersecting
               ) {
                 return;
               }
 
+
               entry.target.classList.add(
                 "is-visible"
               );
 
+
               observer.unobserve(
                 entry.target
               );
+
             }
           );
+
         },
         {
           threshold:
@@ -1132,18 +1661,27 @@
         }
       );
 
+
     dom.reveals.forEach(
-      element =>
-        observer.observe(element)
+      element => {
+
+        observer.observe(
+          element
+        );
+
+      }
     );
+
   };
 
-  /* =========================================================
-     DIRECTION INTERACTION
-     ========================================================= */
+
+  /* =======================================================
+     HERO DIRECTION INTERACTIONS
+     ======================================================= */
 
   const initDirectionInteractions =
     () => {
+
       if (
         !dom.directionLinks.length ||
         !dom.directionNodes.length
@@ -1151,10 +1689,12 @@
         return;
       }
 
+
       const setActive = (
         key,
         active
       ) => {
+
         dom.directionLinks
           .filter(
             element =>
@@ -1169,6 +1709,7 @@
               )
           );
 
+
         dom.directionNodes
           .filter(
             element =>
@@ -1182,73 +1723,108 @@
                 active
               )
           );
+
       };
+
 
       dom.directionLinks.forEach(
         link => {
+
           const key =
             link.dataset.direction;
 
+
           link.addEventListener(
             "pointerenter",
-            () => setActive(key, true)
+            () =>
+              setActive(
+                key,
+                true
+              )
           );
+
 
           link.addEventListener(
             "pointerleave",
-            () => setActive(key, false)
+            () =>
+              setActive(
+                key,
+                false
+              )
           );
+
 
           link.addEventListener(
             "focusin",
-            () => setActive(key, true)
+            () =>
+              setActive(
+                key,
+                true
+              )
           );
+
 
           link.addEventListener(
             "focusout",
-            () => setActive(key, false)
+            () =>
+              setActive(
+                key,
+                false
+              )
           );
+
         }
       );
+
     };
 
-  /* =========================================================
+
+  /* =======================================================
      TRAJECTORY
-     ========================================================= */
+     ======================================================= */
 
   const updateTrajectoryTargets =
     () => {
+
       if (
         dom.sections.length < 2
       ) {
         return;
       }
 
+
       const first =
         dom.sections[0];
+
 
       const last =
         dom.sections[
           dom.sections.length - 1
         ];
 
+
       const firstRect =
         first.getBoundingClientRect();
+
 
       const lastRect =
         last.getBoundingClientRect();
 
+
       const start =
         firstRect.top +
         window.scrollY;
+
 
       const end =
         lastRect.bottom +
         window.scrollY -
         window.innerHeight;
 
+
       const range =
         end - start;
+
 
       const progress =
         range <= 0
@@ -1262,8 +1838,10 @@
               1
             );
 
+
       state.trajectory.targetProgress =
         progress;
+
 
       state.trajectory.targetDrift =
         state.reducedMotion
@@ -1274,18 +1852,24 @@
               2
             ) *
             CONFIG.trajectoryDrift;
+
     };
+
 
   const updateTrajectoryFrame =
     () => {
+
       if (
         state.reducedMotion
       ) {
+
         state.trajectory.progress =
           state.trajectory.targetProgress;
 
         state.trajectory.drift = 0;
+
       } else {
+
         state.trajectory.progress =
           lerp(
             state.trajectory.progress,
@@ -1293,13 +1877,16 @@
             CONFIG.trajectoryLerp
           );
 
+
         state.trajectory.drift =
           lerp(
             state.trajectory.drift,
             state.trajectory.targetDrift,
             CONFIG.trajectoryLerp
           );
+
       }
+
 
       setStyleVariable(
         dom.html,
@@ -1307,42 +1894,60 @@
         state.trajectory.progress.toFixed(4)
       );
 
+
       setStyleVariable(
         dom.html,
         "--trajectory-drift",
         `${state.trajectory.drift.toFixed(2)}px`
       );
+
     };
 
-  /* =========================================================
+
+  /* =======================================================
      NARRATIVE LINKS
-     ========================================================= */
+     ======================================================= */
 
   const initNarrativeLinks =
     () => {
+
       dom.narrativeLinks.forEach(
         link => {
+
           const node =
             link.dataset.trajectoryNode;
 
-          if (!node) return;
+
+          if (!node) {
+            return;
+          }
+
+
+          const escapedNode =
+            cssEscape(node);
+
 
           const targets = [
+
             ...document.querySelectorAll(
-              `.network-node[data-node="${CSS.escape(node)}"]`
+              `.network-node[data-node="${escapedNode}"]`
             ),
 
             ...document.querySelectorAll(
-              `.direction-node[data-direction="${CSS.escape(node)}"]`
+              `.direction-node[data-direction="${escapedNode}"]`
             )
+
           ];
+
 
           if (!targets.length) {
             return;
           }
 
+
           const setLinked =
             active => {
+
               targets.forEach(
                 target =>
                   target.classList.toggle(
@@ -1350,36 +1955,81 @@
                     active
                   )
               );
+
             };
+
+
+          const engage = () =>
+            setLinked(true);
+
+
+          const disengage = () =>
+            setLinked(false);
+
 
           link.addEventListener(
             "pointerenter",
-            () => setLinked(true)
+            engage
           );
+
 
           link.addEventListener(
             "pointerleave",
-            () => setLinked(false)
+            disengage
           );
+
 
           link.addEventListener(
             "focusin",
-            () => setLinked(true)
+            engage
           );
+
 
           link.addEventListener(
             "focusout",
-            () => setLinked(false)
+            disengage
           );
+
+
+          link.addEventListener(
+            "keydown",
+            event => {
+
+              if (
+                event.key === "Enter" ||
+                event.key === " "
+              ) {
+
+                event.preventDefault();
+
+                const firstTarget =
+                  targets[0];
+
+                firstTarget?.scrollIntoView({
+                  behavior:
+                    state.reducedMotion
+                      ? "auto"
+                      : "smooth",
+                  block: "center"
+                });
+
+              }
+
+            }
+          );
+
         }
       );
+
     };
 
-  /* =========================================================
+
+  /* =======================================================
      CUSTOM CURSOR
-     ========================================================= */
+     ======================================================= */
 
   const initCursor = () => {
+
     if (
       !dom.cursor ||
       !dom.cursorDot ||
@@ -1388,9 +2038,11 @@
       return;
     }
 
+
     document.addEventListener(
       "pointermove",
       event => {
+
         if (
           !isFinePointer() ||
           state.reducedMotion
@@ -1398,67 +2050,91 @@
           return;
         }
 
+
         state.pointer.targetX =
           event.clientX;
 
+
         state.pointer.targetY =
           event.clientY;
+
 
         dom.cursor.classList.add(
           "is-visible"
         );
 
+
         updateAnimationRequirement();
+
       },
       {
         passive: true
       }
     );
 
+
     document
-      .querySelectorAll("a, button")
-      .forEach(element => {
-        element.addEventListener(
-          "pointerenter",
-          () => {
-            if (
-              !isFinePointer() ||
-              state.reducedMotion
-            ) {
-              return;
+      .querySelectorAll(
+        "a, button, [role='button']"
+      )
+      .forEach(
+        element => {
+
+          element.addEventListener(
+            "pointerenter",
+            () => {
+
+              if (
+                !isFinePointer() ||
+                state.reducedMotion
+              ) {
+                return;
+              }
+
+
+              dom.cursor.classList.add(
+                "is-hovering"
+              );
+
             }
+          );
 
-            dom.cursor.classList.add(
-              "is-hovering"
-            );
-          }
-        );
 
-        element.addEventListener(
-          "pointerleave",
-          () => {
-            dom.cursor.classList.remove(
-              "is-hovering"
-            );
-          }
-        );
-      });
+          element.addEventListener(
+            "pointerleave",
+            () => {
+
+              dom.cursor.classList.remove(
+                "is-hovering"
+              );
+
+            }
+          );
+
+        }
+      );
+
 
     window.addEventListener(
       "pointerleave",
       () => {
+
         dom.cursor?.classList.remove(
           "is-visible",
           "is-hovering"
         );
 
         updateAnimationRequirement();
+
       }
     );
+
   };
+
 
   const updateCursorFrame =
     () => {
+
       if (
         !dom.cursor ||
         !dom.cursorDot ||
@@ -1469,12 +2145,14 @@
         return;
       }
 
+
       state.cursor.x =
         lerp(
           state.cursor.x,
           state.pointer.targetX,
           CONFIG.cursorLerp
         );
+
 
       state.cursor.y =
         lerp(
@@ -1483,30 +2161,38 @@
           CONFIG.cursorLerp
         );
 
+
       dom.cursorDot.style.transform =
         `translate3d(${state.pointer.targetX}px, ${state.pointer.targetY}px, 0) translate(-50%, -50%)`;
 
+
       dom.cursorRing.style.transform =
         `translate3d(${state.cursor.x}px, ${state.cursor.y}px, 0) translate(-50%, -50%)`;
+
     };
 
-  /* =========================================================
+
+  /* =======================================================
      MAGNETIC ELEMENTS
-     ========================================================= */
+     ======================================================= */
 
   const initMagneticElements =
     () => {
+
       if (
         !dom.magneticElements.length
       ) {
         return;
       }
 
+
       dom.magneticElements.forEach(
         element => {
+
           element.addEventListener(
             "pointermove",
             event => {
+
               if (
                 !isFinePointer() ||
                 state.reducedMotion
@@ -1514,8 +2200,10 @@
                 return;
               }
 
+
               const rect =
                 element.getBoundingClientRect();
+
 
               const dx =
                 event.clientX -
@@ -1524,6 +2212,7 @@
                   rect.width / 2
                 );
 
+
               const dy =
                 event.clientY -
                 (
@@ -1531,18 +2220,23 @@
                   rect.height / 2
                 );
 
+
               const distance =
                 Math.hypot(
                   dx,
                   dy
                 );
 
+
               if (
                 distance >
                 CONFIG.magneticRadius
               ) {
+
                 return;
+
               }
+
 
               const strength =
                 CONFIG.magneticStrength *
@@ -1552,49 +2246,60 @@
                   CONFIG.magneticRadius
                 );
 
+
               setStyleVariable(
                 element,
                 "--magnetic-x",
                 `${dx * strength}px`
               );
 
+
               setStyleVariable(
                 element,
                 "--magnetic-y",
                 `${dy * strength}px`
               );
+
             },
             {
               passive: true
             }
           );
 
+
           element.addEventListener(
             "pointerleave",
             () => {
+
               setStyleVariable(
                 element,
                 "--magnetic-x",
                 "0px"
               );
 
+
               setStyleVariable(
                 element,
                 "--magnetic-y",
                 "0px"
               );
+
             }
           );
+
         }
       );
+
     };
 
-  /* =========================================================
+
+  /* =======================================================
      CTA
-     ========================================================= */
+     ======================================================= */
 
   const initCtaInteraction =
     () => {
+
       if (
         !dom.ctaTrajectory ||
         !dom.contactCta
@@ -1602,55 +2307,69 @@
         return;
       }
 
+
       const engage = () =>
         dom.ctaTrajectory.classList.add(
           "is-engaged"
         );
+
 
       const disengage = () =>
         dom.ctaTrajectory.classList.remove(
           "is-engaged"
         );
 
+
       dom.contactCta.addEventListener(
         "pointerenter",
         engage
       );
+
 
       dom.contactCta.addEventListener(
         "pointerleave",
         disengage
       );
 
+
       dom.contactCta.addEventListener(
         "focusin",
         engage
       );
 
+
       dom.contactCta.addEventListener(
         "focusout",
         disengage
       );
+
     };
 
-  /* =========================================================
+
+  /* =======================================================
      STANDBY
-     ========================================================= */
+     ======================================================= */
 
   const clearStandbyTimer =
     () => {
+
       if (
         state.standbyTimer !== null
       ) {
+
         window.clearTimeout(
           state.standbyTimer
         );
 
         state.standbyTimer = null;
+
       }
+
     };
 
+
   const enterStandby = () => {
+
     if (
       state.menuOpen ||
       state.standby ||
@@ -1661,115 +2380,160 @@
       return;
     }
 
-    /*
-     * Non interrompere chi sta scrivendo,
-     * compilando un form o interagendo
-     * con un controllo.
-     */
+
     if (
       isEditableElement(
         document.activeElement
       )
     ) {
+
       resetStandbyTimer();
+
       return;
+
     }
+
 
     state.standbyReturnFocus =
       document.activeElement;
 
+
     state.standby = true;
 
+
     clearStandbyTimer();
+
 
     dom.body.classList.add(
       "is-standby"
     );
 
+
     dom.standby.classList.add(
       "is-active"
     );
+
 
     dom.standby.setAttribute(
       "aria-hidden",
       "false"
     );
 
+
     if (
       "inert" in dom.standby
     ) {
-      dom.standby.inert = false;
+
+      dom.standby.inert =
+        false;
+
     } else {
+
       dom.standby.removeAttribute(
         "inert"
       );
+
     }
+
 
     dom.standbyWake?.focus({
       preventScroll: true
     });
+
   };
 
-  const exitStandby = () => {
+
+  const exitStandby = (
+    returnFocus = true
+  ) => {
+
     if (!state.standby) {
       return;
     }
 
+
     state.standby = false;
+
 
     dom.body.classList.remove(
       "is-standby"
     );
 
+
     dom.standby?.classList.remove(
       "is-active"
     );
+
 
     dom.standby?.setAttribute(
       "aria-hidden",
       "true"
     );
 
+
     if (dom.standby) {
+
       if (
         "inert" in dom.standby
       ) {
-        dom.standby.inert = true;
+
+        dom.standby.inert =
+          true;
+
       } else {
+
         dom.standby.setAttribute(
           "inert",
           ""
         );
+
       }
+
     }
 
-    const returnFocus =
+
+    const returnTarget =
       state.standbyReturnFocus;
 
-    state.standbyReturnFocus = null;
+
+    state.standbyReturnFocus =
+      null;
+
 
     if (
       returnFocus &&
-      returnFocus !== document.body &&
-      typeof returnFocus.focus ===
+      returnTarget &&
+      returnTarget !== document.body &&
+      typeof returnTarget.focus ===
         "function" &&
-      document.contains(returnFocus)
+      document.contains(
+        returnTarget
+      )
     ) {
+
       window.requestAnimationFrame(
         () => {
-          returnFocus.focus({
+
+          returnTarget.focus({
             preventScroll: true
           });
+
         }
       );
+
     }
 
+
     resetStandbyTimer();
+
   };
+
 
   const resetStandbyTimer =
     () => {
+
       clearStandbyTimer();
+
 
       if (
         state.menuOpen ||
@@ -1780,92 +2544,135 @@
         return;
       }
 
+
       state.standbyTimer =
         window.setTimeout(
           enterStandby,
           CONFIG.standbyDelay
         );
+
     };
 
+
   const initStandby = () => {
+
     if (!dom.standby) {
       return;
     }
+
 
     dom.standby.setAttribute(
       "aria-hidden",
       "true"
     );
 
+
     if (
       "inert" in dom.standby
     ) {
-      dom.standby.inert = true;
+
+      dom.standby.inert =
+        true;
+
     } else {
+
       dom.standby.setAttribute(
         "inert",
         ""
       );
+
     }
+
 
     dom.standbyWake?.addEventListener(
       "click",
-      exitStandby
+      () => exitStandby(true)
     );
+
 
     [
       "pointerdown",
       "wheel",
       "touchstart",
       "keydown"
-    ].forEach(eventName => {
-      window.addEventListener(
-        eventName,
-        event => {
-          if (state.standby) {
-            /*
-             * Lasciamo Tab alla gestione
-             * del focus del browser.
-             */
-            if (
-              eventName === "keydown" &&
-              event.key === "Tab"
-            ) {
+    ].forEach(
+      eventName => {
+
+        window.addEventListener(
+          eventName,
+          event => {
+
+            if (state.standby) {
+
+              if (
+                eventName === "keydown" &&
+                event.key === "Tab"
+              ) {
+                return;
+              }
+
+
+              if (
+                eventName === "keydown" &&
+                event.key === "Escape"
+              ) {
+
+                event.preventDefault();
+
+              }
+
+
+              exitStandby(
+                true
+              );
+
+
               return;
+
             }
 
-            exitStandby();
-            return;
-          }
 
-          if (
-            eventName !== "keydown" ||
-            event.key !== "Shift"
-          ) {
-            resetStandbyTimer();
+            if (
+              eventName !== "keydown" ||
+              event.key !== "Shift"
+            ) {
+
+              resetStandbyTimer();
+
+            }
+
+          },
+          {
+            passive:
+              eventName !== "keydown"
           }
-        },
-        {
-          passive:
-            eventName !== "keydown"
-        }
-      );
-    });
+        );
+
+      }
+    );
+
   };
 
-  /* =========================================================
+
+  /* =======================================================
      HASH NAVIGATION
-     ========================================================= */
+     ======================================================= */
 
   const initHashNavigation =
     () => {
+
       const hash =
         window.location.hash;
 
-      if (!hash) return;
+
+      if (!hash) {
+        return;
+      }
+
 
       const normalizedHash =
         hash.toLowerCase();
+
 
       const index =
         dom.sections.findIndex(
@@ -1874,32 +2681,44 @@
             normalizedHash
         );
 
-      if (index < 0) return;
+
+      if (index < 0) {
+        return;
+      }
+
 
       window.requestAnimationFrame(
         () => {
+
           window.setTimeout(
             () => {
+
               navigateToSection(
                 index,
                 false
               );
+
             },
             0
           );
+
         }
       );
+
     };
 
-  /* =========================================================
+
+  /* =======================================================
      KEYBOARD NAVIGATION
-     ========================================================= */
+     ======================================================= */
 
   const initKeyboardNavigation =
     () => {
+
       document.addEventListener(
         "keydown",
         event => {
+
           if (
             state.menuOpen ||
             state.standby
@@ -1907,12 +2726,14 @@
             return;
           }
 
+
           if (
             event.key !== "PageDown" &&
             event.key !== "PageUp"
           ) {
             return;
           }
+
 
           if (
             isEditableElement(
@@ -1922,12 +2743,15 @@
             return;
           }
 
+
           event.preventDefault();
+
 
           const direction =
             event.key === "PageDown"
               ? 1
               : -1;
+
 
           const nextIndex =
             clamp(
@@ -1937,48 +2761,68 @@
               dom.sections.length - 1
             );
 
+
           navigateToSection(
             nextIndex
           );
+
         }
       );
+
     };
 
-  /* =========================================================
+
+  /* =======================================================
      SCROLL / RESIZE
-     ========================================================= */
+     ======================================================= */
 
   const handleScrollFrame =
     () => {
-      state.scrollTicking = false;
+
+      state.scrollTicking =
+        false;
+
 
       detectActiveSection();
+
       updateTrajectoryTargets();
+
       updateAnimationRequirement();
+
     };
 
+
   const handleScroll = () => {
+
     if (
       state.scrollTicking
     ) {
       return;
     }
 
-    state.scrollTicking = true;
+
+    state.scrollTicking =
+      true;
+
 
     window.requestAnimationFrame(
       handleScrollFrame
     );
+
   };
 
+
   const handleResize = () => {
+
     window.clearTimeout(
       state.resizeTimer
     );
 
+
     state.resizeTimer =
       window.setTimeout(
         () => {
+
           detectActiveSection();
 
           updateTrajectoryTargets();
@@ -1988,17 +2832,21 @@
           );
 
           updateAnimationRequirement();
+
         },
         CONFIG.resizeDebounce
       );
+
   };
 
-  /* =========================================================
+
+  /* =======================================================
      ANIMATION LOOP
-     ========================================================= */
+     ======================================================= */
 
   const animationIsNeeded =
     () => {
+
       if (
         state.reducedMotion ||
         document.hidden
@@ -2006,11 +2854,13 @@
         return false;
       }
 
+
       const cursorVisible =
         isFinePointer() &&
         dom.cursor?.classList.contains(
           "is-visible"
         );
+
 
       const trajectoryMoving =
         Math.abs(
@@ -2022,137 +2872,221 @@
           state.trajectory.targetDrift
         ) > 0.05;
 
+
       return (
         cursorVisible ||
         trajectoryMoving
       );
+
     };
 
-  const animationFrame = () => {
-    updateCursorFrame();
-    updateTrajectoryFrame();
 
-    if (
-      animationIsNeeded()
-    ) {
+  const animationFrame =
+    () => {
+
+      updateCursorFrame();
+
+      updateTrajectoryFrame();
+
+
+      if (
+        animationIsNeeded()
+      ) {
+
+        state.rafId =
+          window.requestAnimationFrame(
+            animationFrame
+          );
+
+      } else {
+
+        state.animationRunning =
+          false;
+
+        state.rafId =
+          null;
+
+      }
+
+    };
+
+
+  const startAnimationLoop =
+    () => {
+
+      if (
+        state.animationRunning ||
+        state.reducedMotion ||
+        document.hidden
+      ) {
+        return;
+      }
+
+
+      state.animationRunning =
+        true;
+
+
       state.rafId =
         window.requestAnimationFrame(
           animationFrame
         );
-    } else {
+
+    };
+
+
+  const stopAnimationLoop =
+    () => {
+
+      if (
+        state.rafId !== null
+      ) {
+
+        window.cancelAnimationFrame(
+          state.rafId
+        );
+
+      }
+
+
+      state.rafId = null;
+
       state.animationRunning =
         false;
 
-      state.rafId = null;
-    }
-  };
+    };
 
-  const startAnimationLoop = () => {
-    if (
-      state.animationRunning ||
-      state.reducedMotion ||
-      document.hidden
-    ) {
-      return;
-    }
-
-    state.animationRunning = true;
-
-    state.rafId =
-      window.requestAnimationFrame(
-        animationFrame
-      );
-  };
-
-  const stopAnimationLoop = () => {
-    if (
-      state.rafId !== null
-    ) {
-      window.cancelAnimationFrame(
-        state.rafId
-      );
-    }
-
-    state.rafId = null;
-    state.animationRunning = false;
-  };
 
   const updateAnimationRequirement =
     () => {
+
       if (
         animationIsNeeded()
       ) {
+
         startAnimationLoop();
+
       }
+
     };
 
-  /* =========================================================
-     VISIBILITY / BFCACHE
-     ========================================================= */
+
+  /* =======================================================
+     VISIBILITY / BF CACHE
+     ======================================================= */
 
   const initVisibilityHandling =
     () => {
+
       document.addEventListener(
         "visibilitychange",
         () => {
-          if (document.hidden) {
+
+          if (
+            document.hidden
+          ) {
+
             stopAnimationLoop();
+
             clearStandbyTimer();
+
             return;
+
           }
 
+
           updateTrajectoryTargets();
+
           resetStandbyTimer();
+
           updateAnimationRequirement();
+
         }
       );
+
 
       window.addEventListener(
         "pageshow",
         event => {
-          /*
-           * Ripristino da BFCache.
-           */
-          if (event.persisted) {
+
+          dom.transition?.classList.remove(
+            "is-active"
+          );
+
+
+          if (
+            event.persisted
+          ) {
+
             updateTrajectoryTargets();
+
             detectActiveSection();
+
             updateSectionHeader(
               state.activeIndex
             );
+
             resetStandbyTimer();
+
             updateAnimationRequirement();
+
           }
+
         }
       );
+
+
+      window.addEventListener(
+        "pagehide",
+        () => {
+
+          stopAnimationLoop();
+
+          clearStandbyTimer();
+
+        }
+      );
+
     };
 
-  /* =========================================================
+
+  /* =======================================================
      INITIAL STATE
-     ========================================================= */
+     ======================================================= */
 
   const setInitialState =
     () => {
+
       if (!dom.sections.length) {
         return;
       }
 
-      state.activeIndex = 0;
 
-      updateSectionHeader(0);
+      state.activeIndex =
+        0;
+
+
+      updateSectionHeader(
+        0
+      );
+
 
       updateTrajectoryTargets();
 
+
       resetStandbyTimer();
 
+
       updateAnimationRequirement();
+
     };
 
-  /* =========================================================
+
+  /* =======================================================
      INIT
-     ========================================================= */
+     ======================================================= */
 
   const init = () => {
-    initProgressiveEnhancement();
 
     initPreferences();
 
@@ -2190,6 +3124,7 @@
 
     updateTrajectoryTargets();
 
+
     window.addEventListener(
       "scroll",
       handleScroll,
@@ -2197,6 +3132,7 @@
         passive: true
       }
     );
+
 
     window.addEventListener(
       "resize",
@@ -2206,13 +3142,21 @@
       }
     );
 
+
     updateAnimationRequirement();
+
   };
+
+
+  /* =======================================================
+     BOOT
+     ======================================================= */
 
   if (
     document.readyState ===
     "loading"
   ) {
+
     document.addEventListener(
       "DOMContentLoaded",
       init,
@@ -2220,7 +3164,11 @@
         once: true
       }
     );
+
   } else {
+
     init();
+
   }
+
 })();
