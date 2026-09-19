@@ -1,402 +1,639 @@
 (() => {
   "use strict";
 
-  const CFG = {
-    loaderMin: 700,
-    loaderMax: 2200,
-    revealThreshold: 0.12,
-    cursorLerp: 0.18,
-    resizeDebounce: 160,
-    navOffset: 18,
-    transitionMs: 620,
-    trajectoryLerp: 0.09,
-    trajectoryDrift: 18,
-    magneticStrength: 0.12,
-    magneticRadius: 90,
-    standbyDelay: 45000
+  /*
+   * ============================================================
+   * MOVIMENTO / CON DIREZIONE.
+   * Interaction system
+   *
+   * Principi:
+   * - un solo requestAnimationFrame per lo scroll
+   * - IntersectionObserver per l'attivazione dei capitoli
+   * - CSS custom property per la progressione
+   * - nessun contenuto nascosto prima dell'inizializzazione
+   * - degradazione completa senza JS
+   * ============================================================
+   */
+
+  const root = document.documentElement;
+
+  root.classList.remove("no-js");
+
+  const body = document.body;
+
+  const loader = document.querySelector(".page-loader");
+
+  const chapters = Array.from(
+    document.querySelectorAll(".chapter, .home-section--territory")
+  );
+
+  const progressFill = document.getElementById("progress-fill");
+  const progressPoint = document.getElementById("progress-point");
+  const progressCurrent = document.getElementById("progress-current");
+
+  const previousSection = document.getElementById("previous-section");
+  const previousSectionLabel = document.getElementById("previous-section-label");
+
+  const nextSection = document.getElementById("next-section");
+  const nextSectionLabel = document.getElementById("next-section-label");
+
+  const menuTrigger = document.querySelector(".menu-trigger");
+  const menu = document.getElementById("site-menu");
+  const menuClose = document.querySelector(".chapter-close");
+  const menuLinks = Array.from(document.querySelectorAll("[data-menu-link]"));
+
+  const contextCursor = document.querySelector(".context-cursor");
+  const contextCursorLabel = document.querySelector(".context-cursor-label");
+
+  const isReducedMotion =
+    window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+
+  /*
+   * ============================================================
+   * CONFIG
+   * ============================================================
+   */
+
+  const chapterData = chapters.map((chapter, index) => ({
+    element: chapter,
+    id: chapter.id || String(index + 1).padStart(2, "0"),
+    title:
+      chapter.dataset.sectionTitle ||
+      `CAPITOLO ${String(index + 1).padStart(2, "0")}`,
+    index
+  }));
+
+  let activeChapterIndex = 0;
+  let scrollTicking = false;
+  let menuOpen = false;
+  let previousFocusedElement = null;
+
+
+  /*
+   * ============================================================
+   * LOADER
+   * ============================================================
+   */
+
+  const hideLoader = () => {
+    if (!loader) return;
+
+    window.setTimeout(() => {
+      loader.classList.add("is-hidden");
+    }, isReducedMotion ? 0 : 1450);
   };
 
-  const st = {
-    loaded: false,
-    menuOpen: false,
-    standby: false,
-    active: 0,
-    reduced: false,
-    resizeTimer: 0,
-    standbyTimer: 0,
-    raf: 0,
-    menuReturn: null,
-    standbyReturn: null,
-    pointer: { x: innerWidth / 2, y: innerHeight / 2 },
-    cursor: { x: innerWidth / 2, y: innerHeight / 2 },
-    traj: { p: 0, tp: 0, d: 0, td: 0 }
+  if (document.readyState === "complete") {
+    hideLoader();
+  } else {
+    window.addEventListener("load", hideLoader, { once: true });
+  }
+
+
+  /*
+   * ============================================================
+   * CHAPTER ACTIVATION
+   * ============================================================
+   */
+
+  const setChapterActive = (index) => {
+    if (!chapterData[index]) return;
+
+    chapterData.forEach((item, itemIndex) => {
+      item.element.classList.toggle(
+        "is-active",
+        itemIndex === index
+      );
+    });
+
+    activeChapterIndex = index;
+
+    updateNavigation();
   };
 
-  const q = s => document.querySelector(s);
-  const qa = s => [...document.querySelectorAll(s)];
-  const dom = {
-    html: document.documentElement,
-    body: document.body,
-    loader: q(".page-loader"),
-    transition: q(".page-transition"),
-    cursor: q(".custom-cursor"),
-    dot: q(".custom-cursor-dot"),
-    ring: q(".custom-cursor-ring"),
-    header: q(".site-header"),
-    menu: q(".site-menu"),
-    menuBtn: q(".menu-trigger"),
-    menuLinks: qa(".site-menu-nav a"),
-    label: q("#progress-current"),
-    fill: q("#progress-fill"),
-    point: q("#progress-point"),
-    prev: q("#previous-section"),
-    prevLabel: q("#previous-section-label"),
-    next: q("#next-section"),
-    nextLabel: q("#next-section-label"),
-    sections: qa(".home-section"),
-    reveals: qa(".reveal"),
-    links: qa(".narrative-link"),
-    magnetic: qa(".magnetic"),
-    transitionLinks: qa('a[href]:not([target="_blank"])'),
-    standby: q(".standby-screen"),
-    wake: q(".standby-wake"),
-    cta: q(".cta-trajectory"),
-    contact: q(".contact-cta"),
-    dirLinks: qa(".hero-direction[data-direction]"),
-    dirNodes: qa(".direction-node[data-direction]")
-  };
 
-  const clamp = (n, a, b) => Math.min(Math.max(n, a), b);
-  const lerp = (a, b, t) => a + (b - a) * t;
-  const secNum = i => String(i + 1).padStart(2, "0");
-  const fine = () => matchMedia("(pointer:fine)").matches;
-  const motionOK = () => !st.reduced;
-  const section = i => dom.sections[clamp(i, 0, dom.sections.length - 1)] || null;
+  const observer = new IntersectionObserver(
+    (entries) => {
+      let strongestEntry = null;
 
-  function focusables(root) {
-    return [...root.querySelectorAll('a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])')]
-      .filter(el => !el.hidden && el.offsetParent !== null);
-  }
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
 
-  function setInert(el, value) {
-    if (!el) return;
-    if ("inert" in el) el.inert = value;
-    else value ? el.setAttribute("inert", "") : el.removeAttribute("inert");
-  }
+        if (
+          !strongestEntry ||
+          entry.intersectionRatio > strongestEntry.intersectionRatio
+        ) {
+          strongestEntry = entry;
+        }
 
-  function motionInit() {
-    const mq = matchMedia("(prefers-reduced-motion: reduce)");
-    const apply = reduced => {
-      st.reduced = reduced;
-      dom.html.classList.toggle("reduced-motion", reduced);
-      if (reduced) closeStandby();
-      resetStandby();
-    };
-    apply(mq.matches);
-    mq.addEventListener?.("change", e => apply(e.matches));
-  }
+        entry.target.classList.add("is-visible");
+      });
 
-  function loaderInit() {
-    if (!dom.loader) { st.loaded = true; return; }
-    const started = performance.now();
-    let done = false;
-    const finish = () => {
-      if (done) return;
-      done = true;
-      const wait = Math.max(0, CFG.loaderMin - (performance.now() - started));
-      setTimeout(() => {
-        st.loaded = true;
-        dom.loader.classList.add("is-hidden");
-        setTimeout(() => dom.loader?.remove(), 700);
-      }, wait);
-    };
-    if (document.readyState === "complete") finish();
-    else window.addEventListener("load", finish, { once: true });
-    setTimeout(finish, CFG.loaderMax);
-  }
+      if (strongestEntry) {
+        const index = chapterData.findIndex(
+          (item) => item.element === strongestEntry.target
+        );
 
-  function pageTransitionsInit() {
-    if (!dom.transition) return;
-    dom.transitionLinks.forEach(link => link.addEventListener("click", e => {
-      if (st.reduced || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-      const href = link.getAttribute("href");
-      if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:") || link.hasAttribute("download")) return;
-      let url;
-      try { url = new URL(href, location.href); } catch { return; }
-      if (url.origin !== location.origin || url.pathname === location.pathname && url.search === location.search && url.hash) return;
-      e.preventDefault();
-      dom.transition.classList.add("is-active");
-      setTimeout(() => { location.href = url.href; }, CFG.transitionMs);
-    }));
-    window.addEventListener("pageshow", () => dom.transition.classList.remove("is-active"));
-  }
-
-  function menuOpen() {
-    if (!dom.menu || st.menuOpen) return;
-    clearStandby();
-    st.menuReturn = document.activeElement;
-    st.menuOpen = true;
-    dom.menu.setAttribute("aria-hidden", "false");
-    dom.menuBtn?.setAttribute("aria-expanded", "true");
-    dom.menuBtn?.setAttribute("aria-label", "Chiudi menu");
-    dom.body.classList.add("is-menu-open");
-    setInert(dom.menu, false);
-    requestAnimationFrame(() => dom.menuLinks[0]?.focus({ preventScroll: true }));
-  }
-
-  function menuClose(restore = true) {
-    if (!dom.menu || !st.menuOpen) return;
-    st.menuOpen = false;
-    dom.menu.setAttribute("aria-hidden", "true");
-    dom.menuBtn?.setAttribute("aria-expanded", "false");
-    dom.menuBtn?.setAttribute("aria-label", "Apri menu");
-    dom.body.classList.remove("is-menu-open");
-    setInert(dom.menu, true);
-    if (restore) {
-      const el = st.menuReturn;
-      if (el && document.contains(el) && typeof el.focus === "function") el.focus({ preventScroll: true });
-      else dom.menuBtn?.focus({ preventScroll: true });
-    }
-    st.menuReturn = null;
-    resetStandby();
-  }
-
-  function menuInit() {
-    dom.menuBtn?.addEventListener("click", () => st.menuOpen ? menuClose() : menuOpen());
-    dom.menuLinks.forEach(a => a.addEventListener("click", () => menuClose(false)));
-    dom.menu?.addEventListener("click", e => { if (e.target === dom.menu) menuClose(); });
-    document.addEventListener("keydown", e => {
-      if (e.key === "Escape") {
-        if (st.menuOpen) { e.preventDefault(); menuClose(); return; }
-        if (st.standby) { e.preventDefault(); closeStandby(); }
+        if (index >= 0) {
+          setChapterActive(index);
+        }
       }
-      if (e.key !== "Tab" || !st.menuOpen) return;
-      const els = focusables(dom.menu);
-      if (!els.length) return;
-      const first = els[0], last = els[els.length - 1];
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    },
+    {
+      threshold: [0.08, 0.2, 0.4, 0.6, 0.8],
+      rootMargin: "-12% 0px -12% 0px"
+    }
+  );
+
+  chapterData.forEach((item) => observer.observe(item.element));
+
+
+  /*
+   * ============================================================
+   * PROGRESS
+   * ============================================================
+   */
+
+  const clamp = (value, min, max) =>
+    Math.min(Math.max(value, min), max);
+
+
+  const getChapterProgress = (element) => {
+    const rect = element.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+
+    const scrollableDistance =
+      Math.max(element.offsetHeight - viewportHeight, 1);
+
+    const passed = -rect.top;
+
+    return clamp(passed / scrollableDistance, 0, 1);
+  };
+
+
+  const updateChapterProgress = () => {
+    chapterData.forEach((item, index) => {
+      const progress = getChapterProgress(item.element);
+
+      item.element.style.setProperty(
+        "--chapter-progress",
+        progress.toFixed(4)
+      );
+
+      /*
+       * La sezione 06 è una sezione reale con un comportamento
+       * leggermente diverso, ma partecipa comunque alla progressione.
+       */
+      if (index === activeChapterIndex) {
+        item.element.style.setProperty(
+          "--trajectory-drift",
+          `${Math.round(progress * 20)}px`
+        );
+      }
+    });
+  };
+
+
+  const updateGlobalProgress = () => {
+    if (!chapters.length) return;
+
+    const first = chapters[0];
+    const last = chapters[chapters.length - 1];
+
+    const firstTop = first.offsetTop;
+    const lastBottom = last.offsetTop + last.offsetHeight;
+
+    const scrollPosition =
+      window.scrollY + window.innerHeight * 0.45;
+
+    const total =
+      Math.max(lastBottom - firstTop - window.innerHeight, 1);
+
+    const progress = clamp(
+      (scrollPosition - firstTop) / total,
+      0,
+      1
+    );
+
+    const percent = progress * 100;
+
+    if (progressFill) {
+      progressFill.style.width = `${percent}%`;
+    }
+
+    if (progressPoint) {
+      progressPoint.style.left = `${percent}%`;
+    }
+
+    updateChapterProgress();
+  };
+
+
+  const requestScrollUpdate = () => {
+    if (scrollTicking) return;
+
+    scrollTicking = true;
+
+    window.requestAnimationFrame(() => {
+      updateGlobalProgress();
+      scrollTicking = false;
+    });
+  };
+
+
+  window.addEventListener("scroll", requestScrollUpdate, {
+    passive: true
+  });
+
+  window.addEventListener("resize", requestScrollUpdate);
+
+  updateGlobalProgress();
+
+
+  /*
+   * ============================================================
+   * HEADER NAVIGATION
+   * ============================================================
+   */
+
+  const updateNavigation = () => {
+    const current = chapterData[activeChapterIndex];
+
+    if (!current) return;
+
+    if (progressCurrent) {
+      progressCurrent.textContent = current.title;
+    }
+
+    const previous = chapterData[activeChapterIndex - 1];
+    const next = chapterData[activeChapterIndex + 1];
+
+    if (previous && previousSection && previousSectionLabel) {
+      previousSection.href = `#${previous.id}`;
+      previousSectionLabel.textContent = previous.id;
+      previousSection.classList.remove("is-disabled");
+      previousSection.removeAttribute("aria-hidden");
+      previousSection.removeAttribute("tabindex");
+    } else if (previousSection) {
+      previousSection.href = "#01";
+      previousSection.classList.add("is-disabled");
+      previousSection.setAttribute("aria-hidden", "true");
+      previousSection.setAttribute("tabindex", "-1");
+    }
+
+    if (next && nextSection && nextSectionLabel) {
+      nextSection.href = `#${next.id}`;
+      nextSectionLabel.textContent = next.id;
+      nextSection.setAttribute(
+        "aria-label",
+        `Vai alla sezione ${next.id}`
+      );
+    } else if (nextSection && nextSectionLabel) {
+      nextSection.href = "#11";
+      nextSectionLabel.textContent = "—";
+      nextSection.setAttribute(
+        "aria-label",
+        "Ultima sezione"
+      );
+    }
+  };
+
+
+  /*
+   * ============================================================
+   * MENU
+   * ============================================================
+   */
+
+  const getFocusableMenuElements = () => {
+    if (!menu) return [];
+
+    return Array.from(
+      menu.querySelectorAll(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )
+    );
+  };
+
+
+  const openMenu = () => {
+    if (menuOpen || !menu) return;
+
+    previousFocusedElement = document.activeElement;
+    menuOpen = true;
+
+    body.classList.add("is-menu-open");
+
+    menu.setAttribute("aria-hidden", "false");
+
+    if (menuTrigger) {
+      menuTrigger.setAttribute("aria-expanded", "true");
+      menuTrigger.setAttribute("aria-label", "Chiudi menu");
+    }
+
+    const focusable = getFocusableMenuElements();
+
+    if (focusable.length) {
+      window.setTimeout(() => {
+        focusable[0].focus();
+      }, isReducedMotion ? 0 : 300);
+    }
+  };
+
+
+  const closeMenu = () => {
+    if (!menuOpen) return;
+
+    menuOpen = false;
+
+    body.classList.remove("is-menu-open");
+
+    menu.setAttribute("aria-hidden", "true");
+
+    if (menuTrigger) {
+      menuTrigger.setAttribute("aria-expanded", "false");
+      menuTrigger.setAttribute("aria-label", "Apri menu");
+    }
+
+    if (
+      previousFocusedElement &&
+      typeof previousFocusedElement.focus === "function"
+    ) {
+      previousFocusedElement.focus();
+    }
+  };
+
+
+  if (menuTrigger) {
+    menuTrigger.addEventListener("click", () => {
+      if (menuOpen) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
     });
   }
 
-  function wowUpdate(i) {
-    const s = section(i);
-    if (!s) return;
-    st.active = i;
-    const total = dom.sections.length;
-    const p = total > 1 ? i / (total - 1) : 0;
-    if (dom.label) dom.label.textContent = s.dataset.sectionTitle || "";
-    if (dom.fill) dom.fill.style.width = `${p * 100}%`;
-    if (dom.point) dom.point.style.left = `${p * 100}%`;
-    const first = i === 0, last = i === total - 1;
-    dom.prev?.classList.toggle("is-disabled", first);
-    dom.prev?.setAttribute("aria-hidden", String(first));
-    first ? dom.prev?.setAttribute("tabindex", "-1") : dom.prev?.removeAttribute("tabindex");
-    if (!first) { dom.prev.href = `#${secNum(i - 1)}`; dom.prev.setAttribute("aria-label", `Vai alla sezione ${secNum(i - 1)}`); dom.prevLabel.textContent = secNum(i - 1); }
-    else dom.prevLabel.textContent = "";
-    if (last) { dom.next.href = "#01"; dom.next.setAttribute("aria-label", "Torna all'inizio"); dom.nextLabel.textContent = "01"; dom.next.querySelector(".section-jump-arrow").textContent = "↑"; }
-    else { dom.next.href = `#${secNum(i + 1)}`; dom.next.setAttribute("aria-label", `Vai alla sezione ${secNum(i + 1)}`); dom.nextLabel.textContent = secNum(i + 1); dom.next.querySelector(".section-jump-arrow").textContent = "→"; }
+
+  if (menuClose) {
+    menuClose.addEventListener("click", closeMenu);
   }
 
-  function goTo(i, updateHash = true) {
-    const s = section(i);
-    if (!s) return;
-    const y = window.scrollY + s.getBoundingClientRect().top - (dom.header?.offsetHeight || 0) - CFG.navOffset;
-    window.scrollTo({ top: Math.max(0, y), behavior: motionOK() ? "smooth" : "auto" });
-    if (updateHash && history.replaceState) history.replaceState(null, "", `#${s.id}`);
-    if (updateHash) s.setAttribute("tabindex", "-1");
-  }
 
-  function wowInit() {
-    dom.prev?.addEventListener("click", e => { e.preventDefault(); if (st.active > 0) goTo(st.active - 1); });
-    dom.next?.addEventListener("click", e => { e.preventDefault(); goTo(st.active === dom.sections.length - 1 ? 0 : st.active + 1); });
-  }
-
-  function activeDetect() {
-    if (!dom.sections.length) return;
-    const ref = innerHeight * .52;
-    let best = st.active, dist = Infinity;
-    dom.sections.forEach((s, i) => {
-      const r = s.getBoundingClientRect();
-      if (r.bottom <= 0 || r.top >= innerHeight) return;
-      const d = Math.abs(r.top + r.height / 2 - ref);
-      if (d < dist) { dist = d; best = i; }
+  menuLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      closeMenu();
     });
-    if (best !== st.active) wowUpdate(best);
-  }
+  });
 
-  function revealInit() {
-    if (!dom.reveals.length || st.reduced || !("IntersectionObserver" in window)) {
-      dom.reveals.forEach(el => el.classList.add("is-visible"));
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && menuOpen) {
+      closeMenu();
       return;
     }
-    const io = new IntersectionObserver(entries => entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.add("is-visible");
-      io.unobserve(entry.target);
-    }), { threshold: CFG.revealThreshold, rootMargin: "0px 0px -8% 0px" });
-    dom.reveals.forEach(el => io.observe(el));
+
+    if (
+      event.key === "Tab" &&
+      menuOpen &&
+      menu
+    ) {
+      const focusable = getFocusableMenuElements();
+
+      if (!focusable.length) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (
+        !event.shiftKey &&
+        document.activeElement === last
+      ) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+  });
+
+
+  /*
+   * ============================================================
+   * MAGNETIC INTERACTION
+   * ============================================================
+   */
+
+  const supportsFinePointer =
+    window.matchMedia &&
+    window.matchMedia("(pointer:fine)").matches;
+
+  const magneticElements = Array.from(
+    document.querySelectorAll(".magnetic")
+  );
+
+  if (supportsFinePointer && !isReducedMotion) {
+    magneticElements.forEach((element) => {
+      const strength = 0.18;
+
+      element.addEventListener("pointermove", (event) => {
+        const rect = element.getBoundingClientRect();
+
+        const x =
+          event.clientX -
+          (rect.left + rect.width / 2);
+
+        const y =
+          event.clientY -
+          (rect.top + rect.height / 2);
+
+        element.style.setProperty(
+          "--magnetic-x",
+          `${x * strength}px`
+        );
+
+        element.style.setProperty(
+          "--magnetic-y",
+          `${y * strength}px`
+        );
+      });
+
+      element.addEventListener("pointerleave", () => {
+        element.style.setProperty("--magnetic-x", "0px");
+        element.style.setProperty("--magnetic-y", "0px");
+      });
+    });
   }
 
-  function directionInit() {
-    const set = (key, on) => {
-      dom.dirLinks.filter(x => x.dataset.direction === key).forEach(x => x.classList.toggle("is-active", on));
-      dom.dirNodes.filter(x => x.dataset.direction === key).forEach(x => x.classList.toggle("is-active", on));
+
+  /*
+   * ============================================================
+   * CONTEXT CURSOR
+   * ============================================================
+   */
+
+  if (
+    contextCursor &&
+    contextCursorLabel &&
+    supportsFinePointer &&
+    !isReducedMotion
+  ) {
+    body.classList.add("has-pointer");
+
+    window.addEventListener(
+      "pointermove",
+      (event) => {
+        root.style.setProperty(
+          "--cursor-x",
+          `${event.clientX}px`
+        );
+
+        root.style.setProperty(
+          "--cursor-y",
+          `${event.clientY}px`
+        );
+      },
+      { passive: true }
+    );
+
+    const interactiveElements = document.querySelectorAll(
+      "a, button"
+    );
+
+    interactiveElements.forEach((element) => {
+      element.addEventListener("mouseenter", () => {
+        const href = element.getAttribute("href");
+
+        if (
+          element.classList.contains("final-cta") ||
+          href === "/contatti/"
+        ) {
+          contextCursorLabel.textContent = "TALK";
+          return;
+        }
+
+        contextCursorLabel.textContent = "→";
+      });
+
+      element.addEventListener("mouseleave", () => {
+        contextCursorLabel.textContent = "MOVE";
+      });
+    });
+  } else if (contextCursor) {
+    contextCursor.style.display = "none";
+  }
+
+
+  /*
+   * ============================================================
+   * HEADER SCROLL STATE
+   * ============================================================
+   */
+
+  const updateHeaderState = () => {
+    if (window.scrollY > 20) {
+      body.classList.add("is-scrolled");
+    } else {
+      body.classList.remove("is-scrolled");
+    }
+  };
+
+  window.addEventListener("scroll", updateHeaderState, {
+    passive: true
+  });
+
+  updateHeaderState();
+
+
+  /*
+   * ============================================================
+   * HASH NAVIGATION
+   * ============================================================
+   */
+
+  const scrollToHashTarget = (hash) => {
+    if (!hash || hash === "#") return;
+
+    const target = document.querySelector(hash);
+
+    if (!target) return;
+
+    target.scrollIntoView({
+      behavior: isReducedMotion ? "auto" : "smooth",
+      block: "start"
+    });
+  };
+
+
+  document.querySelectorAll('a[href^="#"]').forEach((link) => {
+    link.addEventListener("click", (event) => {
+      const hash = link.getAttribute("href");
+
+      if (!hash || hash === "#") return;
+
+      const target = document.querySelector(hash);
+
+      if (!target) return;
+
+      event.preventDefault();
+
+      if (menuOpen) {
+        closeMenu();
+      }
+
+      window.setTimeout(
+        () => scrollToHashTarget(hash),
+        menuOpen && !isReducedMotion ? 450 : 0
+      );
+
+      history.pushState(null, "", hash);
+    });
+  });
+
+
+  /*
+   * ============================================================
+   * INITIAL STATE
+   * ============================================================
+   */
+
+  if (chapterData.length) {
+    chapterData[0].element.classList.add("is-visible");
+    setChapterActive(0);
+  }
+
+  updateGlobalProgress();
+
+
+  /*
+   * ============================================================
+   * RESPECT REDUCED MOTION DYNAMICALLY
+   * ============================================================
+   */
+
+  if (window.matchMedia) {
+    const motionQuery = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    );
+
+    const handleMotionPreference = (event) => {
+      body.classList.toggle(
+        "is-reduced-motion",
+        event.matches
+      );
     };
-    dom.dirLinks.forEach(a => {
-      const key = a.dataset.direction;
-      a.addEventListener("pointerenter", () => set(key, true));
-      a.addEventListener("pointerleave", () => set(key, false));
-      a.addEventListener("focusin", () => set(key, true));
-      a.addEventListener("focusout", () => set(key, false));
-    });
+
+    handleMotionPreference(motionQuery);
+
+    if (typeof motionQuery.addEventListener === "function") {
+      motionQuery.addEventListener(
+        "change",
+        handleMotionPreference
+      );
+    }
   }
 
-  function narrativeInit() {
-    dom.links.forEach(a => {
-      const key = a.dataset.trajectoryNode;
-      if (!key) return;
-      const els = qa(`[data-node="${CSS.escape(key)}"], [data-direction="${CSS.escape(key)}"]`);
-      const on = () => els.forEach(el => el.classList.add("is-linked"));
-      const off = () => els.forEach(el => el.classList.remove("is-linked"));
-      a.addEventListener("pointerenter", on); a.addEventListener("pointerleave", off);
-      a.addEventListener("focusin", on); a.addEventListener("focusout", off);
-    });
-  }
-
-  function cursorInit() {
-    if (!dom.cursor || !dom.dot || !dom.ring || !fine() || st.reduced) return;
-    document.addEventListener("pointermove", e => { st.pointer.x = e.clientX; st.pointer.y = e.clientY; dom.cursor.classList.add("is-visible"); }, { passive: true });
-    qa("a,button").forEach(el => {
-      el.addEventListener("pointerenter", () => dom.cursor.classList.add("is-hovering"));
-      el.addEventListener("pointerleave", () => dom.cursor.classList.remove("is-hovering"));
-    });
-    window.addEventListener("pointerleave", () => dom.cursor.classList.remove("is-visible", "is-hovering"));
-  }
-
-  function cursorFrame() {
-    if (!dom.cursor || !dom.dot || !dom.ring || !fine() || st.reduced) return false;
-    st.cursor.x = lerp(st.cursor.x, st.pointer.x, CFG.cursorLerp);
-    st.cursor.y = lerp(st.cursor.y, st.pointer.y, CFG.cursorLerp);
-    dom.dot.style.transform = `translate3d(${st.pointer.x}px,${st.pointer.y}px,0) translate(-50%,-50%)`;
-    dom.ring.style.transform = `translate3d(${st.cursor.x}px,${st.cursor.y}px,0) translate(-50%,-50%)`;
-    return true;
-  }
-
-  function magneticInit() {
-    if (!fine() || st.reduced) return;
-    dom.magnetic.forEach(el => {
-      el.addEventListener("pointermove", e => {
-        const r = el.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2), d = Math.hypot(dx, dy);
-        if (d > CFG.magneticRadius) return;
-        const k = CFG.magneticStrength * (1 - d / CFG.magneticRadius);
-        el.style.setProperty("--magnetic-x", `${dx * k}px`); el.style.setProperty("--magnetic-y", `${dy * k}px`);
-      }, { passive: true });
-      el.addEventListener("pointerleave", () => { el.style.setProperty("--magnetic-x", "0px"); el.style.setProperty("--magnetic-y", "0px"); });
-    });
-  }
-
-  function ctaInit() {
-    if (!dom.cta || !dom.contact) return;
-    const on = () => dom.cta.classList.add("is-engaged"), off = () => dom.cta.classList.remove("is-engaged");
-    dom.contact.addEventListener("pointerenter", on); dom.contact.addEventListener("pointerleave", off); dom.contact.addEventListener("focusin", on); dom.contact.addEventListener("focusout", off);
-  }
-
-  function clearStandby() { if (st.standbyTimer) { clearTimeout(st.standbyTimer); st.standbyTimer = 0; } }
-  function openStandby() {
-    if (st.menuOpen || st.standby || st.reduced || !dom.standby || document.hidden || innerWidth < 700) return;
-    st.standby = true; st.standbyReturn = document.activeElement; clearStandby();
-    dom.body.classList.add("is-standby"); dom.standby.classList.add("is-active"); dom.standby.setAttribute("aria-hidden", "false"); setInert(dom.standby, false);
-    dom.wake?.focus({ preventScroll: true });
-  }
-  function closeStandby() {
-    if (!st.standby || !dom.standby) return;
-    st.standby = false; dom.body.classList.remove("is-standby"); dom.standby.classList.remove("is-active"); dom.standby.setAttribute("aria-hidden", "true"); setInert(dom.standby, true);
-    const el = st.standbyReturn; st.standbyReturn = null;
-    if (el && document.contains(el) && typeof el.focus === "function") requestAnimationFrame(() => el.focus({ preventScroll: true }));
-    resetStandby();
-  }
-  function resetStandby() {
-    clearStandby();
-    if (st.menuOpen || st.standby || st.reduced || document.hidden || innerWidth < 700) return;
-    st.standbyTimer = setTimeout(openStandby, CFG.standbyDelay);
-  }
-  function standbyInit() {
-    if (!dom.standby) return;
-    setInert(dom.standby, true);
-    dom.wake?.addEventListener("click", closeStandby);
-    dom.standby.addEventListener("keydown", e => {
-      if (!st.standby || e.key !== "Tab") return;
-      e.preventDefault(); dom.wake?.focus({ preventScroll: true });
-    });
-    ["pointerdown","wheel","touchstart","scroll"].forEach(type => window.addEventListener(type, () => st.standby ? closeStandby() : resetStandby(), { passive: true }));
-    document.addEventListener("visibilitychange", () => document.hidden ? clearStandby() : resetStandby());
-  }
-
-  function trajectoryTargets() {
-    if (dom.sections.length < 2) return;
-    const first = dom.sections[0].getBoundingClientRect(), last = dom.sections.at(-1).getBoundingClientRect();
-    const start = first.top + scrollY, end = last.bottom + scrollY - innerHeight, range = end - start;
-    st.traj.tp = range <= 0 ? 0 : clamp((scrollY - start) / range, 0, 1);
-    st.traj.td = st.reduced ? 0 : Math.sin(st.traj.tp * Math.PI * 2) * CFG.trajectoryDrift;
-  }
-  function trajectoryFrame() {
-    st.traj.p = st.reduced ? st.traj.tp : lerp(st.traj.p, st.traj.tp, CFG.trajectoryLerp);
-    st.traj.d = st.reduced ? 0 : lerp(st.traj.d, st.traj.td, CFG.trajectoryLerp);
-    dom.html.style.setProperty("--trajectory-drift", `${st.traj.d.toFixed(2)}px`);
-  }
-
-  function raf() {
-    const cursorActive = cursorFrame();
-    trajectoryFrame();
-    if (cursorActive || Math.abs(st.traj.d - st.traj.td) > 0.02) st.raf = requestAnimationFrame(raf);
-    else st.raf = 0;
-  }
-  function wakeRaf() { if (!st.raf) st.raf = requestAnimationFrame(raf); }
-
-  function hashInit() {
-    const raw = location.hash.slice(1);
-    const i = dom.sections.findIndex(s => s.id === raw);
-    if (i < 0) return;
-    setTimeout(() => goTo(i, false), st.reduced ? 0 : 300);
-  }
-
-  function keyboardInit() {
-    document.addEventListener("keydown", e => {
-      if (st.menuOpen || st.standby || !dom.sections.length) return;
-      if (e.key !== "PageDown" && e.key !== "PageUp") return;
-      e.preventDefault(); goTo(clamp(st.active + (e.key === "PageDown" ? 1 : -1), 0, dom.sections.length - 1));
-    });
-  }
-
-  function scrollInit() {
-    let ticking = false;
-    window.addEventListener("scroll", () => {
-      resetStandby(); wakeRaf();
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => { activeDetect(); trajectoryTargets(); ticking = false; });
-    }, { passive: true });
-  }
-
-  function resizeInit() {
-    window.addEventListener("resize", () => {
-      clearTimeout(st.resizeTimer);
-      st.resizeTimer = setTimeout(() => { activeDetect(); trajectoryTargets(); wowUpdate(st.active); resetStandby(); wakeRaf(); }, CFG.resizeDebounce);
-    }, { passive: true });
-  }
-
-  function setInitial() {
-    if (!dom.sections.length) return;
-    st.active = 0; wowUpdate(0); trajectoryTargets(); resetStandby();
-  }
-
-  function init() {
-    motionInit(); loaderInit(); pageTransitionsInit(); menuInit(); wowInit(); revealInit(); directionInit(); narrativeInit(); cursorInit(); magneticInit(); ctaInit(); standbyInit(); hashInit(); keyboardInit(); setInitial(); activeDetect(); trajectoryTargets(); wakeRaf();
-    document.addEventListener("visibilitychange", () => { if (document.hidden && st.raf) { cancelAnimationFrame(st.raf); st.raf = 0; } else if (!document.hidden) wakeRaf(); });
-    scrollInit(); resizeInit();
-  }
-
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
-  else init();
 })();
