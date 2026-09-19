@@ -1,3 +1,9 @@
+/* =========================================================
+   CESARE PARATORE
+   HOME — MOVIMENTO CON DIREZIONE
+   MASTER BEST SELLER
+   ========================================================= */
+
 (() => {
   "use strict";
 
@@ -16,294 +22,112 @@
     standbyDelay: 45000
   };
 
-  const DIRECTIONS = [
-    "sport",
-    "scienze-motorie",
-    "educazione",
-    "management",
-    "digitale"
-  ];
 
-  const JOURNEY = {
-    0: {
-      visited: [],
-      current: null,
-      state: "origin"
-    },
+  /* =======================================================
+     DOM
+     ======================================================= */
 
-    1: {
-      visited: ["sport"],
-      current: "sport",
-      state: "current"
-    },
+  const $ = (selector, root = document) =>
+    root.querySelector(selector);
 
-    2: {
-      visited: DIRECTIONS,
-      current: null,
-      state: "exploration"
-    },
+  const $$ = (selector, root = document) =>
+    [...root.querySelectorAll(selector)];
 
-    3: {
-      visited: DIRECTIONS,
-      current: null,
-      state: "converged"
-    },
 
-    4: {
-      visited: DIRECTIONS,
-      current: null,
-      state: "pause"
-    },
+  const body = document.body;
 
-    5: {
-      visited: DIRECTIONS,
-      current: null,
-      state: "territory"
-    },
+  const loader = $(".page-loader");
 
-    6: {
-      visited: DIRECTIONS,
-      current: null,
-      state: "integrated"
-    },
+  const header = $("#site-header");
 
-    7: {
-      visited: DIRECTIONS,
-      current: null,
-      state: "possibility"
-    },
+  const sections = $$(".chapter");
 
-    8: {
-      visited: DIRECTIONS,
-      current: null,
-      state: "reader"
-    },
+  const progressCurrent = $("#progress-current");
+  const progressTotal = $("#progress-total");
+  const progressFill = $("#progress-fill");
 
-    9: {
-      visited: DIRECTIONS,
-      current: null,
-      state: "complete"
-    }
-  };
+  const previousButton = $("#previous-section");
+  const nextButton = $("#next-section");
 
-  const st = {
-    loaded: false,
-    menuOpen: false,
-    standby: false,
-    active: 0,
-    reduced: false,
-    resizeTimer: 0,
-    standbyTimer: 0,
-    raf: 0,
-    menuReturn: null,
-    standbyReturn: null,
+  const menuTrigger = $("#menu-trigger");
+  const menu = $("#site-menu");
+  const menuLinks = $$("a", menu);
 
-    pointer: {
-      x: innerWidth / 2,
-      y: innerHeight / 2
-    },
+  const standby = $("#standby-screen");
+  const standbyWake = $(".standby-wake");
 
-    cursor: {
-      x: innerWidth / 2,
-      y: innerHeight / 2
-    },
+  const directionLinks = $$(".direction-link");
 
-    traj: {
-      p: 0,
-      tp: 0,
-      d: 0,
-      td: 0
-    },
+  const reducedMotion =
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    interaction: {
-      hover: new Set(),
-      focus: new Set()
-    }
-  };
-
-  const q = selector =>
-    document.querySelector(selector);
-
-  const qa = selector =>
-    [...document.querySelectorAll(selector)];
-
-  const dom = {
-    html: document.documentElement,
-    body: document.body,
-
-    loader: q(".page-loader"),
-    transition: q(".page-transition"),
-
-    cursor: q(".custom-cursor"),
-    dot: q(".custom-cursor-dot"),
-    ring: q(".custom-cursor-ring"),
-
-    header: q(".site-header"),
-
-    menu: q(".site-menu"),
-    menuBtn: q(".menu-trigger"),
-    menuLinks: qa(".site-menu-nav a"),
-
-    label: q("#progress-current"),
-    fill: q("#progress-fill"),
-    point: q("#progress-point"),
-
-    prev: q("#previous-section"),
-    prevLabel: q("#previous-section-label"),
-    next: q("#next-section"),
-    nextLabel: q("#next-section-label"),
-
-    sections: qa(".home-section"),
-    reveals: qa(".reveal"),
-
-    links: qa(".narrative-link"),
-    magnetic: qa(".magnetic"),
-
-    transitionLinks:
-      qa('a[href]:not([target="_blank"])'),
-
-    standby: q(".standby-screen"),
-    wake: q(".standby-wake"),
-
-    cta: q(".cta-trajectory"),
-    contact: q(".contact-cta"),
-
-    dirLinks:
-      qa(".hero-direction[data-direction]"),
-
-    dirNodes:
-      qa(".direction-node[data-direction]"),
-
-    fiveDirections:
-      qa(".five-directions [data-trajectory-node]"),
-
-    networkNodes:
-      qa(".network-node[data-node]")
-  };
-
-  const clamp = (n, min, max) =>
-    Math.min(Math.max(n, min), max);
-
-  const lerp = (a, b, t) =>
-    a + (b - a) * t;
-
-  const secNum = i =>
-    String(i + 1).padStart(2, "0");
-
-  const fine = () =>
-    matchMedia("(pointer:fine)").matches;
-
-  const motionOK = () =>
-    !st.reduced;
-
-  const section = i =>
-    dom.sections[
-      clamp(
-        i,
-        0,
-        dom.sections.length - 1
-      )
-    ] || null;
-
-  function focusables(root) {
-    return [
-      ...root.querySelectorAll(
-        'a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])'
-      )
-    ].filter(el =>
-      !el.hidden &&
-      el.offsetParent !== null
-    );
+  if (reducedMotion) {
+    body.classList.add("reduced-motion");
   }
 
-  function setInert(el, value) {
-    if (!el) return;
 
-    if ("inert" in el) {
-      el.inert = value;
-    } else if (value) {
-      el.setAttribute("inert", "");
-    } else {
-      el.removeAttribute("inert");
-    }
+  /* =======================================================
+     STATE
+     ======================================================= */
+
+  let currentIndex = 0;
+  let loaderRemoved = false;
+  let menuOpen = false;
+  let standbyTimer = null;
+  let lastFocusedElement = null;
+  let resizeTimer = null;
+
+  const visitedDirections = new Set();
+
+
+  /* =======================================================
+     HELPERS
+     ======================================================= */
+
+  const clamp = (value, min, max) =>
+    Math.min(Math.max(value, min), max);
+
+  const formatNumber = (value) =>
+    String(value).padStart(2, "0");
+
+  const isFinePointer =
+    window.matchMedia("(pointer:fine)").matches;
+
+
+  /* =======================================================
+     LOADER — FROZEN BEHAVIOR
+     ======================================================= */
+
+  function removeLoader() {
+
+    if (loaderRemoved || !loader) return;
+
+    loaderRemoved = true;
+
+    loader.classList.add("is-hidden");
+
+    window.setTimeout(() => {
+      loader.remove();
+    }, 900);
   }
 
-  /* ========================================================
-     MOTION
-     ======================================================== */
+  function initLoader() {
 
-  function motionInit() {
-    const mq =
-      matchMedia(
-        "(prefers-reduced-motion: reduce)"
-      );
+    if (!loader) return;
 
-    const apply = reduced => {
-      st.reduced = reduced;
-
-      dom.html.classList.toggle(
-        "reduced-motion",
-        reduced
-      );
-
-      if (reduced) {
-        closeStandby();
-      }
-
-      resetStandby();
-      wakeRaf();
-    };
-
-    apply(mq.matches);
-
-    mq.addEventListener?.(
-      "change",
-      event =>
-        apply(event.matches)
-    );
-  }
-
-  /* ========================================================
-     LOADER — FROZEN
-     ======================================================== */
-
-  function loaderInit() {
-    if (!dom.loader) {
-      st.loaded = true;
-      return;
-    }
-
-    const started = performance.now();
-    let done = false;
+    const startedAt = performance.now();
 
     const finish = () => {
-      if (done) return;
 
-      done = true;
+      const elapsed = performance.now() - startedAt;
 
-      const wait = Math.max(
-        0,
-        CFG.loaderMin -
-        (performance.now() - started)
-      );
+      const remaining =
+        Math.max(0, CFG.loaderMin - elapsed);
 
-      setTimeout(() => {
-        st.loaded = true;
-
-        dom.loader.classList.add(
-          "is-hidden"
-        );
-
-        setTimeout(() => {
-          dom.loader?.remove();
-        }, 700);
-      }, wait);
+      window.setTimeout(removeLoader, remaining);
     };
 
-    if (
-      document.readyState ===
-      "complete"
-    ) {
+    if (document.readyState === "complete") {
       finish();
     } else {
       window.addEventListener(
@@ -313,789 +137,570 @@
       );
     }
 
-    setTimeout(
-      finish,
-      CFG.loaderMax
-    );
+    window.setTimeout(removeLoader, CFG.loaderMax);
   }
 
-  /* ========================================================
+
+  /* =======================================================
      PAGE TRANSITIONS
-     ======================================================== */
+     ======================================================= */
 
-  function pageTransitionsInit() {
-    if (!dom.transition) return;
+  function isSameOriginInternalLink(link) {
 
-    dom.transitionLinks.forEach(link => {
+    if (!link) return false;
+
+    if (
+      link.target === "_blank" ||
+      link.hasAttribute("download")
+    ) {
+      return false;
+    }
+
+    const href = link.getAttribute("href");
+
+    if (!href || href.startsWith("#")) {
+      return false;
+    }
+
+    try {
+
+      const url =
+        new URL(href, window.location.href);
+
+      return (
+        url.origin === window.location.origin &&
+        !url.pathname.endsWith(".pdf")
+      );
+
+    } catch {
+      return false;
+    }
+  }
+
+  function initPageTransitions() {
+
+    $$("a").forEach(link => {
+
+      if (!isSameOriginInternalLink(link)) {
+        return;
+      }
+
+      link.addEventListener("click", event => {
+
+        if (
+          event.metaKey ||
+          event.ctrlKey ||
+          event.shiftKey ||
+          event.altKey
+        ) {
+          return;
+        }
+
+        event.preventDefault();
+
+        const href = link.href;
+
+        body.classList.add("page-leaving");
+
+        window.setTimeout(() => {
+          window.location.href = href;
+        }, CFG.transitionMs);
+
+      });
+
+    });
+
+  }
+
+
+  /* =======================================================
+     MENU
+     ======================================================= */
+
+  function openMenu() {
+
+    if (!menu || !menuTrigger) return;
+
+    lastFocusedElement = document.activeElement;
+
+    menuOpen = true;
+
+    body.classList.add("is-locked");
+
+    menu.classList.add("is-open");
+
+    menu.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
+    menuTrigger.setAttribute(
+      "aria-expanded",
+      "true"
+    );
+
+    const firstLink = menuLinks[0];
+
+    if (firstLink) {
+      window.setTimeout(() => {
+        firstLink.focus();
+      }, 120);
+    }
+  }
+
+  function closeMenu(
+    restoreFocus = true
+  ) {
+
+    if (!menu || !menuTrigger) return;
+
+    menuOpen = false;
+
+    body.classList.remove("is-locked");
+
+    menu.classList.remove("is-open");
+
+    menu.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    menuTrigger.setAttribute(
+      "aria-expanded",
+      "false"
+    );
+
+    if (
+      restoreFocus &&
+      lastFocusedElement &&
+      typeof lastFocusedElement.focus === "function"
+    ) {
+      lastFocusedElement.focus();
+    }
+  }
+
+  function toggleMenu() {
+
+    if (menuOpen) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+
+  }
+
+  function initMenu() {
+
+    if (!menuTrigger) return;
+
+    menuTrigger.addEventListener(
+      "click",
+      toggleMenu
+    );
+
+    menuLinks.forEach(link => {
+
       link.addEventListener(
         "click",
-        event => {
-          if (
-            st.reduced ||
-            event.defaultPrevented ||
-            event.button !== 0 ||
-            event.metaKey ||
-            event.ctrlKey ||
-            event.shiftKey ||
-            event.altKey
-          ) {
-            return;
+        () => closeMenu(false)
+      );
+
+    });
+
+    document.addEventListener(
+      "keydown",
+      event => {
+
+        if (event.key === "Escape") {
+
+          if (menuOpen) {
+            closeMenu();
           }
 
-          const href =
-            link.getAttribute("href");
-
-          if (
-            !href ||
-            href.startsWith("#") ||
-            href.startsWith("mailto:") ||
-            href.startsWith("tel:") ||
-            link.hasAttribute("download")
-          ) {
-            return;
+          if (standby?.classList.contains("is-active")) {
+            closeStandby();
           }
 
-          let url;
+        }
 
-          try {
-            url = new URL(
-              href,
-              location.href
-            );
-          } catch {
-            return;
-          }
+      }
+    );
 
-          const samePage =
-            url.origin === location.origin &&
-            url.pathname === location.pathname &&
-            url.search === location.search;
+  }
 
-          if (
-            samePage &&
-            url.hash
-          ) {
-            return;
-          }
 
-          if (
-            url.origin !==
-            location.origin
-          ) {
-            return;
-          }
+  /* =======================================================
+     MENU FOCUS TRAP
+     ======================================================= */
+
+  function initMenuFocusTrap() {
+
+    document.addEventListener(
+      "keydown",
+      event => {
+
+        if (!menuOpen || event.key !== "Tab") {
+          return;
+        }
+
+        const focusable = $$(
+          "a[href], button:not([disabled])",
+          menu
+        );
+
+        if (!focusable.length) return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (event.shiftKey && document.activeElement === first) {
 
           event.preventDefault();
+          last.focus();
 
-          dom.transition.classList.add(
-            "is-active"
-          );
-
-          setTimeout(() => {
-            location.href = url.href;
-          }, CFG.transitionMs);
-        }
-      );
-    });
-
-    window.addEventListener(
-      "pageshow",
-      () =>
-        dom.transition.classList.remove(
-          "is-active"
-        )
-    );
-  }
-
-  /* ========================================================
-     MENU — FROZEN EXPERIENCE
-     ======================================================== */
-
-  function menuOpen() {
-    if (
-      !dom.menu ||
-      st.menuOpen
-    ) {
-      return;
-    }
-
-    clearStandby();
-
-    st.menuReturn =
-      document.activeElement;
-
-    st.menuOpen = true;
-
-    dom.menu.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-    dom.menuBtn?.setAttribute(
-      "aria-expanded",
-      "true"
-    );
-
-    dom.menuBtn?.setAttribute(
-      "aria-label",
-      "Chiudi menu"
-    );
-
-    dom.body.classList.add(
-      "is-menu-open"
-    );
-
-    setInert(
-      dom.menu,
-      false
-    );
-
-    requestAnimationFrame(() => {
-      dom.menuLinks[0]?.focus({
-        preventScroll:true
-      });
-    });
-  }
-
-  function menuClose(restore = true) {
-    if (
-      !dom.menu ||
-      !st.menuOpen
-    ) {
-      return;
-    }
-
-    st.menuOpen = false;
-
-    dom.menu.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-
-    dom.menuBtn?.setAttribute(
-      "aria-expanded",
-      "false"
-    );
-
-    dom.menuBtn?.setAttribute(
-      "aria-label",
-      "Apri menu"
-    );
-
-    dom.body.classList.remove(
-      "is-menu-open"
-    );
-
-    setInert(
-      dom.menu,
-      true
-    );
-
-    if (restore) {
-      const target =
-        st.menuReturn;
-
-      if (
-        target &&
-        document.contains(target) &&
-        typeof target.focus ===
-          "function"
-      ) {
-        target.focus({
-          preventScroll:true
-        });
-      } else {
-        dom.menuBtn?.focus({
-          preventScroll:true
-        });
-      }
-    }
-
-    st.menuReturn = null;
-
-    resetStandby();
-  }
-
-  function menuInit() {
-    dom.menuBtn?.addEventListener(
-      "click",
-      () =>
-        st.menuOpen
-          ? menuClose()
-          : menuOpen()
-    );
-
-    dom.menuLinks.forEach(link => {
-      link.addEventListener(
-        "click",
-        () =>
-          menuClose(false)
-      );
-    });
-
-    dom.menu?.addEventListener(
-      "click",
-      event => {
-        if (
-          event.target === dom.menu
+        } else if (
+          !event.shiftKey &&
+          document.activeElement === last
         ) {
-          menuClose();
+
+          event.preventDefault();
+          first.focus();
+
         }
+
       }
+    );
+
+  }
+
+
+  /* =======================================================
+     SECTION NAVIGATION
+     ======================================================= */
+
+  function getSectionTop(section) {
+
+    const rect =
+      section.getBoundingClientRect();
+
+    return (
+      window.scrollY +
+      rect.top -
+      CFG.navOffset
+    );
+  }
+
+  function goTo(index, smooth = true) {
+
+    const next =
+      clamp(index, 0, sections.length - 1);
+
+    const target =
+      sections[next];
+
+    if (!target) return;
+
+    if (smooth) {
+
+      target.scrollIntoView({
+        behavior: reducedMotion
+          ? "auto"
+          : "smooth",
+        block: "start"
+      });
+
+    } else {
+
+      window.scrollTo({
+        top: getSectionTop(target),
+        behavior: "auto"
+      });
+
+    }
+
+  }
+
+  function goNext() {
+
+    if (currentIndex < sections.length - 1) {
+      goTo(currentIndex + 1);
+    }
+
+  }
+
+  function goPrevious() {
+
+    if (currentIndex > 0) {
+      goTo(currentIndex - 1);
+    }
+
+  }
+
+  function initSectionNavigation() {
+
+    previousButton?.addEventListener(
+      "click",
+      goPrevious
+    );
+
+    nextButton?.addEventListener(
+      "click",
+      goNext
     );
 
     document.addEventListener(
       "keydown",
       event => {
-        if (
-          event.key === "Escape"
-        ) {
-          if (st.menuOpen) {
-            event.preventDefault();
-            menuClose();
-            return;
-          }
-
-          if (st.standby) {
-            event.preventDefault();
-            closeStandby();
-          }
-        }
 
         if (
-          event.key !== "Tab" ||
-          !st.menuOpen
+          event.target instanceof HTMLInputElement ||
+          event.target instanceof HTMLTextAreaElement ||
+          event.target instanceof HTMLSelectElement
         ) {
           return;
         }
 
-        const els =
-          focusables(dom.menu);
+        if (menuOpen) return;
 
-        if (!els.length) return;
+        if (event.key === "PageDown") {
 
-        const first = els[0];
-        const last =
-          els[els.length - 1];
-
-        if (
-          event.shiftKey &&
-          document.activeElement ===
-            first
-        ) {
           event.preventDefault();
-          last.focus();
-        } else if (
-          !event.shiftKey &&
-          document.activeElement ===
-            last
-        ) {
-          event.preventDefault();
-          first.focus();
+          goNext();
+
         }
+
+        if (event.key === "PageUp") {
+
+          event.preventDefault();
+          goPrevious();
+
+        }
+
       }
     );
+
   }
 
-  /* ========================================================
-     PROGRESS
-     ======================================================== */
 
-  function wowUpdate(index) {
-    const current =
-      section(index);
+  /* =======================================================
+     ACTIVE SECTION / PROGRESS
+     ======================================================= */
 
-    if (!current) return;
-
-    st.active = index;
+  function updateProgress(index) {
 
     const total =
-      dom.sections.length;
+      sections.length;
 
-    const progress =
-      total > 1
-        ? index / (total - 1)
-        : 0;
+    const percent =
+      total <= 1
+        ? 100
+        : (index / (total - 1)) * 100;
 
-    if (dom.label) {
-      dom.label.textContent =
-        current.dataset.sectionTitle ||
-        "";
+    if (progressCurrent) {
+      progressCurrent.textContent =
+        formatNumber(index + 1);
     }
 
-    if (dom.fill) {
-      dom.fill.style.width =
-        `${progress * 100}%`;
+    if (progressTotal) {
+      progressTotal.textContent =
+        formatNumber(total);
     }
 
-    if (dom.point) {
-      dom.point.style.left =
-        `${progress * 100}%`;
+    if (progressFill) {
+      progressFill.style.transform =
+        `scaleX(${percent / 100})`;
     }
 
-    const first =
-      index === 0;
-
-    const last =
-      index === total - 1;
-
-    dom.prev?.classList.toggle(
-      "is-disabled",
-      first
-    );
-
-    dom.prev?.setAttribute(
-      "aria-hidden",
-      String(first)
-    );
-
-    if (first) {
-      dom.prev?.setAttribute(
-        "tabindex",
-        "-1"
-      );
-
-      if (dom.prevLabel) {
-        dom.prevLabel.textContent =
-          "";
-      }
-    } else {
-      dom.prev?.removeAttribute(
-        "tabindex"
-      );
-
-      dom.prev.href =
-        `#${secNum(index - 1)}`;
-
-      dom.prev.setAttribute(
-        "aria-label",
-        `Vai alla sezione ${secNum(index - 1)}`
-      );
-
-      if (dom.prevLabel) {
-        dom.prevLabel.textContent =
-          secNum(index - 1);
-      }
+    if (previousButton) {
+      previousButton.disabled =
+        index === 0;
     }
 
-    const arrow =
-      dom.next?.querySelector(
-        ".section-jump-arrow"
-      );
-
-    if (last) {
-      dom.next.href = "#01";
-
-      dom.next.setAttribute(
-        "aria-label",
-        "Torna all'inizio"
-      );
-
-      dom.nextLabel.textContent =
-        "01";
-
-      if (arrow) {
-        arrow.textContent = "↑";
-      }
-    } else {
-      dom.next.href =
-        `#${secNum(index + 1)}`;
-
-      dom.next.setAttribute(
-        "aria-label",
-        `Vai alla sezione ${secNum(index + 1)}`
-      );
-
-      dom.nextLabel.textContent =
-        secNum(index + 1);
-
-      if (arrow) {
-        arrow.textContent = "→";
-      }
+    if (nextButton) {
+      nextButton.disabled =
+        index === total - 1;
     }
 
-    journeyUpdate(index);
   }
 
-  function goTo(
-    index,
-    updateHash = true
-  ) {
-    const target =
-      section(index);
+  function updateActiveSection() {
 
-    if (!target) return;
+    const viewportCenter =
+      window.innerHeight * 0.45;
 
-    const headerHeight =
-      dom.header?.offsetHeight || 0;
+    let closestIndex = currentIndex;
 
-    const y =
-      window.scrollY +
-      target.getBoundingClientRect().top -
-      headerHeight -
-      CFG.navOffset;
+    let closestDistance = Infinity;
 
-    window.scrollTo({
-      top:Math.max(0,y),
-      behavior:
-        motionOK()
-          ? "smooth"
-          : "auto"
-    });
+    sections.forEach(
+      (section, index) => {
 
-    if (
-      updateHash &&
-      history.replaceState
-    ) {
-      history.replaceState(
-        null,
-        "",
-        `#${target.id}`
-      );
-    }
-
-    target.setAttribute(
-      "tabindex",
-      "-1"
-    );
-  }
-
-  function wowInit() {
-    dom.prev?.addEventListener(
-      "click",
-      event => {
-        event.preventDefault();
-
-        if (st.active > 0) {
-          goTo(
-            st.active - 1
-          );
-        }
-      }
-    );
-
-    dom.next?.addEventListener(
-      "click",
-      event => {
-        event.preventDefault();
-
-        goTo(
-          st.active ===
-            dom.sections.length - 1
-            ? 0
-            : st.active + 1
-        );
-      }
-    );
-  }
-
-  function activeDetect() {
-    if (!dom.sections.length) {
-      return;
-    }
-
-    const reference =
-      innerHeight * .52;
-
-    let best = st.active;
-    let distance = Infinity;
-
-    dom.sections.forEach(
-      (current,index) => {
         const rect =
-          current.getBoundingClientRect();
-
-        if (
-          rect.bottom <= 0 ||
-          rect.top >= innerHeight
-        ) {
-          return;
-        }
+          section.getBoundingClientRect();
 
         const center =
-          rect.top +
-          rect.height / 2;
+          rect.top + rect.height / 2;
 
-        const currentDistance =
-          Math.abs(
-            center - reference
-          );
+        const distance =
+          Math.abs(center - viewportCenter);
 
-        if (
-          currentDistance <
-          distance
-        ) {
-          distance =
-            currentDistance;
+        if (distance < closestDistance) {
 
-          best = index;
+          closestDistance = distance;
+          closestIndex = index;
+
         }
+
       }
     );
 
-    if (
-      best !== st.active
-    ) {
-      wowUpdate(best);
+    if (closestIndex !== currentIndex) {
+
+      currentIndex = closestIndex;
+
+      updateProgress(currentIndex);
+
+      applyJourneyState();
+
     }
+
   }
 
-  /* ========================================================
+
+  /* =======================================================
      JOURNEY SYSTEM
-     ======================================================== */
+     ======================================================= */
 
-  function directionRepresentations(key) {
-    return [
-      ...dom.dirLinks.filter(
-        element =>
-          element.dataset.direction ===
-          key
-      ),
+  const JOURNEY = [
+    "origin",
+    "sport",
+    "exploration",
+    "converged",
+    "pause",
+    "territory",
+    "integrated",
+    "possibility",
+    "reader",
+    "complete"
+  ];
 
-      ...dom.dirNodes.filter(
-        element =>
-          element.dataset.direction ===
-          key
-      ),
+  function applyJourneyState() {
 
-      ...dom.links.filter(
-        element =>
-          element.dataset.trajectoryNode ===
-          key
-      ),
+    const state =
+      JOURNEY[currentIndex] || "origin";
 
-      ...dom.fiveDirections.filter(
-        element =>
-          element.dataset.trajectoryNode ===
-          key
-      ),
+    body.dataset.journeyState = state;
 
-      ...dom.networkNodes.filter(
-        element =>
-          element.dataset.node ===
-          key
-      )
-    ];
-  }
+    sections.forEach(
+      (section, index) => {
 
-  function setStateClass(
-    elements,
-    className,
-    active
-  ) {
-    elements.forEach(
-      element =>
-        element.classList.toggle(
-          className,
-          active
-        )
-    );
-  }
+        section.dataset.journeyState =
+          JOURNEY[index] || "origin";
 
-  function applyJourneyState(
-    index
-  ) {
-    const config =
-      JOURNEY[index] ||
-      JOURNEY[0];
+        section.classList.toggle(
+          "is-current",
+          index === currentIndex
+        );
 
-    dom.sections.forEach(
-      (element,sectionIndex) => {
-        const state =
-          JOURNEY[sectionIndex]?.state ||
-          "origin";
-
-        element.dataset.journeyState =
-          state;
       }
     );
 
-    DIRECTIONS.forEach(key => {
-      const elements =
-        directionRepresentations(key);
+    directionLinks.forEach(link => {
 
-      setStateClass(
-        elements,
-        "is-visited",
-        config.visited.includes(key)
-      );
-
-      setStateClass(
-        elements,
-        "is-current",
-        config.current === key
-      );
-
-      setStateClass(
-        elements,
-        "is-converged",
-        (
-          config.state === "converged" ||
-          config.state === "integrated" ||
-          config.state === "possibility" ||
-          config.state === "reader" ||
-          config.state === "complete"
-        ) &&
-        config.visited.includes(key)
-      );
-    });
-
-    const current =
-      section(index);
-
-    if (
-      current &&
-      config.current
-    ) {
-      current.dataset.direction =
-        config.current;
-    } else if (current) {
-      delete current.dataset.direction;
-    }
-  }
-
-  function journeyUpdate(index) {
-    applyJourneyState(index);
-  }
-
-  function interactionState(
-    key,
-    source,
-    active
-  ) {
-    const collection =
-      st.interaction[source];
-
-    if (active) {
-      collection.add(key);
-    } else {
-      collection.delete(key);
-    }
-
-    const isActive =
-      st.interaction.hover.has(key) ||
-      st.interaction.focus.has(key);
-
-    setStateClass(
-      directionRepresentations(key),
-      "is-active",
-      isActive
-    );
-  }
-
-  function narrativeInit() {
-    dom.links.forEach(link => {
-      const key =
-        link.dataset.trajectoryNode;
-
-      if (!key) return;
-
-      link.addEventListener(
-        "pointerenter",
-        () =>
-          interactionState(
-            key,
-            "hover",
-            true
-          )
-      );
-
-      link.addEventListener(
-        "pointerleave",
-        () =>
-          interactionState(
-            key,
-            "hover",
-            false
-          )
-      );
-
-      link.addEventListener(
-        "focusin",
-        () =>
-          interactionState(
-            key,
-            "focus",
-            true
-          )
-      );
-
-      link.addEventListener(
-        "focusout",
-        () =>
-          interactionState(
-            key,
-            "focus",
-            false
-          )
-      );
-    });
-  }
-
-  function directionInit() {
-    dom.dirLinks.forEach(link => {
-      const key =
+      const direction =
         link.dataset.direction;
 
-      if (!key) return;
+      link.classList.toggle(
+        "is-visited",
+        visitedDirections.has(direction)
+      );
+
+    });
+
+  }
+
+
+  /* =======================================================
+     DIRECTION INTERACTION
+     ======================================================= */
+
+  function markDirectionVisited(direction) {
+
+    if (!direction) return;
+
+    visitedDirections.add(direction);
+
+    directionLinks.forEach(link => {
+
+      if (
+        link.dataset.direction === direction
+      ) {
+
+        link.classList.add("is-visited");
+
+      }
+
+    });
+
+  }
+
+  function initDirections() {
+
+    directionLinks.forEach(link => {
+
+      link.addEventListener(
+        "click",
+        () => {
+
+          markDirectionVisited(
+            link.dataset.direction
+          );
+
+        }
+      );
 
       link.addEventListener(
         "pointerenter",
-        () =>
-          interactionState(
-            key,
-            "hover",
-            true
-          )
+        () => {
+
+          if (!isFinePointer) return;
+
+          link.classList.add("is-hovered");
+
+        }
       );
 
       link.addEventListener(
         "pointerleave",
-        () =>
-          interactionState(
-            key,
-            "hover",
-            false
-          )
+        () => {
+
+          link.classList.remove("is-hovered");
+
+        }
       );
 
-      link.addEventListener(
-        "focusin",
-        () =>
-          interactionState(
-            key,
-            "focus",
-            true
-          )
-      );
-
-      link.addEventListener(
-        "focusout",
-        () =>
-          interactionState(
-            key,
-            "focus",
-            false
-          )
-      );
     });
+
   }
 
-  /* ========================================================
-     REVEAL
-     ======================================================== */
 
-  function revealInit() {
+  /* =======================================================
+     REVEAL
+     ======================================================= */
+
+  function initReveal() {
+
+    const elements =
+      $$(".reveal");
+
     if (
-      !dom.reveals.length ||
-      st.reduced ||
+      reducedMotion ||
       !("IntersectionObserver" in window)
     ) {
-      dom.reveals.forEach(
+
+      elements.forEach(
         element =>
-          element.classList.add(
-            "is-visible"
-          )
+          element.classList.add("is-visible")
       );
 
       return;
@@ -1104,768 +709,553 @@
     const observer =
       new IntersectionObserver(
         entries => {
-          entries.forEach(
-            entry => {
-              if (
-                !entry.isIntersecting
-              ) {
-                return;
-              }
 
-              entry.target.classList.add(
-                "is-visible"
-              );
+          entries.forEach(entry => {
 
-              observer.unobserve(
-                entry.target
-              );
+            if (!entry.isIntersecting) {
+              return;
             }
-          );
+
+            entry.target.classList.add(
+              "is-visible"
+            );
+
+            observer.unobserve(
+              entry.target
+            );
+
+          });
+
         },
         {
-          threshold:
-            CFG.revealThreshold,
-          rootMargin:
-            "0px 0px -8% 0px"
+          threshold:CFG.revealThreshold,
+          rootMargin:"0px 0px -8% 0px"
         }
       );
 
-    dom.reveals.forEach(
+    elements.forEach(
       element =>
         observer.observe(element)
     );
+
   }
 
-  /* ========================================================
-     CURSOR
-     ======================================================== */
 
-  function cursorInit() {
+  /* =======================================================
+     CURSOR
+     ======================================================= */
+
+  function initCursor() {
+
     if (
-      !dom.cursor ||
-      !dom.dot ||
-      !dom.ring ||
-      !fine() ||
-      st.reduced
+      !isFinePointer ||
+      reducedMotion
     ) {
       return;
     }
+
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+
+    let currentX = mouseX;
+    let currentY = mouseY;
 
     document.addEventListener(
       "pointermove",
       event => {
-        st.pointer.x =
-          event.clientX;
 
-        st.pointer.y =
-          event.clientY;
+        mouseX = event.clientX;
+        mouseY = event.clientY;
 
-        dom.cursor.classList.add(
-          "is-visible"
-        );
-
-        wakeRaf();
       },
       { passive:true }
     );
 
-    qa("a,button").forEach(
-      element => {
-        element.addEventListener(
-          "pointerenter",
-          () =>
-            dom.cursor.classList.add(
-              "is-hovering"
-            )
+    const tick = () => {
+
+      currentX +=
+        (mouseX - currentX) *
+        CFG.cursorLerp;
+
+      currentY +=
+        (mouseY - currentY) *
+        CFG.cursorLerp;
+
+      document.documentElement.style.setProperty(
+        "--cursor-x",
+        `${currentX}px`
+      );
+
+      document.documentElement.style.setProperty(
+        "--cursor-y",
+        `${currentY}px`
+      );
+
+      requestAnimationFrame(tick);
+
+    };
+
+    requestAnimationFrame(tick);
+
+  }
+
+
+  /* =======================================================
+     MAGNETIC INTERACTION
+     ======================================================= */
+
+  function initMagnetic() {
+
+    if (
+      !isFinePointer ||
+      reducedMotion
+    ) {
+      return;
+    }
+
+    const elements = [
+      ...$$(".final-cta"),
+      ...$$(".direction-link"),
+      ...$$(".section-jump button"),
+      ...$$(".menu-trigger")
+    ];
+
+    elements.forEach(element => {
+
+      let rect = null;
+
+      element.addEventListener(
+        "pointerenter",
+        () => {
+          rect =
+            element.getBoundingClientRect();
+        }
+      );
+
+      element.addEventListener(
+        "pointermove",
+        event => {
+
+          if (!rect) {
+            rect =
+              element.getBoundingClientRect();
+          }
+
+          const centerX =
+            rect.left + rect.width / 2;
+
+          const centerY =
+            rect.top + rect.height / 2;
+
+          const dx =
+            event.clientX - centerX;
+
+          const dy =
+            event.clientY - centerY;
+
+          const distance =
+            Math.sqrt(dx * dx + dy * dy);
+
+          if (
+            distance >
+            CFG.magneticRadius
+          ) {
+            return;
+          }
+
+          const strength =
+            CFG.magneticStrength *
+            (1 - distance / CFG.magneticRadius);
+
+          element.style.setProperty(
+            "--magnetic-x",
+            `${dx * strength}px`
+          );
+
+          element.style.setProperty(
+            "--magnetic-y",
+            `${dy * strength}px`
+          );
+
+          element.style.transform =
+            `translate3d(
+              ${dx * strength}px,
+              ${dy * strength}px,
+              0
+            )`;
+
+        }
+      );
+
+      element.addEventListener(
+        "pointerleave",
+        () => {
+
+          rect = null;
+
+          element.style.removeProperty(
+            "--magnetic-x"
+          );
+
+          element.style.removeProperty(
+            "--magnetic-y"
+          );
+
+          element.style.transform = "";
+
+        }
+      );
+
+    });
+
+  }
+
+
+  /* =======================================================
+     TRAJECTORY
+     ======================================================= */
+
+  function initTrajectory() {
+
+    if (reducedMotion) {
+      return;
+    }
+
+    let targetDrift = 0;
+    let currentDrift = 0;
+
+    const updateTarget = () => {
+
+      const progress =
+        window.scrollY /
+        Math.max(
+          1,
+          document.documentElement.scrollHeight -
+          window.innerHeight
         );
 
-        element.addEventListener(
-          "pointerleave",
-          () =>
-            dom.cursor.classList.remove(
-              "is-hovering"
-            )
-        );
-      }
-    );
+      targetDrift =
+        (
+          progress -
+          0.5
+        ) *
+        CFG.trajectoryDrift;
+
+    };
 
     window.addEventListener(
-      "pointerleave",
-      () =>
-        dom.cursor.classList.remove(
-          "is-visible",
-          "is-hovering"
-        )
+      "scroll",
+      updateTarget,
+      { passive:true }
     );
+
+    const tick = () => {
+
+      currentDrift +=
+        (
+          targetDrift -
+          currentDrift
+        ) *
+        CFG.trajectoryLerp;
+
+      document.documentElement.style.setProperty(
+        "--trajectory-drift",
+        `${currentDrift}px`
+      );
+
+      requestAnimationFrame(tick);
+
+    };
+
+    updateTarget();
+
+    requestAnimationFrame(tick);
+
   }
 
-  function cursorFrame() {
-    if (
-      !dom.cursor ||
-      !dom.dot ||
-      !dom.ring ||
-      !fine() ||
-      st.reduced
-    ) {
-      return false;
-    }
 
-    st.cursor.x =
-      lerp(
-        st.cursor.x,
-        st.pointer.x,
-        CFG.cursorLerp
-      );
+  /* =======================================================
+     CTA ENGAGEMENT
+     ======================================================= */
 
-    st.cursor.y =
-      lerp(
-        st.cursor.y,
-        st.pointer.y,
-        CFG.cursorLerp
-      );
+  function initCTA() {
 
-    dom.dot.style.transform =
-      `translate3d(${st.pointer.x}px,${st.pointer.y}px,0) translate(-50%,-50%)`;
+    const cta =
+      $(".final-cta");
 
-    dom.ring.style.transform =
-      `translate3d(${st.cursor.x}px,${st.cursor.y}px,0) translate(-50%,-50%)`;
+    if (!cta) return;
 
-    const distance =
-      Math.hypot(
-        st.cursor.x -
-          st.pointer.x,
-        st.cursor.y -
-          st.pointer.y
-      );
+    cta.addEventListener(
+      "click",
+      () => {
 
-    return distance > .1;
-  }
-
-  /* ========================================================
-     MAGNETIC
-     ======================================================== */
-
-  function magneticInit() {
-    if (
-      !fine() ||
-      st.reduced
-    ) {
-      return;
-    }
-
-    dom.magnetic.forEach(
-      element => {
-        element.addEventListener(
-          "pointermove",
-          event => {
-            const rect =
-              element.getBoundingClientRect();
-
-            const dx =
-              event.clientX -
-              (
-                rect.left +
-                rect.width / 2
-              );
-
-            const dy =
-              event.clientY -
-              (
-                rect.top +
-                rect.height / 2
-              );
-
-            const distance =
-              Math.hypot(dx,dy);
-
-            if (
-              distance >
-              CFG.magneticRadius
-            ) {
-              return;
-            }
-
-            const strength =
-              CFG.magneticStrength *
-              (
-                1 -
-                distance /
-                  CFG.magneticRadius
-              );
-
-            element.style.setProperty(
-              "--magnetic-x",
-              `${dx * strength}px`
-            );
-
-            element.style.setProperty(
-              "--magnetic-y",
-              `${dy * strength}px`
-            );
-          },
-          { passive:true }
+        cta.classList.add(
+          "is-engaged"
         );
 
-        element.addEventListener(
-          "pointerleave",
-          () => {
-            element.style.setProperty(
-              "--magnetic-x",
-              "0px"
-            );
-
-            element.style.setProperty(
-              "--magnetic-y",
-              "0px"
-            );
-          }
-        );
       }
     );
+
   }
 
-  /* ========================================================
-     CTA
-     ======================================================== */
 
-  function ctaInit() {
-    if (
-      !dom.cta ||
-      !dom.contact
-    ) {
-      return;
-    }
-
-    const on = () =>
-      dom.cta.classList.add(
-        "is-engaged"
-      );
-
-    const off = () =>
-      dom.cta.classList.remove(
-        "is-engaged"
-      );
-
-    dom.contact.addEventListener(
-      "pointerenter",
-      on
-    );
-
-    dom.contact.addEventListener(
-      "pointerleave",
-      off
-    );
-
-    dom.contact.addEventListener(
-      "focusin",
-      on
-    );
-
-    dom.contact.addEventListener(
-      "focusout",
-      off
-    );
-  }
-
-  /* ========================================================
+  /* =======================================================
      STANDBY — FROZEN
-     ======================================================== */
-
-  function clearStandby() {
-    if (st.standbyTimer) {
-      clearTimeout(
-        st.standbyTimer
-      );
-
-      st.standbyTimer = 0;
-    }
-  }
-
-  function openStandby() {
-    if (
-      st.menuOpen ||
-      st.standby ||
-      st.reduced ||
-      !dom.standby ||
-      document.hidden ||
-      innerWidth < 700
-    ) {
-      return;
-    }
-
-    st.standby = true;
-
-    st.standbyReturn =
-      document.activeElement;
-
-    clearStandby();
-
-    dom.body.classList.add(
-      "is-standby"
-    );
-
-    dom.standby.classList.add(
-      "is-active"
-    );
-
-    dom.standby.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-    setInert(
-      dom.standby,
-      false
-    );
-
-    dom.wake?.focus({
-      preventScroll:true
-    });
-  }
+     ======================================================= */
 
   function closeStandby() {
-    if (
-      !st.standby ||
-      !dom.standby
-    ) {
-      return;
-    }
 
-    st.standby = false;
+    if (!standby) return;
 
-    dom.body.classList.remove(
-      "is-standby"
-    );
-
-    dom.standby.classList.remove(
+    standby.classList.remove(
       "is-active"
     );
 
-    dom.standby.setAttribute(
+    standby.setAttribute(
       "aria-hidden",
       "true"
     );
 
-    setInert(
-      dom.standby,
-      true
+    body.classList.remove(
+      "is-locked"
     );
 
-    const target =
-      st.standbyReturn;
+    resetStandbyTimer();
 
-    st.standbyReturn = null;
-
-    if (
-      target &&
-      document.contains(target) &&
-      typeof target.focus ===
-        "function"
-    ) {
-      requestAnimationFrame(
-        () => {
-          target.focus({
-            preventScroll:true
-          });
-        }
-      );
-    }
-
-    resetStandby();
   }
 
-  function resetStandby() {
-    clearStandby();
+  function openStandby() {
 
     if (
-      st.menuOpen ||
-      st.standby ||
-      st.reduced ||
-      document.hidden ||
-      innerWidth < 700
+      !standby ||
+      reducedMotion ||
+      window.innerWidth < 700
     ) {
       return;
     }
 
-    st.standbyTimer =
-      setTimeout(
+    standby.classList.add(
+      "is-active"
+    );
+
+    standby.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
+    body.classList.add(
+      "is-locked"
+    );
+
+    standbyWake?.focus();
+  }
+
+  function resetStandbyTimer() {
+
+    if (standbyTimer) {
+      clearTimeout(standbyTimer);
+    }
+
+    if (
+      reducedMotion ||
+      window.innerWidth < 700
+    ) {
+      return;
+    }
+
+    standbyTimer =
+      window.setTimeout(
         openStandby,
         CFG.standbyDelay
       );
+
   }
 
-  function standbyInit() {
-    if (!dom.standby) {
-      return;
-    }
+  function initStandby() {
 
-    setInert(
-      dom.standby,
-      true
-    );
+    if (!standby) return;
 
-    dom.wake?.addEventListener(
+    standbyWake?.addEventListener(
       "click",
       closeStandby
     );
 
-    dom.standby.addEventListener(
-      "keydown",
-      event => {
-        if (
-          !st.standby ||
-          event.key !== "Tab"
-        ) {
-          return;
-        }
+    ["pointerdown","wheel","touchstart","keydown"]
+      .forEach(eventName => {
 
-        event.preventDefault();
+        window.addEventListener(
+          eventName,
+          () => {
 
-        dom.wake?.focus({
-          preventScroll:true
-        });
-      }
-    );
+            if (
+              !standby.classList.contains(
+                "is-active"
+              )
+            ) {
+              resetStandbyTimer();
+            }
 
-    [
-      "pointerdown",
-      "wheel",
-      "touchstart",
-      "scroll"
-    ].forEach(type => {
-      window.addEventListener(
-        type,
-        () =>
-          st.standby
-            ? closeStandby()
-            : resetStandby(),
-        { passive:true }
-      );
-    });
+          },
+          {
+            passive:
+              eventName !== "keydown"
+          }
+        );
 
-    document.addEventListener(
-      "visibilitychange",
-      () =>
-        document.hidden
-          ? clearStandby()
-          : resetStandby()
-    );
+      });
+
+    resetStandbyTimer();
+
   }
 
-  /* ========================================================
-     TRAJECTORY
-     ======================================================== */
 
-  function trajectoryTargets() {
-    if (
-      dom.sections.length < 2
-    ) {
+  /* =======================================================
+     HASH NAVIGATION
+     ======================================================= */
+
+  function initHashNavigation() {
+
+    if (!window.location.hash) {
       return;
     }
 
-    const first =
-      dom.sections[0]
-        .getBoundingClientRect();
-
-    const last =
-      dom.sections[
-        dom.sections.length - 1
-      ].getBoundingClientRect();
-
-    const start =
-      first.top + scrollY;
-
-    const end =
-      last.bottom +
-      scrollY -
-      innerHeight;
-
-    const range =
-      end - start;
-
-    st.traj.tp =
-      range <= 0
-        ? 0
-        : clamp(
-            (
-              scrollY -
-              start
-            ) / range,
-            0,
-            1
-          );
-
-    st.traj.td =
-      st.reduced
-        ? 0
-        : Math.sin(
-            st.traj.tp *
-            Math.PI *
-            2
-          ) *
-          CFG.trajectoryDrift;
-  }
-
-  function trajectoryFrame() {
-    st.traj.p =
-      st.reduced
-        ? st.traj.tp
-        : lerp(
-            st.traj.p,
-            st.traj.tp,
-            CFG.trajectoryLerp
-          );
-
-    st.traj.d =
-      st.reduced
-        ? 0
-        : lerp(
-            st.traj.d,
-            st.traj.td,
-            CFG.trajectoryLerp
-          );
-
-    dom.html.style.setProperty(
-      "--trajectory-drift",
-      `${st.traj.d.toFixed(2)}px`
-    );
-  }
-
-  function raf() {
-    const cursorActive =
-      cursorFrame();
-
-    trajectoryFrame();
-
-    const trajectoryActive =
-      Math.abs(
-        st.traj.d -
-        st.traj.td
-      ) > .02;
-
-    if (
-      cursorActive ||
-      trajectoryActive
-    ) {
-      st.raf =
-        requestAnimationFrame(
-          raf
-        );
-    } else {
-      st.raf = 0;
-    }
-  }
-
-  function wakeRaf() {
-    if (!st.raf) {
-      st.raf =
-        requestAnimationFrame(
-          raf
-        );
-    }
-  }
-
-  /* ========================================================
-     HASH / KEYBOARD
-     ======================================================== */
-
-  function hashInit() {
-    const raw =
-      location.hash.slice(1);
-
-    const index =
-      dom.sections.findIndex(
-        current =>
-          current.id === raw
+    const target =
+      document.querySelector(
+        window.location.hash
       );
 
-    if (index < 0) {
-      return;
-    }
+    if (!target) return;
 
-    setTimeout(
-      () =>
-        goTo(
-          index,
-          false
-        ),
-      st.reduced
-        ? 0
-        : 300
-    );
+    window.setTimeout(() => {
+
+      target.scrollIntoView({
+        behavior:"auto",
+        block:"start"
+      });
+
+    }, CFG.loaderMin + 50);
+
   }
 
-  function keyboardInit() {
-    document.addEventListener(
-      "keydown",
-      event => {
-        if (
-          st.menuOpen ||
-          st.standby ||
-          !dom.sections.length
-        ) {
-          return;
-        }
 
-        if (
-          event.key !==
-            "PageDown" &&
-          event.key !==
-            "PageUp"
-        ) {
-          return;
-        }
+  /* =======================================================
+     RESIZE
+     ======================================================= */
 
-        event.preventDefault();
+  function initResize() {
 
-        goTo(
-          clamp(
-            st.active +
-              (
-                event.key ===
-                "PageDown"
-                  ? 1
-                  : -1
-              ),
-            0,
-            dom.sections.length - 1
-          )
-        );
-      }
+    window.addEventListener(
+      "resize",
+      () => {
+
+        clearTimeout(resizeTimer);
+
+        resizeTimer =
+          window.setTimeout(
+            () => {
+
+              resetStandbyTimer();
+              updateActiveSection();
+
+            },
+            CFG.resizeDebounce
+          );
+
+      },
+      { passive:true }
     );
+
   }
 
-  /* ========================================================
-     SCROLL / RESIZE
-     ======================================================== */
 
-  function scrollInit() {
+  /* =======================================================
+     SCROLL
+     ======================================================= */
+
+  function initScroll() {
+
     let ticking = false;
 
     window.addEventListener(
       "scroll",
       () => {
-        resetStandby();
-        wakeRaf();
 
-        if (ticking) {
-          return;
-        }
+        if (ticking) return;
 
         ticking = true;
 
-        requestAnimationFrame(
-          () => {
-            activeDetect();
-            trajectoryTargets();
-            ticking = false;
-          }
-        );
+        requestAnimationFrame(() => {
+
+          updateActiveSection();
+
+          ticking = false;
+
+        });
+
       },
       { passive:true }
     );
+
   }
 
-  function resizeInit() {
-    window.addEventListener(
-      "resize",
-      () => {
-        clearTimeout(
-          st.resizeTimer
-        );
 
-        st.resizeTimer =
-          setTimeout(
-            () => {
-              activeDetect();
-              trajectoryTargets();
-              wowUpdate(st.active);
-              resetStandby();
-              wakeRaf();
-            },
-            CFG.resizeDebounce
-          );
-      },
-      { passive:true }
-    );
-  }
-
-  function setInitial() {
-    if (
-      !dom.sections.length
-    ) {
-      return;
-    }
-
-    st.active = 0;
-
-    wowUpdate(0);
-    trajectoryTargets();
-    resetStandby();
-  }
-
-  /* ========================================================
-     INIT
-     ======================================================== */
+  /* =======================================================
+     INITIALIZATION
+     ======================================================= */
 
   function init() {
-    motionInit();
-    loaderInit();
-    pageTransitionsInit();
 
-    menuInit();
-    wowInit();
+    updateProgress(0);
+    applyJourneyState();
 
-    revealInit();
+    initLoader();
 
-    directionInit();
-    narrativeInit();
+    initPageTransitions();
 
-    cursorInit();
-    magneticInit();
-    ctaInit();
+    initMenu();
+    initMenuFocusTrap();
 
-    standbyInit();
+    initSectionNavigation();
 
-    hashInit();
-    keyboardInit();
+    initDirections();
 
-    setInitial();
-    activeDetect();
-    trajectoryTargets();
-    wakeRaf();
+    initReveal();
 
-    document.addEventListener(
-      "visibilitychange",
-      () => {
-        if (document.hidden) {
-          if (st.raf) {
-            cancelAnimationFrame(
-              st.raf
-            );
+    initCursor();
 
-            st.raf = 0;
-          }
-        } else {
-          wakeRaf();
-        }
-      }
-    );
+    initMagnetic();
 
-    scrollInit();
-    resizeInit();
+    initTrajectory();
+
+    initCTA();
+
+    initStandby();
+
+    initHashNavigation();
+
+    initResize();
+
+    initScroll();
+
+    updateActiveSection();
+
   }
 
+
   if (
-    document.readyState ===
-    "loading"
+    document.readyState === "loading"
   ) {
+
     document.addEventListener(
       "DOMContentLoaded",
       init,
       { once:true }
     );
+
   } else {
+
     init();
+
   }
+
 })();
