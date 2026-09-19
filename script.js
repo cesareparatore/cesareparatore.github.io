@@ -16,6 +16,76 @@
     standbyDelay: 45000
   };
 
+  const DIRECTIONS = [
+    "sport",
+    "scienze-motorie",
+    "educazione",
+    "management",
+    "digitale"
+  ];
+
+  const JOURNEY = {
+    0: {
+      visited: [],
+      current: null,
+      state: "origin"
+    },
+
+    1: {
+      visited: ["sport"],
+      current: "sport",
+      state: "current"
+    },
+
+    2: {
+      visited: DIRECTIONS,
+      current: null,
+      state: "exploration"
+    },
+
+    3: {
+      visited: DIRECTIONS,
+      current: null,
+      state: "converged"
+    },
+
+    4: {
+      visited: DIRECTIONS,
+      current: null,
+      state: "pause"
+    },
+
+    5: {
+      visited: DIRECTIONS,
+      current: null,
+      state: "territory"
+    },
+
+    6: {
+      visited: DIRECTIONS,
+      current: null,
+      state: "integrated"
+    },
+
+    7: {
+      visited: DIRECTIONS,
+      current: null,
+      state: "possibility"
+    },
+
+    8: {
+      visited: DIRECTIONS,
+      current: null,
+      state: "reader"
+    },
+
+    9: {
+      visited: DIRECTIONS,
+      current: null,
+      state: "complete"
+    }
+  };
+
   const st = {
     loaded: false,
     menuOpen: false,
@@ -27,24 +97,35 @@
     raf: 0,
     menuReturn: null,
     standbyReturn: null,
+
     pointer: {
       x: innerWidth / 2,
       y: innerHeight / 2
     },
+
     cursor: {
       x: innerWidth / 2,
       y: innerHeight / 2
     },
+
     traj: {
       p: 0,
       tp: 0,
       d: 0,
       td: 0
+    },
+
+    interaction: {
+      hover: new Set(),
+      focus: new Set()
     }
   };
 
-  const q = selector => document.querySelector(selector);
-  const qa = selector => [...document.querySelectorAll(selector)];
+  const q = selector =>
+    document.querySelector(selector);
+
+  const qa = selector =>
+    [...document.querySelectorAll(selector)];
 
   const dom = {
     html: document.documentElement,
@@ -78,7 +159,8 @@
     links: qa(".narrative-link"),
     magnetic: qa(".magnetic"),
 
-    transitionLinks: qa('a[href]:not([target="_blank"])'),
+    transitionLinks:
+      qa('a[href]:not([target="_blank"])'),
 
     standby: q(".standby-screen"),
     wake: q(".standby-wake"),
@@ -86,8 +168,17 @@
     cta: q(".cta-trajectory"),
     contact: q(".contact-cta"),
 
-    dirLinks: qa(".hero-direction[data-direction]"),
-    dirNodes: qa(".direction-node[data-direction]")
+    dirLinks:
+      qa(".hero-direction[data-direction]"),
+
+    dirNodes:
+      qa(".direction-node[data-direction]"),
+
+    fiveDirections:
+      qa(".five-directions [data-trajectory-node]"),
+
+    networkNodes:
+      qa(".network-node[data-node]")
   };
 
   const clamp = (n, min, max) =>
@@ -106,7 +197,13 @@
     !st.reduced;
 
   const section = i =>
-    dom.sections[clamp(i, 0, dom.sections.length - 1)] || null;
+    dom.sections[
+      clamp(
+        i,
+        0,
+        dom.sections.length - 1
+      )
+    ] || null;
 
   function focusables(root) {
     return [
@@ -136,7 +233,10 @@
      ======================================================== */
 
   function motionInit() {
-    const mq = matchMedia("(prefers-reduced-motion: reduce)");
+    const mq =
+      matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      );
 
     const apply = reduced => {
       st.reduced = reduced;
@@ -158,7 +258,8 @@
 
     mq.addEventListener?.(
       "change",
-      event => apply(event.matches)
+      event =>
+        apply(event.matches)
     );
   }
 
@@ -188,7 +289,10 @@
 
       setTimeout(() => {
         st.loaded = true;
-        dom.loader.classList.add("is-hidden");
+
+        dom.loader.classList.add(
+          "is-hidden"
+        );
 
         setTimeout(() => {
           dom.loader?.remove();
@@ -196,7 +300,10 @@
       }, wait);
     };
 
-    if (document.readyState === "complete") {
+    if (
+      document.readyState ===
+      "complete"
+    ) {
       finish();
     } else {
       window.addEventListener(
@@ -220,61 +327,83 @@
     if (!dom.transition) return;
 
     dom.transitionLinks.forEach(link => {
-      link.addEventListener("click", event => {
-        if (
-          st.reduced ||
-          event.defaultPrevented ||
-          event.button !== 0 ||
-          event.metaKey ||
-          event.ctrlKey ||
-          event.shiftKey ||
-          event.altKey
-        ) {
-          return;
+      link.addEventListener(
+        "click",
+        event => {
+          if (
+            st.reduced ||
+            event.defaultPrevented ||
+            event.button !== 0 ||
+            event.metaKey ||
+            event.ctrlKey ||
+            event.shiftKey ||
+            event.altKey
+          ) {
+            return;
+          }
+
+          const href =
+            link.getAttribute("href");
+
+          if (
+            !href ||
+            href.startsWith("#") ||
+            href.startsWith("mailto:") ||
+            href.startsWith("tel:") ||
+            link.hasAttribute("download")
+          ) {
+            return;
+          }
+
+          let url;
+
+          try {
+            url = new URL(
+              href,
+              location.href
+            );
+          } catch {
+            return;
+          }
+
+          const samePage =
+            url.origin === location.origin &&
+            url.pathname === location.pathname &&
+            url.search === location.search;
+
+          if (
+            samePage &&
+            url.hash
+          ) {
+            return;
+          }
+
+          if (
+            url.origin !==
+            location.origin
+          ) {
+            return;
+          }
+
+          event.preventDefault();
+
+          dom.transition.classList.add(
+            "is-active"
+          );
+
+          setTimeout(() => {
+            location.href = url.href;
+          }, CFG.transitionMs);
         }
-
-        const href = link.getAttribute("href");
-
-        if (
-          !href ||
-          href.startsWith("#") ||
-          href.startsWith("mailto:") ||
-          href.startsWith("tel:") ||
-          link.hasAttribute("download")
-        ) {
-          return;
-        }
-
-        let url;
-
-        try {
-          url = new URL(href, location.href);
-        } catch {
-          return;
-        }
-
-        const samePage =
-          url.origin === location.origin &&
-          url.pathname === location.pathname &&
-          url.search === location.search;
-
-        if (samePage && url.hash) return;
-
-        if (url.origin !== location.origin) return;
-
-        event.preventDefault();
-
-        dom.transition.classList.add("is-active");
-
-        setTimeout(() => {
-          location.href = url.href;
-        }, CFG.transitionMs);
-      });
+      );
     });
 
     window.addEventListener(
       "pageshow",
-      () => dom.transition.classList.remove("is-active")
+      () =>
+        dom.transition.classList.remove(
+          "is-active"
+        )
     );
   }
 
@@ -283,55 +412,101 @@
      ======================================================== */
 
   function menuOpen() {
-    if (!dom.menu || st.menuOpen) return;
+    if (
+      !dom.menu ||
+      st.menuOpen
+    ) {
+      return;
+    }
 
     clearStandby();
 
-    st.menuReturn = document.activeElement;
+    st.menuReturn =
+      document.activeElement;
+
     st.menuOpen = true;
 
-    dom.menu.setAttribute("aria-hidden", "false");
-    dom.menuBtn?.setAttribute("aria-expanded", "true");
-    dom.menuBtn?.setAttribute("aria-label", "Chiudi menu");
+    dom.menu.setAttribute(
+      "aria-hidden",
+      "false"
+    );
 
-    dom.body.classList.add("is-menu-open");
+    dom.menuBtn?.setAttribute(
+      "aria-expanded",
+      "true"
+    );
 
-    setInert(dom.menu, false);
+    dom.menuBtn?.setAttribute(
+      "aria-label",
+      "Chiudi menu"
+    );
+
+    dom.body.classList.add(
+      "is-menu-open"
+    );
+
+    setInert(
+      dom.menu,
+      false
+    );
 
     requestAnimationFrame(() => {
       dom.menuLinks[0]?.focus({
-        preventScroll: true
+        preventScroll:true
       });
     });
   }
 
   function menuClose(restore = true) {
-    if (!dom.menu || !st.menuOpen) return;
+    if (
+      !dom.menu ||
+      !st.menuOpen
+    ) {
+      return;
+    }
 
     st.menuOpen = false;
 
-    dom.menu.setAttribute("aria-hidden", "true");
-    dom.menuBtn?.setAttribute("aria-expanded", "false");
-    dom.menuBtn?.setAttribute("aria-label", "Apri menu");
+    dom.menu.setAttribute(
+      "aria-hidden",
+      "true"
+    );
 
-    dom.body.classList.remove("is-menu-open");
+    dom.menuBtn?.setAttribute(
+      "aria-expanded",
+      "false"
+    );
 
-    setInert(dom.menu, true);
+    dom.menuBtn?.setAttribute(
+      "aria-label",
+      "Apri menu"
+    );
+
+    dom.body.classList.remove(
+      "is-menu-open"
+    );
+
+    setInert(
+      dom.menu,
+      true
+    );
 
     if (restore) {
-      const target = st.menuReturn;
+      const target =
+        st.menuReturn;
 
       if (
         target &&
         document.contains(target) &&
-        typeof target.focus === "function"
+        typeof target.focus ===
+          "function"
       ) {
         target.focus({
-          preventScroll: true
+          preventScroll:true
         });
       } else {
         dom.menuBtn?.focus({
-          preventScroll: true
+          preventScroll:true
         });
       }
     }
@@ -344,22 +519,26 @@
   function menuInit() {
     dom.menuBtn?.addEventListener(
       "click",
-      () => st.menuOpen
-        ? menuClose()
-        : menuOpen()
+      () =>
+        st.menuOpen
+          ? menuClose()
+          : menuOpen()
     );
 
     dom.menuLinks.forEach(link => {
       link.addEventListener(
         "click",
-        () => menuClose(false)
+        () =>
+          menuClose(false)
       );
     });
 
     dom.menu?.addEventListener(
       "click",
       event => {
-        if (event.target === dom.menu) {
+        if (
+          event.target === dom.menu
+        ) {
           menuClose();
         }
       }
@@ -368,7 +547,9 @@
     document.addEventListener(
       "keydown",
       event => {
-        if (event.key === "Escape") {
+        if (
+          event.key === "Escape"
+        ) {
           if (st.menuOpen) {
             event.preventDefault();
             menuClose();
@@ -388,22 +569,26 @@
           return;
         }
 
-        const els = focusables(dom.menu);
+        const els =
+          focusables(dom.menu);
 
         if (!els.length) return;
 
         const first = els[0];
-        const last = els[els.length - 1];
+        const last =
+          els[els.length - 1];
 
         if (
           event.shiftKey &&
-          document.activeElement === first
+          document.activeElement ===
+            first
         ) {
           event.preventDefault();
           last.focus();
         } else if (
           !event.shiftKey &&
-          document.activeElement === last
+          document.activeElement ===
+            last
         ) {
           event.preventDefault();
           first.focus();
@@ -417,13 +602,15 @@
      ======================================================== */
 
   function wowUpdate(index) {
-    const current = section(index);
+    const current =
+      section(index);
 
     if (!current) return;
 
     st.active = index;
 
-    const total = dom.sections.length;
+    const total =
+      dom.sections.length;
 
     const progress =
       total > 1
@@ -432,7 +619,8 @@
 
     if (dom.label) {
       dom.label.textContent =
-        current.dataset.sectionTitle || "";
+        current.dataset.sectionTitle ||
+        "";
     }
 
     if (dom.fill) {
@@ -445,8 +633,11 @@
         `${progress * 100}%`;
     }
 
-    const first = index === 0;
-    const last = index === total - 1;
+    const first =
+      index === 0;
+
+    const last =
+      index === total - 1;
 
     dom.prev?.classList.toggle(
       "is-disabled",
@@ -465,10 +656,13 @@
       );
 
       if (dom.prevLabel) {
-        dom.prevLabel.textContent = "";
+        dom.prevLabel.textContent =
+          "";
       }
     } else {
-      dom.prev?.removeAttribute("tabindex");
+      dom.prev?.removeAttribute(
+        "tabindex"
+      );
 
       dom.prev.href =
         `#${secNum(index - 1)}`;
@@ -484,6 +678,11 @@
       }
     }
 
+    const arrow =
+      dom.next?.querySelector(
+        ".section-jump-arrow"
+      );
+
     if (last) {
       dom.next.href = "#01";
 
@@ -492,12 +691,8 @@
         "Torna all'inizio"
       );
 
-      dom.nextLabel.textContent = "01";
-
-      const arrow =
-        dom.next.querySelector(
-          ".section-jump-arrow"
-        );
+      dom.nextLabel.textContent =
+        "01";
 
       if (arrow) {
         arrow.textContent = "↑";
@@ -514,19 +709,20 @@
       dom.nextLabel.textContent =
         secNum(index + 1);
 
-      const arrow =
-        dom.next.querySelector(
-          ".section-jump-arrow"
-        );
-
       if (arrow) {
         arrow.textContent = "→";
       }
     }
+
+    journeyUpdate(index);
   }
 
-  function goTo(index, updateHash = true) {
-    const target = section(index);
+  function goTo(
+    index,
+    updateHash = true
+  ) {
+    const target =
+      section(index);
 
     if (!target) return;
 
@@ -540,10 +736,11 @@
       CFG.navOffset;
 
     window.scrollTo({
-      top: Math.max(0, y),
-      behavior: motionOK()
-        ? "smooth"
-        : "auto"
+      top:Math.max(0,y),
+      behavior:
+        motionOK()
+          ? "smooth"
+          : "auto"
     });
 
     if (
@@ -570,7 +767,9 @@
         event.preventDefault();
 
         if (st.active > 0) {
-          goTo(st.active - 1);
+          goTo(
+            st.active - 1
+          );
         }
       }
     );
@@ -581,7 +780,8 @@
         event.preventDefault();
 
         goTo(
-          st.active === dom.sections.length - 1
+          st.active ===
+            dom.sections.length - 1
             ? 0
             : st.active + 1
         );
@@ -590,7 +790,9 @@
   }
 
   function activeDetect() {
-    if (!dom.sections.length) return;
+    if (!dom.sections.length) {
+      return;
+    }
 
     const reference =
       innerHeight * .52;
@@ -599,7 +801,7 @@
     let distance = Infinity;
 
     dom.sections.forEach(
-      (current, index) => {
+      (current,index) => {
         const rect =
           current.getBoundingClientRect();
 
@@ -615,18 +817,268 @@
           rect.height / 2;
 
         const currentDistance =
-          Math.abs(center - reference);
+          Math.abs(
+            center - reference
+          );
 
-        if (currentDistance < distance) {
-          distance = currentDistance;
+        if (
+          currentDistance <
+          distance
+        ) {
+          distance =
+            currentDistance;
+
           best = index;
         }
       }
     );
 
-    if (best !== st.active) {
+    if (
+      best !== st.active
+    ) {
       wowUpdate(best);
     }
+  }
+
+  /* ========================================================
+     JOURNEY SYSTEM
+     ======================================================== */
+
+  function directionRepresentations(key) {
+    return [
+      ...dom.dirLinks.filter(
+        element =>
+          element.dataset.direction ===
+          key
+      ),
+
+      ...dom.dirNodes.filter(
+        element =>
+          element.dataset.direction ===
+          key
+      ),
+
+      ...dom.links.filter(
+        element =>
+          element.dataset.trajectoryNode ===
+          key
+      ),
+
+      ...dom.fiveDirections.filter(
+        element =>
+          element.dataset.trajectoryNode ===
+          key
+      ),
+
+      ...dom.networkNodes.filter(
+        element =>
+          element.dataset.node ===
+          key
+      )
+    ];
+  }
+
+  function setStateClass(
+    elements,
+    className,
+    active
+  ) {
+    elements.forEach(
+      element =>
+        element.classList.toggle(
+          className,
+          active
+        )
+    );
+  }
+
+  function applyJourneyState(
+    index
+  ) {
+    const config =
+      JOURNEY[index] ||
+      JOURNEY[0];
+
+    dom.sections.forEach(
+      (element,sectionIndex) => {
+        const state =
+          JOURNEY[sectionIndex]?.state ||
+          "origin";
+
+        element.dataset.journeyState =
+          state;
+      }
+    );
+
+    DIRECTIONS.forEach(key => {
+      const elements =
+        directionRepresentations(key);
+
+      setStateClass(
+        elements,
+        "is-visited",
+        config.visited.includes(key)
+      );
+
+      setStateClass(
+        elements,
+        "is-current",
+        config.current === key
+      );
+
+      setStateClass(
+        elements,
+        "is-converged",
+        (
+          config.state === "converged" ||
+          config.state === "integrated" ||
+          config.state === "possibility" ||
+          config.state === "reader" ||
+          config.state === "complete"
+        ) &&
+        config.visited.includes(key)
+      );
+    });
+
+    const current =
+      section(index);
+
+    if (
+      current &&
+      config.current
+    ) {
+      current.dataset.direction =
+        config.current;
+    } else if (current) {
+      delete current.dataset.direction;
+    }
+  }
+
+  function journeyUpdate(index) {
+    applyJourneyState(index);
+  }
+
+  function interactionState(
+    key,
+    source,
+    active
+  ) {
+    const collection =
+      st.interaction[source];
+
+    if (active) {
+      collection.add(key);
+    } else {
+      collection.delete(key);
+    }
+
+    const isActive =
+      st.interaction.hover.has(key) ||
+      st.interaction.focus.has(key);
+
+    setStateClass(
+      directionRepresentations(key),
+      "is-active",
+      isActive
+    );
+  }
+
+  function narrativeInit() {
+    dom.links.forEach(link => {
+      const key =
+        link.dataset.trajectoryNode;
+
+      if (!key) return;
+
+      link.addEventListener(
+        "pointerenter",
+        () =>
+          interactionState(
+            key,
+            "hover",
+            true
+          )
+      );
+
+      link.addEventListener(
+        "pointerleave",
+        () =>
+          interactionState(
+            key,
+            "hover",
+            false
+          )
+      );
+
+      link.addEventListener(
+        "focusin",
+        () =>
+          interactionState(
+            key,
+            "focus",
+            true
+          )
+      );
+
+      link.addEventListener(
+        "focusout",
+        () =>
+          interactionState(
+            key,
+            "focus",
+            false
+          )
+      );
+    });
+  }
+
+  function directionInit() {
+    dom.dirLinks.forEach(link => {
+      const key =
+        link.dataset.direction;
+
+      if (!key) return;
+
+      link.addEventListener(
+        "pointerenter",
+        () =>
+          interactionState(
+            key,
+            "hover",
+            true
+          )
+      );
+
+      link.addEventListener(
+        "pointerleave",
+        () =>
+          interactionState(
+            key,
+            "hover",
+            false
+          )
+      );
+
+      link.addEventListener(
+        "focusin",
+        () =>
+          interactionState(
+            key,
+            "focus",
+            true
+          )
+      );
+
+      link.addEventListener(
+        "focusout",
+        () =>
+          interactionState(
+            key,
+            "focus",
+            false
+          )
+      );
+    });
   }
 
   /* ========================================================
@@ -641,7 +1093,9 @@
     ) {
       dom.reveals.forEach(
         element =>
-          element.classList.add("is-visible")
+          element.classList.add(
+            "is-visible"
+          )
       );
 
       return;
@@ -650,143 +1104,36 @@
     const observer =
       new IntersectionObserver(
         entries => {
-          entries.forEach(entry => {
-            if (!entry.isIntersecting) return;
+          entries.forEach(
+            entry => {
+              if (
+                !entry.isIntersecting
+              ) {
+                return;
+              }
 
-            entry.target.classList.add(
-              "is-visible"
-            );
+              entry.target.classList.add(
+                "is-visible"
+              );
 
-            observer.unobserve(
-              entry.target
-            );
-          });
+              observer.unobserve(
+                entry.target
+              );
+            }
+          );
         },
         {
-          threshold:CFG.revealThreshold,
-          rootMargin:"0px 0px -8% 0px"
+          threshold:
+            CFG.revealThreshold,
+          rootMargin:
+            "0px 0px -8% 0px"
         }
       );
 
     dom.reveals.forEach(
-      element => observer.observe(element)
+      element =>
+        observer.observe(element)
     );
-  }
-
-  /* ========================================================
-     HERO DIRECTIONS
-     ======================================================== */
-
-  function directionInit() {
-    const set = (key, active) => {
-      dom.dirLinks
-        .filter(
-          element =>
-            element.dataset.direction === key
-        )
-        .forEach(
-          element =>
-            element.classList.toggle(
-              "is-active",
-              active
-            )
-        );
-
-      dom.dirNodes
-        .filter(
-          element =>
-            element.dataset.direction === key
-        )
-        .forEach(
-          element =>
-            element.classList.toggle(
-              "is-active",
-              active
-            )
-        );
-    };
-
-    dom.dirLinks.forEach(link => {
-      const key =
-        link.dataset.direction;
-
-      link.addEventListener(
-        "pointerenter",
-        () => set(key, true)
-      );
-
-      link.addEventListener(
-        "pointerleave",
-        () => set(key, false)
-      );
-
-      link.addEventListener(
-        "focusin",
-        () => set(key, true)
-      );
-
-      link.addEventListener(
-        "focusout",
-        () => set(key, false)
-      );
-    });
-  }
-
-  /* ========================================================
-     NARRATIVE CONNECTIONS
-     ======================================================== */
-
-  function narrativeInit() {
-    dom.links.forEach(link => {
-      const key =
-        link.dataset.trajectoryNode;
-
-      if (!key) return;
-
-      const selector =
-        `[data-node="${CSS.escape(key)}"],
-         [data-direction="${CSS.escape(key)}"]`;
-
-      const elements = qa(selector);
-
-      const on = () => {
-        elements.forEach(
-          element =>
-            element.classList.add(
-              "is-linked"
-            )
-        );
-      };
-
-      const off = () => {
-        elements.forEach(
-          element =>
-            element.classList.remove(
-              "is-linked"
-            )
-        );
-      };
-
-      link.addEventListener(
-        "pointerenter",
-        on
-      );
-
-      link.addEventListener(
-        "pointerleave",
-        off
-      );
-
-      link.addEventListener(
-        "focusin",
-        on
-      );
-
-      link.addEventListener(
-        "focusout",
-        off
-      );
-    });
   }
 
   /* ========================================================
@@ -807,8 +1154,11 @@
     document.addEventListener(
       "pointermove",
       event => {
-        st.pointer.x = event.clientX;
-        st.pointer.y = event.clientY;
+        st.pointer.x =
+          event.clientX;
+
+        st.pointer.y =
+          event.clientY;
 
         dom.cursor.classList.add(
           "is-visible"
@@ -819,23 +1169,25 @@
       { passive:true }
     );
 
-    qa("a,button").forEach(element => {
-      element.addEventListener(
-        "pointerenter",
-        () =>
-          dom.cursor.classList.add(
-            "is-hovering"
-          )
-      );
+    qa("a,button").forEach(
+      element => {
+        element.addEventListener(
+          "pointerenter",
+          () =>
+            dom.cursor.classList.add(
+              "is-hovering"
+            )
+        );
 
-      element.addEventListener(
-        "pointerleave",
-        () =>
-          dom.cursor.classList.remove(
-            "is-hovering"
-          )
-      );
-    });
+        element.addEventListener(
+          "pointerleave",
+          () =>
+            dom.cursor.classList.remove(
+              "is-hovering"
+            )
+        );
+      }
+    );
 
     window.addEventListener(
       "pointerleave",
@@ -858,17 +1210,19 @@
       return false;
     }
 
-    st.cursor.x = lerp(
-      st.cursor.x,
-      st.pointer.x,
-      CFG.cursorLerp
-    );
+    st.cursor.x =
+      lerp(
+        st.cursor.x,
+        st.pointer.x,
+        CFG.cursorLerp
+      );
 
-    st.cursor.y = lerp(
-      st.cursor.y,
-      st.pointer.y,
-      CFG.cursorLerp
-    );
+    st.cursor.y =
+      lerp(
+        st.cursor.y,
+        st.pointer.y,
+        CFG.cursorLerp
+      );
 
     dom.dot.style.transform =
       `translate3d(${st.pointer.x}px,${st.pointer.y}px,0) translate(-50%,-50%)`;
@@ -876,13 +1230,15 @@
     dom.ring.style.transform =
       `translate3d(${st.cursor.x}px,${st.cursor.y}px,0) translate(-50%,-50%)`;
 
-    const cursorDistance =
+    const distance =
       Math.hypot(
-        st.cursor.x - st.pointer.x,
-        st.cursor.y - st.pointer.y
+        st.cursor.x -
+          st.pointer.x,
+        st.cursor.y -
+          st.pointer.y
       );
 
-    return cursorDistance > 0.1;
+    return distance > .1;
   }
 
   /* ========================================================
@@ -890,65 +1246,82 @@
      ======================================================== */
 
   function magneticInit() {
-    if (!fine() || st.reduced) return;
+    if (
+      !fine() ||
+      st.reduced
+    ) {
+      return;
+    }
 
-    dom.magnetic.forEach(element => {
-      element.addEventListener(
-        "pointermove",
-        event => {
-          const rect =
-            element.getBoundingClientRect();
+    dom.magnetic.forEach(
+      element => {
+        element.addEventListener(
+          "pointermove",
+          event => {
+            const rect =
+              element.getBoundingClientRect();
 
-          const dx =
-            event.clientX -
-            (rect.left + rect.width / 2);
+            const dx =
+              event.clientX -
+              (
+                rect.left +
+                rect.width / 2
+              );
 
-          const dy =
-            event.clientY -
-            (rect.top + rect.height / 2);
+            const dy =
+              event.clientY -
+              (
+                rect.top +
+                rect.height / 2
+              );
 
-          const distance =
-            Math.hypot(dx, dy);
+            const distance =
+              Math.hypot(dx,dy);
 
-          if (
-            distance >
-            CFG.magneticRadius
-          ) {
-            return;
+            if (
+              distance >
+              CFG.magneticRadius
+            ) {
+              return;
+            }
+
+            const strength =
+              CFG.magneticStrength *
+              (
+                1 -
+                distance /
+                  CFG.magneticRadius
+              );
+
+            element.style.setProperty(
+              "--magnetic-x",
+              `${dx * strength}px`
+            );
+
+            element.style.setProperty(
+              "--magnetic-y",
+              `${dy * strength}px`
+            );
+          },
+          { passive:true }
+        );
+
+        element.addEventListener(
+          "pointerleave",
+          () => {
+            element.style.setProperty(
+              "--magnetic-x",
+              "0px"
+            );
+
+            element.style.setProperty(
+              "--magnetic-y",
+              "0px"
+            );
           }
-
-          const strength =
-            CFG.magneticStrength *
-            (1 - distance / CFG.magneticRadius);
-
-          element.style.setProperty(
-            "--magnetic-x",
-            `${dx * strength}px`
-          );
-
-          element.style.setProperty(
-            "--magnetic-y",
-            `${dy * strength}px`
-          );
-        },
-        { passive:true }
-      );
-
-      element.addEventListener(
-        "pointerleave",
-        () => {
-          element.style.setProperty(
-            "--magnetic-x",
-            "0px"
-          );
-
-          element.style.setProperty(
-            "--magnetic-y",
-            "0px"
-          );
-        }
-      );
-    });
+        );
+      }
+    );
   }
 
   /* ========================================================
@@ -956,7 +1329,12 @@
      ======================================================== */
 
   function ctaInit() {
-    if (!dom.cta || !dom.contact) return;
+    if (
+      !dom.cta ||
+      !dom.contact
+    ) {
+      return;
+    }
 
     const on = () =>
       dom.cta.classList.add(
@@ -995,7 +1373,10 @@
 
   function clearStandby() {
     if (st.standbyTimer) {
-      clearTimeout(st.standbyTimer);
+      clearTimeout(
+        st.standbyTimer
+      );
+
       st.standbyTimer = 0;
     }
   }
@@ -1013,6 +1394,7 @@
     }
 
     st.standby = true;
+
     st.standbyReturn =
       document.activeElement;
 
@@ -1077,13 +1459,16 @@
     if (
       target &&
       document.contains(target) &&
-      typeof target.focus === "function"
+      typeof target.focus ===
+        "function"
     ) {
-      requestAnimationFrame(() => {
-        target.focus({
-          preventScroll:true
-        });
-      });
+      requestAnimationFrame(
+        () => {
+          target.focus({
+            preventScroll:true
+          });
+        }
+      );
     }
 
     resetStandby();
@@ -1110,7 +1495,9 @@
   }
 
   function standbyInit() {
-    if (!dom.standby) return;
+    if (!dom.standby) {
+      return;
+    }
 
     setInert(
       dom.standby,
@@ -1170,7 +1557,9 @@
      ======================================================== */
 
   function trajectoryTargets() {
-    if (dom.sections.length < 2) {
+    if (
+      dom.sections.length < 2
+    ) {
       return;
     }
 
@@ -1198,7 +1587,10 @@
       range <= 0
         ? 0
         : clamp(
-            (scrollY - start) / range,
+            (
+              scrollY -
+              start
+            ) / range,
             0,
             1
           );
@@ -1210,7 +1602,8 @@
             st.traj.tp *
             Math.PI *
             2
-          ) * CFG.trajectoryDrift;
+          ) *
+          CFG.trajectoryDrift;
   }
 
   function trajectoryFrame() {
@@ -1248,14 +1641,16 @@
       Math.abs(
         st.traj.d -
         st.traj.td
-      ) > 0.02;
+      ) > .02;
 
     if (
       cursorActive ||
       trajectoryActive
     ) {
       st.raf =
-        requestAnimationFrame(raf);
+        requestAnimationFrame(
+          raf
+        );
     } else {
       st.raf = 0;
     }
@@ -1264,7 +1659,9 @@
   function wakeRaf() {
     if (!st.raf) {
       st.raf =
-        requestAnimationFrame(raf);
+        requestAnimationFrame(
+          raf
+        );
     }
   }
 
@@ -1282,7 +1679,9 @@
           current.id === raw
       );
 
-    if (index < 0) return;
+    if (index < 0) {
+      return;
+    }
 
     setTimeout(
       () =>
@@ -1290,7 +1689,9 @@
           index,
           false
         ),
-      st.reduced ? 0 : 300
+      st.reduced
+        ? 0
+        : 300
     );
   }
 
@@ -1307,8 +1708,10 @@
         }
 
         if (
-          event.key !== "PageDown" &&
-          event.key !== "PageUp"
+          event.key !==
+            "PageDown" &&
+          event.key !==
+            "PageUp"
         ) {
           return;
         }
@@ -1318,11 +1721,12 @@
         goTo(
           clamp(
             st.active +
-            (
-              event.key === "PageDown"
-                ? 1
-                : -1
-            ),
+              (
+                event.key ===
+                "PageDown"
+                  ? 1
+                  : -1
+              ),
             0,
             dom.sections.length - 1
           )
@@ -1344,15 +1748,19 @@
         resetStandby();
         wakeRaf();
 
-        if (ticking) return;
+        if (ticking) {
+          return;
+        }
 
         ticking = true;
 
-        requestAnimationFrame(() => {
-          activeDetect();
-          trajectoryTargets();
-          ticking = false;
-        });
+        requestAnimationFrame(
+          () => {
+            activeDetect();
+            trajectoryTargets();
+            ticking = false;
+          }
+        );
       },
       { passive:true }
     );
@@ -1367,20 +1775,25 @@
         );
 
         st.resizeTimer =
-          setTimeout(() => {
-            activeDetect();
-            trajectoryTargets();
-            wowUpdate(st.active);
-            resetStandby();
-            wakeRaf();
-          }, CFG.resizeDebounce);
+          setTimeout(
+            () => {
+              activeDetect();
+              trajectoryTargets();
+              wowUpdate(st.active);
+              resetStandby();
+              wakeRaf();
+            },
+            CFG.resizeDebounce
+          );
       },
       { passive:true }
     );
   }
 
   function setInitial() {
-    if (!dom.sections.length) {
+    if (
+      !dom.sections.length
+    ) {
       return;
     }
 
@@ -1404,6 +1817,7 @@
     wowInit();
 
     revealInit();
+
     directionInit();
     narrativeInit();
 
