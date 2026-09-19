@@ -1,972 +1,618 @@
 (() => {
   'use strict';
 
-  /*
-   * CESARE PARATORE
-   * MOVIMENTO / CON DIREZIONE.
-   *
-   * Global interaction layer
-   * 01 → 11
-   *
-   * Principles:
-   * - progressive enhancement
-   * - one central animation frame loop
-   * - IntersectionObserver for chapter state
-   * - CSS handles visual interpolation
-   * - no content is hidden by JS before initialization
-   */
+  const root = document.documentElement;
+  const body = document.body;
 
-  const doc = document;
-  const body = doc.body;
-  const root = doc.documentElement;
+  root.classList.add('js');
 
   const SELECTORS = {
     loader: '.page-loader',
     header: '.site-header',
+    menu: '#site-menu',
     menuTrigger: '.menu-trigger',
-    menu: '.site-menu',
+    menuLinks: '.site-menu-nav a',
     menuClose: '.chapter-close',
-    menuLinks: '.site-menu a',
     chapters: '.chapter',
-    legacySections: '.home-section',
+    reveal: '.reveal',
+    progressCurrent: '#progress-current',
     progressFill: '#progress-fill',
     progressPoint: '#progress-point',
-    progressCurrent: '#progress-current',
-    previousSection: '#previous-section',
-    previousSectionLabel: '#previous-section-label',
-    nextSection: '#next-section',
-    nextSectionLabel: '#next-section-label',
-    magnetic: '.magnetic',
-    cursor: '[data-cursor]',
-    reveal: '.reveal'
+    previous: '#previous-section',
+    previousLabel: '#previous-section-label',
+    next: '#next-section',
+    nextLabel: '#next-section-label',
+    cursor: '#context-cursor',
+    standby: '#standby-screen',
+    magnetic: '.magnetic'
   };
-
-  const chapters = Array.from(doc.querySelectorAll(SELECTORS.chapters));
-  const legacySections = Array.from(doc.querySelectorAll(SELECTORS.legacySections));
-  const allSections = [...chapters, ...legacySections];
-
-  const chapterCount = chapters.length || 11;
 
   const state = {
     initialized: false,
-    reducedMotion: false,
+    reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+
     menuOpen: false,
-    activeChapter: 1,
-    previousChapter: null,
-    scrollY: window.scrollY || 0,
-    ticking: false,
+    standby: false,
+
+    activeChapter: 0,
+    scrollY: window.scrollY,
     framePending: false,
-    loaderFinished: false,
-    pointerFine: window.matchMedia
-      ? window.matchMedia('(pointer: fine)').matches
-      : false,
-    cursorEnabled: false,
-    lastCursorX: 0,
-    lastCursorY: 0,
-    targetCursorX: 0,
-    targetCursorY: 0,
-    lastScrollDirection: 0
+
+    cursorEnabled:
+      window.matchMedia('(pointer:fine)').matches &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+
+    cursorX: -100,
+    cursorY: -100,
+
+    idleTimer: null,
+
+    idleDelay: 60000,
+
+    standbyAllowed: true
   };
 
-  /*
-   * ------------------------------------------------------------
-   * Utilities
-   * ------------------------------------------------------------
-   */
+  const chapters = Array.from(
+    document.querySelectorAll(SELECTORS.chapters)
+  );
+
+  const loader = document.querySelector(SELECTORS.loader);
+  const header = document.querySelector(SELECTORS.header);
+
+  const menu = document.querySelector(SELECTORS.menu);
+  const menuTrigger = document.querySelector(SELECTORS.menuTrigger);
+  const menuClose = document.querySelector(SELECTORS.menuClose);
+
+  const menuLinks = Array.from(
+    document.querySelectorAll(SELECTORS.menuLinks)
+  );
+
+  const progressCurrent =
+    document.querySelector(SELECTORS.progressCurrent);
+
+  const progressFill =
+    document.querySelector(SELECTORS.progressFill);
+
+  const progressPoint =
+    document.querySelector(SELECTORS.progressPoint);
+
+  const previous =
+    document.querySelector(SELECTORS.previous);
+
+  const previousLabel =
+    document.querySelector(SELECTORS.previousLabel);
+
+  const next =
+    document.querySelector(SELECTORS.next);
+
+  const nextLabel =
+    document.querySelector(SELECTORS.nextLabel);
+
+  const cursor =
+    document.querySelector(SELECTORS.cursor);
+
+  const standby =
+    document.querySelector(SELECTORS.standby);
+
+
+  /* =========================================================
+     HELPERS
+  ========================================================== */
 
   const clamp = (value, min = 0, max = 1) =>
-    Math.min(max, Math.max(min, value));
+    Math.min(Math.max(value, min), max);
 
-  const lerp = (a, b, t) =>
-    a + (b - a) * t;
+  const getChapterTitle = chapter =>
+    chapter?.dataset.sectionTitle || '';
 
-  const prefersReducedMotion = () =>
-    window.matchMedia &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const getChapterIndex = chapter =>
+    Number(chapter?.dataset.chapterIndex || 0);
 
-  const isElementVisible = (element) => {
+  const getChapterByIndex = index =>
+    chapters.find(
+      chapter => getChapterIndex(chapter) === index
+    );
+
+  const isInteractiveElement = element => {
     if (!element) return false;
 
-    const rect = element.getBoundingClientRect();
-
-    return (
-      rect.bottom > 0 &&
-      rect.top < window.innerHeight
+    return Boolean(
+      element.closest(
+        'a,button,input,textarea,select,summary,[contenteditable="true"]'
+      )
     );
   };
 
-  const getChapterNumber = (chapter) => {
-    if (!chapter) return null;
 
-    const id = chapter.id || '';
-    const match = id.match(/\d+/);
+  /* =========================================================
+     LOADER
+  ========================================================== */
 
-    if (match) {
-      return Number(match[0]);
-    }
-
-    const index = chapters.indexOf(chapter);
-
-    return index >= 0 ? index + 1 : null;
-  };
-
-  const getChapter = (number) => {
-    if (!number) return null;
-
-    return (
-      doc.getElementById(String(number)) ||
-      doc.querySelector(`.chapter--${String(number).padStart(2, '0')}`)
-    );
-  };
-
-  const formatChapter = (number) =>
-    String(number).padStart(2, '0');
-
-  const getChapterTitle = (chapter) => {
-    if (!chapter) return '';
-
-    return (
-      chapter.dataset.sectionTitle ||
-      chapter.dataset.chapterTitle ||
-      chapter.querySelector('.chapter-title')?.textContent?.trim() ||
-      chapter.querySelector('.section-title')?.textContent?.trim() ||
-      ''
-    );
-  };
-
-  const getSectionList = () => {
-    if (chapters.length) {
-      return chapters;
-    }
-
-    return allSections;
-  };
-
-  /*
-   * ------------------------------------------------------------
-   * Reduced motion
-   * ------------------------------------------------------------
-   */
-
-  const setupReducedMotion = () => {
-    state.reducedMotion = prefersReducedMotion();
-
-    root.classList.toggle(
-      'is-reduced-motion',
-      state.reducedMotion
-    );
-
-    const mediaQuery = window.matchMedia
-      ? window.matchMedia('(prefers-reduced-motion: reduce)')
-      : null;
-
-    if (!mediaQuery) return;
-
-    const handleChange = (event) => {
-      state.reducedMotion = event.matches;
-
-      root.classList.toggle(
-        'is-reduced-motion',
-        state.reducedMotion
-      );
-
-      if (state.reducedMotion) {
-        root.style.setProperty('--chapter-progress', '1');
-      }
-
-      requestUpdate();
-    };
-
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener('change', handleChange);
-    } else if (mediaQuery.addListener) {
-      mediaQuery.addListener(handleChange);
-    }
-  };
-
-  /*
-   * ------------------------------------------------------------
-   * Loader
-   * ------------------------------------------------------------
-   */
-
-  const finishLoader = () => {
-    if (state.loaderFinished) return;
-
-    state.loaderFinished = true;
-
-    const loader = doc.querySelector(SELECTORS.loader);
-
+  function hideLoader() {
     if (!loader) return;
 
-    if (state.reducedMotion) {
-      loader.classList.add('is-hidden');
-      return;
+    loader.classList.add('is-hidden');
+  }
+
+  function setupLoader() {
+    if (!loader) return;
+
+    const complete = () => {
+      if (state.reducedMotion) {
+        hideLoader();
+        return;
+      }
+
+      window.setTimeout(hideLoader, 300);
+    };
+
+    if (document.readyState === 'complete') {
+      complete();
+    } else {
+      window.addEventListener('load', complete, {
+        once: true
+      });
+
+      window.setTimeout(() => {
+        hideLoader();
+      }, 5000);
     }
+  }
 
-    window.setTimeout(() => {
-      loader.classList.add('is-hidden');
-    }, 1700);
-  };
 
-  const setupLoader = () => {
-    const loader = doc.querySelector(SELECTORS.loader);
+  /* =========================================================
+     HEADER
+  ========================================================== */
 
-    if (!loader) {
-      state.loaderFinished = true;
-      return;
-    }
-
-    /*
-     * The loader remains CSS-driven.
-     * JS only removes it after the opening sequence.
-     */
-
-    if (state.reducedMotion) {
-      loader.classList.add('is-hidden');
-      state.loaderFinished = true;
-      return;
-    }
-
-    window.addEventListener(
-      'load',
-      finishLoader,
-      { once: true }
-    );
-
-    /*
-     * Safety fallback:
-     * the site must never remain blocked by the loader.
-     */
-    window.setTimeout(finishLoader, 2800);
-  };
-
-  /*
-   * ------------------------------------------------------------
-   * Header / scroll state
-   * ------------------------------------------------------------
-   */
-
-  const updateHeaderState = () => {
-    const header = doc.querySelector(SELECTORS.header);
-
+  function updateHeader() {
     if (!header) return;
 
     header.classList.toggle(
       'is-scrolled',
       state.scrollY > 24
     );
-  };
+  }
 
-  /*
-   * ------------------------------------------------------------
-   * Chapter progress
-   * ------------------------------------------------------------
-   *
-   * Each chapter receives:
-   *
-   * --chapter-progress: 0 → 1
-   *
-   * CSS can then use this variable for:
-   * - SVG drawing
-   * - opacity
-   * - transforms
-   * - point movement
-   * - trajectory convergence
-   */
 
-  const calculateChapterProgress = (chapter) => {
-    if (!chapter) return 0;
+  /* =========================================================
+     CHAPTER PROGRESS
+  ========================================================== */
+
+  function updateChapterProgress(chapter) {
+    if (!chapter) return;
 
     const rect = chapter.getBoundingClientRect();
-    const viewportHeight = window.innerHeight;
+    const viewport = window.innerHeight;
 
-    /*
-     * 0:
-     * chapter enters from below.
-     *
-     * 1:
-     * chapter has completely passed through the viewport.
-     */
+    const total = rect.height + viewport;
 
-    const totalDistance =
-      rect.height + viewportHeight;
+    const travelled = viewport - rect.top;
 
-    const travelled =
-      viewportHeight - rect.top;
-
-    return clamp(
-      travelled / totalDistance,
-      0,
-      1
+    const progress = clamp(
+      travelled / total
     );
-  };
 
-  const updateChapterProgress = () => {
-    const sections = getSectionList();
+    chapter.style.setProperty(
+      '--chapter-progress',
+      progress.toFixed(4)
+    );
+  }
 
-    sections.forEach((section) => {
-      const progress = state.reducedMotion
-        ? 1
-        : calculateChapterProgress(section);
 
-      section.style.setProperty(
-        '--chapter-progress',
-        progress.toFixed(4)
-      );
+  function updateAllVisibleProgress() {
+    chapters.forEach(chapter => {
+      const rect = chapter.getBoundingClientRect();
 
-      section.classList.toggle(
-        'is-visible',
-        progress > 0.02 && progress < 0.98
-      );
+      const visible =
+        rect.bottom > 0 &&
+        rect.top < window.innerHeight;
+
+      if (visible) {
+        updateChapterProgress(chapter);
+      }
     });
-  };
+  }
 
-  /*
-   * ------------------------------------------------------------
-   * Active chapter
-   * ------------------------------------------------------------
-   */
 
-  const setActiveChapter = (number, source = 'observer') => {
-    if (!number || number < 1) return;
+  /* =========================================================
+     ACTIVE CHAPTER
+  ========================================================== */
 
-    const boundedNumber = clamp(
-      number,
-      1,
-      chapterCount
-    );
-
-    if (
-      state.activeChapter === boundedNumber &&
-      source !== 'initial'
-    ) {
+  function setActiveChapter(index) {
+    if (!index || index === state.activeChapter) {
       return;
     }
 
-    state.previousChapter = state.activeChapter;
-    state.activeChapter = boundedNumber;
+    state.activeChapter = index;
 
-    chapters.forEach((chapter) => {
-      const chapterNumber =
-        getChapterNumber(chapter);
-
-      const isActive =
-        chapterNumber === boundedNumber;
-
-      const isComplete =
-        chapterNumber < boundedNumber;
+    chapters.forEach(chapter => {
+      const chapterIndex = getChapterIndex(chapter);
 
       chapter.classList.toggle(
         'is-active',
-        isActive
+        chapterIndex === index
       );
 
       chapter.classList.toggle(
         'is-complete',
-        isComplete
+        chapterIndex < index
       );
     });
 
     updateProgressUI();
-  };
+  }
 
-  /*
-   * ------------------------------------------------------------
-   * Progress bar
-   * ------------------------------------------------------------
-   */
 
-  const updateProgressUI = () => {
-    const fill =
-      doc.querySelector(SELECTORS.progressFill);
-
-    const point =
-      doc.querySelector(SELECTORS.progressPoint);
-
-    const current =
-      doc.querySelector(SELECTORS.progressCurrent);
-
-    const previous =
-      doc.querySelector(SELECTORS.previousSection);
-
-    const previousLabel =
-      doc.querySelector(SELECTORS.previousSectionLabel);
-
-    const next =
-      doc.querySelector(SELECTORS.nextSection);
-
-    const nextLabel =
-      doc.querySelector(SELECTORS.nextSectionLabel);
-
-    const currentNumber =
-      state.activeChapter;
-
-    const percentage =
-      chapterCount > 1
-        ? ((currentNumber - 1) / (chapterCount - 1)) * 100
-        : 0;
-
-    if (fill) {
-      fill.style.width =
-        `${percentage}%`;
-    }
-
-    if (point) {
-      point.style.left =
-        `${percentage}%`;
-    }
-
-    /*
-     * Preserve the existing header wording until JS is active.
-     * Once active, the progress label becomes contextual.
-     */
-    if (current) {
-      const chapter = getChapter(currentNumber);
-      const title = getChapterTitle(chapter);
-
-      current.textContent =
-        title || `${formatChapter(currentNumber)} / ${formatChapter(chapterCount)}`;
-    }
-
-    if (previous) {
-      if (currentNumber <= 1) {
-        previous.classList.add('is-disabled');
-        previous.setAttribute('aria-hidden', 'true');
-        previous.setAttribute('tabindex', '-1');
-        previous.setAttribute('href', '#01');
-      } else {
-        const previousNumber =
-          currentNumber - 1;
-
-        previous.classList.remove('is-disabled');
-        previous.removeAttribute('aria-hidden');
-        previous.removeAttribute('tabindex');
-        previous.setAttribute(
-          'href',
-          `#${formatChapter(previousNumber)}`
-        );
-        previous.setAttribute(
-          'aria-label',
-          `Vai alla sezione ${formatChapter(previousNumber)}`
-        );
-
-        if (previousLabel) {
-          previousLabel.textContent =
-            formatChapter(previousNumber);
-        }
-      }
-    }
-
-    if (next) {
-      if (currentNumber >= chapterCount) {
-        next.classList.add('is-disabled');
-        next.setAttribute('aria-hidden', 'true');
-        next.setAttribute('tabindex', '-1');
-      } else {
-        const nextNumber =
-          currentNumber + 1;
-
-        next.classList.remove('is-disabled');
-        next.removeAttribute('aria-hidden');
-        next.removeAttribute('tabindex');
-
-        next.setAttribute(
-          'href',
-          `#${formatChapter(nextNumber)}`
-        );
-
-        next.setAttribute(
-          'aria-label',
-          `Vai alla sezione ${formatChapter(nextNumber)}`
-        );
-
-        if (nextLabel) {
-          nextLabel.textContent =
-            formatChapter(nextNumber);
-        }
-      }
-    }
-  };
-
-  /*
-   * ------------------------------------------------------------
-   * IntersectionObserver
-   * ------------------------------------------------------------
-   */
-
-  const setupChapterObserver = () => {
+  function updateProgressUI() {
     if (!chapters.length) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleEntries =
-          entries.filter(
-            (entry) => entry.isIntersecting
-          );
+    const current =
+      getChapterByIndex(state.activeChapter) ||
+      chapters[0];
 
-        if (!visibleEntries.length) return;
+    const currentIndex =
+      getChapterIndex(current);
 
-        /*
-         * Choose the chapter whose center is
-         * closest to the viewport center.
-         */
-        visibleEntries.sort((a, b) => {
-          const aCenter =
-            Math.abs(
-              a.boundingClientRect.top +
-              a.boundingClientRect.height / 2 -
-              window.innerHeight / 2
+    const total =
+      chapters.length;
+
+    const percentage =
+      total > 1
+        ? ((currentIndex - 1) / (total - 1)) * 100
+        : 0;
+
+    if (progressCurrent) {
+      progressCurrent.textContent =
+        getChapterTitle(current);
+    }
+
+    if (progressFill) {
+      progressFill.style.width =
+        `${clamp(percentage / 100) * 100}%`;
+    }
+
+    if (progressPoint) {
+      progressPoint.style.left =
+        `${clamp(percentage / 100) * 100}%`;
+    }
+
+    const previousChapter =
+      getChapterByIndex(currentIndex - 1);
+
+    const nextChapter =
+      getChapterByIndex(currentIndex + 1);
+
+    if (previousChapter) {
+      previous.href =
+        `#${previousChapter.id}`;
+
+      previousLabel.textContent =
+        String(currentIndex - 1).padStart(2, '0');
+
+      previous.classList.remove('is-disabled');
+      previous.removeAttribute('aria-hidden');
+      previous.removeAttribute('tabindex');
+    } else {
+      previous.href = '#01';
+      previousLabel.textContent = '';
+      previous.classList.add('is-disabled');
+      previous.setAttribute('aria-hidden', 'true');
+      previous.setAttribute('tabindex', '-1');
+    }
+
+    if (nextChapter) {
+      next.href =
+        `#${nextChapter.id}`;
+
+      nextLabel.textContent =
+        String(currentIndex + 1).padStart(2, '0');
+
+      next.setAttribute(
+        'aria-label',
+        `Vai alla sezione ${String(currentIndex + 1).padStart(2, '0')}`
+      );
+    } else {
+      next.href = '#11';
+      nextLabel.textContent = '11';
+      next.setAttribute(
+        'aria-label',
+        'Vai alla sezione 11'
+      );
+    }
+  }
+
+
+  /* =========================================================
+     INTERSECTION OBSERVER
+  ========================================================== */
+
+  function setupChapterObserver() {
+    if (!chapters.length) return;
+
+    const observer =
+      new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+
+            entry.target.classList.add(
+              'is-visible'
             );
 
-          const bCenter =
-            Math.abs(
-              b.boundingClientRect.top +
-              b.boundingClientRect.height / 2 -
-              window.innerHeight / 2
-            );
+            const index =
+              getChapterIndex(entry.target);
 
-          return aCenter - bCenter;
-        });
-
-        const chapter =
-          visibleEntries[0].target;
-
-        const number =
-          getChapterNumber(chapter);
-
-        if (number) {
-          setActiveChapter(
-            number,
-            'observer'
-          );
+            setActiveChapter(index);
+          });
+        },
+        {
+          root:null,
+          rootMargin:'-35% 0px -45% 0px',
+          threshold:0
         }
-      },
-      {
-        root: null,
-        rootMargin: '-25% 0px -25% 0px',
-        threshold: [0, 0.1, 0.25, 0.5, 0.75, 1]
-      }
-    );
+      );
 
-    chapters.forEach((chapter) => {
+    chapters.forEach(chapter => {
       observer.observe(chapter);
     });
-  };
+  }
 
-  /*
-   * ------------------------------------------------------------
-   * Central requestAnimationFrame
-   * ------------------------------------------------------------
-   */
 
-  const requestUpdate = () => {
-    if (state.framePending) return;
+  /* =========================================================
+     REVEALS
+  ========================================================== */
 
-    state.framePending = true;
+  function setupRevealObserver() {
+    const elements =
+      document.querySelectorAll(
+        SELECTORS.reveal
+      );
 
-    window.requestAnimationFrame(() => {
-      state.framePending = false;
+    if (!elements.length) return;
 
-      updateChapterProgress();
-      updateHeaderState();
-      updateCursor();
-    });
-  };
+    if (state.reducedMotion) {
+      elements.forEach(element => {
+        element.classList.add('is-visible');
+      });
 
-  const handleScroll = () => {
-    const currentY =
-      window.scrollY || window.pageYOffset;
-
-    const delta =
-      currentY - state.scrollY;
-
-    if (delta !== 0) {
-      state.lastScrollDirection =
-        delta > 0 ? 1 : -1;
+      return;
     }
 
-    state.scrollY = currentY;
+    const observer =
+      new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            if (
+              entry.isIntersecting
+            ) {
+              entry.target.classList.add(
+                'is-visible'
+              );
+            }
+          });
+        },
+        {
+          root:null,
+          rootMargin:'0px 0px -12% 0px',
+          threshold:.05
+        }
+      );
 
-    requestUpdate();
-  };
-
-  /*
-   * ------------------------------------------------------------
-   * Smooth internal navigation
-   * ------------------------------------------------------------
-   */
-
-  const scrollToTarget = (target) => {
-    if (!target) return;
-
-    const header =
-      doc.querySelector(SELECTORS.header);
-
-    const headerHeight =
-      header?.getBoundingClientRect().height || 0;
-
-    const rect =
-      target.getBoundingClientRect();
-
-    const targetY =
-      window.scrollY +
-      rect.top -
-      headerHeight;
-
-    window.scrollTo({
-      top: Math.max(0, targetY),
-      behavior: state.reducedMotion
-        ? 'auto'
-        : 'smooth'
+    elements.forEach(element => {
+      observer.observe(element);
     });
-  };
+  }
 
-  const setupAnchorNavigation = () => {
-    doc.addEventListener(
-      'click',
-      (event) => {
-        const link =
-          event.target.closest('a[href^="#"]');
 
-        if (!link) return;
+  /* =========================================================
+     MENU
+  ========================================================== */
 
-        const href =
-          link.getAttribute('href');
+  let menuPreviouslyFocused = null;
 
-        if (
-          !href ||
-          href === '#' ||
-          href.length < 2
-        ) {
-          return;
-        }
+  function setMenuState(open) {
+    if (!menu || !menuTrigger) return;
 
-        const target =
-          doc.querySelector(href);
+    state.menuOpen = open;
 
-        if (!target) return;
-
-        event.preventDefault();
-
-        closeMenu();
-
-        scrollToTarget(target);
-
-        /*
-         * Preserve browser history without
-         * forcing an immediate jump.
-         */
-        if (
-          window.history &&
-          window.history.pushState
-        ) {
-          window.history.pushState(
-            null,
-            '',
-            href
-          );
-        }
-      }
+    body.classList.toggle(
+      'is-menu-open',
+      open
     );
-  };
 
-  /*
-   * ------------------------------------------------------------
-   * Menu
-   * ------------------------------------------------------------
-   */
-
-  let menuPreviousFocus = null;
-
-  const getFocusableElements = (container) => {
-    if (!container) return [];
-
-    return Array.from(
-      container.querySelectorAll(
-        'a[href], button:not([disabled]), ' +
-        'input:not([disabled]), ' +
-        'select:not([disabled]), ' +
-        'textarea:not([disabled]), ' +
-        '[tabindex]:not([tabindex="-1"])'
-      )
-    );
-  };
-
-  const openMenu = () => {
-    const menu =
-      doc.querySelector(SELECTORS.menu);
-
-    const trigger =
-      doc.querySelector(SELECTORS.menuTrigger);
-
-    if (!menu || !trigger) return;
-
-    if (state.menuOpen) return;
-
-    menuPreviousFocus =
-      doc.activeElement;
-
-    state.menuOpen = true;
-
-    body.classList.add('is-menu-open');
-    root.classList.add('is-menu-open');
-
-    trigger.setAttribute(
+    menuTrigger.setAttribute(
       'aria-expanded',
-      'true'
+      String(open)
     );
 
-    trigger.setAttribute(
+    menuTrigger.setAttribute(
       'aria-label',
-      'Chiudi menu'
+      open ? 'Chiudi menu' : 'Apri menu'
     );
 
-    /*
-     * Prevent background scrolling.
-     */
-    body.style.overflow = 'hidden';
+    menu.setAttribute(
+      'aria-hidden',
+      String(!open)
+    );
 
-    const focusables =
-      getFocusableElements(menu);
+    if (open) {
+      menuPreviouslyFocused =
+        document.activeElement;
 
-    if (focusables.length) {
+      const firstLink =
+        menuLinks[0];
+
       window.setTimeout(() => {
-        focusables[0].focus();
-      }, state.reducedMotion ? 0 : 100);
+        (firstLink || menuClose)?.focus();
+      }, 350);
+
+    } else {
+
+      window.setTimeout(() => {
+        if (
+          menuPreviouslyFocused &&
+          typeof menuPreviouslyFocused.focus === 'function'
+        ) {
+          menuPreviouslyFocused.focus();
+        } else {
+          menuTrigger.focus();
+        }
+      }, 50);
     }
+  }
 
-    if (typeof menu.focus === 'function') {
-      menu.setAttribute('tabindex', '-1');
-    }
-  };
 
-  const closeMenu = (restoreFocus = true) => {
-    const trigger =
-      doc.querySelector(SELECTORS.menuTrigger);
-
-    if (!state.menuOpen) return;
-
-    state.menuOpen = false;
-
-    body.classList.remove('is-menu-open');
-    root.classList.remove('is-menu-open');
-
-    if (trigger) {
-      trigger.setAttribute(
-        'aria-expanded',
-        'false'
-      );
-
-      trigger.setAttribute(
-        'aria-label',
-        'Apri menu'
-      );
-    }
-
-    body.style.overflow = '';
-
-    if (
-      restoreFocus &&
-      menuPreviousFocus &&
-      typeof menuPreviousFocus.focus === 'function'
-    ) {
-      menuPreviousFocus.focus();
-    }
-
-    menuPreviousFocus = null;
-  };
-
-  const setupMenu = () => {
-    const trigger =
-      doc.querySelector(SELECTORS.menuTrigger);
-
-    const menu =
-      doc.querySelector(SELECTORS.menu);
-
-    if (!trigger || !menu) return;
-
-    trigger.addEventListener(
+  function setupMenu() {
+    menuTrigger?.addEventListener(
       'click',
       () => {
-        if (state.menuOpen) {
-          closeMenu();
-        } else {
-          openMenu();
-        }
+        setMenuState(!state.menuOpen);
+        resetIdleTimer();
       }
     );
 
-    /*
-     * Close button.
-     */
-    doc.addEventListener(
+    menuClose?.addEventListener(
       'click',
-      (event) => {
-        const close =
-          event.target.closest(
-            SELECTORS.menuClose
-          );
-
-        if (!close) return;
-
-        event.preventDefault();
-
-        closeMenu();
+      () => {
+        setMenuState(false);
+        resetIdleTimer();
       }
     );
 
-    /*
-     * Menu navigation.
-     */
-    menu.addEventListener(
-      'click',
-      (event) => {
-        const link =
-          event.target.closest('a[href]');
-
-        if (!link) return;
-
-        const href =
-          link.getAttribute('href');
-
-        if (
-          href &&
-          href.startsWith('#')
-        ) {
-          const target =
-            doc.querySelector(href);
-
-          if (target) {
-            event.preventDefault();
-
-            closeMenu(false);
-
-            window.setTimeout(() => {
-              scrollToTarget(target);
-
-              if (
-                window.history &&
-                window.history.pushState
-              ) {
-                window.history.pushState(
-                  null,
-                  '',
-                  href
-                );
-              }
-            }, state.reducedMotion ? 0 : 50);
-          }
-        } else {
-          closeMenu(false);
+    menuLinks.forEach(link => {
+      link.addEventListener(
+        'click',
+        () => {
+          setMenuState(false);
+          resetIdleTimer();
         }
-      }
-    );
-  };
+      );
+    });
+  }
 
-  /*
-   * ------------------------------------------------------------
-   * Keyboard accessibility
-   * ------------------------------------------------------------
-   */
 
-  const trapMenuFocus = (event) => {
+  function handleMenuKeyboard(event) {
     if (!state.menuOpen) return;
 
     if (event.key === 'Escape') {
       event.preventDefault();
-      closeMenu();
+      setMenuState(false);
       return;
     }
 
     if (event.key !== 'Tab') return;
 
-    const menu =
-      doc.querySelector(SELECTORS.menu);
-
-    const focusables =
-      getFocusableElements(menu);
+    const focusables = [
+      ...menuLinks,
+      menuClose
+    ].filter(Boolean);
 
     if (!focusables.length) return;
 
-    const first =
-      focusables[0];
-
+    const first = focusables[0];
     const last =
       focusables[focusables.length - 1];
 
     if (
       event.shiftKey &&
-      doc.activeElement === first
+      document.activeElement === first
     ) {
       event.preventDefault();
       last.focus();
     } else if (
       !event.shiftKey &&
-      doc.activeElement === last
+      document.activeElement === last
     ) {
       event.preventDefault();
       first.focus();
     }
-  };
+  }
 
-  const setupKeyboard = () => {
-    doc.addEventListener(
-      'keydown',
-      trapMenuFocus
+
+  /* =========================================================
+     ANCHOR NAVIGATION
+  ========================================================== */
+
+  function setupAnchorNavigation() {
+    document.addEventListener(
+      'click',
+      event => {
+        const link =
+          event.target.closest('a[href^="#"]');
+
+        if (!link) return;
+
+        const hash =
+          link.getAttribute('href');
+
+        if (!hash || hash === '#') return;
+
+        const target =
+          document.querySelector(hash);
+
+        if (!target) return;
+
+        event.preventDefault();
+
+        target.scrollIntoView({
+          behavior:
+            state.reducedMotion
+              ? 'auto'
+              : 'smooth',
+          block:'start'
+        });
+
+        history.replaceState(
+          null,
+          '',
+          hash
+        );
+
+        resetIdleTimer();
+      }
     );
-  };
+  }
 
-  /*
-   * ------------------------------------------------------------
-   * Magnetic interaction
-   * ------------------------------------------------------------
-   *
-   * Kept deliberately subtle.
-   * Disabled on touch and reduced motion.
-   */
 
-  const setupMagneticElements = () => {
+  /* =========================================================
+     MAGNETIC
+  ========================================================== */
+
+  function setupMagnetic() {
     if (
-      !state.pointerFine ||
-      state.reducedMotion
+      state.reducedMotion ||
+      !window.matchMedia('(pointer:fine)').matches
     ) {
       return;
     }
 
     const elements =
-      Array.from(
-        doc.querySelectorAll(
-          SELECTORS.magnetic
-        )
+      document.querySelectorAll(
+        SELECTORS.magnetic
       );
 
-    elements.forEach((element) => {
+    elements.forEach(element => {
+
       element.addEventListener(
         'pointermove',
-        (event) => {
+        event => {
           const rect =
             element.getBoundingClientRect();
 
           const x =
-            event.clientX -
-            (rect.left + rect.width / 2);
+            ((event.clientX - rect.left) / rect.width - .5) * 8;
 
           const y =
-            event.clientY -
-            (rect.top + rect.height / 2);
-
-          const strength =
-            0.08;
+            ((event.clientY - rect.top) / rect.height - .5) * 8;
 
           element.style.setProperty(
             '--magnetic-x',
-            `${x * strength}px`
+            `${x}px`
           );
 
           element.style.setProperty(
             '--magnetic-y',
-            `${y * strength}px`
+            `${y}px`
           );
         }
       );
@@ -986,571 +632,407 @@
         }
       );
     });
-  };
+  }
 
-  /*
-   * ------------------------------------------------------------
-   * Contextual cursor
-   * ------------------------------------------------------------
-   *
-   * Optional enhancement.
-   * Never required for navigation.
-   */
 
-  const createCursor = () => {
-    if (
-      !state.pointerFine ||
-      state.reducedMotion
-    ) {
-      return null;
+  /* =========================================================
+     CONTEXTUAL CURSOR
+  ========================================================== */
+
+  function setupCursor() {
+    if (!state.cursorEnabled || !cursor) {
+      return;
     }
 
-    if (doc.querySelector('.context-cursor')) {
-      return doc.querySelector('.context-cursor');
-    }
+    const updateCursor =
+      event => {
+        state.cursorX = event.clientX;
+        state.cursorY = event.clientY;
 
-    const cursor =
-      doc.createElement('div');
+        cursor.style.setProperty(
+          '--cursor-x',
+          `${state.cursorX}px`
+        );
 
-    cursor.className =
-      'context-cursor';
+        cursor.style.setProperty(
+          '--cursor-y',
+          `${state.cursorY}px`
+        );
 
-    cursor.setAttribute(
-      'aria-hidden',
-      'true'
-    );
-
-    cursor.innerHTML =
-      '<span class="context-cursor__label"></span>';
-
-    body.appendChild(cursor);
-
-    state.cursorEnabled = true;
-
-    return cursor;
-  };
-
-  const updateCursor = () => {
-    if (!state.cursorEnabled) return;
-
-    const cursor =
-      doc.querySelector('.context-cursor');
-
-    if (!cursor) return;
-
-    state.lastCursorX =
-      lerp(
-        state.lastCursorX,
-        state.targetCursorX,
-        0.16
-      );
-
-    state.lastCursorY =
-      lerp(
-        state.lastCursorY,
-        state.targetCursorY,
-        0.16
-      );
-
-    cursor.style.transform =
-      `translate3d(${state.lastCursorX}px, ${state.lastCursorY}px, 0)`;
-  };
-
-  const setCursorLabel = (label) => {
-    const cursor =
-      doc.querySelector('.context-cursor');
-
-    if (!cursor) return;
-
-    const labelElement =
-      cursor.querySelector(
-        '.context-cursor__label'
-      );
-
-    if (labelElement) {
-      labelElement.textContent =
-        label || '';
-    }
-
-    cursor.classList.toggle(
-      'is-visible',
-      Boolean(label)
-    );
-  };
-
-  const setupCursor = () => {
-    const cursor =
-      createCursor();
-
-    if (!cursor) return;
+        cursor.classList.add('is-active');
+      };
 
     window.addEventListener(
       'pointermove',
-      (event) => {
-        state.targetCursorX =
-          event.clientX;
-
-        state.targetCursorY =
-          event.clientY;
-
-        requestUpdate();
-      },
-      { passive: true }
+      updateCursor,
+      { passive:true }
     );
 
-    doc.addEventListener(
+    document.addEventListener(
       'pointerover',
-      (event) => {
+      event => {
         const interactive =
-          event.target.closest(
-            'a, button, [data-cursor]'
+          isInteractiveElement(
+            event.target
           );
 
-        if (!interactive) {
-          setCursorLabel('');
-          return;
-        }
-
-        const custom =
-          interactive.dataset.cursor;
-
-        if (custom) {
-          setCursorLabel(custom);
-          return;
-        }
-
-        if (
-          interactive.matches(
-            '.menu-trigger'
-          )
-        ) {
-          setCursorLabel(
-            state.menuOpen
-              ? 'CLOSE'
-              : 'MENU'
+        const label =
+          interactive?.dataset.cursor ||
+          (
+            event.target.closest(
+              'a,button'
+            )
+              ? 'GO'
+              : 'MOVE'
           );
 
-          return;
-        }
+        const cursorLabel =
+          cursor.querySelector(
+            '.context-cursor-label'
+          );
 
-        if (
-          interactive.matches(
-            'a[href^="#"]'
-          )
-        ) {
-          setCursorLabel('MOVE');
-          return;
+        if (cursorLabel) {
+          cursorLabel.textContent =
+            label;
         }
-
-        setCursorLabel('OPEN');
       }
     );
 
-    doc.addEventListener(
-      'pointerout',
-      (event) => {
-        const related =
-          event.relatedTarget;
-
-        if (
-          related &&
-          related.closest &&
-          related.closest(
-            'a, button, [data-cursor]'
-          )
-        ) {
-          return;
-        }
-
-        setCursorLabel('');
+    document.addEventListener(
+      'pointerleave',
+      () => {
+        cursor.classList.remove(
+          'is-active'
+        );
       }
     );
-  };
+  }
 
-  /*
-   * ------------------------------------------------------------
-   * Reveal observer
-   * ------------------------------------------------------------
-   *
-   * Content is visible by default.
-   * JS only adds is-visible after detection.
-   */
 
-  const setupRevealObserver = () => {
-    const elements =
-      Array.from(
-        doc.querySelectorAll(
-          SELECTORS.reveal
-        )
-      );
+  /* =========================================================
+     STANDBY
+  ========================================================== */
 
-    if (!elements.length) return;
+  function canEnterStandby() {
+    if (!state.standbyAllowed) {
+      return false;
+    }
+
+    if (state.reducedMotion) {
+      return false;
+    }
+
+    if (state.menuOpen) {
+      return false;
+    }
 
     if (
-      state.reducedMotion ||
-      !('IntersectionObserver' in window)
+      document.visibilityState !== 'visible'
     ) {
-      elements.forEach((element) => {
-        element.classList.add('is-visible');
-      });
+      return false;
+    }
 
+    const active =
+      document.activeElement;
+
+    if (
+      active &&
+      (
+        active.matches(
+          'input,textarea,select'
+        ) ||
+        active.isContentEditable
+      )
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
+
+  function enterStandby() {
+    if (
+      state.standby ||
+      !canEnterStandby()
+    ) {
       return;
     }
 
-    const observer =
-      new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
+    state.standby = true;
 
-            entry.target.classList.add(
-              'is-visible'
-            );
-
-            observer.unobserve(
-              entry.target
-            );
-          });
-        },
-        {
-          root: null,
-          rootMargin: '0px 0px -12% 0px',
-          threshold: 0.05
-        }
-      );
-
-    elements.forEach((element) => {
-      observer.observe(element);
-    });
-  };
-
-  /*
-   * ------------------------------------------------------------
-   * SVG trajectory helpers
-   * ------------------------------------------------------------
-   *
-   * CSS controls the actual visual drawing.
-   * JS only marks trajectories as ready/visible.
-   */
-
-  const setupTrajectories = () => {
-    const trajectories =
-      Array.from(
-        doc.querySelectorAll(
-          '[data-trajectory]'
-        )
-      );
-
-    trajectories.forEach((trajectory) => {
-      trajectory.setAttribute(
-        'aria-hidden',
-        'true'
-      );
-
-      trajectory.setAttribute(
-        'focusable',
-        'false'
-      );
-
-      trajectory.classList.add(
-        'trajectory-ready'
-      );
-    });
-  };
-
-  /*
-   * ------------------------------------------------------------
-   * Chapter-specific semantic states
-   * ------------------------------------------------------------
-   *
-   * This is intentionally small.
-   * Complex choreography belongs to CSS
-   * and the chapter's own markup.
-   */
-
-  const updateChapterSemanticState = () => {
-    chapters.forEach((chapter) => {
-      const number =
-        getChapterNumber(chapter);
-
-      if (!number) return;
-
-      chapter.dataset.progress =
-        calculateChapterProgress(
-          chapter
-        ).toFixed(3);
-
-      /*
-       * Useful hooks:
-       *
-       * .chapter--01
-       * .chapter--02
-       * ...
-       * .chapter--11
-       *
-       * CSS can react without JS knowing
-       * the visual details of each chapter.
-       */
-    });
-  };
-
-  /*
-   * ------------------------------------------------------------
-   * Initial active chapter
-   * ------------------------------------------------------------
-   */
-
-  const detectInitialChapter = () => {
-    if (!chapters.length) {
-      setActiveChapter(1, 'initial');
-      return;
-    }
-
-    let bestChapter = chapters[0];
-    let bestDistance = Infinity;
-
-    const viewportCenter =
-      window.innerHeight / 2;
-
-    chapters.forEach((chapter) => {
-      const rect =
-        chapter.getBoundingClientRect();
-
-      const center =
-        rect.top +
-        rect.height / 2;
-
-      const distance =
-        Math.abs(
-          center -
-          viewportCenter
-        );
-
-      if (distance < bestDistance) {
-        bestDistance = distance;
-        bestChapter = chapter;
-      }
-    });
-
-    const number =
-      getChapterNumber(bestChapter) || 1;
-
-    setActiveChapter(
-      number,
-      'initial'
+    body.classList.add(
+      'is-standby'
     );
-  };
 
-  /*
-   * ------------------------------------------------------------
-   * Resize
-   * ------------------------------------------------------------
-   */
+    standby?.setAttribute(
+      'aria-hidden',
+      'false'
+    );
 
-  let resizeTimer = null;
+    if (cursor) {
+      cursor.classList.remove(
+        'is-active'
+      );
+    }
+  }
 
-  const handleResize = () => {
-    window.clearTimeout(resizeTimer);
 
-    resizeTimer = window.setTimeout(() => {
-      state.pointerFine =
-        window.matchMedia
-          ? window.matchMedia(
-              '(pointer: fine)'
-            ).matches
-          : false;
+  function exitStandby() {
+    if (!state.standby) return;
 
-      requestUpdate();
-      updateChapterSemanticState();
-    }, 100);
-  };
+    state.standby = false;
 
-  /*
-   * ------------------------------------------------------------
-   * Page visibility
-   * ------------------------------------------------------------
-   */
+    body.classList.remove(
+      'is-standby'
+    );
 
-  const setupVisibilityHandling = () => {
+    standby?.setAttribute(
+      'aria-hidden',
+      'true'
+    );
+  }
+
+
+  function resetIdleTimer() {
+    window.clearTimeout(
+      state.idleTimer
+    );
+
+    if (state.standby) {
+      exitStandby();
+    }
+
+    if (state.reducedMotion) {
+      return;
+    }
+
+    if (
+      document.visibilityState !== 'visible'
+    ) {
+      return;
+    }
+
+    state.idleTimer =
+      window.setTimeout(
+        enterStandby,
+        state.idleDelay
+      );
+  }
+
+
+  function setupStandby() {
+    if (!standby) return;
+
+    const activityEvents = [
+      'pointermove',
+      'pointerdown',
+      'touchstart',
+      'wheel',
+      'scroll',
+      'keydown',
+      'click'
+    ];
+
+    activityEvents.forEach(
+      eventName => {
+        window.addEventListener(
+          eventName,
+          () => {
+            resetIdleTimer();
+          },
+          {
+            passive:true
+          }
+        );
+      }
+    );
+
     document.addEventListener(
       'visibilitychange',
       () => {
         if (
-          document.visibilityState === 'visible'
+          document.visibilityState !== 'visible'
         ) {
-          requestUpdate();
+          window.clearTimeout(
+            state.idleTimer
+          );
+
+          if (state.standby) {
+            exitStandby();
+          }
+
+          return;
         }
+
+        resetIdleTimer();
       }
     );
-  };
 
-  /*
-   * ------------------------------------------------------------
-   * Hash navigation on initial load
-   * ------------------------------------------------------------
-   */
+    resetIdleTimer();
+  }
 
-  const handleInitialHash = () => {
-    const hash =
-      window.location.hash;
 
-    if (!hash || hash === '#') return;
+  /* =========================================================
+     CENTRAL SCROLL RAF
+  ========================================================== */
 
-    const target =
-      doc.querySelector(hash);
+  function requestFrame() {
+    if (state.framePending) return;
 
-    if (!target) return;
+    state.framePending = true;
 
-    /*
-     * Let layout settle before scrolling.
-     */
-    window.setTimeout(() => {
-      scrollToTarget(target);
-    }, state.reducedMotion ? 0 : 100);
-  };
+    window.requestAnimationFrame(
+      () => {
+        state.framePending = false;
 
-  /*
-   * ------------------------------------------------------------
-   * Scroll listeners
-   * ------------------------------------------------------------
-   */
+        updateHeader();
+        updateAllVisibleProgress();
+      }
+    );
+  }
 
-  const setupScroll = () => {
+
+  function setupScroll() {
     window.addEventListener(
       'scroll',
-      handleScroll,
+      () => {
+        state.scrollY =
+          window.scrollY;
+
+        requestFrame();
+      },
       {
-        passive: true
+        passive:true
       }
     );
 
     window.addEventListener(
       'resize',
-      handleResize,
+      () => {
+        requestFrame();
+      },
       {
-        passive: true
+        passive:true
       }
     );
-  };
+  }
 
-  /*
-   * ------------------------------------------------------------
-   * Focus handling
-   * ------------------------------------------------------------
-   */
 
-  const setupFocusHandling = () => {
-    doc.addEventListener(
-      'focusin',
-      (event) => {
-        const element =
-          event.target.closest(
-            'a, button, input, textarea, select, [tabindex]'
-          );
+  /* =========================================================
+     INITIAL STATE
+  ========================================================== */
 
-        if (!element) return;
-
-        element.classList.add(
-          'is-keyboard-focus'
+  function setupInitialState() {
+    chapters.forEach(
+      (chapter, index) => {
+        chapter.style.setProperty(
+          '--chapter-progress',
+          index === 0 ? '0' : '0'
         );
       }
     );
 
-    doc.addEventListener(
-      'focusout',
-      (event) => {
-        const element =
-          event.target.closest(
-            'a, button, input, textarea, select, [tabindex]'
-          );
+    if (chapters[0]) {
+      chapters[0].classList.add(
+        'is-active',
+        'is-visible'
+      );
 
-        if (!element) return;
-
-        element.classList.remove(
-          'is-keyboard-focus'
+      state.activeChapter =
+        getChapterIndex(
+          chapters[0]
         );
+    }
+
+    updateProgressUI();
+    updateHeader();
+  }
+
+
+  /* =========================================================
+     HASH
+  ========================================================== */
+
+  function handleInitialHash() {
+    const hash =
+      window.location.hash;
+
+    if (!hash) return;
+
+    const target =
+      document.querySelector(hash);
+
+    if (!target) return;
+
+    window.setTimeout(
+      () => {
+        target.scrollIntoView({
+          behavior:'auto',
+          block:'start'
+        });
+      },
+      100
+    );
+  }
+
+
+  /* =========================================================
+     KEYBOARD / FOCUS
+  ========================================================== */
+
+  function setupKeyboard() {
+    document.addEventListener(
+      'keydown',
+      handleMenuKeyboard
+    );
+
+    document.addEventListener(
+      'keydown',
+      event => {
+        if (
+          event.key === 'Escape' &&
+          state.standby
+        ) {
+          exitStandby();
+          resetIdleTimer();
+        }
       }
     );
-  };
+  }
 
-  /*
-   * ------------------------------------------------------------
-   * Body ready state
-   * ------------------------------------------------------------
-   */
 
-  const setReadyState = () => {
-    body.classList.add(
-      'is-js-ready'
-    );
+  /* =========================================================
+     INIT
+  ========================================================== */
 
-    root.classList.add(
-      'is-js-ready'
-    );
-  };
-
-  /*
-   * ------------------------------------------------------------
-   * Main initialization
-   * ------------------------------------------------------------
-   */
-
-  const init = () => {
+  function init() {
     if (state.initialized) return;
 
     state.initialized = true;
 
-    setupReducedMotion();
-
-    setReadyState();
-
     setupLoader();
-
-    setupScroll();
+    setupInitialState();
 
     setupChapterObserver();
-
-    setupAnchorNavigation();
-
-    setupMenu();
-
-    setupKeyboard();
-
     setupRevealObserver();
 
-    setupTrajectories();
+    setupMenu();
+    setupAnchorNavigation();
 
-    setupMagneticElements();
-
+    setupMagnetic();
     setupCursor();
 
-    setupVisibilityHandling();
+    setupScroll();
+    setupKeyboard();
 
-    setupFocusHandling();
-
-    detectInitialChapter();
-
-    updateChapterProgress();
-
-    updateHeaderState();
-
-    updateProgressUI();
-
-    updateChapterSemanticState();
+    setupStandby();
 
     handleInitialHash();
 
-    /*
-     * First visual update.
-     */
-    requestUpdate();
-  };
+    requestFrame();
+  }
 
-  /*
-   * ------------------------------------------------------------
-   * Start
-   * ------------------------------------------------------------
-   */
 
   if (
     document.readyState === 'loading'
@@ -1558,7 +1040,7 @@
     document.addEventListener(
       'DOMContentLoaded',
       init,
-      { once: true }
+      { once:true }
     );
   } else {
     init();
