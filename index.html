@@ -1,16 +1,12 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Cesare Paratore | Scienze Motorie, Sport, Educazione, Management e Digitale - Partinico e oltre</title>
 
-  <meta
-    name="description"
-    content="Cesare Paratore, professionista delle Scienze Motorie e dello Sport, con una formazione che integra competenze motorie, sportive, educative, manageriali e digitali, con base a Partinico e un percorso aperto al territorio e alle collaborazioni online."
-  >
+  <meta name="description" content="Cesare Paratore, professionista delle Scienze Motorie e dello Sport, con una formazione che integra competenze motorie, sportive, educative, manageriali e digitali, con base a Partinico e un percorso aperto al territorio e alle collaborazioni online.">
 
   <link rel="canonical" href="https://cesareparatore.github.io/">
 
@@ -20,24 +16,54 @@
   <meta property="og:url" content="https://cesareparatore.github.io/">
   <meta property="og:locale" content="it_IT">
   <meta property="og:image" content="https://cesareparatore.github.io/assets/images/cp-foto.webp">
+  <meta property="og:image:alt" content="Cesare Paratore">
+
+  <meta name="theme-color" content="#0B1F33">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link
-    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap"
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap"
     rel="stylesheet"
   >
 
-  <!-- CSS -->
   <link rel="stylesheet" href="css/style.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Cesare Paratore",
+    "url": "https://cesareparatore.github.io/",
+    "image": "https://cesareparatore.github.io/assets/images/cp-foto.webp",
+    "jobTitle": "Professionista delle Scienze Motorie e dello Sport",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Partinico",
+      "addressCountry": "IT"
+    }
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Cesare Paratore",
+    "url": "https://cesareparatore.github.io/"
+  }
+  </script>
 </head>
 
 <body>
 
   <a class="skip-link" href="#main-content">Vai al contenuto</a>
 
-  <!-- LOADER -->
+  <!-- =========================================================
+       LOADER — BLOCCO FISSO
+  ========================================================== -->
+
   <div class="page-loader" aria-hidden="true">
     <div class="page-loader-inner">
       <div class="loader-trajectory" aria-hidden="true">
@@ -55,7 +81,42 @@
     </div>
   </div>
 
-  <!-- HEADER -->
+  <!-- =========================================================
+       STANDBY — ATTIVATO DOPO INATTIVITÀ
+  ========================================================== -->
+
+  <div
+    class="standby-screen"
+    id="standby-screen"
+    aria-hidden="true"
+  >
+    <div class="standby-field" aria-hidden="true">
+      <span class="standby-orbit standby-orbit--one"></span>
+      <span class="standby-orbit standby-orbit--two"></span>
+      <span class="standby-line standby-line--one"></span>
+      <span class="standby-line standby-line--two"></span>
+      <span class="standby-point"></span>
+    </div>
+
+    <div class="standby-inner">
+      <p class="standby-kicker">IL MOVIMENTO SI FERMA.</p>
+
+      <p class="standby-title">
+        <span>MOVIMENTO</span>
+        <span class="standby-slash" aria-hidden="true">/</span>
+        <span>CON DIREZIONE.</span>
+      </p>
+
+      <p class="standby-message">LA DIREZIONE RESTA.</p>
+
+      <p class="standby-hint">MUOVI PER CONTINUARE</p>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       HEADER — BLOCCO FISSO
+  ========================================================== -->
+
   <header class="site-header">
 
     <a
@@ -64,15 +125,17 @@
       aria-label="Cesare Paratore — torna all'inizio"
     >
       <img
-        src="assets/images/cp-mark.png"
+        src="/assets/images/cp-mark.png"
         alt=""
         width="48"
         height="48"
       >
     </a>
 
-    <div class="wow-progress" aria-label="Navigazione del percorso">
-
+    <div
+      class="wow-progress"
+      aria-label="Navigazione del percorso"
+    >
       <div
         class="progress-label"
         id="progress-current"
@@ -129,10 +192,7 @@
     >
       <span class="menu-trigger-label">MENU</span>
 
-      <span
-        class="menu-trigger-icon"
-        aria-hidden="true"
-      >
+      <span class="menu-trigger-icon" aria-hidden="true">
         <span></span>
         <span></span>
       </span>
@@ -140,66 +200,77 @@
 
   </header>
 
-  <!-- MENU -->
-  <nav
+  <!-- =========================================================
+       MENU
+  ========================================================== -->
+
+  <div
     class="site-menu"
     id="site-menu"
     aria-hidden="true"
-    aria-label="Navigazione principale"
   >
     <div class="site-menu-inner">
 
-      <div class="menu-eyebrow">
+      <p class="site-menu-kicker">
         MOVIMENTO / CON DIREZIONE.
-      </div>
+      </p>
 
-      <div class="menu-links">
-
-        <a href="#03">CHI SONO</a>
-        <a href="#02">SCIENZE MOTORIE</a>
-        <a href="#02">SPORT</a>
-        <a href="#02">EDUCAZIONE</a>
-        <a href="#02">MANAGEMENT DELLO SPORT</a>
-        <a href="#02">PRESENZA WEB</a>
-        <a href="#06">TERRITORIO</a>
+      <nav
+        class="site-menu-nav"
+        aria-label="Navigazione principale"
+      >
+        <a href="/chi-sono/">CHI SONO</a>
+        <a href="/scienze-motorie/">SCIENZE MOTORIE</a>
+        <a href="/sport/">SPORT</a>
+        <a href="/educazione/">EDUCAZIONE</a>
+        <a href="/management-dello-sport/">MANAGEMENT DELLO SPORT</a>
+        <a href="/presenza-web/">PRESENZA WEB</a>
+        <a href="/territorio/">TERRITORIO</a>
         <a href="/contatti/">CONTATTI</a>
-
-      </div>
+      </nav>
 
       <button
         class="chapter-close"
         type="button"
         aria-label="Chiudi menu"
       >
-        CHIUDI
+        CHIUDI <span aria-hidden="true">×</span>
       </button>
 
     </div>
-  </nav>
+  </div>
+
+  <!-- =========================================================
+       MAIN
+  ========================================================== -->
 
   <main
-    id="main-content"
     class="site-main"
+    id="main-content"
   >
 
-    <!-- 01 -->
+    <!-- =======================================================
+         01 — ORIGINE
+    ======================================================== -->
+
     <section
-      class="chapter chapter--01"
+      class="chapter chapter--light chapter--01"
       id="01"
       data-section-title="IL MOVIMENTO È SOLO L'INIZIO."
+      data-chapter-index="1"
     >
       <div class="chapter-inner chapter-inner--hero">
 
         <div class="chapter-content chapter-content--hero">
 
-          <div class="chapter-number">01 / 11</div>
+          <p class="chapter-number">01</p>
 
-          <h1 class="chapter-title chapter-title--hero">
+          <h1 class="chapter-title chapter-title--hero reveal">
             <span>MOVIMENTO</span>
-            <span>CON DIREZIONE.</span>
+            <em>CON DIREZIONE.</em>
           </h1>
 
-          <p class="chapter-copy chapter-copy--hero">
+          <p class="chapter-copy chapter-copy--hero reveal">
             Il movimento è ciò da cui tutto prende forma.
             <br>
             La direzione è ciò che gli dà senso.
@@ -207,89 +278,153 @@
 
         </div>
 
-        <svg
-          class="trajectory trajectory--hero"
-          viewBox="0 0 1200 400"
+        <div
+          class="chapter-visual chapter-visual--hero"
           aria-hidden="true"
-          focusable="false"
         >
-          <path
-            d="M80 300 C260 300 300 180 520 210 S820 300 1120 100"
-          />
-        </svg>
+          <svg
+            class="trajectory trajectory--hero"
+            viewBox="0 0 1200 260"
+            preserveAspectRatio="none"
+            focusable="false"
+          >
+            <path
+              class="trajectory-path"
+              d="M30 190 C260 190 340 168 500 142 C700 110 770 74 960 86 C1050 92 1110 74 1190 28"
+            />
+          </svg>
+
+          <span class="trajectory-point"></span>
+        </div>
 
       </div>
     </section>
 
-    <!-- 02 -->
+
+    <!-- =======================================================
+         02 — DIMENSIONI
+    ======================================================== -->
+
     <section
-      class="chapter chapter--02"
+      class="chapter chapter--light chapter--02"
       id="02"
       data-section-title="UNA DIREZIONE NON NASCE DA UNA SOLA DIMENSIONE."
+      data-chapter-index="2"
     >
-      <div class="chapter-inner">
+      <div class="chapter-inner chapter-inner--dimensions">
 
         <div class="chapter-content">
 
-          <div class="chapter-number">02 / 11</div>
+          <p class="chapter-number">02</p>
 
-          <h2 class="chapter-title">
-            UNA DIREZIONE
-            NON NASCE DA
+          <h2 class="chapter-title reveal">
+            UNA DIREZIONE<br>
+            NON NASCE DA<br>
             UNA SOLA DIMENSIONE.
           </h2>
 
-          <div class="dimension-field">
+          <p class="chapter-copy reveal">
+            Una direzione si allarga quando le esperienze
+            smettono di stare separate e iniziano a parlarsi.
+          </p>
 
-            <span>SCIENZE MOTORIE</span>
-            <span>SPORT</span>
-            <span>EDUCAZIONE</span>
-            <span>MANAGEMENT</span>
-            <span>DIGITALE</span>
+        </div>
 
-            <span class="dimension-center">
-              CP
-            </span>
+        <div
+          class="dimensions-visual"
+          aria-hidden="true"
+        >
 
-          </div>
+          <div
+            class="dimension-node"
+            data-label="SCIENZE MOTORIE"
+          ></div>
+
+          <div
+            class="dimension-node"
+            data-label="SPORT"
+          ></div>
+
+          <div
+            class="dimension-node"
+            data-label="EDUCAZIONE"
+          ></div>
+
+          <div
+            class="dimension-node"
+            data-label="MANAGEMENT"
+          ></div>
+
+          <div
+            class="dimension-node"
+            data-label="DIGITALE"
+          ></div>
+
+          <svg
+            class="trajectory trajectory--dimensions"
+            viewBox="0 0 800 620"
+            focusable="false"
+          >
+            <path d="M60 70 C240 100 270 250 400 300 C520 345 610 250 740 80"></path>
+            <path d="M60 520 C240 480 300 350 400 300 C520 245 600 360 740 540"></path>
+            <path d="M80 300 C220 300 300 300 400 300 C530 300 620 300 720 300"></path>
+          </svg>
+
+          <span class="dimensions-center">CP</span>
 
         </div>
 
       </div>
     </section>
 
-    <!-- 03 -->
+
+    <!-- =======================================================
+         03 — PERSONA
+    ======================================================== -->
+
     <section
-      class="chapter chapter--03"
+      class="chapter chapter--navy chapter--03"
       id="03"
       data-section-title="DIETRO OGNI DIREZIONE C'È UNA PERSONA."
+      data-chapter-index="3"
     >
       <div class="chapter-inner chapter-inner--person">
 
-        <div class="chapter-content">
+        <div class="chapter-content chapter-content--person">
 
-          <div class="chapter-number">03 / 11</div>
+          <p class="chapter-number">03</p>
 
-          <h2 class="chapter-title">
-            DIETRO OGNI DIREZIONE
+          <h2 class="chapter-title reveal">
+            DIETRO OGNI DIREZIONE<br>
             C'È UNA PERSONA.
           </h2>
 
-          <div class="person-name">
+          <p class="person-name reveal">
             CESARE PARATORE
-          </div>
+          </p>
 
-          <div class="person-bio">
+          <div class="person-copy reveal">
+
             <p>
-              [Inserire qui il testo biografico già approvato.]
+              Il movimento è stato il punto di partenza.
+              Da lì il percorso si è aperto, ha incontrato
+              lo sport, l'educazione, la progettazione
+              e il digitale.
             </p>
+
+            <p>
+              Oggi queste dimensioni non sono strade separate.
+              Sono parti di un unico modo di osservare,
+              comprendere e costruire.
+            </p>
+
           </div>
 
         </div>
 
-        <figure class="chapter-visual person-photo">
+        <figure class="person-portrait reveal">
           <img
-            src="assets/images/cp-foto.webp"
+            src="/assets/images/cp-foto.webp"
             alt="Cesare Paratore"
             width="753"
             height="941"
@@ -301,90 +436,134 @@
       </div>
     </section>
 
-    <!-- 04 -->
+
+    <!-- =======================================================
+         04 — PERCORSO
+    ======================================================== -->
+
     <section
-      class="chapter chapter--04"
+      class="chapter chapter--light chapter--04"
       id="04"
       data-section-title="IL PERCORSO NON È UNA LINEA."
+      data-chapter-index="4"
     >
-      <div class="chapter-inner">
+      <div class="chapter-inner chapter-inner--path">
 
-        <div class="chapter-content">
+        <div class="chapter-content chapter-content--path">
 
-          <div class="chapter-number">04 / 11</div>
+          <p class="chapter-number">04</p>
 
-          <h2 class="chapter-title">
-            IL PERCORSO
+          <h2 class="chapter-title reveal">
+            IL PERCORSO<br>
             NON È UNA LINEA.
           </h2>
 
+          <p class="chapter-copy reveal">
+            Alcune esperienze aprono una strada.
+            Altre la cambiano.
+            Alcune fanno incontrare direzioni che prima
+            sembravano lontane.
+          </p>
+
+        </div>
+
+        <div
+          class="path-map"
+          aria-hidden="true"
+        >
+
           <svg
-            class="trajectory trajectory--path"
-            viewBox="0 0 1200 700"
-            aria-hidden="true"
+            class="trajectory trajectory--organic"
+            viewBox="0 0 1200 680"
             focusable="false"
           >
-            <path
-              d="M80 600 C180 380 340 580 470 330 S750 100 1120 180"
-            />
+            <path d="M30 560 C180 560 130 370 310 390 C470 410 400 180 570 220 C760 270 650 520 820 500 C980 480 900 130 1170 80"></path>
           </svg>
 
-          <div class="milestones">
-            <span>L-22</span>
-            <span>LM-47</span>
-            <span>EDUCAZIONE</span>
-            <span>SPORT</span>
-            <span>DIDATTICA</span>
-            <span>DIGITALE</span>
-          </div>
+          <span class="path-milestone path-milestone--one">
+            <i></i>
+            <b>SCIENZE MOTORIE</b>
+          </span>
+
+          <span class="path-milestone path-milestone--two">
+            <i></i>
+            <b>SPORT</b>
+          </span>
+
+          <span class="path-milestone path-milestone--three">
+            <i></i>
+            <b>EDUCAZIONE</b>
+          </span>
+
+          <span class="path-milestone path-milestone--four">
+            <i></i>
+            <b>DIDATTICA</b>
+          </span>
+
+          <span class="path-milestone path-milestone--five">
+            <i></i>
+            <b>DIGITALE</b>
+          </span>
 
         </div>
 
       </div>
     </section>
 
-    <!-- 05 -->
+
+    <!-- =======================================================
+         05 — SINTESI
+    ======================================================== -->
+
     <section
-      class="chapter chapter--05"
+      class="chapter chapter--navy chapter--05"
       id="05"
       data-section-title="QUANDO COMPETENZE DIVERSE SI INCONTRANO."
+      data-chapter-index="5"
     >
-      <div class="chapter-inner">
+      <div class="chapter-inner chapter-inner--synthesis">
 
         <div class="chapter-content">
 
-          <div class="chapter-number">05 / 11</div>
+          <p class="chapter-number">05</p>
 
-          <h2 class="chapter-title">
-            QUANDO COMPETENZE DIVERSE
-            SI INCONTRANO,
+          <h2 class="chapter-title reveal">
+            QUANDO COMPETENZE DIVERSE<br>
+            SI INCONTRANO,<br>
             QUALCOSA PRENDE FORMA.
           </h2>
 
-          <div class="synthesis">
+        </div>
 
-            <div class="synthesis-group">
-              <span>SCIENZE MOTORIE</span>
-              <span>SPORT</span>
-              <span>EDUCAZIONE</span>
-              <span>MANAGEMENT</span>
-              <span>DIGITALE</span>
-            </div>
+        <div class="synthesis-stage">
 
-            <div class="synthesis-arrow">↓</div>
+          <div class="synthesis-group synthesis-group--dimensions">
+            <span>SCIENZE MOTORIE</span>
+            <span>SPORT</span>
+            <span>EDUCAZIONE</span>
+            <span>MANAGEMENT</span>
+            <span>DIGITALE</span>
+          </div>
 
-            <div class="synthesis-group synthesis-group--strong">
-              <span>COMPRENDERE</span>
-              <span>PROGETTARE</span>
-              <span>COSTRUIRE</span>
-            </div>
+          <div class="synthesis-arrow" aria-hidden="true">
+            →
+          </div>
 
-            <div class="synthesis-arrow">↓</div>
+          <div class="synthesis-group synthesis-group--verbs">
+            <span>COMPRENDERE</span>
+            <span>PROGETTARE</span>
+            <span>COSTRUIRE</span>
+          </div>
 
-            <div class="synthesis-final">
-              UN'ESIGENZA CONCRETA.
-            </div>
+          <div
+            class="synthesis-arrow synthesis-arrow--last"
+            aria-hidden="true"
+          >
+            →
+          </div>
 
+          <div class="synthesis-result">
+            UN'ESIGENZA CONCRETA.
           </div>
 
         </div>
@@ -392,11 +571,17 @@
       </div>
     </section>
 
-    <!-- 06 — BLOCCO PRESERVATO -->
+
+    <!-- =======================================================
+         06 — BASE REALE DEL LAVORO
+         BLOCCO FISSO
+    ======================================================== -->
+
     <section
       class="home-section home-section--territory chapter chapter--06"
       id="06"
       data-section-title="OGGI SO ANCHE DA DOVE PARTO."
+      data-chapter-index="6"
     >
       <div class="section-inner section-inner--territory">
 
@@ -459,73 +644,118 @@
       </div>
     </section>
 
-    <!-- 07 -->
+
+    <!-- =======================================================
+         07 — PUNTO DI PARTENZA
+    ======================================================== -->
+
     <section
-      class="chapter chapter--07"
+      class="chapter chapter--light chapter--07"
       id="07"
       data-section-title="OGNI PERCORSO COMINCIA DA UN PUNTO."
+      data-chapter-index="7"
     >
-      <div class="chapter-inner">
+      <div class="chapter-inner chapter-inner--question">
 
-        <div class="chapter-content">
+        <div class="question-content">
 
-          <div class="chapter-number">07 / 11</div>
+          <p class="chapter-number">07</p>
 
-          <h2 class="chapter-title">
-            OGNI PERCORSO
+          <p class="question-kicker reveal">
+            DA DOVE SI PARTE?
+          </p>
+
+          <h2 class="chapter-title question-title reveal">
+            OGNI PERCORSO<br>
             COMINCIA DA UN PUNTO.
           </h2>
 
-          <div class="starting-point">
-            <span>DA DOVE SI PARTE?</span>
+          <p class="chapter-copy question-copy reveal">
+            Può essere un'idea.
+            Un'esigenza.
+            Un progetto.
+            Una domanda.
+          </p>
 
-            <div class="starting-point-dot"></div>
+        </div>
 
-            <div class="starting-point-items">
-              <span>MOVIMENTO</span>
-              <span>SPORT</span>
-              <span>EDUCAZIONE</span>
-              <span>PRESENZA DIGITALE</span>
-              <span>MANAGEMENT</span>
-            </div>
-          </div>
-
+        <div
+          class="question-point-field"
+          aria-hidden="true"
+        >
+          <span class="question-point"></span>
+          <span class="question-line"></span>
         </div>
 
       </div>
     </section>
 
-    <!-- 08 -->
+
+    <!-- =======================================================
+         08 — RELAZIONE
+    ======================================================== -->
+
     <section
-      class="chapter chapter--08"
+      class="chapter chapter--navy chapter--08"
       id="08"
       data-section-title="UNA COMPETENZA HA VALORE QUANDO ENTRA IN RELAZIONE."
+      data-chapter-index="8"
     >
-      <div class="chapter-inner">
+      <div class="chapter-inner chapter-inner--relation">
 
         <div class="chapter-content">
 
-          <div class="chapter-number">08 / 11</div>
+          <p class="chapter-number">08</p>
 
-          <h2 class="chapter-title">
-            UNA COMPETENZA
-            HA VALORE
-            QUANDO ENTRA
+          <h2 class="chapter-title reveal">
+            UNA COMPETENZA<br>
+            HA VALORE<br>
+            QUANDO ENTRA<br>
             IN RELAZIONE.
           </h2>
 
-          <div class="relationship">
+        </div>
 
+        <div class="relation-stage">
+
+          <div class="relation-node relation-node--01">
             <span>OBIETTIVO</span>
-            <span>CONTESTO</span>
-            <span>COMPETENZE</span>
-            <span>ESPERIENZA</span>
-            <span>STRUMENTI</span>
-
           </div>
 
-          <div class="relationship-final">
-            comprendere → collegare → costruire
+          <div class="relation-node relation-node--02">
+            <span>CONTESTO</span>
+          </div>
+
+          <div class="relation-node relation-node--03">
+            <span>COMPETENZE</span>
+          </div>
+
+          <div class="relation-node relation-node--04">
+            <span>ESPERIENZA</span>
+          </div>
+
+          <div class="relation-node relation-node--05">
+            <span>STRUMENTI</span>
+          </div>
+
+          <svg
+            class="relation-lines"
+            viewBox="0 0 900 620"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="M160 120 L450 310 L740 150"></path>
+            <path d="M160 500 L450 310 L740 470"></path>
+            <path d="M160 120 L450 310 L160 500"></path>
+            <path d="M740 150 L450 310 L740 470"></path>
+          </svg>
+
+          <div class="relation-conclusion">
+            <span>comprendere</span>
+            <span>→</span>
+            <span>collegare</span>
+            <span>→</span>
+            <span>costruire</span>
           </div>
 
         </div>
@@ -533,92 +763,119 @@
       </div>
     </section>
 
-    <!-- 09 -->
+
+    <!-- =======================================================
+         09 — SOSTANZA
+    ======================================================== -->
+
     <section
-      class="chapter chapter--09"
+      class="chapter chapter--light chapter--09"
       id="09"
       data-section-title="UNA DIREZIONE HA BISOGNO DI SOSTANZA."
+      data-chapter-index="9"
     >
-      <div class="chapter-inner">
+      <div class="chapter-inner chapter-inner--substance">
 
         <div class="chapter-content">
 
-          <div class="chapter-number">09 / 11</div>
+          <p class="chapter-number">09</p>
 
-          <h2 class="chapter-title">
-            UNA DIREZIONE
-            HA BISOGNO
+          <h2 class="chapter-title reveal">
+            UNA DIREZIONE<br>
+            HA BISOGNO<br>
             DI SOSTANZA.
           </h2>
 
-          <div class="evidence-grid">
+          <p class="chapter-copy reveal">
+            Le competenze acquistano valore quando diventano
+            esperienza, metodo e capacità di affrontare
+            un'esigenza concreta.
+          </p>
 
-            <div class="evidence-group">
-              <span class="evidence-label">FORMAZIONE</span>
-              <span>L-22 · 180 CFU</span>
-              <span>LM-47 · 120 CFU</span>
-            </div>
+        </div>
 
-            <div class="evidence-group">
-              <span class="evidence-label">SPORT</span>
-              <span>FIDAL · Istruttore di Atletica Leggera</span>
-              <span>Atleta FIDAL</span>
-            </div>
+        <div class="substance-grid">
 
-            <div class="evidence-group">
-              <span class="evidence-label">EDUCAZIONE</span>
-              <span>Docenza · Educazione motoria</span>
-              <span>Scienze Motorie e Sportive</span>
-            </div>
+          <article class="substance-item reveal">
+            <span class="substance-index">01</span>
+            <h3>OSSERVARE</h3>
+            <p>
+              Capire il punto di partenza prima di decidere
+              dove andare.
+            </p>
+          </article>
 
-            <div class="evidence-group">
-              <span class="evidence-label">DIDATTICA</span>
-              <span>CLIL · coding · tecnologie educative</span>
-            </div>
+          <article class="substance-item reveal">
+            <span class="substance-index">02</span>
+            <h3>COLLEGARE</h3>
+            <p>
+              Mettere in relazione competenze, persone,
+              contesto e strumenti.
+            </p>
+          </article>
 
-            <div class="evidence-group">
-              <span class="evidence-label">DIGITALE</span>
-              <span>Progettazione e realizzazione</span>
-              <span>della presenza ufficiale sul web</span>
-            </div>
+          <article class="substance-item reveal">
+            <span class="substance-index">03</span>
+            <h3>PROGETTARE</h3>
+            <p>
+              Trasformare ciò che emerge in un percorso
+              leggibile e concreto.
+            </p>
+          </article>
 
-          </div>
+          <article class="substance-item reveal">
+            <span class="substance-index">04</span>
+            <h3>COSTRUIRE</h3>
+            <p>
+              Portare la direzione fuori dall'idea
+              e dentro la realtà.
+            </p>
+          </article>
 
         </div>
 
       </div>
     </section>
 
-    <!-- 10 -->
+
+    <!-- =======================================================
+         10 — INCONTRO
+    ======================================================== -->
+
     <section
-      class="chapter chapter--10"
+      class="chapter chapter--light chapter--10"
       id="10"
       data-section-title="UNA DIREZIONE PRENDE SENSO QUANDO INCONTRA QUALCUNO."
+      data-chapter-index="10"
     >
-      <div class="chapter-inner">
+      <div class="chapter-inner chapter-inner--encounter">
 
-        <div class="chapter-content">
+        <div class="chapter-content encounter-content">
 
-          <div class="chapter-number">10 / 11</div>
+          <p class="chapter-number">10</p>
 
-          <h2 class="chapter-title">
-            UNA DIREZIONE
-            PRENDE SENSO
-            QUANDO INCONTRA
+          <h2 class="chapter-title reveal">
+            UNA DIREZIONE<br>
+            PRENDE SENSO<br>
+            QUANDO INCONTRA<br>
             QUALCUNO.
           </h2>
 
-          <div class="encounter-copy">
+          <div class="encounter-copy reveal">
 
             <p>
-              Forse parti da un’idea.
-              <br>
-              Forse da un’esigenza.
-              <br>
-              Forse da una domanda.
+              Forse parti da un'idea.
             </p>
 
             <p>
+              Forse da un'esigenza.
+            </p>
+
+            <p>
+              Forse da una domanda.
+            </p>
+
+            <p class="encounter-emphasis">
               Non serve avere già tutto definito.
             </p>
 
@@ -626,86 +883,124 @@
               Serve un punto da cui cominciare.
             </p>
 
-            <p>
-              Da lì, competenze, esperienza e progettazione
-              possono incontrarsi per costruire un percorso
-              coerente con ciò che vuoi raggiungere.
-            </p>
-
           </div>
 
+        </div>
+
+        <div
+          class="encounter-stage"
+          aria-hidden="true"
+        >
+
           <svg
-            class="trajectory trajectory--encounter"
-            viewBox="0 0 1200 400"
-            aria-hidden="true"
+            class="encounter-trajectories"
+            viewBox="0 0 1200 520"
             focusable="false"
           >
             <path
-              d="M40 300 C300 300 420 80 600 200 C780 320 900 100 1160 100"
+              class="encounter-path encounter-path--cesare"
+              d="M0 100 C250 100 300 220 480 260 C560 278 580 278 600 278"
+            />
+
+            <path
+              class="encounter-path encounter-path--visitor"
+              d="M1200 420 C950 420 900 340 720 300 C640 282 620 278 600 278"
             />
           </svg>
+
+          <span class="encounter-point"></span>
+
+          <span class="encounter-label encounter-label--cesare">
+            CESARE
+          </span>
+
+          <span class="encounter-label encounter-label--visitor">
+            TU
+          </span>
 
         </div>
 
       </div>
     </section>
 
-    <!-- 11 -->
+
+    <!-- =======================================================
+         11 — DIREZIONE
+    ======================================================== -->
+
     <section
-      class="chapter chapter--11"
+      class="chapter chapter--navy chapter--11"
       id="11"
       data-section-title="ALLA FINE, NON SI TRATTA DI AVERE UNA SOLA STRADA."
+      data-chapter-index="11"
     >
-      <div class="chapter-inner">
+      <div class="chapter-inner chapter-inner--final">
 
-        <div class="chapter-content chapter-content--final">
+        <div class="final-opening">
 
-          <div class="chapter-number">11 / 11</div>
+          <p class="chapter-number">11</p>
 
-          <h2 class="chapter-title">
-            ALLA FINE,
-            NON SI TRATTA
+          <p class="final-statement final-statement--one reveal">
+            ALLA FINE,<br>
+            NON SI TRATTA<br>
             DI AVERE UNA SOLA STRADA.
-          </h2>
+          </p>
 
-          <h3 class="chapter-final-statement">
-            SI TRATTA
-            DI SAPERE
+          <p class="final-statement final-statement--two reveal">
+            SI TRATTA<br>
+            DI SAPERE<br>
             DOVE ANDARE.
-          </h3>
+          </p>
 
-          <div class="final-recomposition">
-            <span>SCIENZE MOTORIE</span>
-            <span>SPORT</span>
-            <span>EDUCAZIONE</span>
-            <span>MANAGEMENT</span>
-            <span>DIGITALE</span>
-            <span>ESPERIENZA</span>
-            <span>COMPETENZE</span>
-            <span>OBIETTIVO</span>
-            <span>PERCORSO</span>
-          </div>
+        </div>
 
-          <div class="final-signature">
+        <div class="final-recomposition">
+
+          <span>SCIENZE MOTORIE</span>
+          <span>SPORT</span>
+          <span>EDUCAZIONE</span>
+          <span>MANAGEMENT</span>
+          <span>DIGITALE</span>
+          <span>ESPERIENZA</span>
+          <span>COMPETENZE</span>
+          <span>OBIETTIVO</span>
+          <span>PERCORSO</span>
+
+        </div>
+
+        <div class="final-signature">
+
+          <p class="final-motto">
             <span>MOVIMENTO</span>
             <span aria-hidden="true">/</span>
             <span>CON DIREZIONE.</span>
-          </div>
+          </p>
 
-          <div class="final-cta">
+          <p class="final-question">
+            HAI UN PUNTO DA CUI PARTIRE?
+          </p>
 
-            <p>
-              HAI UN PUNTO DA CUI PARTIRE?
-            </p>
+          <a
+            class="final-cta"
+            href="/contatti/"
+          >
+            PARLIAMONE <span aria-hidden="true">→</span>
+          </a>
 
-            <a href="/contatti/">
-              PARLIAMONE →
-            </a>
+        </div>
 
-          </div>
-
-          <div class="final-trajectory" aria-hidden="true"></div>
-
+        <div
+          class="final-trajectory"
+          aria-hidden="true"
+        >
+          <svg
+            viewBox="0 0 1400 220"
+            preserveAspectRatio="none"
+            focusable="false"
+          >
+            <path d="M0 170 C250 170 390 80 620 110 C850 140 970 50 1170 80 C1270 96 1340 65 1400 20"></path>
+          </svg>
+          <span></span>
         </div>
 
       </div>
@@ -713,13 +1008,17 @@
 
   </main>
 
-  <!-- FOOTER -->
+
+  <!-- =========================================================
+       FOOTER — BLOCCO FISSO
+  ========================================================== -->
+
   <footer class="site-footer">
     <div class="footer-inner">
 
       <div class="footer-mark">
         <img
-          src="assets/images/cp-mark.png"
+          src="/assets/images/cp-mark.png"
           alt=""
           width="72"
           height="72"
@@ -750,7 +1049,15 @@
     </div>
   </footer>
 
-  <!-- JS -->
+
+  <div
+    class="context-cursor"
+    id="context-cursor"
+    aria-hidden="true"
+  >
+    <span class="context-cursor-label">MOVE</span>
+  </div>
+
   <script src="script.js" defer></script>
 
 </body>
