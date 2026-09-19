@@ -1,823 +1,836 @@
-<!doctype html>
-<html lang="it">
-<head>
-  <meta charset="utf-8">
+(() => {
+  "use strict";
 
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#F2EFE8">
-  <meta name="description" content="Cesare Paratore, professionista delle Scienze Motorie e dello Sport, con una formazione che integra competenze motorie, sportive, educative, manageriali e digitali, con base a Partinico e un percorso aperto al territorio e alle collaborazioni online.">
+  /*
+   * ============================================================
+   * CONFIG
+   * ============================================================
+   */
 
-  <title>Cesare Paratore | Scienze Motorie, Sport, Educazione, Management e Digitale - Partinico e oltre</title>
+  const CONFIG = {
+    idleDelay: 45000,
+    loaderFallback: 7000,
+    scrollEase: "smooth"
+  };
 
-  <link rel="canonical" href="https://cesareparatore.github.io/">
 
-  <meta property="og:title" content="Cesare Paratore | Scienze Motorie, Sport, Educazione, Management e Digitale - Partinico e oltre">
-  <meta property="og:description" content="Cesare Paratore, professionista delle Scienze Motorie e dello Sport, con una formazione che integra competenze motorie, sportive, educative, manageriali e digitali, con base a Partinico e un percorso aperto al territorio e alle collaborazioni online.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://cesareparatore.github.io/">
-  <meta property="og:locale" content="it_IT">
-  <meta property="og:image" content="https://cesareparatore.github.io/assets/images/cp-foto.webp">
+  /*
+   * ============================================================
+   * DOM
+   * ============================================================
+   */
 
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Cesare Paratore | Scienze Motorie, Sport, Educazione, Management e Digitale - Partinico e oltre">
-  <meta name="twitter:description" content="Cesare Paratore, professionista delle Scienze Motorie e dello Sport, con una formazione che integra competenze motorie, sportive, educative, manageriali e digitali, con base a Partinico e un percorso aperto al territorio e alle collaborazioni online.">
-  <meta name="twitter:image" content="https://cesareparatore.github.io/assets/images/cp-foto.webp">
+  const body = document.body;
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  const loader = document.getElementById("page-loader");
+  const idleScreen = document.getElementById("idle-screen");
 
-  <link rel="stylesheet" href="css/style.css">
-  <script src="script.js" defer></script>
+  const menu = document.getElementById("site-menu");
+  const menuTrigger = document.getElementById("menu-trigger");
 
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Cesare Paratore",
-    "url": "https://cesareparatore.github.io/",
-    "image": "https://cesareparatore.github.io/assets/images/cp-foto.webp",
-    "jobTitle": "Professionista delle Scienze Motorie e dello Sport",
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": "Partinico",
-      "addressRegion": "PA",
-      "addressCountry": "IT"
+  const progressCurrent = document.getElementById("progress-current");
+  const progressFill = document.getElementById("progress-fill");
+  const progressPoint = document.getElementById("progress-point");
+
+  const previousSection = document.getElementById("previous-section");
+  const previousSectionLabel = document.getElementById("previous-section-label");
+
+  const nextSection = document.getElementById("next-section");
+  const nextSectionLabel = document.getElementById("next-section-label");
+
+  const sections = Array.from(
+    document.querySelectorAll(".home-section")
+  );
+
+
+  /*
+   * ============================================================
+   * STATE
+   * ============================================================
+   */
+
+  let activeSectionIndex = 0;
+  let menuOpen = false;
+  let idleActive = false;
+  let loaderFinished = false;
+
+  let idleTimer = null;
+
+  let lastScrollY = window.scrollY;
+  let ticking = false;
+
+  let previousBodyOverflow = "";
+  let lastFocusedElement = null;
+
+
+  /*
+   * ============================================================
+   * HELPERS
+   * ============================================================
+   */
+
+  const prefersReducedMotion = () =>
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+
+  const clamp = (value, min, max) =>
+    Math.min(Math.max(value, min), max);
+
+
+  const getSectionLabel = (section) =>
+    section?.dataset?.shortTitle ||
+    section?.dataset?.sectionTitle ||
+    "";
+
+
+  const getSectionTitle = (section) =>
+    section?.dataset?.sectionTitle || "";
+
+
+  /*
+   * ============================================================
+   * LOADER
+   * ============================================================
+   */
+
+  function finishLoader() {
+    if (loaderFinished) return;
+
+    loaderFinished = true;
+
+    if (!loader) return;
+
+    loader.classList.add("is-hidden");
+
+    window.setTimeout(() => {
+      loader.setAttribute("aria-hidden", "true");
+      resetIdleTimer();
+    }, prefersReducedMotion() ? 100 : 1100);
+  }
+
+
+  function startLoader() {
+    if (!loader) {
+      loaderFinished = true;
+      resetIdleTimer();
+      return;
+    }
+
+    const fallbackTimer = window.setTimeout(
+      finishLoader,
+      CONFIG.loaderFallback
+    );
+
+    const onLoad = () => {
+      window.clearTimeout(fallbackTimer);
+
+      if (prefersReducedMotion()) {
+        window.setTimeout(finishLoader, 250);
+      } else {
+        /*
+         * The loader itself contains the long cinematic sequence.
+         * We deliberately wait before opening the page.
+         */
+        window.setTimeout(finishLoader, 3400);
+      }
+    };
+
+    if (document.readyState === "complete") {
+      onLoad();
+    } else {
+      window.addEventListener("load", onLoad, {
+        once: true
+      });
     }
   }
-  </script>
 
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Cesare Paratore",
-    "url": "https://cesareparatore.github.io/"
+
+  /*
+   * ============================================================
+   * SECTION NAVIGATION
+   * ============================================================
+   */
+
+  function updateHeader(index) {
+    if (!sections.length) return;
+
+    const section = sections[index];
+
+    if (!section) return;
+
+    const total = sections.length;
+
+    const progress =
+      total <= 1
+        ? 0
+        : index / (total - 1);
+
+    const percent = progress * 100;
+
+    progressCurrent.textContent =
+      getSectionTitle(section);
+
+    progressFill.style.width =
+      `${percent}%`;
+
+    progressPoint.style.left =
+      `${percent}%`;
+
+    /*
+     * Previous
+     */
+
+    if (index > 0) {
+      const previous = sections[index - 1];
+
+      previousSection.classList.remove("is-disabled");
+      previousSection.setAttribute("aria-hidden", "false");
+      previousSection.removeAttribute("tabindex");
+
+      previousSection.href =
+        `#${previous.id}`;
+
+      previousSectionLabel.textContent =
+        getSectionLabel(previous);
+
+      previousSection.setAttribute(
+        "aria-label",
+        `Vai a ${getSectionTitle(previous)}`
+      );
+    } else {
+      previousSection.classList.add("is-disabled");
+      previousSection.setAttribute("aria-hidden", "true");
+      previousSection.setAttribute("tabindex", "-1");
+      previousSection.href = "#01";
+      previousSectionLabel.textContent = "";
+    }
+
+    /*
+     * Next
+     */
+
+    if (index < total - 1) {
+      const next = sections[index + 1];
+
+      nextSection.classList.remove("is-disabled");
+      nextSection.href =
+        `#${next.id}`;
+
+      nextSectionLabel.textContent =
+        getSectionLabel(next);
+
+      nextSection.setAttribute(
+        "aria-label",
+        `Vai a ${getSectionTitle(next)}`
+      );
+    } else {
+      nextSection.classList.add("is-disabled");
+      nextSection.href = "#11";
+      nextSectionLabel.textContent = "";
+    }
+
+    activeSectionIndex = index;
   }
-  </script>
-</head>
-
-<body>
-
-  <!-- =========================================================
-       LOADER
-  ========================================================== -->
-  <div class="page-loader" id="page-loader" aria-hidden="true">
-    <div class="page-loader-inner">
-      <img
-        class="loader-mark"
-        src="assets/images/cp-mark.png"
-        alt=""
-        width="72"
-        height="72"
-      >
-
-      <div class="loader-trajectory" aria-hidden="true">
-        <span class="loader-point"></span>
-        <span class="loader-line"></span>
-      </div>
-
-      <p class="loader-motto">
-        <span>MOVIMENTO</span>
-        <span aria-hidden="true">/</span>
-        <span>CON DIREZIONE.</span>
-      </p>
-
-      <p class="loader-signature">CESARE PARATORE</p>
-    </div>
-  </div>
-
-
-  <!-- =========================================================
-       IDLE SCREEN
-  ========================================================== -->
-  <div
-    class="idle-screen"
-    id="idle-screen"
-    aria-hidden="true"
-  >
-    <div class="idle-screen__inner">
-
-      <img
-        class="idle-screen__mark"
-        src="assets/images/cp-mark.png"
-        alt=""
-        width="72"
-        height="72"
-      >
-
-      <div class="idle-screen__trajectory" aria-hidden="true">
-        <span class="idle-screen__point"></span>
-        <span class="idle-screen__line"></span>
-      </div>
-
-      <p class="idle-screen__motto">
-        <span>MOVIMENTO</span>
-        <span aria-hidden="true">/</span>
-        <span>CON DIREZIONE.</span>
-      </p>
-
-      <p class="idle-screen__signature">CESARE PARATORE</p>
-      <p class="idle-screen__return">MUOVI PER CONTINUARE</p>
-
-    </div>
-  </div>
-
-
-  <!-- =========================================================
-       HEADER
-  ========================================================== -->
-  <header class="site-header">
-
-    <a
-      class="site-brand magnetic"
-      href="#01"
-      aria-label="Cesare Paratore — torna all'inizio"
-    >
-      <img
-        src="assets/images/cp-mark.png"
-        alt=""
-        width="48"
-        height="48"
-      >
-    </a>
-
-    <div
-      class="wow-progress"
-      aria-label="Navigazione del percorso"
-    >
-      <div
-        class="progress-label"
-        id="progress-current"
-        aria-live="polite"
-      >
-        IL MOVIMENTO È SOLO L'INIZIO.
-      </div>
-
-      <div
-        class="progress-track"
-        aria-hidden="true"
-      >
-        <span
-          class="progress-fill"
-          id="progress-fill"
-        ></span>
-
-        <span
-          class="progress-point"
-          id="progress-point"
-        ></span>
-      </div>
-
-      <div class="section-jump">
-
-        <a
-          id="previous-section"
-          class="section-jump-link section-jump-link--previous is-disabled"
-          href="#01"
-          aria-label="Sezione precedente"
-          aria-hidden="true"
-          tabindex="-1"
-        >
-          <span aria-hidden="true">←</span>
-          <span id="previous-section-label"></span>
-        </a>
-
-        <a
-          id="next-section"
-          class="section-jump-link section-jump-link--next"
-          href="#02"
-          aria-label="Vai alla sezione successiva"
-        >
-          <span id="next-section-label">LA DOMANDA</span>
-          <span
-            aria-hidden="true"
-            class="section-jump-arrow"
-          >→</span>
-        </a>
-
-      </div>
-    </div>
-
-    <button
-      class="menu-trigger magnetic"
-      id="menu-trigger"
-      type="button"
-      aria-expanded="false"
-      aria-controls="site-menu"
-      aria-label="Apri menu"
-    >
-      <span class="menu-trigger-label">MENU</span>
-
-      <span
-        class="menu-trigger-icon"
-        aria-hidden="true"
-      >
-        <span></span>
-        <span></span>
-      </span>
-    </button>
-
-  </header>
-
-
-  <!-- =========================================================
-       FULL SCREEN MENU
-  ========================================================== -->
-  <aside
-    class="site-menu"
-    id="site-menu"
-    aria-hidden="true"
-  >
-    <div class="site-menu__inner">
-
-      <div class="site-menu__header">
-        <span class="site-menu__eyebrow">MOVIMENTO / CON DIREZIONE.</span>
-        <span class="site-menu__close-hint">ESC</span>
-      </div>
-
-      <nav
-        class="site-menu__nav"
-        aria-label="Menu principale"
-      >
-        <a href="#03">CHI SONO</a>
-        <a href="#04">SPORT</a>
-        <a href="#04">SCIENZE MOTORIE</a>
-        <a href="#04">EDUCAZIONE</a>
-        <a href="#04">MANAGMENT</a>
-        <a href="#04">DIGITALE</a>
-        <a href="#06">TERRITORIO</a>
-        <a href="#10">CONTATTI</a>
-      </nav>
-
-      <div class="site-menu__footer">
-        <span>CESARE PARATORE</span>
-        <span>PARTINICO / ONLINE</span>
-      </div>
-
-    </div>
-  </aside>
-
-
-  <main id="main-content">
-
-
-    <!-- =======================================================
-         01
-    ======================================================== -->
-    <section
-      class="home-section home-section--hero"
-      id="01"
-      data-section-title="IL MOVIMENTO È SOLO L'INIZIO."
-      data-short-title="L'INIZIO"
-    >
-      <div class="section-sticky hero-sticky">
-
-        <div class="hero-copy">
-          <p class="eyebrow reveal">01</p>
-
-          <h1 class="hero-title">
-            <span class="hero-title-line">IL MOVIMENTO</span>
-            <span class="hero-title-line">È SOLO L'INIZIO.</span>
-          </h1>
-
-          <p class="hero-subtitle reveal">
-            Il punto da cui tutto è cominciato.
-          </p>
-        </div>
-
-        <div
-          class="hero-trajectory"
-          aria-hidden="true"
-        >
-          <span class="trajectory-point"></span>
-          <span class="trajectory-line"></span>
-        </div>
-
-      </div>
-    </section>
-
-
-    <!-- =======================================================
-         02
-    ======================================================== -->
-    <section
-      class="home-section home-section--question"
-      id="02"
-      data-section-title="LA DOMANDA È CAMBIATA."
-      data-short-title="LA DOMANDA"
-    >
-      <div class="section-sticky question-sticky">
-
-        <div class="question-copy">
-          <p class="question-lead">
-            <span class="question-word question-word--accent">È</span>
-            <span class="question-word">LA DOMANDA</span>
-          </p>
-
-          <p class="question-body reveal">
-            A volte il movimento non basta.
-            <br>
-            Serve capire dove porta.
-          </p>
-        </div>
-
-        <div
-          class="question-line"
-          aria-hidden="true"
-        ></div>
-
-      </div>
-    </section>
-
-
-    <!-- =======================================================
-         03
-    ======================================================== -->
-    <section
-      class="home-section home-section--origin"
-      id="03"
-      data-section-title="UNA STRADA NON ERA ABBASTANZA."
-      data-short-title="LA STRADA"
-    >
-      <div class="section-inner section-inner--origin">
-
-        <div class="origin-copy">
-
-          <div class="section-title reveal">
-            UNA STRADA NON ERA ABBASTANZA.
-          </div>
-
-          <p class="origin-lead reveal">
-            Prima ancora del movimento,
-            c'era la curiosità.
-          </p>
-
-          <p class="origin-text reveal">
-            Una storia costruita per strati:
-            digitale, movimento, sport,
-            Scienze Motorie, educazione,
-            management.
-          </p>
-
-        </div>
-
-        <div class="origin-image reveal">
-          <img
-            src="assets/images/cp-foto.webp"
-            alt="Cesare Paratore"
-            loading="lazy"
-            decoding="async"
-          >
-        </div>
-
-      </div>
-    </section>
-
-
-    <!-- =======================================================
-         04
-    ======================================================== -->
-    <section
-      class="home-section home-section--roads"
-      id="04"
-      data-section-title="POI HO CAPITO CHE NON ERANO CINQUE STRADE."
-      data-short-title="CINQUE STRADE"
-    >
-      <div class="section-sticky roads-sticky">
-
-        <div class="roads-heading">
-          <div class="section-title">
-            POI HO CAPITO CHE NON ERANO
-            <br>
-            CINQUE STRADE.
-          </div>
-        </div>
-
-        <div
-          class="roads-stage"
-          aria-hidden="true"
-        >
-
-          <div class="road road--one">
-            <span class="road-label">SPORT</span>
-            <span class="road-line"></span>
-          </div>
-
-          <div class="road road--two">
-            <span class="road-label">SCIENZE MOTORIE</span>
-            <span class="road-line"></span>
-          </div>
-
-          <div class="road road--three">
-            <span class="road-label">EDUCAZIONE</span>
-            <span class="road-line"></span>
-          </div>
-
-          <div class="road road--four">
-            <span class="road-label">MANAGMENT</span>
-            <span class="road-line"></span>
-          </div>
-
-          <div class="road road--five">
-            <span class="road-label">DIGITALE</span>
-            <span class="road-line"></span>
-          </div>
-
-          <div class="roads-nucleus">
-            <img
-              src="assets/images/cp-mark.png"
-              alt=""
-              width="76"
-              height="76"
-            >
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-
-
-    <!-- =======================================================
-         05
-    ======================================================== -->
-    <section
-      class="home-section home-section--pause"
-      id="05"
-      data-section-title="E LE CONNESSIONI, A VOLTE, PASSANO ANCHE DA UNA PAUSA."
-      data-short-title="UNA PAUSA"
-    >
-      <div class="section-sticky pause-sticky">
-
-        <div class="pause-copy">
-
-          <div class="section-title reveal">
-            E LE CONNESSIONI,
-            <br>
-            A VOLTE,
-            <br>
-            PASSANO ANCHE DA UNA PAUSA.
-          </div>
-
-          <div
-            class="pause-mark"
-            aria-hidden="true"
-          >
-            <span></span>
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-
-
-    <!-- =======================================================
-         06
-    ======================================================== -->
-    <section
-      class="home-section home-section--territory"
-      id="06"
-      data-section-title="OGGI SO ANCHE DA DOVE PARTO."
-      data-short-title="DA DOVE PARTO"
-    >
-      <div class="section-inner section-inner--territory">
-
-        <div class="territory-copy">
-
-          <div class="section-title reveal">
-            OGGI SO ANCHE DA DOVE PARTO.
-          </div>
-
-          <div class="territory-location reveal">
-
-            <a
-              class="territory-card-place"
-              href="#territorio"
-            >
-              PARTINICO
-            </a>
-
-            <span class="territory-location-name">
-              Stadio Comunale "Giuseppe La Franca"
-            </span>
-
-          </div>
-
-          <div class="territory-card reveal">
-
-            <span class="territory-card-title">
-              DA QUI, NON SOLO QUI.
-            </span>
-
-            <p>
-              È qui che ha la sua base il mio lavoro.
-              In presenza, per chi parte da qui e per chi arriva
-              dai <a class="territory-inline-link" href="#territorio">territori vicini</a>.
-              Online, quando la distanza non deve essere un limite.
-            </p>
-
-            <p class="territory-card-note">
-              Perché una base non è un confine.
-              È il punto che ti permette di sapere sempre
-              da dove stai partendo.
-            </p>
-
-          </div>
-
-        </div>
-
-        <div class="territory-map reveal">
-
-          <iframe
-            title="Stadio Comunale Giuseppe La Franca, Partinico — vista satellitare"
-            src="https://www.google.com/maps?q=Stadio+Comunale+Giuseppe+La+Franca%2C+Viale+Aldo+Moro%2C+Partinico%2C+PA%2C+Italy&layer=satellite&output=embed"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-            allowfullscreen
-          ></iframe>
-
-        </div>
-
-      </div>
-    </section>
-
-
-    <!-- =======================================================
-         07
-    ======================================================== -->
-    <section
-      class="home-section home-section--continue"
-      id="07"
-      data-section-title="DA QUI, IL PERCORSO CONTINUA."
-      data-short-title="CONTINUA"
-    >
-      <div class="section-sticky continue-sticky">
-
-        <div class="continue-copy">
-
-          <div class="section-title">
-            DA QUI,
-            <br>
-            IL PERCORSO CONTINUA.
-          </div>
-
-        </div>
-
-        <div
-          class="continue-trajectory"
-          aria-hidden="true"
-        >
-          <span class="continue-point"></span>
-          <span class="continue-line"></span>
-        </div>
-
-      </div>
-    </section>
-
-
-    <!-- =======================================================
-         08
-    ======================================================== -->
-    <section
-      class="home-section home-section--form"
-      id="08"
-      data-section-title="ORA QUESTA DIREZIONE PRENDE FORMA."
-      data-short-title="PRENDE FORMA"
-    >
-      <div class="section-sticky form-sticky">
-
-        <div class="form-heading">
-          <div class="section-title">
-            ORA QUESTA DIREZIONE
-            <br>
-            PRENDE FORMA.
-          </div>
-        </div>
-
-        <div
-          class="form-trajectory"
-          aria-hidden="true"
-        >
-          <span class="form-trajectory-point"></span>
-          <span class="form-trajectory-line"></span>
-        </div>
-
-        <div class="form-words" aria-label="Direzioni">
-
-          <span class="form-word form-word--one">MOVIMENTO</span>
-          <span class="form-word form-word--two">OBIETTIVO</span>
-          <span class="form-word form-word--three">PRESTAZIONE</span>
-          <span class="form-word form-word--four">PROGETTO</span>
-          <span class="form-word form-word--five">SVILUPPO</span>
-
-        </div>
-
-      </div>
-    </section>
-
-
-    <!-- =======================================================
-         09
-    ======================================================== -->
-    <section
-      class="home-section home-section--encounter"
-      id="09"
-      data-section-title="FORSE È QUI CHE LA STORIA CAMBIA."
-      data-short-title="CAMBIA"
-    >
-      <div class="section-sticky encounter-sticky">
-
-        <div class="encounter-title">
-          <div class="section-title">
-            FORSE È QUI
-            <br>
-            CHE LA STORIA CAMBIA.
-          </div>
-        </div>
-
-        <div class="encounter-text encounter-text--first">
-          NON TUTTI I MOVIMENTI
-          <br>
-          PRENDONO LA STESSA DIREZIONE.
-        </div>
-
-        <div class="encounter-text encounter-text--second">
-          MA POSSONO INCONTRARSI
-          <br>
-          NELLO STESSO PUNTO.
-        </div>
-
-        <div
-          class="encounter-stage"
-          aria-hidden="true"
-        >
-
-          <span class="encounter-line encounter-line--a"></span>
-          <span class="encounter-line encounter-line--b"></span>
-          <span class="encounter-meeting-point"></span>
-
-        </div>
-
-      </div>
-    </section>
-
-
-    <!-- =======================================================
-         10
-    ======================================================== -->
-    <section
-      class="home-section home-section--start"
-      id="10"
-      data-section-title="PARTIAMO DA QUELLO."
-      data-short-title="PARTIAMO"
-    >
-      <div class="section-sticky start-sticky">
-
-        <div class="start-trajectory" aria-hidden="true">
-          <span></span>
-        </div>
-
-        <div class="start-copy">
-
-          <div class="section-title">
-            PARTIAMO
-            <br>
-            DA QUELLO.
-          </div>
-
-          <p class="start-statement">
-            DA UN PUNTO
-            <br>
-            PUÒ NASCERE UNA DIREZIONE.
-          </p>
-
-          <a
-            class="start-cta magnetic"
-            href="mailto:"
-            aria-label="Inizia un percorso"
-          >
-            <span>INIZIAMO</span>
-            <span aria-hidden="true">→</span>
-          </a>
-
-        </div>
-
-      </div>
-    </section>
-
-
-    <!-- =======================================================
-         11 — EPILOGO
-    ======================================================== -->
-    <section
-      class="home-section home-section--epilogue"
-      id="11"
-      data-section-title="MOVIMENTO / CON DIREZIONE."
-      data-short-title="EPILOGO"
-    >
-      <div class="section-sticky epilogue-sticky">
-
-        <div class="epilogue-mark">
-          <img
-            src="assets/images/cp-mark.png"
-            alt=""
-            width="72"
-            height="72"
-            loading="lazy"
-          >
-        </div>
-
-        <p class="epilogue-motto">
-          <span>MOVIMENTO</span>
-          <span aria-hidden="true">/</span>
-          <span>CON DIREZIONE.</span>
-        </p>
-
-        <p class="epilogue-signature">
-          CESARE PARATORE
-        </p>
-
-      </div>
-    </section>
-
-
-    <!-- =======================================================
-         FIDAL / SOURCE REFERENCES
-    ======================================================== -->
-    <section
-      class="credential-strip"
-      id="territorio"
-      aria-label="Riferimenti"
-    >
-      <div class="credential-strip__inner">
-
-        <div class="credential-strip__label">
-          RIFERIMENTI
-        </div>
-
-        <div class="credential-strip__links">
-
-          <a
-            href="https://www.fidal.it/result.php?cerca=tessera&id_sito=1"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="credential-link"
-          >
-            <span>ATLETA</span>
-            <span aria-hidden="true">↗</span>
-          </a>
-
-          <a
-            href="https://www.fidal.it/content/Albo-dei-Tecnici/158961"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="credential-link"
-          >
-            <span>TECNICO</span>
-            <span aria-hidden="true">↗</span>
-          </a>
-
-        </div>
-
-      </div>
-    </section>
-
-  </main>
-
-
-  <!-- =========================================================
-       FOOTER
-  ========================================================== -->
-  <footer class="site-footer">
-
-    <div class="footer-inner">
-
-      <div class="footer-mark">
-        <img
-          src="assets/images/cp-mark.png"
-          alt=""
-          width="72"
-          height="72"
-          loading="lazy"
-          decoding="async"
-        >
-      </div>
-
-      <p class="footer-motto">
-        <span>MOVIMENTO</span>
-        <span aria-hidden="true">/</span>
-        <span>CON DIREZIONE.</span>
-      </p>
-
-      <p class="footer-signature">
-        CESARE PARATORE
-      </p>
-
-    </div>
-
-  </footer>
-
-</body>
-</html>
+
+
+  /*
+   * ============================================================
+   * INTERSECTION OBSERVER
+   * ============================================================
+   */
+
+  const sectionObserver = new IntersectionObserver(
+    entries => {
+      const visibleEntries = entries
+        .filter(entry => entry.isIntersecting)
+        .sort(
+          (a, b) =>
+            b.intersectionRatio -
+            a.intersectionRatio
+        );
+
+      if (!visibleEntries.length) return;
+
+      const section = visibleEntries[0].target;
+      const index = sections.indexOf(section);
+
+      if (index === -1) return;
+
+      updateHeader(index);
+    },
+    {
+      root:null,
+      threshold:[
+        0.2,
+        0.35,
+        0.5,
+        0.65
+      ],
+      rootMargin:"-10% 0px -10% 0px"
+    }
+  );
+
+
+  sections.forEach(section => {
+    sectionObserver.observe(section);
+  });
+
+
+  /*
+   * ============================================================
+   * CHAPTER PROGRESS
+   * ============================================================
+   */
+
+  function updateChapterProgress() {
+    if (!sections.length) return;
+
+    const viewportHeight =
+      window.innerHeight;
+
+    const scrollY =
+      window.scrollY;
+
+    sections.forEach(section => {
+
+      const rect =
+        section.getBoundingClientRect();
+
+      const sectionTop =
+        scrollY + rect.top;
+
+      const sectionHeight =
+        Math.max(
+          section.offsetHeight,
+          viewportHeight
+        );
+
+      const rawProgress =
+        (scrollY - sectionTop) /
+        Math.max(
+          sectionHeight - viewportHeight,
+          1
+        );
+
+      const progress =
+        clamp(rawProgress, 0, 1);
+
+      section.style.setProperty(
+        "--chapter-progress",
+        progress.toFixed(4)
+      );
+    });
+
+    lastScrollY = scrollY;
+    ticking = false;
+  }
+
+
+  function requestScrollUpdate() {
+    if (ticking) return;
+
+    ticking = true;
+
+    window.requestAnimationFrame(
+      updateChapterProgress
+    );
+  }
+
+
+  window.addEventListener(
+    "scroll",
+    requestScrollUpdate,
+    {
+      passive:true
+    }
+  );
+
+  window.addEventListener(
+    "resize",
+    requestScrollUpdate
+  );
+
+  requestScrollUpdate();
+
+
+  /*
+   * ============================================================
+   * ANCHOR NAVIGATION
+   * ============================================================
+   */
+
+  function scrollToTarget(target) {
+    if (!target) return;
+
+    target.scrollIntoView({
+      behavior:
+        prefersReducedMotion()
+          ? "auto"
+          : CONFIG.scrollEase,
+      block:"start"
+    });
+  }
+
+
+  document.addEventListener(
+    "click",
+    event => {
+
+      const link =
+        event.target.closest(
+          'a[href^="#"]'
+        );
+
+      if (!link) return;
+
+      const href =
+        link.getAttribute("href");
+
+      if (
+        !href ||
+        href === "#" ||
+        href === "#territorio"
+      ) {
+        return;
+      }
+
+      const target =
+        document.querySelector(href);
+
+      if (!target) return;
+
+      event.preventDefault();
+
+      if (menuOpen) {
+        closeMenu();
+      }
+
+      scrollToTarget(target);
+    }
+  );
+
+
+  /*
+   * ============================================================
+   * MENU
+   * ============================================================
+   */
+
+  function getFocusableMenuElements() {
+    return Array.from(
+      menu.querySelectorAll(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )
+    );
+  }
+
+
+  function lockBodyScroll() {
+    previousBodyOverflow =
+      body.style.overflow;
+
+    body.style.overflow = "hidden";
+  }
+
+
+  function unlockBodyScroll() {
+    body.style.overflow =
+      previousBodyOverflow;
+  }
+
+
+  function openMenu() {
+    if (menuOpen) return;
+
+    lastFocusedElement =
+      document.activeElement;
+
+    menuOpen = true;
+
+    body.classList.add("is-menu-open");
+
+    lockBodyScroll();
+
+    menu.classList.add("is-open");
+
+    menu.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
+    menuTrigger.setAttribute(
+      "aria-expanded",
+      "true"
+    );
+
+    menuTrigger.setAttribute(
+      "aria-label",
+      "Chiudi menu"
+    );
+
+    const focusables =
+      getFocusableMenuElements();
+
+    if (focusables.length) {
+      window.setTimeout(() => {
+        focusables[0].focus();
+      }, 250);
+    }
+  }
+
+
+  function closeMenu() {
+    if (!menuOpen) return;
+
+    menuOpen = false;
+
+    body.classList.remove("is-menu-open");
+
+    unlockBodyScroll();
+
+    menu.classList.remove("is-open");
+
+    menu.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    menuTrigger.setAttribute(
+      "aria-expanded",
+      "false"
+    );
+
+    menuTrigger.setAttribute(
+      "aria-label",
+      "Apri menu"
+    );
+
+    if (
+      lastFocusedElement &&
+      typeof lastFocusedElement.focus === "function"
+    ) {
+      window.setTimeout(() => {
+        lastFocusedElement.focus();
+      }, 250);
+    }
+  }
+
+
+  menuTrigger.addEventListener(
+    "click",
+    () => {
+      if (menuOpen) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    }
+  );
+
+
+  document.addEventListener(
+    "keydown",
+    event => {
+
+      if (event.key === "Escape") {
+
+        if (menuOpen) {
+          closeMenu();
+          return;
+        }
+
+        if (idleActive) {
+          exitIdle();
+        }
+      }
+
+      if (
+        menuOpen &&
+        event.key === "Tab"
+      ) {
+
+        const focusables =
+          getFocusableMenuElements();
+
+        if (!focusables.length) return;
+
+        const first =
+          focusables[0];
+
+        const last =
+          focusables[focusables.length - 1];
+
+        if (
+          event.shiftKey &&
+          document.activeElement === first
+        ) {
+          event.preventDefault();
+          last.focus();
+        } else if (
+          !event.shiftKey &&
+          document.activeElement === last
+        ) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    }
+  );
+
+
+  /*
+   * ============================================================
+   * MAGNETIC ELEMENTS
+   * ============================================================
+   */
+
+  function initMagnetic() {
+
+    if (
+      prefersReducedMotion() ||
+      window.matchMedia("(pointer:coarse)").matches
+    ) {
+      return;
+    }
+
+    const elements =
+      document.querySelectorAll(
+        ".magnetic"
+      );
+
+    elements.forEach(element => {
+
+      element.addEventListener(
+        "pointermove",
+        event => {
+
+          const rect =
+            element.getBoundingClientRect();
+
+          const x =
+            event.clientX -
+            (rect.left + rect.width / 2);
+
+          const y =
+            event.clientY -
+            (rect.top + rect.height / 2);
+
+          const strength = 0.12;
+
+          element.style.setProperty(
+            "--magnetic-x",
+            `${x * strength}px`
+          );
+
+          element.style.setProperty(
+            "--magnetic-y",
+            `${y * strength}px`
+          );
+        }
+      );
+
+      element.addEventListener(
+        "pointerleave",
+        () => {
+          element.style.setProperty(
+            "--magnetic-x",
+            "0px"
+          );
+
+          element.style.setProperty(
+            "--magnetic-y",
+            "0px"
+          );
+        }
+      );
+    });
+  }
+
+
+  /*
+   * ============================================================
+   * TEMPORARY PHOTO TRANSITION BLUR
+   *
+   * The stable state is ALWAYS blur(0).
+   * No permanent blur.
+   * ============================================================
+   */
+
+  function initImageTransitions() {
+
+    const images =
+      document.querySelectorAll(
+        ".origin-image img"
+      );
+
+    images.forEach(image => {
+
+      image.addEventListener(
+        "load",
+        () => {
+          image.style.filter = "blur(0)";
+        }
+      );
+
+      image.style.filter = "blur(0)";
+    });
+  }
+
+
+  /*
+   * ============================================================
+   * IDLE STANDBY
+   * ============================================================
+   */
+
+  function clearIdleTimer() {
+    if (!idleTimer) return;
+
+    window.clearTimeout(idleTimer);
+    idleTimer = null;
+  }
+
+
+  function resetIdleTimer() {
+
+    clearIdleTimer();
+
+    if (
+      !loaderFinished ||
+      menuOpen ||
+      idleActive
+    ) {
+      return;
+    }
+
+    idleTimer =
+      window.setTimeout(
+        enterIdle,
+        CONFIG.idleDelay
+      );
+  }
+
+
+  function enterIdle() {
+
+    if (
+      !loaderFinished ||
+      menuOpen ||
+      idleActive
+    ) {
+      return;
+    }
+
+    idleActive = true;
+
+    body.classList.add("is-idle");
+
+    idleScreen.classList.add(
+      "is-active"
+    );
+
+    idleScreen.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+  }
+
+
+  function exitIdle() {
+
+    if (!idleActive) return;
+
+    idleActive = false;
+
+    body.classList.remove("is-idle");
+
+    idleScreen.classList.remove(
+      "is-active"
+    );
+
+    idleScreen.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    /*
+     * No scroll restoration is needed because the standby
+     * screen is fixed over the document and never changes
+     * scrollTop.
+     */
+
+    resetIdleTimer();
+  }
+
+
+  const interactionEvents = [
+    "pointerdown",
+    "pointermove",
+    "touchstart",
+    "wheel",
+    "scroll",
+    "keydown"
+  ];
+
+
+  interactionEvents.forEach(
+    eventName => {
+
+      window.addEventListener(
+        eventName,
+        () => {
+
+          if (idleActive) {
+            exitIdle();
+          } else {
+            resetIdleTimer();
+          }
+
+        },
+        {
+          passive:
+            eventName !== "keydown"
+        }
+      );
+
+    }
+  );
+
+
+  /*
+   * ============================================================
+   * INITIAL STATE
+   * ============================================================
+   */
+
+  if (sections.length) {
+    updateHeader(0);
+  }
+
+  initMagnetic();
+  initImageTransitions();
+  startLoader();
+
+
+  /*
+   * ============================================================
+   * RE-INITIALIZE IDLE AFTER VISIBILITY RETURN
+   * ============================================================
+   */
+
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+
+      if (
+        document.visibilityState === "visible"
+      ) {
+        resetIdleTimer();
+      } else {
+        clearIdleTimer();
+      }
+
+    }
+  );
+
+})();
