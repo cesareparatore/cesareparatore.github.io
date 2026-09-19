@@ -1,38 +1,31 @@
 /* =========================================================
    CESARE PARATORE
    MOVIMENTO / CON DIREZIONE.
-   MASTER INTERACTION SYSTEM — 3.1
+   MASTER INTERACTION SYSTEM — 4.0
    ========================================================= */
 
 (() => {
   "use strict";
 
-  /* =======================================================
-     PROGRESSIVE ENHANCEMENT — FIRST THING
-     ======================================================= */
-
-  const html = document.documentElement;
-
-  html.classList.add("js");
-
-  /* =======================================================
-     CONFIG
-     ======================================================= */
+  /*
+   * Progressive enhancement:
+   * viene applicato immediatamente, prima dell'inizializzazione
+   * DOMContentLoaded, così html.js è già disponibile quando
+   * il CSS viene valutato.
+   */
+  document.documentElement.classList.add("js");
 
   const CONFIG = {
     loaderMinimumTime: 650,
     loaderMaximumWait: 3500,
-    loaderRemoveDelay: 800,
 
     revealThreshold: 0.12,
-    revealRootMargin: "0px 0px -8% 0px",
 
     cursorLerp: 0.16,
 
     resizeDebounce: 180,
 
     scrollNavigationOffset: 18,
-
     transitionDuration: 500,
 
     trajectoryLerp: 0.085,
@@ -41,44 +34,35 @@
     magneticStrength: 0.12,
     magneticRadius: 90,
 
+    standbyDelay: 30000,
+
     activeSectionReference: 0.52,
 
-    hashNavigationDelay: 0
+    focusDelay: 120
   };
 
-  /* =======================================================
-     STATE
-     ======================================================= */
-
   const state = {
-    initialized: false,
-
     loaded: false,
 
     menuOpen: false,
+    standby: false,
 
     activeIndex: 0,
 
     reducedMotion: false,
-
     finePointer: false,
 
     resizeTimer: null,
+    standbyTimer: null,
 
     loaderTimer: null,
 
-    loaderRemovalTimer: null,
-
-    transitionTimer: null,
-
     rafId: null,
-
     animationRunning: false,
 
     scrollTicking: false,
 
-    transitionInProgress: false,
-
+    standbyReturnFocus: null,
     menuReturnFocus: null,
 
     pointer: {
@@ -94,73 +78,40 @@
     trajectory: {
       progress: 0,
       targetProgress: 0,
+
       drift: 0,
       targetDrift: 0
     }
   };
 
-  /* =======================================================
-     DOM
-     ======================================================= */
-
   const dom = {
-    html,
-
+    html: document.documentElement,
     body: document.body,
 
     loader: document.querySelector(".page-loader"),
-
     transition: document.querySelector(".page-transition"),
 
     cursor: document.querySelector(".custom-cursor"),
-
-    cursorDot: document.querySelector(
-      ".custom-cursor-dot"
-    ),
-
-    cursorRing: document.querySelector(
-      ".custom-cursor-ring"
-    ),
+    cursorDot: document.querySelector(".custom-cursor-dot"),
+    cursorRing: document.querySelector(".custom-cursor-ring"),
 
     header: document.querySelector(".site-header"),
 
     menu: document.querySelector(".site-menu"),
-
-    menuTrigger: document.querySelector(
-      ".menu-trigger"
-    ),
-
+    menuTrigger: document.querySelector(".menu-trigger"),
     menuLinks: Array.from(
       document.querySelectorAll(".site-menu a")
     ),
 
-    progressLabel: document.querySelector(
-      "#progress-current"
-    ),
+    progressLabel: document.querySelector("#progress-current"),
+    progressFill: document.querySelector("#progress-fill"),
+    progressPoint: document.querySelector("#progress-point"),
 
-    progressFill: document.querySelector(
-      "#progress-fill"
-    ),
+    previousSection: document.querySelector("#previous-section"),
+    previousLabel: document.querySelector("#previous-section-label"),
 
-    progressPoint: document.querySelector(
-      "#progress-point"
-    ),
-
-    previousSection: document.querySelector(
-      "#previous-section"
-    ),
-
-    previousLabel: document.querySelector(
-      "#previous-section-label"
-    ),
-
-    nextSection: document.querySelector(
-      "#next-section"
-    ),
-
-    nextLabel: document.querySelector(
-      "#next-section-label"
-    ),
+    nextSection: document.querySelector("#next-section"),
+    nextLabel: document.querySelector("#next-section-label"),
 
     sections: Array.from(
       document.querySelectorAll(".home-section")
@@ -186,13 +137,11 @@
       )
     ),
 
-    ctaTrajectory: document.querySelector(
-      ".cta-trajectory"
-    ),
+    standby: document.querySelector(".standby-screen"),
+    standbyWake: document.querySelector(".standby-wake"),
 
-    contactCta: document.querySelector(
-      ".contact-cta"
-    ),
+    ctaTrajectory: document.querySelector(".cta-trajectory"),
+    contactCta: document.querySelector(".contact-cta"),
 
     directionLinks: Array.from(
       document.querySelectorAll(
@@ -207,9 +156,9 @@
     )
   };
 
-  /* =======================================================
+  /* =========================================================
      UTILITIES
-     ======================================================= */
+     ========================================================= */
 
   const clamp = (value, min, max) =>
     Math.min(Math.max(value, min), max);
@@ -221,22 +170,43 @@
     String(index + 1).padStart(2, "0");
 
   const getSectionByIndex = index => {
-    if (!dom.sections.length) {
-      return null;
-    }
+    if (!dom.sections.length) return null;
 
     return dom.sections[
-      clamp(index, 0, dom.sections.length - 1)
+      clamp(
+        index,
+        0,
+        dom.sections.length - 1
+      )
     ];
   };
 
   const getSectionTitle = section =>
     section?.dataset.sectionTitle || "";
 
+  const isFinePointer = () =>
+    state.finePointer;
+
+  const isModifiedClick = event =>
+    event.button !== 0 ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey;
+
+  const isEditableElement = element => {
+    if (!element) return false;
+
+    return (
+      element.matches?.(
+        "input, textarea, select, [contenteditable='true']"
+      ) ||
+      element.isContentEditable
+    );
+  };
+
   const getFocusableElements = container => {
-    if (!container) {
-      return [];
-    }
+    if (!container) return [];
 
     return Array.from(
       container.querySelectorAll(
@@ -256,38 +226,30 @@
       return (
         style.display !== "none" &&
         style.visibility !== "hidden" &&
-        !element.hasAttribute("inert")
+        !element.hasAttribute("hidden")
       );
     });
   };
 
-  const isModifiedClick = event =>
-    event.button !== 0 ||
-    event.metaKey ||
-    event.ctrlKey ||
-    event.shiftKey ||
-    event.altKey;
+  const setStyleVariable = (
+    element,
+    property,
+    value
+  ) => {
+    element?.style.setProperty(property, value);
+  };
 
-  const isSameDocumentHash = url =>
-    url.origin === window.location.origin &&
-    url.pathname === window.location.pathname &&
-    url.search === window.location.search &&
-    Boolean(url.hash);
+  /* =========================================================
+     PROGRESSIVE ENHANCEMENT
+     ========================================================= */
 
-  const isEditableElement = element =>
-    Boolean(
-      element &&
-      (
-        element.matches?.(
-          "input, textarea, select"
-        ) ||
-        element.isContentEditable
-      )
-    );
+  const initProgressiveEnhancement = () => {
+    dom.html.classList.add("js");
+  };
 
-  /* =======================================================
-     MOTION / POINTER PREFERENCES
-     ======================================================= */
+  /* =========================================================
+     PREFERENCES
+     ========================================================= */
 
   const initPreferences = () => {
     const motionMedia =
@@ -300,42 +262,46 @@
         "(pointer: fine)"
       );
 
-    const applyMotion = reduced => {
-      state.reducedMotion = reduced;
+    const applyMotion = matches => {
+      state.reducedMotion = matches;
 
       dom.html.classList.toggle(
         "reduced-motion",
-        reduced
+        matches
       );
 
-      if (reduced) {
+      dom.standby?.classList.toggle(
+        "is-reduced",
+        matches
+      );
+
+      if (matches) {
         state.trajectory.drift = 0;
         state.trajectory.targetDrift = 0;
 
-        if (dom.cursor) {
-          dom.cursor.classList.remove(
-            "is-visible",
-            "is-hovering"
-          );
-        }
+        dom.cursor?.classList.remove(
+          "is-visible",
+          "is-hovering"
+        );
 
         stopAnimationLoop();
-
-        updateTrajectoryFrame();
+        clearStandbyTimer();
       } else {
+        updateTrajectoryTargets();
+        resetStandbyTimer();
         updateAnimationRequirement();
       }
     };
 
-    const applyPointer = fine => {
-      state.finePointer = fine;
+    const applyPointer = matches => {
+      state.finePointer = matches;
 
       dom.html.classList.toggle(
         "fine-pointer",
-        fine
+        matches
       );
 
-      if (!fine) {
+      if (!matches) {
         dom.cursor?.classList.remove(
           "is-visible",
           "is-hovering"
@@ -383,35 +349,9 @@
     }
   };
 
-  /* =======================================================
+  /* =========================================================
      LOADER
-     ======================================================= */
-
-  const removeLoader = () => {
-    if (
-      !dom.loader ||
-      state.loaded
-    ) {
-      return;
-    }
-
-    state.loaded = true;
-
-    if (state.loaderTimer) {
-      clearTimeout(state.loaderTimer);
-      state.loaderTimer = null;
-    }
-
-    dom.loader.classList.add(
-      "is-hidden"
-    );
-
-    state.loaderRemovalTimer =
-      window.setTimeout(() => {
-        dom.loader?.remove();
-        state.loaderRemovalTimer = null;
-      }, CONFIG.loaderRemoveDelay);
-  };
+     ========================================================= */
 
   const initLoader = () => {
     if (!dom.loader) {
@@ -422,195 +362,149 @@
     const started =
       performance.now();
 
-    let completed = false;
+    let finished = false;
 
-    const finish = () => {
-      if (completed || state.loaded) {
+    const removeLoader = () => {
+      if (
+        finished ||
+        state.loaded
+      ) {
         return;
       }
 
-      completed = true;
+      finished = true;
 
       const elapsed =
-        performance.now() - started;
+        performance.now() -
+        started;
 
       const remaining =
         Math.max(
           0,
           CONFIG.loaderMinimumTime -
-            elapsed
+          elapsed
         );
 
-      window.setTimeout(
-        removeLoader,
-        remaining
-      );
+      window.setTimeout(() => {
+        if (state.loaded) return;
+
+        state.loaded = true;
+
+        dom.loader.classList.add(
+          "is-hidden"
+        );
+
+        window.setTimeout(
+          () => dom.loader?.remove(),
+          800
+        );
+      }, remaining);
     };
 
     if (
       document.readyState ===
       "complete"
     ) {
-      finish();
+      removeLoader();
     } else {
       window.addEventListener(
         "load",
-        finish,
+        removeLoader,
         { once: true }
       );
     }
 
     state.loaderTimer =
       window.setTimeout(
-        finish,
+        removeLoader,
         CONFIG.loaderMaximumWait
       );
   };
 
-  /* =======================================================
+  /* =========================================================
      PAGE TRANSITIONS
-     ======================================================= */
-
-  const shouldInterceptTransition =
-    (event, link) => {
-      if (
-        !link ||
-        isModifiedClick(event) ||
-        state.transitionInProgress ||
-        state.reducedMotion
-      ) {
-        return false;
-      }
-
-      if (
-        link.hasAttribute("download") ||
-        link.hasAttribute("data-no-transition") ||
-        link.target === "_blank" ||
-        link.target === "_parent" ||
-        link.target === "_top"
-      ) {
-        return false;
-      }
-
-      const href =
-        link.getAttribute("href");
-
-      if (
-        !href ||
-        href.startsWith("#") ||
-        href.startsWith("mailto:") ||
-        href.startsWith("tel:") ||
-        href.startsWith("javascript:")
-      ) {
-        return false;
-      }
-
-      let url;
-
-      try {
-        url = new URL(
-          href,
-          window.location.href
-        );
-      } catch {
-        return false;
-      }
-
-      if (
-        url.origin !==
-        window.location.origin
-      ) {
-        return false;
-      }
-
-      if (
-        url.href ===
-        window.location.href
-      ) {
-        return false;
-      }
-
-      if (
-        isSameDocumentHash(url)
-      ) {
-        return false;
-      }
-
-      return true;
-    };
+     ========================================================= */
 
   const initPageTransitions = () => {
-    if (!dom.transition) {
-      return;
-    }
+    if (!dom.transition) return;
 
-    dom.transitionLinks.forEach(
-      link => {
-        link.addEventListener(
-          "click",
-          event => {
-            if (
-              !shouldInterceptTransition(
-                event,
-                link
-              )
-            ) {
-              return;
-            }
-
-            const href =
-              link.getAttribute(
-                "href"
-              );
-
-            let url;
-
-            try {
-              url = new URL(
-                href,
-                window.location.href
-              );
-            } catch {
-              return;
-            }
-
-            event.preventDefault();
-
-            state.transitionInProgress =
-              true;
-
-            closeMenu(false);
-
-            dom.transition.classList.add(
-              "is-active"
-            );
-
-            state.transitionTimer =
-              window.setTimeout(() => {
-                window.location.assign(
-                  url.href
-                );
-              },
-              CONFIG.transitionDuration);
+    dom.transitionLinks.forEach(link => {
+      link.addEventListener(
+        "click",
+        event => {
+          if (
+            isModifiedClick(event)
+          ) {
+            return;
           }
-        );
-      }
-    );
+
+          if (
+            link.hasAttribute("download") ||
+            link.target &&
+            link.target !== "_self"
+          ) {
+            return;
+          }
+
+          const href =
+            link.getAttribute("href");
+
+          if (
+            !href ||
+            href.startsWith("#") ||
+            href.startsWith("mailto:") ||
+            href.startsWith("tel:")
+          ) {
+            return;
+          }
+
+          let url;
+
+          try {
+            url = new URL(
+              href,
+              window.location.href
+            );
+          } catch {
+            return;
+          }
+
+          if (
+            url.origin !==
+            window.location.origin
+          ) {
+            return;
+          }
+
+          if (
+            url.href ===
+            window.location.href
+          ) {
+            return;
+          }
+
+          if (state.reducedMotion) {
+            return;
+          }
+
+          event.preventDefault();
+
+          dom.transition.classList.add(
+            "is-active"
+          );
+
+          window.setTimeout(() => {
+            window.location.assign(
+              url.href
+            );
+          }, CONFIG.transitionDuration);
+        }
+      );
+    });
 
     window.addEventListener(
       "pageshow",
       () => {
-        state.transitionInProgress =
-          false;
-
-        if (state.transitionTimer) {
-          clearTimeout(
-            state.transitionTimer
-          );
-
-          state.transitionTimer = null;
-        }
-
         dom.transition?.classList.remove(
           "is-active"
         );
@@ -627,15 +521,13 @@
     );
   };
 
-  /* =======================================================
+  /* =========================================================
      MENU ACCESSIBILITY
-     ======================================================= */
+     ========================================================= */
 
   const setMenuAccessibility =
     isOpen => {
-      if (!dom.menu) {
-        return;
-      }
+      if (!dom.menu) return;
 
       dom.menu.setAttribute(
         "aria-hidden",
@@ -654,7 +546,9 @@
           : "Apri menu"
       );
 
-      if ("inert" in dom.menu) {
+      if (
+        "inert" in dom.menu
+      ) {
         dom.menu.inert = !isOpen;
       } else if (isOpen) {
         dom.menu.removeAttribute(
@@ -671,10 +565,13 @@
   const openMenu = () => {
     if (
       !dom.menu ||
-      state.menuOpen
+      state.menuOpen ||
+      state.standby
     ) {
       return;
     }
+
+    clearStandbyTimer();
 
     state.menuReturnFocus =
       document.activeElement;
@@ -687,15 +584,7 @@
       "is-menu-open"
     );
 
-    dom.menuTrigger?.classList.add(
-      "is-active"
-    );
-
     const focusFirst = () => {
-      if (!state.menuOpen) {
-        return;
-      }
-
       getFocusableElements(
         dom.menu
       )[0]?.focus({
@@ -708,7 +597,7 @@
     } else {
       window.setTimeout(
         focusFirst,
-        80
+        CONFIG.focusDelay
       );
     }
   };
@@ -729,10 +618,6 @@
 
     dom.body.classList.remove(
       "is-menu-open"
-    );
-
-    dom.menuTrigger?.classList.remove(
-      "is-active"
     );
 
     const returnTarget =
@@ -756,57 +641,52 @@
         }
       );
     }
+
+    resetStandbyTimer();
   };
 
-  const trapMenuFocus =
-    event => {
-      if (
-        !state.menuOpen ||
-        event.key !== "Tab"
-      ) {
-        return;
-      }
-
-      const focusable =
-        getFocusableElements(
-          dom.menu
-        );
-
-      if (!focusable.length) {
-        event.preventDefault();
-        return;
-      }
-
-      const first =
-        focusable[0];
-
-      const last =
-        focusable[
-          focusable.length - 1
-        ];
-
-      if (
-        event.shiftKey &&
-        document.activeElement ===
-          first
-      ) {
-        event.preventDefault();
-        last.focus();
-      } else if (
-        !event.shiftKey &&
-        document.activeElement ===
-          last
-      ) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-
-  const initMenu = () => {
-    if (!dom.menu) {
+  const trapMenuFocus = event => {
+    if (
+      !state.menuOpen ||
+      event.key !== "Tab"
+    ) {
       return;
     }
 
+    const focusable =
+      getFocusableElements(
+        dom.menu
+      );
+
+    if (!focusable.length) {
+      event.preventDefault();
+      return;
+    }
+
+    const first =
+      focusable[0];
+
+    const last =
+      focusable[
+        focusable.length - 1
+      ];
+
+    if (
+      event.shiftKey &&
+      document.activeElement === first
+    ) {
+      event.preventDefault();
+      last.focus();
+    } else if (
+      !event.shiftKey &&
+      document.activeElement === last
+    ) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
+
+  const initMenu = () => {
     setMenuAccessibility(false);
 
     dom.menuTrigger?.addEventListener(
@@ -820,29 +700,26 @@
       }
     );
 
-    dom.menuLinks.forEach(
-      link => {
-        link.addEventListener(
-          "click",
-          () => {
-            closeMenu(false);
-          }
-        );
-      }
-    );
+    dom.menuLinks.forEach(link => {
+      link.addEventListener(
+        "click",
+        () => closeMenu(false)
+      );
+    });
 
-    dom.menu.addEventListener(
+    dom.menu?.addEventListener(
       "click",
       event => {
         if (
-          event.target === dom.menu
+          event.target ===
+          dom.menu
         ) {
           closeMenu();
         }
       }
     );
 
-    dom.menu.addEventListener(
+    dom.menu?.addEventListener(
       "keydown",
       trapMenuFocus
     );
@@ -861,18 +738,16 @@
     );
   };
 
-  /* =======================================================
+  /* =========================================================
      SECTION HEADER / PROGRESS
-     ======================================================= */
+     ========================================================= */
 
   const updateSectionHeader =
     index => {
       const section =
         getSectionByIndex(index);
 
-      if (!section) {
-        return;
-      }
+      if (!section) return;
 
       const total =
         dom.sections.length;
@@ -891,7 +766,9 @@
 
         dom.progressLabel.setAttribute(
           "aria-label",
-          `Sezione ${getSectionNumber(index)}: ${title}`
+          `Sezione ${getSectionNumber(
+            index
+          )}: ${title}`
         );
       }
 
@@ -913,10 +790,10 @@
         "precedente"
       );
 
-      const last =
+      const isLast =
         index === total - 1;
 
-      if (last) {
+      if (isLast) {
         dom.nextSection?.classList.add(
           "is-home-return"
         );
@@ -936,14 +813,13 @@
             "01";
         }
 
-        const arrow =
-          dom.nextSection?.querySelector(
+        dom.nextSection
+          ?.querySelector(
             ".section-jump-arrow"
+          )
+          ?.replaceChildren(
+            document.createTextNode("↑")
           );
-
-        if (arrow) {
-          arrow.textContent = "↑";
-        }
       } else {
         const nextNumber =
           getSectionNumber(
@@ -969,14 +845,13 @@
             nextNumber;
         }
 
-        const arrow =
-          dom.nextSection?.querySelector(
+        dom.nextSection
+          ?.querySelector(
             ".section-jump-arrow"
+          )
+          ?.replaceChildren(
+            document.createTextNode("→")
           );
-
-        if (arrow) {
-          arrow.textContent = "→";
-        }
       }
     };
 
@@ -987,9 +862,7 @@
     disabled,
     direction
   ) => {
-    if (!control) {
-      return;
-    }
+    if (!control) return;
 
     if (disabled) {
       control.classList.add(
@@ -1044,63 +917,55 @@
     }
   };
 
-  /* =======================================================
-     SECTION NAVIGATION
-     ======================================================= */
+  /* =========================================================
+     NAVIGATION
+     ========================================================= */
 
-  const navigateToSection =
-    (index, updateHash = true) => {
-      const target =
-        getSectionByIndex(index);
+  const navigateToSection = (
+    index,
+    updateUrl = true
+  ) => {
+    const target =
+      getSectionByIndex(index);
 
-      if (!target) {
-        return;
-      }
+    if (!target) return;
 
-      const headerHeight =
-        dom.header?.offsetHeight || 0;
+    const headerHeight =
+      dom.header?.offsetHeight || 0;
 
-      const rect =
-        target.getBoundingClientRect();
+    const rect =
+      target.getBoundingClientRect();
 
-      const top =
-        window.scrollY +
-        rect.top -
-        headerHeight -
-        CONFIG.scrollNavigationOffset;
+    const top =
+      window.scrollY +
+      rect.top -
+      headerHeight -
+      CONFIG.scrollNavigationOffset;
 
-      const behavior =
-        state.reducedMotion
-          ? "auto"
-          : "smooth";
+    if (updateUrl && target.id) {
+      const hash =
+        `#${target.id}`;
 
       if (
-        updateHash &&
-        target.id
+        window.location.hash !==
+        hash
       ) {
-        try {
-          window.history.replaceState(
-            null,
-            "",
-            `#${target.id}`
-          );
-        } catch {
-          /* Native scrolling remains functional. */
-        }
+        window.history.replaceState(
+          null,
+          "",
+          hash
+        );
       }
+    }
 
-      window.scrollTo({
-        top: Math.max(0, top),
-        behavior
-      });
-
-      state.activeIndex =
-        index;
-
-      updateSectionHeader(
-        index
-      );
-    };
+    window.scrollTo({
+      top: Math.max(0, top),
+      behavior:
+        state.reducedMotion
+          ? "auto"
+          : "smooth"
+    });
+  };
 
   const initSectionNavigation =
     () => {
@@ -1139,27 +1004,22 @@
           const last =
             dom.sections.length - 1;
 
-          const nextIndex =
+          navigateToSection(
             state.activeIndex === last
               ? 0
-              : state.activeIndex + 1;
-
-          navigateToSection(
-            nextIndex
+              : state.activeIndex + 1
           );
         }
       );
     };
 
-  /* =======================================================
+  /* =========================================================
      ACTIVE SECTION
-     ======================================================= */
+     ========================================================= */
 
   const detectActiveSection =
     () => {
-      if (
-        !dom.sections.length
-      ) {
+      if (!dom.sections.length) {
         return;
       }
 
@@ -1178,20 +1038,19 @@
           const rect =
             section.getBoundingClientRect();
 
-          const visible =
-            rect.bottom > 0 &&
-            rect.top <
-              window.innerHeight;
-
-          if (!visible) {
+          if (
+            rect.bottom <= 0 ||
+            rect.top >=
+              window.innerHeight
+          ) {
             return;
           }
 
           const distance =
             Math.abs(
               rect.top +
-                rect.height / 2 -
-                reference
+              rect.height / 2 -
+              reference
             );
 
           if (
@@ -1208,8 +1067,8 @@
       );
 
       if (
-        bestIndex !==
-        state.activeIndex
+        state.activeIndex !==
+        bestIndex
       ) {
         state.activeIndex =
           bestIndex;
@@ -1220,72 +1079,68 @@
       }
     };
 
-  /* =======================================================
-     REVEALS
-     ======================================================= */
+  /* =========================================================
+     REVEAL SYSTEM
+     ========================================================= */
 
-  const initRevealSystem =
-    () => {
-      if (!dom.reveals.length) {
-        return;
-      }
+  const initRevealSystem = () => {
+    if (!dom.reveals.length) {
+      return;
+    }
 
-      if (
-        state.reducedMotion ||
-        !("IntersectionObserver" in window)
-      ) {
-        dom.reveals.forEach(
-          element => {
-            element.classList.add(
-              "is-visible"
-            );
-          }
-        );
-
-        return;
-      }
-
-      const observer =
-        new IntersectionObserver(
-          entries => {
-            entries.forEach(
-              entry => {
-                if (
-                  !entry.isIntersecting
-                ) {
-                  return;
-                }
-
-                entry.target.classList.add(
-                  "is-visible"
-                );
-
-                observer.unobserve(
-                  entry.target
-                );
-              }
-            );
-          },
-          {
-            threshold:
-              CONFIG.revealThreshold,
-
-            rootMargin:
-              CONFIG.revealRootMargin
-          }
-        );
-
+    if (
+      state.reducedMotion ||
+      !("IntersectionObserver" in window)
+    ) {
       dom.reveals.forEach(
         element =>
-          observer.observe(
-            element
+          element.classList.add(
+            "is-visible"
           )
       );
-    };
 
-  /* =======================================================
-     DIRECTION INTERACTIONS
-     ======================================================= */
+      return;
+    }
+
+    const observer =
+      new IntersectionObserver(
+        entries => {
+          entries.forEach(
+            entry => {
+              if (
+                !entry.isIntersecting
+              ) {
+                return;
+              }
+
+              entry.target.classList.add(
+                "is-visible"
+              );
+
+              observer.unobserve(
+                entry.target
+              );
+            }
+          );
+        },
+        {
+          threshold:
+            CONFIG.revealThreshold,
+
+          rootMargin:
+            "0px 0px -8% 0px"
+        }
+      );
+
+    dom.reveals.forEach(
+      element =>
+        observer.observe(element)
+    );
+  };
+
+  /* =========================================================
+     DIRECTION INTERACTION
+     ========================================================= */
 
   const initDirectionInteractions =
     () => {
@@ -1296,98 +1151,70 @@
         return;
       }
 
-      const setActive =
-        (key, active) => {
-          dom.directionLinks
-            .filter(
-              element =>
-                element.dataset
-                  .direction === key
-            )
-            .forEach(
-              element =>
-                element.classList.toggle(
-                  "is-active",
-                  active
-                )
-            );
+      const setActive = (
+        key,
+        active
+      ) => {
+        dom.directionLinks
+          .filter(
+            element =>
+              element.dataset.direction ===
+              key
+          )
+          .forEach(
+            element =>
+              element.classList.toggle(
+                "is-active",
+                active
+              )
+          );
 
-          dom.directionNodes
-            .filter(
-              element =>
-                element.dataset
-                  .direction === key
-            )
-            .forEach(
-              element =>
-                element.classList.toggle(
-                  "is-active",
-                  active
-                )
-            );
-        };
+        dom.directionNodes
+          .filter(
+            element =>
+              element.dataset.direction ===
+              key
+          )
+          .forEach(
+            element =>
+              element.classList.toggle(
+                "is-active",
+                active
+              )
+          );
+      };
 
       dom.directionLinks.forEach(
         link => {
           const key =
             link.dataset.direction;
 
-          if (!key) {
-            return;
-          }
-
           link.addEventListener(
             "pointerenter",
-            () => {
-              if (
-                state.finePointer
-              ) {
-                setActive(
-                  key,
-                  true
-                );
-              }
-            }
+            () => setActive(key, true)
           );
 
           link.addEventListener(
             "pointerleave",
-            () => {
-              if (
-                state.finePointer
-              ) {
-                setActive(
-                  key,
-                  false
-                );
-              }
-            }
+            () => setActive(key, false)
           );
 
           link.addEventListener(
             "focusin",
-            () =>
-              setActive(
-                key,
-                true
-              )
+            () => setActive(key, true)
           );
 
           link.addEventListener(
             "focusout",
-            () =>
-              setActive(
-                key,
-                false
-              )
+            () => setActive(key, false)
           );
         }
       );
     };
 
-  /* =======================================================
+  /* =========================================================
      TRAJECTORY
-     ======================================================= */
+     ========================================================= */
 
   const updateTrajectoryTargets =
     () => {
@@ -1435,41 +1262,34 @@
               1
             );
 
-      state.trajectory
-        .targetProgress =
+      state.trajectory.targetProgress =
         progress;
 
-      state.trajectory
-        .targetDrift =
+      state.trajectory.targetDrift =
         state.reducedMotion
           ? 0
           : Math.sin(
               progress *
-                Math.PI *
-                2
+              Math.PI *
+              2
             ) *
             CONFIG.trajectoryDrift;
     };
 
   const updateTrajectoryFrame =
     () => {
-      const targetProgress =
-        state.trajectory
-          .targetProgress;
-
       if (
         state.reducedMotion
       ) {
         state.trajectory.progress =
-          targetProgress;
+          state.trajectory.targetProgress;
 
-        state.trajectory.drift =
-          0;
+        state.trajectory.drift = 0;
       } else {
         state.trajectory.progress =
           lerp(
             state.trajectory.progress,
-            targetProgress,
+            state.trajectory.targetProgress,
             CONFIG.trajectoryLerp
           );
 
@@ -1481,47 +1301,39 @@
           );
       }
 
-      dom.html.style.setProperty(
+      setStyleVariable(
+        dom.html,
         "--trajectory-progress",
-        state.trajectory.progress.toFixed(
-          4
-        )
+        state.trajectory.progress.toFixed(4)
       );
 
-      dom.html.style.setProperty(
+      setStyleVariable(
+        dom.html,
         "--trajectory-drift",
-        `${state.trajectory.drift.toFixed(
-          2
-        )}px`
+        `${state.trajectory.drift.toFixed(2)}px`
       );
     };
 
-  /* =======================================================
+  /* =========================================================
      NARRATIVE LINKS
-     ======================================================= */
+     ========================================================= */
 
   const initNarrativeLinks =
     () => {
       dom.narrativeLinks.forEach(
         link => {
           const node =
-            link.dataset
-              .trajectoryNode;
+            link.dataset.trajectoryNode;
 
-          if (!node) {
-            return;
-          }
+          if (!node) return;
 
           const targets = [
             ...document.querySelectorAll(
-              `.network-node[data-node="${CSS.escape(
-                node
-              )}"]`
+              `.network-node[data-node="${CSS.escape(node)}"]`
             ),
+
             ...document.querySelectorAll(
-              `.direction-node[data-direction="${CSS.escape(
-                node
-              )}"]`
+              `.direction-node[data-direction="${CSS.escape(node)}"]`
             )
           ];
 
@@ -1542,132 +1354,108 @@
 
           link.addEventListener(
             "pointerenter",
-            () => {
-              if (
-                state.finePointer
-              ) {
-                setLinked(true);
-              }
-            }
+            () => setLinked(true)
           );
 
           link.addEventListener(
             "pointerleave",
-            () => {
-              if (
-                state.finePointer
-              ) {
-                setLinked(false);
-              }
-            }
+            () => setLinked(false)
           );
 
           link.addEventListener(
             "focusin",
-            () =>
-              setLinked(true)
+            () => setLinked(true)
           );
 
           link.addEventListener(
             "focusout",
-            () =>
-              setLinked(false)
+            () => setLinked(false)
           );
         }
       );
     };
 
-  /* =======================================================
+  /* =========================================================
      CUSTOM CURSOR
-     ======================================================= */
+     ========================================================= */
 
-  const initCursor =
-    () => {
-      if (
-        !dom.cursor ||
-        !dom.cursorDot ||
-        !dom.cursorRing
-      ) {
-        return;
-      }
+  const initCursor = () => {
+    if (
+      !dom.cursor ||
+      !dom.cursorDot ||
+      !dom.cursorRing
+    ) {
+      return;
+    }
 
-      if (
-        !state.finePointer ||
-        state.reducedMotion
-      ) {
-        return;
-      }
-
-      document.addEventListener(
-        "pointermove",
-        event => {
-          if (
-            !state.finePointer ||
-            state.reducedMotion
-          ) {
-            return;
-          }
-
-          state.pointer.targetX =
-            event.clientX;
-
-          state.pointer.targetY =
-            event.clientY;
-
-          dom.cursor.classList.add(
-            "is-visible"
-          );
-
-          updateAnimationRequirement();
-        },
-        { passive: true }
-      );
-
-      document
-        .querySelectorAll(
-          "a, button"
-        )
-        .forEach(element => {
-          element.addEventListener(
-            "pointerenter",
-            () => {
-              if (
-                !state.finePointer ||
-                state.reducedMotion
-              ) {
-                return;
-              }
-
-              dom.cursor.classList.add(
-                "is-hovering"
-              );
-
-              updateAnimationRequirement();
-            }
-          );
-
-          element.addEventListener(
-            "pointerleave",
-            () => {
-              dom.cursor?.classList.remove(
-                "is-hovering"
-              );
-            }
-          );
-        });
-
-      window.addEventListener(
-        "pointerleave",
-        () => {
-          dom.cursor?.classList.remove(
-            "is-visible",
-            "is-hovering"
-          );
-
-          updateAnimationRequirement();
+    document.addEventListener(
+      "pointermove",
+      event => {
+        if (
+          !isFinePointer() ||
+          state.reducedMotion
+        ) {
+          return;
         }
-      );
-    };
+
+        state.pointer.targetX =
+          event.clientX;
+
+        state.pointer.targetY =
+          event.clientY;
+
+        dom.cursor.classList.add(
+          "is-visible"
+        );
+
+        updateAnimationRequirement();
+      },
+      {
+        passive: true
+      }
+    );
+
+    document
+      .querySelectorAll("a, button")
+      .forEach(element => {
+        element.addEventListener(
+          "pointerenter",
+          () => {
+            if (
+              !isFinePointer() ||
+              state.reducedMotion
+            ) {
+              return;
+            }
+
+            dom.cursor.classList.add(
+              "is-hovering"
+            );
+          }
+        );
+
+        element.addEventListener(
+          "pointerleave",
+          () => {
+            dom.cursor.classList.remove(
+              "is-hovering"
+            );
+          }
+        );
+      });
+
+    window.addEventListener(
+      "pointerleave",
+      () => {
+        dom.cursor?.classList.remove(
+          "is-visible",
+          "is-hovering"
+        );
+
+        updateAnimationRequirement();
+      }
+    );
+  };
 
   const updateCursorFrame =
     () => {
@@ -1675,7 +1463,7 @@
         !dom.cursor ||
         !dom.cursorDot ||
         !dom.cursorRing ||
-        !state.finePointer ||
+        !isFinePointer() ||
         state.reducedMotion
       ) {
         return;
@@ -1702,22 +1490,9 @@
         `translate3d(${state.cursor.x}px, ${state.cursor.y}px, 0) translate(-50%, -50%)`;
     };
 
-  /* =======================================================
+  /* =========================================================
      MAGNETIC ELEMENTS
-     ======================================================= */
-
-  const resetMagneticElement =
-    element => {
-      element.style.setProperty(
-        "--magnetic-x",
-        "0px"
-      );
-
-      element.style.setProperty(
-        "--magnetic-y",
-        "0px"
-      );
-    };
+     ========================================================= */
 
   const initMagneticElements =
     () => {
@@ -1733,7 +1508,7 @@
             "pointermove",
             event => {
               if (
-                !state.finePointer ||
+                !isFinePointer() ||
                 state.reducedMotion
               ) {
                 return;
@@ -1742,21 +1517,19 @@
               const rect =
                 element.getBoundingClientRect();
 
-              const centerX =
-                rect.left +
-                rect.width / 2;
-
-              const centerY =
-                rect.top +
-                rect.height / 2;
-
               const dx =
                 event.clientX -
-                centerX;
+                (
+                  rect.left +
+                  rect.width / 2
+                );
 
               const dy =
                 event.clientY -
-                centerY;
+                (
+                  rect.top +
+                  rect.height / 2
+                );
 
               const distance =
                 Math.hypot(
@@ -1768,10 +1541,6 @@
                 distance >
                 CONFIG.magneticRadius
               ) {
-                resetMagneticElement(
-                  element
-                );
-
                 return;
               }
 
@@ -1780,44 +1549,49 @@
                 (
                   1 -
                   distance /
-                    CONFIG.magneticRadius
+                  CONFIG.magneticRadius
                 );
 
-              element.style.setProperty(
+              setStyleVariable(
+                element,
                 "--magnetic-x",
-                `${(
-                  dx * strength
-                ).toFixed(2)}px`
+                `${dx * strength}px`
               );
 
-              element.style.setProperty(
+              setStyleVariable(
+                element,
                 "--magnetic-y",
-                `${(
-                  dy * strength
-                ).toFixed(2)}px`
+                `${dy * strength}px`
               );
             },
-            { passive: true }
+            {
+              passive: true
+            }
           );
 
           element.addEventListener(
             "pointerleave",
-            () =>
-              resetMagneticElement(
-                element
-              )
-          );
+            () => {
+              setStyleVariable(
+                element,
+                "--magnetic-x",
+                "0px"
+              );
 
-          resetMagneticElement(
-            element
+              setStyleVariable(
+                element,
+                "--magnetic-y",
+                "0px"
+              );
+            }
           );
         }
       );
     };
 
-  /* =======================================================
+  /* =========================================================
      CTA
-     ======================================================= */
+     ========================================================= */
 
   const initCtaInteraction =
     () => {
@@ -1828,17 +1602,15 @@
         return;
       }
 
-      const engage =
-        () =>
-          dom.ctaTrajectory.classList.add(
-            "is-engaged"
-          );
+      const engage = () =>
+        dom.ctaTrajectory.classList.add(
+          "is-engaged"
+        );
 
-      const disengage =
-        () =>
-          dom.ctaTrajectory.classList.remove(
-            "is-engaged"
-          );
+      const disengage = () =>
+        dom.ctaTrajectory.classList.remove(
+          "is-engaged"
+        );
 
       dom.contactCta.addEventListener(
         "pointerenter",
@@ -1861,43 +1633,248 @@
       );
     };
 
-  /* =======================================================
-     HASH NAVIGATION
-     ======================================================= */
+  /* =========================================================
+     STANDBY
+     ========================================================= */
 
-  const getSectionIndexFromHash =
-    hash => {
-      if (!hash) {
-        return -1;
-      }
-
-      const id =
-        decodeURIComponent(
-          hash.replace(
-            /^#/,
-            ""
-          )
+  const clearStandbyTimer =
+    () => {
+      if (
+        state.standbyTimer !== null
+      ) {
+        window.clearTimeout(
+          state.standbyTimer
         );
 
-      return dom.sections.findIndex(
-        section =>
-          section.id === id
-      );
+        state.standbyTimer = null;
+      }
     };
+
+  const enterStandby = () => {
+    if (
+      state.menuOpen ||
+      state.standby ||
+      !dom.standby ||
+      state.reducedMotion ||
+      document.hidden
+    ) {
+      return;
+    }
+
+    /*
+     * Non interrompere chi sta scrivendo,
+     * compilando un form o interagendo
+     * con un controllo.
+     */
+    if (
+      isEditableElement(
+        document.activeElement
+      )
+    ) {
+      resetStandbyTimer();
+      return;
+    }
+
+    state.standbyReturnFocus =
+      document.activeElement;
+
+    state.standby = true;
+
+    clearStandbyTimer();
+
+    dom.body.classList.add(
+      "is-standby"
+    );
+
+    dom.standby.classList.add(
+      "is-active"
+    );
+
+    dom.standby.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
+    if (
+      "inert" in dom.standby
+    ) {
+      dom.standby.inert = false;
+    } else {
+      dom.standby.removeAttribute(
+        "inert"
+      );
+    }
+
+    dom.standbyWake?.focus({
+      preventScroll: true
+    });
+  };
+
+  const exitStandby = () => {
+    if (!state.standby) {
+      return;
+    }
+
+    state.standby = false;
+
+    dom.body.classList.remove(
+      "is-standby"
+    );
+
+    dom.standby?.classList.remove(
+      "is-active"
+    );
+
+    dom.standby?.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    if (dom.standby) {
+      if (
+        "inert" in dom.standby
+      ) {
+        dom.standby.inert = true;
+      } else {
+        dom.standby.setAttribute(
+          "inert",
+          ""
+        );
+      }
+    }
+
+    const returnFocus =
+      state.standbyReturnFocus;
+
+    state.standbyReturnFocus = null;
+
+    if (
+      returnFocus &&
+      returnFocus !== document.body &&
+      typeof returnFocus.focus ===
+        "function" &&
+      document.contains(returnFocus)
+    ) {
+      window.requestAnimationFrame(
+        () => {
+          returnFocus.focus({
+            preventScroll: true
+          });
+        }
+      );
+    }
+
+    resetStandbyTimer();
+  };
+
+  const resetStandbyTimer =
+    () => {
+      clearStandbyTimer();
+
+      if (
+        state.menuOpen ||
+        state.standby ||
+        document.hidden ||
+        state.reducedMotion
+      ) {
+        return;
+      }
+
+      state.standbyTimer =
+        window.setTimeout(
+          enterStandby,
+          CONFIG.standbyDelay
+        );
+    };
+
+  const initStandby = () => {
+    if (!dom.standby) {
+      return;
+    }
+
+    dom.standby.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    if (
+      "inert" in dom.standby
+    ) {
+      dom.standby.inert = true;
+    } else {
+      dom.standby.setAttribute(
+        "inert",
+        ""
+      );
+    }
+
+    dom.standbyWake?.addEventListener(
+      "click",
+      exitStandby
+    );
+
+    [
+      "pointerdown",
+      "wheel",
+      "touchstart",
+      "keydown"
+    ].forEach(eventName => {
+      window.addEventListener(
+        eventName,
+        event => {
+          if (state.standby) {
+            /*
+             * Lasciamo Tab alla gestione
+             * del focus del browser.
+             */
+            if (
+              eventName === "keydown" &&
+              event.key === "Tab"
+            ) {
+              return;
+            }
+
+            exitStandby();
+            return;
+          }
+
+          if (
+            eventName !== "keydown" ||
+            event.key !== "Shift"
+          ) {
+            resetStandbyTimer();
+          }
+        },
+        {
+          passive:
+            eventName !== "keydown"
+        }
+      );
+    });
+  };
+
+  /* =========================================================
+     HASH NAVIGATION
+     ========================================================= */
 
   const initHashNavigation =
     () => {
       const hash =
         window.location.hash;
 
+      if (!hash) return;
+
+      const normalizedHash =
+        hash.toLowerCase();
+
       const index =
-        getSectionIndexFromHash(
-          hash
+        dom.sections.findIndex(
+          section =>
+            `#${section.id}`.toLowerCase() ===
+            normalizedHash
         );
 
-      if (index < 0) {
-        return;
-      }
+      if (index < 0) return;
 
       window.requestAnimationFrame(
         () => {
@@ -1908,15 +1885,15 @@
                 false
               );
             },
-            CONFIG.hashNavigationDelay
+            0
           );
         }
       );
     };
 
-  /* =======================================================
+  /* =========================================================
      KEYBOARD NAVIGATION
-     ======================================================= */
+     ========================================================= */
 
   const initKeyboardNavigation =
     () => {
@@ -1925,9 +1902,7 @@
         event => {
           if (
             state.menuOpen ||
-            isEditableElement(
-              document.activeElement
-            )
+            state.standby
           ) {
             return;
           }
@@ -1935,6 +1910,14 @@
           if (
             event.key !== "PageDown" &&
             event.key !== "PageUp"
+          ) {
+            return;
+          }
+
+          if (
+            isEditableElement(
+              document.activeElement
+            )
           ) {
             return;
           }
@@ -1951,8 +1934,7 @@
               state.activeIndex +
                 direction,
               0,
-              dom.sections.length -
-                1
+              dom.sections.length - 1
             );
 
           navigateToSection(
@@ -1962,72 +1944,58 @@
       );
     };
 
-  /* =======================================================
-     SCROLL
-     ======================================================= */
+  /* =========================================================
+     SCROLL / RESIZE
+     ========================================================= */
 
-  const processScroll =
+  const handleScrollFrame =
     () => {
-      state.scrollTicking =
-        false;
+      state.scrollTicking = false;
 
       detectActiveSection();
-
       updateTrajectoryTargets();
-
       updateAnimationRequirement();
     };
 
-  const handleScroll =
-    () => {
-      if (
-        state.scrollTicking
-      ) {
-        return;
-      }
+  const handleScroll = () => {
+    if (
+      state.scrollTicking
+    ) {
+      return;
+    }
 
-      state.scrollTicking =
-        true;
+    state.scrollTicking = true;
 
-      window.requestAnimationFrame(
-        processScroll
+    window.requestAnimationFrame(
+      handleScrollFrame
+    );
+  };
+
+  const handleResize = () => {
+    window.clearTimeout(
+      state.resizeTimer
+    );
+
+    state.resizeTimer =
+      window.setTimeout(
+        () => {
+          detectActiveSection();
+
+          updateTrajectoryTargets();
+
+          updateSectionHeader(
+            state.activeIndex
+          );
+
+          updateAnimationRequirement();
+        },
+        CONFIG.resizeDebounce
       );
-    };
+  };
 
-  /* =======================================================
-     RESIZE
-     ======================================================= */
-
-  const handleResize =
-    () => {
-      if (
-        state.resizeTimer
-      ) {
-        clearTimeout(
-          state.resizeTimer
-        );
-      }
-
-      state.resizeTimer =
-        window.setTimeout(
-          () => {
-            detectActiveSection();
-
-            updateTrajectoryTargets();
-
-            updateSectionHeader(
-              state.activeIndex
-            );
-
-            updateAnimationRequirement();
-          },
-          CONFIG.resizeDebounce
-        );
-    };
-
-  /* =======================================================
-     SMART ANIMATION LOOP
-     ======================================================= */
+  /* =========================================================
+     ANIMATION LOOP
+     ========================================================= */
 
   const animationIsNeeded =
     () => {
@@ -2039,7 +2007,7 @@
       }
 
       const cursorVisible =
-        state.finePointer &&
+        isFinePointer() &&
         dom.cursor?.classList.contains(
           "is-visible"
         );
@@ -2047,75 +2015,67 @@
       const trajectoryMoving =
         Math.abs(
           state.trajectory.progress -
-            state.trajectory
-              .targetProgress
+          state.trajectory.targetProgress
         ) > 0.0005 ||
         Math.abs(
           state.trajectory.drift -
-            state.trajectory
-              .targetDrift
+          state.trajectory.targetDrift
         ) > 0.05;
 
-      return Boolean(
+      return (
         cursorVisible ||
         trajectoryMoving
       );
     };
 
-  const animationFrame =
-    () => {
-      updateCursorFrame();
+  const animationFrame = () => {
+    updateCursorFrame();
+    updateTrajectoryFrame();
 
-      updateTrajectoryFrame();
-
-      if (
-        animationIsNeeded()
-      ) {
-        state.rafId =
-          window.requestAnimationFrame(
-            animationFrame
-          );
-      } else {
-        state.rafId = null;
-        state.animationRunning =
-          false;
-      }
-    };
-
-  const startAnimationLoop =
-    () => {
-      if (
-        state.animationRunning ||
-        state.reducedMotion ||
-        document.hidden
-      ) {
-        return;
-      }
-
-      state.animationRunning =
-        true;
-
+    if (
+      animationIsNeeded()
+    ) {
       state.rafId =
         window.requestAnimationFrame(
           animationFrame
         );
-    };
-
-  const stopAnimationLoop =
-    () => {
-      if (
-        state.rafId !== null
-      ) {
-        window.cancelAnimationFrame(
-          state.rafId
-        );
-      }
-
-      state.rafId = null;
-
+    } else {
       state.animationRunning =
         false;
-    };
+
+      state.rafId = null;
+    }
+  };
+
+  const startAnimationLoop = () => {
+    if (
+      state.animationRunning ||
+      state.reducedMotion ||
+      document.hidden
+    ) {
+      return;
+    }
+
+    state.animationRunning = true;
+
+    state.rafId =
+      window.requestAnimationFrame(
+        animationFrame
+      );
+  };
+
+  const stopAnimationLoop = () => {
+    if (
+      state.rafId !== null
+    ) {
+      window.cancelAnimationFrame(
+        state.rafId
+      );
+    }
+
+    state.rafId = null;
+    state.animationRunning = false;
+  };
 
   const updateAnimationRequirement =
     () => {
@@ -2126,51 +2086,53 @@
       }
     };
 
-  /* =======================================================
-     VISIBILITY / BFCache
-     ======================================================= */
+  /* =========================================================
+     VISIBILITY / BFCACHE
+     ========================================================= */
 
   const initVisibilityHandling =
     () => {
       document.addEventListener(
         "visibilitychange",
         () => {
-          if (
-            document.hidden
-          ) {
+          if (document.hidden) {
             stopAnimationLoop();
-          } else {
-            updateTrajectoryTargets();
-
-            updateAnimationRequirement();
+            clearStandbyTimer();
+            return;
           }
+
+          updateTrajectoryTargets();
+          resetStandbyTimer();
+          updateAnimationRequirement();
         }
       );
 
       window.addEventListener(
         "pageshow",
-        () => {
-          state.transitionInProgress =
-            false;
-
-          detectActiveSection();
-
-          updateTrajectoryTargets();
-
-          updateAnimationRequirement();
+        event => {
+          /*
+           * Ripristino da BFCache.
+           */
+          if (event.persisted) {
+            updateTrajectoryTargets();
+            detectActiveSection();
+            updateSectionHeader(
+              state.activeIndex
+            );
+            resetStandbyTimer();
+            updateAnimationRequirement();
+          }
         }
       );
     };
 
-  /* =======================================================
+  /* =========================================================
      INITIAL STATE
-     ======================================================= */
+     ========================================================= */
 
   const setInitialState =
     () => {
-      if (
-        !dom.sections.length
-      ) {
+      if (!dom.sections.length) {
         return;
       }
 
@@ -2180,47 +2142,17 @@
 
       updateTrajectoryTargets();
 
-      updateTrajectoryFrame();
+      resetStandbyTimer();
 
       updateAnimationRequirement();
     };
 
-  /* =======================================================
-     GLOBAL CLEANUP
-     ======================================================= */
-
-  const initGlobalEvents =
-    () => {
-      window.addEventListener(
-        "scroll",
-        handleScroll,
-        {
-          passive: true
-        }
-      );
-
-      window.addEventListener(
-        "resize",
-        handleResize,
-        {
-          passive: true
-        }
-      );
-    };
-
-  /* =======================================================
+  /* =========================================================
      INIT
-     ======================================================= */
+     ========================================================= */
 
   const init = () => {
-    if (
-      state.initialized
-    ) {
-      return;
-    }
-
-    state.initialized =
-      true;
+    initProgressiveEnhancement();
 
     initPreferences();
 
@@ -2244,13 +2176,13 @@
 
     initCtaInteraction();
 
+    initStandby();
+
     initHashNavigation();
 
     initKeyboardNavigation();
 
     initVisibilityHandling();
-
-    initGlobalEvents();
 
     setInitialState();
 
@@ -2258,12 +2190,24 @@
 
     updateTrajectoryTargets();
 
-    updateTrajectoryFrame();
-  };
+    window.addEventListener(
+      "scroll",
+      handleScroll,
+      {
+        passive: true
+      }
+    );
 
-  /* =======================================================
-     BOOT
-     ======================================================= */
+    window.addEventListener(
+      "resize",
+      handleResize,
+      {
+        passive: true
+      }
+    );
+
+    updateAnimationRequirement();
+  };
 
   if (
     document.readyState ===
