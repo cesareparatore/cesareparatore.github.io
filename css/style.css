@@ -1688,3 +1688,277 @@ body.is-menu-open .menu-trigger-icon span:last-child{
     transform:none;
   }
 }
+/* =========================================================
+   HOME — FINAL NARRATIVE SYSTEM
+   =========================================================
+   Principi:
+   - le cinque direzioni condividono un unico linguaggio;
+   - visited/current/converged hanno significati diversi;
+   - le grafiche non attraversano mai il testo;
+   - ogni link resta riconoscibile anche senza hover;
+   - nessun nuovo colore viene introdotto.
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   01 — INTERACTIVE TYPOGRAPHY
+   --------------------------------------------------------- */
+
+.narrative-link{
+  text-decoration-line:underline;
+  text-decoration-thickness:1px;
+  text-decoration-color:var(--sand);
+  text-underline-offset:.2em;
+}
+
+.narrative-link:hover,
+.narrative-link:focus-visible,
+.narrative-link:active{
+  text-decoration-color:var(--terracotta);
+}
+
+.hero-direction{
+  text-decoration:none;
+}
+
+.hero-direction::after{
+  transform:scaleX(1);
+  background:var(--sand);
+}
+
+.hero-direction:hover::after,
+.hero-direction:focus-visible::after,
+.hero-direction.is-active::after{
+  background:var(--terracotta);
+  transform:scaleX(1);
+}
+
+.five-directions a{
+  text-decoration-line:underline;
+  text-decoration-thickness:1px;
+  text-decoration-color:var(--sand);
+  text-underline-offset:.55em;
+}
+
+.five-directions a:hover,
+.five-directions a:focus-visible,
+.five-directions a.is-linked,
+.five-directions a.is-active{
+  text-decoration-color:var(--terracotta);
+}
+
+/* ---------------------------------------------------------
+   02 — HERO TRAJECTORY
+   ---------------------------------------------------------
+   La linea vive nella fascia centrale.
+   Le etichette vivono in una fascia separata.
+   Nessuna etichetta segue verticalmente la linea.
+   Questo elimina qualsiasi possibilità di collisione.
+   --------------------------------------------------------- */
+
+.direction-trajectory{
+  isolation:isolate;
+  contain:layout paint;
+}
+
+.direction-trajectory-line{
+  transform:
+    translateY(calc(var(--trajectory-drift) * .35))
+    rotate(-2deg);
+}
+
+.direction-node-label{
+  top:auto;
+  bottom:4px;
+  line-height:1.1;
+  pointer-events:none;
+}
+
+.direction-node.is-visited{
+  background:var(--sand);
+}
+
+.direction-node.is-current{
+  background:var(--terracotta);
+  transform:translate(-50%,-50%) scale(1.35);
+  box-shadow:0 0 0 6px rgba(166,66,50,.07);
+}
+
+.direction-node.is-converged{
+  background:var(--terracotta);
+  transform:translate(-50%,-50%) scale(1.15);
+  box-shadow:0 0 0 5px rgba(166,66,50,.06);
+}
+
+.direction-node.is-active,
+.direction-node.is-linked{
+  background:var(--terracotta);
+}
+
+.direction-node.is-active .direction-node-label,
+.direction-node.is-linked .direction-node-label,
+.direction-node.is-current .direction-node-label,
+.direction-node.is-converged .direction-node-label{
+  color:var(--terracotta);
+}
+
+/* La direzione già attraversata resta percepibile,
+   ma non compete con quella corrente. */
+
+.hero-direction.is-visited{
+  color:var(--ink);
+}
+
+.hero-direction.is-current,
+.hero-direction.is-active{
+  color:var(--terracotta);
+}
+
+.hero-direction.is-current::after{
+  background:var(--terracotta);
+}
+
+/* ---------------------------------------------------------
+   03 — FIVE DIRECTIONS
+   --------------------------------------------------------- */
+
+.five-directions a.is-visited{
+  color:var(--ink);
+  border-color:var(--sand);
+}
+
+.five-directions a.is-current,
+.five-directions a.is-active{
+  color:var(--terracotta);
+  border-color:var(--terracotta);
+}
+
+.five-directions a.is-converged{
+  color:var(--ink);
+  border-color:var(--terracotta);
+}
+
+/* ---------------------------------------------------------
+   04 — NETWORK
+   --------------------------------------------------------- */
+
+.network-visual{
+  isolation:isolate;
+  contain:layout paint;
+}
+
+.network-node.is-visited{
+  background:var(--sand);
+}
+
+.network-node.is-current{
+  background:var(--terracotta);
+  transform:translate(-50%,-50%) scale(1.25);
+  box-shadow:0 0 0 6px rgba(166,66,50,.06);
+}
+
+.network-node.is-converged{
+  background:var(--terracotta);
+  transform:translate(-50%,-50%) scale(1.3);
+  box-shadow:0 0 0 8px rgba(166,66,50,.08);
+}
+
+.network-node.is-linked,
+.network-node.is-active{
+  background:var(--terracotta);
+}
+
+/* La rete rimane una zona esclusivamente grafica.
+   Nessun testo viene inserito al suo interno. */
+
+.network-visual.is-converged .network-line{
+  background:var(--stone);
+}
+
+/* ---------------------------------------------------------
+   05 — SECTION STATES
+   --------------------------------------------------------- */
+
+.home-section[data-journey-state="current"] .section-title{
+  color:var(--terracotta);
+}
+
+.home-section[data-journey-state="converged"] .section-title{
+  color:var(--stone);
+}
+
+/* ---------------------------------------------------------
+   06 — CTA / CONVERGENCE
+   --------------------------------------------------------- */
+
+.home-section--cta[data-journey-state="complete"] .cta-trajectory-line{
+  background:rgba(242,239,232,.52);
+}
+
+.home-section--cta[data-journey-state="complete"] .cta-trajectory-point{
+  box-shadow:0 0 0 9px rgba(166,66,50,.09);
+}
+
+/* ---------------------------------------------------------
+   07 — TOUCH / FOCUS
+   --------------------------------------------------------- */
+
+@media(pointer:coarse){
+  .hero-direction,
+  .narrative-link,
+  .five-directions a,
+  .territory-card a{
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  .hero-direction:active{
+    color:var(--terracotta);
+  }
+
+  .hero-direction:active::after{
+    background:var(--terracotta);
+    transform:scaleX(1);
+  }
+
+  .five-directions a:active{
+    color:var(--terracotta);
+    border-color:var(--terracotta);
+    text-decoration-color:var(--terracotta);
+  }
+}
+
+/* ---------------------------------------------------------
+   08 — SMALL SCREENS
+   --------------------------------------------------------- */
+
+@media(max-width:420px){
+  /*
+   * I label dei nodi vengono nascosti come già previsto
+   * dal layout mobile. Le cinque destinazioni restano però
+   * completamente leggibili e interattive nei link testuali.
+   */
+
+  .direction-trajectory-line{
+    transform:
+      translateY(calc(var(--trajectory-drift) * .2))
+      rotate(-2deg);
+  }
+}
+
+/* ---------------------------------------------------------
+   09 — REDUCED MOTION
+   --------------------------------------------------------- */
+
+@media(prefers-reduced-motion:reduce){
+  .direction-node,
+  .hero-direction,
+  .five-directions a,
+  .network-node{
+    transition:none!important;
+  }
+
+  .direction-trajectory-line,
+  .pause-trajectory-line,
+  .cta-trajectory-line{
+    transform:none;
+  }
+}
