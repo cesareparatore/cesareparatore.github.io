@@ -1,522 +1,459 @@
 (() => {
-  'use strict';
+  "use strict";
 
-  const root = document.documentElement;
   const body = document.body;
 
-  root.classList.add('js');
+  const loader = document.querySelector(".page-loader");
 
-  const SELECTORS = {
-    loader: '.page-loader',
-    header: '.site-header',
-    menu: '#site-menu',
-    menuTrigger: '.menu-trigger',
-    menuLinks: '.site-menu-nav a',
-    menuClose: '.chapter-close',
-    chapters: '.chapter',
-    reveal: '.reveal',
-    progressCurrent: '#progress-current',
-    progressFill: '#progress-fill',
-    progressPoint: '#progress-point',
-    previous: '#previous-section',
-    previousLabel: '#previous-section-label',
-    next: '#next-section',
-    nextLabel: '#next-section-label',
-    cursor: '#context-cursor',
-    standby: '#standby-screen',
-    magnetic: '.magnetic'
-  };
+  const menuTrigger = document.querySelector(".menu-trigger");
+  const menu = document.querySelector(".site-menu");
+  const menuClose = document.querySelector(".chapter-close");
+  const menuLinks = [...document.querySelectorAll("[data-menu-link]")];
 
-  const state = {
-    initialized: false,
-    reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+  const chapters = [...document.querySelectorAll(".chapter, .home-section")];
 
-    menuOpen: false,
-    standby: false,
+  const progressCurrent = document.getElementById("progress-current");
+  const progressFill = document.getElementById("progress-fill");
+  const progressPoint = document.getElementById("progress-point");
 
-    activeChapter: 0,
-    scrollY: window.scrollY,
-    framePending: false,
+  const previousSection = document.getElementById("previous-section");
+  const previousSectionLabel = document.getElementById("previous-section-label");
 
-    cursorEnabled:
-      window.matchMedia('(pointer:fine)').matches &&
-      !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+  const nextSection = document.getElementById("next-section");
+  const nextSectionLabel = document.getElementById("next-section-label");
 
-    cursorX: -100,
-    cursorY: -100,
+  const cursor = document.getElementById("cursor");
 
-    idleTimer: null,
+  const idleScreen = document.getElementById("idle-screen");
 
-    idleDelay: 60000,
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    standbyAllowed: true
-  };
+  let initialized = false;
+  let activeIndex = 0;
+  let menuOpen = false;
 
-  const chapters = Array.from(
-    document.querySelectorAll(SELECTORS.chapters)
-  );
+  let framePending = false;
+  let idleTimer = null;
+  let lastPointerX = 0;
+  let lastPointerY = 0;
 
-  const loader = document.querySelector(SELECTORS.loader);
-  const header = document.querySelector(SELECTORS.header);
-
-  const menu = document.querySelector(SELECTORS.menu);
-  const menuTrigger = document.querySelector(SELECTORS.menuTrigger);
-  const menuClose = document.querySelector(SELECTORS.menuClose);
-
-  const menuLinks = Array.from(
-    document.querySelectorAll(SELECTORS.menuLinks)
-  );
-
-  const progressCurrent =
-    document.querySelector(SELECTORS.progressCurrent);
-
-  const progressFill =
-    document.querySelector(SELECTORS.progressFill);
-
-  const progressPoint =
-    document.querySelector(SELECTORS.progressPoint);
-
-  const previous =
-    document.querySelector(SELECTORS.previous);
-
-  const previousLabel =
-    document.querySelector(SELECTORS.previousLabel);
-
-  const next =
-    document.querySelector(SELECTORS.next);
-
-  const nextLabel =
-    document.querySelector(SELECTORS.nextLabel);
-
-  const cursor =
-    document.querySelector(SELECTORS.cursor);
-
-  const standby =
-    document.querySelector(SELECTORS.standby);
+  const IDLE_DELAY = 45000;
 
 
-  /* =========================================================
-     HELPERS
-  ========================================================== */
+  /* --------------------------------
+     JS FALLBACK / READY
+  -------------------------------- */
 
-  const clamp = (value, min = 0, max = 1) =>
-    Math.min(Math.max(value, min), max);
-
-  const getChapterTitle = chapter =>
-    chapter?.dataset.sectionTitle || '';
-
-  const getChapterIndex = chapter =>
-    Number(chapter?.dataset.chapterIndex || 0);
-
-  const getChapterByIndex = index =>
-    chapters.find(
-      chapter => getChapterIndex(chapter) === index
-    );
-
-  const isInteractiveElement = element => {
-    if (!element) return false;
-
-    return Boolean(
-      element.closest(
-        'a,button,input,textarea,select,summary,[contenteditable="true"]'
-      )
-    );
-  };
+  body.classList.add("js-ready");
 
 
-  /* =========================================================
+  /* --------------------------------
      LOADER
-  ========================================================== */
+  -------------------------------- */
 
-  function hideLoader() {
+  const hideLoader = () => {
     if (!loader) return;
 
-    loader.classList.add('is-hidden');
-  }
+    loader.classList.add("is-hidden");
 
-  function setupLoader() {
-    if (!loader) return;
+    window.setTimeout(() => {
+      loader.setAttribute("aria-hidden", "true");
+    }, 950);
+  };
 
-    const complete = () => {
-      if (state.reducedMotion) {
-        hideLoader();
-        return;
-      }
-
-      window.setTimeout(hideLoader, 300);
-    };
-
-    if (document.readyState === 'complete') {
-      complete();
-    } else {
-      window.addEventListener('load', complete, {
-        once: true
-      });
-
-      window.setTimeout(() => {
-        hideLoader();
-      }, 5000);
-    }
-  }
-
-
-  /* =========================================================
-     HEADER
-  ========================================================== */
-
-  function updateHeader() {
-    if (!header) return;
-
-    header.classList.toggle(
-      'is-scrolled',
-      state.scrollY > 24
-    );
-  }
-
-
-  /* =========================================================
-     CHAPTER PROGRESS
-  ========================================================== */
-
-  function updateChapterProgress(chapter) {
-    if (!chapter) return;
-
-    const rect = chapter.getBoundingClientRect();
-    const viewport = window.innerHeight;
-
-    const total = rect.height + viewport;
-
-    const travelled = viewport - rect.top;
-
-    const progress = clamp(
-      travelled / total
-    );
-
-    chapter.style.setProperty(
-      '--chapter-progress',
-      progress.toFixed(4)
-    );
-  }
-
-
-  function updateAllVisibleProgress() {
-    chapters.forEach(chapter => {
-      const rect = chapter.getBoundingClientRect();
-
-      const visible =
-        rect.bottom > 0 &&
-        rect.top < window.innerHeight;
-
-      if (visible) {
-        updateChapterProgress(chapter);
-      }
-    });
-  }
-
-
-  /* =========================================================
-     ACTIVE CHAPTER
-  ========================================================== */
-
-  function setActiveChapter(index) {
-    if (!index || index === state.activeChapter) {
+  const startLoader = () => {
+    if (reducedMotion) {
+      hideLoader();
       return;
     }
 
-    state.activeChapter = index;
+    const fallback = window.setTimeout(hideLoader, 5200);
 
-    chapters.forEach(chapter => {
-      const chapterIndex = getChapterIndex(chapter);
+    window.addEventListener("load", () => {
+      window.clearTimeout(fallback);
 
+      window.setTimeout(() => {
+        hideLoader();
+      }, 2400);
+    }, { once: true });
+  };
+
+
+  /* --------------------------------
+     IDLE / STANDBY
+  -------------------------------- */
+
+  const clearIdleTimer = () => {
+    if (idleTimer) {
+      window.clearTimeout(idleTimer);
+      idleTimer = null;
+    }
+  };
+
+  const exitIdle = () => {
+    if (!body.classList.contains("is-idle")) return;
+
+    body.classList.remove("is-idle");
+
+    if (idleScreen) {
+      idleScreen.setAttribute("aria-hidden", "true");
+    }
+  };
+
+  const enterIdle = () => {
+    if (
+      menuOpen ||
+      document.visibilityState !== "visible" ||
+      reducedMotion
+    ) {
+      scheduleIdle();
+      return;
+    }
+
+    body.classList.add("is-idle");
+
+    if (idleScreen) {
+      idleScreen.setAttribute("aria-hidden", "false");
+    }
+  };
+
+  const scheduleIdle = () => {
+    clearIdleTimer();
+
+    if (reducedMotion) return;
+
+    idleTimer = window.setTimeout(() => {
+      enterIdle();
+    }, IDLE_DELAY);
+  };
+
+  const registerActivity = () => {
+    if (body.classList.contains("is-idle")) {
+      exitIdle();
+    }
+
+    scheduleIdle();
+  };
+
+  [
+    "pointerdown",
+    "pointermove",
+    "wheel",
+    "touchstart",
+    "keydown",
+    "scroll"
+  ].forEach((eventName) => {
+    window.addEventListener(eventName, registerActivity, {
+      passive: eventName !== "keydown"
+    });
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible") {
+      clearIdleTimer();
+      exitIdle();
+    } else {
+      scheduleIdle();
+    }
+  });
+
+
+  /* --------------------------------
+     HEADER SCROLL STATE
+  -------------------------------- */
+
+  const updateHeader = () => {
+    if (window.scrollY > 30) {
+      body.classList.add("is-scrolled");
+    } else {
+      body.classList.remove("is-scrolled");
+    }
+  };
+
+
+  /* --------------------------------
+     CHAPTER PROGRESS
+  -------------------------------- */
+
+  const clamp = (value, min, max) => {
+    return Math.min(Math.max(value, min), max);
+  };
+
+  const getChapterProgress = (chapter) => {
+    const rect = chapter.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+
+    const start = viewportHeight;
+    const end = -rect.height;
+
+    const raw = (start - rect.top) / (start - end);
+
+    return clamp(raw, 0, 1);
+  };
+
+  const updateChapterProgress = () => {
+    chapters.forEach((chapter) => {
+      const progress = getChapterProgress(chapter);
+
+      chapter.style.setProperty(
+        "--chapter-progress",
+        progress.toFixed(4)
+      );
+    });
+  };
+
+
+  /* --------------------------------
+     ACTIVE CHAPTER
+  -------------------------------- */
+
+  const updateActiveChapter = (index) => {
+    if (index < 0 || index >= chapters.length) return;
+
+    activeIndex = index;
+
+    chapters.forEach((chapter, chapterIndex) => {
       chapter.classList.toggle(
-        'is-active',
+        "is-active",
         chapterIndex === index
       );
 
       chapter.classList.toggle(
-        'is-complete',
+        "is-complete",
         chapterIndex < index
       );
     });
 
-    updateProgressUI();
-  }
-
-
-  function updateProgressUI() {
-    if (!chapters.length) return;
-
-    const current =
-      getChapterByIndex(state.activeChapter) ||
-      chapters[0];
-
-    const currentIndex =
-      getChapterIndex(current);
-
-    const total =
-      chapters.length;
-
-    const percentage =
-      total > 1
-        ? ((currentIndex - 1) / (total - 1)) * 100
-        : 0;
+    const current = chapters[index];
 
     if (progressCurrent) {
       progressCurrent.textContent =
-        getChapterTitle(current);
+        current.dataset.sectionTitle || "";
     }
 
+    const previous = chapters[index - 1];
+    const next = chapters[index + 1];
+
+    if (previous && previous.id) {
+      previousSection.href = `#${previous.id}`;
+      previousSectionLabel.textContent =
+        previous.dataset.sectionTitle || "";
+      previousSection.classList.remove("is-disabled");
+      previousSection.setAttribute("aria-hidden", "false");
+      previousSection.tabIndex = 0;
+    } else {
+      previousSection.href = "#01";
+      previousSectionLabel.textContent = "";
+      previousSection.classList.add("is-disabled");
+      previousSection.setAttribute("aria-hidden", "true");
+      previousSection.tabIndex = -1;
+    }
+
+    if (next && next.id) {
+      nextSection.href = `#${next.id}`;
+
+      /*
+       * The header itself remains visually minimal.
+       * The section number is retained only here because
+       * the fixed header uses it as a navigation affordance.
+       */
+      nextSectionLabel.textContent =
+        String(index + 2).padStart(2, "0");
+
+      nextSection.setAttribute(
+        "aria-label",
+        `Vai alla sezione ${index + 2}`
+      );
+
+      nextSection.classList.remove("is-disabled");
+    } else {
+      nextSection.href = "#11";
+      nextSectionLabel.textContent = "FINE";
+      nextSection.classList.add("is-disabled");
+    }
+
+    const overall = chapters.length > 1
+      ? index / (chapters.length - 1)
+      : 0;
+
     if (progressFill) {
-      progressFill.style.width =
-        `${clamp(percentage / 100) * 100}%`;
+      progressFill.style.width = `${overall * 100}%`;
     }
 
     if (progressPoint) {
-      progressPoint.style.left =
-        `${clamp(percentage / 100) * 100}%`;
+      progressPoint.style.left = `${overall * 100}%`;
     }
-
-    const previousChapter =
-      getChapterByIndex(currentIndex - 1);
-
-    const nextChapter =
-      getChapterByIndex(currentIndex + 1);
-
-    if (previousChapter) {
-      previous.href =
-        `#${previousChapter.id}`;
-
-      previousLabel.textContent =
-        String(currentIndex - 1).padStart(2, '0');
-
-      previous.classList.remove('is-disabled');
-      previous.removeAttribute('aria-hidden');
-      previous.removeAttribute('tabindex');
-    } else {
-      previous.href = '#01';
-      previousLabel.textContent = '';
-      previous.classList.add('is-disabled');
-      previous.setAttribute('aria-hidden', 'true');
-      previous.setAttribute('tabindex', '-1');
-    }
-
-    if (nextChapter) {
-      next.href =
-        `#${nextChapter.id}`;
-
-      nextLabel.textContent =
-        String(currentIndex + 1).padStart(2, '0');
-
-      next.setAttribute(
-        'aria-label',
-        `Vai alla sezione ${String(currentIndex + 1).padStart(2, '0')}`
-      );
-    } else {
-      next.href = '#11';
-      nextLabel.textContent = '11';
-      next.setAttribute(
-        'aria-label',
-        'Vai alla sezione 11'
-      );
-    }
-  }
+  };
 
 
-  /* =========================================================
+  /* --------------------------------
      INTERSECTION OBSERVER
-  ========================================================== */
+  -------------------------------- */
 
-  function setupChapterObserver() {
-    if (!chapters.length) return;
+  const chapterObserver = new IntersectionObserver(
+    (entries) => {
+      let strongest = null;
+      let strongestRatio = 0;
 
-    const observer =
-      new IntersectionObserver(
-        entries => {
-          entries.forEach(entry => {
-            if (!entry.isIntersecting) return;
-
-            entry.target.classList.add(
-              'is-visible'
-            );
-
-            const index =
-              getChapterIndex(entry.target);
-
-            setActiveChapter(index);
-          });
-        },
-        {
-          root:null,
-          rootMargin:'-35% 0px -45% 0px',
-          threshold:0
+      entries.forEach((entry) => {
+        if (
+          entry.isIntersecting &&
+          entry.intersectionRatio >= strongestRatio
+        ) {
+          strongest = entry.target;
+          strongestRatio = entry.intersectionRatio;
         }
-      );
-
-    chapters.forEach(chapter => {
-      observer.observe(chapter);
-    });
-  }
-
-
-  /* =========================================================
-     REVEALS
-  ========================================================== */
-
-  function setupRevealObserver() {
-    const elements =
-      document.querySelectorAll(
-        SELECTORS.reveal
-      );
-
-    if (!elements.length) return;
-
-    if (state.reducedMotion) {
-      elements.forEach(element => {
-        element.classList.add('is-visible');
       });
 
-      return;
+      if (!strongest) return;
+
+      const index = chapters.indexOf(strongest);
+
+      if (index !== -1) {
+        updateActiveChapter(index);
+      }
+    },
+    {
+      threshold: [0.15, 0.3, 0.5, 0.7],
+      rootMargin: "-10% 0px -10% 0px"
     }
+  );
 
-    const observer =
-      new IntersectionObserver(
-        entries => {
-          entries.forEach(entry => {
-            if (
-              entry.isIntersecting
-            ) {
-              entry.target.classList.add(
-                'is-visible'
-              );
-            }
-          });
-        },
-        {
-          root:null,
-          rootMargin:'0px 0px -12% 0px',
-          threshold:.05
-        }
-      );
-
-    elements.forEach(element => {
-      observer.observe(element);
-    });
-  }
+  chapters.forEach((chapter) => {
+    chapterObserver.observe(chapter);
+  });
 
 
-  /* =========================================================
+  /* --------------------------------
+     REVEAL OBSERVER
+  -------------------------------- */
+
+  const revealElements = [
+    ...document.querySelectorAll(".reveal")
+  ];
+
+  const revealObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+
+        entry.target.classList.add("is-visible");
+        revealObserver.unobserve(entry.target);
+      });
+    },
+    {
+      threshold: 0.12,
+      rootMargin: "0px 0px -8% 0px"
+    }
+  );
+
+  revealElements.forEach((element) => {
+    revealObserver.observe(element);
+  });
+
+
+  /* --------------------------------
      MENU
-  ========================================================== */
+  -------------------------------- */
 
-  let menuPreviouslyFocused = null;
+  let lastFocusedElement = null;
 
-  function setMenuState(open) {
+  const openMenu = () => {
     if (!menu || !menuTrigger) return;
 
-    state.menuOpen = open;
+    lastFocusedElement = document.activeElement;
 
-    body.classList.toggle(
-      'is-menu-open',
-      open
-    );
+    menuOpen = true;
 
-    menuTrigger.setAttribute(
-      'aria-expanded',
-      String(open)
-    );
+    body.classList.add("is-menu-open");
 
-    menuTrigger.setAttribute(
-      'aria-label',
-      open ? 'Chiudi menu' : 'Apri menu'
-    );
+    menuTrigger.setAttribute("aria-expanded", "true");
+    menuTrigger.setAttribute("aria-label", "Chiudi menu");
 
-    menu.setAttribute(
-      'aria-hidden',
-      String(!open)
-    );
+    menu.setAttribute("aria-hidden", "false");
 
-    if (open) {
-      menuPreviouslyFocused =
-        document.activeElement;
+    clearIdleTimer();
+    exitIdle();
 
-      const firstLink =
-        menuLinks[0];
+    window.setTimeout(() => {
+      if (menuClose) {
+        menuClose.focus();
+      }
+    }, 400);
+  };
 
-      window.setTimeout(() => {
-        (firstLink || menuClose)?.focus();
-      }, 350);
+  const closeMenu = (restoreFocus = true) => {
+    if (!menu || !menuTrigger) return;
 
-    } else {
+    menuOpen = false;
 
-      window.setTimeout(() => {
-        if (
-          menuPreviouslyFocused &&
-          typeof menuPreviouslyFocused.focus === 'function'
-        ) {
-          menuPreviouslyFocused.focus();
-        } else {
-          menuTrigger.focus();
-        }
-      }, 50);
+    body.classList.remove("is-menu-open");
+
+    menuTrigger.setAttribute("aria-expanded", "false");
+    menuTrigger.setAttribute("aria-label", "Apri menu");
+
+    menu.setAttribute("aria-hidden", "true");
+
+    if (
+      restoreFocus &&
+      lastFocusedElement &&
+      typeof lastFocusedElement.focus === "function"
+    ) {
+      lastFocusedElement.focus();
     }
-  }
 
+    scheduleIdle();
+  };
 
-  function setupMenu() {
-    menuTrigger?.addEventListener(
-      'click',
-      () => {
-        setMenuState(!state.menuOpen);
-        resetIdleTimer();
-      }
-    );
+  menuTrigger?.addEventListener("click", () => {
+    if (menuOpen) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  });
 
-    menuClose?.addEventListener(
-      'click',
-      () => {
-        setMenuState(false);
-        resetIdleTimer();
-      }
-    );
+  menuClose?.addEventListener("click", () => {
+    closeMenu();
+  });
 
-    menuLinks.forEach(link => {
-      link.addEventListener(
-        'click',
-        () => {
-          setMenuState(false);
-          resetIdleTimer();
-        }
-      );
+  menuLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      closeMenu(false);
     });
-  }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && menuOpen) {
+      closeMenu();
+    }
+  });
 
 
-  function handleMenuKeyboard(event) {
-    if (!state.menuOpen) return;
+  /* --------------------------------
+     MENU FOCUS TRAP
+  -------------------------------- */
 
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      setMenuState(false);
+  document.addEventListener("keydown", (event) => {
+    if (
+      event.key !== "Tab" ||
+      !menuOpen ||
+      !menu
+    ) {
       return;
     }
 
-    if (event.key !== 'Tab') return;
-
-    const focusables = [
-      ...menuLinks,
-      menuClose
+    const focusable = [
+      menuClose,
+      ...menu.querySelectorAll("a[href]")
     ].filter(Boolean);
 
-    if (!focusables.length) return;
+    if (!focusable.length) return;
 
-    const first = focusables[0];
-    const last =
-      focusables[focusables.length - 1];
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
 
-    if (
-      event.shiftKey &&
-      document.activeElement === first
-    ) {
+    if (event.shiftKey && document.activeElement === first) {
       event.preventDefault();
       last.focus();
     } else if (
@@ -526,524 +463,228 @@
       event.preventDefault();
       first.focus();
     }
-  }
+  });
 
 
-  /* =========================================================
-     ANCHOR NAVIGATION
-  ========================================================== */
+  /* --------------------------------
+     SMOOTH ANCHOR NAVIGATION
+  -------------------------------- */
 
-  function setupAnchorNavigation() {
-    document.addEventListener(
-      'click',
-      event => {
-        const link =
-          event.target.closest('a[href^="#"]');
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest('a[href^="#"]');
 
-        if (!link) return;
+    if (!link) return;
 
-        const hash =
-          link.getAttribute('href');
+    const href = link.getAttribute("href");
 
-        if (!hash || hash === '#') return;
+    if (!href || href === "#") return;
 
-        const target =
-          document.querySelector(hash);
+    const target = document.querySelector(href);
 
-        if (!target) return;
+    if (!target) return;
 
-        event.preventDefault();
+    event.preventDefault();
 
-        target.scrollIntoView({
-          behavior:
-            state.reducedMotion
-              ? 'auto'
-              : 'smooth',
-          block:'start'
-        });
+    const headerOffset =
+      parseInt(
+        getComputedStyle(document.documentElement)
+          .getPropertyValue("--header-height"),
+        10
+      ) || 0;
 
-        history.replaceState(
-          null,
-          '',
-          hash
-        );
+    const targetTop =
+      target.getBoundingClientRect().top +
+      window.scrollY -
+      Math.max(headerOffset * .35, 0);
 
-        resetIdleTimer();
-      }
-    );
-  }
+    window.scrollTo({
+      top: targetTop,
+      behavior: reducedMotion ? "auto" : "smooth"
+    });
 
-
-  /* =========================================================
-     MAGNETIC
-  ========================================================== */
-
-  function setupMagnetic() {
-    if (
-      state.reducedMotion ||
-      !window.matchMedia('(pointer:fine)').matches
-    ) {
-      return;
+    if (menuOpen) {
+      closeMenu(false);
     }
+  });
 
-    const elements =
-      document.querySelectorAll(
-        SELECTORS.magnetic
-      );
 
-    elements.forEach(element => {
+  /* --------------------------------
+     MAGNETIC INTERACTION
+  -------------------------------- */
 
-      element.addEventListener(
-        'pointermove',
-        event => {
-          const rect =
-            element.getBoundingClientRect();
+  const magneticElements = [
+    ...document.querySelectorAll(".magnetic")
+  ];
 
-          const x =
-            ((event.clientX - rect.left) / rect.width - .5) * 8;
+  const updateMagnetic = (element, event) => {
+    if (reducedMotion) return;
 
-          const y =
-            ((event.clientY - rect.top) / rect.height - .5) * 8;
+    const rect = element.getBoundingClientRect();
 
-          element.style.setProperty(
-            '--magnetic-x',
-            `${x}px`
-          );
+    const x =
+      (event.clientX - (rect.left + rect.width / 2)) * .12;
 
-          element.style.setProperty(
-            '--magnetic-y',
-            `${y}px`
-          );
-        }
-      );
+    const y =
+      (event.clientY - (rect.top + rect.height / 2)) * .12;
 
-      element.addEventListener(
-        'pointerleave',
-        () => {
-          element.style.setProperty(
-            '--magnetic-x',
-            '0px'
-          );
+    element.style.setProperty(
+      "--magnetic-x",
+      `${clamp(x, -8, 8)}px`
+    );
 
-          element.style.setProperty(
-            '--magnetic-y',
-            '0px'
-          );
-        }
-      );
+    element.style.setProperty(
+      "--magnetic-y",
+      `${clamp(y, -8, 8)}px`
+    );
+  };
+
+  const resetMagnetic = (element) => {
+    element.style.setProperty("--magnetic-x", "0px");
+    element.style.setProperty("--magnetic-y", "0px");
+  };
+
+  magneticElements.forEach((element) => {
+    element.addEventListener("pointermove", (event) => {
+      updateMagnetic(element, event);
+    });
+
+    element.addEventListener("pointerleave", () => {
+      resetMagnetic(element);
+    });
+  });
+
+
+  /* --------------------------------
+     CONTEXTUAL CURSOR
+  -------------------------------- */
+
+  const hasFinePointer =
+    window.matchMedia("(pointer:fine)").matches;
+
+  if (hasFinePointer && cursor && !reducedMotion) {
+
+    body.classList.add("has-pointer");
+
+    window.addEventListener("pointermove", (event) => {
+      lastPointerX = event.clientX;
+      lastPointerY = event.clientY;
+
+      cursor.style.left = `${lastPointerX}px`;
+      cursor.style.top = `${lastPointerY}px`;
+    }, { passive: true });
+
+    const interactiveElements = [
+      ...document.querySelectorAll(
+        "a, button, .direction-item, .site-door, .synthesis-item"
+      )
+    ];
+
+    interactiveElements.forEach((element) => {
+      element.addEventListener("pointerenter", () => {
+        cursor.classList.add("is-hover");
+      });
+
+      element.addEventListener("pointerleave", () => {
+        cursor.classList.remove("is-hover");
+      });
     });
   }
 
 
-  /* =========================================================
-     CONTEXTUAL CURSOR
-  ========================================================== */
+  /* --------------------------------
+     CENTRAL RAF
+  -------------------------------- */
 
-  function setupCursor() {
-    if (!state.cursorEnabled || !cursor) {
-      return;
-    }
+  const frame = () => {
+    framePending = false;
 
-    const updateCursor =
-      event => {
-        state.cursorX = event.clientX;
-        state.cursorY = event.clientY;
-
-        cursor.style.setProperty(
-          '--cursor-x',
-          `${state.cursorX}px`
-        );
-
-        cursor.style.setProperty(
-          '--cursor-y',
-          `${state.cursorY}px`
-        );
-
-        cursor.classList.add('is-active');
-      };
-
-    window.addEventListener(
-      'pointermove',
-      updateCursor,
-      { passive:true }
-    );
-
-    document.addEventListener(
-      'pointerover',
-      event => {
-        const interactive =
-          isInteractiveElement(
-            event.target
-          );
-
-        const label =
-          interactive?.dataset.cursor ||
-          (
-            event.target.closest(
-              'a,button'
-            )
-              ? 'GO'
-              : 'MOVE'
-          );
-
-        const cursorLabel =
-          cursor.querySelector(
-            '.context-cursor-label'
-          );
-
-        if (cursorLabel) {
-          cursorLabel.textContent =
-            label;
-        }
-      }
-    );
-
-    document.addEventListener(
-      'pointerleave',
-      () => {
-        cursor.classList.remove(
-          'is-active'
-        );
-      }
-    );
-  }
-
-
-  /* =========================================================
-     STANDBY
-  ========================================================== */
-
-  function canEnterStandby() {
-    if (!state.standbyAllowed) {
-      return false;
-    }
-
-    if (state.reducedMotion) {
-      return false;
-    }
-
-    if (state.menuOpen) {
-      return false;
-    }
-
-    if (
-      document.visibilityState !== 'visible'
-    ) {
-      return false;
-    }
-
-    const active =
-      document.activeElement;
-
-    if (
-      active &&
-      (
-        active.matches(
-          'input,textarea,select'
-        ) ||
-        active.isContentEditable
-      )
-    ) {
-      return false;
-    }
-
-    return true;
-  }
-
-
-  function enterStandby() {
-    if (
-      state.standby ||
-      !canEnterStandby()
-    ) {
-      return;
-    }
-
-    state.standby = true;
-
-    body.classList.add(
-      'is-standby'
-    );
-
-    standby?.setAttribute(
-      'aria-hidden',
-      'false'
-    );
-
-    if (cursor) {
-      cursor.classList.remove(
-        'is-active'
-      );
-    }
-  }
-
-
-  function exitStandby() {
-    if (!state.standby) return;
-
-    state.standby = false;
-
-    body.classList.remove(
-      'is-standby'
-    );
-
-    standby?.setAttribute(
-      'aria-hidden',
-      'true'
-    );
-  }
-
-
-  function resetIdleTimer() {
-    window.clearTimeout(
-      state.idleTimer
-    );
-
-    if (state.standby) {
-      exitStandby();
-    }
-
-    if (state.reducedMotion) {
-      return;
-    }
-
-    if (
-      document.visibilityState !== 'visible'
-    ) {
-      return;
-    }
-
-    state.idleTimer =
-      window.setTimeout(
-        enterStandby,
-        state.idleDelay
-      );
-  }
-
-
-  function setupStandby() {
-    if (!standby) return;
-
-    const activityEvents = [
-      'pointermove',
-      'pointerdown',
-      'touchstart',
-      'wheel',
-      'scroll',
-      'keydown',
-      'click'
-    ];
-
-    activityEvents.forEach(
-      eventName => {
-        window.addEventListener(
-          eventName,
-          () => {
-            resetIdleTimer();
-          },
-          {
-            passive:true
-          }
-        );
-      }
-    );
-
-    document.addEventListener(
-      'visibilitychange',
-      () => {
-        if (
-          document.visibilityState !== 'visible'
-        ) {
-          window.clearTimeout(
-            state.idleTimer
-          );
-
-          if (state.standby) {
-            exitStandby();
-          }
-
-          return;
-        }
-
-        resetIdleTimer();
-      }
-    );
-
-    resetIdleTimer();
-  }
-
-
-  /* =========================================================
-     CENTRAL SCROLL RAF
-  ========================================================== */
-
-  function requestFrame() {
-    if (state.framePending) return;
-
-    state.framePending = true;
-
-    window.requestAnimationFrame(
-      () => {
-        state.framePending = false;
-
-        updateHeader();
-        updateAllVisibleProgress();
-      }
-    );
-  }
-
-
-  function setupScroll() {
-    window.addEventListener(
-      'scroll',
-      () => {
-        state.scrollY =
-          window.scrollY;
-
-        requestFrame();
-      },
-      {
-        passive:true
-      }
-    );
-
-    window.addEventListener(
-      'resize',
-      () => {
-        requestFrame();
-      },
-      {
-        passive:true
-      }
-    );
-  }
-
-
-  /* =========================================================
-     INITIAL STATE
-  ========================================================== */
-
-  function setupInitialState() {
-    chapters.forEach(
-      (chapter, index) => {
-        chapter.style.setProperty(
-          '--chapter-progress',
-          index === 0 ? '0' : '0'
-        );
-      }
-    );
-
-    if (chapters[0]) {
-      chapters[0].classList.add(
-        'is-active',
-        'is-visible'
-      );
-
-      state.activeChapter =
-        getChapterIndex(
-          chapters[0]
-        );
-    }
-
-    updateProgressUI();
     updateHeader();
-  }
+    updateChapterProgress();
+  };
+
+  const requestFrame = () => {
+    if (framePending) return;
+
+    framePending = true;
+
+    window.requestAnimationFrame(frame);
+  };
+
+  window.addEventListener("scroll", requestFrame, {
+    passive: true
+  });
+
+  window.addEventListener("resize", requestFrame, {
+    passive: true
+  });
 
 
-  /* =========================================================
-     HASH
-  ========================================================== */
+  /* --------------------------------
+     HASH / INITIAL POSITION
+  -------------------------------- */
 
-  function handleInitialHash() {
-    const hash =
-      window.location.hash;
+  const initialHash = window.location.hash;
 
-    if (!hash) return;
+  if (initialHash) {
+    const target = document.querySelector(initialHash);
 
-    const target =
-      document.querySelector(hash);
-
-    if (!target) return;
-
-    window.setTimeout(
-      () => {
+    if (target) {
+      window.requestAnimationFrame(() => {
         target.scrollIntoView({
-          behavior:'auto',
-          block:'start'
+          behavior:"auto",
+          block:"start"
         });
-      },
-      100
-    );
+      });
+    }
   }
 
 
-  /* =========================================================
-     KEYBOARD / FOCUS
-  ========================================================== */
+  /* --------------------------------
+     INITIALIZATION
+  -------------------------------- */
 
-  function setupKeyboard() {
-    document.addEventListener(
-      'keydown',
-      handleMenuKeyboard
-    );
+  const initialize = () => {
+    if (initialized) return;
 
-    document.addEventListener(
-      'keydown',
-      event => {
-        if (
-          event.key === 'Escape' &&
-          state.standby
-        ) {
-          exitStandby();
-          resetIdleTimer();
+    initialized = true;
+
+    updateHeader();
+    updateChapterProgress();
+
+    if (chapters.length) {
+      let closestIndex = 0;
+      let closestDistance = Infinity;
+
+      chapters.forEach((chapter, index) => {
+        const rect = chapter.getBoundingClientRect();
+
+        const distance =
+          Math.abs(
+            rect.top -
+            window.innerHeight * .35
+          );
+
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = index;
         }
-      }
-    );
-  }
+      });
 
+      updateActiveChapter(closestIndex);
+    }
 
-  /* =========================================================
-     INIT
-  ========================================================== */
+    scheduleIdle();
+    startLoader();
+  };
 
-  function init() {
-    if (state.initialized) return;
-
-    state.initialized = true;
-
-    setupLoader();
-    setupInitialState();
-
-    setupChapterObserver();
-    setupRevealObserver();
-
-    setupMenu();
-    setupAnchorNavigation();
-
-    setupMagnetic();
-    setupCursor();
-
-    setupScroll();
-    setupKeyboard();
-
-    setupStandby();
-
-    handleInitialHash();
-
-    requestFrame();
-  }
-
-
-  if (
-    document.readyState === 'loading'
-  ) {
+  if (document.readyState === "loading") {
     document.addEventListener(
-      'DOMContentLoaded',
-      init,
+      "DOMContentLoaded",
+      initialize,
       { once:true }
     );
   } else {
-    init();
+    initialize();
   }
 
 })();
