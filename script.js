@@ -1,11 +1,16 @@
 /* =========================================================
    CESARE PARATORE
-   HOME — MOVIMENTO CON DIREZIONE
-   MASTER BEST SELLER
+   MOVIMENTO CON DIREZIONE
+   HOME — FINAL NARRATIVE SYSTEM
    ========================================================= */
 
 (() => {
   "use strict";
+
+
+  /* =======================================================
+     CONFIG
+     ======================================================= */
 
   const CFG = {
     loaderMin: 700,
@@ -27,57 +32,76 @@
      DOM
      ======================================================= */
 
-  const $ = (selector, root = document) =>
-    root.querySelector(selector);
-
-  const $$ = (selector, root = document) =>
-    [...root.querySelectorAll(selector)];
-
-
   const body = document.body;
+  const loader = document.getElementById("loader");
+  const header = document.getElementById("site-header");
+  const menu = document.getElementById("site-menu");
+  const menuToggle = document.querySelector(".menu-toggle");
+  const menuLinks = [...document.querySelectorAll("[data-menu-link]")];
 
-  const loader = $(".page-loader");
+  const chapters = [
+    ...document.querySelectorAll(".chapter[data-chapter]")
+  ];
 
-  const header = $("#site-header");
+  const reveals = [
+    ...document.querySelectorAll(".reveal")
+  ];
 
-  const sections = $$(".chapter");
+  const progressCurrent =
+    document.querySelector(".wow-progress-current");
 
-  const progressCurrent = $("#progress-current");
-  const progressTotal = $("#progress-total");
-  const progressFill = $("#progress-fill");
+  const progressFill =
+    document.querySelector(".wow-progress-fill");
 
-  const previousButton = $("#previous-section");
-  const nextButton = $("#next-section");
+  const progressTotal =
+    document.querySelector(".wow-progress-total");
 
-  const menuTrigger = $("#menu-trigger");
-  const menu = $("#site-menu");
-  const menuLinks = $$("a", menu);
-
-  const standby = $("#standby-screen");
-  const standbyWake = $(".standby-wake");
-
-  const directionLinks = $$(".direction-link");
-
-  const reducedMotion =
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  if (reducedMotion) {
-    body.classList.add("reduced-motion");
-  }
+  const standby =
+    document.getElementById("standby");
 
 
   /* =======================================================
      STATE
      ======================================================= */
 
-  let currentIndex = 0;
-  let loaderRemoved = false;
-  let menuOpen = false;
-  let standbyTimer = null;
-  let lastFocusedElement = null;
+  let currentChapter = 1;
+  let lastScrollY = window.scrollY;
+
   let resizeTimer = null;
 
-  const visitedDirections = new Set();
+  let standbyTimer = null;
+
+  let menuOpen = false;
+
+  let pointerX = window.innerWidth / 2;
+  let pointerY = window.innerHeight / 2;
+
+  let magneticX = 0;
+  let magneticY = 0;
+
+  let trajectoryTarget = 0;
+  let trajectoryCurrent = 0;
+
+  const DIRECTIONS = [
+    "sport",
+    "scienze-motorie",
+    "educazione",
+    "management",
+    "digitale"
+  ];
+
+  const JOURNEY = {
+    0: "origin",
+    1: "sport",
+    2: "exploration",
+    3: "converged",
+    4: "pause",
+    5: "territory",
+    6: "integrated",
+    7: "possibility",
+    8: "reader",
+    9: "complete"
+  };
 
 
   /* =======================================================
@@ -87,57 +111,39 @@
   const clamp = (value, min, max) =>
     Math.min(Math.max(value, min), max);
 
-  const formatNumber = (value) =>
-    String(value).padStart(2, "0");
+  const lerp = (a, b, amount) =>
+    a + (b - a) * amount;
 
-  const isFinePointer =
-    window.matchMedia("(pointer:fine)").matches;
+  const getChapterNumber = (chapter) =>
+    Number(chapter?.dataset.chapter || 0);
 
 
   /* =======================================================
-     LOADER — FROZEN BEHAVIOR
+     LOADER
      ======================================================= */
-
-  function removeLoader() {
-
-    if (loaderRemoved || !loader) return;
-
-    loaderRemoved = true;
-
-    loader.classList.add("is-hidden");
-
-    window.setTimeout(() => {
-      loader.remove();
-    }, 900);
-  }
 
   function initLoader() {
 
-    if (!loader) return;
-
-    const startedAt = performance.now();
-
-    const finish = () => {
-
-      const elapsed = performance.now() - startedAt;
-
-      const remaining =
-        Math.max(0, CFG.loaderMin - elapsed);
-
-      window.setTimeout(removeLoader, remaining);
-    };
-
-    if (document.readyState === "complete") {
-      finish();
-    } else {
-      window.addEventListener(
-        "load",
-        finish,
-        { once: true }
-      );
+    if (!loader) {
+      return;
     }
 
-    window.setTimeout(removeLoader, CFG.loaderMax);
+    const start = performance.now();
+
+    const finish = () => {
+      const elapsed = performance.now() - start;
+      const remaining = Math.max(0, CFG.loaderMin - elapsed);
+
+      window.setTimeout(() => {
+        loader.classList.add("is-complete");
+        window.setTimeout(() => {
+          loader.remove();
+        }, 950);
+      }, remaining);
+    };
+
+    window.setTimeout(finish, CFG.loaderMax);
+    window.addEventListener("load", finish, { once: true });
   }
 
 
@@ -145,14 +151,17 @@
      PAGE TRANSITIONS
      ======================================================= */
 
-  function isSameOriginInternalLink(link) {
+  function sameOriginInternalLink(link) {
 
-    if (!link) return false;
+    if (!link) {
+      return false;
+    }
 
-    if (
-      link.target === "_blank" ||
-      link.hasAttribute("download")
-    ) {
+    if (link.target === "_blank") {
+      return false;
+    }
+
+    if (link.hasAttribute("download")) {
       return false;
     }
 
@@ -163,53 +172,52 @@
     }
 
     try {
-
-      const url =
-        new URL(href, window.location.href);
+      const url = new URL(href, window.location.href);
 
       return (
         url.origin === window.location.origin &&
-        !url.pathname.endsWith(".pdf")
+        url.pathname !== window.location.pathname
       );
-
     } catch {
       return false;
     }
   }
 
+
   function initPageTransitions() {
 
-    $$("a").forEach(link => {
+    document
+      .querySelectorAll("a")
+      .forEach((link) => {
 
-      if (!isSameOriginInternalLink(link)) {
-        return;
-      }
-
-      link.addEventListener("click", event => {
-
-        if (
-          event.metaKey ||
-          event.ctrlKey ||
-          event.shiftKey ||
-          event.altKey
-        ) {
+        if (!sameOriginInternalLink(link)) {
           return;
         }
 
-        event.preventDefault();
+        link.addEventListener("click", (event) => {
 
-        const href = link.href;
+          if (
+            event.metaKey ||
+            event.ctrlKey ||
+            event.shiftKey ||
+            event.altKey
+          ) {
+            return;
+          }
 
-        body.classList.add("page-leaving");
+          event.preventDefault();
 
-        window.setTimeout(() => {
-          window.location.href = href;
-        }, CFG.transitionMs);
+          const destination =
+            link.href;
+
+          body.classList.add("is-navigating");
+
+          window.setTimeout(() => {
+            window.location.href = destination;
+          }, CFG.transitionMs);
+        });
 
       });
-
-    });
-
   }
 
 
@@ -219,65 +227,49 @@
 
   function openMenu() {
 
-    if (!menu || !menuTrigger) return;
-
-    lastFocusedElement = document.activeElement;
+    if (!menu || !menuToggle) {
+      return;
+    }
 
     menuOpen = true;
 
-    body.classList.add("is-locked");
-
     menu.classList.add("is-open");
+    menu.setAttribute("aria-hidden", "false");
 
-    menu.setAttribute(
-      "aria-hidden",
-      "false"
-    );
+    menuToggle.setAttribute("aria-expanded", "true");
+    menuToggle.setAttribute("aria-label", "Chiudi menu");
 
-    menuTrigger.setAttribute(
-      "aria-expanded",
-      "true"
-    );
+    body.classList.add("is-locked");
 
     const firstLink = menuLinks[0];
 
-    if (firstLink) {
-      window.setTimeout(() => {
-        firstLink.focus();
-      }, 120);
-    }
+    window.setTimeout(() => {
+      firstLink?.focus();
+    }, 450);
   }
 
-  function closeMenu(
-    restoreFocus = true
-  ) {
 
-    if (!menu || !menuTrigger) return;
+  function closeMenu(returnFocus = true) {
+
+    if (!menu || !menuToggle) {
+      return;
+    }
 
     menuOpen = false;
 
+    menu.classList.remove("is-open");
+    menu.setAttribute("aria-hidden", "true");
+
+    menuToggle.setAttribute("aria-expanded", "false");
+    menuToggle.setAttribute("aria-label", "Apri menu");
+
     body.classList.remove("is-locked");
 
-    menu.classList.remove("is-open");
-
-    menu.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-
-    menuTrigger.setAttribute(
-      "aria-expanded",
-      "false"
-    );
-
-    if (
-      restoreFocus &&
-      lastFocusedElement &&
-      typeof lastFocusedElement.focus === "function"
-    ) {
-      lastFocusedElement.focus();
+    if (returnFocus) {
+      menuToggle.focus();
     }
   }
+
 
   function toggleMenu() {
 
@@ -286,401 +278,247 @@
     } else {
       openMenu();
     }
-
   }
+
 
   function initMenu() {
 
-    if (!menuTrigger) return;
+    if (!menuToggle) {
+      return;
+    }
 
-    menuTrigger.addEventListener(
-      "click",
-      toggleMenu
-    );
+    menuToggle.addEventListener("click", toggleMenu);
 
-    menuLinks.forEach(link => {
-
-      link.addEventListener(
-        "click",
-        () => closeMenu(false)
-      );
-
+    menuLinks.forEach((link) => {
+      link.addEventListener("click", () => {
+        closeMenu(false);
+      });
     });
 
-    document.addEventListener(
-      "keydown",
-      event => {
+    document.addEventListener("keydown", (event) => {
 
-        if (event.key === "Escape") {
-
-          if (menuOpen) {
-            closeMenu();
-          }
-
-          if (standby?.classList.contains("is-active")) {
-            closeStandby();
-          }
-
-        }
-
+      if (!menuOpen) {
+        return;
       }
-    );
 
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeMenu();
+        return;
+      }
+
+      if (event.key !== "Tab") {
+        return;
+      }
+
+      const focusable = [
+        menuToggle,
+        ...menuLinks
+      ].filter(Boolean);
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (
+        !event.shiftKey &&
+        document.activeElement === last
+      ) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
   }
 
 
   /* =======================================================
-     MENU FOCUS TRAP
+     NAVIGATION
      ======================================================= */
 
-  function initMenuFocusTrap() {
+  function goTo(number, behavior = "smooth") {
 
-    document.addEventListener(
-      "keydown",
-      event => {
+    const target = chapters.find(
+      chapter => getChapterNumber(chapter) === number
+    );
 
-        if (!menuOpen || event.key !== "Tab") {
-          return;
-        }
+    if (!target) {
+      return;
+    }
 
-        const focusable = $$(
-          "a[href], button:not([disabled])",
-          menu
+    const headerHeight =
+      header?.offsetHeight || 0;
+
+    const top =
+      target.getBoundingClientRect().top +
+      window.scrollY -
+      headerHeight -
+      CFG.navOffset;
+
+    window.scrollTo({
+      top: Math.max(0, top),
+      behavior
+    });
+  }
+
+
+  function initKeyboardNavigation() {
+
+    document.addEventListener("keydown", (event) => {
+
+      if (
+        menuOpen ||
+        event.target.matches(
+          "input, textarea, select, button, a"
+        )
+      ) {
+        return;
+      }
+
+      if (event.key === "PageDown") {
+
+        event.preventDefault();
+
+        goTo(
+          clamp(
+            currentChapter + 1,
+            1,
+            chapters.length
+          )
         );
-
-        if (!focusable.length) return;
-
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-
-        if (event.shiftKey && document.activeElement === first) {
-
-          event.preventDefault();
-          last.focus();
-
-        } else if (
-          !event.shiftKey &&
-          document.activeElement === last
-        ) {
-
-          event.preventDefault();
-          first.focus();
-
-        }
-
       }
-    );
 
+      if (event.key === "PageUp") {
+
+        event.preventDefault();
+
+        goTo(
+          clamp(
+            currentChapter - 1,
+            1,
+            chapters.length
+          )
+        );
+      }
+
+    });
   }
 
 
   /* =======================================================
-     SECTION NAVIGATION
+     PROGRESS
      ======================================================= */
 
-  function getSectionTop(section) {
+  function wowUpdate() {
 
-    const rect =
-      section.getBoundingClientRect();
+    if (!chapters.length) {
+      return;
+    }
 
-    return (
+    const viewportPoint =
       window.scrollY +
-      rect.top -
-      CFG.navOffset
-    );
-  }
+      window.innerHeight * 0.45;
 
-  function goTo(index, smooth = true) {
+    let closest = chapters[0];
+    let closestDistance = Infinity;
 
-    const next =
-      clamp(index, 0, sections.length - 1);
+    chapters.forEach((chapter) => {
 
-    const target =
-      sections[next];
+      const rect =
+        chapter.getBoundingClientRect();
 
-    if (!target) return;
+      const center =
+        rect.top +
+        window.scrollY +
+        rect.height / 2;
 
-    if (smooth) {
+      const distance =
+        Math.abs(center - viewportPoint);
 
-      target.scrollIntoView({
-        behavior: reducedMotion
-          ? "auto"
-          : "smooth",
-        block: "start"
-      });
-
-    } else {
-
-      window.scrollTo({
-        top: getSectionTop(target),
-        behavior: "auto"
-      });
-
-    }
-
-  }
-
-  function goNext() {
-
-    if (currentIndex < sections.length - 1) {
-      goTo(currentIndex + 1);
-    }
-
-  }
-
-  function goPrevious() {
-
-    if (currentIndex > 0) {
-      goTo(currentIndex - 1);
-    }
-
-  }
-
-  function initSectionNavigation() {
-
-    previousButton?.addEventListener(
-      "click",
-      goPrevious
-    );
-
-    nextButton?.addEventListener(
-      "click",
-      goNext
-    );
-
-    document.addEventListener(
-      "keydown",
-      event => {
-
-        if (
-          event.target instanceof HTMLInputElement ||
-          event.target instanceof HTMLTextAreaElement ||
-          event.target instanceof HTMLSelectElement
-        ) {
-          return;
-        }
-
-        if (menuOpen) return;
-
-        if (event.key === "PageDown") {
-
-          event.preventDefault();
-          goNext();
-
-        }
-
-        if (event.key === "PageUp") {
-
-          event.preventDefault();
-          goPrevious();
-
-        }
-
+      if (distance < closestDistance) {
+        closest = chapter;
+        closestDistance = distance;
       }
-    );
+    });
 
-  }
-
-
-  /* =======================================================
-     ACTIVE SECTION / PROGRESS
-     ======================================================= */
-
-  function updateProgress(index) {
+    currentChapter =
+      getChapterNumber(closest);
 
     const total =
-      sections.length;
+      chapters.length;
 
-    const percent =
+    const progress =
       total <= 1
-        ? 100
-        : (index / (total - 1)) * 100;
+        ? 1
+        : (currentChapter - 1) / (total - 1);
 
     if (progressCurrent) {
       progressCurrent.textContent =
-        formatNumber(index + 1);
+        String(currentChapter).padStart(2, "0");
     }
 
     if (progressTotal) {
       progressTotal.textContent =
-        formatNumber(total);
+        String(total).padStart(2, "0");
     }
 
     if (progressFill) {
       progressFill.style.transform =
-        `scaleX(${percent / 100})`;
+        `scaleX(${clamp(progress, 0, 1)})`;
     }
 
-    if (previousButton) {
-      previousButton.disabled =
-        index === 0;
-    }
-
-    if (nextButton) {
-      nextButton.disabled =
-        index === total - 1;
-    }
-
-  }
-
-  function updateActiveSection() {
-
-    const viewportCenter =
-      window.innerHeight * 0.45;
-
-    let closestIndex = currentIndex;
-
-    let closestDistance = Infinity;
-
-    sections.forEach(
-      (section, index) => {
-
-        const rect =
-          section.getBoundingClientRect();
-
-        const center =
-          rect.top + rect.height / 2;
-
-        const distance =
-          Math.abs(center - viewportCenter);
-
-        if (distance < closestDistance) {
-
-          closestDistance = distance;
-          closestIndex = index;
-
-        }
-
-      }
-    );
-
-    if (closestIndex !== currentIndex) {
-
-      currentIndex = closestIndex;
-
-      updateProgress(currentIndex);
-
-      applyJourneyState();
-
-    }
-
+    applyJourneyState(currentChapter);
   }
 
 
   /* =======================================================
-     JOURNEY SYSTEM
+     JOURNEY STATE
      ======================================================= */
 
-  const JOURNEY = [
-    "origin",
-    "sport",
-    "exploration",
-    "converged",
-    "pause",
-    "territory",
-    "integrated",
-    "possibility",
-    "reader",
-    "complete"
-  ];
-
-  function applyJourneyState() {
+  function applyJourneyState(number) {
 
     const state =
-      JOURNEY[currentIndex] || "origin";
+      JOURNEY[number - 1] || "origin";
 
-    body.dataset.journeyState = state;
+    document.documentElement.dataset.journey =
+      state;
 
-    sections.forEach(
-      (section, index) => {
+    chapters.forEach((chapter) => {
 
-        section.dataset.journeyState =
-          JOURNEY[index] || "origin";
+      const chapterNumber =
+        getChapterNumber(chapter);
 
-        section.classList.toggle(
-          "is-current",
-          index === currentIndex
-        );
-
-      }
-    );
-
-    directionLinks.forEach(link => {
-
-      const direction =
-        link.dataset.direction;
-
-      link.classList.toggle(
-        "is-visited",
-        visitedDirections.has(direction)
+      chapter.classList.toggle(
+        "is-current",
+        chapterNumber === number
       );
 
+      chapter.classList.toggle(
+        "is-past",
+        chapterNumber < number
+      );
+
+      chapter.classList.toggle(
+        "is-future",
+        chapterNumber > number
+      );
     });
 
-  }
-
-
-  /* =======================================================
-     DIRECTION INTERACTION
-     ======================================================= */
-
-  function markDirectionVisited(direction) {
-
-    if (!direction) return;
-
-    visitedDirections.add(direction);
-
-    directionLinks.forEach(link => {
-
-      if (
-        link.dataset.direction === direction
-      ) {
-
-        link.classList.add("is-visited");
-
-      }
-
-    });
-
-  }
-
-  function initDirections() {
-
-    directionLinks.forEach(link => {
-
-      link.addEventListener(
-        "click",
-        () => {
-
-          markDirectionVisited(
-            link.dataset.direction
-          );
-
-        }
+    const directionNodes =
+      document.querySelectorAll(
+        ".network-node"
       );
 
-      link.addEventListener(
-        "pointerenter",
-        () => {
-
-          if (!isFinePointer) return;
-
-          link.classList.add("is-hovered");
-
-        }
+    if (number >= 4) {
+      directionNodes.forEach(
+        node => node.classList.add("is-active")
       );
-
-      link.addEventListener(
-        "pointerleave",
-        () => {
-
-          link.classList.remove("is-hovered");
-
-        }
+    } else {
+      directionNodes.forEach(
+        node => node.classList.remove("is-active")
       );
-
-    });
-
+    }
   }
 
 
@@ -690,17 +528,11 @@
 
   function initReveal() {
 
-    const elements =
-      $$(".reveal");
-
     if (
-      reducedMotion ||
       !("IntersectionObserver" in window)
     ) {
-
-      elements.forEach(
-        element =>
-          element.classList.add("is-visible")
+      reveals.forEach(
+        element => element.classList.add("is-visible")
       );
 
       return;
@@ -708,9 +540,9 @@
 
     const observer =
       new IntersectionObserver(
-        entries => {
+        (entries) => {
 
-          entries.forEach(entry => {
+          entries.forEach((entry) => {
 
             if (!entry.isIntersecting) {
               return;
@@ -723,191 +555,201 @@
             observer.unobserve(
               entry.target
             );
-
           });
 
         },
         {
-          threshold:CFG.revealThreshold,
-          rootMargin:"0px 0px -8% 0px"
+          threshold: CFG.revealThreshold,
+          rootMargin: "0px 0px -8% 0px"
         }
       );
 
-    elements.forEach(
-      element =>
-        observer.observe(element)
+    reveals.forEach(
+      element => observer.observe(element)
     );
-
   }
 
 
   /* =======================================================
-     CURSOR
+     DIRECTION INTERACTION
      ======================================================= */
 
-  function initCursor() {
+  function initDirections() {
 
-    if (
-      !isFinePointer ||
-      reducedMotion
-    ) {
-      return;
-    }
-
-    let mouseX = window.innerWidth / 2;
-    let mouseY = window.innerHeight / 2;
-
-    let currentX = mouseX;
-    let currentY = mouseY;
-
-    document.addEventListener(
-      "pointermove",
-      event => {
-
-        mouseX = event.clientX;
-        mouseY = event.clientY;
-
-      },
-      { passive:true }
-    );
-
-    const tick = () => {
-
-      currentX +=
-        (mouseX - currentX) *
-        CFG.cursorLerp;
-
-      currentY +=
-        (mouseY - currentY) *
-        CFG.cursorLerp;
-
-      document.documentElement.style.setProperty(
-        "--cursor-x",
-        `${currentX}px`
+    const links =
+      document.querySelectorAll(
+        ".direction-link"
       );
 
-      document.documentElement.style.setProperty(
-        "--cursor-y",
-        `${currentY}px`
-      );
+    links.forEach((link) => {
 
-      requestAnimationFrame(tick);
-
-    };
-
-    requestAnimationFrame(tick);
-
-  }
-
-
-  /* =======================================================
-     MAGNETIC INTERACTION
-     ======================================================= */
-
-  function initMagnetic() {
-
-    if (
-      !isFinePointer ||
-      reducedMotion
-    ) {
-      return;
-    }
-
-    const elements = [
-      ...$$(".final-cta"),
-      ...$$(".direction-link"),
-      ...$$(".section-jump button"),
-      ...$$(".menu-trigger")
-    ];
-
-    elements.forEach(element => {
-
-      let rect = null;
-
-      element.addEventListener(
-        "pointerenter",
+      link.addEventListener(
+        "mouseenter",
         () => {
-          rect =
-            element.getBoundingClientRect();
-        }
-      );
 
-      element.addEventListener(
-        "pointermove",
-        event => {
+          const direction =
+            link.dataset.direction;
 
-          if (!rect) {
-            rect =
-              element.getBoundingClientRect();
-          }
-
-          const centerX =
-            rect.left + rect.width / 2;
-
-          const centerY =
-            rect.top + rect.height / 2;
-
-          const dx =
-            event.clientX - centerX;
-
-          const dy =
-            event.clientY - centerY;
-
-          const distance =
-            Math.sqrt(dx * dx + dy * dy);
-
-          if (
-            distance >
-            CFG.magneticRadius
-          ) {
+          if (!direction) {
             return;
           }
 
-          const strength =
-            CFG.magneticStrength *
-            (1 - distance / CFG.magneticRadius);
-
-          element.style.setProperty(
-            "--magnetic-x",
-            `${dx * strength}px`
-          );
-
-          element.style.setProperty(
-            "--magnetic-y",
-            `${dy * strength}px`
-          );
-
-          element.style.transform =
-            `translate3d(
-              ${dx * strength}px,
-              ${dy * strength}px,
-              0
-            )`;
-
+          document.documentElement.dataset.direction =
+            direction;
         }
       );
 
-      element.addEventListener(
-        "pointerleave",
+      link.addEventListener(
+        "mouseleave",
         () => {
 
-          rect = null;
+          delete document.documentElement
+            .dataset.direction;
+        }
+      );
 
-          element.style.removeProperty(
-            "--magnetic-x"
-          );
+      link.addEventListener(
+        "focus",
+        () => {
 
-          element.style.removeProperty(
-            "--magnetic-y"
-          );
+          const direction =
+            link.dataset.direction;
 
-          element.style.transform = "";
+          if (!direction) {
+            return;
+          }
 
+          document.documentElement.dataset.direction =
+            direction;
+        }
+      );
+
+      link.addEventListener(
+        "blur",
+        () => {
+
+          delete document.documentElement
+            .dataset.direction;
         }
       );
 
     });
+  }
 
+
+  /* =======================================================
+     MAGNETIC CURSOR
+     ======================================================= */
+
+  function supportsFinePointer() {
+
+    return window.matchMedia(
+      "(pointer: fine)"
+    ).matches;
+  }
+
+
+  function initCursor() {
+
+    if (!supportsFinePointer()) {
+      return;
+    }
+
+    const interactive =
+      document.querySelectorAll(
+        "a, button"
+      );
+
+    document.addEventListener(
+      "pointermove",
+      (event) => {
+
+        pointerX = event.clientX;
+        pointerY = event.clientY;
+      },
+      {
+        passive: true
+      }
+    );
+
+    function frame() {
+
+      let targetX = 0;
+      let targetY = 0;
+
+      interactive.forEach((element) => {
+
+        const rect =
+          element.getBoundingClientRect();
+
+        if (
+          pointerX < rect.left - CFG.magneticRadius ||
+          pointerX > rect.right + CFG.magneticRadius ||
+          pointerY < rect.top - CFG.magneticRadius ||
+          pointerY > rect.bottom + CFG.magneticRadius
+        ) {
+          return;
+        }
+
+        const centerX =
+          rect.left +
+          rect.width / 2;
+
+        const centerY =
+          rect.top +
+          rect.height / 2;
+
+        const dx =
+          pointerX - centerX;
+
+        const dy =
+          pointerY - centerY;
+
+        const distance =
+          Math.sqrt(dx * dx + dy * dy);
+
+        if (distance > CFG.magneticRadius) {
+          return;
+        }
+
+        const strength =
+          (1 - distance / CFG.magneticRadius) *
+          CFG.magneticStrength;
+
+        targetX += dx * strength;
+        targetY += dy * strength;
+      });
+
+      magneticX =
+        lerp(
+          magneticX,
+          targetX,
+          CFG.cursorLerp
+        );
+
+      magneticY =
+        lerp(
+          magneticY,
+          targetY,
+          CFG.cursorLerp
+        );
+
+      document.documentElement.style
+        .setProperty(
+          "--magnetic-x",
+          `${magneticX}px`
+        );
+
+      document.documentElement.style
+        .setProperty(
+          "--magnetic-y",
+          `${magneticY}px`
+        );
+
+      requestAnimationFrame(frame);
+    }
+
+    requestAnimationFrame(frame);
   }
 
 
@@ -915,62 +757,61 @@
      TRAJECTORY
      ======================================================= */
 
+  function updateTrajectory() {
+
+    const center =
+      window.innerHeight / 2;
+
+    const normalized =
+      clamp(
+        (pointerY - center) /
+        Math.max(center, 1),
+        -1,
+        1
+      );
+
+    trajectoryTarget =
+      normalized *
+      CFG.trajectoryDrift;
+
+    trajectoryCurrent =
+      lerp(
+        trajectoryCurrent,
+        trajectoryTarget,
+        CFG.trajectoryLerp
+      );
+
+    document.documentElement.style
+      .setProperty(
+        "--trajectory-drift",
+        `${trajectoryCurrent}px`
+      );
+
+    requestAnimationFrame(
+      updateTrajectory
+    );
+  }
+
+
   function initTrajectory() {
 
-    if (reducedMotion) {
+    if (!supportsFinePointer()) {
       return;
     }
 
-    let targetDrift = 0;
-    let currentDrift = 0;
-
-    const updateTarget = () => {
-
-      const progress =
-        window.scrollY /
-        Math.max(
-          1,
-          document.documentElement.scrollHeight -
-          window.innerHeight
-        );
-
-      targetDrift =
-        (
-          progress -
-          0.5
-        ) *
-        CFG.trajectoryDrift;
-
-    };
-
-    window.addEventListener(
-      "scroll",
-      updateTarget,
-      { passive:true }
+    document.addEventListener(
+      "pointermove",
+      (event) => {
+        pointerY = event.clientY;
+      },
+      {
+        passive: true
+      }
     );
 
-    const tick = () => {
-
-      currentDrift +=
-        (
-          targetDrift -
-          currentDrift
-        ) *
-        CFG.trajectoryLerp;
-
-      document.documentElement.style.setProperty(
-        "--trajectory-drift",
-        `${currentDrift}px`
-      );
-
-      requestAnimationFrame(tick);
-
-    };
-
-    updateTarget();
-
-    requestAnimationFrame(tick);
-
+    requestAnimationFrame(
+      updateTrajectory
+    );
   }
 
 
@@ -981,31 +822,57 @@
   function initCTA() {
 
     const cta =
-      $(".final-cta");
+      document.querySelector(
+        ".final-cta"
+      );
 
-    if (!cta) return;
+    if (!cta) {
+      return;
+    }
 
     cta.addEventListener(
-      "click",
+      "mouseenter",
       () => {
-
-        cta.classList.add(
-          "is-engaged"
-        );
-
+        document.documentElement
+          .classList.add("cta-engaged");
       }
     );
 
+    cta.addEventListener(
+      "mouseleave",
+      () => {
+        document.documentElement
+          .classList.remove("cta-engaged");
+      }
+    );
+
+    cta.addEventListener(
+      "focus",
+      () => {
+        document.documentElement
+          .classList.add("cta-engaged");
+      }
+    );
+
+    cta.addEventListener(
+      "blur",
+      () => {
+        document.documentElement
+          .classList.remove("cta-engaged");
+      }
+    );
   }
 
 
   /* =======================================================
-     STANDBY — FROZEN
+     STANDBY
      ======================================================= */
 
   function closeStandby() {
 
-    if (!standby) return;
+    if (!standby) {
+      return;
+    }
 
     standby.classList.remove(
       "is-active"
@@ -1019,17 +886,14 @@
     body.classList.remove(
       "is-locked"
     );
-
-    resetStandbyTimer();
-
   }
+
 
   function openStandby() {
 
     if (
       !standby ||
-      reducedMotion ||
-      window.innerWidth < 700
+      menuOpen
     ) {
       return;
     }
@@ -1046,95 +910,143 @@
     body.classList.add(
       "is-locked"
     );
-
-    standbyWake?.focus();
   }
+
 
   function resetStandbyTimer() {
 
-    if (standbyTimer) {
-      clearTimeout(standbyTimer);
-    }
+    window.clearTimeout(
+      standbyTimer
+    );
 
-    if (
-      reducedMotion ||
-      window.innerWidth < 700
-    ) {
-      return;
-    }
+    closeStandby();
 
     standbyTimer =
       window.setTimeout(
         openStandby,
         CFG.standbyDelay
       );
-
   }
+
 
   function initStandby() {
 
-    if (!standby) return;
+    [
+      "pointermove",
+      "pointerdown",
+      "wheel",
+      "touchstart",
+      "keydown",
+      "scroll"
+    ].forEach((eventName) => {
 
-    standbyWake?.addEventListener(
-      "click",
-      closeStandby
-    );
+      window.addEventListener(
+        eventName,
+        resetStandbyTimer,
+        {
+          passive: true
+        }
+      );
 
-    ["pointerdown","wheel","touchstart","keydown"]
-      .forEach(eventName => {
+    });
 
-        window.addEventListener(
-          eventName,
-          () => {
+    if (standby) {
 
-            if (
-              !standby.classList.contains(
-                "is-active"
-              )
-            ) {
-              resetStandbyTimer();
-            }
+      standby.addEventListener(
+        "click",
+        () => {
+          resetStandbyTimer();
+        }
+      );
 
-          },
-          {
-            passive:
-              eventName !== "keydown"
-          }
-        );
-
-      });
+    }
 
     resetStandbyTimer();
-
   }
 
 
   /* =======================================================
-     HASH NAVIGATION
+     HASH
      ======================================================= */
 
   function initHashNavigation() {
 
-    if (!window.location.hash) {
+    const hash =
+      window.location.hash;
+
+    if (!hash) {
       return;
     }
 
     const target =
-      document.querySelector(
-        window.location.hash
-      );
+      document.querySelector(hash);
 
-    if (!target) return;
+    if (!target) {
+      return;
+    }
 
     window.setTimeout(() => {
 
       target.scrollIntoView({
-        behavior:"auto",
-        block:"start"
+        behavior: "auto",
+        block: "start"
       });
 
-    }, CFG.loaderMin + 50);
+    }, 100);
+  }
 
+
+  /* =======================================================
+     SCROLL
+     ======================================================= */
+
+  function initScroll() {
+
+    let ticking = false;
+
+    const update = () => {
+
+      wowUpdate();
+
+      const currentY =
+        window.scrollY;
+
+      body.classList.toggle(
+        "is-scrolling-down",
+        currentY > lastScrollY
+      );
+
+      body.classList.toggle(
+        "is-scrolling-up",
+        currentY < lastScrollY
+      );
+
+      lastScrollY =
+        currentY;
+
+      ticking = false;
+    };
+
+    window.addEventListener(
+      "scroll",
+      () => {
+
+        if (ticking) {
+          return;
+        }
+
+        ticking = true;
+
+        requestAnimationFrame(
+          update
+        );
+      },
+      {
+        passive: true
+      }
+    );
+
+    update();
   }
 
 
@@ -1148,82 +1060,42 @@
       "resize",
       () => {
 
-        clearTimeout(resizeTimer);
+        window.clearTimeout(
+          resizeTimer
+        );
 
         resizeTimer =
           window.setTimeout(
             () => {
-
-              resetStandbyTimer();
-              updateActiveSection();
-
+              wowUpdate();
             },
             CFG.resizeDebounce
           );
-
       },
-      { passive:true }
+      {
+        passive: true
+      }
     );
-
   }
 
 
   /* =======================================================
-     SCROLL
-     ======================================================= */
-
-  function initScroll() {
-
-    let ticking = false;
-
-    window.addEventListener(
-      "scroll",
-      () => {
-
-        if (ticking) return;
-
-        ticking = true;
-
-        requestAnimationFrame(() => {
-
-          updateActiveSection();
-
-          ticking = false;
-
-        });
-
-      },
-      { passive:true }
-    );
-
-  }
-
-
-  /* =======================================================
-     INITIALIZATION
+     INIT
      ======================================================= */
 
   function init() {
 
-    updateProgress(0);
-    applyJourneyState();
-
     initLoader();
+
+    initMenu();
 
     initPageTransitions();
 
-    initMenu();
-    initMenuFocusTrap();
-
-    initSectionNavigation();
+    initReveal();
 
     initDirections();
 
-    initReveal();
-
     initCursor();
-
-    initMagnetic();
 
     initTrajectory();
 
@@ -1231,31 +1103,37 @@
 
     initStandby();
 
-    initHashNavigation();
-
-    initResize();
+    initKeyboardNavigation();
 
     initScroll();
 
-    updateActiveSection();
+    initResize();
 
+    initHashNavigation();
+
+    wowUpdate();
+
+    window.setTimeout(
+      closeStandby,
+      0
+    );
   }
 
+
+  /* =======================================================
+     START
+     ======================================================= */
 
   if (
     document.readyState === "loading"
   ) {
-
     document.addEventListener(
       "DOMContentLoaded",
       init,
-      { once:true }
+      { once: true }
     );
-
   } else {
-
     init();
-
   }
 
 })();
