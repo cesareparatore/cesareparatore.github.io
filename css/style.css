@@ -1,2290 +1,1775 @@
-/* =========================================================
-   CESARE PARATORE
-   MOVIMENTO / CON DIREZIONE.
-   MASTER VISUAL SYSTEM — 2.3
-   ========================================================= */
-
-:root {
-  --ivory: #F2EFE8;
-  --ink: #11110F;
-  --terracotta: #A64232;
-  --sand: #C9C0AF;
-  --stone: #77736B;
-  --white: #FFFDF8;
-
-  --font-serif: "Instrument Serif", Georgia, serif;
-  --font-sans: "DM Sans", Arial, sans-serif;
-  --font-mono: "DM Mono", monospace;
-
-  --header-height: 108px;
-  --content-max: 1680px;
-  --copy-max: 760px;
-  --narrow-copy: 620px;
-
-  --space-1: 8px;
-  --space-2: 16px;
-  --space-3: 24px;
-  --space-4: 32px;
-  --space-5: 48px;
-  --space-6: 64px;
-  --space-7: 96px;
-  --space-8: 128px;
-  --space-9: 180px;
-
-  --ease-out: cubic-bezier(.16, 1, .3, 1);
-  --ease-in-out: cubic-bezier(.65, 0, .35, 1);
-
-  --trajectory-progress: 0;
-  --trajectory-drift: 0px;
-
-  --magnetic-x: 0px;
-  --magnetic-y: 0px;
-}
-
-
-/* =========================================================
-   RESET
-   ========================================================= */
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-  background: var(--ivory);
-}
-
-body {
-  margin: 0;
-  overflow-x: clip;
-  background: var(--ivory);
-  color: var(--ink);
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-body.is-menu-open,
-body.is-standby {
-  overflow: hidden;
-}
-
-img,
-svg,
-iframe {
-  display: block;
-  max-width: 100%;
-}
-
-button,
-input,
-textarea,
-select {
-  font: inherit;
-}
-
-button,
-a {
-  -webkit-tap-highlight-color: transparent;
-}
-
-a {
-  color: inherit;
-}
-
-:focus {
-  outline: none;
-}
-
-:focus-visible {
-  outline: 1px solid var(--terracotta);
-  outline-offset: 5px;
-}
-
-
-/* =========================================================
-   LOADER
-   ========================================================= */
-
-.page-loader {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-
-  display: grid;
-  place-items: center;
-
-  background: var(--ivory);
-  color: var(--ink);
-
-  opacity: 1;
-  visibility: visible;
-
-  transition:
-    opacity .9s var(--ease-out),
-    visibility 0s linear 0s;
-}
-
-.page-loader.is-hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-
-  transition:
-    opacity .9s var(--ease-out),
-    visibility 0s linear .9s;
-}
-
-.page-loader-inner {
-  position: relative;
-
-  width: min(86vw, 720px);
-  min-height: 250px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.loader-trajectory {
-  position: relative;
-
-  width: min(360px, 68vw);
-  height: 42px;
-
-  margin-bottom: 48px;
-}
-
-.loader-line {
-  position: absolute;
-  left: 0;
-  top: 50%;
-
-  width: 100%;
-  height: 1px;
-
-  background: var(--ink);
-
-  transform-origin: left center;
-  transform: scaleX(0);
-
-  opacity: 0;
-
-  animation:
-    loaderLine
-    2.1s
-    var(--ease-out)
-    1.35s
-    forwards;
-}
-
-.loader-point {
-  position: absolute;
-  left: 0;
-  top: 50%;
-
-  width: 9px;
-  height: 9px;
-
-  border-radius: 50%;
-
-  background: var(--terracotta);
-
-  transform:
-    translate(-50%, -50%)
-    scale(0);
-
-  animation:
-    loaderPointAppear
-    .8s
-    var(--ease-out)
-    .15s
-    forwards;
-}
-
-.loader-motto {
-  display: flex;
-  align-items: center;
-  gap: .55em;
-
-  margin: 0;
-
-  color: var(--ink);
-
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: .13em;
-  line-height: 1.4;
-
-  text-align: center;
-
-  opacity: 0;
-  transform: translateY(12px);
-
-  animation:
-    loaderMotto
-    1.1s
-    var(--ease-out)
-    3.25s
-    forwards;
-}
-
-.loader-signature {
-  margin: 22px 0 0;
-
-  color: var(--stone);
-
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: .16em;
-  line-height: 1.2;
-
-  text-align: center;
-
-  opacity: 0;
-  transform: translateY(8px);
-
-  animation:
-    loaderSignature
-    .9s
-    var(--ease-out)
-    4.05s
-    forwards;
-}
-
-@keyframes loaderPointAppear {
-  0% {
-    opacity: 0;
-    transform:
-      translate(-50%, -50%)
-      scale(0);
-  }
-
-  65% {
-    opacity: 1;
-    transform:
-      translate(-50%, -50%)
-      scale(1.15);
-  }
-
-  100% {
-    opacity: 1;
-    transform:
-      translate(-50%, -50%)
-      scale(1);
-  }
-}
-
-@keyframes loaderLine {
-  0% {
-    opacity: 0;
-    transform: scaleX(0);
-  }
-
-  12% {
-    opacity: 1;
+<!doctype html>
+<html lang="it">
+
+<head>
+
+  <!-- =====================================================
+       CORE
+       ===================================================== -->
+
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <meta
+    name="theme-color"
+    content="#F2EFE8"
+  >
+
+  <meta
+    name="color-scheme"
+    content="light"
+  >
+
+  <meta
+    name="description"
+    content="Cesare Paratore. Sport, Scienze Motorie, educazione, management e digitale: un percorso costruito attraverso movimento, esperienza e connessioni."
+  >
+
+  <title>
+    Cesare Paratore — Movimento / Con direzione.
+  </title>
+
+  <link
+    rel="canonical"
+    href="https://www.cesareparatore.it/"
+  >
+
+  <!-- =====================================================
+       OPEN GRAPH / SOCIAL
+       ===================================================== -->
+
+  <meta
+    property="og:type"
+    content="website"
+  >
+
+  <meta
+    property="og:locale"
+    content="it_IT"
+  >
+
+  <meta
+    property="og:title"
+    content="Cesare Paratore — Movimento / Con direzione."
+  >
+
+  <meta
+    property="og:description"
+    content="Sport, Scienze Motorie, educazione, management e digitale: un percorso costruito attraverso movimento, esperienza e connessioni."
+  >
+
+  <meta
+    property="og:url"
+    content="https://www.cesareparatore.it/"
+  >
+
+  <meta
+    property="og:image"
+    content="https://www.cesareparatore.it/assets/images/cp-foto.webp"
+  >
+
+  <meta
+    property="og:image:alt"
+    content="Cesare Paratore"
+  >
+
+  <meta
+    name="twitter:card"
+    content="summary_large_image"
+  >
+
+  <meta
+    name="twitter:title"
+    content="Cesare Paratore — Movimento / Con direzione."
+  >
+
+  <meta
+    name="twitter:description"
+    content="Sport, Scienze Motorie, educazione, management e digitale: un percorso costruito attraverso movimento, esperienza e connessioni."
+  >
+
+  <meta
+    name="twitter:image"
+    content="https://www.cesareparatore.it/assets/images/cp-foto.webp"
+  >
+
+  <!-- =====================================================
+       FAVICON
+       ===================================================== -->
+
+  <link
+    rel="icon"
+    type="image/png"
+    href="/assets/images/cp-mark.png"
+  >
+
+  <!-- =====================================================
+       FONTS
+       ===================================================== -->
+
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- =====================================================
+       STYLES
+       ===================================================== -->
+
+  <link
+    rel="stylesheet"
+    href="/css/style.css"
+  >
+
+  <!-- =====================================================
+       STRUCTURED DATA
+       ===================================================== -->
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://www.cesareparatore.it/#website",
+        "url": "https://www.cesareparatore.it/",
+        "name": "Cesare Paratore",
+        "description": "Movimento / Con direzione.",
+        "inLanguage": "it-IT"
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://www.cesareparatore.it/#webpage",
+        "url": "https://www.cesareparatore.it/",
+        "name": "Cesare Paratore — Movimento / Con direzione.",
+        "description": "Sport, Scienze Motorie, educazione, management e digitale: un percorso costruito attraverso movimento, esperienza e connessioni.",
+        "isPartOf": {
+          "@id": "https://www.cesareparatore.it/#website"
+        },
+        "inLanguage": "it-IT"
+      },
+      {
+        "@type": "Person",
+        "@id": "https://www.cesareparatore.it/#person",
+        "name": "Cesare Paratore",
+        "url": "https://www.cesareparatore.it/",
+        "image": "https://www.cesareparatore.it/assets/images/cp-foto.webp"
+      }
+    ]
   }
-
-  100% {
-    opacity: 1;
-    transform: scaleX(1);
-  }
-}
-
-@keyframes loaderMotto {
-  0% {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes loaderSignature {
-  0% {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-
-/* =========================================================
-   PAGE TRANSITION
-   ========================================================= */
-
-.page-transition {
-  position: fixed;
-  inset: 0;
-  z-index: 950;
-
-  background: var(--ink);
-
-  transform: translateY(100%);
-  pointer-events: none;
-
-  transition:
-    transform .7s var(--ease-in-out);
-}
-
-.page-transition.is-active {
-  transform: translateY(0);
-}
-
-
-/* =========================================================
-   CUSTOM CURSOR
-   ========================================================= */
-
-.custom-cursor {
-  position: fixed;
-  inset: 0;
-
-  z-index: 900;
-
-  pointer-events: none;
-
-  opacity: 0;
-  transition: opacity .2s ease;
-}
-
-.custom-cursor.is-visible {
-  opacity: 1;
-}
-
-.custom-cursor-dot,
-.custom-cursor-ring {
-  position: fixed;
-
-  left: 0;
-  top: 0;
-
-  border-radius: 50%;
-
-  pointer-events: none;
-}
-
-.custom-cursor-dot {
-  width: 6px;
-  height: 6px;
-
-  background: var(--terracotta);
-}
-
-.custom-cursor-ring {
-  width: 30px;
-  height: 30px;
-
-  border: 1px solid var(--stone);
-
-  transition:
-    width .35s var(--ease-out),
-    height .35s var(--ease-out),
-    border-color .25s ease;
-}
-
-.custom-cursor.is-hovering .custom-cursor-ring {
-  width: 48px;
-  height: 48px;
-  border-color: var(--terracotta);
-}
-
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
-.site-header {
-  position: fixed;
-
-  top: 0;
-  left: 0;
-  right: 0;
-
-  z-index: 800;
-
-  height: var(--header-height);
-
-  display: grid;
-  grid-template-columns: 1fr minmax(280px, 560px) 1fr;
-  align-items: center;
-
-  padding:
-    0 clamp(20px, 4vw, 64px);
-
-  background: rgba(242, 239, 232, .92);
-
-  border-bottom: 1px solid rgba(17, 17, 15, .08);
-
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-.site-brand {
-  justify-self: start;
-
-  display: inline-flex;
-
-  transform:
-    translate(
-      var(--magnetic-x),
-      var(--magnetic-y)
-    );
-
-  transition:
-    transform .45s var(--ease-out);
-}
-
-.site-brand img {
-  width: 48px;
-  height: 48px;
+  </script>
 
-  object-fit: contain;
-}
+</head>
 
-.menu-trigger {
-  justify-self: end;
 
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
+<body>
 
-  min-height: 44px;
-  padding: 8px 0;
+  <!-- =====================================================
+       ACCESSIBILITY
+       ===================================================== -->
 
-  border: 0;
-  background: transparent;
+  <a
+    class="skip-link"
+    href="#01"
+  >
+    Vai al contenuto
+  </a>
 
-  color: var(--ink);
 
-  cursor: pointer;
+  <!-- =====================================================
+       PAGE LOADER
+       ===================================================== -->
 
-  transform:
-    translate(
-      var(--magnetic-x),
-      var(--magnetic-y)
-    );
+  <div
+    class="page-loader"
+    aria-hidden="true"
+  >
 
-  transition:
-    color .25s ease,
-    transform .45s var(--ease-out);
-}
+    <div class="page-loader-inner">
 
-.menu-trigger:hover,
-.menu-trigger:focus-visible {
-  color: var(--terracotta);
-}
+      <div class="loader-mark">
 
-.menu-trigger-label {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: .14em;
-}
+        <span class="loader-point"></span>
 
-.menu-trigger-icon {
-  position: relative;
+        <span class="loader-line"></span>
 
-  width: 28px;
-  height: 18px;
+        <span class="loader-direction"></span>
 
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 6px;
-}
+      </div>
 
-.menu-trigger-icon span {
-  display: block;
 
-  width: 100%;
-  height: 1px;
+      <p class="loader-motto">
+        IL MOVIMENTO È SOLO L'INIZIO.
+      </p>
 
-  background: currentColor;
 
-  transition:
-    transform .45s var(--ease-out);
-}
+      <p class="loader-signature">
+        Cesare Paratore
+      </p>
 
-body.is-menu-open .menu-trigger-icon span:first-child {
-  transform: translateY(3.5px) rotate(45deg);
-}
+    </div>
 
-body.is-menu-open .menu-trigger-icon span:last-child {
-  transform: translateY(-3.5px) rotate(-45deg);
-}
+  </div>
 
 
-/* =========================================================
-   WOW PROGRESS
-   ========================================================= */
+  <!-- =====================================================
+       PAGE TRANSITION
+       ===================================================== -->
 
-.wow-progress {
-  justify-self: center;
+  <div
+    class="page-transition"
+    aria-hidden="true"
+  ></div>
 
-  width: min(100%, 560px);
-}
 
-.progress-label {
-  margin-bottom: 12px;
+  <!-- =====================================================
+       CUSTOM CURSOR
+       ===================================================== -->
 
-  color: var(--stone);
+  <div
+    class="custom-cursor"
+    aria-hidden="true"
+  >
 
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: .1em;
-  line-height: 1.2;
+    <span class="custom-cursor-dot"></span>
 
-  text-align: center;
-  text-transform: uppercase;
-}
+    <span class="custom-cursor-ring"></span>
 
-.progress-track {
-  position: relative;
+  </div>
 
-  width: 100%;
-  height: 1px;
 
-  background: var(--sand);
-}
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
 
-.progress-fill {
-  position: absolute;
+  <header class="site-header">
 
-  left: 0;
-  top: 0;
+    <div class="site-header-inner">
 
-  width: 0;
-  height: 100%;
 
-  background: var(--ink);
-}
+      <!-- BRAND -->
 
-.progress-point {
-  position: absolute;
+      <a
+        class="site-brand"
+        href="/"
+        aria-label="Cesare Paratore — torna all'inizio"
+      >
 
-  left: 0;
-  top: 50%;
+        <span class="site-brand-mark">
+          CP
+        </span>
 
-  width: 7px;
-  height: 7px;
+        <span class="site-brand-text">
+          Cesare Paratore
+        </span>
 
-  border-radius: 50%;
+      </a>
 
-  background: var(--terracotta);
 
-  transform: translate(-50%, -50%);
-}
+      <!-- SECTION PROGRESS -->
 
-.section-jump {
-  display: flex;
-  justify-content: space-between;
+      <div
+        class="section-progress"
+        aria-label="Progressione della pagina"
+      >
 
-  margin-top: 10px;
-}
+        <div
+          class="progress-track"
+          aria-hidden="true"
+        >
 
-.section-jump-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
+          <span
+            id="progress-fill"
+            class="progress-fill"
+          ></span>
 
-  min-height: 28px;
+          <span
+            id="progress-point"
+            class="progress-point"
+          ></span>
 
-  color: var(--stone);
+        </div>
 
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: .08em;
 
-  text-decoration: none;
+        <span
+          id="progress-current"
+          class="progress-current"
+          aria-live="polite"
+        >
+          Origine
+        </span>
 
-  transition:
-    color .25s ease,
-    transform .3s var(--ease-out);
-}
+      </div>
 
-.section-jump-link:hover,
-.section-jump-link:focus-visible {
-  color: var(--terracotta);
-}
 
-.section-jump-link--next:hover,
-.section-jump-link--next:focus-visible {
-  transform: translateX(3px);
-}
+      <!-- HEADER NAVIGATION -->
 
-.section-jump-link--previous:hover,
-.section-jump-link--previous:focus-visible {
-  transform: translateX(-3px);
-}
+      <div class="site-header-navigation">
 
-.section-jump-link.is-disabled {
-  pointer-events: none;
-  opacity: 0;
-}
 
+        <a
+          id="previous-section"
+          class="section-jump section-jump-previous is-disabled"
+          href="#01"
+          aria-hidden="true"
+          tabindex="-1"
+        >
 
-/* =========================================================
-   MENU
-   ========================================================= */
+          <span
+            id="previous-section-label"
+            class="section-jump-label"
+          ></span>
 
-.site-menu {
-  position: fixed;
-  inset: 0;
+          <span
+            class="section-jump-arrow"
+            aria-hidden="true"
+          >
+            ←
+          </span>
 
-  z-index: 700;
+        </a>
 
-  background: var(--ink);
-  color: var(--ivory);
 
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
+        <a
+          id="next-section"
+          class="section-jump section-jump-next"
+          href="#02"
+          aria-label="Vai alla sezione 02"
+        >
 
-  transition:
-    opacity .55s var(--ease-out),
-    visibility 0s linear .55s;
-}
+          <span
+            id="next-section-label"
+            class="section-jump-label"
+          >
+            02
+          </span>
 
-.site-menu[aria-hidden="false"] {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
+          <span
+            class="section-jump-arrow"
+            aria-hidden="true"
+          >
+            →
+          </span>
 
-  transition:
-    opacity .55s var(--ease-out),
-    visibility 0s linear 0s;
-}
+        </a>
 
-.site-menu-inner {
-  width: min(
-    calc(100% - 40px),
-    var(--content-max)
-  );
 
-  min-height: 100%;
+        <button
+          class="menu-trigger"
+          type="button"
+          aria-controls="site-menu"
+          aria-expanded="false"
+          aria-label="Apri menu"
+        >
 
-  margin: 0 auto;
+          <span class="menu-trigger-label">
+            Menu
+          </span>
 
-  display: flex;
-  align-items: center;
-}
+          <span
+            class="menu-trigger-icon"
+            aria-hidden="true"
+          >
+            <span></span>
+            <span></span>
+          </span>
 
-.site-menu-nav {
-  width: 100%;
+        </button>
 
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+      </div>
 
-  gap:
-    clamp(10px, 1.8vw, 24px)
-    clamp(24px, 6vw, 100px);
-}
+    </div>
 
-.site-menu-nav a {
-  display: grid;
-  grid-template-columns: 38px 1fr;
-  align-items: baseline;
+  </header>
 
-  min-height: 52px;
 
-  color: var(--ivory);
+  <!-- =====================================================
+       FULL SCREEN MENU
+       ===================================================== -->
 
-  font-family: var(--font-serif);
-  font-size: clamp(28px, 4vw, 62px);
-  line-height: .95;
+  <aside
+    id="site-menu"
+    class="site-menu"
+    aria-hidden="true"
+    inert
+  >
 
-  text-decoration: none;
+    <div class="site-menu-inner">
 
-  transition:
-    color .25s ease,
-    transform .45s var(--ease-out);
-}
+      <div class="site-menu-header">
 
-.site-menu-nav a:hover,
-.site-menu-nav a:focus-visible {
-  color: var(--terracotta);
-  transform: translateX(8px);
-}
+        <span class="site-menu-eyebrow">
+          Esplora
+        </span>
 
-.site-menu-number {
-  color: var(--stone);
+        <span class="site-menu-number">
+          00
+        </span>
 
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: .08em;
-}
+      </div>
 
 
-/* =========================================================
-   GENERAL SECTIONS
-   ========================================================= */
+      <nav
+        class="site-menu-navigation"
+        aria-label="Navigazione principale"
+      >
 
-.home-section {
-  position: relative;
+        <a
+          href="/chi-sono/"
+          class="site-menu-link"
+        >
+          <span class="site-menu-link-number">
+            01
+          </span>
 
-  min-height: 100svh;
+          <span class="site-menu-link-label">
+            Chi sono
+          </span>
+        </a>
 
-  display: flex;
-  align-items: center;
 
-  padding:
-    calc(var(--header-height) + clamp(56px, 9vw, 140px))
-    clamp(20px, 5vw, 80px)
-    clamp(80px, 10vw, 150px);
-}
+        <a
+          href="/sport/"
+          class="site-menu-link"
+        >
+          <span class="site-menu-link-number">
+            02
+          </span>
 
-.section-inner {
-  width: min(
-    100%,
-    var(--content-max)
-  );
+          <span class="site-menu-link-label">
+            Sport
+          </span>
+        </a>
 
-  margin: 0 auto;
-}
 
-.section-inner--narrow {
-  width: min(
-    100%,
-    var(--narrow-copy)
-  );
-}
+        <a
+          href="/scienze-motorie/"
+          class="site-menu-link"
+        >
+          <span class="site-menu-link-number">
+            03
+          </span>
 
-.section-inner--split {
-  display: grid;
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(320px, .9fr);
+          <span class="site-menu-link-label">
+            Scienze Motorie
+          </span>
+        </a>
 
-  gap: clamp(60px, 10vw, 180px);
 
-  align-items: center;
-}
+        <a
+          href="/educazione/"
+          class="site-menu-link"
+        >
+          <span class="site-menu-link-number">
+            04
+          </span>
 
-.section-title {
-  margin-bottom: clamp(32px, 5vw, 72px);
+          <span class="site-menu-link-label">
+            Educazione
+          </span>
+        </a>
 
-  color: var(--stone);
 
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 500;
-  letter-spacing: .12em;
-  line-height: 1.35;
+        <a
+          href="/management-dello-sport/"
+          class="site-menu-link"
+        >
+          <span class="site-menu-link-number">
+            05
+          </span>
 
-  text-transform: uppercase;
-}
+          <span class="site-menu-link-label">
+            Management
+          </span>
+        </a>
 
-.editorial-copy {
-  width: min(100%, var(--copy-max));
 
-  font-size: 17px;
-  line-height: 1.8;
-}
+        <a
+          href="/digitale/"
+          class="site-menu-link"
+        >
+          <span class="site-menu-link-number">
+            06
+          </span>
 
-.editorial-copy--large {
-  font-size: clamp(18px, 1.5vw, 24px);
-  line-height: 1.7;
-}
+          <span class="site-menu-link-label">
+            Digitale
+          </span>
+        </a>
 
-.editorial-copy p {
-  margin: 0 0 1.35em;
-}
 
-.editorial-copy p:last-child {
-  margin-bottom: 0;
-}
+        <a
+          href="/territorio/"
+          class="site-menu-link"
+        >
+          <span class="site-menu-link-number">
+            07
+          </span>
 
-.editorial-copy a,
-.territory-card a {
-  text-decoration-thickness: 1px;
-  text-underline-offset: .18em;
+          <span class="site-menu-link-label">
+            Territorio
+          </span>
+        </a>
 
-  transition:
-    color .25s ease,
-    text-decoration-color .25s ease;
-}
 
-.editorial-copy a:hover,
-.editorial-copy a:focus-visible,
-.territory-card a:hover,
-.territory-card a:focus-visible {
-  color: var(--terracotta);
-}
+        <a
+          href="/contatti/"
+          class="site-menu-link"
+        >
+          <span class="site-menu-link-number">
+            08
+          </span>
 
-.editorial-copy strong {
-  font-weight: 600;
-}
+          <span class="site-menu-link-label">
+            Contatti
+          </span>
+        </a>
 
-.editorial-emphasis {
-  font-family: var(--font-serif);
-  font-size: 1.35em;
-  line-height: 1.2;
-}
+      </nav>
 
-.editorial-sequence {
-  margin:
-    clamp(48px, 7vw, 96px)
-    0;
 
-  padding-left: clamp(24px, 5vw, 72px);
+      <div class="site-menu-footer">
 
-  border-left: 1px solid var(--sand);
-}
+        <p>
+          Movimento / Con direzione.
+        </p>
 
-.editorial-sequence p {
-  margin-bottom: .45em;
+        <span>
+          Da qui, non solo qui.
+        </span>
 
-  color: var(--stone);
+      </div>
 
-  font-family: var(--font-serif);
-  font-size: clamp(24px, 3vw, 42px);
-  line-height: 1.05;
-}
+    </div>
 
+  </aside>
 
-/* =========================================================
-   BACKGROUNDS
-   ========================================================= */
 
-.home-section--hero {
-  background: var(--ivory);
-}
+  <!-- =====================================================
+       MAIN
+       ===================================================== -->
 
-.home-section--question {
-  background: var(--white);
-}
+  <main id="main-content">
 
-.home-section--directions {
-  background: #EAE5DC;
-}
 
-.home-section--network {
-  background: var(--ivory);
-}
+    <!-- ===================================================
+         01 — ORIGINE
+         =================================================== -->
 
-.home-section--pause {
-  background: #DDD6C9;
-}
+    <section
+      id="01"
+      class="home-section hero-section"
+      data-section-title="Origine"
+      aria-labelledby="hero-title"
+    >
 
-.home-section--territory {
-  background: var(--white);
-}
+      <div class="section-index reveal">
+        01 / 10
+      </div>
 
-.home-section--present {
-  background: #E8E2D8;
-}
 
-.home-section--possibility {
-  background: var(--ivory);
-}
+      <div class="hero-section-inner">
 
-.home-section--question-for-you {
-  background: var(--ink);
-  color: var(--ivory);
-}
+        <p class="hero-kicker reveal">
+          Il movimento è solo l'inizio.
+        </p>
 
-.home-section--cta {
-  background: var(--ink);
-  color: var(--ivory);
-}
 
-.site-footer {
-  background: var(--ivory);
-  color: var(--ink);
-}
+        <h1
+          id="hero-title"
+          class="hero-title reveal"
+        >
+          <span>
+            MOVIMENTO
+          </span>
 
+          <span>
+            /
+          </span>
 
-/* =========================================================
-   HERO
-   ========================================================= */
+          <span>
+            CON DIREZIONE.
+          </span>
+        </h1>
 
-.section-inner--hero {
-  position: relative;
 
-  min-height: calc(100svh - var(--header-height));
+        <div class="hero-intro reveal">
 
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
+          <p>
+            Tutto è iniziato da una domanda:
+            <em>dove può portarti il movimento?</em>
+          </p>
 
-.hero-title {
-  margin: 0;
+        </div>
 
-  font-family: var(--font-serif);
-  font-size: clamp(76px, 13vw, 220px);
-  font-weight: 400;
-  letter-spacing: -.045em;
-  line-height: .76;
-}
 
-.hero-title-line {
-  display: block;
-}
+        <div
+          class="hero-directions"
+          aria-label="Le cinque direzioni"
+        >
 
-.hero-title-line--identity {
-  display: flex;
-  align-items: baseline;
-  gap: .04em;
-}
+          <a
+            href="/sport/"
+            class="hero-direction reveal"
+            data-direction="sport"
+          >
+            <span class="hero-direction-number">
+              01
+            </span>
 
-.hero-title-word {
-  display: inline-block;
-}
+            <span class="hero-direction-label">
+              Sport
+            </span>
+          </a>
 
-.identity-slash {
-  color: var(--terracotta);
 
-  font-family: var(--font-mono);
-  font-size: .28em;
-  font-weight: 400;
-  letter-spacing: 0;
-}
+          <a
+            href="/scienze-motorie/"
+            class="hero-direction reveal"
+            data-direction="scienze-motorie"
+          >
+            <span class="hero-direction-number">
+              02
+            </span>
 
-.hero-intro {
-  margin-top: clamp(50px, 7vw, 96px);
+            <span class="hero-direction-label">
+              Scienze Motorie
+            </span>
+          </a>
 
-  max-width: 520px;
-}
 
-.hero-directions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 28px;
+          <a
+            href="/educazione/"
+            class="hero-direction reveal"
+            data-direction="educazione"
+          >
+            <span class="hero-direction-number">
+              03
+            </span>
 
-  margin-top: clamp(48px, 7vw, 92px);
-}
+            <span class="hero-direction-label">
+              Educazione
+            </span>
+          </a>
 
-.hero-direction {
-  position: relative;
 
-  color: var(--stone);
+          <a
+            href="/management-dello-sport/"
+            class="hero-direction reveal"
+            data-direction="management"
+          >
+            <span class="hero-direction-number">
+              04
+            </span>
 
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: .08em;
+            <span class="hero-direction-label">
+              Management
+            </span>
+          </a>
 
-  text-decoration: none;
 
-  transition:
-    color .25s ease,
-    transform .4s var(--ease-out);
-}
+          <a
+            href="/digitale/"
+            class="hero-direction reveal"
+            data-direction="digitale"
+          >
+            <span class="hero-direction-number">
+              05
+            </span>
 
-.hero-direction::after {
-  content: "";
+            <span class="hero-direction-label">
+              Digitale
+            </span>
+          </a>
 
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -5px;
+        </div>
 
-  height: 1px;
 
-  background: currentColor;
+        <div
+          class="hero-trajectory"
+          aria-hidden="true"
+        >
 
-  transform: scaleX(0);
-  transform-origin: left center;
+          <span class="trajectory-line"></span>
 
-  transition:
-    transform .45s var(--ease-out);
-}
+          <span
+            class="direction-node"
+            data-direction="sport"
+            style="--node-x: 8%; --node-y: 64%;"
+          ></span>
 
-.hero-direction:hover,
-.hero-direction:focus-visible,
-.hero-direction.is-active {
-  color: var(--terracotta);
-  transform: translateY(-2px);
-}
+          <span
+            class="direction-node"
+            data-direction="scienze-motorie"
+            style="--node-x: 27%; --node-y: 38%;"
+          ></span>
 
-.hero-direction:hover::after,
-.hero-direction:focus-visible::after,
-.hero-direction.is-active::after {
-  transform: scaleX(1);
-}
+          <span
+            class="direction-node"
+            data-direction="educazione"
+            style="--node-x: 49%; --node-y: 57%;"
+          ></span>
 
-.direction-trajectory {
-  position: relative;
+          <span
+            class="direction-node"
+            data-direction="management"
+            style="--node-x: 71%; --node-y: 32%;"
+          ></span>
 
-  width: 100%;
-  height: 130px;
+          <span
+            class="direction-node"
+            data-direction="digitale"
+            style="--node-x: 91%; --node-y: 52%;"
+          ></span>
 
-  margin-top: clamp(24px, 4vw, 50px);
-}
+        </div>
 
-.direction-trajectory-line {
-  position: absolute;
+      </div>
 
-  left: 3%;
-  right: 3%;
-  top: 50%;
 
-  height: 1px;
+      <div class="section-scroll-cue reveal">
 
-  background: var(--sand);
+        <span>
+          Scorri
+        </span>
 
-  transform:
-    translateY(var(--trajectory-drift))
-    rotate(-2deg);
+        <span
+          class="section-scroll-line"
+          aria-hidden="true"
+        ></span>
 
-  transform-origin: left center;
-}
+      </div>
 
-.direction-node {
-  position: absolute;
+    </section>
 
-  width: 9px;
-  height: 9px;
 
-  border-radius: 50%;
+    <!-- ===================================================
+         02 — DOMANDA
+         =================================================== -->
 
-  background: var(--ink);
+    <section
+      id="02"
+      class="home-section question-section section-dark"
+      data-section-title="La domanda"
+      aria-labelledby="question-title"
+    >
 
-  transform: translate(-50%, -50%);
+      <div class="section-index reveal">
+        02 / 10
+      </div>
 
-  transition:
-    background-color .3s ease,
-    transform .45s var(--ease-out),
-    box-shadow .35s ease;
-}
 
-.direction-node-label {
-  position: absolute;
+      <div class="question-section-inner">
 
-  left: 50%;
-  top: 17px;
+        <div class="section-meta reveal">
 
-  white-space: nowrap;
+          <span>
+            Una domanda
+          </span>
 
-  color: var(--stone);
+          <span>
+            ↓
+          </span>
 
-  font-family: var(--font-mono);
-  font-size: 8px;
-  letter-spacing: .08em;
+        </div>
 
-  transform: translateX(-50%);
 
-  transition: color .25s ease;
-}
+        <div class="question-copy">
 
-.direction-node.is-active,
-.direction-node.is-linked {
-  background: var(--terracotta);
+          <p class="question-lead reveal">
+            Ho iniziato dallo sport.
+          </p>
 
-  transform:
-    translate(-50%, -50%)
-    scale(1.55);
 
-  box-shadow:
-    0 0 0 7px rgba(166, 66, 50, .08);
-}
+          <p class="question-text reveal">
 
-.direction-node.is-active .direction-node-label,
-.direction-node.is-linked .direction-node-label {
-  color: var(--terracotta);
-}
+            Corsa, allenamento,
+            pratica, fatica,
+            limite.
 
+            <span class="narrative-link"
+              data-trajectory-node="sport"
+            >
+              Il corpo
+            </span>
 
-/* =========================================================
-   FIVE DIRECTIONS
-   ========================================================= */
+            diventava il primo
+            luogo in cui osservare
+            il cambiamento.
 
-.five-directions {
-  display: grid;
+          </p>
 
-  grid-template-columns:
-    repeat(5, minmax(0, 1fr));
 
-  gap: 12px;
+          <p class="question-text question-text-secondary reveal">
 
-  margin:
-    clamp(56px, 8vw, 110px)
-    0;
-}
+            L'esperienza da atleta
+            e quella da allenatore
+            hanno trasformato il movimento
+            da gesto in metodo.
 
-.five-directions a {
-  display: block;
+          </p>
 
-  padding-top: 14px;
 
-  border-top: 1px solid var(--sand);
+          <div class="question-proof reveal">
 
-  color: var(--stone);
+            <a
+              href="https://www.fidal.it/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="external-proof-link"
+            >
+              FIDAL
+              <span aria-hidden="true">
+                ↗
+              </span>
+            </a>
 
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: .08em;
+            <span>
+              Esperienza, pratica,
+              osservazione.
+            </span>
 
-  text-decoration: none;
+          </div>
 
-  transition:
-    color .25s ease,
-    border-color .25s ease,
-    transform .4s var(--ease-out);
-}
 
-.five-directions a:hover,
-.five-directions a:focus-visible,
-.five-directions a.is-linked {
-  color: var(--terracotta);
-  border-color: var(--terracotta);
-  transform: translateY(-4px);
-}
+          <h2
+            id="question-title"
+            class="question-heading reveal"
+          >
+            Se il movimento può
+            cambiare un corpo,
+            che cosa può cambiare
+            una persona?
+          </h2>
 
+        </div>
 
-/* =========================================================
-   NETWORK
-   ========================================================= */
+      </div>
 
-.network-visual {
-  position: relative;
+    </section>
 
-  min-height: 480px;
-}
 
-.network-line {
-  position: absolute;
+    <!-- ===================================================
+         03 — CINQUE STRADE
+         =================================================== -->
 
-  height: 1px;
+    <section
+      id="03"
+      class="home-section directions-section"
+      data-section-title="Cinque strade"
+      aria-labelledby="directions-title"
+    >
 
-  background: var(--sand);
+      <div class="section-index reveal">
+        03 / 10
+      </div>
 
-  transform-origin: left center;
-}
 
-.network-line--a {
-  left: 16%;
-  top: 32%;
+      <div class="directions-section-inner">
 
-  width: 62%;
+        <header class="section-heading-block reveal">
 
-  transform: rotate(13deg);
-}
+          <p class="section-eyebrow">
+            Non una sola risposta.
+          </p>
 
-.network-line--b {
-  left: 28%;
-  top: 58%;
+          <h2 id="directions-title">
+            Cinque strade.
+          </h2>
 
-  width: 48%;
+          <p class="section-heading-description">
+            Lo stesso punto di partenza
+            può generare direzioni diverse.
+          </p>
 
-  transform: rotate(-17deg);
-}
+        </header>
 
-.network-line--c {
-  left: 22%;
-  top: 35%;
 
-  width: 58%;
+        <div class="directions-list">
 
-  transform: rotate(29deg);
-}
+          <a
+            href="/sport/"
+            class="direction-row reveal"
+          >
 
-.network-line--d {
-  left: 35%;
-  top: 65%;
+            <span class="direction-row-number">
+              01
+            </span>
 
-  width: 43%;
+            <span class="direction-row-title">
+              Sport
+            </span>
 
-  transform: rotate(-30deg);
-}
+            <span class="direction-row-description">
+              Il movimento come esperienza,
+              disciplina e trasformazione.
+            </span>
 
-.network-line--e {
-  left: 12%;
-  top: 52%;
+            <span
+              class="direction-row-arrow"
+              aria-hidden="true"
+            >
+              →
+            </span>
 
-  width: 71%;
+          </a>
 
-  transform: rotate(2deg);
-}
 
-.network-node {
-  position: absolute;
+          <a
+            href="/scienze-motorie/"
+            class="direction-row reveal"
+          >
 
-  width: 14px;
-  height: 14px;
+            <span class="direction-row-number">
+              02
+            </span>
 
-  border-radius: 50%;
+            <span class="direction-row-title">
+              Scienze Motorie
+            </span>
 
-  background: var(--ink);
+            <span class="direction-row-description">
+              Il corpo osservato,
+              compreso e allenato.
+            </span>
 
-  transform: translate(-50%, -50%);
+            <span
+              class="direction-row-arrow"
+              aria-hidden="true"
+            >
+              →
+            </span>
 
-  transition:
-    background-color .3s ease,
-    transform .45s var(--ease-out),
-    box-shadow .35s ease;
-}
+          </a>
 
-.network-node--sport {
-  left: 16%;
-  top: 32%;
-}
 
-.network-node--scienze-motorie {
-  left: 28%;
-  top: 58%;
-}
+          <a
+            href="/educazione/"
+            class="direction-row reveal"
+          >
 
-.network-node--educazione {
-  left: 66%;
-  top: 35%;
-}
+            <span class="direction-row-number">
+              03
+            </span>
 
-.network-node--management {
-  left: 57%;
-  top: 68%;
-}
+            <span class="direction-row-title">
+              Educazione
+            </span>
 
-.network-node--digitale {
-  left: 78%;
-  top: 48%;
-}
+            <span class="direction-row-description">
+              Conoscenza e crescita
+              trasformate in possibilità.
+            </span>
 
-.network-node.is-linked {
-  background: var(--terracotta);
+            <span
+              class="direction-row-arrow"
+              aria-hidden="true"
+            >
+              →
+            </span>
 
-  transform:
-    translate(-50%, -50%)
-    scale(1.6);
+          </a>
 
-  box-shadow:
-    0 0 0 8px rgba(166, 66, 50, .08);
-}
 
+          <a
+            href="/management-dello-sport/"
+            class="direction-row reveal"
+          >
 
-/* =========================================================
-   PAUSE
-   ========================================================= */
+            <span class="direction-row-number">
+              04
+            </span>
 
-.pause-trajectory {
-  position: relative;
+            <span class="direction-row-title">
+              Management
+            </span>
 
-  width: 100%;
-  min-height: 360px;
-}
+            <span class="direction-row-description">
+              Organizzare persone,
+              progetti e direzioni.
+            </span>
 
-.pause-trajectory-line {
-  position: absolute;
+            <span
+              class="direction-row-arrow"
+              aria-hidden="true"
+            >
+              →
+            </span>
 
-  left: 8%;
-  right: 8%;
-  top: 50%;
+          </a>
 
-  height: 1px;
 
-  background: var(--stone);
+          <a
+            href="/digitale/"
+            class="direction-row reveal"
+          >
 
-  transform:
-    translateY(var(--trajectory-drift))
-    rotate(-8deg);
+            <span class="direction-row-number">
+              05
+            </span>
 
-  transform-origin: left center;
-}
+            <span class="direction-row-title">
+              Digitale
+            </span>
 
-.pause-trajectory-point {
-  position: absolute;
+            <span class="direction-row-description">
+              Strumenti e connessioni
+              per portare il movimento oltre.
+            </span>
 
-  left: 50%;
-  top: 50%;
+            <span
+              class="direction-row-arrow"
+              aria-hidden="true"
+            >
+              →
+            </span>
 
-  width: 18px;
-  height: 18px;
+          </a>
 
-  border-radius: 50%;
+        </div>
 
-  background: var(--terracotta);
+      </div>
 
-  transform:
-    translate(-50%, -50%);
+    </section>
 
-  box-shadow:
-    0 0 0 12px rgba(166, 66, 50, .08);
-}
 
+    <!-- ===================================================
+         04 — CONNESSIONI
+         =================================================== -->
 
-/* =========================================================
-   TERRITORY
-   ========================================================= */
+    <section
+      id="04"
+      class="home-section connections-section section-stone"
+      data-section-title="Connessioni"
+      aria-labelledby="connections-title"
+    >
 
-.section-inner--territory {
-  display: grid;
+      <div class="section-index reveal">
+        04 / 10
+      </div>
 
-  grid-template-columns:
-    minmax(300px, .8fr)
-    minmax(420px, 1.2fr);
 
-  gap: clamp(50px, 8vw, 130px);
+      <div class="connections-section-inner">
 
-  align-items: center;
-}
+        <div class="connections-copy">
 
-.territory-location {
-  margin-bottom: 40px;
-}
+          <p class="section-eyebrow reveal">
+            Una prospettiva.
+          </p>
 
-.territory-card-place {
-  display: inline-block;
 
-  margin-bottom: 8px;
+          <h2
+            id="connections-title"
+            class="connections-title reveal"
+          >
+            Non erano cinque strade.
+          </h2>
 
-  color: var(--stone);
 
-  font-family: var(--font-mono);
-  font-size: 18px;
-  font-weight: 500;
-  letter-spacing: .08em;
-  line-height: 1.1;
+          <p class="connections-lead reveal">
+            Erano cinque modi di guardare
+            la stessa realtà.
+          </p>
 
-  text-decoration: none;
 
-  transition:
-    color .25s ease,
-    letter-spacing .3s var(--ease-out);
-}
+          <p class="connections-text reveal">
+            Lo sport porta alla scienza.
+            La scienza porta all'educazione.
+            L'educazione incontra il management.
+            Il digitale crea nuove connessioni.
+            E tutto torna al movimento.
+          </p>
 
-.territory-card-place:hover,
-.territory-card-place:focus-visible {
-  color: var(--terracotta);
-  letter-spacing: .1em;
-}
+        </div>
 
-.territory-location-name {
-  display: block;
 
-  margin-top: 8px;
+        <div
+          class="network-visual reveal"
+          aria-hidden="true"
+        >
 
-  color: var(--stone);
+          <span
+            class="network-line network-line-1"
+          ></span>
 
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: .12em;
-  line-height: 1.2;
+          <span
+            class="network-line network-line-2"
+          ></span>
 
-  text-transform: uppercase;
-}
+          <span
+            class="network-line network-line-3"
+          ></span>
 
-.territory-card {
-  max-width: 560px;
-}
+          <span
+            class="network-line network-line-4"
+          ></span>
 
-.territory-card-title {
-  display: block;
+          <span
+            class="network-line network-line-5"
+          ></span>
 
-  margin-bottom: 22px;
 
-  color: var(--ink);
+          <span
+            class="network-node network-node-center"
+            data-node="sport"
+          >
+            Sport
+          </span>
 
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: .12em;
-}
+          <span
+            class="network-node network-node-top"
+            data-node="scienze-motorie"
+          >
+            Scienze
+          </span>
 
-.territory-card p {
-  margin: 0 0 24px;
+          <span
+            class="network-node network-node-left"
+            data-node="educazione"
+          >
+            Educazione
+          </span>
 
-  font-size: 17px;
-  line-height: 1.7;
-}
+          <span
+            class="network-node network-node-right"
+            data-node="management"
+          >
+            Management
+          </span>
 
-.territory-card-note {
-  color: var(--stone);
+          <span
+            class="network-node network-node-bottom"
+            data-node="digitale"
+          >
+            Digitale
+          </span>
 
-  font-family: var(--font-serif);
-  font-size: 24px !important;
-  line-height: 1.2 !important;
-}
+        </div>
 
-.territory-map {
-  position: relative;
+      </div>
 
-  min-height: 560px;
+    </section>
 
-  overflow: hidden;
 
-  background: var(--sand);
-}
+    <!-- ===================================================
+         05 — PAUSA / METODO
+         =================================================== -->
 
-.territory-map iframe {
-  width: 100%;
-  height: 100%;
+    <section
+      id="05"
+      class="home-section pause-section"
+      data-section-title="Il metodo"
+      aria-labelledby="method-title"
+    >
 
-  min-height: 560px;
+      <div class="section-index reveal">
+        05 / 10
+      </div>
 
-  border: 0;
-}
 
+      <div class="pause-section-inner">
 
-/* =========================================================
-   PRESENT
-   ========================================================= */
+        <div class="pause-mark reveal">
+          —
+        </div>
 
-.section-inner--present {
-  align-items: start;
-}
 
-.present-portrait {
-  position: relative;
+        <p class="section-eyebrow reveal">
+          Anche fermarsi è movimento.
+        </p>
 
-  margin: 0;
 
-  overflow: hidden;
+        <h2
+          id="method-title"
+          class="pause-title reveal"
+        >
+          Movimento significa anche
+          fermarsi, cambiare direzione,
+          sbagliare, ricominciare.
+        </h2>
 
-  background: var(--sand);
-}
 
-.present-portrait img {
-  width: 100%;
-  height: auto;
+        <div class="method-block reveal">
 
-  aspect-ratio: 753 / 941;
+          <p class="method-label">
+            Il metodo
+          </p>
 
-  object-fit: cover;
 
-  filter: saturate(.82) contrast(.96);
-}
+          <p class="method-statement">
+            Prima capire.
+            <br>
+            Poi costruire.
+            <br>
+            Infine muoversi.
+          </p>
 
+        </div>
 
-/* =========================================================
-   QUESTION FOR YOU
-   ========================================================= */
 
-.section-inner--question-for-you {
-  width: min(
-    100%,
-    var(--content-max)
-  );
-}
+        <div class="pause-trajectory" aria-hidden="true">
 
-.reader-question {
-  min-height: 50vh;
+          <span class="pause-trajectory-line"></span>
 
-  display: flex;
-  align-items: center;
-}
+          <span class="pause-trajectory-point"></span>
 
-.reader-question h2 {
-  margin: 0;
+        </div>
 
-  font-family: var(--font-serif);
-  font-size: clamp(82px, 16vw, 250px);
-  font-weight: 400;
-  letter-spacing: -.055em;
-  line-height: .78;
-}
+      </div>
 
-.reader-question h2 span {
-  display: block;
+    </section>
 
-  margin-left: clamp(8%, 15vw, 24%);
 
-  color: var(--terracotta);
-}
+    <!-- ===================================================
+         06 — TERRITORIO
+         =================================================== -->
 
+    <section
+      id="06"
+      class="home-section territory-section section-dark"
+      data-section-title="Territorio"
+      aria-labelledby="territory-title"
+    >
 
-/* =========================================================
-   FINAL CTA
-   ========================================================= */
+      <div class="section-index reveal">
+        06 / 10
+      </div>
 
-.section-inner--cta {
-  width: min(
-    100%,
-    1180px
-  );
-}
 
-.home-section--cta .section-title {
-  color: rgba(242, 239, 232, .48);
-}
+      <div class="territory-section-inner">
 
-.home-section--cta .editorial-copy {
-  color: var(--ivory);
-}
+        <div class="territory-copy">
 
-.cta-trajectory {
-  position: relative;
+          <p class="section-eyebrow reveal">
+            Un punto di partenza.
+          </p>
 
-  width: min(100%, 1080px);
-  min-height: 190px;
 
-  margin-top: 88px;
-}
+          <p class="territory-place reveal">
+            Partinico
+          </p>
 
-.cta-trajectory-line {
-  position: absolute;
 
-  left: 0;
-  right: 7%;
-  top: 42%;
+          <h2
+            id="territory-title"
+            class="territory-title reveal"
+          >
+            DA QUI,
+            <br>
+            NON SOLO QUI.
+          </h2>
 
-  height: 1px;
 
-  background: rgba(242, 239, 232, .38);
+          <p class="territory-description reveal">
+            Ogni direzione parte da un luogo,
+            da una storia, da un'esperienza
+            concreta.
+          </p>
 
-  transform:
-    translateY(var(--trajectory-drift))
-    rotate(-3deg);
 
-  transform-origin: left center;
+          <div class="territory-location reveal">
 
-  transition:
-    background-color .45s ease,
-    transform .7s var(--ease-out);
-}
+            <span class="territory-location-label">
+              Luogo
+            </span>
 
-.cta-trajectory-point {
-  position: absolute;
+            <span class="territory-location-name">
+              Stadio Comunale
+              “Giuseppe La Franca”
+            </span>
 
-  right: 6.5%;
-  top: 42%;
+          </div>
 
-  width: 14px;
-  height: 14px;
 
-  border-radius: 50%;
+          <a
+            class="territory-link reveal"
+            href="https://www.google.com/maps/search/?api=1&query=Stadio+Comunale+Giuseppe+La+Franca+Partinico"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Apri la posizione
+            <span aria-hidden="true">
+              ↗
+            </span>
+          </a>
 
-  background: var(--terracotta);
+        </div>
 
-  transform:
-    translate(50%, -50%);
 
-  transition:
-    transform .55s var(--ease-out),
-    box-shadow .45s ease;
-}
+        <div class="territory-map reveal">
 
-.contact-cta {
-  position: absolute;
+          <iframe
+            title="Posizione dello Stadio Comunale Giuseppe La Franca a Partinico"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3!2d13!3d38!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0!2sStadio%20Comunale%20Giuseppe%20La%20Franca!5e0!3m2!1sit!2sit!4v0"
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+          ></iframe>
 
-  right: 0;
-  top: calc(42% + 48px);
+        </div>
 
-  display: inline-flex;
-  align-items: center;
-  gap: 18px;
+      </div>
 
-  min-height: 52px;
-  padding: 8px 0;
+    </section>
 
-  color: var(--ivory);
 
-  font-family: var(--font-mono);
-  font-size: clamp(13px, 1.15vw, 16px);
-  font-weight: 500;
-  letter-spacing: .035em;
-  line-height: 1.3;
+    <!-- ===================================================
+         07 — PRESENTE
+         =================================================== -->
 
-  text-decoration: none;
+    <section
+      id="07"
+      class="home-section present-section"
+      data-section-title="Presente"
+      aria-labelledby="present-title"
+    >
 
-  transform:
-    translate(
-      var(--magnetic-x),
-      var(--magnetic-y)
-    );
+      <div class="section-index reveal">
+        07 / 10
+      </div>
 
-  transition:
-    color .3s ease,
-    gap .45s var(--ease-out);
-}
 
-.contact-cta::after {
-  content: "";
+      <div class="present-section-inner">
 
-  position: absolute;
+        <div class="present-heading">
 
-  left: 0;
-  right: 0;
-  bottom: 0;
+          <p class="section-eyebrow reveal">
+            Oggi
+          </p>
 
-  height: 1px;
 
-  background: currentColor;
+          <h2
+            id="present-title"
+            class="present-title reveal"
+          >
+            Cinque aree.
+            <br>
+            Una stessa direzione.
+          </h2>
 
-  transform: scaleX(.35);
-  transform-origin: left center;
 
-  transition:
-    transform .5s var(--ease-out);
-}
+          <p class="present-intro reveal">
+            Il percorso continua attraverso
+            discipline diverse che si incontrano,
+            si contaminano e diventano strumenti.
+          </p>
 
-.contact-cta span:last-child {
-  display: inline-block;
+        </div>
 
-  font-size: 1.35em;
-  line-height: 1;
 
-  transition:
-    transform .45s var(--ease-out);
-}
+        <div class="present-content">
 
-.contact-cta:hover,
-.contact-cta:focus-visible,
-.cta-trajectory.is-engaged .contact-cta {
-  color: var(--terracotta);
-  gap: 24px;
-}
+          <div class="present-areas">
 
-.contact-cta:hover::after,
-.contact-cta:focus-visible::after,
-.cta-trajectory.is-engaged .contact-cta::after {
-  transform: scaleX(1);
-}
+            <a
+              href="/sport/"
+              class="present-area reveal"
+            >
+              <span>01</span>
+              <strong>Sport</strong>
+            </a>
 
-.contact-cta:hover span:last-child,
-.contact-cta:focus-visible span:last-child,
-.cta-trajectory.is-engaged .contact-cta span:last-child {
-  transform: translateX(6px);
-}
 
-.cta-trajectory.is-engaged .cta-trajectory-point,
-.contact-cta:hover ~ .cta-trajectory-point,
-.contact-cta:focus-visible ~ .cta-trajectory-point {
-  transform:
-    translate(50%, -50%)
-    scale(1.65);
+            <a
+              href="/scienze-motorie/"
+              class="present-area reveal"
+            >
+              <span>02</span>
+              <strong>Scienze Motorie</strong>
+            </a>
 
-  box-shadow:
-    0 0 0 8px rgba(166, 66, 50, .08);
-}
 
-.cta-trajectory.is-engaged .cta-trajectory-line {
-  background: var(--terracotta);
+            <a
+              href="/educazione/"
+              class="present-area reveal"
+            >
+              <span>03</span>
+              <strong>Educazione</strong>
+            </a>
 
-  transform:
-    translateY(var(--trajectory-drift))
-    rotate(-3deg)
-    scaleX(1.015);
-}
 
+            <a
+              href="/management-dello-sport/"
+              class="present-area reveal"
+            >
+              <span>04</span>
+              <strong>Management</strong>
+            </a>
 
-/* =========================================================
-   REVEAL
-   ========================================================= */
 
-.reveal {
-  opacity: 0;
+            <a
+              href="/digitale/"
+              class="present-area reveal"
+            >
+              <span>05</span>
+              <strong>Digitale</strong>
+            </a>
 
-  transform: translateY(30px);
+          </div>
 
-  transition:
-    opacity .9s var(--ease-out),
-    transform .9s var(--ease-out);
-}
 
-.reveal.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
+          <figure class="present-portrait reveal">
 
+            <img
+              src="/assets/images/cp-foto.webp"
+              alt="Cesare Paratore"
+              width="753"
+              height="941"
+              loading="lazy"
+              decoding="async"
+            >
 
-/* =========================================================
-   STANDBY
-   ========================================================= */
+          </figure>
 
-.standby-screen {
-  position: fixed;
-  inset: 0;
+        </div>
 
-  z-index: 850;
+      </div>
 
-  display: grid;
-  place-items: center;
+    </section>
 
-  background: var(--ivory);
-  color: var(--ink);
 
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
+    <!-- ===================================================
+         08 — POSSIBILITÀ
+         =================================================== -->
 
-  transition:
-    opacity .75s var(--ease-out),
-    visibility 0s linear .75s;
-}
+    <section
+      id="08"
+      class="home-section possibilities-section section-stone"
+      data-section-title="Possibilità"
+      aria-labelledby="possibilities-title"
+    >
 
-.standby-screen.is-active {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
+      <div class="section-index reveal">
+        08 / 10
+      </div>
 
-  transition:
-    opacity .75s var(--ease-out),
-    visibility 0s linear 0s;
-}
 
-.standby-atmosphere {
-  position: absolute;
-  inset: 0;
+      <div class="possibilities-section-inner">
 
-  pointer-events: none;
-}
+        <div class="possibilities-heading">
 
-.standby-path {
-  position: absolute;
+          <p class="section-eyebrow reveal">
+            Non un curriculum.
+          </p>
 
-  left: 10%;
-  right: 10%;
-  top: 50%;
 
-  height: 1px;
+          <h2
+            id="possibilities-title"
+            class="possibilities-title reveal"
+          >
+            Un modo per
+            mettere ordine.
+          </h2>
 
-  background: var(--sand);
+        </div>
 
-  transform: rotate(-4deg);
-}
 
-.standby-point {
-  position: absolute;
+        <div class="possibilities-copy">
 
-  left: 50%;
-  top: 50%;
+          <p class="large-copy reveal">
+            Questo spazio non nasce
+            per elencare tutto quello
+            che ho fatto.
+          </p>
 
-  width: 12px;
-  height: 12px;
 
-  border-radius: 50%;
+          <p class="large-copy reveal">
+            Nasce per mettere in ordine
+            esperienze, competenze,
+            domande e connessioni.
+          </p>
 
-  background: var(--terracotta);
 
-  transform: translate(-50%, -50%);
+          <p class="large-copy reveal">
+            Per trasformare ciò che conosco
+            in qualcosa che possa diventare
+            utile.
+          </p>
 
-  box-shadow:
-    0 0 0 10px rgba(166, 66, 50, .07);
-}
 
-.standby-center {
-  position: relative;
-  z-index: 1;
-}
+          <div class="possibility-trajectory reveal">
 
-.standby-copy {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+            <span class="possibility-node">
+              esperienza
+            </span>
 
-.standby-label {
-  display: block;
+            <span
+              class="possibility-line"
+              aria-hidden="true"
+            ></span>
 
-  color: var(--ink);
+            <span class="possibility-node">
+              conoscenza
+            </span>
 
-  font-family: var(--font-serif);
-  font-size: clamp(38px, 6vw, 72px);
-  line-height: .95;
-}
+            <span
+              class="possibility-line"
+              aria-hidden="true"
+            ></span>
 
-.standby-wake {
-  position: relative;
+            <span class="possibility-node">
+              utilità
+            </span>
 
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+          </div>
 
-  min-width: 120px;
-  min-height: 52px;
+        </div>
 
-  margin-top: 30px;
-  padding: 8px 20px;
+      </div>
 
-  border: 0;
-  background: transparent;
+    </section>
 
-  color: var(--terracotta);
 
-  font: inherit;
+    <!-- ===================================================
+         09 — VISITATORE
+         =================================================== -->
 
-  cursor: pointer;
-}
+    <section
+      id="09"
+      class="home-section reader-section"
+      data-section-title="La tua direzione"
+      aria-labelledby="reader-title"
+    >
 
-.standby-touch {
-  position: relative;
+      <div class="section-index reveal">
+        09 / 10
+      </div>
 
-  display: inline-block;
 
-  padding-bottom: 7px;
+      <div class="reader-section-inner">
 
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: .16em;
-}
+        <p class="section-eyebrow reveal">
+          Ora tocca a te.
+        </p>
 
-.standby-touch::after {
-  content: "";
 
-  position: absolute;
+        <h2
+          id="reader-title"
+          class="reader-title reveal"
+        >
+          FORSE È QUI
+          <br>
+          CHE LA STORIA
+          <br>
+          CAMBIA.
+        </h2>
 
-  left: 0;
-  right: 0;
-  bottom: 0;
 
-  height: 1px;
+        <div class="reader-question reveal">
 
-  background: currentColor;
+          <span class="reader-question-label">
+            La domanda
+          </span>
 
-  transform: scaleX(.35);
-  transform-origin: center;
+          <p>
+            Da dove parti?
+          </p>
 
-  transition:
-    transform .45s var(--ease-out);
-}
+        </div>
 
-.standby-wake:hover .standby-touch::after,
-.standby-wake:focus-visible .standby-touch::after {
-  transform: scaleX(1);
-}
 
-.standby-wake:focus-visible {
-  outline: 1px solid var(--terracotta);
-  outline-offset: 8px;
-}
+        <div class="reader-direction reveal">
 
-.standby-signature {
-  display: block;
+          <span class="reader-direction-line"></span>
 
-  margin-top: 28px;
+          <span class="reader-direction-point"></span>
 
-  color: var(--stone);
+          <span class="reader-direction-line"></span>
 
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: .16em;
-}
+        </div>
 
+      </div>
 
-/* =========================================================
-   FOOTER
-   ========================================================= */
+    </section>
 
-.site-footer {
-  min-height: 360px;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    <!-- ===================================================
+         10 — CTA
+         =================================================== -->
 
-  padding:
-    80px 24px;
-}
+    <section
+      id="10"
+      class="home-section cta-section section-dark"
+      data-section-title="Partiamo"
+      aria-labelledby="cta-title"
+    >
 
-.footer-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+      <div class="section-index reveal">
+        10 / 10
+      </div>
 
-  text-align: center;
-}
 
-.footer-mark img {
-  width: 72px;
-  height: 72px;
+      <div class="cta-section-inner">
 
-  object-fit: contain;
-}
+        <p class="section-eyebrow reveal">
+          Una direzione possibile.
+        </p>
 
-.footer-motto {
-  display: flex;
-  align-items: center;
-  gap: .55em;
 
-  margin: 32px 0 0;
+        <h2
+          id="cta-title"
+          class="cta-title reveal"
+        >
+          PARTIAMO
+          <br>
+          DA QUELLO.
+        </h2>
 
-  color: var(--ink);
 
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: .12em;
-}
+        <p class="cta-description reveal">
+          Una domanda, un progetto,
+          un'idea, un percorso.
+          Raccontami da dove vuoi partire.
+        </p>
 
-.footer-signature {
-  margin: 18px 0 0;
 
-  color: var(--stone);
+        <div
+          class="cta-trajectory reveal"
+          aria-hidden="true"
+        >
 
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: .16em;
-}
+          <span class="cta-trajectory-line"></span>
 
+          <span class="cta-trajectory-point"></span>
 
-/* =========================================================
-   RESPONSIVE — 1280
-   ========================================================= */
+        </div>
 
-@media (max-width: 1280px) {
 
-  :root {
-    --header-height: 92px;
-  }
-
-  .site-header {
-    grid-template-columns: 1fr minmax(240px, 440px) 1fr;
-  }
-
-  .hero-title {
-    font-size: clamp(72px, 13vw, 170px);
-  }
-
-  .network-visual {
-    min-height: 420px;
-  }
-
-  .territory-map,
-  .territory-map iframe {
-    min-height: 480px;
-  }
-
-}
-
-
-/* =========================================================
-   RESPONSIVE — 820
-   ========================================================= */
-
-@media (max-width: 820px) {
-
-  :root {
-    --header-height: 76px;
-  }
-
-  .site-header {
-    grid-template-columns: auto 1fr auto;
-
-    padding:
-      0 20px;
-  }
-
-  .site-brand img {
-    width: 38px;
-    height: 38px;
-  }
-
-  .wow-progress {
-    width: min(100%, 280px);
-  }
-
-  .progress-label {
-    font-size: 8px;
-  }
-
-  .site-menu-nav {
-    grid-template-columns: 1fr;
-
-    gap: 10px;
-  }
-
-  .site-menu-nav a {
-    font-size: clamp(32px, 9vw, 56px);
-  }
-
-  .home-section {
-    min-height: auto;
-
-    padding:
-      calc(var(--header-height) + 72px)
-      20px
-      100px;
-  }
-
-  .section-inner--hero {
-    min-height:
-      calc(100svh - var(--header-height));
-  }
-
-  .hero-title {
-    font-size: clamp(62px, 16vw, 118px);
-  }
-
-  .hero-directions {
-    gap: 12px 20px;
-  }
-
-  .direction-trajectory {
-    height: 100px;
-  }
-
-  .direction-node-label {
-    font-size: 7px;
-  }
-
-  .section-inner--split,
-  .section-inner--territory {
-    grid-template-columns: 1fr;
-
-    gap: 64px;
-  }
-
-  .network-visual {
-    min-height: 360px;
-  }
-
-  .five-directions {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
+        <a
+          href="/contatti/"
+          class="contact-cta reveal"
+        >
 
-    gap: 18px 14px;
-  }
-
-  .territory-map,
-  .territory-map iframe {
-    min-height: 420px;
-  }
-
-  .reader-question h2 {
-    font-size: clamp(72px, 18vw, 150px);
-  }
-
-  .cta-trajectory {
-    min-height: 170px;
-    margin-top: 64px;
-  }
-
-  .cta-trajectory-line {
-    right: 9%;
-    top: 38%;
-  }
-
-  .cta-trajectory-point {
-    right: 8.5%;
-    top: 38%;
-  }
-
-  .contact-cta {
-    right: 0;
-    top: calc(38% + 42px);
+          <span class="contact-cta-label">
+            Raccontami da dove vuoi partire
+          </span>
 
-    max-width: 88%;
+          <span
+            class="contact-cta-arrow"
+            aria-hidden="true"
+          >
+            →
+          </span>
 
-    font-size: 12px;
-  }
-
-}
-
-
-/* =========================================================
-   RESPONSIVE — 420
-   ========================================================= */
-
-@media (max-width: 420px) {
-
-  .site-header {
-    padding:
-      0 16px;
-  }
-
-  .wow-progress {
-    display: none;
-  }
+        </a>
 
-  .hero-title {
-    font-size: clamp(56px, 17vw, 82px);
-    line-height: .8;
-  }
+      </div>
 
-  .hero-directions {
-    flex-direction: column;
-    align-items: flex-start;
-
-    gap: 13px;
-  }
+    </section>
 
-  .direction-trajectory {
-    height: 90px;
-  }
 
-  .direction-node-label {
-    display: none;
-  }
+  </main>
 
-  .five-directions {
-    grid-template-columns: 1fr;
-  }
 
-  .network-visual {
-    min-height: 300px;
-  }
+  <!-- =====================================================
+       STANDBY
+       ===================================================== -->
 
-  .territory-map,
-  .territory-map iframe {
-    min-height: 340px;
-  }
+  <aside
+    class="standby-screen"
+    aria-hidden="true"
+    inert
+  >
 
-  .territory-card-note {
-    font-size: 21px !important;
-  }
+    <div class="standby-screen-inner">
 
-  .reader-question {
-    min-height: 45vh;
-  }
+      <p class="standby-eyebrow">
+        Il movimento continua.
+      </p>
 
-  .reader-question h2 {
-    font-size: clamp(60px, 20vw, 100px);
-  }
 
-  .cta-trajectory {
-    min-height: 190px;
-    margin-top: 54px;
-  }
+      <p class="standby-title">
+        Dove vuoi andare?
+      </p>
 
-  .cta-trajectory-line {
-    right: 13%;
-  }
 
-  .cta-trajectory-point {
-    right: 12.5%;
-  }
+      <button
+        class="standby-wake"
+        type="button"
+      >
+        Riprendi
+        <span aria-hidden="true">
+          →
+        </span>
+      </button>
 
-  .contact-cta {
-    right: 0;
-    top: calc(38% + 38px);
+    </div>
 
-    max-width: 94%;
+  </aside>
 
-    align-items: flex-start;
-    gap: 12px;
 
-    font-size: 11px;
-  }
+  <!-- =====================================================
+       FOOTER
+       ===================================================== -->
 
-  .page-loader-inner {
-    width: min(88vw, 720px);
-    min-height: 210px;
-  }
+  <footer class="site-footer">
 
-  .loader-trajectory {
-    width: min(280px, 72vw);
-    margin-bottom: 38px;
-  }
+    <div class="site-footer-inner">
 
-  .loader-motto {
-    font-size: 10px;
-    letter-spacing: .1em;
-  }
+      <div class="footer-brand">
 
-  .loader-signature {
-    margin-top: 18px;
-    font-size: 8px;
-  }
+        <span class="footer-mark">
+          CP
+        </span>
 
-}
+        <span class="footer-name">
+          Cesare Paratore
+        </span>
 
+      </div>
 
-/* =========================================================
-   COARSE POINTER
-   ========================================================= */
 
-@media (pointer: coarse) {
+      <p class="footer-motto">
+        MOVIMENTO / CON DIREZIONE.
+      </p>
 
-  .custom-cursor {
-    display: none;
-  }
 
-  .contact-cta,
-  .site-brand,
-  .menu-trigger {
-    transform: none;
-  }
+      <p class="footer-signature">
+        Il movimento è solo l'inizio.
+      </p>
 
-}
 
+      <div class="footer-bottom">
 
-/* =========================================================
-   REDUCED MOTION
-   ========================================================= */
+        <span>
+          © Cesare Paratore
+        </span>
 
-@media (prefers-reduced-motion: reduce) {
+        <span>
+          Da qui, non solo qui.
+        </span>
 
-  html {
-    scroll-behavior: auto;
-  }
+      </div>
 
-  *,
-  *::before,
-  *::after {
-    animation-duration: .001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: .001ms !important;
-    scroll-behavior: auto !important;
-  }
+    </div>
 
-  .reveal {
-    opacity: 1;
-    transform: none;
-  }
+  </footer>
 
-}
-
-.reduced-motion .page-loader .loader-point,
-.reduced-motion .page-loader .loader-line,
-.reduced-motion .page-loader .loader-motto,
-.reduced-motion .page-loader .loader-signature {
-  animation: none;
-
-  opacity: 1;
-  transform: none;
-}
-
-.reduced-motion .page-loader .loader-point {
-  transform: translate(-50%, -50%);
-}
-
-.reduced-motion .page-loader .loader-line {
-  transform: scaleX(1);
-}
-
-.reduced-motion .reveal {
-  opacity: 1;
-  transform: none;
-}
-
-.reduced-motion .contact-cta,
-.reduced-motion .site-brand,
-.reduced-motion .menu-trigger {
-  transform: none;
-}
-
-
-/* =========================================================
-   PRINT
-   ========================================================= */
-
-@media print {
-
-  .page-loader,
-  .page-transition,
-  .custom-cursor,
-  .site-header,
-  .site-menu,
-  .standby-screen {
-    display: none !important;
-  }
 
-  body {
-    overflow: visible;
-    background: white;
-    color: black;
-  }
+  <!-- =====================================================
+       SCRIPT
+       ===================================================== -->
 
-  .home-section {
-    min-height: auto;
-    padding: 40px 0;
-    break-inside: avoid;
-  }
+  <script
+    src="/script.js"
+    defer
+  ></script>
 
-  .reveal {
-    opacity: 1;
-    transform: none;
-  }
+</body>
 
-}
+</html>
