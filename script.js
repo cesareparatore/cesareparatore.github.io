@@ -1,16 +1,19 @@
 /* =========================================================
    CESARE PARATORE
    MOVIMENTO / CON DIREZIONE.
-   MASTER INTERACTION SYSTEM — 2.3
+   MASTER INTERACTION SYSTEM — 3.0
    ========================================================= */
 
 (() => {
   "use strict";
 
+  /* =======================================================
+     CONFIG
+     ======================================================= */
 
   const CONFIG = {
-    loaderMinimumTime: 5200,
-    loaderMaximumWait: 8000,
+    loaderMinimumTime: 650,
+    loaderMaximumWait: 3500,
 
     revealThreshold: 0.12,
 
@@ -20,7 +23,7 @@
 
     scrollNavigationOffset: 18,
 
-    transitionDuration: 700,
+    transitionDuration: 500,
 
     trajectoryLerp: 0.085,
     trajectoryDrift: 18,
@@ -28,9 +31,17 @@
     magneticStrength: 0.12,
     magneticRadius: 90,
 
-    standbyDelay: 30000
+    standbyDelay: 30000,
+
+    hashNavigationDelay: 0,
+
+    activeSectionReference: 0.52
   };
 
+
+  /* =======================================================
+     STATE
+     ======================================================= */
 
   const state = {
     loaded: false,
@@ -40,12 +51,17 @@
     activeIndex: 0,
 
     resizeTimer: null,
+    loaderTimer: null,
     standbyTimer: null,
+
     rafId: null,
+    animationRunning: false,
 
     reducedMotion: false,
+    finePointer: false,
 
     standbyReturnFocus: null,
+    menuReturnFocus: null,
 
     pointer: {
       targetX: window.innerWidth / 2,
@@ -66,115 +82,82 @@
   };
 
 
-  const dom = {
+  /* =======================================================
+     DOM
+     ======================================================= */
 
+  const dom = {
     html: document.documentElement,
     body: document.body,
 
-    loader:
-      document.querySelector(".page-loader"),
+    loader: document.querySelector(".page-loader"),
 
-    transition:
-      document.querySelector(".page-transition"),
+    transition: document.querySelector(".page-transition"),
 
-    cursor:
-      document.querySelector(".custom-cursor"),
+    cursor: document.querySelector(".custom-cursor"),
+    cursorDot: document.querySelector(".custom-cursor-dot"),
+    cursorRing: document.querySelector(".custom-cursor-ring"),
 
-    cursorDot:
-      document.querySelector(".custom-cursor-dot"),
+    header: document.querySelector(".site-header"),
 
-    cursorRing:
-      document.querySelector(".custom-cursor-ring"),
+    menu: document.querySelector(".site-menu"),
+    menuTrigger: document.querySelector(".menu-trigger"),
 
-    header:
-      document.querySelector(".site-header"),
+    menuLinks: Array.from(
+      document.querySelectorAll(".site-menu a")
+    ),
 
-    menu:
-      document.querySelector(".site-menu"),
+    progressLabel: document.querySelector("#progress-current"),
+    progressFill: document.querySelector("#progress-fill"),
+    progressPoint: document.querySelector("#progress-point"),
 
-    menuTrigger:
-      document.querySelector(".menu-trigger"),
+    previousSection: document.querySelector("#previous-section"),
+    previousLabel: document.querySelector("#previous-section-label"),
 
-    menuLinks:
-      Array.from(
-        document.querySelectorAll(".site-menu a")
-      ),
+    nextSection: document.querySelector("#next-section"),
+    nextLabel: document.querySelector("#next-section-label"),
 
-    progressLabel:
-      document.querySelector("#progress-current"),
+    sections: Array.from(
+      document.querySelectorAll(".home-section")
+    ),
 
-    progressFill:
-      document.querySelector("#progress-fill"),
+    reveals: Array.from(
+      document.querySelectorAll(".reveal")
+    ),
 
-    progressPoint:
-      document.querySelector("#progress-point"),
+    narrativeLinks: Array.from(
+      document.querySelectorAll(".narrative-link")
+    ),
 
-    previousSection:
-      document.querySelector("#previous-section"),
-
-    previousLabel:
-      document.querySelector("#previous-section-label"),
-
-    nextSection:
-      document.querySelector("#next-section"),
-
-    nextLabel:
-      document.querySelector("#next-section-label"),
-
-    sections:
-      Array.from(
-        document.querySelectorAll(".home-section")
-      ),
-
-    reveals:
-      Array.from(
-        document.querySelectorAll(".reveal")
-      ),
-
-    narrativeLinks:
-      Array.from(
-        document.querySelectorAll(".narrative-link")
-      ),
-
-    magneticElements:
-      Array.from(
-        document.querySelectorAll(
-          ".site-brand, .menu-trigger, .contact-cta"
-        )
-      ),
-
-    transitionLinks:
-      Array.from(
-        document.querySelectorAll(
-          'a[href]:not([target="_blank"])'
-        )
-      ),
-
-    standby:
-      document.querySelector(".standby-screen"),
-
-    standbyWake:
-      document.querySelector(".standby-wake"),
-
-    ctaTrajectory:
-      document.querySelector(".cta-trajectory"),
-
-    contactCta:
-      document.querySelector(".contact-cta"),
-
-    directionLinks:
-      Array.from(
-        document.querySelectorAll(
-          ".hero-direction[data-direction]"
-        )
-      ),
-
-    directionNodes:
-      Array.from(
-        document.querySelectorAll(
-          ".direction-node[data-direction]"
-        )
+    magneticElements: Array.from(
+      document.querySelectorAll(
+        ".site-brand, .menu-trigger, .contact-cta"
       )
+    ),
+
+    transitionLinks: Array.from(
+      document.querySelectorAll(
+        'a[href]:not([target="_blank"])'
+      )
+    ),
+
+    standby: document.querySelector(".standby-screen"),
+    standbyWake: document.querySelector(".standby-wake"),
+
+    ctaTrajectory: document.querySelector(".cta-trajectory"),
+    contactCta: document.querySelector(".contact-cta"),
+
+    directionLinks: Array.from(
+      document.querySelectorAll(
+        ".hero-direction[data-direction]"
+      )
+    ),
+
+    directionNodes: Array.from(
+      document.querySelectorAll(
+        ".direction-node[data-direction]"
+      )
+    )
   };
 
 
@@ -182,25 +165,12 @@
      UTILITIES
      ======================================================= */
 
-  const clamp = (
-    value,
-    min,
-    max
-  ) =>
-    Math.min(
-      Math.max(value, min),
-      max
-    );
+  const clamp = (value, min, max) =>
+    Math.min(Math.max(value, min), max);
 
 
-  const lerp = (
-    current,
-    target,
-    amount
-  ) =>
-    current +
-    (target - current) *
-    amount;
+  const lerp = (current, target, amount) =>
+    current + (target - current) * amount;
 
 
   const getSectionNumber = index =>
@@ -208,17 +178,12 @@
 
 
   const getSectionByIndex = index => {
-
     if (!dom.sections.length) {
       return null;
     }
 
     return dom.sections[
-      clamp(
-        index,
-        0,
-        dom.sections.length - 1
-      )
+      clamp(index, 0, dom.sections.length - 1)
     ];
   };
 
@@ -228,25 +193,68 @@
 
 
   const isFinePointer = () =>
-    window.matchMedia(
-      "(pointer: fine)"
-    ).matches;
+    state.finePointer;
+
+
+  const getFocusableElements = container => {
+    if (!container) {
+      return [];
+    }
+
+    return Array.from(
+      container.querySelectorAll(
+        [
+          "a[href]",
+          "button:not([disabled])",
+          "input:not([disabled])",
+          "select:not([disabled])",
+          "textarea:not([disabled])",
+          "[tabindex]:not([tabindex='-1'])"
+        ].join(",")
+      )
+    ).filter(element => {
+      const style = window.getComputedStyle(element);
+
+      return (
+        style.display !== "none" &&
+        style.visibility !== "hidden"
+      );
+    });
+  };
+
+
+  const isModifiedClick = event =>
+    event.button !== 0 ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey;
 
 
   /* =======================================================
-     MOTION PREFERENCE
+     PROGRESSIVE ENHANCEMENT
      ======================================================= */
 
-  const initMotionPreference = () => {
-
-    const media =
-      window.matchMedia(
-        "(prefers-reduced-motion: reduce)"
-      );
+  const initProgressiveEnhancement = () => {
+    dom.html.classList.add("js");
+  };
 
 
-    const apply = matches => {
+  /* =======================================================
+     MOTION / POINTER PREFERENCES
+     ======================================================= */
 
+  const initPreferences = () => {
+    const motionMedia = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    );
+
+    const pointerMedia = window.matchMedia(
+      "(pointer: fine)"
+    );
+
+
+    const applyMotion = matches => {
       state.reducedMotion = matches;
 
       dom.html.classList.toggle(
@@ -254,36 +262,64 @@
         matches
       );
 
-
       dom.standby?.classList.toggle(
         "is-reduced",
         matches
       );
 
+      if (matches) {
+        state.trajectory.drift = 0;
+        state.trajectory.targetDrift = 0;
 
-      if (!state.standby) {
-        resetStandbyTimer();
+        dom.cursor?.classList.remove(
+          "is-visible",
+          "is-hovering"
+        );
+
+        stopAnimationLoop();
+      } else {
+        startAnimationLoop();
       }
-
     };
 
 
-    apply(media.matches);
+    const applyPointer = matches => {
+      state.finePointer = matches;
 
-
-    if (
-      typeof media.addEventListener ===
-      "function"
-    ) {
-
-      media.addEventListener(
-        "change",
-        event =>
-          apply(event.matches)
+      dom.html.classList.toggle(
+        "fine-pointer",
+        matches
       );
 
+      if (!matches) {
+        dom.cursor?.classList.remove(
+          "is-visible",
+          "is-hovering"
+        );
+      }
+
+      updateAnimationRequirement();
+    };
+
+
+    applyMotion(motionMedia.matches);
+    applyPointer(pointerMedia.matches);
+
+
+    if (typeof motionMedia.addEventListener === "function") {
+      motionMedia.addEventListener(
+        "change",
+        event => applyMotion(event.matches)
+      );
     }
 
+
+    if (typeof pointerMedia.addEventListener === "function") {
+      pointerMedia.addEventListener(
+        "change",
+        event => applyPointer(event.matches)
+      );
+    }
   };
 
 
@@ -292,96 +328,61 @@
      ======================================================= */
 
   const initLoader = () => {
-
     if (!dom.loader) {
       state.loaded = true;
       return;
     }
 
-
-    const started =
-      performance.now();
-
-    let finishScheduled = false;
+    const started = performance.now();
+    let finished = false;
 
 
-    const finish = () => {
-
-      if (
-        state.loaded ||
-        finishScheduled
-      ) {
+    const removeLoader = () => {
+      if (finished || state.loaded) {
         return;
       }
 
+      finished = true;
 
-      finishScheduled = true;
+      const elapsed = performance.now() - started;
 
-
-      const elapsed =
-        performance.now() - started;
-
-
-      const remaining =
-        Math.max(
-          0,
-          CONFIG.loaderMinimumTime -
-          elapsed
-        );
-
-
-      window.setTimeout(
-        () => {
-
-          if (state.loaded) {
-            return;
-          }
-
-
-          state.loaded = true;
-
-
-          dom.loader.classList.add(
-            "is-hidden"
-          );
-
-
-          window.setTimeout(
-            () =>
-              dom.loader?.remove(),
-            950
-          );
-
-        },
-        remaining
+      const remaining = Math.max(
+        0,
+        CONFIG.loaderMinimumTime - elapsed
       );
 
+
+      window.setTimeout(() => {
+        if (state.loaded) {
+          return;
+        }
+
+        state.loaded = true;
+
+        dom.loader.classList.add("is-hidden");
+
+        window.setTimeout(() => {
+          dom.loader?.remove();
+        }, 800);
+      }, remaining);
     };
 
 
-    if (
-      document.readyState ===
-      "complete"
-    ) {
-
-      finish();
-
+    if (document.readyState === "complete") {
+      removeLoader();
     } else {
-
       window.addEventListener(
         "load",
-        finish,
+        removeLoader,
         { once: true }
       );
-
     }
 
 
-    window.setTimeout(
-      finish,
+    state.loaderTimer = window.setTimeout(
+      removeLoader,
       CONFIG.loaderMaximumWait
     );
-
   };
 
 
@@ -390,100 +391,96 @@
      ======================================================= */
 
   const initPageTransitions = () => {
-
     if (!dom.transition) {
       return;
     }
 
 
-    dom.transitionLinks.forEach(
-      link => {
+    dom.transitionLinks.forEach(link => {
+      link.addEventListener("click", event => {
+        if (isModifiedClick(event)) {
+          return;
+        }
 
-        link.addEventListener(
-          "click",
-          event => {
+        const href = link.getAttribute("href");
 
-            const href =
-              link.getAttribute("href");
-
-
-            if (
-              !href ||
-              href.startsWith("#") ||
-              href.startsWith("mailto:") ||
-              href.startsWith("tel:") ||
-              link.hasAttribute("download") ||
-              link.target === "_blank"
-            ) {
-              return;
-            }
+        if (
+          !href ||
+          href.startsWith("#") ||
+          href.startsWith("mailto:") ||
+          href.startsWith("tel:") ||
+          link.hasAttribute("download") ||
+          link.target === "_blank"
+        ) {
+          return;
+        }
 
 
-            let url;
+        let url;
+
+        try {
+          url = new URL(
+            href,
+            window.location.href
+          );
+        } catch {
+          return;
+        }
 
 
-            try {
-
-              url =
-                new URL(
-                  href,
-                  window.location.href
-                );
-
-            } catch {
-
-              return;
-
-            }
+        if (
+          url.origin !==
+          window.location.origin
+        ) {
+          return;
+        }
 
 
-            if (
-              url.origin !==
-              window.location.origin
-            ) {
-              return;
-            }
+        if (
+          url.href ===
+          window.location.href
+        ) {
+          return;
+        }
 
 
-            if (state.reducedMotion) {
-              return;
-            }
+        if (state.reducedMotion) {
+          return;
+        }
 
 
-            event.preventDefault();
+        event.preventDefault();
 
-
-            dom.transition.classList.add(
-              "is-active"
-            );
-
-
-            window.setTimeout(
-              () => {
-                window.location.href =
-                  url.href;
-              },
-              CONFIG.transitionDuration
-            );
-
-          }
+        dom.transition.classList.add(
+          "is-active"
         );
 
-      }
-    );
+
+        window.setTimeout(() => {
+          window.location.assign(url.href);
+        }, CONFIG.transitionDuration);
+      });
+    });
 
 
     window.addEventListener(
       "pageshow",
       () => {
-
         dom.transition?.classList.remove(
           "is-active"
         );
-
       }
     );
 
+
+    window.addEventListener(
+      "pagehide",
+      () => {
+        dom.transition?.classList.remove(
+          "is-active"
+        );
+      }
+    );
   };
 
 
@@ -491,223 +488,233 @@
      MENU
      ======================================================= */
 
-  const openMenu = () => {
-
+  const setMenuAccessibility = isOpen => {
     if (!dom.menu) {
+      return;
+    }
+
+    dom.menu.setAttribute(
+      "aria-hidden",
+      String(!isOpen)
+    );
+
+
+    dom.menuTrigger?.setAttribute(
+      "aria-expanded",
+      String(isOpen)
+    );
+
+
+    dom.menuTrigger?.setAttribute(
+      "aria-label",
+      isOpen
+        ? "Chiudi menu"
+        : "Apri menu"
+    );
+
+
+    if ("inert" in dom.menu) {
+      dom.menu.inert = !isOpen;
+    } else if (isOpen) {
+      dom.menu.removeAttribute("inert");
+    } else {
+      dom.menu.setAttribute(
+        "inert",
+        ""
+      );
+    }
+  };
+
+
+  const openMenu = () => {
+    if (
+      !dom.menu ||
+      state.menuOpen ||
+      state.standby
+    ) {
       return;
     }
 
 
     clearStandbyTimer();
 
+    state.menuReturnFocus =
+      document.activeElement;
+
+
     state.menuOpen = true;
 
-
-    dom.menu.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-
-    dom.menuTrigger?.setAttribute(
-      "aria-expanded",
-      "true"
-    );
-
-
-    dom.menuTrigger?.setAttribute(
-      "aria-label",
-      "Chiudi menu"
-    );
-
+    setMenuAccessibility(true);
 
     dom.body.classList.add(
       "is-menu-open"
     );
 
 
-    window.setTimeout(
-      () =>
-        dom.menuLinks[0]?.focus(),
-      state.reducedMotion ? 0 : 250
-    );
+    const focusFirst = () => {
+      getFocusableElements(dom.menu)[0]?.focus({
+        preventScroll: true
+      });
+    };
 
+
+    if (state.reducedMotion) {
+      focusFirst();
+    } else {
+      window.setTimeout(
+        focusFirst,
+        120
+      );
+    }
   };
 
 
   const closeMenu = (
     returnFocus = true
   ) => {
-
-    if (!dom.menu) {
+    if (!dom.menu || !state.menuOpen) {
       return;
     }
 
 
     state.menuOpen = false;
 
-
-    dom.menu.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-
-
-    dom.menuTrigger?.setAttribute(
-      "aria-expanded",
-      "false"
-    );
-
-
-    dom.menuTrigger?.setAttribute(
-      "aria-label",
-      "Apri menu"
-    );
-
+    setMenuAccessibility(false);
 
     dom.body.classList.remove(
       "is-menu-open"
     );
 
 
+    const returnTarget =
+      state.menuReturnFocus ||
+      dom.menuTrigger;
+
+
+    state.menuReturnFocus = null;
+
+
     if (
       returnFocus &&
-      document.activeElement !==
-      dom.menuTrigger
+      returnTarget &&
+      typeof returnTarget.focus ===
+        "function" &&
+      document.contains(returnTarget)
     ) {
-
-      dom.menuTrigger?.focus();
-
+      window.requestAnimationFrame(() => {
+        returnTarget.focus({
+          preventScroll: true
+        });
+      });
     }
 
 
     resetStandbyTimer();
+  };
 
+
+  const trapMenuFocus = event => {
+    if (
+      !state.menuOpen ||
+      event.key !== "Tab"
+    ) {
+      return;
+    }
+
+
+    const focusable =
+      getFocusableElements(dom.menu);
+
+
+    if (!focusable.length) {
+      event.preventDefault();
+      return;
+    }
+
+
+    const first = focusable[0];
+    const last =
+      focusable[focusable.length - 1];
+
+
+    if (
+      event.shiftKey &&
+      document.activeElement === first
+    ) {
+      event.preventDefault();
+      last.focus();
+    } else if (
+      !event.shiftKey &&
+      document.activeElement === last
+    ) {
+      event.preventDefault();
+      first.focus();
+    }
   };
 
 
   const initMenu = () => {
+    setMenuAccessibility(false);
+
 
     dom.menuTrigger?.addEventListener(
       "click",
-      () =>
-        state.menuOpen
-          ? closeMenu()
-          : openMenu()
+      () => {
+        if (state.menuOpen) {
+          closeMenu();
+        } else {
+          openMenu();
+        }
+      }
     );
 
 
-    dom.menuLinks.forEach(
-      link =>
-        link.addEventListener(
-          "click",
-          () => closeMenu(false)
-        )
-    );
+    dom.menuLinks.forEach(link => {
+      link.addEventListener(
+        "click",
+        () => closeMenu(false)
+      );
+    });
 
 
     dom.menu?.addEventListener(
       "click",
       event => {
-
-        if (
-          event.target ===
-          dom.menu
-        ) {
+        if (event.target === dom.menu) {
           closeMenu();
         }
-
       }
     );
 
 
     dom.menu?.addEventListener(
       "keydown",
-      event => {
-
-        if (
-          !state.menuOpen ||
-          event.key !== "Tab"
-        ) {
-          return;
-        }
-
-
-        const focusable =
-          dom.menuLinks.filter(
-            element =>
-              !element.hasAttribute(
-                "disabled"
-              )
-          );
-
-
-        if (!focusable.length) {
-          return;
-        }
-
-
-        const first =
-          focusable[0];
-
-        const last =
-          focusable[
-            focusable.length - 1
-          ];
-
-
-        if (
-          event.shiftKey &&
-          document.activeElement === first
-        ) {
-
-          event.preventDefault();
-
-          last.focus();
-
-        } else if (
-          !event.shiftKey &&
-          document.activeElement === last
-        ) {
-
-          event.preventDefault();
-
-          first.focus();
-
-        }
-
-      }
+      trapMenuFocus
     );
 
 
     document.addEventListener(
       "keydown",
       event => {
-
         if (
           event.key === "Escape" &&
           state.menuOpen
         ) {
-
+          event.preventDefault();
           closeMenu();
-
         }
-
       }
     );
-
   };
 
 
   /* =======================================================
-     WOW
+     SECTION HEADER / PROGRESS
      ======================================================= */
 
   const updateWowHeader = index => {
-
     const section =
       getSectionByIndex(index);
-
 
     if (!section) {
       return;
@@ -725,146 +732,72 @@
 
 
     if (dom.progressLabel) {
-
       dom.progressLabel.textContent =
         getSectionTitle(section);
 
+      dom.progressLabel.setAttribute(
+        "aria-label",
+        `Sezione ${getSectionNumber(index)}: ${getSectionTitle(section)}`
+      );
     }
 
 
     if (dom.progressFill) {
-
       dom.progressFill.style.width =
         `${progress * 100}%`;
-
     }
 
 
     if (dom.progressPoint) {
-
       dom.progressPoint.style.left =
         `${progress * 100}%`;
-
     }
 
 
-    const isFirst =
-      index === 0;
+    updateJumpControl(
+      dom.previousSection,
+      dom.previousLabel,
+      index - 1,
+      index === 0,
+      "precedente"
+    );
+
 
     const isLast =
       index === total - 1;
 
 
-    if (isFirst) {
-
-      dom.previousSection?.classList.add(
-        "is-disabled"
-      );
-
-      dom.previousSection?.setAttribute(
-        "aria-hidden",
-        "true"
-      );
-
-      dom.previousSection?.setAttribute(
-        "tabindex",
-        "-1"
-      );
-
-      if (dom.previousLabel) {
-        dom.previousLabel.textContent = "";
-      }
-
-    } else {
-
-      const previousNumber =
-        getSectionNumber(index - 1);
-
-
-      dom.previousSection?.classList.remove(
-        "is-disabled"
-      );
-
-      dom.previousSection?.removeAttribute(
-        "aria-hidden"
-      );
-
-      dom.previousSection?.removeAttribute(
-        "tabindex"
-      );
-
-
-      if (dom.previousSection) {
-
-        dom.previousSection.href =
-          `#${previousNumber}`;
-
-        dom.previousSection.setAttribute(
-          "aria-label",
-          `Vai alla sezione ${previousNumber}`
-        );
-
-      }
-
-
-      if (dom.previousLabel) {
-
-        dom.previousLabel.textContent =
-          previousNumber;
-
-      }
-
-    }
-
-
     if (isLast) {
+      dom.nextSection?.classList.add(
+        "is-home-return"
+      );
 
       if (dom.nextSection) {
-
-        dom.nextSection.classList.add(
-          "is-home-return"
-        );
-
-        dom.nextSection.href =
-          "#01";
-
+        dom.nextSection.href = "#01";
         dom.nextSection.setAttribute(
           "aria-label",
           "Torna all'inizio"
         );
-
       }
-
 
       if (dom.nextLabel) {
-
-        dom.nextLabel.textContent =
-          "01";
-
+        dom.nextLabel.textContent = "01";
       }
 
-
       dom.nextSection
-        ?.querySelector(
-          ".section-jump-arrow"
-        )
+        ?.querySelector(".section-jump-arrow")
         ?.replaceChildren(
           document.createTextNode("↑")
         );
-
     } else {
-
       const nextNumber =
         getSectionNumber(index + 1);
-
 
       dom.nextSection?.classList.remove(
         "is-home-return"
       );
 
-
       if (dom.nextSection) {
-
         dom.nextSection.href =
           `#${nextNumber}`;
 
@@ -872,28 +805,83 @@
           "aria-label",
           `Vai alla sezione ${nextNumber}`
         );
-
       }
-
 
       if (dom.nextLabel) {
-
         dom.nextLabel.textContent =
           nextNumber;
-
       }
 
-
       dom.nextSection
-        ?.querySelector(
-          ".section-jump-arrow"
-        )
+        ?.querySelector(".section-jump-arrow")
         ?.replaceChildren(
           document.createTextNode("→")
         );
+    }
+  };
 
+
+  const updateJumpControl = (
+    control,
+    label,
+    targetIndex,
+    disabled,
+    direction
+  ) => {
+    if (!control) {
+      return;
     }
 
+
+    if (disabled) {
+      control.classList.add("is-disabled");
+      control.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+      control.setAttribute(
+        "tabindex",
+        "-1"
+      );
+
+      if (label) {
+        label.textContent = "";
+      }
+
+      return;
+    }
+
+
+    const number =
+      getSectionNumber(targetIndex);
+
+
+    control.classList.remove(
+      "is-disabled"
+    );
+
+    control.removeAttribute(
+      "aria-hidden"
+    );
+
+    control.removeAttribute(
+      "tabindex"
+    );
+
+
+    control.href =
+      `#${number}`;
+
+
+    control.setAttribute(
+      "aria-label",
+      `Vai alla sezione ${number}, ${direction}`
+    );
+
+
+    if (label) {
+      label.textContent = number;
+    }
   };
 
 
@@ -902,10 +890,8 @@
      ======================================================= */
 
   const navigateToSection = index => {
-
     const target =
       getSectionByIndex(index);
-
 
     if (!target) {
       return;
@@ -913,9 +899,7 @@
 
 
     const headerHeight =
-      dom.header
-        ? dom.header.offsetHeight
-        : 0;
+      dom.header?.offsetHeight || 0;
 
 
     const rect =
@@ -936,29 +920,20 @@
           ? "auto"
           : "smooth"
     });
-
   };
 
 
   const initWowNavigation = () => {
-
     dom.previousSection?.addEventListener(
       "click",
       event => {
-
         event.preventDefault();
 
-
-        if (
-          state.activeIndex > 0
-        ) {
-
+        if (state.activeIndex > 0) {
           navigateToSection(
             state.activeIndex - 1
           );
-
         }
-
       }
     );
 
@@ -966,9 +941,7 @@
     dom.nextSection?.addEventListener(
       "click",
       event => {
-
         event.preventDefault();
-
 
         const last =
           dom.sections.length - 1;
@@ -979,10 +952,8 @@
             ? 0
             : state.activeIndex + 1
         );
-
       }
     );
-
   };
 
 
@@ -991,14 +962,14 @@
      ======================================================= */
 
   const detectActiveSection = () => {
-
     if (!dom.sections.length) {
       return;
     }
 
 
     const reference =
-      window.innerHeight * .52;
+      window.innerHeight *
+      CONFIG.activeSectionReference;
 
 
     let bestIndex =
@@ -1011,7 +982,6 @@
 
     dom.sections.forEach(
       (section, index) => {
-
         const rect =
           section.getBoundingClientRect();
 
@@ -1034,19 +1004,10 @@
           );
 
 
-        if (
-          distance <
-          bestDistance
-        ) {
-
-          bestDistance =
-            distance;
-
-          bestIndex =
-            index;
-
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          bestIndex = index;
         }
-
       }
     );
 
@@ -1055,26 +1016,21 @@
       state.activeIndex !==
       bestIndex
     ) {
-
       state.activeIndex =
         bestIndex;
-
 
       updateWowHeader(
         bestIndex
       );
-
     }
-
   };
 
 
   /* =======================================================
-     REVEAL
+     REVEALS
      ======================================================= */
 
   const initRevealSystem = () => {
-
     if (!dom.reveals.length) {
       return;
     }
@@ -1084,7 +1040,6 @@
       state.reducedMotion ||
       !("IntersectionObserver" in window)
     ) {
-
       dom.reveals.forEach(
         element =>
           element.classList.add(
@@ -1099,29 +1054,19 @@
     const observer =
       new IntersectionObserver(
         entries => {
-
-          entries.forEach(
-            entry => {
-
-              if (
-                !entry.isIntersecting
-              ) {
-                return;
-              }
-
-
-              entry.target.classList.add(
-                "is-visible"
-              );
-
-
-              observer.unobserve(
-                entry.target
-              );
-
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) {
+              return;
             }
-          );
 
+            entry.target.classList.add(
+              "is-visible"
+            );
+
+            observer.unobserve(
+              entry.target
+            );
+          });
         },
         {
           threshold:
@@ -1137,7 +1082,6 @@
       element =>
         observer.observe(element)
     );
-
   };
 
 
@@ -1146,7 +1090,6 @@
      ======================================================= */
 
   const initDirectionInteractions = () => {
-
     if (
       !dom.directionLinks.length ||
       !dom.directionNodes.length
@@ -1159,7 +1102,6 @@
       key,
       active
     ) => {
-
       dom.directionLinks
         .filter(
           element =>
@@ -1186,43 +1128,37 @@
               active
             )
         );
-
     };
 
 
-    dom.directionLinks.forEach(
-      link => {
-
-        const key =
-          link.dataset.direction;
+    dom.directionLinks.forEach(link => {
+      const key =
+        link.dataset.direction;
 
 
-        link.addEventListener(
-          "pointerenter",
-          () => setActive(key, true)
-        );
+      link.addEventListener(
+        "pointerenter",
+        () => setActive(key, true)
+      );
 
 
-        link.addEventListener(
-          "pointerleave",
-          () => setActive(key, false)
-        );
+      link.addEventListener(
+        "pointerleave",
+        () => setActive(key, false)
+      );
 
 
-        link.addEventListener(
-          "focusin",
-          () => setActive(key, true)
-        );
+      link.addEventListener(
+        "focusin",
+        () => setActive(key, true)
+      );
 
 
-        link.addEventListener(
-          "focusout",
-          () => setActive(key, false)
-        );
-
-      }
-    );
-
+      link.addEventListener(
+        "focusout",
+        () => setActive(key, false)
+      );
+    });
   };
 
 
@@ -1231,10 +1167,7 @@
      ======================================================= */
 
   const updateTrajectoryTargets = () => {
-
-    if (
-      dom.sections.length < 2
-    ) {
+    if (dom.sections.length < 2) {
       return;
     }
 
@@ -1279,8 +1212,7 @@
             (
               window.scrollY -
               start
-            ) /
-            range,
+            ) / range,
             0,
             1
           );
@@ -1299,25 +1231,24 @@
             2
           ) *
           CONFIG.trajectoryDrift;
-
   };
 
 
   const updateTrajectoryFrame = () => {
+    const targetProgress =
+      state.trajectory.targetProgress;
+
 
     if (state.reducedMotion) {
-
       state.trajectory.progress =
-        state.trajectory.targetProgress;
+        targetProgress;
 
       state.trajectory.drift = 0;
-
     } else {
-
       state.trajectory.progress =
         lerp(
           state.trajectory.progress,
-          state.trajectory.targetProgress,
+          targetProgress,
           CONFIG.trajectoryLerp
         );
 
@@ -1328,7 +1259,6 @@
           state.trajectory.targetDrift,
           CONFIG.trajectoryLerp
         );
-
     }
 
 
@@ -1342,7 +1272,6 @@
       "--trajectory-drift",
       `${state.trajectory.drift.toFixed(2)}px`
     );
-
   };
 
 
@@ -1351,84 +1280,65 @@
      ======================================================= */
 
   const initNarrativeLinks = () => {
-
-    dom.narrativeLinks.forEach(
-      link => {
-
-        const node =
-          link.dataset.trajectoryNode;
+    dom.narrativeLinks.forEach(link => {
+      const node =
+        link.dataset.trajectoryNode;
 
 
-        if (!node) {
-          return;
-        }
-
-
-        const targets = [
-          ...document.querySelectorAll(
-            `.network-node[data-node="${node}"]`
-          ),
-          ...document.querySelectorAll(
-            `.direction-node[data-direction="${node}"]`
-          )
-        ];
-
-
-        if (!targets.length) {
-          return;
-        }
-
-
-        const activate = () => {
-
-          targets.forEach(
-            target =>
-              target.classList.add(
-                "is-linked"
-              )
-          );
-
-        };
-
-
-        const deactivate = () => {
-
-          targets.forEach(
-            target =>
-              target.classList.remove(
-                "is-linked"
-              )
-          );
-
-        };
-
-
-        link.addEventListener(
-          "pointerenter",
-          activate
-        );
-
-
-        link.addEventListener(
-          "pointerleave",
-          deactivate
-        );
-
-
-        link.addEventListener(
-          "focusin",
-          activate
-        );
-
-
-        link.addEventListener(
-          "focusout",
-          deactivate
-        );
-
+      if (!node) {
+        return;
       }
-    );
 
+
+      const targets = [
+        ...document.querySelectorAll(
+          `.network-node[data-node="${node}"]`
+        ),
+        ...document.querySelectorAll(
+          `.direction-node[data-direction="${node}"]`
+        )
+      ];
+
+
+      if (!targets.length) {
+        return;
+      }
+
+
+      const setLinked = active => {
+        targets.forEach(
+          target =>
+            target.classList.toggle(
+              "is-linked",
+              active
+            )
+        );
+      };
+
+
+      link.addEventListener(
+        "pointerenter",
+        () => setLinked(true)
+      );
+
+
+      link.addEventListener(
+        "pointerleave",
+        () => setLinked(false)
+      );
+
+
+      link.addEventListener(
+        "focusin",
+        () => setLinked(true)
+      );
+
+
+      link.addEventListener(
+        "focusout",
+        () => setLinked(false)
+      );
+    });
   };
 
 
@@ -1437,13 +1347,10 @@
      ======================================================= */
 
   const initCursor = () => {
-
     if (
       !dom.cursor ||
       !dom.cursorDot ||
-      !dom.cursorRing ||
-      !isFinePointer() ||
-      state.reducedMotion
+      !dom.cursorRing
     ) {
       return;
     }
@@ -1452,9 +1359,17 @@
     document.addEventListener(
       "pointermove",
       event => {
+        if (
+          !isFinePointer() ||
+          state.reducedMotion
+        ) {
+          return;
+        }
+
 
         state.pointer.targetX =
           event.clientX;
+
 
         state.pointer.targetY =
           event.clientY;
@@ -1464,68 +1379,59 @@
           "is-visible"
         );
 
+
+        updateAnimationRequirement();
       },
-      {
-        passive: true
-      }
+      { passive: true }
     );
 
 
     document
       .querySelectorAll("a, button")
-      .forEach(
-        element => {
+      .forEach(element => {
+        element.addEventListener(
+          "pointerenter",
+          () => {
+            if (
+              !isFinePointer() ||
+              state.reducedMotion
+            ) {
+              return;
+            }
 
-          element.addEventListener(
-            "pointerenter",
-            () =>
-              dom.cursor.classList.add(
-                "is-hovering"
-              )
-          );
+            dom.cursor.classList.add(
+              "is-hovering"
+            );
+          }
+        );
 
 
-          element.addEventListener(
-            "pointerleave",
-            () =>
-              dom.cursor.classList.remove(
-                "is-hovering"
-              )
-          );
-
-        }
-      );
+        element.addEventListener(
+          "pointerleave",
+          () => {
+            dom.cursor.classList.remove(
+              "is-hovering"
+            );
+          }
+        );
+      });
 
 
     window.addEventListener(
       "pointerleave",
       () => {
-
         dom.cursor?.classList.remove(
           "is-visible",
           "is-hovering"
         );
 
+        updateAnimationRequirement();
       }
     );
-
-
-    window.addEventListener(
-      "pointerenter",
-      () => {
-
-        dom.cursor?.classList.add(
-          "is-visible"
-        );
-
-      }
-    );
-
   };
 
 
   const updateCursorFrame = () => {
-
     if (
       !dom.cursor ||
       !dom.cursorDot ||
@@ -1554,20 +1460,11 @@
 
 
     dom.cursorDot.style.transform =
-      `translate3d(
-        ${state.pointer.targetX}px,
-        ${state.pointer.targetY}px,
-        0
-      ) translate(-50%,-50%)`;
+      `translate3d(${state.pointer.targetX}px, ${state.pointer.targetY}px, 0) translate(-50%, -50%)`;
 
 
     dom.cursorRing.style.transform =
-      `translate3d(
-        ${state.cursor.x}px,
-        ${state.cursor.y}px,
-        0
-      ) translate(-50%,-50%)`;
-
+      `translate3d(${state.cursor.x}px, ${state.cursor.y}px, 0) translate(-50%, -50%)`;
   };
 
 
@@ -1576,102 +1473,88 @@
      ======================================================= */
 
   const initMagneticElements = () => {
-
-    if (
-      !isFinePointer() ||
-      state.reducedMotion
-    ) {
+    if (!dom.magneticElements.length) {
       return;
     }
 
 
-    dom.magneticElements.forEach(
-      element => {
-
-        element.addEventListener(
-          "pointermove",
-          event => {
-
-            const rect =
-              element.getBoundingClientRect();
-
-
-            const dx =
-              event.clientX -
-              (
-                rect.left +
-                rect.width / 2
-              );
+    dom.magneticElements.forEach(element => {
+      element.addEventListener(
+        "pointermove",
+        event => {
+          if (
+            !isFinePointer() ||
+            state.reducedMotion
+          ) {
+            return;
+          }
 
 
-            const dy =
-              event.clientY -
-              (
-                rect.top +
-                rect.height / 2
-              );
+          const rect =
+            element.getBoundingClientRect();
 
 
-            const distance =
-              Math.sqrt(
-                dx * dx +
-                dy * dy
-              );
+          const dx =
+            event.clientX -
+            (rect.left + rect.width / 2);
 
 
-            if (
-              distance >
+          const dy =
+            event.clientY -
+            (rect.top + rect.height / 2);
+
+
+          const distance =
+            Math.hypot(dx, dy);
+
+
+          if (
+            distance >
+            CONFIG.magneticRadius
+          ) {
+            return;
+          }
+
+
+          const strength =
+            CONFIG.magneticStrength *
+            (
+              1 -
+              distance /
               CONFIG.magneticRadius
-            ) {
-              return;
-            }
-
-
-            const strength =
-              CONFIG.magneticStrength *
-              (
-                1 -
-                distance /
-                CONFIG.magneticRadius
-              );
-
-
-            element.style.setProperty(
-              "--magnetic-x",
-              `${dx * strength}px`
             );
 
 
-            element.style.setProperty(
-              "--magnetic-y",
-              `${dy * strength}px`
-            );
-
-          }
-        );
+          element.style.setProperty(
+            "--magnetic-x",
+            `${dx * strength}px`
+          );
 
 
-        element.addEventListener(
-          "pointerleave",
-          () => {
+          element.style.setProperty(
+            "--magnetic-y",
+            `${dy * strength}px`
+          );
+        },
+        { passive: true }
+      );
 
-            element.style.setProperty(
-              "--magnetic-x",
-              "0px"
-            );
 
+      element.addEventListener(
+        "pointerleave",
+        () => {
+          element.style.setProperty(
+            "--magnetic-x",
+            "0px"
+          );
 
-            element.style.setProperty(
-              "--magnetic-y",
-              "0px"
-            );
-
-          }
-        );
-
-      }
-    );
-
+          element.style.setProperty(
+            "--magnetic-y",
+            "0px"
+          );
+        }
+      );
+    });
   };
 
 
@@ -1680,28 +1563,24 @@
      ======================================================= */
 
   const initCtaInteraction = () => {
-
-    if (!dom.ctaTrajectory || !dom.contactCta) {
+    if (
+      !dom.ctaTrajectory ||
+      !dom.contactCta
+    ) {
       return;
     }
 
 
-    const engage = () => {
-
+    const engage = () =>
       dom.ctaTrajectory.classList.add(
         "is-engaged"
       );
 
-    };
 
-
-    const disengage = () => {
-
+    const disengage = () =>
       dom.ctaTrajectory.classList.remove(
         "is-engaged"
       );
-
-    };
 
 
     dom.contactCta.addEventListener(
@@ -1726,13 +1605,6 @@
       "focusout",
       disengage
     );
-
-
-    dom.contactCta.addEventListener(
-      "pointerdown",
-      engage
-    );
-
   };
 
 
@@ -1741,26 +1613,22 @@
      ======================================================= */
 
   const clearStandbyTimer = () => {
-
     if (state.standbyTimer) {
-
       window.clearTimeout(
         state.standbyTimer
       );
 
       state.standbyTimer = null;
-
     }
-
   };
 
 
   const enterStandby = () => {
-
     if (
       state.menuOpen ||
       state.standby ||
-      !dom.standby
+      !dom.standby ||
+      state.reducedMotion
     ) {
       return;
     }
@@ -1771,7 +1639,6 @@
 
 
     state.standby = true;
-
 
     clearStandbyTimer();
 
@@ -1786,12 +1653,6 @@
     );
 
 
-    dom.standby.classList.toggle(
-      "is-reduced",
-      state.reducedMotion
-    );
-
-
     dom.standby.setAttribute(
       "aria-hidden",
       "false"
@@ -1801,19 +1662,19 @@
     if ("inert" in dom.standby) {
       dom.standby.inert = false;
     } else {
-      dom.standby.removeAttribute("inert");
+      dom.standby.removeAttribute(
+        "inert"
+      );
     }
 
 
     dom.standbyWake?.focus({
       preventScroll: true
     });
-
   };
 
 
   const exitStandby = () => {
-
     if (!state.standby) {
       return;
     }
@@ -1864,34 +1725,27 @@
         "function" &&
       document.contains(returnFocus)
     ) {
-
-      window.requestAnimationFrame(
-        () => {
-
-          returnFocus.focus({
-            preventScroll: true
-          });
-
-        }
-      );
-
+      window.requestAnimationFrame(() => {
+        returnFocus.focus({
+          preventScroll: true
+        });
+      });
     }
 
 
     resetStandbyTimer();
-
   };
 
 
   const resetStandbyTimer = () => {
-
     clearStandbyTimer();
 
 
     if (
       state.menuOpen ||
       state.standby ||
-      document.hidden
+      document.hidden ||
+      state.reducedMotion
     ) {
       return;
     }
@@ -1902,12 +1756,10 @@
         enterStandby,
         CONFIG.standbyDelay
       );
-
   };
 
 
   const initStandby = () => {
-
     if (!dom.standby) {
       return;
     }
@@ -1929,93 +1781,52 @@
     );
 
 
-    dom.standby?.addEventListener(
-      "keydown",
-      event => {
-
-        if (
-          !state.standby ||
-          event.key !== "Tab"
-        ) {
-          return;
-        }
-
-
-        event.preventDefault();
-
-
-        dom.standbyWake?.focus({
-          preventScroll: true
-        });
-
-      }
-    );
-
-
     [
       "pointerdown",
       "wheel",
       "touchstart",
-      "keydown",
-      "scroll"
-    ].forEach(
-      eventName => {
-
-        window.addEventListener(
-          eventName,
-          event => {
-
-            if (state.standby) {
-
-              if (
-                eventName === "keydown" &&
-                event.key === "Escape"
-              ) {
-                return;
-              }
-
-              exitStandby();
-
-              return;
-
-            }
-
-
+      "keydown"
+    ].forEach(eventName => {
+      window.addEventListener(
+        eventName,
+        event => {
+          if (state.standby) {
             if (
-              eventName !== "scroll" ||
-              event.isTrusted
+              eventName === "keydown" &&
+              event.key === "Tab"
             ) {
-              resetStandbyTimer();
+              return;
             }
 
-          },
-          {
-            passive:
-              eventName !== "keydown"
+            exitStandby();
+            return;
           }
-        );
 
-      }
-    );
+          if (
+            eventName !== "keydown" ||
+            event.key !== "Shift"
+          ) {
+            resetStandbyTimer();
+          }
+        },
+        {
+          passive:
+            eventName !== "keydown"
+        }
+      );
+    });
 
 
     document.addEventListener(
       "visibilitychange",
       () => {
-
         if (document.hidden) {
-
           clearStandbyTimer();
-
         } else {
-
           resetStandbyTimer();
-
         }
-
       }
     );
-
   };
 
 
@@ -2024,7 +1835,6 @@
      ======================================================= */
 
   const initHashNavigation = () => {
-
     const hash =
       window.location.hash;
 
@@ -2037,8 +1847,7 @@
     const index =
       dom.sections.findIndex(
         section =>
-          `#${section.id}` ===
-          hash
+          `#${section.id}` === hash
       );
 
 
@@ -2047,12 +1856,12 @@
     }
 
 
-    window.setTimeout(
-      () =>
-        navigateToSection(index),
-      500
-    );
-
+    window.requestAnimationFrame(() => {
+      window.setTimeout(
+        () => navigateToSection(index),
+        CONFIG.hashNavigationDelay
+      );
+    });
   };
 
 
@@ -2061,11 +1870,9 @@
      ======================================================= */
 
   const initKeyboardNavigation = () => {
-
     document.addEventListener(
       "keydown",
       event => {
-
         if (
           state.menuOpen ||
           state.standby
@@ -2078,6 +1885,25 @@
           event.key !== "PageDown" &&
           event.key !== "PageUp"
         ) {
+          return;
+        }
+
+
+        const active =
+          document.activeElement;
+
+
+        const isFormField =
+          active &&
+          (
+            active.matches(
+              "input, textarea, select"
+            ) ||
+            active.isContentEditable
+          );
+
+
+        if (isFormField) {
           return;
         }
 
@@ -2103,72 +1929,153 @@
         navigateToSection(
           nextIndex
         );
-
       }
     );
-
   };
 
 
   /* =======================================================
-     SCROLL
+     SCROLL / RESIZE
      ======================================================= */
 
   const handleScroll = () => {
-
     detectActiveSection();
-
     updateTrajectoryTargets();
 
+    updateAnimationRequirement();
   };
 
 
-  /* =======================================================
-     RESIZE
-     ======================================================= */
-
   const handleResize = () => {
-
     window.clearTimeout(
       state.resizeTimer
     );
 
 
     state.resizeTimer =
-      window.setTimeout(
-        () => {
+      window.setTimeout(() => {
+        detectActiveSection();
+        updateTrajectoryTargets();
 
-          detectActiveSection();
-
-          updateTrajectoryTargets();
-
-          updateWowHeader(
-            state.activeIndex
-          );
-
-        },
-        CONFIG.resizeDebounce
-      );
-
+        updateWowHeader(
+          state.activeIndex
+        );
+      }, CONFIG.resizeDebounce);
   };
 
 
   /* =======================================================
-     ANIMATION FRAME
+     SMART ANIMATION LOOP
      ======================================================= */
 
+  const animationIsNeeded = () => {
+    if (
+      state.reducedMotion ||
+      document.hidden
+    ) {
+      return false;
+    }
+
+
+    const cursorVisible =
+      isFinePointer() &&
+      dom.cursor?.classList.contains(
+        "is-visible"
+      );
+
+
+    const trajectoryMoving =
+      Math.abs(
+        state.trajectory.progress -
+        state.trajectory.targetProgress
+      ) > 0.0005 ||
+      Math.abs(
+        state.trajectory.drift -
+        state.trajectory.targetDrift
+      ) > 0.05;
+
+
+    return (
+      cursorVisible ||
+      trajectoryMoving
+    );
+  };
+
+
   const animationFrame = () => {
-
     updateCursorFrame();
-
     updateTrajectoryFrame();
+
+    if (animationIsNeeded()) {
+      state.rafId =
+        requestAnimationFrame(
+          animationFrame
+        );
+    } else {
+      state.animationRunning = false;
+      state.rafId = null;
+    }
+  };
+
+
+  const startAnimationLoop = () => {
+    if (
+      state.animationRunning ||
+      state.reducedMotion ||
+      document.hidden
+    ) {
+      return;
+    }
+
+
+    state.animationRunning = true;
 
 
     state.rafId =
       requestAnimationFrame(
         animationFrame
       );
+  };
 
+
+  const stopAnimationLoop = () => {
+    if (state.rafId) {
+      cancelAnimationFrame(
+        state.rafId
+      );
+    }
+
+
+    state.rafId = null;
+    state.animationRunning = false;
+  };
+
+
+  const updateAnimationRequirement = () => {
+    if (animationIsNeeded()) {
+      startAnimationLoop();
+    }
+  };
+
+
+  /* =======================================================
+     VISIBILITY
+     ======================================================= */
+
+  const initVisibilityHandling = () => {
+    document.addEventListener(
+      "visibilitychange",
+      () => {
+        if (document.hidden) {
+          stopAnimationLoop();
+          clearStandbyTimer();
+        } else {
+          updateTrajectoryTargets();
+          resetStandbyTimer();
+          updateAnimationRequirement();
+        }
+      }
+    );
   };
 
 
@@ -2177,7 +2084,6 @@
      ======================================================= */
 
   const setInitialState = () => {
-
     if (!dom.sections.length) {
       return;
     }
@@ -2192,6 +2098,34 @@
 
     resetStandbyTimer();
 
+    updateAnimationRequirement();
+  };
+
+
+  /* =======================================================
+     GLOBAL ERROR CONTAINMENT
+     ======================================================= */
+
+  const initErrorContainment = () => {
+    window.addEventListener(
+      "error",
+      event => {
+        /*
+         * Progressive enhancement principle:
+         * an interaction failure must never
+         * make the content unusable.
+         */
+        if (
+          event?.error &&
+          typeof event.error === "object"
+        ) {
+          console.warn(
+            "[CP] Interaction error contained.",
+            event.error
+          );
+        }
+      }
+    );
   };
 
 
@@ -2200,8 +2134,11 @@
      ======================================================= */
 
   const init = () => {
+    initProgressiveEnhancement();
 
-    initMotionPreference();
+    initPreferences();
+
+    initErrorContainment();
 
     initLoader();
 
@@ -2229,6 +2166,8 @@
 
     initKeyboardNavigation();
 
+    initVisibilityHandling();
+
     setInitialState();
 
     detectActiveSection();
@@ -2239,43 +2178,36 @@
     window.addEventListener(
       "scroll",
       handleScroll,
-      {
-        passive: true
-      }
+      { passive: true }
     );
 
 
     window.addEventListener(
       "resize",
       handleResize,
-      {
-        passive: true
-      }
+      { passive: true }
     );
 
 
-    animationFrame();
-
+    updateAnimationRequirement();
   };
 
+
+  /* =======================================================
+     BOOT
+     ======================================================= */
 
   if (
     document.readyState ===
     "loading"
   ) {
-
     document.addEventListener(
       "DOMContentLoaded",
       init,
-      {
-        once: true
-      }
+      { once: true }
     );
-
   } else {
-
     init();
-
   }
 
 })();
