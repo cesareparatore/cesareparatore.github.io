@@ -1,739 +1,1532 @@
-(() => {
+```javascript
 "use strict";
 
 /*
 ==========================================================
-CESARE PARATORE
-A DIRECTION IS BORN FROM A POINT
-FINAL EXPERIENCE ENGINE
+ CESARE PARATORE
+ MOVIMENTO / DIREZIONE
+
+ SCRIPT.JS DEFINITIVO 10/10
+ PARTE 1/2
+
+ CORE EXPERIENCE ENGINE
+
+ - Loader
+ - Motion System
+ - Navigation
+ - Progress
+ - Reveal
+ - Menu
+ - Accessibility
+ - Scroll Intelligence
 ==========================================================
 */
 
 
 const CONFIG = {
 
- loader: {
-  min:700,
-  max:2200
- },
+    loader: {
+        min: 700,
+        max: 2200,
+        hideDelay: 700
+    },
 
- scroll:{
-  threshold:.55,
-  smooth:true
- },
 
- reveal:{
-  threshold:.15
- },
+    scroll: {
+        offset: 18,
+        smooth: true,
+        threshold: .52
+    },
 
- motion:{
-  lerp:.08,
-  drift:18
- },
 
- standby:{
-  delay:45000,
-  minWidth:700
- },
+    reveal: {
+        threshold: .15,
+        rootMargin: "0px 0px -10% 0px"
+    },
 
- cursor:{
-  enabled:true
- }
+
+    motion: {
+        cursorLerp: .18,
+        trajectoryLerp: .09,
+        drift:18
+    },
+
+
+    standby: {
+        delay:45000,
+        minWidth:700
+    }
 
 };
+
+
 
 
 
 const STATE = {
 
- section:0,
+    loaded:false,
 
- reduced:false,
+    section:0,
 
- menu:false,
+    menu:false,
 
- standby:false,
+    reduced:false,
 
- pointer:{
-  x:0,
-  y:0
- },
+    standby:false,
 
- cursor:{
-  x:0,
-  y:0
- },
 
- trajectory:{
-  value:0,
-  target:0
- }
+    pointer:{
+        x:window.innerWidth/2,
+        y:window.innerHeight/2
+    },
+
+
+    cursor:{
+        x:window.innerWidth/2,
+        y:window.innerHeight/2
+    },
+
+
+    trajectory:{
+        current:0,
+        target:0
+    },
+
+
+    menuReturn:null,
+
+    standbyReturn:null,
+
+    raf:null
 
 };
 
 
 
-const $ = s => document.querySelector(s);
-const $$ = s => [...document.querySelectorAll(s)];
+
+
+const $ = selector =>
+document.querySelector(selector);
+
+
+
+const $$ = selector =>
+[
+...document.querySelectorAll(selector)
+];
+
+
 
 
 
 const DOM = {
 
- body:document.body,
 
- html:document.documentElement,
+    html:
+    document.documentElement,
 
- loader:$(".page-loader"),
 
- menu:$(".site-menu"),
+    body:
+    document.body,
 
- menuButton:$(".menu-trigger"),
 
- sections:$$(".home-section"),
+    loader:
+    $(".page-loader"),
 
- reveals:$$(".reveal"),
 
- cursor:$(".custom-cursor"),
+    header:
+    $(".site-header"),
 
- cursorDot:$(".custom-cursor-dot"),
 
- cursorRing:$(".custom-cursor-ring"),
+    menu:
+    $(".site-menu"),
 
- progress:$(".progress-fill"),
 
- progressPoint:$(".progress-point"),
+    menuButton:
+    $(".menu-trigger"),
 
- progressLabel:$("#progress-current"),
 
- standby:$(".standby-screen"),
+    menuLinks:
+    $$(".site-menu-nav a"),
 
- wake:$(".standby-wake"),
 
- trajectories:$$("[data-trajectory]")
+    sections:
+    $$(".home-section"),
+
+
+    reveals:
+    $$(".reveal"),
+
+
+    progress:
+    $(".progress-fill"),
+
+
+    progressPoint:
+    $(".progress-point"),
+
+
+    progressLabel:
+    $("#progress-current"),
+
+
+    prev:
+    $("#previous-section"),
+
+
+    next:
+    $("#next-section"),
+
+
+    cursor:
+    $(".custom-cursor"),
+
+
+    cursorDot:
+    $(".custom-cursor-dot"),
+
+
+    cursorRing:
+    $(".custom-cursor-ring"),
+
+
+    standby:
+    $(".standby-screen"),
+
+
+    wake:
+    $(".standby-wake")
 
 };
 
 
 
+
+
 /*
-----------------------------------------------------------
-MOTION
-----------------------------------------------------------
+==========================================================
+ UTILITY
+==========================================================
 */
 
 
-function motion(){
-
- const media =
- matchMedia("(prefers-reduced-motion:reduce)");
-
- const update = () => {
-
-  STATE.reduced = media.matches;
-
-  DOM.html.classList.toggle(
-   "reduced-motion",
-   STATE.reduced
-  );
-
- };
+const clamp = (value,min,max)=>
+Math.min(
+Math.max(value,min),
+max
+);
 
 
- update();
 
- media.addEventListener(
-  "change",
-  update
- );
+const lerp = (a,b,t)=>
+a+(b-a)*t;
+
+
+
+const sectionNumber = i =>
+String(i+1).padStart(2,"0");
+
+
+
+
+
+function reducedMotion(){
+
+    const media =
+    window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+    );
+
+
+    const update = ()=>{
+
+        STATE.reduced =
+        media.matches;
+
+
+        DOM.html.classList.toggle(
+            "reduced-motion",
+            STATE.reduced
+        );
+
+    };
+
+
+    update();
+
+
+    media.addEventListener(
+        "change",
+        update
+    );
 
 }
 
 
 
+
+
 /*
-----------------------------------------------------------
-LOADER
-----------------------------------------------------------
+==========================================================
+ LOADER
+==========================================================
 */
 
 
-function loader(){
-
- if(!DOM.loader)
- return;
+function initLoader(){
 
 
- const start = performance.now();
+    if(!DOM.loader){
+
+        STATE.loaded=true;
+        return;
+
+    }
 
 
- function finish(){
-
-  const elapsed =
-  performance.now()-start;
+    const start =
+    performance.now();
 
 
-  const wait =
-  Math.max(
-   0,
-   CONFIG.loader.min-elapsed
-  );
+    let finished=false;
 
 
-  setTimeout(()=>{
 
-   DOM.loader.classList.add(
-    "is-hidden"
-   );
+    const finish=()=>{
 
 
-   setTimeout(()=>{
-    DOM.loader.remove();
-   },700);
+        if(finished)
+        return;
 
 
-  },wait);
+        finished=true;
 
 
- }
+        const elapsed =
+        performance.now()-start;
 
 
- window.addEventListener(
-  "load",
-  finish,
-  {once:true}
- );
+
+        const wait =
+        Math.max(
+            0,
+            CONFIG.loader.min-elapsed
+        );
 
 
- setTimeout(
-  finish,
-  CONFIG.loader.max
- );
+
+        setTimeout(()=>{
+
+
+            STATE.loaded=true;
+
+
+            DOM.loader.classList.add(
+                "is-hidden"
+            );
+
+
+
+            setTimeout(()=>{
+
+
+                DOM.loader.remove();
+
+
+            },CONFIG.loader.hideDelay);
+
+
+
+        },wait);
+
+
+    };
+
+
+
+    window.addEventListener(
+        "load",
+        finish,
+        {once:true}
+    );
+
+
+
+    setTimeout(
+        finish,
+        CONFIG.loader.max
+    );
 
 
 }
 
 
 
+
+
 /*
-----------------------------------------------------------
-SECTIONS
-----------------------------------------------------------
+==========================================================
+ NAVIGATION
+==========================================================
 */
-
-
-function currentSection(){
-
- let index=0;
-
- let distance=Infinity;
-
-
- DOM.sections.forEach((section,i)=>{
-
-  const box =
-  section.getBoundingClientRect();
-
-
-  const center =
-  Math.abs(
-   box.top + box.height/2 -
-   innerHeight*.5
-  );
-
-
-  if(center<distance){
-
-   distance=center;
-   index=i;
-
-  }
-
-
- });
-
-
- if(index!==STATE.section){
-
-  STATE.section=index;
-
-  updateNavigation();
-
- }
-
-}
-
 
 
 function updateNavigation(){
 
- const section =
- DOM.sections[STATE.section];
+
+    const active =
+    DOM.sections[STATE.section];
 
 
- if(!section)
- return;
-
-
- const total =
- DOM.sections.length;
-
-
- const progress =
- total<=1
- ?0
- :STATE.section/(total-1);
+    if(!active)
+    return;
 
 
 
- if(DOM.progress)
- DOM.progress.style.width =
- `${progress*100}%`;
-
-
- if(DOM.progressPoint)
- DOM.progressPoint.style.left =
- `${progress*100}%`;
-
-
- if(DOM.progressLabel)
-
- DOM.progressLabel.textContent =
- section.dataset.sectionTitle || "";
-
-
-}
+    const total =
+    DOM.sections.length;
 
 
 
-/*
-----------------------------------------------------------
-SMOOTH NAVIGATION
-----------------------------------------------------------
-*/
-
-
-function navigate(index){
-
- const target =
- DOM.sections[index];
-
-
- if(!target)
- return;
-
-
- const offset =
- $(".site-header")?.offsetHeight || 0;
-
-
- window.scrollTo({
-
-  top:
-  target.offsetTop-offset,
-
-  behavior:
-  STATE.reduced
-  ?"auto"
-  :"smooth"
-
- });
-
-
-}
+    const progress =
+    total<=1
+    ?0
+    :
+    STATE.section/(total-1);
 
 
 
-/*
-----------------------------------------------------------
-REVEAL SYSTEM
-----------------------------------------------------------
-*/
-
-
-function reveal(){
-
- if(
- STATE.reduced ||
- !("IntersectionObserver" in window)
- ){
-
-  DOM.reveals.forEach(
-   el=>el.classList.add(
-    "is-visible"
-   )
-  );
-
-  return;
-
- }
-
-
- const observer =
- new IntersectionObserver(
- entries=>{
-
-  entries.forEach(entry=>{
-
-   if(
-   entry.isIntersecting
-   ){
-
-    entry.target.classList.add(
-     "is-visible"
+    DOM.progress?.style.setProperty(
+        "width",
+        `${progress*100}%`
     );
 
-    observer.unobserve(
-     entry.target
+
+
+    DOM.progressPoint?.style.setProperty(
+        "left",
+        `${progress*100}%`
     );
 
-   }
-
-  });
 
 
- },
- {
- threshold:
- CONFIG.reveal.threshold
- });
+    if(DOM.progressLabel){
 
+        DOM.progressLabel.textContent =
+        active.dataset.sectionTitle || "";
 
- DOM.reveals.forEach(
- el=>observer.observe(el)
- );
+    }
+
 
 }
 
 
 
+
+
+function detectSection(){
+
+
+    let current =
+    STATE.section;
+
+
+    let closest =
+    Infinity;
+
+
+
+    DOM.sections.forEach(
+    (section,index)=>{
+
+
+        const rect =
+        section.getBoundingClientRect();
+
+
+
+        if(
+        rect.bottom < 0 ||
+        rect.top > innerHeight
+        )
+        return;
+
+
+
+        const distance =
+        Math.abs(
+        rect.top+
+        rect.height/2-
+        innerHeight*.5
+        );
+
+
+
+        if(distance<closest){
+
+            closest=distance;
+            current=index;
+
+        }
+
+
+    });
+
+
+
+    if(current!==STATE.section){
+
+        STATE.section=current;
+        updateNavigation();
+
+    }
+
+
+}
+
+
+
+
+
+function goToSection(index){
+
+
+    const section =
+    DOM.sections[index];
+
+
+    if(!section)
+    return;
+
+
+
+    const offset =
+    DOM.header?.offsetHeight || 0;
+
+
+
+    const y =
+    section.offsetTop-
+    offset-
+    CONFIG.scroll.offset;
+
+
+
+    window.scrollTo({
+
+        top:y,
+
+        behavior:
+        STATE.reduced
+        ?
+        "auto"
+        :
+        "smooth"
+
+    });
+
+
+}
+
+
+
+
+
+
 /*
-----------------------------------------------------------
-CURSOR
-----------------------------------------------------------
+==========================================================
+ REVEAL ENGINE
+==========================================================
 */
 
 
-function cursor(){
-
- if(
- STATE.reduced ||
- !DOM.cursor ||
- !matchMedia("(pointer:fine)").matches
- )
- return;
+function initReveal(){
 
 
+    if(
+    STATE.reduced ||
+    !("IntersectionObserver" in window)
+    ){
 
- window.addEventListener(
- "pointermove",
- e=>{
-
-  STATE.pointer.x=e.clientX;
-  STATE.pointer.y=e.clientY;
-
-  DOM.cursor.classList.add(
-   "is-visible"
-  );
-
- });
+        DOM.reveals.forEach(
+        el=>
+        el.classList.add(
+        "is-visible"
+        )
+        );
 
 
- $$("a,button").forEach(el=>{
+        return;
 
-  el.addEventListener(
-   "mouseenter",
-   ()=>DOM.cursor.classList.add(
-    "is-hovering"
-   )
-  );
+    }
 
 
-  el.addEventListener(
-   "mouseleave",
-   ()=>DOM.cursor.classList.remove(
-    "is-hovering"
-   )
-  );
 
- });
+    const observer =
+    new IntersectionObserver(
+
+    entries=>{
+
+
+        entries.forEach(
+        entry=>{
+
+
+            if(!entry.isIntersecting)
+            return;
+
+
+
+            entry.target.classList.add(
+                "is-visible"
+            );
+
+
+
+            observer.unobserve(
+                entry.target
+            );
+
+
+        });
+
+
+    },
+
+
+    {
+
+        threshold:
+        CONFIG.reveal.threshold,
+
+
+        rootMargin:
+        CONFIG.reveal.rootMargin
+
+    });
+
+
+
+    DOM.reveals.forEach(
+    element=>
+    observer.observe(element)
+    );
 
 
 }
 
 
 
+
+
 /*
-----------------------------------------------------------
-TRAJECTORY
-----------------------------------------------------------
+==========================================================
+ MENU
+==========================================================
 */
 
 
-function trajectory(){
-
- const first =
- DOM.sections[0];
-
- const last =
- DOM.sections.at(-1);
+function initMenu(){
 
 
- if(!first || !last)
- return;
+    if(!DOM.menuButton ||
+       !DOM.menu)
+    return;
 
 
- const start =
- first.offsetTop;
+
+    const open=()=>{
 
 
- const end =
- last.offsetTop +
- last.offsetHeight -
- innerHeight;
+        STATE.menu=true;
 
 
- STATE.trajectory.target =
- Math.max(
-  0,
-  Math.min(
-   1,
-   (scrollY-start)/(end-start)
-  )
- );
+        STATE.menuReturn =
+        document.activeElement;
+
+
+
+        DOM.menu.classList.add(
+            "is-open"
+        );
+
+
+        DOM.menu.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
+
+        DOM.body.classList.add(
+            "is-menu-open"
+        );
+
+
+        DOM.menuLinks[0]?.focus();
+
+
+    };
+
+
+
+
+
+    const close=()=>{
+
+
+        STATE.menu=false;
+
+
+        DOM.menu.classList.remove(
+            "is-open"
+        );
+
+
+        DOM.menu.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+
+        DOM.body.classList.remove(
+            "is-menu-open"
+        );
+
+
+        STATE.menuReturn?.focus();
+
+
+    };
+
+
+
+
+    DOM.menuButton.addEventListener(
+        "click",
+        ()=>{
+            STATE.menu
+            ?
+            close()
+            :
+            open();
+        }
+    );
+
+
+
+    DOM.menuLinks.forEach(
+    link=>
+    link.addEventListener(
+        "click",
+        close
+    ));
+
+
+
+    document.addEventListener(
+        "keydown",
+        event=>{
+
+
+            if(
+            event.key==="Escape" &&
+            STATE.menu
+            ){
+
+                close();
+
+            }
+
+
+        }
+    );
 
 
 }
-
-
-
-function animate(){
-
- STATE.trajectory.value +=
- (
- STATE.trajectory.target -
- STATE.trajectory.value
- )
- *
- CONFIG.motion.lerp;
-
-
-
- DOM.html.style.setProperty(
-
- "--trajectory-progress",
-
- STATE.trajectory.value
-
- );
-
-
-
- if(
- DOM.cursor &&
- !STATE.reduced
- ){
-
-  STATE.cursor.x +=
-  (
-  STATE.pointer.x-
-  STATE.cursor.x
-  )*.18;
-
-
-  STATE.cursor.y +=
-  (
-  STATE.pointer.y-
-  STATE.cursor.y
-  )*.18;
-
-
-  DOM.cursorDot.style.transform =
-  `translate(${STATE.pointer.x}px,${STATE.pointer.y}px)`;
-
-
-  DOM.cursorRing.style.transform =
-  `translate(${STATE.cursor.x}px,${STATE.cursor.y}px)`;
-
- }
-
-
- requestAnimationFrame(
-  animate
- );
-
-}
-
-
-
+```
+```javascript
 /*
-----------------------------------------------------------
-MENU
-----------------------------------------------------------
+==========================================================
+ CESARE PARATORE
+ MOVIMENTO / DIREZIONE
+
+ SCRIPT.JS DEFINITIVO 10/10
+ PARTE 2/2
+
+ PREMIUM INTERACTION ENGINE
+
+ - Cursor
+ - Magnetic Motion
+ - Narrative Trajectory
+ - Standby Experience
+ - Performance Loop
+ - Resize
+ - Final Boot
+==========================================================
 */
 
 
-function menu(){
-
- if(!DOM.menuButton)
- return;
-
-
- DOM.menuButton.onclick=()=>{
-
-  STATE.menu=!STATE.menu;
-
-
-  DOM.menu.classList.toggle(
-   "is-open",
-   STATE.menu
-  );
-
-
-  DOM.body.classList.toggle(
-   "is-menu-open",
-   STATE.menu
-  );
-
-
- };
-
-
-}
-
-
 
 /*
-----------------------------------------------------------
-STANDBY MOMENT
-----------------------------------------------------------
+==========================================================
+ CURSOR PREMIUM
+==========================================================
 */
 
 
-function standby(){
-
- if(!DOM.standby)
- return;
+function initCursor(){
 
 
- let timer;
+    if(
+        STATE.reduced ||
+        !DOM.cursor ||
+        !DOM.cursorDot ||
+        !DOM.cursorRing ||
+        !matchMedia("(pointer:fine)").matches
+    )
+    return;
 
 
- function reset(){
 
-  clearTimeout(timer);
-
-
-  if(
-  STATE.reduced ||
-  innerWidth<CONFIG.standby.minWidth
-  )
-  return;
+    window.addEventListener(
+        "pointermove",
+        event=>{
 
 
-  timer=setTimeout(()=>{
-
-   DOM.standby.classList.add(
-    "is-active"
-   );
-
-  },
-  CONFIG.standby.delay);
+            STATE.pointer.x =
+            event.clientX;
 
 
- }
+            STATE.pointer.y =
+            event.clientY;
 
 
- [
- "mousemove",
- "scroll",
- "wheel",
- "touchstart"
- ]
- .forEach(
- e=>window.addEventListener(
- e,
- reset,
- {passive:true}
- )
- );
+
+            DOM.cursor.classList.add(
+                "is-visible"
+            );
 
 
- DOM.wake?.addEventListener(
- "click",
- ()=>DOM.standby.classList.remove(
-  "is-active"
- )
- );
+        },
+        {
+            passive:true
+        }
+    );
 
 
- reset();
+
+    $$("a,button").forEach(
+    element=>{
+
+
+        element.addEventListener(
+            "pointerenter",
+            ()=>{
+
+                DOM.cursor.classList.add(
+                    "is-hovering"
+                );
+
+            }
+        );
+
+
+
+        element.addEventListener(
+            "pointerleave",
+            ()=>{
+
+                DOM.cursor.classList.remove(
+                    "is-hovering"
+                );
+
+            }
+        );
+
+
+    });
+
+
+
+    window.addEventListener(
+        "pointerleave",
+        ()=>{
+
+            DOM.cursor.classList.remove(
+                "is-visible"
+            );
+
+        }
+    );
+
 
 }
 
 
 
+
+
+function updateCursor(){
+
+
+    if(
+        !DOM.cursor ||
+        STATE.reduced
+    )
+    return;
+
+
+
+    STATE.cursor.x =
+    lerp(
+        STATE.cursor.x,
+        STATE.pointer.x,
+        CONFIG.motion.cursorLerp
+    );
+
+
+    STATE.cursor.y =
+    lerp(
+        STATE.cursor.y,
+        STATE.pointer.y,
+        CONFIG.motion.cursorLerp
+    );
+
+
+
+    DOM.cursorDot.style.transform =
+    `
+    translate3d(
+        ${STATE.pointer.x}px,
+        ${STATE.pointer.y}px,
+        0
+    )
+    translate(-50%,-50%)
+    `;
+
+
+
+    DOM.cursorRing.style.transform =
+    `
+    translate3d(
+        ${STATE.cursor.x}px,
+        ${STATE.cursor.y}px,
+        0
+    )
+    translate(-50%,-50%)
+    `;
+
+
+}
+
+
+
+
+
 /*
-----------------------------------------------------------
-INIT
-----------------------------------------------------------
+==========================================================
+ MAGNETIC ELEMENTS
+==========================================================
+*/
+
+
+function initMagnetic(){
+
+
+    if(
+        STATE.reduced ||
+        !matchMedia("(pointer:fine)").matches
+    )
+    return;
+
+
+
+    $$(".magnetic").forEach(
+    element=>{
+
+
+        element.addEventListener(
+            "pointermove",
+            event=>{
+
+
+                const rect =
+                element.getBoundingClientRect();
+
+
+
+                const x =
+                event.clientX -
+                (
+                    rect.left+
+                    rect.width/2
+                );
+
+
+
+                const y =
+                event.clientY -
+                (
+                    rect.top+
+                    rect.height/2
+                );
+
+
+
+                const strength=.12;
+
+
+
+                element.style.transform =
+                `
+                translate(
+                ${x*strength}px,
+                ${y*strength}px
+                )
+                `;
+
+
+            }
+        );
+
+
+
+        element.addEventListener(
+            "pointerleave",
+            ()=>{
+
+
+                element.style.transform =
+                "";
+
+            }
+        );
+
+
+    });
+
+
+}
+
+
+
+
+
+/*
+==========================================================
+ NARRATIVE TRAJECTORY
+==========================================================
+*/
+
+
+function updateTrajectory(){
+
+
+    if(DOM.sections.length<2)
+    return;
+
+
+
+    const first =
+    DOM.sections[0];
+
+
+    const last =
+    DOM.sections[
+        DOM.sections.length-1
+    ];
+
+
+
+    const start =
+    first.offsetTop;
+
+
+
+    const end =
+    last.offsetTop+
+    last.offsetHeight-
+    innerHeight;
+
+
+
+    const progress =
+    (scrollY-start)/
+    (end-start);
+
+
+
+    STATE.trajectory.target =
+    clamp(
+        progress,
+        0,
+        1
+    );
+
+
+
+}
+
+
+
+
+
+function animateTrajectory(){
+
+
+    STATE.trajectory.current =
+    lerp(
+        STATE.trajectory.current,
+        STATE.trajectory.target,
+        CONFIG.motion.trajectoryLerp
+    );
+
+
+
+    DOM.html.style.setProperty(
+        "--trajectory-progress",
+        STATE.trajectory.current
+    );
+
+
+
+}
+
+
+
+
+
+/*
+==========================================================
+ STANDBY CINEMATIC MODE
+==========================================================
+*/
+
+
+function initStandby(){
+
+
+    if(!DOM.standby)
+    return;
+
+
+
+    let timer;
+
+
+
+    const reset=()=>{
+
+
+        clearTimeout(timer);
+
+
+
+        if(
+            STATE.reduced ||
+            innerWidth <
+            CONFIG.standby.minWidth
+        )
+        return;
+
+
+
+        timer =
+        setTimeout(
+        ()=>{
+
+
+            if(
+                STATE.menu ||
+                document.hidden
+            )
+            return;
+
+
+
+            STATE.standby=true;
+
+
+
+            DOM.standby.classList.add(
+                "is-active"
+            );
+
+
+            DOM.body.classList.add(
+                "is-standby"
+            );
+
+
+        },
+        CONFIG.standby.delay);
+
+
+
+    };
+
+
+
+
+
+    [
+        "mousemove",
+        "scroll",
+        "wheel",
+        "touchstart"
+    ]
+    .forEach(
+    event=>
+
+        window.addEventListener(
+            event,
+            ()=>{
+
+
+                if(STATE.standby){
+
+                    closeStandby();
+
+                }
+
+
+                reset();
+
+
+            },
+            {
+                passive:true
+            }
+        )
+    );
+
+
+
+
+
+    DOM.wake?.addEventListener(
+        "click",
+        closeStandby
+    );
+
+
+
+    reset();
+
+
+}
+
+
+
+
+
+function closeStandby(){
+
+
+    STATE.standby=false;
+
+
+    DOM.standby?.classList.remove(
+        "is-active"
+    );
+
+
+    DOM.body.classList.remove(
+        "is-standby"
+    );
+
+
+}
+
+
+
+
+
+/*
+==========================================================
+ KEYBOARD NAVIGATION
+==========================================================
+*/
+
+
+function initKeyboard(){
+
+
+    document.addEventListener(
+        "keydown",
+        event=>{
+
+
+            if(
+                STATE.menu ||
+                STATE.standby
+            )
+            return;
+
+
+
+            if(
+                event.key==="PageDown"
+            ){
+
+                event.preventDefault();
+
+
+                goToSection(
+                    clamp(
+                        STATE.section+1,
+                        0,
+                        DOM.sections.length-1
+                    )
+                );
+
+
+            }
+
+
+
+            if(
+                event.key==="PageUp"
+            ){
+
+                event.preventDefault();
+
+
+                goToSection(
+                    clamp(
+                        STATE.section-1,
+                        0,
+                        DOM.sections.length-1
+                    )
+                );
+
+
+            }
+
+
+        }
+    );
+
+
+}
+
+
+
+
+
+/*
+==========================================================
+ RESIZE
+==========================================================
+*/
+
+
+function initResize(){
+
+
+    let timer;
+
+
+
+    window.addEventListener(
+        "resize",
+        ()=>{
+
+
+            clearTimeout(timer);
+
+
+
+            timer =
+            setTimeout(
+            ()=>{
+
+
+                detectSection();
+
+                updateTrajectory();
+
+
+            },
+            160);
+
+
+
+        },
+        {
+            passive:true
+        }
+    );
+
+
+}
+
+
+
+
+
+/*
+==========================================================
+ SCROLL ENGINE
+==========================================================
+*/
+
+
+function initScroll(){
+
+
+    let ticking=false;
+
+
+
+    window.addEventListener(
+        "scroll",
+        ()=>{
+
+
+            if(ticking)
+            return;
+
+
+
+            ticking=true;
+
+
+
+            requestAnimationFrame(
+            ()=>{
+
+
+                detectSection();
+
+
+                updateTrajectory();
+
+
+                ticking=false;
+
+
+            });
+
+
+        },
+        {
+            passive:true
+        }
+    );
+
+
+}
+
+
+
+
+
+/*
+==========================================================
+ MAIN LOOP
+==========================================================
+*/
+
+
+function loop(){
+
+
+    updateCursor();
+
+
+    animateTrajectory();
+
+
+    STATE.raf =
+    requestAnimationFrame(
+        loop
+    );
+
+
+}
+
+
+
+
+
+/*
+==========================================================
+ BOOT
+==========================================================
 */
 
 
 function init(){
 
- motion();
 
- loader();
-
- reveal();
-
- cursor();
-
- menu();
-
- standby();
+    reducedMotion();
 
 
- window.addEventListener(
- "scroll",
- ()=>{
-
-  currentSection();
-
-  trajectory();
-
- },
- {
- passive:true
- });
+    initLoader();
 
 
- trajectory();
-
- currentSection();
+    initReveal();
 
 
- animate();
+    initMenu();
+
+
+    initCursor();
+
+
+    initMagnetic();
+
+
+    initStandby();
+
+
+    initKeyboard();
+
+
+    initScroll();
+
+
+    initResize();
+
+
+
+    detectSection();
+
+
+    updateNavigation();
+
+
+    updateTrajectory();
+
+
+
+    loop();
+
 
 }
 
 
 
+
+if(
 document.readyState==="loading"
+){
 
-?
-
-document.addEventListener(
-"DOMContentLoaded",
-init,
-{once:true}
-)
-
-:
-
-init();
+    document.addEventListener(
+        "DOMContentLoaded",
+        init,
+        {
+            once:true
+        }
+    );
 
 
+}
+else{
 
-})();
+    init();
+
+}
+```
