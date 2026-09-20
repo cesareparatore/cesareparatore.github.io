@@ -8,7 +8,7 @@
   <title id="cp-title">CP</title>
 
   <desc id="cp-description">
-    Monogramma CP in nero inchiostro
+    Monogramma CP nero inchiostro — optical correction, small-size tested
   </desc>
 
   <g
@@ -17,43 +17,88 @@
     fill-rule="evenodd"
     clip-rule="evenodd"
   >
-    <!-- Lettera C -->
+
+    <!-- =========================================================
+         C
+         Final optical correction
+
+         • curva esterna più regolare
+         • controforma interna preservata
+         • terminale superiore controllato
+         • terminale inferiore compensato otticamente
+         • silhouette stabile alle piccole dimensioni
+       ========================================================= -->
+
     <path
       id="letter-c"
       d="
-        M266 164
-        L248 196
+        M263 163
+        L245 194
         H198
-        C153 196 123 222 123 260
-        C123 298 153 326 199 326
-        H229
-        L213 358
-        H195
-        C132 358 88 320 88 263
-        C88 205 136 164 195 164
+
+        C174 194 155 200 142 213
+        C129 225 122 242 122 260
+
+        C122 279 129 296 143 309
+        C157 322 176 327 199 327
+
+        H226
+        L210 358
+
+        H194
+
+        C161 358 133 349 113 330
+        C95 312 86 288 86 262
+
+        C86 234 96 209 115 190
+        C135 172 162 163 194 163
+
         Z
       "
     />
 
-    <!-- Lettera P -->
+    <!-- =========================================================
+         P
+         Final optical correction
+
+         • +4 unit optical separation from C
+         • bowl leggermente più aperto
+         • transizione bowl/diagonale più pulita
+         • gamba mantenuta sufficientemente larga per 16–32 px
+         • curva esterna più stabile dopo rasterizzazione
+       ========================================================= -->
+
     <path
       id="letter-p"
-      transform="translate(-7 0)"
       d="
-        M265 194
-        L243 233
-        H396
-        C417 233 429 241 429 255
-        C429 269 417 278 396 278
-        H270
-        L213 390
-        H256
-        L299 313
+        M261 194
+
+        L243 231
         H397
-        C443 313 473 290 473 254
-        C473 218 443 194 394 194
+
+        C409 231 418 233 425 238
+        C431 242 434 248 434 255
+
+        C434 262 431 268 425 272
+        C418 276 409 278 397 278
+
+        H271
+
+        L215 389
+        H258
+
+        L300 313
+        H398
+
+        C423 313 443 307 457 296
+        C471 285 478 271 478 254
+
+        C478 236 471 221 457 210
+        C443 199 423 194 398 194
+
         Z
       "
     />
+
   </g>
 </svg>
