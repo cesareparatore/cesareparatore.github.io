@@ -1,1287 +1,905 @@
-(() => {
+/* ============================================================
+   MOVIMENTO / CON DIREZIONE
+   EXPERIENCE ENGINE
+   ============================================================ */
 
+(() => {
   "use strict";
 
+  document.documentElement.classList.add("js");
 
-  /* =========================================================
-     CORE REFERENCES
-  ========================================================== */
-
-  const root =
-    document.documentElement;
-
-  const body =
-    document.body;
-
-  const header =
-    document.getElementById("site-header");
-
-  const loader =
-    document.getElementById("loader");
-
-  const menu =
-    document.getElementById("site-menu");
-
-  const menuTrigger =
-    document.querySelector(".menu-trigger");
-
-  const menuLinks =
-    [...document.querySelectorAll("[data-menu-link]")];
-
-  const chapters =
-    [...document.querySelectorAll("[data-chapter]")];
-
-  const cover =
-    document.querySelector("[data-cover]");
-
-  const progressFill =
-    document.getElementById("progress-fill");
-
-  const progressPoint =
-    document.getElementById("progress-point");
-
-  const progressCurrent =
-    document.getElementById("progress-current");
-
-  const previous =
-    document.getElementById("previous-section");
-
-  const next =
-    document.getElementById("next-section");
-
-  const previousLabel =
-    document.getElementById(
-      "previous-section-label"
-    );
-
-  const nextLabel =
-    document.getElementById(
-      "next-section-label"
-    );
-
-  const idleOverlay =
-    document.getElementById(
-      "idle-overlay"
-    );
-
-
-  /* =========================================================
-     MOTION / STATE
-  ========================================================== */
-
-  const reducedMotion =
-    window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    );
-
-  const finePointer =
-    window.matchMedia(
-      "(pointer:fine)"
-    );
-
-
-  const chapterMeta =
-    chapters.map(
-      (element, index) => ({
-        element,
-        id: element.dataset.chapter,
-        title: element.dataset.title,
-        index
-      })
-    );
-
-
-  let state = {
-
-    activeIndex: -1,
-
-    journeyProgress: 0,
-
-    chapterProgress: 0,
-
-    menuOpen: false,
-
-    idle: false
-
+  const CONFIG = {
+    loaderMaxWait: 4200,
+    loaderMinimum: 900,
+    idleDelay: 18000,
+    scrollEndDelay: 120,
+    magneticMax: 4,
+    magneticRadius: 90
   };
 
+  const DOM = {
+    body: document.body,
+    html: document.documentElement,
 
-  let animationFrame = 0;
+    loader: document.getElementById("loader"),
 
-  let renderRequested = true;
+    header: document.getElementById("site-header"),
+    progressCurrent: document.getElementById("progress-current"),
+    progressFill: document.getElementById("progress-fill"),
+    progressPoint: document.getElementById("progress-point"),
 
-  let lastInteraction =
-    performance.now();
+    previous: document.getElementById("previous-section"),
+    previousLabel: document.getElementById("previous-section-label"),
+    next: document.getElementById("next-section"),
+    nextLabel: document.getElementById("next-section-label"),
 
-  let idleTimer = null;
+    menuTrigger: document.getElementById("menu-trigger"),
+    menu: document.getElementById("site-menu"),
+    menuLinks: [...document.querySelectorAll("[data-menu-link]")],
 
-  let loaderFinished = false;
+    idleMark: document.getElementById("idle-mark"),
 
-  let loaderFallback = null;
+    sections: [...document.querySelectorAll("[data-chapter]")],
+    cover: document.getElementById("cover")
+  };
 
-
-  /* =========================================================
-     UTILITIES
-  ========================================================== */
-
-  const clamp =
-    (value, min, max) =>
-      Math.min(
-        max,
-        Math.max(
-          min,
-          value
-        )
-      );
-
-
-  function requestRender() {
-
-    renderRequested = true;
-
-    if (!animationFrame) {
-
-      animationFrame =
-        requestAnimationFrame(
-          render
-        );
-    }
-  }
-
-
-  function getSectionProgress(
-    section
-  ) {
-
-    const rect =
-      section.getBoundingClientRect();
-
-    const viewport =
-      window.innerHeight;
-
-    const travel =
-      Math.max(
-        1,
-        rect.height - viewport
-      );
-
-    return clamp(
-      -rect.top / travel,
-      0,
-      1
-    );
-  }
-
-
-  /* =========================================================
-     STATE CALCULATION
-  ========================================================== */
-
-  function calculateState() {
-
-    const scrollTop =
-      window.scrollY;
-
-
-    let activeIndex = -1;
-
-    let nearestDistance =
-      Infinity;
-
-
-    chapterMeta.forEach(
-      (chapter) => {
-
-        const rect =
-          chapter.element.getBoundingClientRect();
-
-
-        const chapterCenter =
-          rect.top +
-          Math.min(
-            rect.height,
-            window.innerHeight
-          ) / 2;
-
-
-        const distance =
-          Math.abs(
-            chapterCenter -
-            window.innerHeight / 2
-          );
-
-
-        const visible =
-          rect.bottom >
-          header.offsetHeight * .75
-          &&
-          rect.top <
-          window.innerHeight * .75;
-
-
-        if (
-          visible &&
-          distance <
-          nearestDistance
-        ) {
-
-          nearestDistance =
-            distance;
-
-          activeIndex =
-            chapter.index;
-        }
-
-      }
-    );
-
-
-    /*
-      La cover resta una fase identitaria.
-      Il capitolo 01 diventa attivo solo
-      quando l'utente entra davvero nel racconto.
-    */
-
-    if (
-      scrollTop <
-      cover.offsetHeight * .72
-    ) {
-
-      activeIndex = -1;
-    }
-
-
-    const firstChapter =
-      chapters[0];
-
-    const lastChapter =
-      chapters[
-        chapters.length - 1
-      ];
-
-
-    const journeyStart =
-      firstChapter.offsetTop;
-
-
-    const journeyEnd =
-      lastChapter.offsetTop +
-      lastChapter.offsetHeight -
-      window.innerHeight;
-
-
-    const journeyProgress =
-      clamp(
-        (
-          scrollTop -
-          journeyStart
-        ) /
-        Math.max(
-          1,
-          journeyEnd -
-          journeyStart
-        ),
-        0,
-        1
-      );
-
-
-    const chapterProgress =
-      activeIndex >= 0
-        ? getSectionProgress(
-            chapters[activeIndex]
-          )
-        : 0;
-
-
-    state = {
-
-      ...state,
-
-      activeIndex,
-
-      journeyProgress,
-
-      chapterProgress
-
-    };
-
-  }
-
-
-  /* =========================================================
-     PROGRESS BAR
-  ========================================================== */
-
-  function updateProgressBar() {
-
-    if (!progressFill ||
-        !progressPoint) {
-
-      return;
-    }
-
-
-    const progress =
-      state.journeyProgress;
-
-
-    progressFill.style.width =
-      `${progress * 100}%`;
-
-
-    const trackWidth =
-      progressPoint
-        .parentElement
-        .getBoundingClientRect()
-        .width;
-
-
-    progressPoint.style.left =
-      `${progress * trackWidth}px`;
-
-  }
-
-
-  /* =========================================================
-     NAVIGATION STATE
-  ========================================================== */
-
-  function updateNavigation() {
-
-    const active =
-      state.activeIndex >= 0
-        ? chapterMeta[
-            state.activeIndex
-          ]
-        : null;
-
-
-    const previousChapter =
-      state.activeIndex > 0
-        ? chapterMeta[
-            state.activeIndex - 1
-          ]
-        : null;
-
-
-    const nextChapter =
-      state.activeIndex >= 0 &&
-      state.activeIndex <
-      chapterMeta.length - 1
-
-        ? chapterMeta[
-            state.activeIndex + 1
-          ]
-
-        : state.activeIndex < 0
-          ? chapterMeta[0]
-          : null;
-
-
-    /*
-      TITLE
-    */
-
-    if (progressCurrent) {
-
-      progressCurrent.textContent =
-        active
-          ? active.title
-          : "MOVIMENTO / CON DIREZIONE";
-
-    }
-
-
-    /*
-      PREVIOUS
-    */
-
-    if (previousChapter) {
-
-      previous.href =
-        `#${previousChapter.id}`;
-
-      previousLabel.textContent =
-        previousChapter.id;
-
-      previous.setAttribute(
-        "aria-label",
-        `Vai alla sezione ${previousChapter.id}`
-      );
-
-      previous.removeAttribute(
-        "aria-hidden"
-      );
-
-      previous.removeAttribute(
-        "tabindex"
-      );
-
-      previous.classList.remove(
-        "is-disabled"
-      );
-
-    } else {
-
-      previous.href = "#01";
-
-      previousLabel.textContent = "";
-
-      previous.setAttribute(
-        "aria-label",
-        "Sezione precedente"
-      );
-
-      previous.setAttribute(
-        "aria-hidden",
-        "true"
-      );
-
-      previous.setAttribute(
-        "tabindex",
-        "-1"
-      );
-
-      previous.classList.add(
-        "is-disabled"
-      );
-
-    }
-
-
-    /*
-      NEXT
-    */
-
-    if (nextChapter) {
-
-      next.href =
-        `#${nextChapter.id}`;
-
-      nextLabel.textContent =
-        nextChapter.id;
-
-      next.setAttribute(
-        "aria-label",
-        `Vai alla sezione ${nextChapter.id}`
-      );
-
-      next.classList.remove(
-        "is-disabled"
-      );
-
-    } else {
-
-      next.href = "#10";
-
-      nextLabel.textContent = "10";
-
-      next.setAttribute(
-        "aria-label",
-        "Sezione finale"
-      );
-
-      next.classList.add(
-        "is-disabled"
-      );
-
-    }
-
-  }
-
-
-  /* =========================================================
-     CHAPTER PROGRESS
-  ========================================================== */
-
-  function updateChapterVariables() {
-
-    chapterMeta.forEach(
-      (chapter) => {
-
-        const progress =
-          getSectionProgress(
-            chapter.element
-          );
-
-
-        chapter.element.style
-          .setProperty(
-            "--section-progress",
-            progress.toFixed(4)
-          );
-
-      }
-    );
-
-
-    root.style.setProperty(
-      "--chapter-progress",
-      state.chapterProgress.toFixed(4)
-    );
-
-
-    root.style.setProperty(
-      "--journey-progress",
-      state.journeyProgress.toFixed(4)
-    );
-
-  }
-
-
-  /* =========================================================
-     CENTRAL RENDER
-  ========================================================== */
-
-  function render() {
-
-    animationFrame = 0;
-
-
-    if (!renderRequested) {
-      return;
-    }
-
-
-    renderRequested = false;
-
-
-    calculateState();
-
-    updateProgressBar();
-
-    updateNavigation();
-
-    updateChapterVariables();
-
-  }
-
-
-  /* =========================================================
-     SCROLL TO HASH
-  ========================================================== */
-
-  function scrollToHash(
-    hash
-  ) {
-
-    if (!hash ||
-        hash === "#") {
-
-      return;
-    }
-
-
-    const target =
-      document.querySelector(
-        hash
-      );
-
-
-    if (!target) {
-      return;
-    }
-
-
-    const targetTop =
-      target.getBoundingClientRect()
-        .top +
-      window.scrollY;
-
-
-    window.scrollTo({
-
-      top: targetTop,
-
-      behavior:
-        reducedMotion.matches
-          ? "auto"
-          : "smooth"
-
-    });
-
-  }
-
-
-  /* =========================================================
-     HASH NAVIGATION
-  ========================================================== */
-
-  document
-    .querySelectorAll(
-      'a[href^="#"]'
-    )
-    .forEach(
-      (link) => {
-
-        if (
-          link.closest(
-            ".site-menu"
-          )
-        ) {
-
-          return;
-        }
-
-
-        link.addEventListener(
-          "click",
-          (event) => {
-
-            const hash =
-              link.getAttribute(
-                "href"
-              );
-
-
-            if (!hash ||
-                hash === "#") {
-
-              return;
-            }
-
-
-            const target =
-              document.querySelector(
-                hash
-              );
-
-
-            if (!target) {
-              return;
-            }
-
-
-            event.preventDefault();
-
-
-            scrollToHash(hash);
-
-
-            history.replaceState(
-              null,
-              "",
-              hash
-            );
-
-          }
-        );
-
-      }
-    );
-
-
-  /* =========================================================
-     MENU
-  ========================================================== */
-
-  function openMenu() {
-
-    state.menuOpen = true;
-
-    body.classList.add(
-      "is-menu-open"
-    );
-
-
-    menu.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-
-    menuTrigger.setAttribute(
-      "aria-expanded",
-      "true"
-    );
-
-
-    menuTrigger.setAttribute(
-      "aria-label",
-      "Chiudi menu"
-    );
-
-
-    document.documentElement.style
-      .setProperty(
-        "scrollbar-gutter",
-        "stable"
-      );
-
-
-    resetIdle();
-
-
-    if (menuLinks[0]) {
-
-      window.setTimeout(
-        () => {
-
-          menuLinks[0].focus({
-            preventScroll: true
-          });
-
-        },
-        120
-      );
-
-    }
-
-  }
-
-
-  function closeMenu({
-    restoreFocus = true
-  } = {}) {
-
-    state.menuOpen = false;
-
-    body.classList.remove(
-      "is-menu-open"
-    );
-
-
-    menu.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-
-
-    menuTrigger.setAttribute(
-      "aria-expanded",
-      "false"
-    );
-
-
-    menuTrigger.setAttribute(
-      "aria-label",
-      "Apri menu"
-    );
-
-
-    if (
-      restoreFocus
-    ) {
-
-      menuTrigger.focus({
-        preventScroll: true
-      });
-
-    }
-
-
-    resetIdle();
-
-  }
-
-
-  function toggleMenu() {
-
-    if (state.menuOpen) {
-
-      closeMenu();
-
-    } else {
-
-      openMenu();
-
-    }
-
-  }
-
-
-  menuTrigger.addEventListener(
-    "click",
-    toggleMenu
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
   );
 
+  const isTouch =
+    "ontouchstart" in window ||
+    navigator.maxTouchPoints > 0;
 
-  menuLinks.forEach(
-    (link) => {
+  const STATE = {
+    currentIndex: 0,
+    currentProgress: 0,
+    targetScroll: 0,
+    scrollY: window.scrollY,
+    viewportHeight: window.innerHeight,
+    ticking: false,
+    scrolling: false,
+    menuOpen: false,
+    idleTimer: null,
+    scrollEndTimer: null,
+    lastInteraction: performance.now()
+  };
 
+  /* ==========================================================
+     HELPERS
+     ========================================================== */
+
+  const clamp = (value, min = 0, max = 1) =>
+    Math.min(max, Math.max(min, value));
+
+  const lerp = (a, b, t) =>
+    a + (b - a) * t;
+
+  const prefersMotion = () =>
+    !prefersReducedMotion.matches;
+
+  const getSectionTop = (section) => {
+    const rect = section.getBoundingClientRect();
+    return rect.top + window.scrollY;
+  };
+
+  const getSectionProgress = (section) => {
+    const rect = section.getBoundingClientRect();
+    const height = Math.max(rect.height, 1);
+
+    return clamp(
+      (window.innerHeight * 0.48 - rect.top) / height
+    );
+  };
+
+  const setCssProgress = (section, progress) => {
+    section.style.setProperty(
+      "--local-progress",
+      progress.toFixed(4)
+    );
+  };
+
+  const safeFocus = (element) => {
+    if (!element) return;
+
+    try {
+      element.focus({ preventScroll: true });
+    } catch {
+      element.focus();
+    }
+  };
+
+  /* ==========================================================
+     LOADER
+     ========================================================== */
+
+  const loader = {
+    startedAt: performance.now(),
+    finished: false,
+
+    finish() {
+      if (this.finished) return;
+      this.finished = true;
+
+      const elapsed = performance.now() - this.startedAt;
+      const delay = prefersMotion()
+        ? Math.max(0, CONFIG.loaderMinimum - elapsed)
+        : 80;
+
+      window.setTimeout(() => {
+        DOM.loader?.classList.add("is-hidden");
+
+        window.setTimeout(() => {
+          if (DOM.loader) {
+            DOM.loader.hidden = true;
+          }
+        }, prefersMotion() ? 850 : 100);
+      }, delay);
+    }
+  };
+
+  const loaderFallback = window.setTimeout(
+    () => loader.finish(),
+    CONFIG.loaderMaxWait
+  );
+
+  if (document.readyState === "complete") {
+    window.setTimeout(() => {
+      clearTimeout(loaderFallback);
+      loader.finish();
+    }, 50);
+  } else {
+    window.addEventListener(
+      "load",
+      () => {
+        clearTimeout(loaderFallback);
+        loader.finish();
+      },
+      { once: true }
+    );
+  }
+
+  /* ==========================================================
+     CHAPTER STATE
+     ========================================================== */
+
+  const updateNavigation = () => {
+    const index = STATE.currentIndex;
+    const current = DOM.sections[index];
+
+    if (!current) return;
+
+    const title =
+      current.dataset.title ||
+      "MOVIMENTO / CON DIREZIONE";
+
+    DOM.progressCurrent.textContent = title;
+
+    const total = DOM.sections.length;
+
+    const globalProgress =
+      total <= 1
+        ? 0
+        : clamp(
+            (index + STATE.currentProgress) /
+            total
+          );
+
+    DOM.progressFill.style.width =
+      `${globalProgress * 100}%`;
+
+    DOM.progressPoint.style.left =
+      `${globalProgress * 100}%`;
+
+    const previousIndex = index - 1;
+    const nextIndex = index + 1;
+
+    if (previousIndex >= 0) {
+      const previous = DOM.sections[previousIndex];
+
+      DOM.previous.href =
+        `#${previous.id}`;
+
+      DOM.previousLabel.textContent =
+        previous.dataset.chapter || "";
+
+      DOM.previous.classList.remove("is-disabled");
+      DOM.previous.removeAttribute("aria-hidden");
+      DOM.previous.removeAttribute("tabindex");
+      DOM.previous.setAttribute(
+        "aria-label",
+        `Vai alla sezione ${previous.dataset.chapter}`
+      );
+    } else {
+      DOM.previous.href = "#cover";
+      DOM.previousLabel.textContent = "";
+      DOM.previous.classList.add("is-disabled");
+      DOM.previous.setAttribute("aria-hidden", "true");
+      DOM.previous.setAttribute("tabindex", "-1");
+    }
+
+    if (nextIndex < total) {
+      const next = DOM.sections[nextIndex];
+
+      DOM.next.href =
+        `#${next.id}`;
+
+      DOM.nextLabel.textContent =
+        next.dataset.chapter || "";
+
+      DOM.next.classList.remove("is-disabled");
+      DOM.next.setAttribute(
+        "aria-label",
+        `Vai alla sezione ${next.dataset.chapter}`
+      );
+    } else {
+      DOM.next.href = "#footer";
+      DOM.nextLabel.textContent = "";
+      DOM.next.classList.add("is-disabled");
+      DOM.next.setAttribute("aria-hidden", "true");
+      DOM.next.setAttribute("tabindex", "-1");
+    }
+  };
+
+  const updateChapterState = () => {
+    const viewportCenter =
+      window.innerHeight * 0.5;
+
+    let bestIndex = 0;
+    let bestDistance = Infinity;
+
+    DOM.sections.forEach((section, index) => {
+      const rect = section.getBoundingClientRect();
+
+      const sectionCenter =
+        rect.top + rect.height * 0.5;
+
+      const distance =
+        Math.abs(sectionCenter - viewportCenter);
+
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestIndex = index;
+      }
+    });
+
+    STATE.currentIndex = bestIndex;
+
+    DOM.sections.forEach((section, index) => {
+      const progress = getSectionProgress(section);
+
+      setCssProgress(section, progress);
+
+      section.toggleAttribute(
+        "data-active",
+        index === bestIndex
+      );
+    });
+
+    STATE.currentProgress =
+      getSectionProgress(
+        DOM.sections[bestIndex]
+      );
+
+    updateNavigation();
+  };
+
+  /* ==========================================================
+     CENTRAL FRAME
+     ========================================================== */
+
+  const render = () => {
+    STATE.ticking = false;
+
+    if (STATE.menuOpen) return;
+
+    STATE.scrollY = window.scrollY;
+
+    updateChapterState();
+
+    DOM.body.style.setProperty(
+      "--scroll-progress",
+      clamp(
+        STATE.scrollY /
+        Math.max(
+          document.documentElement.scrollHeight -
+          window.innerHeight,
+          1
+        )
+      ).toFixed(4)
+    );
+  };
+
+  const requestRender = () => {
+    if (STATE.ticking) return;
+
+    STATE.ticking = true;
+    requestAnimationFrame(render);
+  };
+
+  /* ==========================================================
+     SCROLL
+     ========================================================== */
+
+  const onScroll = () => {
+    STATE.scrolling = true;
+
+    resetIdle();
+
+    if (STATE.scrollEndTimer) {
+      clearTimeout(STATE.scrollEndTimer);
+    }
+
+    STATE.scrollEndTimer = window.setTimeout(() => {
+      STATE.scrolling = false;
+    }, CONFIG.scrollEndDelay);
+
+    requestRender();
+  };
+
+  window.addEventListener(
+    "scroll",
+    onScroll,
+    { passive: true }
+  );
+
+  /* ==========================================================
+     RESIZE
+     ========================================================== */
+
+  let resizeTimer = null;
+
+  window.addEventListener("resize", () => {
+    if (resizeTimer) {
+      clearTimeout(resizeTimer);
+    }
+
+    resizeTimer = window.setTimeout(() => {
+      STATE.viewportHeight =
+        window.innerHeight;
+
+      requestRender();
+    }, 80);
+  });
+
+  /* ==========================================================
+     INTERSECTION OBSERVER
+     SEMANTIC STATE SUPPORT
+     ========================================================== */
+
+  if ("IntersectionObserver" in window) {
+    const observer =
+      new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            entry.target.toggleAttribute(
+              "data-near",
+              entry.isIntersecting
+            );
+          });
+
+          requestRender();
+        },
+        {
+          rootMargin: "20% 0px 20% 0px",
+          threshold: 0
+        }
+      );
+
+    DOM.sections.forEach((section) => {
+      observer.observe(section);
+    });
+  }
+
+  /* ==========================================================
+     ANCHOR NAVIGATION
+     ========================================================== */
+
+  const getTargetElement = (href) => {
+    if (!href || !href.startsWith("#")) {
+      return null;
+    }
+
+    return document.getElementById(
+      href.slice(1)
+    );
+  };
+
+  const navigateTo = (element) => {
+    if (!element) return;
+
+    const top =
+      getSectionTop(element);
+
+    window.scrollTo({
+      top,
+      behavior: prefersMotion()
+        ? "smooth"
+        : "auto"
+    });
+  };
+
+  const handleInternalLink = (event) => {
+    const href =
+      event.currentTarget.getAttribute("href");
+
+    const target =
+      getTargetElement(href);
+
+    if (!target) return;
+
+    event.preventDefault();
+
+    closeMenu({
+      restoreFocus: false
+    });
+
+    navigateTo(target);
+
+    if (window.history?.pushState) {
+      window.history.pushState(
+        null,
+        "",
+        href
+      );
+    }
+  };
+
+  [
+    DOM.previous,
+    DOM.next,
+    DOM.menuTrigger
+  ].forEach((element) => {
+    if (!element) return;
+  });
+
+  document
+    .querySelectorAll('a[href^="#"]')
+    .forEach((link) => {
       link.addEventListener(
         "click",
         (event) => {
-
-          event.preventDefault();
-
-
-          const hash =
-            link.getAttribute(
-              "href"
+          const target =
+            getTargetElement(
+              link.getAttribute("href")
             );
 
+          if (!target) return;
 
-          closeMenu({
-            restoreFocus: false
-          });
+          if (
+            link.hasAttribute("data-menu-link")
+          ) {
+            event.preventDefault();
 
+            closeMenu({
+              restoreFocus: false
+            });
 
-          window.setTimeout(
-            () => {
+            navigateTo(target);
 
-              scrollToHash(
-                hash
+            if (window.history?.pushState) {
+              window.history.pushState(
+                null,
+                "",
+                `#${target.id}`
               );
+            }
 
-            },
-            40
-          );
+            return;
+          }
 
-
-          history.replaceState(
-            null,
-            "",
-            hash
-          );
-
+          handleInternalLink(event);
         }
       );
+    });
 
+  /* ==========================================================
+     DEEP LINK / HASH
+     ========================================================== */
+
+  const resolveInitialHash = () => {
+    const hash = window.location.hash;
+
+    if (!hash) {
+      requestRender();
+      return;
+    }
+
+    const target =
+      getTargetElement(hash);
+
+    if (!target) {
+      requestRender();
+      return;
+    }
+
+    window.setTimeout(() => {
+      navigateTo(target);
+      requestRender();
+    }, 80);
+  };
+
+  window.addEventListener(
+    "popstate",
+    () => {
+      resolveInitialHash();
     }
   );
 
+  window.addEventListener(
+    "hashchange",
+    () => {
+      resolveInitialHash();
+    }
+  );
+
+  /* ==========================================================
+     MENU
+     ========================================================== */
+
+  let menuLastFocused = null;
+
+  const setMenuAccessibility = (open) => {
+    DOM.menu.setAttribute(
+      "aria-hidden",
+      String(!open)
+    );
+
+    if (open) {
+      DOM.menu.removeAttribute("inert");
+    } else {
+      DOM.menu.setAttribute(
+        "inert",
+        ""
+      );
+    }
+
+    DOM.menuTrigger.setAttribute(
+      "aria-expanded",
+      String(open)
+    );
+
+    DOM.menuTrigger.setAttribute(
+      "aria-label",
+      open ? "Chiudi menu" : "Apri menu"
+    );
+  };
+
+  const openMenu = () => {
+    if (STATE.menuOpen) return;
+
+    menuLastFocused =
+      document.activeElement;
+
+    STATE.menuOpen = true;
+
+    DOM.body.classList.add(
+      "is-menu-open"
+    );
+
+    setMenuAccessibility(true);
+
+    resetIdle();
+
+    window.setTimeout(() => {
+      const first =
+        DOM.menu.querySelector(
+          "[data-menu-link]"
+        );
+
+      safeFocus(first);
+    }, 50);
+  };
+
+  const closeMenu = ({
+    restoreFocus = true
+  } = {}) => {
+    if (!STATE.menuOpen) return;
+
+    STATE.menuOpen = false;
+
+    DOM.body.classList.remove(
+      "is-menu-open"
+    );
+
+    setMenuAccessibility(false);
+
+    if (
+      restoreFocus &&
+      menuLastFocused &&
+      typeof menuLastFocused.focus === "function"
+    ) {
+      safeFocus(menuLastFocused);
+    }
+
+    menuLastFocused = null;
+
+    requestRender();
+  };
+
+  DOM.menuTrigger.addEventListener(
+    "click",
+    () => {
+      if (STATE.menuOpen) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    }
+  );
 
   document.addEventListener(
     "keydown",
     (event) => {
-
-      if (
-        event.key === "Escape" &&
-        state.menuOpen
-      ) {
-
+      if (event.key === "Escape") {
         closeMenu();
-
       }
-
     }
   );
 
+  /* ==========================================================
+     MENU FOCUS TRAP
+     ========================================================== */
 
-  /* =========================================================
-     MAGNETIC MICRO-INTERACTION
-  ========================================================== */
+  DOM.menu.addEventListener(
+    "keydown",
+    (event) => {
+      if (
+        event.key !== "Tab" ||
+        !STATE.menuOpen
+      ) {
+        return;
+      }
 
-  function setupMagnetic() {
+      const focusable =
+        [
+          ...DOM.menu.querySelectorAll(
+            'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          )
+        ].filter(
+          (element) =>
+            !element.hasAttribute("disabled")
+        );
 
-    if (
-      reducedMotion.matches ||
-      !finePointer.matches
-    ) {
+      if (!focusable.length) return;
 
-      return;
+      const first = focusable[0];
+      const last =
+        focusable[focusable.length - 1];
+
+      if (
+        event.shiftKey &&
+        document.activeElement === first
+      ) {
+        event.preventDefault();
+        safeFocus(last);
+      } else if (
+        !event.shiftKey &&
+        document.activeElement === last
+      ) {
+        event.preventDefault();
+        safeFocus(first);
+      }
     }
+  );
 
+  /* ==========================================================
+     MAGNETIC
+     ========================================================== */
 
-    document
-      .querySelectorAll(
-        ".magnetic"
-      )
-      .forEach(
-        (element) => {
+  const magneticElements = [
+    ...document.querySelectorAll(".magnetic")
+  ];
 
-          element.addEventListener(
-            "pointermove",
-            (event) => {
+  if (
+    !isTouch &&
+    prefersMotion()
+  ) {
+    magneticElements.forEach((element) => {
+      const reset = () => {
+        element.style.setProperty(
+          "--magnetic-x",
+          "0px"
+        );
 
-              const rect =
-                element.getBoundingClientRect();
+        element.style.setProperty(
+          "--magnetic-y",
+          "0px"
+        );
+      };
 
+      element.addEventListener(
+        "pointermove",
+        (event) => {
+          const rect =
+            element.getBoundingClientRect();
 
-              const relativeX =
-                (
-                  event.clientX -
-                  rect.left
-                ) /
-                rect.width -
-                .5;
+          const x =
+            event.clientX -
+            (rect.left + rect.width / 2);
 
+          const y =
+            event.clientY -
+            (rect.top + rect.height / 2);
 
-              const relativeY =
-                (
-                  event.clientY -
-                  rect.top
-                ) /
-                rect.height -
-                .5;
+          const distance =
+            Math.hypot(x, y);
 
+          if (
+            distance >
+            CONFIG.magneticRadius
+          ) {
+            reset();
+            return;
+          }
 
-              const x =
-                relativeX * 5;
+          const strength =
+            1 -
+            distance /
+            CONFIG.magneticRadius;
 
-              const y =
-                relativeY * 5;
-
-
-              element.style
-                .setProperty(
-                  "--magnetic-x",
-                  `${x}px`
-                );
-
-
-              element.style
-                .setProperty(
-                  "--magnetic-y",
-                  `${y}px`
-                );
-
-            }
+          element.style.setProperty(
+            "--magnetic-x",
+            `${x * strength * .045}px`
           );
 
-
-          element.addEventListener(
-            "pointerleave",
-            () => {
-
-              element.style
-                .setProperty(
-                  "--magnetic-x",
-                  "0px"
-                );
-
-              element.style
-                .setProperty(
-                  "--magnetic-y",
-                  "0px"
-                );
-
-            }
+          element.style.setProperty(
+            "--magnetic-y",
+            `${y * strength * .045}px`
           );
-
         }
       );
 
+      element.addEventListener(
+        "pointerleave",
+        reset
+      );
+    });
   }
 
-
-  /* =========================================================
+  /* ==========================================================
      IDLE
-  ========================================================== */
+     ========================================================== */
 
-  function resetIdle() {
+  const clearIdleTimer = () => {
+    if (STATE.idleTimer) {
+      clearTimeout(STATE.idleTimer);
+      STATE.idleTimer = null;
+    }
+  };
 
-    lastInteraction =
+  const resetIdle = () => {
+    clearIdleTimer();
+
+    DOM.body.classList.remove(
+      "is-idle"
+    );
+
+    if (
+      STATE.menuOpen ||
+      prefersReducedMotion.matches
+    ) {
+      return;
+    }
+
+    STATE.lastInteraction =
       performance.now();
 
+    STATE.idleTimer =
+      window.setTimeout(() => {
+        if (!STATE.menuOpen) {
+          DOM.body.classList.add(
+            "is-idle"
+          );
+        }
+      }, CONFIG.idleDelay);
+  };
 
-    if (state.idle) {
+  [
+    "pointerdown",
+    "pointermove",
+    "wheel",
+    "touchstart",
+    "keydown"
+  ].forEach((eventName) => {
+    window.addEventListener(
+      eventName,
+      resetIdle,
+      {
+        passive: true
+      }
+    );
+  });
 
-      state.idle = false;
+  /* ==========================================================
+     REDUCED MOTION CHANGE
+     ========================================================== */
 
-      body.classList.remove(
+  const handleMotionPreference = () => {
+    if (prefersReducedMotion.matches) {
+      DOM.body.classList.remove(
         "is-idle"
       );
 
-      idleOverlay.setAttribute(
-        "aria-hidden",
-        "true"
-      );
+      clearIdleTimer();
 
-    }
-
-  }
-
-
-  function setupIdle() {
-
-    const events = [
-
-      "pointerdown",
-      "pointermove",
-      "wheel",
-      "touchstart",
-      "keydown",
-      "scroll"
-
-    ];
-
-
-    events.forEach(
-      (eventName) => {
-
-        window.addEventListener(
-          eventName,
-          resetIdle,
-          {
-            passive: true
-          }
+      if (DOM.loader) {
+        DOM.loader.classList.add(
+          "is-hidden"
         );
-
       }
-    );
-
-
-    function checkIdle() {
-
-      const elapsed =
-        performance.now() -
-        lastInteraction;
-
-
-      if (
-        !state.menuOpen &&
-        !reducedMotion.matches &&
-        elapsed > 42000
-      ) {
-
-        state.idle = true;
-
-        body.classList.add(
-          "is-idle"
-        );
-
-        idleOverlay.setAttribute(
-          "aria-hidden",
-          "false"
-        );
-
-      }
-
-
-      idleTimer =
-        window.setTimeout(
-          checkIdle,
-          1000
-        );
-
+    } else {
+      resetIdle();
     }
 
+    requestRender();
+  };
 
-    idleTimer =
-      window.setTimeout(
-        checkIdle,
-        1000
+  if (
+    typeof prefersReducedMotion.addEventListener ===
+    "function"
+  ) {
+    prefersReducedMotion.addEventListener(
+      "change",
+      handleMotionPreference
+    );
+  } else if (
+    typeof prefersReducedMotion.addListener ===
+    "function"
+  ) {
+    prefersReducedMotion.addListener(
+      handleMotionPreference
+    );
+  }
+
+  /* ==========================================================
+     HISTORY INITIALIZATION
+     ========================================================== */
+
+  const preventBrowserJumpUntilReady = () => {
+    if (!window.location.hash) return;
+
+    const hash =
+      window.location.hash;
+
+    const target =
+      getTargetElement(hash);
+
+    if (!target) return;
+
+    window.scrollTo(
+      0,
+      0
+    );
+  };
+
+  preventBrowserJumpUntilReady();
+
+  /* ==========================================================
+     INITIAL STATE
+     ========================================================== */
+
+  setMenuAccessibility(false);
+
+  DOM.sections.forEach(
+    (section) => {
+      setCssProgress(
+        section,
+        getSectionProgress(section)
       );
-
-  }
-
-
-  /* =========================================================
-     INTERSECTION OBSERVER
-  ========================================================== */
-
-  function setupObserver() {
-
-    if (
-      !("IntersectionObserver" in window)
-    ) {
-
-      requestRender();
-
-      return;
     }
+  );
 
-
-    const observer =
-      new IntersectionObserver(
-        () => {
-
-          requestRender();
-
-        },
-        {
-          rootMargin:
-            "-20% 0px -20% 0px",
-
-          threshold: [
-            0,
-            .2,
-            .5,
-            .8,
-            1
-          ]
-
-        }
-      );
-
-
-    chapters.forEach(
-      (chapter) => {
-
-        observer.observe(
-          chapter
-        );
-
-      }
-    );
-
-  }
-
-
-  /* =========================================================
-     LOADER
-  ========================================================== */
-
-  function finishLoader() {
-
-    if (loaderFinished) {
-      return;
-    }
-
-
-    loaderFinished = true;
-
-
-    window.clearTimeout(
-      loaderFallback
-    );
-
-
-    if (
-      reducedMotion.matches
-    ) {
-
-      loader.remove();
-
-      requestRender();
-
-      return;
-    }
-
-
-    window.setTimeout(
-      () => {
-
-        loader.classList.add(
-          "is-leaving"
-        );
-
-
-        window.setTimeout(
-          () => {
-
-            loader.remove();
-
-          },
-          760
-        );
-
-      },
-      650
-    );
-
-  }
-
+  requestRender();
+  resetIdle();
 
   window.addEventListener(
     "load",
-    finishLoader,
-    {
-      once: true
-    }
+    () => {
+      resolveInitialHash();
+      requestRender();
+    },
+    { once: true }
   );
-
-
-  /*
-    Fallback fondamentale:
-    la pagina NON può rimanere nera
-    se un asset o un font ritarda window.load.
-  */
-
-  loaderFallback =
-    window.setTimeout(
-      finishLoader,
-      4200
-    );
-
-
-  /* =========================================================
-     GLOBAL INPUT
-  ========================================================== */
-
-  window.addEventListener(
-    "scroll",
-    requestRender,
-    {
-      passive: true
-    }
-  );
-
-
-  window.addEventListener(
-    "resize",
-    requestRender,
-    {
-      passive: true
-    }
-  );
-
-
-  window.addEventListener(
-    "orientationchange",
-    requestRender,
-    {
-      passive: true
-    }
-  );
-
-
-  if (
-    typeof reducedMotion.addEventListener ===
-    "function"
-  ) {
-
-    reducedMotion.addEventListener(
-      "change",
-      () => {
-
-        requestRender();
-
-      }
-    );
-
-  }
-
-
-  /* =========================================================
-     INITIAL HASH
-  ========================================================== */
-
-  if (
-    location.hash &&
-    document.querySelector(
-      location.hash
-    )
-  ) {
-
-    window.addEventListener(
-      "load",
-      () => {
-
-        window.setTimeout(
-          () => {
-
-            scrollToHash(
-              location.hash
-            );
-
-          },
-          80
-        );
-
-      },
-      {
-        once: true
-      }
-    );
-
-  }
-
-
-  /* =========================================================
-     BOOT
-  ========================================================== */
-
-  setupMagnetic();
-
-  setupIdle();
-
-  setupObserver();
-
-  requestRender();
-
 
 })();
