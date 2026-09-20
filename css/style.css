@@ -23,6 +23,7 @@
   --convergence-progress: 0;
   --encounter-progress: 0;
   --final-progress: 0;
+  --journey-progress: 0;
 }
 
 *,
@@ -245,7 +246,7 @@ a {
 .site-header__progress-fill {
   position: absolute;
   inset: 0 auto 0 0;
-  width: calc((var(--chapter-progress) * 100%));
+  width: calc(var(--journey-progress) * 100%);
   background: var(--ink);
   transform-origin: left center;
 }
@@ -253,7 +254,7 @@ a {
 .site-header__progress-point {
   position: absolute;
   top: 50%;
-  left: calc((var(--chapter-progress) * 100%));
+  left: calc(var(--journey-progress) * 100%);
   width: 7px;
   height: 7px;
   border-radius: 50%;
@@ -266,9 +267,58 @@ a {
   display: flex;
   align-items: center;
   gap: 28px;
+}
+
+.site-header__labels {
+  min-width: 210px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 7px;
+
   font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: .12em;
+  font-size: 8px;
+  line-height: 1.25;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.site-header__label {
+  display: block;
+  max-width: 250px;
+  text-align: right;
+}
+
+.site-header__label--current {
+  font-size: 9px;
+  color: var(--ink);
+}
+
+.site-header__adjacent {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.site-header__label--previous,
+.site-header__label--next {
+  color: var(--stone);
+  opacity: .85;
+}
+
+.site-header__label--previous {
+  text-align: left;
+  margin-right: auto;
+}
+
+.site-header__label--next {
+  text-align: right;
+  margin-left: auto;
+}
+
+.site-header__label.is-empty {
+  visibility: hidden;
 }
 
 .menu-trigger,
@@ -278,6 +328,9 @@ a {
   background: transparent;
   cursor: pointer;
   padding: 8px 0;
+
+  font-family: var(--font-mono);
+  font-size: 10px;
   letter-spacing: .12em;
 }
 
@@ -461,10 +514,10 @@ a {
 .origin-point,
 .pause-point,
 .final-direction__point {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: var(--terracotta);
+  background: var(--ink);
 }
 
 
@@ -574,30 +627,44 @@ a {
 
 .chapter02 {
   display: grid;
-  grid-template-columns: minmax(260px, .65fr) minmax(320px, 1.35fr);
+  grid-template-columns: minmax(0, 1.15fr) minmax(260px, .72fr);
   gap: clamp(40px, 7vw, 120px);
   align-content: center;
+  align-items: center;
+}
+
+.chapter02__copy {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  max-width: 760px;
 }
 
 .chapter02__portrait {
+  grid-column: 2;
+  grid-row: 1;
+
   align-self: center;
-  width: min(100%, 460px);
+  justify-self: end;
+
+  width: min(100%, 430px);
   overflow: hidden;
+
   filter: blur(calc((1 - var(--chapter-progress)) * 14px));
+
   transform:
     translateY(calc((1 - var(--chapter-progress)) * 50px))
     scale(calc(.96 + var(--chapter-progress) * .04));
+
   transition: filter .15s linear;
 }
 
 .chapter02__portrait img {
+  display: block;
   width: 100%;
   height: min(70vh, 700px);
   object-fit: cover;
-}
-
-.chapter02__copy {
-  align-self: center;
+  object-position: 62% center;
 }
 
 .chapter02__copy h2 {
@@ -610,7 +677,9 @@ a {
 
 
 /* =========================================================
-   03 — DISPERSIONE TIPOGRAFICA
+   03 — DISPERSIONE
+   Nessuna linea.
+   Le parole sono possibilità indipendenti.
    ========================================================= */
 
 .chapter--03 {
@@ -639,14 +708,15 @@ a {
   position: absolute;
   left: clamp(20px, 6vw, 90px);
   right: clamp(20px, 6vw, 90px);
-  top: 52%;
-  bottom: 8%;
+  top: 50%;
+  bottom: 7%;
   z-index: 2;
   pointer-events: none;
 }
 
 .path-label {
   position: absolute;
+
   z-index: 2;
 
   font-family: var(--font-mono);
@@ -655,15 +725,17 @@ a {
   white-space: nowrap;
 
   opacity: 0;
+
   transform:
     translate3d(
       0,
-      calc((1 - var(--chapter-progress)) * 18px),
+      calc((1 - var(--chapter-progress)) * 24px),
       0
     );
+
   transition:
-    opacity .15s linear,
-    transform .8s var(--ease-out);
+    opacity .25s linear,
+    transform .9s var(--ease-out);
 }
 
 .chapter.is-near .path-label {
@@ -671,38 +743,41 @@ a {
 }
 
 .path-label--digital {
-  left: 2%;
-  top: 8%;
+  left: 0;
+  top: 5%;
 }
 
 .path-label--movement {
-  left: 28%;
-  top: 28%;
+  left: 25%;
+  top: 31%;
 }
 
 .path-label--sport {
-  left: 57%;
-  top: 12%;
+  left: 61%;
+  top: 0;
 }
 
 .path-label--science {
-  left: 43%;
-  top: 53%;
+  left: 38%;
+  top: 58%;
 }
 
 .path-label--education {
-  left: 76%;
-  top: 43%;
+  left: 78%;
+  top: 38%;
 }
 
 .path-label--management {
-  left: 66%;
-  top: 78%;
+  left: 58%;
+  top: 82%;
 }
 
 
 /* =========================================================
-   04 — CONVERGENZA SPAZIALE
+   04 — CONNESSIONE
+   Nessun connettore visibile.
+   Le parole sono il movimento.
+   CP resta fermo.
    ========================================================= */
 
 .chapter--04 {
@@ -760,7 +835,7 @@ a {
   letter-spacing: .1em;
   white-space: nowrap;
 
-  opacity: calc(var(--convergence-progress) * 1.1);
+  opacity: var(--convergence-progress);
 
   z-index: 4;
 
@@ -771,15 +846,13 @@ a {
     opacity .4s linear;
 }
 
-
-/* Initial positions → final positions around CP */
-
 .convergence__label--1 {
   left: 3%;
   top: 4%;
+
   transform:
     translate3d(
-      calc(var(--convergence-progress) * 39%),
+      calc(var(--convergence-progress) * 38%),
       calc(var(--convergence-progress) * 43%),
       0
     );
@@ -787,21 +860,23 @@ a {
 
 .convergence__label--2 {
   left: 18%;
-  top: 27%;
+  top: 25%;
+
   transform:
     translate3d(
-      calc(var(--convergence-progress) * 30%),
-      calc(var(--convergence-progress) * 23%),
+      calc(var(--convergence-progress) * 31%),
+      calc(var(--convergence-progress) * 24%),
       0
     );
 }
 
 .convergence__label--3 {
-  left: 3%;
-  top: 48%;
+  left: 77%;
+  top: 46%;
+
   transform:
     translate3d(
-      calc(var(--convergence-progress) * 44%),
+      calc(var(--convergence-progress) * -27%),
       calc(var(--convergence-progress) * 0%),
       0
     );
@@ -809,11 +884,12 @@ a {
 
 .convergence__label--4 {
   left: 14%;
-  top: 70%;
+  top: 77%;
+
   transform:
     translate3d(
       calc(var(--convergence-progress) * 34%),
-      calc(var(--convergence-progress) * -18%),
+      calc(var(--convergence-progress) * -21%),
       0
     );
 }
@@ -821,10 +897,11 @@ a {
 .convergence__label--5 {
   left: 4%;
   top: 91%;
+
   transform:
     translate3d(
       calc(var(--convergence-progress) * 40%),
-      calc(var(--convergence-progress) * -38%),
+      calc(var(--convergence-progress) * -39%),
       0
     );
 }
@@ -1039,14 +1116,14 @@ a {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--terracotta);
+  background: var(--ink);
 }
 
 .chapter07__line {
   position: absolute;
-  left: 12%;
+  left: calc(12% + 5px);
   top: 50%;
-  width: 76%;
+  width: calc(76% - 5px);
   height: 1px;
   background: var(--ink);
   transform-origin: left center;
@@ -1063,6 +1140,7 @@ a {
 }
 
 .chapter07__copy p {
+  display: inline;
   margin: 0;
   font-family: var(--font-sans);
   font-size: clamp(42px, 8vw, 120px);
@@ -1070,6 +1148,9 @@ a {
   letter-spacing: -.07em;
   line-height: .82;
   background: var(--ivory);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  padding: 0 .04em;
 }
 
 .chapter07__second {
@@ -1104,37 +1185,11 @@ a {
   left: clamp(20px, 6vw, 90px);
   right: clamp(20px, 6vw, 90px);
 
-  /*
-   * La parte alta contiene esclusivamente le parole.
-   * La traiettoria vive nella fascia bassa.
-   */
   top: 47%;
   bottom: 7%;
 
   z-index: 1;
   pointer-events: none;
-}
-
-.form-system__svg {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 4%;
-  width: 100%;
-  height: 30%;
-  overflow: visible;
-}
-
-.form-system__svg path {
-  fill: none;
-  stroke: var(--ink);
-  stroke-width: 1.2;
-  vector-effect: non-scaling-stroke;
-
-  stroke-dasharray: 1;
-  stroke-dashoffset: calc(1 - var(--trajectory-progress));
-
-  pathLength: 1;
 }
 
 .form-word {
@@ -1151,42 +1206,64 @@ a {
 
   opacity: calc(.15 + var(--chapter-progress) * .85);
 
-  /*
-   * Tutte le parole restano nella fascia superiore.
-   * La traiettoria è fisicamente separata.
-   */
+  white-space: nowrap;
 }
 
 .form-word--1 {
   left: 0;
-  top: 10%;
+  top: 4%;
 }
 
 .form-word--2 {
-  left: 23%;
-  top: 35%;
+  left: 22%;
+  top: 24%;
 }
 
 .form-word--3 {
   left: 45%;
-  top: 8%;
+  top: 0;
 }
 
 .form-word--4 {
-  left: 68%;
-  top: 32%;
+  left: 67%;
+  top: 20%;
 }
 
 .form-word--5 {
   right: 0;
-  top: 5%;
+  top: 2%;
+}
+
+.form-system__svg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  width: 100%;
+  height: 30%;
+
+  overflow: visible;
+}
+
+.form-system__svg path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - var(--trajectory-progress));
+
+  pathLength: 1;
 }
 
 
 /* =========================================================
-   09 — DUE TRAIETTORIE CONVERGENTI
-   Effetto preservato:
-   il testo vive sopra le linee.
+   09 — INCONTRO
+   Due traiettorie.
+   Il significato nasce dal loro incontro.
+   Nessun punto arbitrario.
    ========================================================= */
 
 .chapter--09 {
@@ -1206,19 +1283,26 @@ a {
 
 .encounter {
   position: absolute;
+
   left: clamp(20px, 6vw, 90px);
   right: clamp(20px, 6vw, 90px);
+
   top: 46%;
   height: 34%;
+
   z-index: 1;
   pointer-events: none;
 }
 
 .encounter__line {
   position: absolute;
+
   height: 1px;
+
   background: var(--ink);
+
   transform-origin: left center;
+
   z-index: 1;
 }
 
@@ -1226,7 +1310,7 @@ a {
   position: absolute;
   top: -28px;
 
-  padding: 3px 5px;
+  padding: 4px 6px;
 
   background: var(--ivory);
 
@@ -1266,46 +1350,12 @@ a {
   right: 0;
 }
 
-.encounter__point {
-  position: absolute;
-  left: 71%;
-  top: 50%;
-
-  width: 8px;
-  height: 8px;
-
-  border-radius: 50%;
-  background: var(--terracotta);
-
-  transform:
-    translate(-50%, -50%)
-    scale(var(--encounter-progress));
-
-  z-index: 3;
-}
-
-.encounter__point span {
-  position: absolute;
-  left: 18px;
-  top: -5px;
-
-  padding: 2px 5px;
-
-  background: var(--ivory);
-
-  font-family: var(--font-serif);
-  font-size: 34px;
-  white-space: nowrap;
-
-  opacity: var(--encounter-progress);
-
-  z-index: 6;
-}
-
 
 /* =========================================================
    10 — DIREZIONE FINALE
-   Effetto preservato.
+   Punto semanticamente necessario.
+   La linea nasce esattamente dal punto.
+   Il testo vive in una fascia separata.
    ========================================================= */
 
 .chapter--10 {
@@ -1325,34 +1375,52 @@ a {
 
 .final-direction {
   position: absolute;
+
   left: clamp(20px, 6vw, 90px);
   right: clamp(20px, 6vw, 90px);
+
   top: 46%;
   bottom: 8%;
+
   z-index: 1;
 }
 
 .final-direction__point {
   position: absolute;
-  left: 0;
-  top: 56%;
 
-  transform: scale(var(--final-progress));
+  left: 0;
+  top: 78%;
+
+  width: 10px;
+  height: 10px;
+
+  border-radius: 50%;
+  background: var(--ink);
+
+  transform:
+    translateY(-50%)
+    scale(
+      calc(.55 + var(--final-progress) * .45)
+    );
+
+  transform-origin: center;
 
   z-index: 3;
 }
 
 .final-direction__copy {
   position: absolute;
-  left: 12%;
-  top: 35%;
+
+  left: 0;
+  top: 8%;
 
   z-index: 4;
 
-  padding: 6px 8px;
-  background: var(--ivory);
+  max-width: min(850px, 80vw);
 
   opacity: var(--final-progress);
+
+  pointer-events: none;
 }
 
 .final-direction__copy .display {
@@ -1361,9 +1429,16 @@ a {
 
 .final-direction__svg {
   position: absolute;
-  inset: 0;
+
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+
   width: 100%;
   height: 100%;
+
+  overflow: visible;
 }
 
 .final-direction__svg path {
@@ -1489,8 +1564,10 @@ a {
 
   .site-header {
     grid-template-columns: 1fr auto;
-    grid-template-rows: 70px 1fr;
+    grid-template-rows: 68px 56px;
+
     height: var(--header-height);
+
     padding:
       env(safe-area-inset-top)
       20px
@@ -1505,6 +1582,7 @@ a {
   .site-header__progress {
     grid-column: 1 / -1;
     grid-row: 2;
+
     align-self: center;
   }
 
@@ -1512,8 +1590,56 @@ a {
     gap: 18px;
   }
 
-  .site-header__current {
-    display: none;
+  .site-header__labels {
+    position: absolute;
+
+    left: 20px;
+    right: 20px;
+    bottom: 14px;
+
+    min-width: 0;
+
+    align-items: stretch;
+
+    font-size: 7px;
+  }
+
+  .site-header__label {
+    max-width: 42vw;
+  }
+
+  .site-header__label--current {
+    position: absolute;
+
+    right: 0;
+    bottom: 17px;
+
+    max-width: 55vw;
+
+    text-align: right;
+  }
+
+  .site-header__adjacent {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    justify-content: space-between;
+  }
+
+  .site-header__label--previous,
+  .site-header__label--next {
+    max-width: 42%;
+  }
+
+  .site-header__label--previous {
+    text-align: left;
+  }
+
+  .site-header__label--next {
+    text-align: right;
   }
 
   .scene__stage {
@@ -1541,25 +1667,39 @@ a {
     margin-top: 40px;
   }
 
+
+  /* 02 */
+
   .chapter02 {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 34px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(190px, .72fr);
+    gap: 28px;
+  }
+
+  .chapter02__copy {
+    grid-column: 1;
+    grid-row: 1;
   }
 
   .chapter02__portrait {
-    width: min(68vw, 360px);
-    align-self: flex-start;
+    grid-column: 2;
+    grid-row: 1;
+
+    width: min(100%, 300px);
+    justify-self: end;
   }
 
   .chapter02__portrait img {
-    height: min(46vh, 480px);
+    height: min(62vh, 580px);
+    object-position: 62% center;
   }
 
   .chapter02__copy h2 {
     margin-bottom: 34px;
   }
+
+
+  /* 03 */
 
   .chapter03 {
     padding-top: 25vh;
@@ -1568,7 +1708,7 @@ a {
   .path-system {
     left: 20px;
     right: 20px;
-    top: 53%;
+    top: 52%;
     bottom: 7%;
   }
 
@@ -1578,33 +1718,36 @@ a {
 
   .path-label--digital {
     left: 0;
-    top: 5%;
+    top: 4%;
   }
 
   .path-label--movement {
-    left: 28%;
-    top: 26%;
+    left: 24%;
+    top: 29%;
   }
 
   .path-label--sport {
-    left: 58%;
-    top: 7%;
+    left: 63%;
+    top: 0;
   }
 
   .path-label--science {
-    left: 38%;
-    top: 50%;
+    left: 34%;
+    top: 56%;
   }
 
   .path-label--education {
-    left: 67%;
-    top: 43%;
+    left: 68%;
+    top: 38%;
   }
 
   .path-label--management {
-    left: 54%;
-    top: 78%;
+    left: 52%;
+    top: 80%;
   }
+
+
+  /* 04 */
 
   .chapter04 {
     padding-top: 24vh;
@@ -1632,6 +1775,9 @@ a {
     right: 20px;
   }
 
+
+  /* 06 */
+
   .chapter06 {
     display: flex;
     flex-direction: column;
@@ -1657,13 +1803,16 @@ a {
     font-size: clamp(25px, 7vw, 48px);
   }
 
+
+  /* 07 */
+
   .chapter07__origin {
     left: 10%;
   }
 
   .chapter07__line {
-    left: 10%;
-    width: 80%;
+    left: calc(10% + 5px);
+    width: calc(80% - 5px);
   }
 
   .chapter07__copy {
@@ -1674,6 +1823,9 @@ a {
     font-size: clamp(40px, 12vw, 90px);
   }
 
+
+  /* 08 */
+
   .form-system {
     left: 20px;
     right: 20px;
@@ -1682,7 +1834,7 @@ a {
   }
 
   .form-system__svg {
-    bottom: 3%;
+    bottom: 0;
     height: 25%;
   }
 
@@ -1692,28 +1844,31 @@ a {
 
   .form-word--1 {
     left: 0;
-    top: 8%;
+    top: 5%;
   }
 
   .form-word--2 {
     left: 18%;
-    top: 34%;
+    top: 25%;
   }
 
   .form-word--3 {
     left: 42%;
-    top: 7%;
+    top: 0;
   }
 
   .form-word--4 {
     left: 64%;
-    top: 32%;
+    top: 23%;
   }
 
   .form-word--5 {
     right: 0;
-    top: 5%;
+    top: 4%;
   }
+
+
+  /* 09 */
 
   .chapter09 {
     padding-top: 23vh;
@@ -1735,9 +1890,8 @@ a {
     width: 56%;
   }
 
-  .encounter__point {
-    left: 72%;
-  }
+
+  /* 10 */
 
   .final-direction {
     left: 20px;
@@ -1747,7 +1901,7 @@ a {
   }
 
   .final-direction__copy {
-    left: 12%;
+    max-width: 78vw;
   }
 
   .menu-overlay {
@@ -1783,19 +1937,90 @@ a {
     font-size: clamp(44px, 14vw, 76px);
   }
 
-  .chapter01__core {
-    grid-template-columns: 9px minmax(48px, 25vw) minmax(0, 1fr);
-    column-gap: 16px;
-    width: 100%;
+
+  /* 02 */
+
+  .chapter--02 {
+    min-height: 220vh;
   }
 
-  .chapter01__line {
-    width: 100%;
+  .chapter02 {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+    gap: 28px;
   }
 
-  .chapter-note {
-    font-size: 14px;
+  .chapter02__portrait {
+    order: 1;
+
+    width: min(68vw, 330px);
+    align-self: flex-end;
   }
+
+  .chapter02__copy {
+    order: 2;
+  }
+
+  .chapter02__portrait img {
+    height: min(48vh, 480px);
+    object-position: 62% center;
+  }
+
+  .chapter02__copy h2 {
+    margin-bottom: 28px;
+  }
+
+
+  /* 03 */
+
+  .chapter03 {
+    padding-top: 25vh;
+  }
+
+  .path-system {
+    top: 52%;
+    bottom: 6%;
+  }
+
+  .path-label {
+    font-size: 7px;
+    letter-spacing: .08em;
+  }
+
+  .path-label--digital {
+    left: 0;
+    top: 4%;
+  }
+
+  .path-label--movement {
+    left: 19%;
+    top: 29%;
+  }
+
+  .path-label--sport {
+    left: 61%;
+    top: 0;
+  }
+
+  .path-label--science {
+    left: 30%;
+    top: 55%;
+  }
+
+  .path-label--education {
+    left: 61%;
+    top: 38%;
+  }
+
+  .path-label--management {
+    left: 45%;
+    top: 81%;
+  }
+
+
+  /* 04 */
 
   .chapter--04 {
     min-height: 220vh;
@@ -1806,37 +2031,71 @@ a {
     height: 38%;
   }
 
-  .convergence__label--1,
-  .convergence__label--2,
-  .convergence__label--3,
-  .convergence__label--4,
-  .convergence__label--5 {
-    left: 0;
+  .convergence__label {
+    font-size: 7px;
   }
 
   .convergence__label--1 {
-    top: 5%;
+    left: 0;
+    top: 4%;
+    transform:
+      translate3d(
+        calc(var(--convergence-progress) * 42%),
+        calc(var(--convergence-progress) * 44%),
+        0
+      );
   }
 
   .convergence__label--2 {
-    top: 27%;
+    left: 9%;
+    top: 25%;
+    transform:
+      translate3d(
+        calc(var(--convergence-progress) * 38%),
+        calc(var(--convergence-progress) * 25%),
+        0
+      );
   }
 
   .convergence__label--3 {
-    top: 49%;
+    left: 58%;
+    top: 48%;
+    transform:
+      translate3d(
+        calc(var(--convergence-progress) * -13%),
+        0,
+        0
+      );
   }
 
   .convergence__label--4 {
-    top: 71%;
+    left: 4%;
+    top: 72%;
+    transform:
+      translate3d(
+        calc(var(--convergence-progress) * 40%),
+        calc(var(--convergence-progress) * -21%),
+        0
+      );
   }
 
   .convergence__label--5 {
+    left: 0;
     top: 91%;
+    transform:
+      translate3d(
+        calc(var(--convergence-progress) * 44%),
+        calc(var(--convergence-progress) * -40%),
+        0
+      );
   }
 
   .convergence__statement p {
     font-size: 30px;
   }
+
+
+  /* 05 */
 
   .chapter--05 {
     min-height: 150vh;
@@ -1846,6 +2105,9 @@ a {
     font-size: 42px;
   }
 
+
+  /* 06 */
+
   .chapter06__heading h2 {
     font-size: 42px;
   }
@@ -1853,6 +2115,9 @@ a {
   .chapter06__closing {
     font-size: 29px;
   }
+
+
+  /* 08 */
 
   .chapter--08,
   .chapter--09,
@@ -1866,7 +2131,7 @@ a {
   }
 
   .form-system__svg {
-    bottom: 2%;
+    bottom: 0;
     height: 22%;
   }
 
@@ -1876,28 +2141,31 @@ a {
 
   .form-word--1 {
     left: 0;
-    top: 8%;
+    top: 5%;
   }
 
   .form-word--2 {
-    left: 12%;
-    top: 34%;
+    left: 11%;
+    top: 27%;
   }
 
   .form-word--3 {
-    left: 39%;
-    top: 7%;
+    left: 38%;
+    top: 0;
   }
 
   .form-word--4 {
-    left: 58%;
-    top: 33%;
+    left: 57%;
+    top: 25%;
   }
 
   .form-word--5 {
     right: 0;
-    top: 5%;
+    top: 4%;
   }
+
+
+  /* 09 */
 
   .chapter09 > h2 {
     font-size: 40px;
@@ -1918,24 +2186,29 @@ a {
     width: 54%;
   }
 
-  .encounter__point {
-    left: 73%;
+  .encounter__line span {
+    font-size: 7px;
+    padding: 3px 4px;
   }
 
-  .encounter__point span {
-    font-size: 28px;
-  }
+
+  /* 10 */
 
   .final-direction {
     top: 48%;
   }
 
   .final-direction__copy {
-    left: 10%;
+    left: 0;
+    max-width: 88vw;
   }
 
   .final-direction__copy .display {
     font-size: 42px;
+  }
+
+  .final-direction__point {
+    top: 78%;
   }
 
 }
