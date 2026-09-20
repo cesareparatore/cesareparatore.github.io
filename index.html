@@ -3,35 +3,32 @@
 <head>
   <meta charset="utf-8">
 
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
 
-  <title>Cesare Paratore | Scienze Motorie, Sport, Educazione, Management e Digitale - Partinico e oltre</title>
+  <meta name="theme-color" content="#f2efe8">
 
-  <meta name="description"
-        content="Cesare Paratore, professionista delle Scienze Motorie e dello Sport, con una formazione che integra competenze motorie, sportive, educative, manageriali e digitali, con base a Partinico e un percorso aperto al territorio e alle collaborazioni online.">
+  <title>
+    Cesare Paratore | Scienze Motorie, Sport, Educazione, Management e Digitale - Partinico e oltre
+  </title>
+
+  <meta
+    name="description"
+    content="Cesare Paratore, professionista delle Scienze Motorie e dello Sport, con una formazione che integra competenze motorie, sportive, educative, manageriali e digitali, con base a Partinico e un percorso aperto al territorio e alle collaborazioni online."
+  >
 
   <link rel="canonical" href="https://cesareparatore.github.io/">
 
-  <meta property="og:title"
-        content="Cesare Paratore | Scienze Motorie, Sport, Educazione, Management e Digitale - Partinico e oltre">
-  <meta property="og:description"
-        content="Cesare Paratore, professionista delle Scienze Motorie e dello Sport, con una formazione che integra competenze motorie, sportive, educative, manageriali e digitali, con base a Partinico e un percorso aperto al territorio e alle collaborazioni online.">
   <meta property="og:type" content="website">
+  <meta property="og:title" content="Cesare Paratore | Scienze Motorie, Sport, Educazione, Management e Digitale - Partinico e oltre">
+  <meta property="og:description" content="Cesare Paratore, professionista delle Scienze Motorie e dello Sport, con una formazione che integra competenze motorie, sportive, educative, manageriali e digitali, con base a Partinico e un percorso aperto al territorio e alle collaborazioni online.">
   <meta property="og:url" content="https://cesareparatore.github.io/">
   <meta property="og:locale" content="it_IT">
   <meta property="og:image" content="https://cesareparatore.github.io/assets/images/cp-foto.webp">
 
-  <meta name="theme-color" content="#F2EFE8">
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap"
-        rel="stylesheet">
-
   <link rel="stylesheet" href="css/style.css">
-  <script src="script.js" defer></script>
 
   <script type="application/ld+json">
   {
@@ -39,7 +36,13 @@
     "@type": "Person",
     "name": "Cesare Paratore",
     "url": "https://cesareparatore.github.io/",
-    "image": "https://cesareparatore.github.io/assets/images/cp-foto.webp"
+    "image": "https://cesareparatore.github.io/assets/images/cp-foto.webp",
+    "jobTitle": "Professionista delle Scienze Motorie e dello Sport",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Partinico",
+      "addressCountry": "IT"
+    }
   }
   </script>
 
@@ -51,18 +54,28 @@
     "url": "https://cesareparatore.github.io/"
   }
   </script>
+
+  <script src="script.js" defer></script>
 </head>
 
 <body>
 
-  <a class="skip-link" href="#main-content">Vai al contenuto</a>
+  <!-- ACCESSIBILITY -->
+  <a class="skip-link" href="#01">
+    Vai al contenuto
+  </a>
 
-  <!-- ==========================================================
+
+  <!-- =========================================================
        LOADER
-  =========================================================== -->
+  ========================================================== -->
 
-  <div class="page-loader" aria-hidden="true">
-    <div class="page-loader-inner">
+  <div
+    class="loader"
+    id="loader"
+    aria-hidden="true"
+  >
+    <div class="loader-inner">
 
       <img
         class="loader-mark"
@@ -72,96 +85,43 @@
         height="72"
       >
 
-      <div class="loader-trajectory" aria-hidden="true">
-        <span class="loader-point"></span>
+      <div class="loader-sequence" aria-hidden="true">
         <span class="loader-line"></span>
       </div>
 
       <p class="loader-motto">
-        <span>MOVIMENTO</span>
-        <span aria-hidden="true">/</span>
-        <span>CON DIREZIONE.</span>
+        MOVIMENTO / CON DIREZIONE
       </p>
 
-      <p class="loader-signature">CESARE PARATORE</p>
+      <p class="loader-signature">
+        CESARE PARATORE
+      </p>
 
     </div>
   </div>
 
 
-  <!-- ==========================================================
-       IDLE
-  =========================================================== -->
+  <!-- =========================================================
+       HEADER
+  ========================================================== -->
 
-  <div
-    class="idle-screen"
-    id="idle-screen"
-    aria-hidden="true"
+  <header
+    class="site-header"
+    id="site-header"
   >
-    <div class="idle-screen__inner">
 
+    <a
+      class="site-brand magnetic"
+      href="#00"
+      aria-label="Cesare Paratore — torna all'inizio"
+    >
       <img
-        class="idle-screen__mark"
         src="assets/images/cp-mark.svg"
         alt=""
-        width="72"
-        height="72"
+        width="48"
+        height="48"
       >
-
-      <div class="idle-screen__trajectory" aria-hidden="true">
-        <span class="idle-screen__point"></span>
-        <span class="idle-screen__line"></span>
-      </div>
-
-      <p class="idle-screen__motto">
-        <span>MOVIMENTO</span>
-        <span aria-hidden="true">/</span>
-        <span>CON DIREZIONE.</span>
-      </p>
-
-      <p class="idle-screen__signature">CESARE PARATORE</p>
-
-      <p class="idle-screen__return">MUOVI PER CONTINUARE</p>
-
-    </div>
-  </div>
-
-
-  <!-- ==========================================================
-       HEADER
-  =========================================================== -->
-
-  <header class="site-header">
-
-    <div class="site-header__identity">
-      <a
-        class="site-brand magnetic"
-        href="#chapter-01"
-        aria-label="Cesare Paratore — torna all'inizio"
-      >
-        <img
-          src="assets/images/cp-mark.svg"
-          alt=""
-          width="48"
-          height="48"
-        >
-      </a>
-
-      <button
-        class="menu-trigger magnetic"
-        type="button"
-        aria-expanded="false"
-        aria-controls="site-menu"
-        aria-label="Apri menu"
-      >
-        <span class="menu-trigger-label">MENU</span>
-
-        <span class="menu-trigger-icon" aria-hidden="true">
-          <span></span>
-          <span></span>
-        </span>
-      </button>
-    </div>
+    </a>
 
 
     <div
@@ -172,9 +132,8 @@
       <div
         class="progress-label"
         id="progress-current"
-        aria-live="polite"
       >
-        IL MOVIMENTO È SOLO L'INIZIO.
+        MOVIMENTO / CON DIREZIONE
       </div>
 
       <div
@@ -197,7 +156,7 @@
         <a
           id="previous-section"
           class="section-jump-link section-jump-link--previous is-disabled"
-          href="#chapter-01"
+          href="#01"
           aria-label="Sezione precedente"
           aria-hidden="true"
           tabindex="-1"
@@ -209,111 +168,215 @@
         <a
           id="next-section"
           class="section-jump-link section-jump-link--next"
-          href="#chapter-02"
-          aria-label="Vai alla sezione successiva"
+          href="#01"
+          aria-label="Vai alla sezione 01"
         >
-          <span id="next-section-label">LA DOMANDA È CAMBIATA.</span>
+          <span id="next-section-label">01</span>
           <span
             aria-hidden="true"
             class="section-jump-arrow"
-          >→</span>
+          >
+            →
+          </span>
         </a>
 
       </div>
 
     </div>
 
+
+    <button
+      class="menu-trigger magnetic"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-menu"
+      aria-label="Apri menu"
+    >
+
+      <span class="menu-trigger-label">
+        MENU
+      </span>
+
+      <span
+        class="menu-trigger-icon"
+        aria-hidden="true"
+      >
+        <span></span>
+        <span></span>
+      </span>
+
+    </button>
+
   </header>
 
 
-  <!-- ==========================================================
-       FULL SCREEN MENU
-  =========================================================== -->
+  <!-- =========================================================
+       FULLSCREEN MENU
+  ========================================================== -->
 
   <aside
     class="site-menu"
     id="site-menu"
     aria-hidden="true"
-    inert
   >
-    <div class="site-menu__inner">
 
-      <nav
-        class="site-menu__nav"
-        aria-label="Navigazione principale"
-      >
-        <a href="#chapter-02">CHI SONO</a>
-        <a href="#chapter-03">SPORT</a>
-        <a href="#chapter-03">SCIENZE MOTORIE</a>
-        <a href="#chapter-03">EDUCAZIONE</a>
-        <a href="#chapter-03">MANAGMENT</a>
-        <a href="#chapter-03">DIGITALE</a>
-        <a href="#chapter-06">TERRITORIO</a>
-        <a href="#chapter-10">CONTATTI</a>
-      </nav>
+    <nav
+      class="menu-nav"
+      aria-label="Sezioni"
+    >
 
-      <div class="site-menu__footer">
-        <img
-          src="assets/images/cp-mark.svg"
-          alt=""
-          width="48"
-          height="48"
-        >
-        <span>MOVIMENTO / CON DIREZIONE.</span>
-      </div>
+      <p class="menu-kicker">
+        MOVIMENTO / CON DIREZIONE
+      </p>
 
-    </div>
+      <a href="#01" data-menu-link>
+        <span>01</span>
+        <strong>Il movimento è solo l'inizio.</strong>
+      </a>
+
+      <a href="#02" data-menu-link>
+        <span>02</span>
+        <strong>La domanda è cambiata.</strong>
+      </a>
+
+      <a href="#03" data-menu-link>
+        <span>03</span>
+        <strong>Una strada non era abbastanza.</strong>
+      </a>
+
+      <a href="#04" data-menu-link>
+        <span>04</span>
+        <strong>Non erano cinque strade.</strong>
+      </a>
+
+      <a href="#05" data-menu-link>
+        <span>05</span>
+        <strong>A quel punto, mi sono fermato.</strong>
+      </a>
+
+      <a href="#06" data-menu-link>
+        <span>06</span>
+        <strong>Oggi so anche da dove parto.</strong>
+      </a>
+
+      <a href="#07" data-menu-link>
+        <span>07</span>
+        <strong>La base è qui. La direzione, no.</strong>
+      </a>
+
+      <a href="#08" data-menu-link>
+        <span>08</span>
+        <strong>Ora questa direzione prende forma.</strong>
+      </a>
+
+      <a href="#09" data-menu-link>
+        <span>09</span>
+        <strong>Forse è qui che la storia cambia.</strong>
+      </a>
+
+      <a href="#10" data-menu-link>
+        <span>10</span>
+        <strong>Partiamo da quello.</strong>
+      </a>
+
+    </nav>
+
   </aside>
 
 
-  <!-- ==========================================================
+  <!-- =========================================================
        MAIN
-  =========================================================== -->
+  ========================================================== -->
 
   <main id="main-content">
 
 
-    <!-- ========================================================
-         01
-    ========================================================= -->
+    <!-- =======================================================
+         COVER
+    ======================================================== -->
 
     <section
-      id="chapter-01"
+      class="cover"
+      id="00"
+      data-cover
+      aria-label="Copertina"
+    >
+
+      <div class="cover-stage">
+
+        <div class="cover-title">
+
+          <h1>
+            <span>MOVIMENTO</span>
+            <span>CON DIREZIONE</span>
+          </h1>
+
+          <p>
+            CESARE PARATORE
+          </p>
+
+        </div>
+
+        <div
+          class="cover-mark"
+          aria-hidden="true"
+        >
+          <img
+            src="assets/images/cp-mark.svg"
+            alt=""
+            width="56"
+            height="56"
+          >
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =======================================================
+         01
+    ======================================================== -->
+
+    <section
       class="chapter chapter--01"
-      data-chapter="1"
-      aria-labelledby="chapter-01-title"
+      id="01"
+      data-chapter="01"
+      data-title="IL MOVIMENTO È SOLO L'INIZIO."
+      aria-labelledby="title-01"
     >
 
       <div class="chapter-stage">
 
-        <div class="chapter-content chapter-content--cover">
+        <div class="chapter-copy chapter-copy--opening">
 
-          <div class="chapter-kicker">
+          <span class="chapter-number">
+            01
+          </span>
+
+          <h2 id="title-01">
+            IL MOVIMENTO È SOLO L'INIZIO.
+          </h2>
+
+          <div class="chapter-sub">
             MOVIMENTO
           </div>
 
-          <h1 id="chapter-01-title" class="chapter-title chapter-title--hero">
-            IL MOVIMENTO È SOLO L'INIZIO.
-          </h1>
+          <p>
+            Il punto da cui tutto è cominciato.
+          </p>
 
         </div>
 
+
         <svg
-          class="chapter-art chapter-art--01"
-          viewBox="0 0 1000 1000"
+          class="trajectory trajectory--01"
+          viewBox="0 0 1000 600"
           preserveAspectRatio="none"
           aria-hidden="true"
         >
           <path
-            class="trajectory trajectory--01"
-            pathLength="1"
-            d="M120 720 C280 660 400 500 560 470"
-          />
-          <circle
-            class="trajectory-point trajectory-point--01"
-            cx="120"
-            cy="720"
-            r="4"
+            d="M-30 485 C220 470 330 450 490 360 S770 150 1030 105"
           />
         </svg>
 
@@ -322,250 +385,51 @@
     </section>
 
 
-    <!-- ========================================================
+    <!-- =======================================================
          02
-    ========================================================= -->
+    ======================================================== -->
 
     <section
-      id="chapter-02"
-      class="chapter chapter--02"
-      data-chapter="2"
-      aria-labelledby="chapter-02-title"
+      class="chapter chapter--02 chapter--portrait"
+      id="02"
+      data-chapter="02"
+      data-title="LA DOMANDA È CAMBIATA."
+      aria-labelledby="title-02"
     >
 
       <div class="chapter-stage">
 
-        <div class="chapter-content chapter-content--question">
+        <figure class="portrait-frame">
 
-          <div class="chapter-copy">
-            <p class="chapter-kicker">NON BASTAVA MUOVERSI.</p>
-
-            <h2 id="chapter-02-title" class="chapter-title">
-              LA DOMANDA È CAMBIATA.
-            </h2>
-
-            <p class="chapter-emphasis">
-              VOLEVO CAPIRE <em>DOVE.</em>
-            </p>
-          </div>
-
-          <figure class="chapter-portrait">
-            <img
-              src="assets/images/cp-foto.webp"
-              alt="Cesare Paratore"
-              width="900"
-              height="1125"
-              loading="eager"
-              decoding="async"
-            >
-          </figure>
-
-        </div>
-
-        <div class="chapter-art-zone" aria-hidden="true">
-          <svg
-            class="chapter-art chapter-art--02"
-            viewBox="0 0 1000 1000"
-            preserveAspectRatio="none"
-          >
-            <path
-              class="trajectory trajectory--02"
-              pathLength="1"
-              d="M760 760 C720 650 670 580 620 470"
-            />
-          </svg>
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ========================================================
-         03
-    ========================================================= -->
-
-    <section
-      id="chapter-03"
-      class="chapter chapter--03"
-      data-chapter="3"
-      aria-labelledby="chapter-03-title"
-    >
-
-      <div class="chapter-stage">
-
-        <div class="chapter-content chapter-content--roads">
-
-          <div class="chapter-copy">
-            <h2 id="chapter-03-title" class="chapter-title">
-              UNA STRADA NON ERA ABBASTANZA.
-            </h2>
-
-            <div class="chapter-support">
-              <p>Prima c'era la curiosità.</p>
-              <p>Poi le strade.</p>
-            </div>
-          </div>
-
-          <div class="chapter-label">
-            <span>DIGITALE</span>
-            <span>MOVIMENTO</span>
-            <span>SPORT</span>
-            <span>SCIENZE MOTORIE</span>
-            <span>EDUCAZIONE</span>
-            <span>MANAGMENT</span>
-          </div>
-
-        </div>
-
-        <div class="chapter-art-zone" aria-hidden="true">
-
-          <svg
-            class="chapter-art chapter-art--03"
-            viewBox="0 0 1000 1000"
-            preserveAspectRatio="none"
-          >
-            <path class="trajectory trajectory--03 trajectory--03-a"
-              pathLength="1"
-              d="M760 180 C680 250 620 330 570 440" />
-
-            <path class="trajectory trajectory--03 trajectory--03-b"
-              pathLength="1"
-              d="M840 320 C740 360 650 410 570 470" />
-
-            <path class="trajectory trajectory--03 trajectory--03-c"
-              pathLength="1"
-              d="M820 540 C730 530 650 510 570 490" />
-
-            <path class="trajectory trajectory--03 trajectory--03-d"
-              pathLength="1"
-              d="M730 790 C670 670 620 570 570 500" />
-
-            <path class="trajectory trajectory--03 trajectory--03-e"
-              pathLength="1"
-              d="M360 820 C420 690 500 570 570 500" />
-          </svg>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ========================================================
-         04
-    ========================================================= -->
-
-    <section
-      id="chapter-04"
-      class="chapter chapter--04"
-      data-chapter="4"
-      aria-labelledby="chapter-04-title"
-    >
-
-      <div class="chapter-stage">
-
-        <div class="chapter-content chapter-content--convergence">
-
-          <div class="chapter-copy">
-            <h2 id="chapter-04-title" class="chapter-title">
-              POI HO CAPITO CHE NON ERANO CINQUE STRADE.
-            </h2>
-
-            <p class="chapter-reveal">
-              Non erano cinque strade.
-            </p>
-
-            <p class="chapter-reveal chapter-reveal--secondary">
-              Era una sola direzione, ancora da riconoscere.
-            </p>
-          </div>
-
-          <div
-            class="convergence-mark"
-            aria-hidden="true"
-          >
-            <img
-              src="assets/images/cp-mark.svg"
-              alt=""
-              width="72"
-              height="72"
-            >
-          </div>
-
-        </div>
-
-        <div class="chapter-art-zone" aria-hidden="true">
-
-          <svg
-            class="chapter-art chapter-art--04"
-            viewBox="0 0 1000 1000"
-            preserveAspectRatio="none"
+          <img
+            src="assets/images/cp-foto.webp"
+            alt="Cesare Paratore"
+            width="1200"
+            height="1500"
+            loading="eager"
+            fetchpriority="high"
           >
 
-            <path
-              class="trajectory trajectory--04 trajectory--04-a"
-              pathLength="1"
-              d="M40 170 C240 190 410 300 500 500"
-            />
-
-            <path
-              class="trajectory trajectory--04 trajectory--04-b"
-              pathLength="1"
-              d="M970 180 C760 210 600 330 500 500"
-            />
-
-            <path
-              class="trajectory trajectory--04 trajectory--04-c"
-              pathLength="1"
-              d="M960 820 C760 760 600 650 500 500"
-            />
-
-            <path
-              class="trajectory trajectory--04 trajectory--04-d"
-              pathLength="1"
-              d="M120 850 C300 780 420 650 500 500"
-            />
-
-            <path
-              class="trajectory trajectory--04 trajectory--04-e"
-              pathLength="1"
-              d="M500 40 C500 210 500 350 500 500"
-            />
-
-          </svg>
-
-        </div>
-
-      </div>
-
-    </section>
+        </figure>
 
 
-    <!-- ========================================================
-         05
-    ========================================================= -->
+        <div class="chapter-copy chapter-copy--portrait">
 
-    <section
-      id="chapter-05"
-      class="chapter chapter--05"
-      data-chapter="5"
-      aria-labelledby="chapter-05-title"
-    >
-
-      <div class="chapter-stage">
-
-        <div class="chapter-content chapter-content--pause">
-
-          <h2 id="chapter-05-title" class="chapter-title">
-            A QUEL PUNTO, MI SONO FERMATO.
+          <h2 id="title-02">
+            LA DOMANDA È CAMBIATA.
           </h2>
 
-          <span
-            class="pause-point"
-            aria-hidden="true"
-          ></span>
+          <div class="chapter-statement">
+
+            <p>
+              NON BASTAVA MUOVERSI.
+            </p>
+
+            <p>
+              VOLEVO CAPIRE DOVE.
+            </p>
+
+          </div>
 
         </div>
 
@@ -574,70 +438,271 @@
     </section>
 
 
-    <!-- ========================================================
+    <!-- =======================================================
+         03
+    ======================================================== -->
+
+    <section
+      class="chapter chapter--03"
+      id="03"
+      data-chapter="03"
+      data-title="UNA STRADA NON ERA ABBASTANZA."
+      aria-labelledby="title-03"
+    >
+
+      <div class="chapter-stage">
+
+        <div class="chapter-copy">
+
+          <h2 id="title-03">
+            UNA STRADA NON ERA ABBASTANZA.
+          </h2>
+
+          <p>
+            Prima c'era la curiosità.
+          </p>
+
+          <p>
+            Poi le strade.
+          </p>
+
+        </div>
+
+
+        <div
+          class="trajectory-field trajectory-field--03"
+          aria-hidden="true"
+        >
+
+          <svg
+            viewBox="0 0 1000 650"
+            preserveAspectRatio="none"
+          >
+
+            <path
+              class="route route-a"
+              d="M-50 520 C150 500 185 160 430 150 S780 290 1050 70"
+            />
+
+            <path
+              class="route route-b"
+              d="M-50 90 C170 130 270 560 520 430 S790 170 1050 230"
+            />
+
+            <path
+              class="route route-c"
+              d="M-50 310 C170 260 260 270 410 330 S770 500 1050 420"
+            />
+
+          </svg>
+
+
+          <div class="trajectory-label trajectory-label--a">
+            DIGITALE
+          </div>
+
+          <div class="trajectory-label trajectory-label--b">
+            MOVIMENTO
+          </div>
+
+          <div class="trajectory-label trajectory-label--c">
+            SPORT
+          </div>
+
+          <div class="trajectory-label trajectory-label--d">
+            SCIENZE MOTORIE
+          </div>
+
+          <div class="trajectory-label trajectory-label--e">
+            EDUCAZIONE
+          </div>
+
+          <div class="trajectory-label trajectory-label--f">
+            MANAGMENT
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =======================================================
+         04
+    ======================================================== -->
+
+    <section
+      class="chapter chapter--04 chapter--convergence"
+      id="04"
+      data-chapter="04"
+      data-title="POI HO CAPITO CHE NON ERANO CINQUE STRADE."
+      aria-labelledby="title-04"
+    >
+
+      <div class="chapter-stage">
+
+        <div class="convergence-title">
+
+          <h2 id="title-04">
+            POI HO CAPITO CHE NON ERANO CINQUE STRADE.
+          </h2>
+
+        </div>
+
+
+        <div
+          class="convergence-art"
+          aria-hidden="true"
+        >
+
+          <svg
+            viewBox="0 0 1200 700"
+            preserveAspectRatio="none"
+          >
+
+            <path d="M-80 110 C280 100 510 230 600 350" />
+            <path d="M-80 290 C250 260 470 300 600 350" />
+            <path d="M-80 590 C250 590 470 420 600 350" />
+            <path d="M1280 130 C930 120 760 245 600 350" />
+            <path d="M1280 570 C920 570 760 440 600 350" />
+
+          </svg>
+
+
+          <span class="convergence-point"></span>
+
+          <span class="convergence-mark">
+            CP
+          </span>
+
+        </div>
+
+
+        <div class="convergence-reveal">
+
+          <p>
+            Non erano cinque strade.
+          </p>
+
+          <p>
+            Era una sola direzione, ancora da riconoscere.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =======================================================
+         05
+    ======================================================== -->
+
+    <section
+      class="chapter chapter--05 chapter--pause"
+      id="05"
+      data-chapter="05"
+      data-title="A QUEL PUNTO, MI SONO FERMATO."
+      aria-labelledby="title-05"
+    >
+
+      <div class="chapter-stage">
+
+        <h2 id="title-05">
+          A QUEL PUNTO, MI SONO FERMATO.
+        </h2>
+
+        <span
+          class="pause-point"
+          aria-hidden="true"
+        ></span>
+
+      </div>
+
+    </section>
+
+
+    <!-- =======================================================
          06
-    ========================================================= -->
+    ======================================================== -->
 
     <section
-      id="chapter-06"
-      class="chapter chapter--06"
-      data-chapter="6"
-      aria-labelledby="chapter-06-title"
+      class="chapter chapter--06 chapter--origin"
+      id="06"
+      data-chapter="06"
+      data-title="OGGI SO ANCHE DA DOVE PARTO."
+      aria-labelledby="title-06"
     >
 
       <div class="chapter-stage">
 
-        <div class="chapter-content chapter-content--origin">
+        <div class="chapter-copy chapter-copy--origin">
 
-          <div class="origin-copy">
+          <h2 id="title-06">
+            OGGI SO ANCHE DA DOVE PARTO.
+          </h2>
 
-            <h2 id="chapter-06-title" class="chapter-title">
-              OGGI SO ANCHE DA DOVE PARTO.
-            </h2>
+          <div class="origin-place">
 
-            <div class="origin-place">
-              <p class="origin-place__name">PARTINICO</p>
-              <p class="origin-place__detail">
-                Stadio Comunale "Giuseppe La Franca"
-              </p>
-            </div>
+            <strong>
+              PARTINICO
+            </strong>
 
-            <p class="origin-line">
-              DA QUI, NON SOLO QUI.
-            </p>
-
-            <p class="origin-description">
-              È qui che il mio lavoro ha la sua base.
-              In presenza, per chi parte da qui e dai territori vicini.
-              Online, quando la distanza non deve essere un limite.
-            </p>
-
-            <p class="origin-statement">
-              UNA BASE NON È UN CONFINE.
-            </p>
-
-            <p class="origin-statement origin-statement--secondary">
-              È IL PUNTO DA CUI PUOI PARTIRE.
-            </p>
+            <span>
+              Stadio Comunale "Giuseppe La Franca"
+            </span>
 
           </div>
 
-          <div class="origin-map">
 
-            <div class="map-frame">
+          <p class="origin-lead">
+            DA QUI, NON SOLO QUI.
+          </p>
 
-              <div class="map-placeholder">
-                <span>PARTINICO</span>
-              </div>
+          <p>
+            È qui che il mio lavoro ha la sua base.
+            In presenza, per chi parte da qui e dai territori vicini.
+            Online, quando la distanza non deve essere un limite.
+          </p>
 
-              <span
-                class="map-point"
-                aria-hidden="true"
-              ></span>
+        </div>
 
-            </div>
+
+        <div
+          class="map-stage"
+          aria-label="Origine geografica a Partinico"
+        >
+
+          <div class="map-fallback">
+
+            <span class="map-grid"></span>
+
+            <span class="map-road map-road--1"></span>
+            <span class="map-road map-road--2"></span>
+            <span class="map-road map-road--3"></span>
+
+            <span class="map-origin-point"></span>
+
+            <span class="map-caption">
+              PARTINICO · 38.0466° N / 13.1172° E
+            </span>
 
           </div>
+
+        </div>
+
+
+        <div class="origin-close">
+
+          <p>
+            UNA BASE NON È UN CONFINE.
+          </p>
+
+          <p>
+            È IL PUNTO DA CUI PUOI PARTIRE.
+          </p>
 
         </div>
 
@@ -646,56 +711,41 @@
     </section>
 
 
-    <!-- ========================================================
+    <!-- =======================================================
          07
-    ========================================================= -->
+    ======================================================== -->
 
     <section
-      id="chapter-07"
-      class="chapter chapter--07"
-      data-chapter="7"
-      aria-labelledby="chapter-07-title"
+      class="chapter chapter--07 chapter--restart"
+      id="07"
+      data-chapter="07"
+      data-title="LA BASE È QUI. LA DIREZIONE, NO."
+      aria-labelledby="title-07"
     >
 
       <div class="chapter-stage">
 
-        <div class="chapter-content chapter-content--open">
+        <div class="restart-copy">
 
-          <div class="chapter-copy chapter-copy--open">
+          <p>
+            LA BASE È QUI.
+          </p>
 
-            <h2 id="chapter-07-title" class="chapter-title">
-              LA BASE È QUI. LA DIREZIONE, NO.
-            </h2>
-
-            <p class="open-beat">
-              LA BASE È QUI.
-            </p>
-
-            <p class="open-beat open-beat--last">
-              LA DIREZIONE, NO.
-            </p>
-
-          </div>
+          <p>
+            LA DIREZIONE, NO.
+          </p>
 
         </div>
+
 
         <svg
-          class="chapter-art chapter-art--07"
-          viewBox="0 0 1000 1000"
+          class="trajectory trajectory--restart"
+          viewBox="0 0 1000 600"
           preserveAspectRatio="none"
           aria-hidden="true"
         >
           <path
-            class="trajectory trajectory--07"
-            pathLength="1"
-            d="M180 680 C350 610 520 500 820 250"
-          />
-
-          <circle
-            class="trajectory-point trajectory-point--07"
-            cx="180"
-            cy="680"
-            r="4"
+            d="M-20 530 C230 520 350 410 500 330 S760 170 1030 90"
           />
         </svg>
 
@@ -704,45 +754,51 @@
     </section>
 
 
-    <!-- ========================================================
+    <!-- =======================================================
          08
-    ========================================================= -->
+    ======================================================== -->
 
     <section
-      id="chapter-08"
-      class="chapter chapter--08"
-      data-chapter="8"
-      aria-labelledby="chapter-08-title"
+      class="chapter chapter--08 chapter--dimensions"
+      id="08"
+      data-chapter="08"
+      data-title="ORA QUESTA DIREZIONE PRENDE FORMA."
+      aria-labelledby="title-08"
     >
 
       <div class="chapter-stage">
 
-        <div class="chapter-content chapter-content--form">
+        <div class="chapter-copy">
 
-          <h2 id="chapter-08-title" class="chapter-title">
+          <h2 id="title-08">
             ORA QUESTA DIREZIONE PRENDE FORMA.
           </h2>
 
-          <div class="form-words">
-            <span>MOVIMENTO</span>
-            <span>OBIETTIVO</span>
-            <span>PRESTAZIONE</span>
-            <span>PROGETTO</span>
-            <span>SVILUPPO</span>
-          </div>
+        </div>
+
+
+        <div
+          class="dimensions"
+          aria-label="Cinque dimensioni"
+        >
+
+          <span>MOVIMENTO</span>
+          <span>OBIETTIVO</span>
+          <span>PRESTAZIONE</span>
+          <span>PROGETTO</span>
+          <span>SVILUPPO</span>
 
         </div>
 
+
         <svg
-          class="chapter-art chapter-art--08"
-          viewBox="0 0 1000 1000"
+          class="trajectory trajectory--dimensions"
+          viewBox="0 0 1000 600"
           preserveAspectRatio="none"
           aria-hidden="true"
         >
           <path
-            class="trajectory trajectory--08"
-            pathLength="1"
-            d="M90 780 C260 700 420 550 580 500 C700 460 820 330 940 200"
+            d="M-40 500 C170 470 220 300 410 330 S720 470 1040 170"
           />
         </svg>
 
@@ -751,108 +807,111 @@
     </section>
 
 
-    <!-- ========================================================
+    <!-- =======================================================
          09
-    ========================================================= -->
+    ======================================================== -->
 
     <section
-      id="chapter-09"
-      class="chapter chapter--09"
-      data-chapter="9"
-      aria-labelledby="chapter-09-title"
+      class="chapter chapter--09 chapter--encounter"
+      id="09"
+      data-chapter="09"
+      data-title="FORSE È QUI CHE LA STORIA CAMBIA."
+      aria-labelledby="title-09"
     >
 
       <div class="chapter-stage">
 
-        <div class="chapter-content chapter-content--encounter">
+        <div class="encounter-copy">
 
-          <h2 id="chapter-09-title" class="chapter-title">
-            FORSE È QUI CHE LA STORIA CAMBIA.
-          </h2>
+          <p>
+            IO PARTO DA QUI.
+          </p>
 
-          <div class="encounter-copy">
-            <p>IO PARTO DA QUI.</p>
-            <p>TU PARTI DA UN ALTRO PUNTO.</p>
-          </div>
-
-          <p class="encounter-point-label">QUI.</p>
+          <p>
+            TU PARTI DA UN ALTRO PUNTO.
+          </p>
 
         </div>
 
-        <svg
-          class="chapter-art chapter-art--09"
-          viewBox="0 0 1000 1000"
-          preserveAspectRatio="none"
+
+        <div
+          class="encounter-art"
           aria-hidden="true"
         >
-          <path
-            class="trajectory trajectory--09 trajectory--09-a"
-            pathLength="1"
-            d="M80 700 C270 640 410 560 500 500"
-          />
 
-          <path
-            class="trajectory trajectory--09 trajectory--09-b"
-            pathLength="1"
-            d="M920 280 C720 350 600 420 500 500"
-          />
+          <svg
+            viewBox="0 0 1200 700"
+            preserveAspectRatio="none"
+          >
 
-          <circle
-            class="trajectory-point trajectory-point--09"
-            cx="500"
-            cy="500"
-            r="4"
-          />
-        </svg>
+            <path
+              d="M-80 180 C280 190 450 300 600 350"
+            />
+
+            <path
+              d="M1280 520 C930 500 760 410 600 350"
+            />
+
+          </svg>
+
+
+          <span class="encounter-point"></span>
+
+          <span class="encounter-word">
+            QUI.
+          </span>
+
+        </div>
+
+
+        <h2 id="title-09">
+          FORSE È QUI CHE LA STORIA CAMBIA.
+        </h2>
 
       </div>
 
     </section>
 
 
-    <!-- ========================================================
+    <!-- =======================================================
          10
-    ========================================================= -->
+    ======================================================== -->
 
     <section
-      id="chapter-10"
-      class="chapter chapter--10"
+      class="chapter chapter--10 chapter--final"
+      id="10"
       data-chapter="10"
-      aria-labelledby="chapter-10-title"
+      data-title="PARTIAMO DA QUELLO."
+      aria-labelledby="title-10"
     >
 
       <div class="chapter-stage">
 
-        <div class="chapter-content chapter-content--final">
+        <div class="final-copy">
 
-          <h2 id="chapter-10-title" class="chapter-title">
+          <h2 id="title-10">
             PARTIAMO DA QUELLO.
           </h2>
 
-          <div class="final-copy">
-            <p>DA UN PUNTO</p>
-            <p>PUÒ NASCERE UNA DIREZIONE.</p>
-          </div>
+          <p>
+            DA UN PUNTO
+          </p>
+
+          <p>
+            PUÒ NASCERE UNA DIREZIONE.
+          </p>
 
         </div>
 
+
         <svg
-          class="chapter-art chapter-art--10"
-          viewBox="0 0 1000 1000"
+          class="trajectory trajectory--final"
+          viewBox="0 0 1000 600"
           preserveAspectRatio="none"
           aria-hidden="true"
         >
           <path
-            class="trajectory trajectory--10"
-            pathLength="1"
-            d="M500 500 C620 430 760 350 1080 180"
-          />
-
-          <circle
-            class="trajectory-point trajectory-point--10"
-            cx="500"
-            cy="500"
-            r="4"
+            d="M-30 430 C190 420 310 360 470 330 S760 230 1050 80"
           />
         </svg>
 
@@ -863,37 +922,48 @@
   </main>
 
 
-  <!-- ==========================================================
+  <!-- =========================================================
        FOOTER
-  =========================================================== -->
+  ========================================================== -->
 
   <footer class="site-footer">
 
-    <div class="footer-inner">
+    <img
+      src="assets/images/cp-mark.svg"
+      alt=""
+      width="72"
+      height="72"
+    >
 
-      <div class="footer-mark">
-        <img
-          src="assets/images/cp-mark.svg"
-          alt=""
-          width="72"
-          height="72"
-          loading="lazy"
-        >
-      </div>
+    <p>
+      MOVIMENTO / CON DIREZIONE
+    </p>
 
-      <p class="footer-motto">
-        <span>MOVIMENTO</span>
-        <span aria-hidden="true">/</span>
-        <span>CON DIREZIONE.</span>
-      </p>
-
-      <p class="footer-signature">
-        CESARE PARATORE
-      </p>
-
-    </div>
+    <p>
+      CESARE PARATORE
+    </p>
 
   </footer>
+
+
+  <!-- =========================================================
+       IDLE
+  ========================================================== -->
+
+  <div
+    class="idle-overlay"
+    id="idle-overlay"
+    aria-hidden="true"
+  >
+
+    <img
+      src="assets/images/cp-mark.svg"
+      alt=""
+      width="72"
+      height="72"
+    >
+
+  </div>
 
 </body>
 </html>
