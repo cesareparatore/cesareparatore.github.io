@@ -101,7 +101,17 @@
     </div>
 
     <div class="site-header__meta">
-      <span class="site-header__current" id="progress-current">COVER</span>
+
+      <div class="site-header__labels" aria-live="polite">
+        <span class="site-header__label site-header__label--current" id="progress-current">
+          COVER
+        </span>
+
+        <div class="site-header__adjacent">
+          <span class="site-header__label site-header__label--previous" id="progress-previous"></span>
+          <span class="site-header__label site-header__label--next" id="progress-next"></span>
+        </div>
+      </div>
 
       <button
         class="menu-trigger magnetic"
@@ -112,6 +122,7 @@
       >
         MENU
       </button>
+
     </div>
 
   </header>
@@ -259,6 +270,16 @@
 
         <p class="chapter-number">02</p>
 
+        <div class="chapter02__copy">
+          <h2>LA DOMANDA È CAMBIATA.</h2>
+
+          <p class="display">NON BASTAVA MUOVERSI.</p>
+
+          <p class="display display--serif">
+            VOLEVO CAPIRE DOVE.
+          </p>
+        </div>
+
         <div class="chapter02__portrait">
           <img
             src="assets/images/cp-foto.webp"
@@ -268,16 +289,6 @@
             loading="lazy"
             decoding="async"
           >
-        </div>
-
-        <div class="chapter02__copy">
-          <h2>LA DOMANDA È CAMBIATA.</h2>
-
-          <p class="display">NON BASTAVA MUOVERSI.</p>
-
-          <p class="display display--serif">
-            VOLEVO CAPIRE DOVE.
-          </p>
         </div>
 
       </div>
@@ -437,13 +448,13 @@
     >
       <div class="scene__stage chapter07">
 
-        <p class="chapter-number">07</p>
-
         <div class="chapter07__origin">
           <span></span>
         </div>
 
         <div class="chapter07__line"></div>
+
+        <p class="chapter-number">07</p>
 
         <div class="chapter07__copy">
           <p>LA BASE È QUI.</p>
@@ -477,12 +488,12 @@
 
           <svg
             class="form-system__svg"
-            viewBox="0 0 1200 500"
+            viewBox="0 0 1200 300"
             preserveAspectRatio="none"
             aria-hidden="true"
           >
             <path
-              d="M30 438 C270 438 420 432 570 430 C760 428 940 425 1170 420"
+              d="M30 245 C260 245 430 225 610 225 C820 225 980 205 1170 185"
             />
           </svg>
         </div>
@@ -512,10 +523,6 @@
             <span>TU PARTI DA UN ALTRO PUNTO.</span>
           </div>
 
-          <div class="encounter__point">
-            <span>QUI.</span>
-          </div>
-
         </div>
 
       </div>
@@ -535,7 +542,7 @@
 
         <div class="final-direction">
 
-          <span class="final-direction__point"></span>
+          <span class="final-direction__point" aria-hidden="true"></span>
 
           <div class="final-direction__copy">
             <p class="display">DA UN PUNTO</p>
@@ -551,7 +558,7 @@
             aria-hidden="true"
           >
             <path
-              d="M70 380 C250 380 360 345 500 315 C650 280 770 230 900 180 C1010 138 1100 105 1170 70"
+              d="M6 390 C240 390 410 390 570 365 C760 335 950 280 1170 215"
             />
           </svg>
 
