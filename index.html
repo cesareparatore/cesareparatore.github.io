@@ -1,25 +1,24 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Cesare Paratore — Movimento con direzione.</title>
-<meta name="description" content="Cesare Paratore. Movimento con direzione. Un percorso tra Scienze Motorie, Sport, Educazione, Management e Digitale.">
+  <title>Cesare Paratore — Movimento con direzione</title>
+  <meta name="description" content="Cesare Paratore. Movimento con direzione. Sport, Scienze Motorie, Educazione, Management e Digitale: competenze che dialogano per costruire percorsi.">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="css/style.css">
-
+  <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 
 <a class="skip-link" href="#main">
-Vai al contenuto
+  Vai al contenuto
 </a>
 
 
@@ -27,38 +26,40 @@ Vai al contenuto
 
 <div class="page-loader">
 
-    <div class="page-loader-inner">
+  <div class="page-loader-inner">
 
-        <div class="loader-trajectory">
-            <span class="loader-line"></span>
-            <span class="loader-point"></span>
-        </div>
-
-        <p class="loader-motto">
-            MOVIMENTO
-            <span>/</span>
-            CON DIREZIONE.
-        </p>
-
-        <p class="loader-signature">
-            CESARE PARATORE · CP 2026
-        </p>
-
+    <div class="loader-trajectory">
+      <span class="loader-line"></span>
+      <span class="loader-point"></span>
     </div>
+
+    <p class="loader-motto">
+      MOVIMENTO
+      <span>/</span>
+      CON DIREZIONE
+    </p>
+
+    <p class="loader-signature">
+      CESARE PARATORE · CP 2026
+    </p>
+
+  </div>
 
 </div>
 
 
 
+<!-- TRANSITION -->
+
 <div class="page-transition"></div>
 
 
 
-<!-- CUSTOM CURSOR -->
+<!-- CURSOR -->
 
 <div class="custom-cursor">
-    <span class="custom-cursor-dot"></span>
-    <span class="custom-cursor-ring"></span>
+  <span class="custom-cursor-dot"></span>
+  <span class="custom-cursor-ring"></span>
 </div>
 
 
@@ -67,75 +68,83 @@ Vai al contenuto
 
 <header class="site-header">
 
-<a href="#01" class="site-brand magnetic">
 
-<img src="assets/logo.svg" alt="Cesare Paratore">
+<a class="site-brand magnetic" href="#01" aria-label="Home">
+
+  <img src="assets/logo.svg" alt="Cesare Paratore">
 
 </a>
+
 
 
 <div class="wow-progress">
 
-<p class="progress-label">
-<span id="progress-current">
-Movimento
-</span>
-</p>
+  <div class="progress-label">
+    <span id="progress-current">
+      Movimento
+    </span>
+  </div>
 
 
-<div class="progress-track">
+  <div class="progress-track">
 
-<span id="progress-fill" class="progress-fill"></span>
+    <span id="progress-fill" class="progress-fill"></span>
 
-<span id="progress-point" class="progress-point"></span>
+    <span id="progress-point" class="progress-point"></span>
+
+  </div>
+
+
+  <nav class="section-jump">
+
+    <a id="previous-section"
+       class="section-jump-link section-jump-link--previous is-disabled"
+       href="#"
+       aria-hidden="true">
+
+       ←
+       <span id="previous-section-label"></span>
+
+    </a>
+
+
+    <a id="next-section"
+       class="section-jump-link section-jump-link--next"
+       href="#02">
+
+       <span id="next-section-label">
+         02
+       </span>
+
+       <span class="section-jump-arrow">
+         →
+       </span>
+
+    </a>
+
+
+  </nav>
+
 
 </div>
 
-
-<div class="section-jump">
-
-<a id="previous-section"
-class="section-jump-link section-jump-link--previous is-disabled"
-href="#">
-
-<span>←</span>
-<span id="previous-section-label"></span>
-
-</a>
-
-
-<a id="next-section"
-class="section-jump-link section-jump-link--next"
-href="#02">
-
-<span id="next-section-label">
-02
-</span>
-
-<span class="section-jump-arrow">
-→
-</span>
-
-</a>
-
-</div>
-
-</div>
 
 
 
 <button class="menu-trigger magnetic"
-aria-expanded="false"
-aria-label="Apri menu">
+        aria-expanded="false"
+        aria-controls="site-menu">
 
 <span class="menu-trigger-label">
 MENU
 </span>
 
+
 <span class="menu-trigger-icon">
 <span></span>
 <span></span>
 </span>
+
 
 </button>
 
@@ -148,78 +157,88 @@ MENU
 
 <!-- MENU -->
 
-<nav class="site-menu" aria-hidden="true">
+<div class="site-menu"
+     id="site-menu"
+     aria-hidden="true">
+
 
 <div class="site-menu-inner">
 
-<div class="site-menu-nav">
+
+<nav class="site-menu-nav">
 
 
 <a href="#01">
 <span class="site-menu-number">01</span>
-<span>Movimento</span>
+Movimento
 </a>
 
 
 <a href="#02">
 <span class="site-menu-number">02</span>
-<span>Direzione</span>
+Complessità
 </a>
 
 
 <a href="#03">
 <span class="site-menu-number">03</span>
-<span>Percorso</span>
+Persona
 </a>
 
 
 <a href="#04">
 <span class="site-menu-number">04</span>
-<span>Connessioni</span>
+Percorso
 </a>
 
 
 <a href="#05">
 <span class="site-menu-number">05</span>
-<span>Obiettivi</span>
+Connessioni
 </a>
 
 
 <a href="#06">
 <span class="site-menu-number">06</span>
-<span>Punto di partenza</span>
+Obiettivi
 </a>
 
 
 <a href="#07">
 <span class="site-menu-number">07</span>
-<span>Relazione</span>
+Punto di partenza
 </a>
 
 
 <a href="#08">
 <span class="site-menu-number">08</span>
-<span>Sostanza</span>
+Relazione
 </a>
 
 
 <a href="#09">
 <span class="site-menu-number">09</span>
-<span>Incontro</span>
+Sostanza
 </a>
 
 
 <a href="#10">
 <span class="site-menu-number">10</span>
-<span>Firma</span>
+Incontro
 </a>
 
 
-</div>
+<a href="#11">
+<span class="site-menu-number">11</span>
+Firma
+</a>
 
-</div>
 
 </nav>
+
+</div>
+
+</div>
 
 
 
@@ -229,9 +248,7 @@ MENU
 
 
 
-
-
-<!-- HERO -->
+<!-- 01 HERO -->
 
 <section id="01"
 class="home-section home-section--hero"
@@ -241,25 +258,33 @@ data-section-title="Movimento">
 <div class="section-inner section-inner--hero">
 
 
-<h1 class="hero-title reveal">
+<h1 class="hero-title">
+
 
 <span class="hero-title-line">
 MOVIMENTO
 </span>
 
+
 <span class="hero-title-line hero-title-line--identity">
 
+<span>
 CON
+</span>
 
 <span class="identity-slash">
 /
 </span>
 
-DIREZIONE.
+<span>
+DIREZIONE
+</span>
 
 </span>
 
+
 </h1>
+
 
 
 
@@ -269,84 +294,61 @@ DIREZIONE.
 Il movimento è energia.
 </p>
 
+
 <p>
 È ciò che permette di cambiare,
 crescere, costruire.
 </p>
 
+
 <p>
 Ma il movimento da solo non basta.
 </p>
 
-<p>
+
+<p class="editorial-emphasis">
 Serve una direzione.
 </p>
 
-</div>
-
-
-
-<div class="direction-trajectory reveal">
-
-<div class="direction-trajectory-line"></div>
-
-<span class="direction-node"
-style="left:10%;top:50%"
-data-direction="movimento">
-
-<span class="direction-node-label">
-ENERGIA
-</span>
-
-</span>
-
-
-<span class="direction-node"
-style="left:50%;top:50%"
-data-direction="direzione">
-
-<span class="direction-node-label">
-SENSO
-</span>
-
-</span>
-
-
-<span class="direction-node"
-style="left:90%;top:50%"
-data-direction="possibilità">
-
-<span class="direction-node-label">
-PERCORSO
-</span>
-
-</span>
-
 
 </div>
+
+
 
 
 
 <div class="hero-directions reveal">
 
-<a class="hero-direction"
-href="#02"
-data-direction="direzione">
 
-DIREZIONE
+<a href="#02"
+class="hero-direction"
+data-direction="complessita">
+
+COMPLESSITÀ
 
 </a>
 
-<a class="hero-direction"
-href="#03"
+
+<a href="#03"
+class="hero-direction"
+data-direction="persona">
+
+PERSONA
+
+</a>
+
+
+<a href="#04"
+class="hero-direction"
 data-direction="percorso">
 
 PERCORSO
 
 </a>
 
-<a class="hero-direction"
-href="#04"
+
+<a href="#05"
+class="hero-direction"
 data-direction="connessioni">
 
 CONNESSIONI
@@ -357,27 +359,70 @@ CONNESSIONI
 </div>
 
 
+
+
+
+<div class="direction-trajectory">
+
+
+<div class="direction-trajectory-line"></div>
+
+
+<span class="direction-node"
+data-direction="complessita"
+style="left:18%">
+<span class="direction-node-label">
+02
+</span>
+</span>
+
+
+<span class="direction-node"
+data-direction="persona"
+style="left:40%">
+<span class="direction-node-label">
+03
+</span>
+</span>
+
+
+<span class="direction-node"
+data-direction="percorso"
+style="left:63%">
+<span class="direction-node-label">
+04
+</span>
+</span>
+
+
+<span class="direction-node"
+data-direction="connessioni"
+style="left:84%">
+<span class="direction-node-label">
+05
+</span>
+</span>
+
+
 </div>
 
+
+</div>
+
+
 </section>
-
-
-
-
-
-
-<!-- CAPITOLO 01 -->
+<!-- 02 COMPLESSITÀ -->
 
 <section id="02"
 class="home-section home-section--question"
-data-section-title="La complessità">
+data-section-title="Complessità">
 
 
 <div class="section-inner section-inner--narrow">
 
 
 <h2 class="section-title reveal">
-02 · LA COMPLESSITÀ
+CAPITOLO 02 · LA COMPLESSITÀ
 </h2>
 
 
@@ -385,50 +430,46 @@ data-section-title="La complessità">
 <div class="editorial-copy editorial-copy--large reveal">
 
 
-<p class="editorial-emphasis">
+<h3 class="section-heading">
 
 UNA DIREZIONE
+
 <br>
+
 NON NASCE DA
+
 <br>
+
 UNA SOLA DIMENSIONE.
 
-</p>
+</h3>
+
 
 
 <p>
-Ogni percorso nasce dall'incontro
-di prospettive diverse.
+Ogni percorso nasce dall'incontro di prospettive diverse.
 </p>
 
 
 <p>
 Il corpo.
-</p>
-
-<p>
+<br>
 Lo sport.
-</p>
-
-<p>
+<br>
 L'educazione.
-</p>
-
-<p>
+<br>
 La progettazione.
-</p>
-
-<p>
+<br>
 Il digitale.
 </p>
 
 
+
 <p>
-Dimensioni differenti che,
-quando dialogano,
-permettono di vedere oltre
-il singolo elemento.
+Dimensioni differenti che, quando dialogano,
+permettono di vedere oltre il singolo elemento.
 </p>
+
 
 
 <p>
@@ -436,7 +477,8 @@ La sfida non è accumulare conoscenze.
 </p>
 
 
-<p>
+
+<p class="editorial-emphasis">
 È costruire connessioni.
 </p>
 
@@ -453,11 +495,13 @@ La sfida non è accumulare conoscenze.
 
 
 
-<!-- CAPITOLO 02 -->
+
+
+<!-- 03 PERSONA -->
 
 <section id="03"
-class="home-section home-section--network"
-data-section-title="La persona">
+class="home-section home-section--directions"
+data-section-title="Persona">
 
 
 <div class="section-inner section-inner--split">
@@ -467,7 +511,7 @@ data-section-title="La persona">
 
 
 <h2 class="section-title reveal">
-03 · LA PERSONA
+CAPITOLO 03 · LA PERSONA
 </h2>
 
 
@@ -475,13 +519,16 @@ data-section-title="La persona">
 <div class="editorial-copy reveal">
 
 
-<p class="editorial-emphasis">
+<h3 class="section-heading">
 
 DIETRO OGNI DIREZIONE
+
 <br>
+
 C'È UN PERCORSO.
 
-</p>
+</h3>
+
 
 
 <p>
@@ -489,17 +536,19 @@ Sono Cesare Paratore.
 </p>
 
 
+
 <p>
-Il mio percorso nasce dalle
-Scienze Motorie e dallo Sport.
+Il mio percorso nasce dalle Scienze Motorie e dallo Sport.
 </p>
 
 
+
 <p>
-Nel tempo ho sviluppato esperienze
-diverse, incontrando educazione,
-progettazione e strumenti digitali.
+Nel tempo ho sviluppato esperienze diverse,
+incontrando educazione, progettazione
+e strumenti digitali.
 </p>
+
 
 
 <p>
@@ -507,10 +556,12 @@ Non considero queste dimensioni separate.
 </p>
 
 
+
 <p>
 Le considero parti di uno stesso modo
 di osservare il movimento:
 </p>
+
 
 
 <div class="editorial-sequence">
@@ -530,10 +581,13 @@ costruire.
 </div>
 
 
+
 </div>
 
 
 </div>
+
+
 
 
 <div class="network-visual reveal">
@@ -546,20 +600,31 @@ costruire.
 <div class="network-line network-line--e"></div>
 
 
+
 <span class="network-node network-node--sport"
-data-node="sport"></span>
+data-node="sport">
+</span>
+
 
 <span class="network-node network-node--scienze-motorie"
-data-node="scienze-motorie"></span>
+data-node="scienze-motorie">
+</span>
+
 
 <span class="network-node network-node--educazione"
-data-node="educazione"></span>
+data-node="educazione">
+</span>
+
 
 <span class="network-node network-node--management"
-data-node="management"></span>
+data-node="management">
+</span>
+
 
 <span class="network-node network-node--digitale"
-data-node="digitale"></span>
+data-node="digitale">
+</span>
+
 
 
 </div>
@@ -569,37 +634,50 @@ data-node="digitale"></span>
 
 
 </section>
-<!-- CAPITOLO 04 -->
+
+
+
+
+
+
+
+
+<!-- 04 PERCORSO -->
 
 <section id="04"
-class="home-section home-section--pause"
-data-section-title="Il percorso">
+class="home-section home-section--network"
+data-section-title="Percorso">
 
 
 <div class="section-inner section-inner--narrow">
 
 
 <h2 class="section-title reveal">
-04 · IL PERCORSO
+CAPITOLO 04 · IL PERCORSO
 </h2>
+
 
 
 
 <div class="editorial-copy editorial-copy--large reveal">
 
 
-<p class="editorial-emphasis">
+<h3 class="section-heading">
 
 IL PERCORSO
+
 <br>
+
 NON È UNA LINEA.
 
-</p>
+</h3>
+
 
 
 <p>
 Nessun percorso reale è perfettamente lineare.
 </p>
+
 
 
 <p>
@@ -622,6 +700,7 @@ Nuove direzioni.
 </p>
 
 
+
 <p>
 Le esperienze acquistano valore
 non soltanto per dove iniziano,
@@ -629,14 +708,13 @@ ma per ciò che permettono di costruire.
 </p>
 
 
-<p>
+
+<p class="editorial-emphasis">
 La direzione non elimina le curve.
-</p>
-
-
-<p>
+<br>
 Dà loro un significato.
 </p>
+
 
 
 </div>
@@ -645,9 +723,12 @@ Dà loro un significato.
 
 <div class="pause-trajectory reveal">
 
+
 <div class="pause-trajectory-line"></div>
 
+
 <span class="pause-trajectory-point"></span>
+
 
 </div>
 
@@ -664,18 +745,18 @@ Dà loro un significato.
 
 
 
-<!-- CAPITOLO 05 -->
+<!-- 05 CONNESSIONI -->
 
 <section id="05"
-class="home-section home-section--directions"
-data-section-title="Le connessioni">
+class="home-section home-section--pause"
+data-section-title="Connessioni">
 
 
 <div class="section-inner">
 
 
 <h2 class="section-title reveal">
-05 · LE CONNESSIONI
+CAPITOLO 05 · LE CONNESSIONI
 </h2>
 
 
@@ -683,22 +764,26 @@ data-section-title="Le connessioni">
 <div class="editorial-copy editorial-copy--large reveal">
 
 
-<p class="editorial-emphasis">
+<h3 class="section-heading">
 
 QUANDO LE PARTI
-<br>
-SI INCONTRANO,
-<br>
-NASCE QUALCOSA
-<br>
-DI NUOVO.
 
-</p>
+<br>
+
+SI INCONTRANO,
+
+<br>
+
+NASCE QUALCOSA DI NUOVO.
+
+</h3>
+
 
 
 <p>
 Una competenza può risolvere un problema.
 </p>
+
 
 
 <p>
@@ -707,7 +792,50 @@ può aprire nuove possibilità.
 </p>
 
 
+
+<p>
+Le Scienze Motorie permettono
+di comprendere il movimento.
+</p>
+
+
+
+<p>
+Lo Sport insegna metodo,
+esperienza e relazione.
+</p>
+
+
+
+<p>
+L'Educazione costruisce crescita.
+</p>
+
+
+
+<p>
+Il Management organizza visione
+e progettazione.
+</p>
+
+
+
+<p>
+Il Digitale amplia il modo
+di comunicare.
+</p>
+
+
+
+<p class="editorial-emphasis">
+Il valore nasce quando
+queste dimensioni iniziano a dialogare.
+</p>
+
+
+
 </div>
+
 
 
 
@@ -716,19 +844,18 @@ può aprire nuove possibilità.
 
 <a href="#03"
 class="narrative-link"
-data-trajectory-node="scienze-motorie">
+data-trajectory-node="sport">
 
-SCIENZE<br>
-MOTORIE
+SPORT
 
 </a>
 
 
 <a href="#03"
 class="narrative-link"
-data-trajectory-node="sport">
+data-trajectory-node="scienze-motorie">
 
-SPORT
+SCIENZE MOTORIE
 
 </a>
 
@@ -763,50 +890,6 @@ DIGITALE
 </div>
 
 
-
-
-<div class="editorial-copy reveal">
-
-
-<p>
-Le Scienze Motorie permettono
-di comprendere il movimento.
-</p>
-
-
-<p>
-Lo Sport insegna metodo,
-esperienza e relazione.
-</p>
-
-
-<p>
-L'Educazione costruisce crescita.
-</p>
-
-
-<p>
-Il Management organizza visione
-e progettazione.
-</p>
-
-
-<p>
-Il Digitale amplia il modo
-di comunicare.
-</p>
-
-
-<p>
-Il valore nasce quando queste
-dimensioni iniziano a dialogare.
-</p>
-
-
-</div>
-
-
-
 </div>
 
 
@@ -818,18 +901,19 @@ dimensioni iniziano a dialogare.
 
 
 
-<!-- CAPITOLO 06 -->
+
+<!-- 06 OBIETTIVI -->
 
 <section id="06"
-class="home-section home-section--network"
-data-section-title="Gli obiettivi">
+class="home-section home-section--territory"
+data-section-title="Obiettivi">
 
 
 <div class="section-inner section-inner--narrow">
 
 
 <h2 class="section-title reveal">
-06 · GLI OBIETTIVI
+CAPITOLO 06 · GLI OBIETTIVI
 </h2>
 
 
@@ -838,15 +922,19 @@ data-section-title="Gli obiettivi">
 <div class="editorial-copy editorial-copy--large reveal">
 
 
-<p class="editorial-emphasis">
+<h3 class="section-heading">
 
 OGNI DIREZIONE
+
 <br>
+
 HA BISOGNO
+
 <br>
+
 DI UN OBIETTIVO.
 
-</p>
+</h3>
 
 
 
@@ -855,10 +943,12 @@ Ogni situazione è diversa.
 </p>
 
 
+
 <p>
 Ogni persona parte
 da un punto diverso.
 </p>
+
 
 
 <p>
@@ -867,9 +957,11 @@ un percorso bisogna comprendere.
 </p>
 
 
+
 <p>
 Capire il contesto.
 </p>
+
 
 
 <p>
@@ -877,12 +969,14 @@ Individuare il bisogno.
 </p>
 
 
+
 <p>
 Definire una direzione.
 </p>
 
 
-<p>
+
+<p class="editorial-emphasis">
 Solo dopo è possibile progettare.
 </p>
 
@@ -891,54 +985,46 @@ Solo dopo è possibile progettare.
 </div>
 
 
-
 </div>
 
 
 </section>
-
-
-
-
-
-
-
-<!-- CAPITOLO 07 -->
+<!-- 07 PUNTO DI PARTENZA -->
 
 <section id="07"
-class="home-section home-section--question-for-you"
+class="home-section home-section--present"
 data-section-title="Punto di partenza">
 
 
-<div class="section-inner section-inner--question-for-you">
+<div class="section-inner section-inner--split">
 
 
-<div class="reader-question reveal">
+<div>
 
 
-<h2>
-
-OGNI PERCORSO
-
-<span>
-COMINCIA
-</span>
-
-DA UN PUNTO.
-
+<h2 class="section-title reveal">
+CAPITOLO 07 · IL PUNTO DI PARTENZA
 </h2>
-
-
-</div>
 
 
 
 <div class="editorial-copy editorial-copy--large reveal">
 
 
+<h3 class="section-heading">
+
+OGNI PERCORSO
+
+<br>
+
+COMINCIA DA UN PUNTO.
+
+</h3>
+
+
+
 <p>
-A volte il punto di partenza
-è chiaro.
+A volte il punto di partenza è chiaro.
 </p>
 
 
@@ -957,14 +1043,17 @@ Un cambiamento che si vuole affrontare.
 </p>
 
 
+
 <p>
 Non serve avere tutto definito.
 </p>
 
 
-<p>
+
+<p class="editorial-emphasis">
 Serve individuare il primo passo.
 </p>
+
 
 
 <p>
@@ -972,20 +1061,21 @@ Da lì può iniziare una direzione.
 </p>
 
 
+
+</div>
+
+
 </div>
 
 
 
-<div class="editorial-copy editorial-copy--large reveal">
 
+<figure class="present-portrait reveal">
 
-<p class="editorial-emphasis">
-Da dove parti?
-</p>
+<img src="assets/cesare-paratore.jpg"
+     alt="Cesare Paratore">
 
-
-</div>
-
+</figure>
 
 
 </div>
@@ -999,43 +1089,48 @@ Da dove parti?
 
 
 
-<!-- CAPITOLO 08 -->
+
+<!-- 08 RELAZIONE -->
 
 <section id="08"
-class="home-section home-section--present"
-data-section-title="La relazione">
+class="home-section home-section--question"
+data-section-title="Relazione">
 
 
 <div class="section-inner section-inner--narrow">
 
 
 <h2 class="section-title reveal">
-08 · LA RELAZIONE
+CAPITOLO 08 · LA RELAZIONE
 </h2>
+
 
 
 
 <div class="editorial-copy editorial-copy--large reveal">
 
 
-<p class="editorial-emphasis">
+<h3 class="section-heading">
 
 IL VALORE NASCE
-<br>
-QUANDO LE COMPETENZE
-<br>
-INCONTRANO
-<br>
-LA REALTÀ.
 
-</p>
+<br>
+
+QUANDO LE COMPETENZE
+
+<br>
+
+INCONTRANO LA REALTÀ.
+
+</h3>
+
 
 
 
 <p>
-La conoscenza da sola
-non è sufficiente.
+La conoscenza da sola non è sufficiente.
 </p>
+
 
 
 <p>
@@ -1044,36 +1139,34 @@ un contesto.
 </p>
 
 
+
 <p>
 Quando incontra persone.
 </p>
 
 
+
 <p>
-Quando risponde
-a un obiettivo reale.
+Quando risponde a un obiettivo reale.
 </p>
 
 
+
 <p>
-Ogni progetto nasce
-da una relazione:
+Ogni progetto nasce da una relazione:
 </p>
 
 
 
 <div class="editorial-sequence">
 
-
 <p>
 tra esperienza e necessità,
 </p>
 
-
 <p>
 tra competenze e possibilità,
 </p>
-
 
 <p>
 tra ciò che sappiamo
@@ -1081,11 +1174,12 @@ e ciò che possiamo costruire.
 </p>
 
 
-
 </div>
 
 
+
 </div>
+
 
 
 </div>
@@ -1099,11 +1193,13 @@ e ciò che possiamo costruire.
 
 
 
-<!-- CAPITOLO 09 -->
+
+
+<!-- 09 SOSTANZA -->
 
 <section id="09"
-class="home-section home-section--territory"
-data-section-title="La sostanza">
+class="home-section home-section--directions"
+data-section-title="Sostanza">
 
 
 <div class="section-inner section-inner--territory">
@@ -1113,30 +1209,35 @@ data-section-title="La sostanza">
 
 
 <h2 class="section-title reveal">
-09 · LA SOSTANZA
+CAPITOLO 09 · LA SOSTANZA
 </h2>
+
 
 
 
 <div class="editorial-copy reveal">
 
 
-<p class="editorial-emphasis">
+<h3 class="section-heading">
 
 UNA DIREZIONE
+
 <br>
+
 HA BISOGNO
+
 <br>
+
 DI BASI SOLIDE.
 
-</p>
+</h3>
 
 
 
 <p>
-Ogni visione ha bisogno
-di fondamenta.
+Ogni visione ha bisogno di fondamenta.
 </p>
+
 
 
 <p>
@@ -1154,12 +1255,13 @@ Metodo.
 </p>
 
 
+
 <p>
-La mia preparazione nelle
-Scienze Motorie e nello Sport
-rappresenta la base da cui nasce
-un percorso costruito nel tempo.
+La mia preparazione nelle Scienze Motorie
+e nello Sport rappresenta la base
+da cui nasce un percorso costruito nel tempo.
 </p>
+
 
 
 <p>
@@ -1168,12 +1270,11 @@ quando viene applicata.
 </p>
 
 
-
 </div>
 
 
-</div>
 
+</div>
 
 
 
@@ -1225,8 +1326,7 @@ CLIL · coding · tecnologie educative
 
 <p>
 <strong>Digitale</strong><br>
-Progettazione della presenza ufficiale
-sul web
+Progettazione della presenza ufficiale sul web
 </p>
 
 
@@ -1238,36 +1338,49 @@ sul web
 
 
 </section>
-<!-- CAPITOLO 10 -->
+
+
+
+
+
+
+
+
+
+<!-- 10 INCONTRO -->
 
 <section id="10"
-class="home-section home-section--cta"
-data-section-title="L'incontro">
+class="home-section home-section--network"
+data-section-title="Incontro">
 
 
-<div class="section-inner section-inner--cta">
+<div class="section-inner section-inner--narrow">
 
 
 <h2 class="section-title reveal">
-10 · L'INCONTRO
+CAPITOLO 10 · L'INCONTRO
 </h2>
+
 
 
 
 <div class="editorial-copy editorial-copy--large reveal">
 
 
-<p class="editorial-emphasis">
+<h3 class="section-heading">
 
 UNA DIREZIONE
-<br>
-PRENDE SENSO
-<br>
-QUANDO INCONTRA
-<br>
-QUALCUNO.
 
-</p>
+<br>
+
+PRENDE SENSO
+
+<br>
+
+QUANDO INCONTRA QUALCUNO.
+
+</h3>
+
 
 
 
@@ -1276,9 +1389,11 @@ Forse parti da un'idea.
 </p>
 
 
+
 <p>
 Forse da un'esigenza.
 </p>
+
 
 
 <p>
@@ -1286,10 +1401,11 @@ Forse da una domanda.
 </p>
 
 
+
 <p>
-Non serve avere già
-tutto definito.
+Non serve avere già tutto definito.
 </p>
+
 
 
 <p>
@@ -1298,46 +1414,19 @@ da un punto.
 </p>
 
 
-<p>
+
+<p class="editorial-emphasis">
 Da lì, competenze,
 esperienza e progettazione
-possono incontrarsi
-per costruire una direzione
-coerente con ciò che vuoi raggiungere.
+possono incontrarsi.
 </p>
 
 
-</div>
 
-
-
-
-
-<div class="cta-trajectory reveal">
-
-
-<div class="cta-trajectory-line"></div>
-
-
-<span class="cta-trajectory-point"></span>
-
-
-
-<a href="mailto:info@cesareparatore.it"
-class="contact-cta magnetic">
-
-
-<span>
-HAI UN PUNTO DA CUI PARTIRE?
-</span>
-
-
-<span>
-→
-</span>
-
-
-</a>
+<p>
+Per costruire una direzione coerente
+con ciò che vuoi raggiungere.
+</p>
 
 
 
@@ -1355,49 +1444,49 @@ HAI UN PUNTO DA CUI PARTIRE?
 
 
 
-<!-- CAPITOLO 11 -->
+
+
+<!-- 11 FIRMA -->
 
 <section id="11"
-class="home-section home-section--question"
-data-section-title="La firma">
+class="home-section home-section--question-for-you"
+data-section-title="Firma">
 
 
-<div class="section-inner section-inner--narrow">
+<div class="section-inner section-inner--question-for-you">
 
 
-<h2 class="section-title reveal">
-11 · LA FIRMA
+
+<h2 class="reader-question reveal">
+
+<span>
+NON SERVE AVERE
+</span>
+
+<span>
+TUTTE LE STRADE.
+</span>
+
+<span>
+SERVE SAPERE
+</span>
+
+<span>
+QUALE DIREZIONE SEGUIRE.
+</span>
+
+
 </h2>
 
 
 
-
-<div class="editorial-copy editorial-copy--large reveal">
-
-
-<p class="editorial-emphasis">
-
-NON SERVE AVERE
-<br>
-TUTTE LE STRADE.
-
-<br><br>
-
-SERVE SAPERE
-<br>
-QUALE DIREZIONE
-<br>
-SEGUIRE.
-
-</p>
-
-
+<div class="editorial-copy reveal">
 
 
 <p>
-Ogni percorso è fatto
-di elementi diversi.
+Ogni percorso è fatto di elementi diversi.
 </p>
+
 
 
 <p>
@@ -1420,29 +1509,10 @@ Scelte.
 </p>
 
 
-<p>
-La direzione nasce quando
-questi elementi trovano
-un senso comune.
-</p>
 
-
-
-</div>
-
-
-
-
-<div class="editorial-sequence reveal">
-
-
-<p>
-MOVIMENTO
-</p>
-
-
-<p>
-CON DIREZIONE.
+<p class="editorial-emphasis">
+La direzione nasce quando questi elementi
+trovano un senso comune.
 </p>
 
 
@@ -1462,8 +1532,156 @@ CON DIREZIONE.
 
 
 
-<!-- STANDBY EXPERIENCE -->
 
+
+<!-- CTA -->
+
+<section class="home-section home-section--cta"
+data-section-title="Contatto">
+
+
+<div class="section-inner section-inner--cta">
+
+
+<h2 class="section-title reveal">
+MOVIMENTO CON DIREZIONE
+</h2>
+
+
+
+<div class="editorial-copy editorial-copy--large reveal">
+
+
+<p>
+Hai un punto da cui partire?
+</p>
+
+
+
+<p class="editorial-emphasis">
+Parliamone.
+</p>
+
+
+
+</div>
+
+
+
+
+
+<div class="cta-trajectory">
+
+
+<div class="cta-trajectory-line"></div>
+
+
+<span class="cta-trajectory-point"></span>
+
+
+
+
+<a href="mailto:info@cesareparatore.it"
+class="contact-cta magnetic">
+
+
+<span>
+PARLIAMONE
+</span>
+
+
+<span>
+→
+</span>
+
+
+</a>
+
+
+</div>
+
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+</main>
+
+
+
+
+
+
+
+
+<!-- FOOTER -->
+
+<footer class="site-footer">
+
+
+<div class="footer-inner">
+
+
+<a class="footer-mark"
+href="#01">
+
+<img src="assets/logo.svg"
+alt="Cesare Paratore">
+
+</a>
+
+
+
+<p class="footer-motto">
+
+MOVIMENTO
+<span>/</span>
+CON DIREZIONE
+
+</p>
+
+
+
+<p class="footer-signature">
+CESARE PARATORE · CP 2026
+</p>
+
+
+
+<nav class="footer-nav">
+
+<a href="#01">
+HOME
+</a>
+
+<a href="#09">
+PERCORSO
+</a>
+
+<a href="#10">
+CONTATTO
+</a>
+
+</nav>
+
+
+</div>
+
+
+</footer>
+
+
+
+
+
+
+<!-- STANDBY -->
 
 <div class="standby-screen"
 aria-hidden="true">
@@ -1486,111 +1704,32 @@ aria-hidden="true">
 
 
 <span class="standby-label">
-MOVIMENTO
+La direzione continua
 </span>
 
 
 <button class="standby-wake">
 
 <span class="standby-touch">
-RIPRENDI IL PERCORSO
+RIPRENDI
 </span>
-
 
 </button>
 
 
-</div>
 
-
-<p class="standby-signature">
-CESARE PARATORE · CP 2026
-</p>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
-
-<!-- FOOTER -->
-
-
-<footer class="site-footer">
-
-
-<div class="footer-inner">
-
-
-<a href="#01"
-class="footer-mark">
-
-
-<img src="assets/logo.svg"
-alt="Cesare Paratore">
-
-</a>
-
-
-
-
-<p class="footer-motto">
-
-MOVIMENTO
-
-<span>
-/
+<span class="standby-signature">
+CP 2026
 </span>
 
-CON DIREZIONE.
 
-</p>
-
-
-
-
-<p class="footer-signature">
-
-CESARE PARATORE · 2026
-
-</p>
-
-
-
-
-<nav class="footer-nav">
-
-
-<a href="#01">
-INIZIO
-</a>
-
-
-<a href="#07">
-PARTENZA
-</a>
-
-
-<a href="#10">
-CONTATTO
-</a>
-
-
-</nav>
-
+</div>
 
 
 </div>
 
 
-</footer>
+</div>
 
 
 
@@ -1598,8 +1737,7 @@ CONTATTO
 
 
 
-<script src="script.js"></script>
-
+<script src="js/main.js"></script>
 
 </body>
 </html>
