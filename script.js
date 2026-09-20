@@ -1,96 +1,38 @@
 (() => {
+
   "use strict";
 
-  /* ==========================================================
-     ROOT
-  =========================================================== */
 
-  const root = document.documentElement;
-  const body = document.body;
+  /* =========================================================
+     CORE REFERENCES
+  ========================================================== */
 
-  root.classList.remove("no-js");
+  const root =
+    document.documentElement;
 
+  const body =
+    document.body;
 
-  /* ==========================================================
-     CONFIG — SINGLE SOURCE OF TRUTH
-  =========================================================== */
+  const header =
+    document.getElementById("site-header");
 
-  const chapters = [
-    {
-      number: "01",
-      id: "01",
-      title: "IL MOVIMENTO È SOLO L'INIZIO."
-    },
-    {
-      number: "02",
-      id: "02",
-      title: "LA DOMANDA È CAMBIATA."
-    },
-    {
-      number: "03",
-      id: "03",
-      title: "UNA STRADA NON ERA ABBASTANZA."
-    },
-    {
-      number: "04",
-      id: "04",
-      title: "POI HO CAPITO CHE NON ERANO CINQUE STRADE."
-    },
-    {
-      number: "05",
-      id: "05",
-      title: "A QUEL PUNTO, MI SONO FERMATO."
-    },
-    {
-      number: "06",
-      id: "06",
-      title: "OGGI SO ANCHE DA DOVE PARTO."
-    },
-    {
-      number: "07",
-      id: "07",
-      title: "LA BASE È QUI. LA DIREZIONE, NO."
-    },
-    {
-      number: "08",
-      id: "08",
-      title: "ORA QUESTA DIREZIONE PRENDE FORMA."
-    },
-    {
-      number: "09",
-      id: "09",
-      title: "FORSE È QUI CHE LA STORIA CAMBIA."
-    },
-    {
-      number: "10",
-      id: "10",
-      title: "PARTIAMO DA QUELLO."
-    }
-  ];
+  const loader =
+    document.getElementById("loader");
 
+  const menu =
+    document.getElementById("site-menu");
 
-  /* ==========================================================
-     DOM
-  =========================================================== */
+  const menuTrigger =
+    document.querySelector(".menu-trigger");
 
-  /*
-   * The current HTML uses 01 → 10.
-   * We also accept chapter-01 → chapter-10 as a safe fallback.
-   */
+  const menuLinks =
+    [...document.querySelectorAll("[data-menu-link]")];
 
-  const resolveChapterElement = (chapter) => {
-    return (
-      document.getElementById(chapter.id) ||
-      document.getElementById(`chapter-${chapter.number}`)
-    );
-  };
+  const chapters =
+    [...document.querySelectorAll("[data-chapter]")];
 
-  const chapterElements = chapters.map(
-    resolveChapterElement
-  );
-
-  const progressCurrent =
-    document.getElementById("progress-current");
+  const cover =
+    document.querySelector("[data-cover]");
 
   const progressFill =
     document.getElementById("progress-fill");
@@ -98,561 +40,1170 @@
   const progressPoint =
     document.getElementById("progress-point");
 
-  const previousSection =
+  const progressCurrent =
+    document.getElementById("progress-current");
+
+  const previous =
     document.getElementById("previous-section");
 
-  const previousSectionLabel =
-    document.getElementById("previous-section-label");
-
-  const nextSection =
+  const next =
     document.getElementById("next-section");
 
-  const nextSectionLabel =
-    document.getElementById("next-section-label");
+  const previousLabel =
+    document.getElementById(
+      "previous-section-label"
+    );
 
-  const menuTrigger =
-    document.querySelector(".menu-trigger");
+  const nextLabel =
+    document.getElementById(
+      "next-section-label"
+    );
 
-  const menu =
-    document.getElementById("site-menu");
-
-  const menuLinks =
-    [...document.querySelectorAll(".site-menu__nav a")];
-
-  const idleScreen =
-    document.getElementById("idle-screen");
+  const idleOverlay =
+    document.getElementById(
+      "idle-overlay"
+    );
 
 
-  /* ==========================================================
-     STATE
-  =========================================================== */
+  /* =========================================================
+     MOTION / STATE
+  ========================================================== */
 
-  const state = {
-    chapter: 1,
-    chapterProgress: 0,
-    globalProgress: 0,
-    scrollDirection: 1,
-    reducedMotion: window.matchMedia(
+  const reducedMotion =
+    window.matchMedia(
       "(prefers-reduced-motion: reduce)"
-    ).matches,
+    );
+
+  const finePointer =
+    window.matchMedia(
+      "(pointer:fine)"
+    );
+
+
+  const chapterMeta =
+    chapters.map(
+      (element, index) => ({
+        element,
+        id: element.dataset.chapter,
+        title: element.dataset.title,
+        index
+      })
+    );
+
+
+  let state = {
+
+    activeIndex: -1,
+
+    journeyProgress: 0,
+
+    chapterProgress: 0,
+
     menuOpen: false,
-    idle: false,
-    loaderComplete: false
+
+    idle: false
+
   };
 
 
-  /* ==========================================================
-     INTERNAL ENGINE STATE
-  =========================================================== */
+  let animationFrame = 0;
 
-  let frameRequested = false;
-  let geometryDirty = true;
-  let lastScrollY = window.scrollY;
-  let maxScroll = 1;
+  let renderRequested = true;
 
-  let chapterMetrics = [];
+  let lastInteraction =
+    performance.now();
 
   let idleTimer = null;
-  let previousFocus = null;
 
   let loaderFinished = false;
 
-  const IDLE_DELAY = 45000;
+  let loaderFallback = null;
 
 
-  /* ==========================================================
-     UTILS
-  =========================================================== */
+  /* =========================================================
+     UTILITIES
+  ========================================================== */
 
-  const clamp = (value, min = 0, max = 1) =>
-    Math.min(max, Math.max(min, value));
-
-
-  const raf =
-    window.requestAnimationFrame ||
-    ((callback) => window.setTimeout(callback, 16));
-
-
-  /* ==========================================================
-     GEOMETRY
-  =========================================================== */
-
-  function calculateGeometry() {
-
-    const scrollY = window.scrollY;
-
-    maxScroll = Math.max(
-      1,
-      document.documentElement.scrollHeight -
-      window.innerHeight
-    );
-
-    chapterMetrics = chapterElements.map((element) => {
-
-      if (!element) {
-        return {
-          top: 0,
-          height: 1,
-          bottom: 1
-        };
-      }
-
-      const rect =
-        element.getBoundingClientRect();
-
-      const top =
-        rect.top + scrollY;
-
-      const height =
+  const clamp =
+    (value, min, max) =>
+      Math.min(
+        max,
         Math.max(
-          1,
-          element.offsetHeight
+          min,
+          value
+        )
+      );
+
+
+  function requestRender() {
+
+    renderRequested = true;
+
+    if (!animationFrame) {
+
+      animationFrame =
+        requestAnimationFrame(
+          render
         );
-
-      return {
-        top,
-        height,
-        bottom: top + height
-      };
-    });
-
-    geometryDirty = false;
+    }
   }
 
 
-  function ensureGeometry() {
+  function getSectionProgress(
+    section
+  ) {
 
-    if (geometryDirty) {
-      calculateGeometry();
-    }
-  }
+    const rect =
+      section.getBoundingClientRect();
 
+    const viewport =
+      window.innerHeight;
 
-  /* ==========================================================
-     ACTIVE CHAPTER
-  =========================================================== */
-
-  function resolveExperience(scrollY) {
-
-    ensureGeometry();
-
-    const documentProgress =
-      clamp(scrollY / maxScroll);
-
-    /*
-     * The active chapter is determined from the actual
-     * document geometry, not from an observer.
-     *
-     * This keeps scroll as the single source of truth.
-     */
-
-    let activeIndex = 0;
-
-    for (
-      let i = 0;
-      i < chapterMetrics.length;
-      i += 1
-    ) {
-
-      const metric =
-        chapterMetrics[i];
-
-      if (
-        scrollY >= metric.top &&
-        scrollY < metric.bottom
-      ) {
-        activeIndex = i;
-        break;
-      }
-
-      if (scrollY >= metric.bottom) {
-        activeIndex = i;
-      }
-    }
-
-    /*
-     * Defensive fallback:
-     * if a section could not be measured, preserve
-     * the previous chapter instead of jumping to 01.
-     */
-
-    if (
-      !chapterMetrics.length ||
-      !chapterMetrics[activeIndex]
-    ) {
-      activeIndex =
-        clamp(
-          state.chapter - 1,
-          0,
-          chapters.length - 1
-        );
-    }
-
-    const metric =
-      chapterMetrics[activeIndex];
-
-    const scrollableDistance =
+    const travel =
       Math.max(
         1,
-        metric.height - window.innerHeight
+        rect.height - viewport
       );
 
-    const localProgress =
-      clamp(
-        (scrollY - metric.top) /
-        scrollableDistance
-      );
-
-    return {
-      chapter: activeIndex + 1,
-      chapterProgress: localProgress,
-      globalProgress: documentProgress
-    };
+    return clamp(
+      -rect.top / travel,
+      0,
+      1
+    );
   }
 
 
-  /* ==========================================================
-     STATE UPDATE
-  =========================================================== */
+  /* =========================================================
+     STATE CALCULATION
+  ========================================================== */
 
-  function updateState() {
+  function calculateState() {
 
-    const scrollY =
+    const scrollTop =
       window.scrollY;
 
-    if (scrollY > lastScrollY) {
-      state.scrollDirection = 1;
-    } else if (scrollY < lastScrollY) {
-      state.scrollDirection = -1;
+
+    let activeIndex = -1;
+
+    let nearestDistance =
+      Infinity;
+
+
+    chapterMeta.forEach(
+      (chapter) => {
+
+        const rect =
+          chapter.element.getBoundingClientRect();
+
+
+        const chapterCenter =
+          rect.top +
+          Math.min(
+            rect.height,
+            window.innerHeight
+          ) / 2;
+
+
+        const distance =
+          Math.abs(
+            chapterCenter -
+            window.innerHeight / 2
+          );
+
+
+        const visible =
+          rect.bottom >
+          header.offsetHeight * .75
+          &&
+          rect.top <
+          window.innerHeight * .75;
+
+
+        if (
+          visible &&
+          distance <
+          nearestDistance
+        ) {
+
+          nearestDistance =
+            distance;
+
+          activeIndex =
+            chapter.index;
+        }
+
+      }
+    );
+
+
+    /*
+      La cover resta una fase identitaria.
+      Il capitolo 01 diventa attivo solo
+      quando l'utente entra davvero nel racconto.
+    */
+
+    if (
+      scrollTop <
+      cover.offsetHeight * .72
+    ) {
+
+      activeIndex = -1;
     }
 
-    lastScrollY = scrollY;
 
-    const nextState =
-      resolveExperience(scrollY);
+    const firstChapter =
+      chapters[0];
 
-    const chapterChanged =
-      state.chapter !== nextState.chapter;
+    const lastChapter =
+      chapters[
+        chapters.length - 1
+      ];
 
-    state.chapter =
-      nextState.chapter;
 
-    state.chapterProgress =
-      nextState.chapterProgress;
+    const journeyStart =
+      firstChapter.offsetTop;
 
-    state.globalProgress =
-      nextState.globalProgress;
 
-    renderState(chapterChanged);
+    const journeyEnd =
+      lastChapter.offsetTop +
+      lastChapter.offsetHeight -
+      window.innerHeight;
+
+
+    const journeyProgress =
+      clamp(
+        (
+          scrollTop -
+          journeyStart
+        ) /
+        Math.max(
+          1,
+          journeyEnd -
+          journeyStart
+        ),
+        0,
+        1
+      );
+
+
+    const chapterProgress =
+      activeIndex >= 0
+        ? getSectionProgress(
+            chapters[activeIndex]
+          )
+        : 0;
+
+
+    state = {
+
+      ...state,
+
+      activeIndex,
+
+      journeyProgress,
+
+      chapterProgress
+
+    };
+
   }
 
 
-  /* ==========================================================
-     RENDER
-  =========================================================== */
+  /* =========================================================
+     PROGRESS BAR
+  ========================================================== */
 
-  function renderState(
-    chapterChanged = false
-  ) {
+  function updateProgressBar() {
+
+    if (!progressFill ||
+        !progressPoint) {
+
+      return;
+    }
+
+
+    const progress =
+      state.journeyProgress;
+
+
+    progressFill.style.width =
+      `${progress * 100}%`;
+
+
+    const trackWidth =
+      progressPoint
+        .parentElement
+        .getBoundingClientRect()
+        .width;
+
+
+    progressPoint.style.left =
+      `${progress * trackWidth}px`;
+
+  }
+
+
+  /* =========================================================
+     NAVIGATION STATE
+  ========================================================== */
+
+  function updateNavigation() {
+
+    const active =
+      state.activeIndex >= 0
+        ? chapterMeta[
+            state.activeIndex
+          ]
+        : null;
+
+
+    const previousChapter =
+      state.activeIndex > 0
+        ? chapterMeta[
+            state.activeIndex - 1
+          ]
+        : null;
+
+
+    const nextChapter =
+      state.activeIndex >= 0 &&
+      state.activeIndex <
+      chapterMeta.length - 1
+
+        ? chapterMeta[
+            state.activeIndex + 1
+          ]
+
+        : state.activeIndex < 0
+          ? chapterMeta[0]
+          : null;
+
+
+    /*
+      TITLE
+    */
+
+    if (progressCurrent) {
+
+      progressCurrent.textContent =
+        active
+          ? active.title
+          : "MOVIMENTO / CON DIREZIONE";
+
+    }
+
+
+    /*
+      PREVIOUS
+    */
+
+    if (previousChapter) {
+
+      previous.href =
+        `#${previousChapter.id}`;
+
+      previousLabel.textContent =
+        previousChapter.id;
+
+      previous.setAttribute(
+        "aria-label",
+        `Vai alla sezione ${previousChapter.id}`
+      );
+
+      previous.removeAttribute(
+        "aria-hidden"
+      );
+
+      previous.removeAttribute(
+        "tabindex"
+      );
+
+      previous.classList.remove(
+        "is-disabled"
+      );
+
+    } else {
+
+      previous.href = "#01";
+
+      previousLabel.textContent = "";
+
+      previous.setAttribute(
+        "aria-label",
+        "Sezione precedente"
+      );
+
+      previous.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+
+      previous.setAttribute(
+        "tabindex",
+        "-1"
+      );
+
+      previous.classList.add(
+        "is-disabled"
+      );
+
+    }
+
+
+    /*
+      NEXT
+    */
+
+    if (nextChapter) {
+
+      next.href =
+        `#${nextChapter.id}`;
+
+      nextLabel.textContent =
+        nextChapter.id;
+
+      next.setAttribute(
+        "aria-label",
+        `Vai alla sezione ${nextChapter.id}`
+      );
+
+      next.classList.remove(
+        "is-disabled"
+      );
+
+    } else {
+
+      next.href = "#10";
+
+      nextLabel.textContent = "10";
+
+      next.setAttribute(
+        "aria-label",
+        "Sezione finale"
+      );
+
+      next.classList.add(
+        "is-disabled"
+      );
+
+    }
+
+  }
+
+
+  /* =========================================================
+     CHAPTER PROGRESS
+  ========================================================== */
+
+  function updateChapterVariables() {
+
+    chapterMeta.forEach(
+      (chapter) => {
+
+        const progress =
+          getSectionProgress(
+            chapter.element
+          );
+
+
+        chapter.element.style
+          .setProperty(
+            "--section-progress",
+            progress.toFixed(4)
+          );
+
+      }
+    );
+
 
     root.style.setProperty(
       "--chapter-progress",
-      state.chapterProgress
+      state.chapterProgress.toFixed(4)
     );
+
 
     root.style.setProperty(
-      "--global-progress",
-      state.globalProgress
+      "--journey-progress",
+      state.journeyProgress.toFixed(4)
     );
 
-    root.style.setProperty(
-      "--header-progress",
-      state.globalProgress
-    );
-
-    const current =
-      chapters[state.chapter - 1];
-
-    const previous =
-      chapters[state.chapter - 2];
-
-    const next =
-      chapters[state.chapter];
-
-    /*
-     * CURRENT CHAPTER TITLE
-     */
-
-    if (
-      current &&
-      progressCurrent
-    ) {
-      progressCurrent.textContent =
-        current.title;
-    }
-
-    /*
-     * CONTINUOUS WOW BAR
-     */
-
-    const percentage =
-      state.globalProgress * 100;
-
-    if (progressFill) {
-      progressFill.style.width =
-        `${percentage}%`;
-    }
-
-    if (progressPoint) {
-      progressPoint.style.left =
-        `${percentage}%`;
-    }
-
-    /*
-     * CHAPTER NAVIGATION
-     */
-
-    updatePrevious(previous);
-    updateNext(next);
-
-    /*
-     * CHAPTER MOTION
-     */
-
-    if (chapterChanged) {
-      applyChapterTransition();
-    }
   }
 
 
-  /* ==========================================================
-     PREVIOUS CHAPTER
-  =========================================================== */
+  /* =========================================================
+     CENTRAL RENDER
+  ========================================================== */
 
-  function updatePrevious(previous) {
+  function render() {
 
-    if (
-      !previous ||
-      !previousSection
-    ) {
+    animationFrame = 0;
 
-      if (previousSection) {
-        previousSection.classList.add(
-          "is-disabled"
-        );
 
-        previousSection.setAttribute(
-          "aria-hidden",
-          "true"
-        );
-
-        previousSection.setAttribute(
-          "tabindex",
-          "-1"
-        );
-      }
-
-      if (previousSectionLabel) {
-        previousSectionLabel.textContent = "";
-      }
-
+    if (!renderRequested) {
       return;
     }
 
-    previousSection.classList.remove(
-      "is-disabled"
-    );
 
-    previousSection.removeAttribute(
-      "aria-hidden"
-    );
+    renderRequested = false;
 
-    previousSection.removeAttribute(
-      "tabindex"
-    );
 
-    previousSection.href =
-      `#${previous.id}`;
+    calculateState();
 
-    /*
-     * IMPORTANT:
-     * the visible label is the PAGE / CHAPTER NUMBER,
-     * not the title.
-     */
+    updateProgressBar();
 
-    previousSectionLabel.textContent =
-      previous.number;
+    updateNavigation();
 
-    previousSection.setAttribute(
-      "aria-label",
-      `Vai alla sezione ${previous.number}: ${previous.title}`
-    );
+    updateChapterVariables();
+
   }
 
 
-  /* ==========================================================
-     NEXT CHAPTER
-  =========================================================== */
+  /* =========================================================
+     SCROLL TO HASH
+  ========================================================== */
 
-  function updateNext(next) {
+  function scrollToHash(
+    hash
+  ) {
 
-    if (
-      !next ||
-      !nextSection
-    ) {
-
-      if (nextSection) {
-        nextSection.classList.add(
-          "is-disabled"
-        );
-
-        nextSection.setAttribute(
-          "aria-hidden",
-          "true"
-        );
-
-        nextSection.setAttribute(
-          "tabindex",
-          "-1"
-        );
-      }
-
-      if (nextSectionLabel) {
-        nextSectionLabel.textContent = "";
-      }
+    if (!hash ||
+        hash === "#") {
 
       return;
     }
 
-    nextSection.classList.remove(
-      "is-disabled"
-    );
 
-    nextSection.removeAttribute(
-      "aria-hidden"
-    );
-
-    nextSection.removeAttribute(
-      "tabindex"
-    );
-
-    nextSection.href =
-      `#${next.id}`;
-
-    /*
-     * Visible label = chapter number.
-     */
-
-    nextSectionLabel.textContent =
-      next.number;
-
-    nextSection.setAttribute(
-      "aria-label",
-      `Vai alla sezione ${next.number}: ${next.title}`
-    );
-  }
-
-
-  /* ==========================================================
-     CHAPTER TRANSITION
-  =========================================================== */
-
-  function applyChapterTransition() {
-
-    if (state.reducedMotion) {
-      return;
-    }
-
-    chapterElements.forEach((chapter) => {
-
-      if (!chapter) {
-        return;
-      }
-
-      chapter.classList.remove(
-        "is-transitioning"
-      );
-    });
-
-    const current =
-      chapterElements[
-        state.chapter - 1
-      ];
-
-    if (!current) {
-      return;
-    }
-
-    current.classList.add(
-      "is-transitioning"
-    );
-
-    window.setTimeout(() => {
-
-      current.classList.remove(
-        "is-transitioning"
+    const target =
+      document.querySelector(
+        hash
       );
 
-    }, 500);
-  }
 
-
-  /* ==========================================================
-     SINGLE FRAME ENGINE
-  =========================================================== */
-
-  function requestFrame() {
-
-    if (frameRequested) {
+    if (!target) {
       return;
     }
 
-    frameRequested = true;
 
-    raf(() => {
+    const targetTop =
+      target.getBoundingClientRect()
+        .top +
+      window.scrollY;
 
-      frameRequested = false;
 
-      updateState();
+    window.scrollTo({
+
+      top: targetTop,
+
+      behavior:
+        reducedMotion.matches
+          ? "auto"
+          : "smooth"
+
     });
+
   }
 
 
-  /* ==========================================================
-     SCROLL
-  =========================================================== */
+  /* =========================================================
+     HASH NAVIGATION
+  ========================================================== */
 
-  function onScroll() {
+  document
+    .querySelectorAll(
+      'a[href^="#"]'
+    )
+    .forEach(
+      (link) => {
 
-    requestFrame();
-    resetIdleTimer();
+        if (
+          link.closest(
+            ".site-menu"
+          )
+        ) {
+
+          return;
+        }
+
+
+        link.addEventListener(
+          "click",
+          (event) => {
+
+            const hash =
+              link.getAttribute(
+                "href"
+              );
+
+
+            if (!hash ||
+                hash === "#") {
+
+              return;
+            }
+
+
+            const target =
+              document.querySelector(
+                hash
+              );
+
+
+            if (!target) {
+              return;
+            }
+
+
+            event.preventDefault();
+
+
+            scrollToHash(hash);
+
+
+            history.replaceState(
+              null,
+              "",
+              hash
+            );
+
+          }
+        );
+
+      }
+    );
+
+
+  /* =========================================================
+     MENU
+  ========================================================== */
+
+  function openMenu() {
+
+    state.menuOpen = true;
+
+    body.classList.add(
+      "is-menu-open"
+    );
+
+
+    menu.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
+
+    menuTrigger.setAttribute(
+      "aria-expanded",
+      "true"
+    );
+
+
+    menuTrigger.setAttribute(
+      "aria-label",
+      "Chiudi menu"
+    );
+
+
+    document.documentElement.style
+      .setProperty(
+        "scrollbar-gutter",
+        "stable"
+      );
+
+
+    resetIdle();
+
+
+    if (menuLinks[0]) {
+
+      window.setTimeout(
+        () => {
+
+          menuLinks[0].focus({
+            preventScroll: true
+          });
+
+        },
+        120
+      );
+
+    }
+
+  }
+
+
+  function closeMenu({
+    restoreFocus = true
+  } = {}) {
+
+    state.menuOpen = false;
+
+    body.classList.remove(
+      "is-menu-open"
+    );
+
+
+    menu.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+
+    menuTrigger.setAttribute(
+      "aria-expanded",
+      "false"
+    );
+
+
+    menuTrigger.setAttribute(
+      "aria-label",
+      "Apri menu"
+    );
+
+
+    if (
+      restoreFocus
+    ) {
+
+      menuTrigger.focus({
+        preventScroll: true
+      });
+
+    }
+
+
+    resetIdle();
+
+  }
+
+
+  function toggleMenu() {
+
+    if (state.menuOpen) {
+
+      closeMenu();
+
+    } else {
+
+      openMenu();
+
+    }
+
+  }
+
+
+  menuTrigger.addEventListener(
+    "click",
+    toggleMenu
+  );
+
+
+  menuLinks.forEach(
+    (link) => {
+
+      link.addEventListener(
+        "click",
+        (event) => {
+
+          event.preventDefault();
+
+
+          const hash =
+            link.getAttribute(
+              "href"
+            );
+
+
+          closeMenu({
+            restoreFocus: false
+          });
+
+
+          window.setTimeout(
+            () => {
+
+              scrollToHash(
+                hash
+              );
+
+            },
+            40
+          );
+
+
+          history.replaceState(
+            null,
+            "",
+            hash
+          );
+
+        }
+      );
+
+    }
+  );
+
+
+  document.addEventListener(
+    "keydown",
+    (event) => {
+
+      if (
+        event.key === "Escape" &&
+        state.menuOpen
+      ) {
+
+        closeMenu();
+
+      }
+
+    }
+  );
+
+
+  /* =========================================================
+     MAGNETIC MICRO-INTERACTION
+  ========================================================== */
+
+  function setupMagnetic() {
+
+    if (
+      reducedMotion.matches ||
+      !finePointer.matches
+    ) {
+
+      return;
+    }
+
+
+    document
+      .querySelectorAll(
+        ".magnetic"
+      )
+      .forEach(
+        (element) => {
+
+          element.addEventListener(
+            "pointermove",
+            (event) => {
+
+              const rect =
+                element.getBoundingClientRect();
+
+
+              const relativeX =
+                (
+                  event.clientX -
+                  rect.left
+                ) /
+                rect.width -
+                .5;
+
+
+              const relativeY =
+                (
+                  event.clientY -
+                  rect.top
+                ) /
+                rect.height -
+                .5;
+
+
+              const x =
+                relativeX * 5;
+
+              const y =
+                relativeY * 5;
+
+
+              element.style
+                .setProperty(
+                  "--magnetic-x",
+                  `${x}px`
+                );
+
+
+              element.style
+                .setProperty(
+                  "--magnetic-y",
+                  `${y}px`
+                );
+
+            }
+          );
+
+
+          element.addEventListener(
+            "pointerleave",
+            () => {
+
+              element.style
+                .setProperty(
+                  "--magnetic-x",
+                  "0px"
+                );
+
+              element.style
+                .setProperty(
+                  "--magnetic-y",
+                  "0px"
+                );
+
+            }
+          );
+
+        }
+      );
+
+  }
+
+
+  /* =========================================================
+     IDLE
+  ========================================================== */
+
+  function resetIdle() {
+
+    lastInteraction =
+      performance.now();
+
+
+    if (state.idle) {
+
+      state.idle = false;
+
+      body.classList.remove(
+        "is-idle"
+      );
+
+      idleOverlay.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+
+    }
+
+  }
+
+
+  function setupIdle() {
+
+    const events = [
+
+      "pointerdown",
+      "pointermove",
+      "wheel",
+      "touchstart",
+      "keydown",
+      "scroll"
+
+    ];
+
+
+    events.forEach(
+      (eventName) => {
+
+        window.addEventListener(
+          eventName,
+          resetIdle,
+          {
+            passive: true
+          }
+        );
+
+      }
+    );
+
+
+    function checkIdle() {
+
+      const elapsed =
+        performance.now() -
+        lastInteraction;
+
+
+      if (
+        !state.menuOpen &&
+        !reducedMotion.matches &&
+        elapsed > 42000
+      ) {
+
+        state.idle = true;
+
+        body.classList.add(
+          "is-idle"
+        );
+
+        idleOverlay.setAttribute(
+          "aria-hidden",
+          "false"
+        );
+
+      }
+
+
+      idleTimer =
+        window.setTimeout(
+          checkIdle,
+          1000
+        );
+
+    }
+
+
+    idleTimer =
+      window.setTimeout(
+        checkIdle,
+        1000
+      );
+
+  }
+
+
+  /* =========================================================
+     INTERSECTION OBSERVER
+  ========================================================== */
+
+  function setupObserver() {
+
+    if (
+      !("IntersectionObserver" in window)
+    ) {
+
+      requestRender();
+
+      return;
+    }
+
+
+    const observer =
+      new IntersectionObserver(
+        () => {
+
+          requestRender();
+
+        },
+        {
+          rootMargin:
+            "-20% 0px -20% 0px",
+
+          threshold: [
+            0,
+            .2,
+            .5,
+            .8,
+            1
+          ]
+
+        }
+      );
+
+
+    chapters.forEach(
+      (chapter) => {
+
+        observer.observe(
+          chapter
+        );
+
+      }
+    );
+
+  }
+
+
+  /* =========================================================
+     LOADER
+  ========================================================== */
+
+  function finishLoader() {
+
+    if (loaderFinished) {
+      return;
+    }
+
+
+    loaderFinished = true;
+
+
+    window.clearTimeout(
+      loaderFallback
+    );
+
+
+    if (
+      reducedMotion.matches
+    ) {
+
+      loader.remove();
+
+      requestRender();
+
+      return;
+    }
+
+
+    window.setTimeout(
+      () => {
+
+        loader.classList.add(
+          "is-leaving"
+        );
+
+
+        window.setTimeout(
+          () => {
+
+            loader.remove();
+
+          },
+          760
+        );
+
+      },
+      650
+    );
+
   }
 
 
   window.addEventListener(
+    "load",
+    finishLoader,
+    {
+      once: true
+    }
+  );
+
+
+  /*
+    Fallback fondamentale:
+    la pagina NON può rimanere nera
+    se un asset o un font ritarda window.load.
+  */
+
+  loaderFallback =
+    window.setTimeout(
+      finishLoader,
+      4200
+    );
+
+
+  /* =========================================================
+     GLOBAL INPUT
+  ========================================================== */
+
+  window.addEventListener(
     "scroll",
-    onScroll,
+    requestRender,
     {
       passive: true
     }
   );
 
 
-  /* ==========================================================
-     RESIZE
-  =========================================================== */
-
-  function onResize() {
-
-    geometryDirty = true;
-
-    requestFrame();
-  }
-
-
   window.addEventListener(
     "resize",
-    onResize,
+    requestRender,
     {
       passive: true
     }
@@ -661,287 +1212,23 @@
 
   window.addEventListener(
     "orientationchange",
-    () => {
-
-      geometryDirty = true;
-
-      requestFrame();
-
-    },
+    requestRender,
     {
       passive: true
     }
   );
 
 
-  /* ==========================================================
-     INTERSECTION OBSERVER
-     Semantic activation only.
-  =========================================================== */
-
-  const observer =
-    new IntersectionObserver(
-      (entries) => {
-
-        entries.forEach((entry) => {
-
-          if (!entry.isIntersecting) {
-            return;
-          }
-
-          /*
-           * Scroll remains the source of truth.
-           * The observer intentionally does not mutate
-           * chapter state or progress.
-           */
-
-        });
-      },
-      {
-        root: null,
-        threshold: 0.05
-      }
-    );
-
-
-  chapterElements.forEach((chapter) => {
-
-    if (chapter) {
-      observer.observe(chapter);
-    }
-
-  });
-
-
-  /* ==========================================================
-     DIRECT NAVIGATION
-  =========================================================== */
-
-  function scrollToChapter(id) {
-
-    const target =
-      document.getElementById(id) ||
-      document.getElementById(
-        `chapter-${id}`
-      );
-
-    if (!target) {
-      return;
-    }
-
-    const top =
-      target.getBoundingClientRect().top +
-      window.scrollY;
-
-    const headerOffset =
-      window.innerWidth <= 680
-        ? 112
-        : window.innerWidth <= 900
-          ? 106
-          : 118;
-
-    window.scrollTo({
-      top: Math.max(
-        0,
-        top - headerOffset
-      ),
-      behavior:
-        state.reducedMotion
-          ? "auto"
-          : "smooth"
-    });
-  }
-
-
-  document.addEventListener(
-    "click",
-    (event) => {
-
-      const link =
-        event.target.closest(
-          'a[href^="#"]'
-        );
-
-      if (!link) {
-        return;
-      }
-
-      const href =
-        link.getAttribute("href");
-
-      if (!href) {
-        return;
-      }
-
-      /*
-       * Only intercept chapter navigation.
-       * Do not interfere with other anchors.
-       */
-
-      const chapterMatch =
-        href.match(
-          /^#(?:chapter-)?(0[1-9]|10)$/
-        );
-
-      if (!chapterMatch) {
-        return;
-      }
-
-      const number =
-        chapterMatch[1];
-
-      const target =
-        document.getElementById(number) ||
-        document.getElementById(
-          `chapter-${number}`
-        );
-
-      if (!target) {
-        return;
-      }
-
-      event.preventDefault();
-
-      if (state.menuOpen) {
-        closeMenu({
-          restoreFocus: false
-        });
-      }
-
-      scrollToChapter(number);
-
-      history.pushState(
-        null,
-        "",
-        `#${number}`
-      );
-
-      resetIdleTimer();
-    }
-  );
-
-
-  /* ==========================================================
-     MENU
-  =========================================================== */
-
-  function openMenu() {
-
-    if (
-      state.menuOpen ||
-      !menu ||
-      !menuTrigger
-    ) {
-      return;
-    }
-
-    previousFocus =
-      document.activeElement;
-
-    state.menuOpen = true;
-
-    body.classList.add(
-      "is-menu-open"
-    );
-
-    menu.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-    menu.removeAttribute(
-      "inert"
-    );
-
-    menuTrigger.setAttribute(
-      "aria-expanded",
-      "true"
-    );
-
-    menuTrigger.setAttribute(
-      "aria-label",
-      "Chiudi menu"
-    );
-
-    resetIdleTimer();
-
-    window.requestAnimationFrame(() => {
-
-      const firstLink =
-        menuLinks[0];
-
-      if (firstLink) {
-        firstLink.focus();
-      }
-
-    });
-  }
-
-
-  function closeMenu({
-    restoreFocus = true
-  } = {}) {
-
-    if (
-      !state.menuOpen ||
-      !menu ||
-      !menuTrigger
-    ) {
-      return;
-    }
-
-    state.menuOpen = false;
-
-    body.classList.remove(
-      "is-menu-open"
-    );
-
-    menu.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-
-    menu.setAttribute(
-      "inert",
-      ""
-    );
-
-    menuTrigger.setAttribute(
-      "aria-expanded",
-      "false"
-    );
-
-    menuTrigger.setAttribute(
-      "aria-label",
-      "Apri menu"
-    );
-
-    if (
-      restoreFocus &&
-      previousFocus &&
-      typeof previousFocus.focus ===
-        "function"
-    ) {
-      previousFocus.focus();
-    }
-
-    previousFocus = null;
-
-    resetIdleTimer();
-  }
-
-
-  if (menuTrigger) {
-
-    menuTrigger.addEventListener(
-      "click",
+  if (
+    typeof reducedMotion.addEventListener ===
+    "function"
+  ) {
+
+    reducedMotion.addEventListener(
+      "change",
       () => {
 
-        if (state.menuOpen) {
-          closeMenu();
-        } else {
-          openMenu();
-        }
+        requestRender();
 
       }
     );
@@ -949,476 +1236,52 @@
   }
 
 
-  document.addEventListener(
-    "keydown",
-    (event) => {
-
-      if (event.key !== "Escape") {
-        return;
-      }
-
-      if (state.menuOpen) {
-        closeMenu();
-      }
-
-      if (state.idle) {
-        exitIdle();
-      }
-
-    }
-  );
-
-
-  /* ==========================================================
-     MENU FOCUS CONTAINMENT
-  =========================================================== */
-
-  if (menu) {
-
-    menu.addEventListener(
-      "keydown",
-      (event) => {
-
-        if (
-          event.key !== "Tab" ||
-          !state.menuOpen
-        ) {
-          return;
-        }
-
-        const focusable =
-          menu.querySelectorAll(
-            'a[href], button:not([disabled])'
-          );
-
-        if (!focusable.length) {
-          return;
-        }
-
-        const first =
-          focusable[0];
-
-        const last =
-          focusable[
-            focusable.length - 1
-          ];
-
-        if (
-          event.shiftKey &&
-          document.activeElement === first
-        ) {
-
-          event.preventDefault();
-
-          last.focus();
-
-        } else if (
-          !event.shiftKey &&
-          document.activeElement === last
-        ) {
-
-          event.preventDefault();
-
-          first.focus();
-        }
-
-      }
-    );
-
-  }
-
-
-  /* ==========================================================
-     MAGNETIC — PROGRESSIVE ENHANCEMENT
-  =========================================================== */
-
-  const magneticElements =
-    [
-      ...document.querySelectorAll(
-        ".magnetic"
-      )
-    ];
-
-  const finePointer =
-    window.matchMedia(
-      "(hover: hover) and (pointer: fine)"
-    );
-
-
-  function enableMagnetic() {
-
-    if (
-      !finePointer.matches ||
-      state.reducedMotion
-    ) {
-      return;
-    }
-
-    magneticElements.forEach(
-      (element) => {
-
-        element.addEventListener(
-          "pointermove",
-          (event) => {
-
-            const rect =
-              element.getBoundingClientRect();
-
-            const x =
-              (
-                event.clientX -
-                rect.left -
-                rect.width / 2
-              ) / rect.width;
-
-            const y =
-              (
-                event.clientY -
-                rect.top -
-                rect.height / 2
-              ) / rect.height;
-
-            const strength = 5;
-
-            element.style.setProperty(
-              "--magnetic-x",
-              `${x * strength}px`
-            );
-
-            element.style.setProperty(
-              "--magnetic-y",
-              `${y * strength}px`
-            );
-          }
-        );
-
-        element.addEventListener(
-          "pointerleave",
-          () => {
-
-            element.style.setProperty(
-              "--magnetic-x",
-              "0px"
-            );
-
-            element.style.setProperty(
-              "--magnetic-y",
-              "0px"
-            );
-
-          }
-        );
-
-      }
-    );
-  }
-
-
-  enableMagnetic();
-
-
-  /* ==========================================================
-     IDLE
-  =========================================================== */
-
-  function resetIdleTimer() {
-
-    if (
-      !loaderFinished ||
-      state.menuOpen
-    ) {
-      return;
-    }
-
-    if (state.idle) {
-      exitIdle();
-    }
-
-    if (idleTimer) {
-      window.clearTimeout(
-        idleTimer
-      );
-    }
-
-    idleTimer =
-      window.setTimeout(
-        enterIdle,
-        IDLE_DELAY
-      );
-  }
-
-
-  function enterIdle() {
-
-    if (
-      !loaderFinished ||
-      state.menuOpen ||
-      state.idle ||
-      !idleScreen
-    ) {
-      return;
-    }
-
-    state.idle = true;
-
-    body.classList.add(
-      "is-idle"
-    );
-
-    idleScreen.classList.add(
-      "is-active"
-    );
-
-    idleScreen.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-  }
-
-
-  function exitIdle() {
-
-    if (!state.idle) {
-      return;
-    }
-
-    state.idle = false;
-
-    body.classList.remove(
-      "is-idle"
-    );
-
-    if (idleScreen) {
-
-      idleScreen.classList.remove(
-        "is-active"
-      );
-
-      idleScreen.setAttribute(
-        "aria-hidden",
-        "true"
-      );
-
-    }
-
-    resetIdleTimer();
-  }
-
-
-  const interactionEvents = [
-    "pointermove",
-    "pointerdown",
-    "touchstart",
-    "wheel",
-    "keydown"
-  ];
-
-
-  interactionEvents.forEach(
-    (eventName) => {
-
-      window.addEventListener(
-        eventName,
-        resetIdleTimer,
-        {
-          passive:
-            eventName !== "keydown"
-        }
-      );
-
-    }
-  );
-
-
-  if (idleScreen) {
-
-    idleScreen.addEventListener(
-      "pointerdown",
-      exitIdle
-    );
-
-  }
-
-
-  /* ==========================================================
-     LOADER
-  =========================================================== */
-
-  function completeLoader() {
-
-    if (loaderFinished) {
-      return;
-    }
-
-    loaderFinished = true;
-
-    state.loaderComplete = true;
-
-    /*
-     * This is the original loader state.
-     * We preserve it instead of replacing or hiding
-     * the loader through JS.
-     */
-
-    root.classList.add(
-      "is-loader-complete"
-    );
-
-    window.setTimeout(
+  /* =========================================================
+     INITIAL HASH
+  ========================================================== */
+
+  if (
+    location.hash &&
+    document.querySelector(
+      location.hash
+    )
+  ) {
+
+    window.addEventListener(
+      "load",
       () => {
-
-        root.classList.remove(
-          "is-loader-complete"
-        );
-
-      },
-      900
-    );
-
-    geometryDirty = true;
-
-    requestFrame();
-
-    resetIdleTimer();
-  }
-
-
-  window.addEventListener(
-    "load",
-    () => {
-
-      if (state.reducedMotion) {
 
         window.setTimeout(
-          completeLoader,
+          () => {
+
+            scrollToHash(
+              location.hash
+            );
+
+          },
           80
         );
 
-        return;
+      },
+      {
+        once: true
       }
-
-      window.setTimeout(
-        completeLoader,
-        5200
-      );
-
-    },
-    {
-      once: true
-    }
-  );
-
-
-  /*
-   * Hard fallback:
-   * the experience must never remain blocked.
-   */
-
-  window.setTimeout(
-    completeLoader,
-    state.reducedMotion
-      ? 900
-      : 7000
-  );
-
-
-  /* ==========================================================
-     REDUCED MOTION CHANGE
-  =========================================================== */
-
-  const motionQuery =
-    window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    );
-
-
-  function onMotionPreferenceChange(
-    event
-  ) {
-
-    state.reducedMotion =
-      event.matches;
-
-    if (state.reducedMotion) {
-
-      magneticElements.forEach(
-        (element) => {
-
-          element.style.setProperty(
-            "--magnetic-x",
-            "0px"
-          );
-
-          element.style.setProperty(
-            "--magnetic-y",
-            "0px"
-          );
-
-        }
-      );
-    }
-
-    requestFrame();
-  }
-
-
-  if (
-    typeof motionQuery.addEventListener ===
-    "function"
-  ) {
-
-    motionQuery.addEventListener(
-      "change",
-      onMotionPreferenceChange
-    );
-
-  } else if (
-    typeof motionQuery.addListener ===
-    "function"
-  ) {
-
-    motionQuery.addListener(
-      onMotionPreferenceChange
     );
 
   }
 
 
-  /* ==========================================================
-     VISIBILITY
-  =========================================================== */
+  /* =========================================================
+     BOOT
+  ========================================================== */
 
-  document.addEventListener(
-    "visibilitychange",
-    () => {
+  setupMagnetic();
 
-      if (document.hidden) {
+  setupIdle();
 
-        if (idleTimer) {
-          window.clearTimeout(
-            idleTimer
-          );
-        }
+  setupObserver();
 
-      } else {
+  requestRender();
 
-        geometryDirty = true;
-
-        requestFrame();
-
-        resetIdleTimer();
-      }
-
-    }
-  );
-
-
-  /* ==========================================================
-     INITIALIZATION
-  =========================================================== */
-
-  calculateGeometry();
-
-  updateState();
 
 })();
