@@ -5,21 +5,34 @@
   const body = document.body;
 
   const loader = document.getElementById("loader");
-  const header = document.getElementById("site-header");
 
   const menu = document.getElementById("menu-overlay");
   const menuTrigger = document.getElementById("menu-trigger");
   const menuClose = document.getElementById("menu-close");
 
-  const progressFill = document.getElementById("progress-fill");
-  const progressPoint = document.getElementById("progress-point");
-  const progressCurrent = document.getElementById("progress-current");
+  const progressFill =
+    document.getElementById("progress-fill");
 
-  const idleScreen = document.getElementById("idle-screen");
+  const progressPoint =
+    document.getElementById("progress-point");
+
+  const progressCurrent =
+    document.getElementById("progress-current");
+
+  const progressPrevious =
+    document.getElementById("progress-previous");
+
+  const progressNext =
+    document.getElementById("progress-next");
+
+  const idleScreen =
+    document.getElementById("idle-screen");
 
   const scenes = [
     document.getElementById("cover"),
-    ...Array.from(document.querySelectorAll(".chapter"))
+    ...Array.from(
+      document.querySelectorAll(".chapter")
+    )
   ].filter(Boolean);
 
   const menuLinks = Array.from(
@@ -36,6 +49,7 @@
 
   const state = {
     currentIndex: 0,
+
     currentProgress: 0,
     targetProgress: 0,
 
@@ -47,114 +61,207 @@
     scrollDirty: false,
     resizeDirty: false,
 
-    magneticX: 0,
-    magneticY: 0,
-
     lastInteraction: performance.now()
   };
 
-  let loadFinished = document.readyState === "complete";
+  let loadFinished =
+    document.readyState === "complete";
 
-  const clamp = (value, min = 0, max = 1) =>
-    Math.min(max, Math.max(min, value));
+  const clamp = (
+    value,
+    min = 0,
+    max = 1
+  ) =>
+    Math.min(
+      max,
+      Math.max(min, value)
+    );
 
-  const lerp = (a, b, amount) =>
+  const lerp = (
+    a,
+    b,
+    amount
+  ) =>
     a + (b - a) * amount;
 
   const easeOut = (value) =>
-    1 - Math.pow(1 - clamp(value), 3);
-
-  const sceneProgress = (scene) => {
-    const rect = scene.getBoundingClientRect();
-
-    const travel = Math.max(
-      1,
-      scene.offsetHeight - window.innerHeight
+    1 - Math.pow(
+      1 - clamp(value),
+      3
     );
 
-    return clamp(-rect.top / travel);
+
+  /* =========================================================
+     SCENE PROGRESS
+     ========================================================= */
+
+  const sceneProgress = (scene) => {
+    const rect =
+      scene.getBoundingClientRect();
+
+    const travel =
+      Math.max(
+        1,
+        scene.offsetHeight -
+          window.innerHeight
+      );
+
+    return clamp(
+      -rect.top / travel
+    );
   };
 
+
+  /*
+   * The active scene is determined by the viewport center.
+   * This keeps the narrative chapter and its animation
+   * synchronized with the section occupying the screen.
+   */
+
   function getCurrentScene() {
-    const viewportCenter = window.innerHeight / 2;
+    const viewportCenter =
+      window.innerHeight / 2;
 
     let bestIndex = 0;
     let bestDistance = Infinity;
 
-    scenes.forEach((scene, index) => {
-      const rect = scene.getBoundingClientRect();
-      const sceneCenter = rect.top + rect.height / 2;
-      const distance = Math.abs(
-        sceneCenter - viewportCenter
-      );
+    scenes.forEach(
+      (scene, index) => {
 
-      if (distance < bestDistance) {
-        bestDistance = distance;
-        bestIndex = index;
+        const rect =
+          scene.getBoundingClientRect();
+
+        const sceneCenter =
+          rect.top +
+          rect.height / 2;
+
+        const distance =
+          Math.abs(
+            sceneCenter -
+              viewportCenter
+          );
+
+        if (
+          distance <
+          bestDistance
+        ) {
+          bestDistance =
+            distance;
+
+          bestIndex =
+            index;
+        }
+
       }
-    });
+    );
 
     return bestIndex;
   }
 
+
   function getSceneProgress(index) {
+
     if (index === 0) {
+
       const rect =
         scenes[0].getBoundingClientRect();
 
       return clamp(
         -rect.top /
-          Math.max(1, window.innerHeight)
+          Math.max(
+            1,
+            window.innerHeight
+          )
       );
     }
 
-    return sceneProgress(scenes[index]);
+    return sceneProgress(
+      scenes[index]
+    );
   }
+
 
   function updateStateFromScroll() {
-    const nextIndex = getCurrentScene();
-    const nextProgress =
-      getSceneProgress(nextIndex);
 
-    state.currentIndex = nextIndex;
-    state.targetProgress = nextProgress;
+    const nextIndex =
+      getCurrentScene();
+
+    const nextProgress =
+      getSceneProgress(
+        nextIndex
+      );
+
+    state.currentIndex =
+      nextIndex;
+
+    state.targetProgress =
+      nextProgress;
   }
 
-  function render() {
-    const index = state.currentIndex;
-    const progress = state.currentProgress;
 
-    const chapterCount =
-      scenes.length - 1;
+  /* =========================================================
+     GLOBAL JOURNEY PROGRESS
+     ========================================================= */
+
+  function getJourneyProgress() {
+
+    const scrollTop =
+      window.scrollY || window.pageYOffset;
+
+    const maxScroll =
+      Math.max(
+        1,
+        document.documentElement.scrollHeight -
+          window.innerHeight
+      );
+
+    return clamp(
+      scrollTop / maxScroll
+    );
+  }
+
+
+  /* =========================================================
+     RENDER
+     ========================================================= */
+
+  function render() {
+
+    const index =
+      state.currentIndex;
+
+    const progress =
+      state.currentProgress;
 
     const journeyProgress =
-      chapterCount <= 0
-        ? 0
-        : index / chapterCount;
+      getJourneyProgress();
 
     root.style.setProperty(
       "--chapter-progress",
       progress.toFixed(4)
     );
 
+    const easedProgress =
+      easeOut(progress);
+
     root.style.setProperty(
       "--trajectory-progress",
-      easeOut(progress).toFixed(4)
+      easedProgress.toFixed(4)
     );
 
     root.style.setProperty(
       "--convergence-progress",
-      easeOut(progress).toFixed(4)
+      easedProgress.toFixed(4)
     );
 
     root.style.setProperty(
       "--encounter-progress",
-      easeOut(progress).toFixed(4)
+      easedProgress.toFixed(4)
     );
 
     root.style.setProperty(
       "--final-progress",
-      easeOut(progress).toFixed(4)
+      easedProgress.toFixed(4)
     );
 
     root.style.setProperty(
@@ -163,11 +270,13 @@
     );
 
     if (progressFill) {
+
       progressFill.style.width =
         `${journeyProgress * 100}%`;
     }
 
     if (progressPoint) {
+
       progressPoint.style.left =
         `${journeyProgress * 100}%`;
     }
@@ -179,29 +288,97 @@
     state.rafId = 0;
   }
 
-  function updateHeaderLabel(index) {
-    if (!progressCurrent) return;
+
+  /* =========================================================
+     HEADER — CURRENT / PREVIOUS / NEXT
+     ========================================================= */
+
+  function getSceneTitle(index) {
 
     if (index === 0) {
-      progressCurrent.textContent = "COVER";
+      return "COVER";
+    }
+
+    const scene =
+      scenes[index];
+
+    return (
+      scene?.dataset.title ||
+      String(index).padStart(2, "0")
+    );
+  }
+
+
+  function setHeaderItem(
+    element,
+    value
+  ) {
+
+    if (!element) {
       return;
     }
 
-    const scene = scenes[index];
+    if (!value) {
 
-    progressCurrent.textContent =
-      scene?.dataset.title ||
-      String(index).padStart(2, "0");
+      element.textContent = "";
+      element.classList.add(
+        "is-empty"
+      );
+
+      return;
+    }
+
+    element.textContent =
+      value;
+
+    element.classList.remove(
+      "is-empty"
+    );
   }
+
+
+  function updateHeaderLabel(index) {
+
+    setHeaderItem(
+      progressCurrent,
+      getSceneTitle(index)
+    );
+
+    setHeaderItem(
+      progressPrevious,
+      index > 0
+        ? getSceneTitle(index - 1)
+        : ""
+    );
+
+    setHeaderItem(
+      progressNext,
+      index < scenes.length - 1
+        ? getSceneTitle(index + 1)
+        : ""
+    );
+  }
+
+
+  /* =========================================================
+     RAF
+     ========================================================= */
 
   function requestRender() {
-    if (state.rafId) return;
+
+    if (state.rafId) {
+      return;
+    }
 
     state.rafId =
-      requestAnimationFrame(frame);
+      requestAnimationFrame(
+        frame
+      );
   }
 
+
   function frame() {
+
     if (
       state.scrollDirty ||
       state.resizeDirty
@@ -212,14 +389,21 @@
     const target =
       state.targetProgress;
 
-    if (reducedMotion.matches) {
-      state.currentProgress = target;
+    if (
+      reducedMotion.matches
+    ) {
+
+      state.currentProgress =
+        target;
+
     } else {
-      state.currentProgress = lerp(
-        state.currentProgress,
-        target,
-        .13
-      );
+
+      state.currentProgress =
+        lerp(
+          state.currentProgress,
+          target,
+          .13
+        );
     }
 
     render();
@@ -227,7 +411,7 @@
     const difference =
       Math.abs(
         state.currentProgress -
-        target
+          target
       );
 
     if (
@@ -235,71 +419,114 @@
       state.resizeDirty ||
       difference > .0005
     ) {
+
       state.rafId =
-        requestAnimationFrame(frame);
+        requestAnimationFrame(
+          frame
+        );
+
     } else {
+
       state.rafId = 0;
     }
   }
 
+
+  /* =========================================================
+     SCROLL / RESIZE
+     ========================================================= */
+
   function onScroll() {
-    state.scrollDirty = true;
+
+    state.scrollDirty =
+      true;
 
     registerInteraction();
     requestRender();
   }
 
+
   function onResize() {
-    state.resizeDirty = true;
+
+    state.resizeDirty =
+      true;
+
     requestRender();
   }
 
+
+  /* =========================================================
+     NAVIGATION
+     ========================================================= */
+
   function goToScene(index) {
-    const targetIndex = clamp(
-      index,
-      0,
-      scenes.length - 1
-    );
+
+    const targetIndex =
+      clamp(
+        index,
+        0,
+        scenes.length - 1
+      );
 
     const target =
       scenes[targetIndex];
 
-    if (!target) return;
+    if (!target) {
+      return;
+    }
 
-    closeMenu();
+    closeMenu(false);
 
     target.scrollIntoView({
-      behavior: reducedMotion.matches
-        ? "auto"
-        : "smooth",
+      behavior:
+        reducedMotion.matches
+          ? "auto"
+          : "smooth",
+
       block: "start"
     });
   }
 
+
   function goNext() {
+
     goToScene(
       state.currentIndex + 1
     );
   }
 
+
   function goPrevious() {
+
     goToScene(
       state.currentIndex - 1
     );
   }
 
+
+  /* =========================================================
+     MENU
+     ========================================================= */
+
   function openMenu() {
-    if (!menu) return;
+
+    if (!menu) {
+      return;
+    }
 
     state.menuOpen = true;
 
-    menu.classList.add("is-open");
+    menu.classList.add(
+      "is-open"
+    );
+
     menu.setAttribute(
       "aria-hidden",
       "false"
     );
 
     if (menuTrigger) {
+
       menuTrigger.setAttribute(
         "aria-expanded",
         "true"
@@ -310,15 +537,22 @@
       "menu-open"
     );
 
-    window.setTimeout(() => {
-      menuClose?.focus();
-    }, 50);
+    window.setTimeout(
+      () => {
+        menuClose?.focus();
+      },
+      50
+    );
   }
+
 
   function closeMenu(
     returnFocus = true
   ) {
-    if (!menu) return;
+
+    if (!menu) {
+      return;
+    }
 
     state.menuOpen = false;
 
@@ -332,6 +566,7 @@
     );
 
     if (menuTrigger) {
+
       menuTrigger.setAttribute(
         "aria-expanded",
         "false"
@@ -342,69 +577,116 @@
       "menu-open"
     );
 
-    if (returnFocus) {
+    if (
+      returnFocus &&
+      document.activeElement !==
+        menuTrigger
+    ) {
+
       menuTrigger?.focus();
     }
   }
 
+
   menuTrigger?.addEventListener(
     "click",
     () => {
+
       state.menuOpen
         ? closeMenu()
         : openMenu();
     }
   );
 
+
   menuClose?.addEventListener(
     "click",
-    () => closeMenu()
+    () =>
+      closeMenu()
   );
 
-  menuLinks.forEach((link) => {
-    link.addEventListener(
-      "click",
-      () => {
-        const index = Number(
-          link.dataset.menuLink
-        );
 
-        closeMenu(false);
-        goToScene(index);
-      }
-    );
-  });
+  menuLinks.forEach(
+    (link) => {
+
+      link.addEventListener(
+        "click",
+        () => {
+
+          const index =
+            Number(
+              link.dataset.menuLink
+            );
+
+          closeMenu(false);
+
+          goToScene(index);
+        }
+      );
+    }
+  );
+
+
+  /* =========================================================
+     KEYBOARD NAVIGATION
+     ========================================================= */
 
   document.addEventListener(
     "keydown",
     (event) => {
 
-      if (event.key === "Escape") {
+      if (
+        event.key ===
+        "Escape"
+      ) {
 
-        if (state.menuOpen) {
+        if (
+          state.menuOpen
+        ) {
+
           closeMenu();
           return;
         }
 
-        if (state.idle) {
+        if (
+          state.idle
+        ) {
+
           closeIdle();
           return;
         }
       }
 
-      if (state.menuOpen) return;
+      if (
+        state.menuOpen
+      ) {
+        return;
+      }
 
-      if (event.key === "ArrowDown") {
+      if (
+        event.key ===
+        "ArrowDown"
+      ) {
+
         event.preventDefault();
         goNext();
       }
 
-      if (event.key === "ArrowUp") {
+      if (
+        event.key ===
+        "ArrowUp"
+      ) {
+
         event.preventDefault();
         goPrevious();
       }
     }
   );
+
+
+  /* =========================================================
+     MENU FOCUS TRAP
+     ========================================================= */
 
   document.addEventListener(
     "keydown",
@@ -422,31 +704,46 @@
           'a[href], button:not([disabled])'
         );
 
-      if (!focusable.length) return;
+      if (
+        !focusable.length
+      ) {
+        return;
+      }
 
       const first =
         focusable[0];
 
       const last =
-        focusable[focusable.length - 1];
+        focusable[
+          focusable.length - 1
+        ];
 
       if (
         event.shiftKey &&
-        document.activeElement === first
+        document.activeElement ===
+          first
       ) {
+
         event.preventDefault();
         last.focus();
       }
 
       if (
         !event.shiftKey &&
-        document.activeElement === last
+        document.activeElement ===
+          last
       ) {
+
         event.preventDefault();
         first.focus();
       }
     }
   );
+
+
+  /* =========================================================
+     MAGNETIC INTERACTION
+     ========================================================= */
 
   function setupMagnetic() {
 
@@ -458,74 +755,91 @@
     }
 
     document
-      .querySelectorAll(".magnetic")
-      .forEach((element) => {
+      .querySelectorAll(
+        ".magnetic"
+      )
+      .forEach(
+        (element) => {
 
-        element.addEventListener(
-          "pointermove",
-          (event) => {
+          element.addEventListener(
+            "pointermove",
+            (event) => {
 
-            const rect =
-              element.getBoundingClientRect();
+              const rect =
+                element.getBoundingClientRect();
 
-            const x =
-              event.clientX -
-              rect.left -
-              rect.width / 2;
+              const x =
+                event.clientX -
+                rect.left -
+                rect.width / 2;
 
-            const y =
-              event.clientY -
-              rect.top -
-              rect.height / 2;
+              const y =
+                event.clientY -
+                rect.top -
+                rect.height / 2;
 
-            const strength = .12;
+              const strength =
+                .12;
 
-            element.style.setProperty(
-              "--mx",
-              `${x * strength}px`
-            );
+              element.style.setProperty(
+                "--mx",
+                `${x * strength}px`
+              );
 
-            element.style.setProperty(
-              "--my",
-              `${y * strength}px`
-            );
-          }
-        );
+              element.style.setProperty(
+                "--my",
+                `${y * strength}px`
+              );
+            }
+          );
 
-        element.addEventListener(
-          "pointerleave",
-          () => {
+          element.addEventListener(
+            "pointerleave",
+            () => {
 
-            element.style.setProperty(
-              "--mx",
-              "0px"
-            );
+              element.style.setProperty(
+                "--mx",
+                "0px"
+              );
 
-            element.style.setProperty(
-              "--my",
-              "0px"
-            );
-          }
-        );
-
-      });
+              element.style.setProperty(
+                "--my",
+                "0px"
+              );
+            }
+          );
+        }
+      );
   }
 
-  const IDLE_DELAY = 45000;
+
+  /* =========================================================
+     IDLE SCREEN
+     ========================================================= */
+
+  const IDLE_DELAY =
+    45000;
+
   let idleTimer = 0;
 
+
   function registerInteraction() {
+
     state.lastInteraction =
       performance.now();
 
-    if (state.idle) {
+    if (
+      state.idle
+    ) {
       closeIdle();
     }
 
     resetIdleTimer();
   }
 
+
   function resetIdleTimer() {
+
     window.clearTimeout(
       idleTimer
     );
@@ -544,6 +858,7 @@
         IDLE_DELAY
       );
   }
+
 
   function showIdle() {
 
@@ -571,7 +886,9 @@
     );
   }
 
+
   function closeIdle() {
+
     state.idle = false;
 
     idleScreen?.classList.remove(
@@ -590,13 +907,24 @@
     resetIdleTimer();
   }
 
+
+  /* =========================================================
+     LOADER
+     ========================================================= */
+
   function finishLoader() {
 
-    if (state.loaderDone) return;
+    if (
+      state.loaderDone
+    ) {
+      return;
+    }
 
     state.loaderDone = true;
 
-    if (!loader) return;
+    if (!loader) {
+      return;
+    }
 
     const delay =
       reducedMotion.matches
@@ -605,6 +933,7 @@
 
     window.setTimeout(
       () => {
+
         loader.classList.add(
           "is-hidden"
         );
@@ -613,24 +942,32 @@
     );
   }
 
+
   function initLoader() {
 
     if (
       document.readyState ===
       "complete"
     ) {
+
       loadFinished = true;
     }
 
-    if (loadFinished) {
+    if (
+      loadFinished
+    ) {
+
       finishLoader();
+
     } else {
 
       window.addEventListener(
         "load",
         () => {
+
           loadFinished = true;
           finishLoader();
+
         },
         { once: true }
       );
@@ -642,6 +979,11 @@
     }
   }
 
+
+  /* =========================================================
+     VISIBILITY
+     ========================================================= */
+
   document.addEventListener(
     "visibilitychange",
     () => {
@@ -650,16 +992,23 @@
         document.visibilityState ===
         "visible"
       ) {
+
         registerInteraction();
         requestRender();
+
       } else {
+
         window.clearTimeout(
           idleTimer
         );
       }
-
     }
   );
+
+
+  /* =========================================================
+     INTERACTION TRACKING
+     ========================================================= */
 
   [
     "pointerdown",
@@ -673,23 +1022,35 @@
       document.addEventListener(
         eventName,
         registerInteraction,
-        { passive: true }
+        {
+          passive: true
+        }
       );
-
     }
   );
+
+
+  /* =========================================================
+     HASH
+     ========================================================= */
 
   function syncInitialHash() {
 
     const hash =
       window.location.hash;
 
-    if (!hash) return;
+    if (!hash) {
+      return;
+    }
 
     const target =
-      document.querySelector(hash);
+      document.querySelector(
+        hash
+      );
 
-    if (!target) return;
+    if (!target) {
+      return;
+    }
 
     window.requestAnimationFrame(
       () => {
@@ -699,12 +1060,14 @@
           block: "start"
         });
 
-        state.scrollDirty = true;
+        state.scrollDirty =
+          true;
 
         requestRender();
       }
     );
   }
+
 
   window.addEventListener(
     "hashchange",
@@ -715,18 +1078,25 @@
           window.location.hash
         );
 
-      if (!target) return;
+      if (!target) {
+        return;
+      }
 
       target.scrollIntoView({
         behavior:
           reducedMotion.matches
             ? "auto"
             : "smooth",
+
         block: "start"
       });
-
     }
   );
+
+
+  /* =========================================================
+     INTERSECTION
+     ========================================================= */
 
   const observer =
     "IntersectionObserver" in window
@@ -740,26 +1110,32 @@
                   "is-near",
                   entry.isIntersecting
                 );
-
               }
             );
-
           },
           {
             rootMargin:
               "20% 0px 20% 0px",
+
             threshold: 0
           }
         )
       : null;
 
+
   if (observer) {
+
     scenes.forEach(
       (scene) => {
         observer.observe(scene);
       }
     );
   }
+
+
+  /* =========================================================
+     INIT
+     ========================================================= */
 
   function init() {
 
@@ -778,17 +1154,22 @@
     window.addEventListener(
       "scroll",
       onScroll,
-      { passive: true }
+      {
+        passive: true
+      }
     );
 
     window.addEventListener(
       "resize",
       onResize,
-      { passive: true }
+      {
+        passive: true
+      }
     );
 
     requestRender();
   }
+
 
   if (
     document.readyState ===
@@ -798,13 +1179,14 @@
     document.addEventListener(
       "DOMContentLoaded",
       init,
-      { once: true }
+      {
+        once: true
+      }
     );
 
   } else {
 
     init();
-
   }
 
 })();
