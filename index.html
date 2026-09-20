@@ -12,18 +12,16 @@ Cesare Paratore — Una direzione nasce da un punto
 </title>
 
 <meta name="description"
-content="Movimento, direzione, sviluppo. Un percorso costruito attraverso sport, educazione, digitale e progettazione.">
+content="Movimento, direzione, sviluppo. Un percorso tra sport, educazione, digitale e progettazione.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@400;500&family=Instrument+Serif&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="css/style.css">
 
 </head>
-
 
 
 <body>
@@ -41,7 +39,6 @@ Salta al contenuto
 
 <div class="page-loader-inner">
 
-
 <div class="loader-trajectory">
 
 <div class="loader-line"></div>
@@ -54,7 +51,9 @@ Salta al contenuto
 <p class="loader-motto">
 
 MOVIMENTO
+
 <span>/</span>
+
 DIREZIONE
 
 </p>
@@ -74,6 +73,7 @@ CESARE PARATORE
 
 
 
+
 <!-- HEADER -->
 
 <header class="site-header">
@@ -81,7 +81,7 @@ CESARE PARATORE
 
 <a class="site-brand magnetic" href="#01">
 
-<img src="logo-cp.svg"
+<img src="assets/images/cp-mark.svg"
 alt="Cesare Paratore">
 
 </a>
@@ -102,23 +102,33 @@ MOVIMENTO
 
 <div class="progress-track">
 
-<div class="progress-fill"></div>
+<div id="progress-fill"
+class="progress-fill">
+</div>
 
-<div class="progress-point"></div>
 
+<div id="progress-point"
+class="progress-point">
 </div>
 
 
 </div>
+
+
+</div>
+
 
 
 
 <button class="menu-trigger magnetic"
-aria-label="Apri menu">
+aria-label="Apri menu"
+aria-expanded="false">
+
 
 <span class="menu-trigger-label">
 MENU
 </span>
+
 
 <span class="menu-trigger-icon">
 
@@ -128,10 +138,12 @@ MENU
 
 </span>
 
+
 </button>
 
 
 </header>
+
 
 
 
@@ -150,120 +162,73 @@ aria-hidden="true">
 
 
 <a href="#01">
-
-<span class="site-menu-number">
-01
-</span>
-
+<span>01</span>
 MOVIMENTO
-
 </a>
 
 
 <a href="#02">
-
-<span class="site-menu-number">
-02
-</span>
-
+<span>02</span>
 DOMANDA
-
 </a>
 
 
 <a href="#03">
-
-<span class="site-menu-number">
-03
-</span>
-
+<span>03</span>
 STRADE
-
 </a>
 
 
 <a href="#04">
-
-<span class="site-menu-number">
-04
-</span>
-
-DISEGNO
-
+<span>04</span>
+CONNESSIONE
 </a>
 
 
 <a href="#05">
-
-<span class="site-menu-number">
-05
-</span>
-
+<span>05</span>
 PAUSA
-
 </a>
 
 
 <a href="#06">
-
-<span class="site-menu-number">
-06
-</span>
-
+<span>06</span>
 PUNTO
-
 </a>
 
 
 <a href="#07">
-
-<span class="site-menu-number">
-07
-</span>
-
+<span>07</span>
 DIREZIONE
-
 </a>
 
 
 <a href="#08">
-
-<span class="site-menu-number">
-08
-</span>
-
+<span>08</span>
 FORMA
-
 </a>
 
 
 <a href="#09">
-
-<span class="site-menu-number">
-09
-</span>
-
+<span>09</span>
 INCONTRO
-
 </a>
 
 
 <a href="#10">
-
-<span class="site-menu-number">
-10
-</span>
-
+<span>10</span>
 POSSIBILITÀ
-
 </a>
 
 
 </div>
 
+
 </div>
 
+
 </nav>
+
 
 
 
@@ -274,10 +239,11 @@ POSSIBILITÀ
 
 
 
+
+
 <!-- 01 -->
 
-<section
-id="01"
+<section id="01"
 class="home-section home-section--hero"
 data-section-title="MOVIMENTO">
 
@@ -286,7 +252,6 @@ data-section-title="MOVIMENTO">
 
 
 <h1 class="hero-title reveal">
-
 
 <span>
 TUTTO
@@ -298,10 +263,14 @@ TUTTO
 </span>
 
 
-<span class="hero-title-line--identity">
+<span>
 
 DAL
-<span class="identity-slash">/</span>
+
+<span class="identity-slash">
+/
+</span>
+
 MOVIMENTO
 
 </span>
@@ -311,43 +280,46 @@ MOVIMENTO
 
 
 
+<div class="editorial-copy hero-intro reveal">
 
-<div class="hero-intro editorial-copy reveal">
 
 <p>
 
-Prima ancora della direzione,
+Prima della direzione,
 c'era il bisogno di muoversi.
 
 </p>
+
 
 </div>
 
 
 
 
-<div class="direction-trajectory reveal">
+<div class="direction-trajectory"
+data-trajectory>
 
 
 <div class="direction-trajectory-line"></div>
 
 
 <div class="direction-node"
-style="left:20%">
+data-direction="movimento">
 </div>
 
 
 <div class="direction-node"
-style="left:50%">
+data-direction="inizio">
 </div>
 
 
 <div class="direction-node"
-style="left:80%">
+data-direction="direzione">
 </div>
 
 
 </div>
+
 
 
 </div>
@@ -360,11 +332,13 @@ style="left:80%">
 
 
 
+
 <!-- 02 -->
 
-<section
-id="02"
-class="home-section home-section--question">
+
+<section id="02"
+class="home-section home-section--question"
+data-section-title="DOMANDA">
 
 
 <div class="section-inner section-inner--narrow">
@@ -372,13 +346,21 @@ class="home-section home-section--question">
 
 <h2 class="statement reveal">
 
+
 NON BASTAVA
-MUOVERSI.
 
 <br>
 
+MUOVERSI.
+
+
+<br>
+
+
 <span class="accent">
+
 DOVE?
+
 </span>
 
 
@@ -395,11 +377,13 @@ DOVE?
 
 
 
+
 <!-- 03 -->
 
-<section
-id="03"
-class="home-section home-section--directions">
+
+<section id="03"
+class="home-section"
+data-section-title="STRADE">
 
 
 <div class="section-inner">
@@ -417,27 +401,21 @@ LE STRADE
 
 
 <p>
-
 Ho seguito percorsi diversi.
-
 </p>
 
 
 <p>
-
 Digitale.
 Sport.
 Scienze motorie.
 Educazione.
 Management.
-
 </p>
 
 
 <p>
-
 Sembravano cinque strade.
-
 </p>
 
 
@@ -446,6 +424,7 @@ Sembravano cinque strade.
 
 
 </div>
+
 
 </section>
 
@@ -454,11 +433,13 @@ Sembravano cinque strade.
 
 
 
+
 <!-- 04 -->
 
-<section
-id="04"
-class="home-section home-section--network">
+
+<section id="04"
+class="home-section home-section--network"
+data-section-title="CONNESSIONE">
 
 
 <div class="section-inner section-inner--split">
@@ -470,6 +451,9 @@ class="home-section home-section--network">
 <h2 class="statement reveal">
 
 NON ERANO
+
+<br>
+
 CINQUE STRADE.
 
 </h2>
@@ -486,21 +470,45 @@ Era una sola ricerca vista da cinque prospettive.
 
 
 
-<div class="network-visual reveal">
+<div class="network-visual reveal"
+data-trajectory>
 
 
-<div class="network-node network-node--sport"></div>
+<div class="network-node"
+data-node="sport">
+</div>
 
-<div class="network-node network-node--scienze-motorie"></div>
 
-<div class="network-node network-node--educazione"></div>
+<div class="network-node"
+data-node="scienze">
+</div>
 
-<div class="network-node network-node--management"></div>
 
-<div class="network-node network-node--digitale"></div>
+<div class="network-node"
+data-node="educazione">
+</div>
+
+
+<div class="network-node"
+data-node="management">
+</div>
+
+
+<div class="network-node"
+data-node="digitale">
+</div>
+
+
+
+<div class="network-center">
+
+CP
+
+</div>
 
 
 </div>
+
 
 
 </div>
@@ -513,27 +521,39 @@ Era una sola ricerca vista da cinque prospettive.
 
 
 
+
 <!-- 05 -->
 
-<section
-id="05"
-class="home-section home-section--pause">
+
+<section id="05"
+class="home-section home-section--pause"
+data-section-title="PAUSA">
 
 
 <div class="pause-section">
 
 
-<h2 class="reveal">
+<h2 class="statement reveal">
 
-PER VEDERE
-LA DIREZIONE,
+A QUEL PUNTO,
 
 <br>
 
-HO DOVUTO
-FERMARMI.
+MI SONO FERMATO.
 
 </h2>
+
+
+<div class="pause-trajectory"
+data-trajectory>
+
+
+<div class="pause-line"></div>
+
+<div class="pause-point"></div>
+
+
+</div>
 
 
 </div>
@@ -549,9 +569,10 @@ FERMARMI.
 
 <!-- 06 -->
 
-<section
-id="06"
-class="home-section home-section--territory">
+
+<section id="06"
+class="home-section home-section--territory"
+data-section-title="PUNTO">
 
 
 <div class="section-inner section-inner--territory">
@@ -560,18 +581,20 @@ class="home-section home-section--territory">
 <div class="origin-point reveal">
 
 
-<h3>
-
+<h2>
 PARTINICO
-
-</h3>
+</h2>
 
 
 <p>
 
 Un punto preciso.
 
+<br>
+
 Non un limite.
+
+<br>
 
 Una coordinata.
 
@@ -584,10 +607,12 @@ Una coordinata.
 
 <div class="territory-map reveal">
 
+
 <iframe
 src="https://www.google.com/maps/embed"
 loading="lazy">
 </iframe>
+
 
 </div>
 
@@ -602,11 +627,13 @@ loading="lazy">
 
 
 
+
 <!-- 07 -->
 
-<section
-id="07"
-class="home-section">
+
+<section id="07"
+class="home-section"
+data-section-title="DIREZIONE">
 
 
 <div class="section-inner">
@@ -614,12 +641,16 @@ class="home-section">
 
 <h2 class="statement reveal">
 
+
 LA BASE È QUI.
 
 <br>
 
+
 <span class="accent">
+
 LA DIREZIONE NO.
+
 </span>
 
 
@@ -637,18 +668,22 @@ LA DIREZIONE NO.
 
 
 
+
 <!-- 08 -->
 
-<section
-id="08"
-class="home-section">
+
+<section id="08"
+class="home-section"
+data-section-title="FORMA">
 
 
 <div class="section-inner">
 
 
 <h2 class="section-title">
+
 LA FORMA
+
 </h2>
 
 
@@ -656,35 +691,36 @@ LA FORMA
 <div class="direction-grid">
 
 
-<article>
-<h3>Movimento</h3>
-</article>
+<div>
+MOVIMENTO
+</div>
 
 
-<article>
-<h3>Obiettivo</h3>
-</article>
+<div>
+OBIETTIVO
+</div>
 
 
-<article>
-<h3>Prestazione</h3>
-</article>
+<div>
+PRESTAZIONE
+</div>
 
 
-<article>
-<h3>Progetto</h3>
-</article>
+<div>
+PROGETTO
+</div>
 
 
-<article>
-<h3>Sviluppo</h3>
-</article>
-
-
+<div>
+SVILUPPO
 </div>
 
 
 </div>
+
+
+</div>
+
 
 </section>
 
@@ -696,9 +732,10 @@ LA FORMA
 
 <!-- 09 -->
 
-<section
-id="09"
-class="home-section">
+
+<section id="09"
+class="home-section"
+data-section-title="INCONTRO">
 
 
 <div class="section-inner">
@@ -706,13 +743,23 @@ class="home-section">
 
 <h2 class="statement reveal">
 
+
 IO PARTO
+
+<br>
+
 DA QUI.
+
 
 <br><br>
 
+
 TU PARTI
+
+<br>
+
 DA UN ALTRO PUNTO.
+
 
 </h2>
 
@@ -730,21 +777,29 @@ DA UN ALTRO PUNTO.
 
 <!-- 10 -->
 
-<section
-id="10"
-class="home-section final-question">
+
+<section id="10"
+class="home-section final-question"
+data-section-title="POSSIBILITÀ">
 
 
 <div class="section-inner">
 
 
-<h2 class="reveal">
+<h2 class="statement reveal">
+
 
 DA UN PUNTO
+
+<br>
+
 
 <span>
 
 PUÒ NASCERE
+
+<br>
+
 UNA DIREZIONE.
 
 </span>
@@ -754,7 +809,9 @@ UNA DIREZIONE.
 
 
 
-<div class="final-trajectory">
+
+<div class="final-trajectory"
+data-trajectory>
 
 
 <div class="final-trajectory-line"></div>
@@ -766,10 +823,12 @@ UNA DIREZIONE.
 </div>
 
 
+
 </div>
 
 
 </section>
+
 
 
 
@@ -783,37 +842,68 @@ UNA DIREZIONE.
 
 
 
+
+
+<!-- STANDBY -->
+
+<div class="standby-screen"
+aria-hidden="true">
+
+
+<div class="standby-center">
+
+
+<div class="standby-label">
+
+ANCORA QUI?
+
+</div>
+
+
+<button class="standby-wake">
+
+RIPRENDI
+
+</button>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
 <footer class="site-footer">
 
 
-<div class="footer-inner">
-
-
-<img src="logo-cp.svg"
-class="footer-mark"
+<img src="assets/images/cp-mark.svg"
 alt="CP">
 
 
-<p class="footer-motto">
+<p>
 
-MOVIMENTO
-/
-DIREZIONE
+MOVIMENTO / DIREZIONE
 
 </p>
 
 
-<p class="footer-signature">
+<p>
 
 CESARE PARATORE
 
 </p>
 
 
-</div>
-
-
 </footer>
+
+
 
 
 
