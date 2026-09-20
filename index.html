@@ -1,739 +1,839 @@
-(() => {
-"use strict";
+<!DOCTYPE html>
+<html lang="it">
 
-/*
-==========================================================
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>
+Cesare Paratore — Una direzione nasce da un punto
+</title>
+
+<meta name="description"
+content="Movimento, direzione, sviluppo. Un percorso costruito attraverso sport, educazione, digitale e progettazione.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+
+
+<body>
+
+
+<a class="skip-link" href="#main">
+Salta al contenuto
+</a>
+
+
+
+<!-- LOADER -->
+
+<div class="page-loader">
+
+<div class="page-loader-inner">
+
+
+<div class="loader-trajectory">
+
+<div class="loader-line"></div>
+
+<div class="loader-point"></div>
+
+</div>
+
+
+<p class="loader-motto">
+
+MOVIMENTO
+<span>/</span>
+DIREZIONE
+
+</p>
+
+
+<p class="loader-signature">
+
 CESARE PARATORE
-A DIRECTION IS BORN FROM A POINT
-FINAL EXPERIENCE ENGINE
-==========================================================
-*/
 
+</p>
 
-const CONFIG = {
 
- loader: {
-  min:700,
-  max:2200
- },
+</div>
 
- scroll:{
-  threshold:.55,
-  smooth:true
- },
+</div>
 
- reveal:{
-  threshold:.15
- },
 
- motion:{
-  lerp:.08,
-  drift:18
- },
 
- standby:{
-  delay:45000,
-  minWidth:700
- },
 
- cursor:{
-  enabled:true
- }
+<!-- HEADER -->
 
-};
+<header class="site-header">
 
 
+<a class="site-brand magnetic" href="#01">
 
-const STATE = {
+<img src="logo-cp.svg"
+alt="Cesare Paratore">
 
- section:0,
+</a>
 
- reduced:false,
 
- menu:false,
 
- standby:false,
+<div class="wow-progress">
 
- pointer:{
-  x:0,
-  y:0
- },
 
- cursor:{
-  x:0,
-  y:0
- },
+<div class="progress-label">
 
- trajectory:{
-  value:0,
-  target:0
- }
+<span id="progress-current">
+MOVIMENTO
+</span>
 
-};
+</div>
 
 
+<div class="progress-track">
 
-const $ = s => document.querySelector(s);
-const $$ = s => [...document.querySelectorAll(s)];
+<div class="progress-fill"></div>
 
+<div class="progress-point"></div>
 
+</div>
 
-const DOM = {
 
- body:document.body,
+</div>
 
- html:document.documentElement,
 
- loader:$(".page-loader"),
 
- menu:$(".site-menu"),
+<button class="menu-trigger magnetic"
+aria-label="Apri menu">
 
- menuButton:$(".menu-trigger"),
-
- sections:$$(".home-section"),
-
- reveals:$$(".reveal"),
-
- cursor:$(".custom-cursor"),
-
- cursorDot:$(".custom-cursor-dot"),
-
- cursorRing:$(".custom-cursor-ring"),
-
- progress:$(".progress-fill"),
-
- progressPoint:$(".progress-point"),
-
- progressLabel:$("#progress-current"),
-
- standby:$(".standby-screen"),
-
- wake:$(".standby-wake"),
-
- trajectories:$$("[data-trajectory]")
-
-};
-
-
-
-/*
-----------------------------------------------------------
-MOTION
-----------------------------------------------------------
-*/
-
-
-function motion(){
-
- const media =
- matchMedia("(prefers-reduced-motion:reduce)");
-
- const update = () => {
-
-  STATE.reduced = media.matches;
-
-  DOM.html.classList.toggle(
-   "reduced-motion",
-   STATE.reduced
-  );
-
- };
-
-
- update();
-
- media.addEventListener(
-  "change",
-  update
- );
-
-}
-
-
-
-/*
-----------------------------------------------------------
-LOADER
-----------------------------------------------------------
-*/
-
-
-function loader(){
-
- if(!DOM.loader)
- return;
-
-
- const start = performance.now();
-
-
- function finish(){
-
-  const elapsed =
-  performance.now()-start;
-
-
-  const wait =
-  Math.max(
-   0,
-   CONFIG.loader.min-elapsed
-  );
-
-
-  setTimeout(()=>{
-
-   DOM.loader.classList.add(
-    "is-hidden"
-   );
-
-
-   setTimeout(()=>{
-    DOM.loader.remove();
-   },700);
-
-
-  },wait);
-
-
- }
-
-
- window.addEventListener(
-  "load",
-  finish,
-  {once:true}
- );
-
-
- setTimeout(
-  finish,
-  CONFIG.loader.max
- );
-
-
-}
-
-
-
-/*
-----------------------------------------------------------
-SECTIONS
-----------------------------------------------------------
-*/
-
-
-function currentSection(){
-
- let index=0;
-
- let distance=Infinity;
-
-
- DOM.sections.forEach((section,i)=>{
-
-  const box =
-  section.getBoundingClientRect();
-
-
-  const center =
-  Math.abs(
-   box.top + box.height/2 -
-   innerHeight*.5
-  );
-
-
-  if(center<distance){
-
-   distance=center;
-   index=i;
-
-  }
-
-
- });
-
-
- if(index!==STATE.section){
-
-  STATE.section=index;
-
-  updateNavigation();
-
- }
-
-}
-
-
-
-function updateNavigation(){
-
- const section =
- DOM.sections[STATE.section];
-
-
- if(!section)
- return;
-
-
- const total =
- DOM.sections.length;
-
-
- const progress =
- total<=1
- ?0
- :STATE.section/(total-1);
-
-
-
- if(DOM.progress)
- DOM.progress.style.width =
- `${progress*100}%`;
-
-
- if(DOM.progressPoint)
- DOM.progressPoint.style.left =
- `${progress*100}%`;
-
-
- if(DOM.progressLabel)
-
- DOM.progressLabel.textContent =
- section.dataset.sectionTitle || "";
-
-
-}
-
-
-
-/*
-----------------------------------------------------------
-SMOOTH NAVIGATION
-----------------------------------------------------------
-*/
-
-
-function navigate(index){
-
- const target =
- DOM.sections[index];
-
-
- if(!target)
- return;
-
-
- const offset =
- $(".site-header")?.offsetHeight || 0;
-
-
- window.scrollTo({
-
-  top:
-  target.offsetTop-offset,
-
-  behavior:
-  STATE.reduced
-  ?"auto"
-  :"smooth"
-
- });
-
-
-}
-
-
-
-/*
-----------------------------------------------------------
-REVEAL SYSTEM
-----------------------------------------------------------
-*/
-
-
-function reveal(){
-
- if(
- STATE.reduced ||
- !("IntersectionObserver" in window)
- ){
-
-  DOM.reveals.forEach(
-   el=>el.classList.add(
-    "is-visible"
-   )
-  );
-
-  return;
-
- }
-
-
- const observer =
- new IntersectionObserver(
- entries=>{
-
-  entries.forEach(entry=>{
-
-   if(
-   entry.isIntersecting
-   ){
-
-    entry.target.classList.add(
-     "is-visible"
-    );
-
-    observer.unobserve(
-     entry.target
-    );
-
-   }
-
-  });
-
-
- },
- {
- threshold:
- CONFIG.reveal.threshold
- });
-
-
- DOM.reveals.forEach(
- el=>observer.observe(el)
- );
-
-}
-
-
-
-/*
-----------------------------------------------------------
-CURSOR
-----------------------------------------------------------
-*/
-
-
-function cursor(){
-
- if(
- STATE.reduced ||
- !DOM.cursor ||
- !matchMedia("(pointer:fine)").matches
- )
- return;
-
-
-
- window.addEventListener(
- "pointermove",
- e=>{
-
-  STATE.pointer.x=e.clientX;
-  STATE.pointer.y=e.clientY;
-
-  DOM.cursor.classList.add(
-   "is-visible"
-  );
-
- });
-
-
- $$("a,button").forEach(el=>{
-
-  el.addEventListener(
-   "mouseenter",
-   ()=>DOM.cursor.classList.add(
-    "is-hovering"
-   )
-  );
-
-
-  el.addEventListener(
-   "mouseleave",
-   ()=>DOM.cursor.classList.remove(
-    "is-hovering"
-   )
-  );
-
- });
-
-
-}
-
-
-
-/*
-----------------------------------------------------------
-TRAJECTORY
-----------------------------------------------------------
-*/
-
-
-function trajectory(){
-
- const first =
- DOM.sections[0];
-
- const last =
- DOM.sections.at(-1);
-
-
- if(!first || !last)
- return;
-
-
- const start =
- first.offsetTop;
-
-
- const end =
- last.offsetTop +
- last.offsetHeight -
- innerHeight;
-
-
- STATE.trajectory.target =
- Math.max(
-  0,
-  Math.min(
-   1,
-   (scrollY-start)/(end-start)
-  )
- );
-
-
-}
-
-
-
-function animate(){
-
- STATE.trajectory.value +=
- (
- STATE.trajectory.target -
- STATE.trajectory.value
- )
- *
- CONFIG.motion.lerp;
-
-
-
- DOM.html.style.setProperty(
-
- "--trajectory-progress",
-
- STATE.trajectory.value
-
- );
-
-
-
- if(
- DOM.cursor &&
- !STATE.reduced
- ){
-
-  STATE.cursor.x +=
-  (
-  STATE.pointer.x-
-  STATE.cursor.x
-  )*.18;
-
-
-  STATE.cursor.y +=
-  (
-  STATE.pointer.y-
-  STATE.cursor.y
-  )*.18;
-
-
-  DOM.cursorDot.style.transform =
-  `translate(${STATE.pointer.x}px,${STATE.pointer.y}px)`;
-
-
-  DOM.cursorRing.style.transform =
-  `translate(${STATE.cursor.x}px,${STATE.cursor.y}px)`;
-
- }
-
-
- requestAnimationFrame(
-  animate
- );
-
-}
-
-
-
-/*
-----------------------------------------------------------
+<span class="menu-trigger-label">
 MENU
-----------------------------------------------------------
-*/
+</span>
 
+<span class="menu-trigger-icon">
 
-function menu(){
+<span></span>
 
- if(!DOM.menuButton)
- return;
+<span></span>
 
+</span>
 
- DOM.menuButton.onclick=()=>{
+</button>
 
-  STATE.menu=!STATE.menu;
 
+</header>
 
-  DOM.menu.classList.toggle(
-   "is-open",
-   STATE.menu
-  );
 
 
-  DOM.body.classList.toggle(
-   "is-menu-open",
-   STATE.menu
-  );
 
 
- };
+<!-- MENU -->
 
+<nav class="site-menu"
+aria-hidden="true">
 
-}
 
+<div class="site-menu-inner">
 
 
-/*
-----------------------------------------------------------
-STANDBY MOMENT
-----------------------------------------------------------
-*/
+<div class="site-menu-nav">
 
 
-function standby(){
+<a href="#01">
 
- if(!DOM.standby)
- return;
+<span class="site-menu-number">
+01
+</span>
 
+MOVIMENTO
 
- let timer;
+</a>
 
 
- function reset(){
+<a href="#02">
 
-  clearTimeout(timer);
+<span class="site-menu-number">
+02
+</span>
 
+DOMANDA
 
-  if(
-  STATE.reduced ||
-  innerWidth<CONFIG.standby.minWidth
-  )
-  return;
+</a>
 
 
-  timer=setTimeout(()=>{
+<a href="#03">
 
-   DOM.standby.classList.add(
-    "is-active"
-   );
+<span class="site-menu-number">
+03
+</span>
 
-  },
-  CONFIG.standby.delay);
+STRADE
 
+</a>
 
- }
 
+<a href="#04">
 
- [
- "mousemove",
- "scroll",
- "wheel",
- "touchstart"
- ]
- .forEach(
- e=>window.addEventListener(
- e,
- reset,
- {passive:true}
- )
- );
+<span class="site-menu-number">
+04
+</span>
 
+DISEGNO
 
- DOM.wake?.addEventListener(
- "click",
- ()=>DOM.standby.classList.remove(
-  "is-active"
- )
- );
+</a>
 
 
- reset();
+<a href="#05">
 
-}
+<span class="site-menu-number">
+05
+</span>
 
+PAUSA
 
+</a>
 
-/*
-----------------------------------------------------------
-INIT
-----------------------------------------------------------
-*/
 
+<a href="#06">
 
-function init(){
+<span class="site-menu-number">
+06
+</span>
 
- motion();
+PUNTO
 
- loader();
+</a>
 
- reveal();
 
- cursor();
+<a href="#07">
 
- menu();
+<span class="site-menu-number">
+07
+</span>
 
- standby();
+DIREZIONE
 
+</a>
 
- window.addEventListener(
- "scroll",
- ()=>{
 
-  currentSection();
+<a href="#08">
 
-  trajectory();
+<span class="site-menu-number">
+08
+</span>
 
- },
- {
- passive:true
- });
+FORMA
 
+</a>
 
- trajectory();
 
- currentSection();
+<a href="#09">
 
+<span class="site-menu-number">
+09
+</span>
 
- animate();
+INCONTRO
 
-}
+</a>
 
 
+<a href="#10">
 
-document.readyState==="loading"
+<span class="site-menu-number">
+10
+</span>
 
-?
+POSSIBILITÀ
 
-document.addEventListener(
-"DOMContentLoaded",
-init,
-{once:true}
-)
+</a>
 
-:
 
-init();
+</div>
 
+</div>
 
+</nav>
 
-})();
+
+
+
+
+
+<main id="main">
+
+
+
+<!-- 01 -->
+
+<section
+id="01"
+class="home-section home-section--hero"
+data-section-title="MOVIMENTO">
+
+
+<div class="section-inner section-inner--hero">
+
+
+<h1 class="hero-title reveal">
+
+
+<span>
+TUTTO
+</span>
+
+
+<span>
+È INIZIATO
+</span>
+
+
+<span class="hero-title-line--identity">
+
+DAL
+<span class="identity-slash">/</span>
+MOVIMENTO
+
+</span>
+
+
+</h1>
+
+
+
+
+<div class="hero-intro editorial-copy reveal">
+
+<p>
+
+Prima ancora della direzione,
+c'era il bisogno di muoversi.
+
+</p>
+
+</div>
+
+
+
+
+<div class="direction-trajectory reveal">
+
+
+<div class="direction-trajectory-line"></div>
+
+
+<div class="direction-node"
+style="left:20%">
+</div>
+
+
+<div class="direction-node"
+style="left:50%">
+</div>
+
+
+<div class="direction-node"
+style="left:80%">
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+<!-- 02 -->
+
+<section
+id="02"
+class="home-section home-section--question">
+
+
+<div class="section-inner section-inner--narrow">
+
+
+<h2 class="statement reveal">
+
+NON BASTAVA
+MUOVERSI.
+
+<br>
+
+<span class="accent">
+DOVE?
+</span>
+
+
+</h2>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+<!-- 03 -->
+
+<section
+id="03"
+class="home-section home-section--directions">
+
+
+<div class="section-inner">
+
+
+<h2 class="section-title reveal">
+
+LE STRADE
+
+</h2>
+
+
+
+<div class="editorial-copy editorial-copy--large reveal">
+
+
+<p>
+
+Ho seguito percorsi diversi.
+
+</p>
+
+
+<p>
+
+Digitale.
+Sport.
+Scienze motorie.
+Educazione.
+Management.
+
+</p>
+
+
+<p>
+
+Sembravano cinque strade.
+
+</p>
+
+
+</div>
+
+
+
+</div>
+
+</section>
+
+
+
+
+
+
+<!-- 04 -->
+
+<section
+id="04"
+class="home-section home-section--network">
+
+
+<div class="section-inner section-inner--split">
+
+
+<div>
+
+
+<h2 class="statement reveal">
+
+NON ERANO
+CINQUE STRADE.
+
+</h2>
+
+
+<p class="editorial-copy reveal">
+
+Era una sola ricerca vista da cinque prospettive.
+
+</p>
+
+
+</div>
+
+
+
+<div class="network-visual reveal">
+
+
+<div class="network-node network-node--sport"></div>
+
+<div class="network-node network-node--scienze-motorie"></div>
+
+<div class="network-node network-node--educazione"></div>
+
+<div class="network-node network-node--management"></div>
+
+<div class="network-node network-node--digitale"></div>
+
+
+</div>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+<!-- 05 -->
+
+<section
+id="05"
+class="home-section home-section--pause">
+
+
+<div class="pause-section">
+
+
+<h2 class="reveal">
+
+PER VEDERE
+LA DIREZIONE,
+
+<br>
+
+HO DOVUTO
+FERMARMI.
+
+</h2>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+<!-- 06 -->
+
+<section
+id="06"
+class="home-section home-section--territory">
+
+
+<div class="section-inner section-inner--territory">
+
+
+<div class="origin-point reveal">
+
+
+<h3>
+
+PARTINICO
+
+</h3>
+
+
+<p>
+
+Un punto preciso.
+
+Non un limite.
+
+Una coordinata.
+
+</p>
+
+
+</div>
+
+
+
+<div class="territory-map reveal">
+
+<iframe
+src="https://www.google.com/maps/embed"
+loading="lazy">
+</iframe>
+
+</div>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+<!-- 07 -->
+
+<section
+id="07"
+class="home-section">
+
+
+<div class="section-inner">
+
+
+<h2 class="statement reveal">
+
+LA BASE È QUI.
+
+<br>
+
+<span class="accent">
+LA DIREZIONE NO.
+</span>
+
+
+</h2>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+<!-- 08 -->
+
+<section
+id="08"
+class="home-section">
+
+
+<div class="section-inner">
+
+
+<h2 class="section-title">
+LA FORMA
+</h2>
+
+
+
+<div class="direction-grid">
+
+
+<article>
+<h3>Movimento</h3>
+</article>
+
+
+<article>
+<h3>Obiettivo</h3>
+</article>
+
+
+<article>
+<h3>Prestazione</h3>
+</article>
+
+
+<article>
+<h3>Progetto</h3>
+</article>
+
+
+<article>
+<h3>Sviluppo</h3>
+</article>
+
+
+</div>
+
+
+</div>
+
+</section>
+
+
+
+
+
+
+
+<!-- 09 -->
+
+<section
+id="09"
+class="home-section">
+
+
+<div class="section-inner">
+
+
+<h2 class="statement reveal">
+
+IO PARTO
+DA QUI.
+
+<br><br>
+
+TU PARTI
+DA UN ALTRO PUNTO.
+
+</h2>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+<!-- 10 -->
+
+<section
+id="10"
+class="home-section final-question">
+
+
+<div class="section-inner">
+
+
+<h2 class="reveal">
+
+DA UN PUNTO
+
+<span>
+
+PUÒ NASCERE
+UNA DIREZIONE.
+
+</span>
+
+
+</h2>
+
+
+
+<div class="final-trajectory">
+
+
+<div class="final-trajectory-line"></div>
+
+
+<div class="final-trajectory-point"></div>
+
+
+</div>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+</main>
+
+
+
+
+
+
+<footer class="site-footer">
+
+
+<div class="footer-inner">
+
+
+<img src="logo-cp.svg"
+class="footer-mark"
+alt="CP">
+
+
+<p class="footer-motto">
+
+MOVIMENTO
+/
+DIREZIONE
+
+</p>
+
+
+<p class="footer-signature">
+
+CESARE PARATORE
+
+</p>
+
+
+</div>
+
+
+</footer>
+
+
+
+
+
+<div class="custom-cursor">
+
+<div class="custom-cursor-dot"></div>
+
+<div class="custom-cursor-ring"></div>
+
+</div>
+
+
+
+
+
+<script src="script.js"></script>
+
+
+</body>
+
+</html>
