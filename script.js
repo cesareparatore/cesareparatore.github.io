@@ -5,6 +5,7 @@
   const body = document.body;
 
   const loader = document.getElementById("loader");
+  const header = document.getElementById("site-header");
 
   const menu = document.getElementById("menu-overlay");
   const menuTrigger = document.getElementById("menu-trigger");
@@ -46,15 +47,13 @@
     scrollDirty: false,
     resizeDirty: false,
 
+    magneticX: 0,
+    magneticY: 0,
+
     lastInteraction: performance.now()
   };
 
   let loadFinished = document.readyState === "complete";
-
-
-  /* =========================================================
-     UTILITIES
-     ========================================================= */
 
   const clamp = (value, min = 0, max = 1) =>
     Math.min(max, Math.max(min, value));
@@ -75,11 +74,6 @@
 
     return clamp(-rect.top / travel);
   };
-
-
-  /* =========================================================
-     SCENE STATE
-     ========================================================= */
 
   function getCurrentScene() {
     const viewportCenter = window.innerHeight / 2;
@@ -105,10 +99,12 @@
 
   function getSceneProgress(index) {
     if (index === 0) {
-      const rect = scenes[0].getBoundingClientRect();
+      const rect =
+        scenes[0].getBoundingClientRect();
 
       return clamp(
-        -rect.top / Math.max(1, window.innerHeight)
+        -rect.top /
+          Math.max(1, window.innerHeight)
       );
     }
 
@@ -117,22 +113,19 @@
 
   function updateStateFromScroll() {
     const nextIndex = getCurrentScene();
-    const nextProgress = getSceneProgress(nextIndex);
+    const nextProgress =
+      getSceneProgress(nextIndex);
 
     state.currentIndex = nextIndex;
     state.targetProgress = nextProgress;
   }
 
-
-  /* =========================================================
-     RENDER
-     ========================================================= */
-
   function render() {
     const index = state.currentIndex;
     const progress = state.currentProgress;
 
-    const chapterCount = scenes.length - 1;
+    const chapterCount =
+      scenes.length - 1;
 
     const journeyProgress =
       chapterCount <= 0
@@ -144,32 +137,24 @@
       progress.toFixed(4)
     );
 
-    /*
-      Tutte le traiettorie utilizzano lo stesso valore temporale,
-      ma la loro geometria è completamente definita dal CSS/SVG.
-      Il JS non modifica mai coordinate, posizioni o dimensioni.
-    */
-
-    const trajectoryProgress = easeOut(progress);
-
     root.style.setProperty(
       "--trajectory-progress",
-      trajectoryProgress.toFixed(4)
+      easeOut(progress).toFixed(4)
     );
 
     root.style.setProperty(
       "--convergence-progress",
-      trajectoryProgress.toFixed(4)
+      easeOut(progress).toFixed(4)
     );
 
     root.style.setProperty(
       "--encounter-progress",
-      trajectoryProgress.toFixed(4)
+      easeOut(progress).toFixed(4)
     );
 
     root.style.setProperty(
       "--final-progress",
-      trajectoryProgress.toFixed(4)
+      easeOut(progress).toFixed(4)
     );
 
     root.style.setProperty(
@@ -209,15 +194,11 @@
       String(index).padStart(2, "0");
   }
 
-
-  /* =========================================================
-     RAF
-     ========================================================= */
-
   function requestRender() {
     if (state.rafId) return;
 
-    state.rafId = requestAnimationFrame(frame);
+    state.rafId =
+      requestAnimationFrame(frame);
   }
 
   function frame() {
@@ -228,7 +209,8 @@
       updateStateFromScroll();
     }
 
-    const target = state.targetProgress;
+    const target =
+      state.targetProgress;
 
     if (reducedMotion.matches) {
       state.currentProgress = target;
@@ -244,7 +226,8 @@
 
     const difference =
       Math.abs(
-        state.currentProgress - target
+        state.currentProgress -
+        target
       );
 
     if (
@@ -259,13 +242,9 @@
     }
   }
 
-
-  /* =========================================================
-     SCROLL / RESIZE
-     ========================================================= */
-
   function onScroll() {
     state.scrollDirty = true;
+
     registerInteraction();
     requestRender();
   }
@@ -275,11 +254,6 @@
     requestRender();
   }
 
-
-  /* =========================================================
-     NAVIGATION
-     ========================================================= */
-
   function goToScene(index) {
     const targetIndex = clamp(
       index,
@@ -287,7 +261,8 @@
       scenes.length - 1
     );
 
-    const target = scenes[targetIndex];
+    const target =
+      scenes[targetIndex];
 
     if (!target) return;
 
@@ -302,17 +277,16 @@
   }
 
   function goNext() {
-    goToScene(state.currentIndex + 1);
+    goToScene(
+      state.currentIndex + 1
+    );
   }
 
   function goPrevious() {
-    goToScene(state.currentIndex - 1);
+    goToScene(
+      state.currentIndex - 1
+    );
   }
-
-
-  /* =========================================================
-     MENU
-     ========================================================= */
 
   function openMenu() {
     if (!menu) return;
@@ -325,35 +299,48 @@
       "false"
     );
 
-    menuTrigger?.setAttribute(
-      "aria-expanded",
-      "true"
-    );
+    if (menuTrigger) {
+      menuTrigger.setAttribute(
+        "aria-expanded",
+        "true"
+      );
+    }
 
-    body.classList.add("menu-open");
+    body.classList.add(
+      "menu-open"
+    );
 
     window.setTimeout(() => {
       menuClose?.focus();
     }, 50);
   }
 
-  function closeMenu(returnFocus = true) {
+  function closeMenu(
+    returnFocus = true
+  ) {
     if (!menu) return;
 
     state.menuOpen = false;
 
-    menu.classList.remove("is-open");
+    menu.classList.remove(
+      "is-open"
+    );
+
     menu.setAttribute(
       "aria-hidden",
       "true"
     );
 
-    menuTrigger?.setAttribute(
-      "aria-expanded",
-      "false"
-    );
+    if (menuTrigger) {
+      menuTrigger.setAttribute(
+        "aria-expanded",
+        "false"
+      );
+    }
 
-    body.classList.remove("menu-open");
+    body.classList.remove(
+      "menu-open"
+    );
 
     if (returnFocus) {
       menuTrigger?.focus();
@@ -388,11 +375,6 @@
     );
   });
 
-
-  /* =========================================================
-     KEYBOARD
-     ========================================================= */
-
   document.addEventListener(
     "keydown",
     (event) => {
@@ -424,11 +406,6 @@
     }
   );
 
-
-  /* =========================================================
-     FOCUS TRAP
-     ========================================================= */
-
   document.addEventListener(
     "keydown",
     (event) => {
@@ -447,7 +424,9 @@
 
       if (!focusable.length) return;
 
-      const first = focusable[0];
+      const first =
+        focusable[0];
+
       const last =
         focusable[focusable.length - 1];
 
@@ -468,11 +447,6 @@
       }
     }
   );
-
-
-  /* =========================================================
-     MAGNETIC
-     ========================================================= */
 
   function setupMagnetic() {
 
@@ -504,7 +478,7 @@
               rect.top -
               rect.height / 2;
 
-            const strength = 0.12;
+            const strength = .12;
 
             element.style.setProperty(
               "--mx",
@@ -533,13 +507,9 @@
             );
           }
         );
+
       });
   }
-
-
-  /* =========================================================
-     IDLE
-     ========================================================= */
 
   const IDLE_DELAY = 45000;
   let idleTimer = 0;
@@ -556,25 +526,31 @@
   }
 
   function resetIdleTimer() {
-    window.clearTimeout(idleTimer);
+    window.clearTimeout(
+      idleTimer
+    );
 
     if (
       state.menuOpen ||
-      document.visibilityState !== "visible"
+      document.visibilityState !==
+        "visible"
     ) {
       return;
     }
 
-    idleTimer = window.setTimeout(
-      showIdle,
-      IDLE_DELAY
-    );
+    idleTimer =
+      window.setTimeout(
+        showIdle,
+        IDLE_DELAY
+      );
   }
 
   function showIdle() {
+
     if (
       state.menuOpen ||
-      document.visibilityState !== "visible"
+      document.visibilityState !==
+        "visible"
     ) {
       return;
     }
@@ -590,7 +566,9 @@
       "false"
     );
 
-    body.classList.add("idle-open");
+    body.classList.add(
+      "idle-open"
+    );
   }
 
   function closeIdle() {
@@ -611,11 +589,6 @@
 
     resetIdleTimer();
   }
-
-
-  /* =========================================================
-     LOADER
-     ========================================================= */
 
   function finishLoader() {
 
@@ -651,28 +624,23 @@
 
     if (loadFinished) {
       finishLoader();
-      return;
+    } else {
+
+      window.addEventListener(
+        "load",
+        () => {
+          loadFinished = true;
+          finishLoader();
+        },
+        { once: true }
+      );
+
+      window.setTimeout(
+        finishLoader,
+        7000
+      );
     }
-
-    window.addEventListener(
-      "load",
-      () => {
-        loadFinished = true;
-        finishLoader();
-      },
-      { once: true }
-    );
-
-    window.setTimeout(
-      finishLoader,
-      7000
-    );
   }
-
-
-  /* =========================================================
-     VISIBILITY
-     ========================================================= */
 
   document.addEventListener(
     "visibilitychange",
@@ -693,31 +661,23 @@
     }
   );
 
-
-  /* =========================================================
-     INTERACTION EVENTS
-     ========================================================= */
-
   [
     "pointerdown",
     "pointermove",
     "touchstart",
     "keydown",
     "wheel"
-  ].forEach((eventName) => {
+  ].forEach(
+    (eventName) => {
 
-    document.addEventListener(
-      eventName,
-      registerInteraction,
-      { passive: true }
-    );
+      document.addEventListener(
+        eventName,
+        registerInteraction,
+        { passive: true }
+      );
 
-  });
-
-
-  /* =========================================================
-     HISTORY / DEEP LINKS
-     ========================================================= */
+    }
+  );
 
   function syncInitialHash() {
 
@@ -740,6 +700,7 @@
         });
 
         state.scrollDirty = true;
+
         requestRender();
       }
     );
@@ -757,19 +718,15 @@
       if (!target) return;
 
       target.scrollIntoView({
-        behavior: reducedMotion.matches
-          ? "auto"
-          : "smooth",
+        behavior:
+          reducedMotion.matches
+            ? "auto"
+            : "smooth",
         block: "start"
       });
 
     }
   );
-
-
-  /* =========================================================
-     SEMANTIC INTERSECTION OBSERVER
-     ========================================================= */
 
   const observer =
     "IntersectionObserver" in window
@@ -797,15 +754,12 @@
       : null;
 
   if (observer) {
-    scenes.forEach((scene) => {
-      observer.observe(scene);
-    });
+    scenes.forEach(
+      (scene) => {
+        observer.observe(scene);
+      }
+    );
   }
-
-
-  /* =========================================================
-     INITIALIZATION
-     ========================================================= */
 
   function init() {
 
