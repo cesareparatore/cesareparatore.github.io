@@ -1,505 +1,352 @@
-/* ============================================================
-   MOVIMENTO CON DIREZIONE.
-   Cesare Paratore
-   Experience / Creative Technology / Design Engineering
-   ============================================================ */
-
 (() => {
   "use strict";
 
-
   /* ==========================================================
-     01. DOM
-     ========================================================== */
+     ROOT
+  =========================================================== */
 
   const root = document.documentElement;
   const body = document.body;
 
-  const loader = document.querySelector(".page-loader");
-  const idleScreen = document.querySelector("#idle-screen");
+  root.classList.remove("no-js");
 
-  const header = document.querySelector(".site-header");
-  const menu = document.querySelector("#site-menu");
-  const menuTrigger = document.querySelector(".menu-trigger");
-  const menuLinks = [...document.querySelectorAll(".site-menu__nav a")];
 
-  const progressCurrent = document.querySelector("#progress-current");
-  const progressFill = document.querySelector("#progress-fill");
-  const progressPoint = document.querySelector("#progress-point");
-
-  const previousSection = document.querySelector("#previous-section");
-  const previousSectionLabel = document.querySelector("#previous-section-label");
-
-  const nextSection = document.querySelector("#next-section");
-  const nextSectionLabel = document.querySelector("#next-section-label");
+  /* ==========================================================
+     CONFIG — SINGLE SOURCE OF TRUTH
+  =========================================================== */
 
   const chapters = [
-    ...document.querySelectorAll(".chapter")
+    {
+      id: "chapter-01",
+      title: "IL MOVIMENTO È SOLO L'INIZIO."
+    },
+    {
+      id: "chapter-02",
+      title: "LA DOMANDA È CAMBIATA."
+    },
+    {
+      id: "chapter-03",
+      title: "UNA STRADA NON ERA ABBASTANZA."
+    },
+    {
+      id: "chapter-04",
+      title: "POI HO CAPITO CHE NON ERANO CINQUE STRADE."
+    },
+    {
+      id: "chapter-05",
+      title: "A QUEL PUNTO, MI SONO FERMATO."
+    },
+    {
+      id: "chapter-06",
+      title: "OGGI SO ANCHE DA DOVE PARTO."
+    },
+    {
+      id: "chapter-07",
+      title: "LA BASE È QUI. LA DIREZIONE, NO."
+    },
+    {
+      id: "chapter-08",
+      title: "ORA QUESTA DIREZIONE PRENDE FORMA."
+    },
+    {
+      id: "chapter-09",
+      title: "FORSE È QUI CHE LA STORIA CAMBIA."
+    },
+    {
+      id: "chapter-10",
+      title: "PARTIAMO DA QUELLO."
+    }
   ];
-
-  const trajectories = [
-    ...document.querySelectorAll(".trajectory")
-  ];
-
-  const magneticElements = [
-    ...document.querySelectorAll(".magnetic")
-  ];
-
-  const mapElement = document.querySelector(".origin-map img");
 
 
   /* ==========================================================
-     02. CONFIGURATION
-     ========================================================== */
+     DOM
+  =========================================================== */
 
-  const CHAPTERS = chapters.map((chapter, index) => ({
-    index: index + 1,
-    element: chapter,
-    title: chapter.dataset.title || "",
-    id: chapter.id
-  }));
-
-  const IDLE_DELAY = 45000;
-  const LOADER_MAX_WAIT = 6500;
-
-  const MOBILE_BREAKPOINT = 760;
-
-  const motionQuery = window.matchMedia(
-    "(prefers-reduced-motion: reduce)"
+  const chapterElements = chapters.map(({ id }) =>
+    document.getElementById(id)
   );
 
-  const touchQuery = window.matchMedia(
-    "(hover: none), (pointer: coarse)"
-  );
+  const progressCurrent =
+    document.getElementById("progress-current");
+
+  const progressFill =
+    document.getElementById("progress-fill");
+
+  const progressPoint =
+    document.getElementById("progress-point");
+
+  const previousSection =
+    document.getElementById("previous-section");
+
+  const previousSectionLabel =
+    document.getElementById("previous-section-label");
+
+  const nextSection =
+    document.getElementById("next-section");
+
+  const nextSectionLabel =
+    document.getElementById("next-section-label");
+
+  const menuTrigger =
+    document.querySelector(".menu-trigger");
+
+  const menu =
+    document.getElementById("site-menu");
+
+  const menuLinks =
+    [...document.querySelectorAll(".site-menu__nav a")];
+
+  const idleScreen =
+    document.getElementById("idle-screen");
 
 
   /* ==========================================================
-     03. EXPERIENCE STATE
-     ========================================================== */
+     STATE
+  =========================================================== */
 
   const state = {
     chapter: 1,
     chapterProgress: 0,
     globalProgress: 0,
     scrollDirection: 1,
-    reducedMotion: motionQuery.matches,
+    reducedMotion: window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches,
     menuOpen: false,
     idle: false,
-    loaderComplete: false,
-    dirty: true,
-    frameRequested: false,
-    lastScrollY: window.scrollY,
-    lastRenderedScrollY: window.scrollY,
-    previousChapter: 1
+    loaderComplete: false
   };
 
 
   /* ==========================================================
-     04. UTILITY
-     ========================================================== */
+     INTERNAL ENGINE STATE
+  =========================================================== */
 
-  const clamp = (value, min = 0, max = 1) => {
-    return Math.min(
-      Math.max(value, min),
-      max
-    );
-  };
+  let frameRequested = false;
+  let geometryDirty = true;
+  let lastScrollY = window.scrollY;
+  let maxScroll = 1;
 
+  let chapterMetrics = [];
 
-  const lerp = (a, b, amount) => {
-    return a + (b - a) * amount;
-  };
+  let idleTimer = null;
+  let previousFocus = null;
 
+  let loaderFinished = false;
 
-  const easeOut = (value) => {
-    const t = clamp(value);
-    return 1 - Math.pow(1 - t, 3);
-  };
+  const IDLE_DELAY = 45000;
 
 
-  const chapterById = (id) => {
-    return CHAPTERS.find(
-      chapter => chapter.id === id
-    );
-  };
+  /* ==========================================================
+     UTILS
+  =========================================================== */
+
+  const clamp = (value, min = 0, max = 1) =>
+    Math.min(max, Math.max(min, value));
 
 
-  const getChapterIndexFromScroll = () => {
+  const lerp = (a, b, amount) =>
+    a + (b - a) * amount;
+
+
+  const raf = window.requestAnimationFrame ||
+    ((callback) => window.setTimeout(callback, 16));
+
+
+  const caf = window.cancelAnimationFrame ||
+    window.clearTimeout;
+
+
+  /* ==========================================================
+     GEOMETRY
+  =========================================================== */
+
+  function calculateGeometry() {
+
     const scrollY = window.scrollY;
-    const viewportCenter = scrollY + window.innerHeight * .5;
 
-    let closest = CHAPTERS[0];
-    let closestDistance = Infinity;
+    maxScroll = Math.max(
+      1,
+      document.documentElement.scrollHeight -
+      window.innerHeight
+    );
 
-    CHAPTERS.forEach((chapter) => {
-      const rect = chapter.element.getBoundingClientRect();
+    chapterMetrics = chapterElements.map((element) => {
 
-      const absoluteTop = rect.top + scrollY;
-      const center = absoluteTop + rect.height * .5;
-
-      const distance = Math.abs(
-        center - viewportCenter
-      );
-
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closest = chapter;
+      if (!element) {
+        return {
+          top: 0,
+          height: 1,
+          bottom: 1
+        };
       }
+
+      const rect = element.getBoundingClientRect();
+
+      const top =
+        rect.top + scrollY;
+
+      const height =
+        Math.max(1, element.offsetHeight);
+
+      return {
+        top,
+        height,
+        bottom: top + height
+      };
     });
 
-    return closest.index;
-  };
+    geometryDirty = false;
+  }
 
 
-  const getChapterProgress = (chapter) => {
-    const rect = chapter.element.getBoundingClientRect();
+  function ensureGeometry() {
 
-    const scrollableHeight =
-      Math.max(
-        1,
-        rect.height - window.innerHeight
-      );
-
-    const progress =
-      clamp(
-        -rect.top / scrollableHeight
-      );
-
-    return progress;
-  };
-
-
-  const getGlobalProgress = () => {
-    const maxScroll =
-      Math.max(
-        1,
-        document.documentElement.scrollHeight - window.innerHeight
-      );
-
-    return clamp(
-      window.scrollY / maxScroll
-    );
-  };
-
-
-  const getChapterFromHash = () => {
-    const hash = window.location.hash;
-
-    if (!hash) {
-      return null;
+    if (geometryDirty) {
+      calculateGeometry();
     }
-
-    return chapterById(
-      hash.replace("#", "")
-    );
-  };
+  }
 
 
   /* ==========================================================
-     05. STATE CALCULATION
-     ========================================================== */
+     CHAPTER RESOLUTION
+  =========================================================== */
 
-  const calculateState = () => {
+  function resolveExperience(scrollY) {
 
-    const currentChapterIndex =
-      getChapterIndexFromScroll();
+    ensureGeometry();
 
-    const currentChapter =
-      CHAPTERS[currentChapterIndex - 1];
+    const documentProgress =
+      clamp(scrollY / maxScroll);
 
-    if (!currentChapter) {
-      return;
+    let activeIndex = 0;
+
+    for (let i = 0; i < chapterMetrics.length; i += 1) {
+
+      const metric = chapterMetrics[i];
+
+      if (
+        scrollY >= metric.top &&
+        scrollY < metric.bottom
+      ) {
+        activeIndex = i;
+        break;
+      }
+
+      if (scrollY >= metric.bottom) {
+        activeIndex = i;
+      }
     }
 
-    const currentScrollY = window.scrollY;
+    const metric =
+      chapterMetrics[activeIndex];
 
-    if (currentScrollY > state.lastScrollY) {
+    const localProgress =
+      clamp(
+        (scrollY - metric.top) /
+        Math.max(
+          1,
+          metric.height - window.innerHeight
+        )
+      );
+
+    return {
+      chapter: activeIndex + 1,
+      chapterProgress: localProgress,
+      globalProgress: documentProgress
+    };
+  }
+
+
+  /* ==========================================================
+     STATE UPDATE
+  =========================================================== */
+
+  function updateState() {
+
+    const scrollY = window.scrollY;
+
+    if (scrollY > lastScrollY) {
       state.scrollDirection = 1;
-    } else if (currentScrollY < state.lastScrollY) {
+    } else if (scrollY < lastScrollY) {
       state.scrollDirection = -1;
     }
 
-    state.lastScrollY = currentScrollY;
+    lastScrollY = scrollY;
+
+    const nextState =
+      resolveExperience(scrollY);
+
+    const chapterChanged =
+      state.chapter !== nextState.chapter;
 
     state.chapter =
-      currentChapterIndex;
+      nextState.chapter;
 
     state.chapterProgress =
-      getChapterProgress(
-        currentChapter.element
-      );
+      nextState.chapterProgress;
 
     state.globalProgress =
-      getGlobalProgress();
+      nextState.globalProgress;
 
-    state.reducedMotion =
-      motionQuery.matches;
-
-    state.previousChapter =
-      state.chapter;
-
-  };
+    renderState(chapterChanged);
+  }
 
 
   /* ==========================================================
-     06. ROOT CSS STATE
-     ========================================================== */
+     RENDER
+  =========================================================== */
 
-  const writeRootState = () => {
+  function renderState(chapterChanged = false) {
 
     root.style.setProperty(
       "--chapter-progress",
-      state.chapterProgress.toFixed(5)
+      state.chapterProgress
     );
 
     root.style.setProperty(
       "--global-progress",
-      state.globalProgress.toFixed(5)
+      state.globalProgress
     );
 
-  };
-
-
-  /* ==========================================================
-     07. CHAPTER-SPECIFIC MOTION
-     ========================================================== */
-
-  const renderChapterMotion = () => {
-
-    const progress = state.reducedMotion
-      ? 1
-      : state.chapterProgress;
-
-    trajectories.forEach((trajectory) => {
-
-      const chapter =
-        trajectory.closest(".chapter");
-
-      if (!chapter) {
-        return;
-      }
-
-      const chapterNumber =
-        Number(chapter.dataset.chapter);
-
-      if (chapterNumber !== state.chapter) {
-        return;
-      }
-
-      trajectory.style.setProperty(
-        "--trajectory-progress",
-        progress
-      );
-
-    });
-
-
-    /* --------------------------------------------------------
-       CHAPTER 04 — CONVERGENCE
-       -------------------------------------------------------- */
-
-    if (state.chapter === 4) {
-
-      const convergenceMark =
-        document.querySelector(".convergence-mark");
-
-      if (convergenceMark) {
-
-        const markProgress =
-          easeOut(
-            clamp(
-              (progress - .22) / .58
-            )
-          );
-
-        convergenceMark.style.opacity =
-          String(
-            clamp(
-              (progress - .12) / .18
-            )
-          );
-
-        convergenceMark.style.transform =
-          `translate(-50%, -50%) scale(${lerp(
-            .92,
-            1,
-            markProgress
-          )})`;
-
-      }
-    }
-
-
-    /* --------------------------------------------------------
-       CHAPTER 05 — PAUSE
-       -------------------------------------------------------- */
-
-    if (state.chapter === 5) {
-
-      const chapter =
-        document.querySelector(".chapter--05");
-
-      if (chapter) {
-
-        const point =
-          chapter.querySelector(
-            ".trajectory-point--05"
-          );
-
-        if (point) {
-          point.style.opacity =
-            state.reducedMotion
-              ? "1"
-              : String(
-                  clamp(
-                    (progress - .35) / .2
-                  )
-                );
-        }
-      }
-    }
-
-
-    /* --------------------------------------------------------
-       CHAPTER 08 — FORM
-       -------------------------------------------------------- */
-
-    if (state.chapter === 8) {
-
-      const formation =
-        document.querySelector(".formation");
-
-      if (formation) {
-
-        [...formation.children].forEach(
-          (item, index) => {
-
-            const localStart =
-              .18 + index * .11;
-
-            const localProgress =
-              clamp(
-                (progress - localStart) / .25
-              );
-
-            item.style.opacity =
-              state.reducedMotion
-                ? "1"
-                : String(
-                    easeOut(localProgress)
-                  );
-
-            item.style.transform =
-              state.reducedMotion
-                ? "none"
-                : `translateY(${
-                    lerp(16, 0, localProgress)
-                  }px)`;
-
-          }
-        );
-      }
-    }
-
-
-    /* --------------------------------------------------------
-       CHAPTER 09 — ENCOUNTER
-       -------------------------------------------------------- */
-
-    if (state.chapter === 9) {
-
-      const encounterPoint =
-        document.querySelector(
-          ".encounter-point"
-        );
-
-      if (encounterPoint) {
-
-        const localProgress =
-          clamp(
-            (progress - .52) / .2
-          );
-
-        encounterPoint.style.opacity =
-          String(
-            easeOut(localProgress)
-          );
-
-      }
-    }
-
-
-    /* --------------------------------------------------------
-       CHAPTER 10 — RESTART
-       -------------------------------------------------------- */
-
-    if (state.chapter === 10) {
-
-      const point =
-        document.querySelector(
-          ".trajectory-point--10"
-        );
-
-      if (point) {
-        point.style.opacity =
-          state.reducedMotion
-            ? "1"
-            : String(
-                clamp(
-                  (progress - .08) / .12
-                )
-              );
-      }
-    }
-
-  };
-
-
-  /* ==========================================================
-     08. HEADER RENDER
-     ========================================================== */
-
-  const renderHeader = () => {
+    root.style.setProperty(
+      "--header-progress",
+      state.globalProgress
+    );
 
     const current =
-      CHAPTERS[state.chapter - 1];
+      chapters[state.chapter - 1];
 
-    if (!current) {
-      return;
+    const previous =
+      chapters[state.chapter - 2];
+
+    const next =
+      chapters[state.chapter];
+
+    if (current) {
+      progressCurrent.textContent =
+        current.title;
     }
 
-    progressCurrent.textContent =
-      current.title;
+    progressFill.style.width =
+      `${state.globalProgress * 100}%`;
+
+    progressPoint.style.left =
+      `${state.globalProgress * 100}%`;
+
+    updatePrevious(previous);
+    updateNext(next);
+
+    if (chapterChanged) {
+      applyChapterTransition();
+    }
+  }
 
 
-    if (state.chapter > 1) {
+  function updatePrevious(previous) {
 
-      const previous =
-        CHAPTERS[state.chapter - 2];
-
-      previousSection.classList.remove(
-        "is-disabled"
-      );
-
-      previousSection.setAttribute(
-        "href",
-        `#${previous.id}`
-      );
-
-      previousSection.setAttribute(
-        "aria-hidden",
-        "false"
-      );
-
-      previousSection.setAttribute(
-        "tabindex",
-        "0"
-      );
-
-      previousSectionLabel.textContent =
-        previous.title;
-
-    } else {
+    if (!previous) {
 
       previousSection.classList.add(
         "is-disabled"
@@ -515,138 +362,150 @@
         "-1"
       );
 
-      previousSectionLabel.textContent =
-        "";
+      previousSectionLabel.textContent = "";
 
+      return;
     }
 
+    previousSection.classList.remove(
+      "is-disabled"
+    );
 
-    if (state.chapter < CHAPTERS.length) {
+    previousSection.removeAttribute(
+      "aria-hidden"
+    );
 
-      const next =
-        CHAPTERS[state.chapter];
+    previousSection.removeAttribute(
+      "tabindex"
+    );
 
-      nextSection.classList.remove(
-        "is-disabled"
-      );
+    previousSection.href =
+      `#${previous.id}`;
 
-      nextSection.setAttribute(
-        "href",
-        `#${next.id}`
-      );
+    previousSectionLabel.textContent =
+      previous.title;
 
-      nextSection.setAttribute(
-        "aria-label",
-        `Vai a ${next.title}`
-      );
+    previousSection.setAttribute(
+      "aria-label",
+      `Vai a ${previous.title}`
+    );
+  }
 
-      nextSectionLabel.textContent =
-        next.title;
 
-    } else {
+  function updateNext(next) {
+
+    if (!next) {
 
       nextSection.classList.add(
         "is-disabled"
       );
 
       nextSection.setAttribute(
-        "aria-label",
-        "Fine del percorso"
+        "aria-hidden",
+        "true"
       );
 
-      nextSectionLabel.textContent =
-        "";
+      nextSection.setAttribute(
+        "tabindex",
+        "-1"
+      );
 
-    }
+      nextSectionLabel.textContent = "";
 
-  };
-
-
-  /* ==========================================================
-     09. RENDER
-     ========================================================== */
-
-  const render = () => {
-
-    calculateState();
-
-    writeRootState();
-
-    renderChapterMotion();
-
-    renderHeader();
-
-    state.lastRenderedScrollY =
-      window.scrollY;
-
-    state.dirty = false;
-
-  };
-
-
-  /* ==========================================================
-     10. FRAME ENGINE
-     ========================================================== */
-
-  const requestFrame = () => {
-
-    state.dirty = true;
-
-    if (state.frameRequested) {
       return;
     }
 
-    state.frameRequested = true;
+    nextSection.classList.remove(
+      "is-disabled"
+    );
 
-    requestAnimationFrame(() => {
+    nextSection.removeAttribute(
+      "aria-hidden"
+    );
 
-      state.frameRequested = false;
+    nextSection.removeAttribute(
+      "tabindex"
+    );
 
-      if (!state.dirty) {
-        return;
-      }
+    nextSection.href =
+      `#${next.id}`;
 
-      render();
+    nextSectionLabel.textContent =
+      next.title;
 
+    nextSection.setAttribute(
+      "aria-label",
+      `Vai a ${next.title}`
+    );
+  }
+
+
+  function applyChapterTransition() {
+
+    if (state.reducedMotion) {
+      return;
+    }
+
+    chapterElements.forEach((chapter) => {
+      chapter.classList.remove(
+        "is-transitioning"
+      );
     });
 
-  };
+    const current =
+      chapterElements[state.chapter - 1];
+
+    if (!current) {
+      return;
+    }
+
+    current.classList.add(
+      "is-transitioning"
+    );
+
+    window.setTimeout(() => {
+      current.classList.remove(
+        "is-transitioning"
+      );
+    }, 500);
+  }
 
 
   /* ==========================================================
-     11. SCROLL
-     ========================================================== */
+     SINGLE FRAME ENGINE
+  =========================================================== */
 
-  let scrollFramePending = false;
+  function requestFrame() {
 
-  const handleScroll = () => {
+    if (frameRequested) {
+      return;
+    }
 
+    frameRequested = true;
+
+    raf(() => {
+
+      frameRequested = false;
+
+      updateState();
+    });
+  }
+
+
+  /* ==========================================================
+     SCROLL
+  =========================================================== */
+
+  function onScroll() {
+
+    requestFrame();
     resetIdleTimer();
-
-    state.dirty = true;
-
-    if (scrollFramePending) {
-      return;
-    }
-
-    scrollFramePending = true;
-
-    requestAnimationFrame(() => {
-
-      scrollFramePending = false;
-
-      if (!state.menuOpen && !state.idle) {
-        requestFrame();
-      }
-
-    });
-
-  };
+  }
 
 
   window.addEventListener(
     "scroll",
-    handleScroll,
+    onScroll,
     {
       passive: true
     }
@@ -654,36 +513,29 @@
 
 
   /* ==========================================================
-     12. RESIZE
-     ========================================================== */
+     RESIZE
+  =========================================================== */
 
-  let resizeTimer = null;
+  function onResize() {
 
-  const handleResize = () => {
+    geometryDirty = true;
 
-    clearTimeout(resizeTimer);
+    requestFrame();
+  }
 
-    resizeTimer =
-      setTimeout(() => {
-
-        requestFrame();
-
-      }, 100);
-
-  };
 
   window.addEventListener(
     "resize",
-    handleResize,
+    onResize,
     {
       passive: true
     }
   );
 
-
   window.addEventListener(
     "orientationchange",
     () => {
+      geometryDirty = true;
       requestFrame();
     },
     {
@@ -693,221 +545,133 @@
 
 
   /* ==========================================================
-     13. VISIBILITY
-     ========================================================== */
+     INTERSECTION OBSERVER
+     Semantic activation only.
+     It does NOT drive animation.
+  =========================================================== */
 
-  document.addEventListener(
-    "visibilitychange",
-    () => {
-
-      if (document.hidden) {
-        state.dirty = false;
-        return;
-      }
-
-      requestFrame();
-
-    }
-  );
-
-
-  /* ==========================================================
-     14. INTERSECTION OBSERVER
-     ========================================================== */
-
-  const chapterObserver =
+  const observer =
     new IntersectionObserver(
-      entries => {
+      (entries) => {
 
-        const visible =
-          entries
-            .filter(entry => entry.isIntersecting)
-            .sort(
-              (a, b) =>
-                b.intersectionRatio -
-                a.intersectionRatio
-            );
+        entries.forEach((entry) => {
 
-        if (!visible.length) {
-          return;
-        }
+          if (!entry.isIntersecting) {
+            return;
+          }
 
-        const active =
-          visible[0].target;
+          const chapter =
+            entry.target.dataset.chapter;
 
-        const chapter =
-          chapterById(active.id);
+          if (!chapter) {
+            return;
+          }
 
-        if (!chapter) {
-          return;
-        }
-
-        state.chapter =
-          chapter.index;
-
-        requestFrame();
-
+          /*
+            Scroll remains the source of truth.
+            Observer is deliberately not allowed
+            to mutate the experience progress.
+          */
+        });
       },
       {
-        threshold: [
-          0,
-          .15,
-          .35,
-          .5,
-          .7,
-          .85,
-          1
-        ],
-        rootMargin:
-          "-10% 0px -10% 0px"
+        root: null,
+        threshold: 0.05
       }
     );
 
+  chapterElements.forEach((chapter) => {
 
-  chapters.forEach(
-    chapter => {
-      chapterObserver.observe(chapter);
+    if (chapter) {
+      observer.observe(chapter);
     }
-  );
-
-
-  /* ==========================================================
-     15. DIRECT NAVIGATION
-     ========================================================== */
-
-  const navigateToChapter = (
-    chapter,
-    updateHash = true
-  ) => {
-
-    if (!chapter) {
-      return;
-    }
-
-    if (updateHash) {
-
-      history.pushState(
-        null,
-        "",
-        `#${chapter.id}`
-      );
-
-    }
-
-    chapter.element.scrollIntoView({
-      behavior:
-        state.reducedMotion
-          ? "auto"
-          : "auto",
-      block: "start"
-    });
-
-    requestFrame();
-
-  };
-
-
-  const handleHashNavigation = () => {
-
-    const target =
-      getChapterFromHash();
-
-    if (!target) {
-      requestFrame();
-      return;
-    }
-
-    window.requestAnimationFrame(() => {
-
-      target.element.scrollIntoView({
-        behavior: "auto",
-        block: "start"
-      });
-
-      requestFrame();
-
-    });
-
-  };
-
-
-  window.addEventListener(
-    "popstate",
-    handleHashNavigation
-  );
-
-  window.addEventListener(
-    "hashchange",
-    handleHashNavigation
-  );
-
-
-  [...document.querySelectorAll(
-    'a[href^="#chapter-"]'
-  )].forEach(link => {
-
-    link.addEventListener(
-      "click",
-      event => {
-
-        const href =
-          link.getAttribute("href");
-
-        if (!href) {
-          return;
-        }
-
-        const target =
-          document.querySelector(href);
-
-        if (!target) {
-          return;
-        }
-
-        event.preventDefault();
-
-        const chapter =
-          chapterById(
-            target.id
-          );
-
-        navigateToChapter(
-          chapter
-        );
-
-        if (state.menuOpen) {
-          closeMenu();
-        }
-
-      }
-    );
-
   });
 
 
   /* ==========================================================
-     16. MENU
-     ========================================================== */
+     DIRECT NAVIGATION
+  =========================================================== */
 
-  let menuReturnFocus =
-    null;
+  function scrollToChapter(id) {
 
-  const getFirstFocusableMenuElement = () => {
+    const target =
+      document.getElementById(id);
 
-    return menu.querySelector(
-      "a, button, [tabindex]:not([tabindex='-1'])"
-    );
+    if (!target) {
+      return;
+    }
 
-  };
+    const top =
+      target.getBoundingClientRect().top +
+      window.scrollY;
+
+    const headerOffset =
+      window.innerWidth <= 680
+        ? 112
+        : window.innerWidth <= 900
+          ? 106
+          : 118;
+
+    window.scrollTo({
+      top: Math.max(0, top - headerOffset),
+      behavior: state.reducedMotion
+        ? "auto"
+        : "smooth"
+    });
+  }
 
 
-  const openMenu = () => {
+  document.addEventListener(
+    "click",
+    (event) => {
+
+      const link =
+        event.target.closest(
+          'a[href^="#chapter-"]'
+        );
+
+      if (!link) {
+        return;
+      }
+
+      const id =
+        link.getAttribute("href");
+
+      const target =
+        document.querySelector(id);
+
+      if (!target) {
+        return;
+      }
+
+      event.preventDefault();
+
+      if (state.menuOpen) {
+        closeMenu({
+          restoreFocus: false
+        });
+      }
+
+      scrollToChapter(
+        id.substring(1)
+      );
+
+      resetIdleTimer();
+    }
+  );
+
+
+  /* ==========================================================
+     MENU
+  =========================================================== */
+
+  function openMenu() {
 
     if (state.menuOpen) {
       return;
     }
 
-    menuReturnFocus =
+    previousFocus =
       document.activeElement;
 
     state.menuOpen = true;
@@ -935,23 +699,23 @@
       "Chiudi menu"
     );
 
-    window.requestAnimationFrame(() => {
-
-      const first =
-        getFirstFocusableMenuElement();
-
-      if (first) {
-        first.focus();
-      }
-
-    });
-
     resetIdleTimer();
 
-  };
+    requestAnimationFrame(() => {
+
+      const firstLink =
+        menuLinks[0];
+
+      if (firstLink) {
+        firstLink.focus();
+      }
+    });
+  }
 
 
-  const closeMenu = () => {
+  function closeMenu({
+    restoreFocus = true
+  } = {}) {
 
     if (!state.menuOpen) {
       return;
@@ -984,15 +748,17 @@
     );
 
     if (
-      menuReturnFocus &&
-      typeof menuReturnFocus.focus === "function"
+      restoreFocus &&
+      previousFocus &&
+      typeof previousFocus.focus === "function"
     ) {
-      menuReturnFocus.focus();
+      previousFocus.focus();
     }
 
-    resetIdleTimer();
+    previousFocus = null;
 
-  };
+    resetIdleTimer();
+  }
 
 
   menuTrigger.addEventListener(
@@ -1004,141 +770,115 @@
       } else {
         openMenu();
       }
-
-    }
-  );
-
-
-  menuLinks.forEach(
-    link => {
-
-      link.addEventListener(
-        "click",
-        () => {
-          closeMenu();
-        }
-      );
-
     }
   );
 
 
   document.addEventListener(
     "keydown",
-    event => {
+    (event) => {
 
-      if (
-        event.key === "Escape" &&
-        state.menuOpen
-      ) {
-        event.preventDefault();
-        closeMenu();
+      if (event.key !== "Escape") {
         return;
       }
 
-      if (
-        event.key === "Tab" &&
-        state.menuOpen
-      ) {
-
-        const focusable =
-          [
-            ...menu.querySelectorAll(
-              "a, button, [tabindex]:not([tabindex='-1'])"
-            )
-          ].filter(
-            element =>
-              !element.hasAttribute("disabled") &&
-              element.getAttribute("aria-hidden") !== "true"
-          );
-
-        if (!focusable.length) {
-          return;
-        }
-
-        const first =
-          focusable[0];
-
-        const last =
-          focusable[focusable.length - 1];
-
-        if (
-          event.shiftKey &&
-          document.activeElement === first
-        ) {
-
-          event.preventDefault();
-          last.focus();
-
-        } else if (
-          !event.shiftKey &&
-          document.activeElement === last
-        ) {
-
-          event.preventDefault();
-          first.focus();
-
-        }
-
+      if (state.menuOpen) {
+        closeMenu();
       }
 
+      if (state.idle) {
+        exitIdle();
+      }
     }
   );
 
 
   /* ==========================================================
-     17. MAGNETIC INTERACTION
-     ========================================================== */
+     MENU FOCUS CONTAINMENT
+  =========================================================== */
 
-  const magneticEnabled = () => {
+  menu.addEventListener(
+    "keydown",
+    (event) => {
 
-    return (
-      !state.reducedMotion &&
-      !touchQuery.matches &&
-      window.innerWidth > MOBILE_BREAKPOINT
+      if (
+        event.key !== "Tab" ||
+        !state.menuOpen
+      ) {
+        return;
+      }
+
+      const focusable =
+        menu.querySelectorAll(
+          'a[href], button:not([disabled])'
+        );
+
+      if (!focusable.length) {
+        return;
+      }
+
+      const first =
+        focusable[0];
+
+      const last =
+        focusable[focusable.length - 1];
+
+      if (
+        event.shiftKey &&
+        document.activeElement === first
+      ) {
+        event.preventDefault();
+        last.focus();
+      } else if (
+        !event.shiftKey &&
+        document.activeElement === last
+      ) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+  );
+
+
+  /* ==========================================================
+     MAGNETIC — PROGRESSIVE ENHANCEMENT
+  =========================================================== */
+
+  const magneticElements =
+    [...document.querySelectorAll(".magnetic")];
+
+  const finePointer =
+    window.matchMedia(
+      "(hover: hover) and (pointer: fine)"
     );
 
-  };
+  function enableMagnetic() {
 
+    if (
+      !finePointer.matches ||
+      state.reducedMotion
+    ) {
+      return;
+    }
 
-  const resetMagnetic = () => {
-
-    root.style.setProperty(
-      "--magnetic-x",
-      "0px"
-    );
-
-    root.style.setProperty(
-      "--magnetic-y",
-      "0px"
-    );
-
-  };
-
-
-  magneticElements.forEach(
-    element => {
+    magneticElements.forEach((element) => {
 
       element.addEventListener(
         "pointermove",
-        event => {
-
-          if (!magneticEnabled()) {
-            return;
-          }
+        (event) => {
 
           const rect =
             element.getBoundingClientRect();
 
           const x =
-            event.clientX -
-            (rect.left + rect.width / 2);
+            (event.clientX - rect.left - rect.width / 2) /
+            rect.width;
 
           const y =
-            event.clientY -
-            (rect.top + rect.height / 2);
+            (event.clientY - rect.top - rect.height / 2) /
+            rect.height;
 
-          const strength = .08;
+          const strength = 5;
 
           element.style.setProperty(
             "--magnetic-x",
@@ -1149,7 +889,6 @@
             "--magnetic-y",
             `${y * strength}px`
           );
-
         }
       );
 
@@ -1166,45 +905,53 @@
             "--magnetic-y",
             "0px"
           );
-
         }
       );
+    });
+  }
 
-    }
-  );
+  enableMagnetic();
 
 
   /* ==========================================================
-     18. IDLE STANDBY
-     ========================================================== */
+     IDLE
+  =========================================================== */
 
-  let idleTimer = null;
-
-  let savedScrollY = 0;
-
-  const interactionEvents = [
-    "pointerdown",
-    "pointermove",
-    "wheel",
-    "touchstart",
-    "keydown",
-    "scroll"
-  ];
-
-
-  const enterIdle = () => {
+  function resetIdleTimer() {
 
     if (
-      state.idle ||
+      !loaderFinished ||
       state.menuOpen ||
-      !state.loaderComplete ||
-      document.hidden
+      state.reducedMotion && false
     ) {
       return;
     }
 
-    savedScrollY =
-      window.scrollY;
+    if (state.idle) {
+      exitIdle();
+    }
+
+    if (idleTimer) {
+      window.clearTimeout(idleTimer);
+    }
+
+    idleTimer =
+      window.setTimeout(
+        enterIdle,
+        IDLE_DELAY
+      );
+  }
+
+
+  function enterIdle() {
+
+    if (
+      !loaderFinished ||
+      state.menuOpen ||
+      state.idle
+    ) {
+      return;
+    }
 
     state.idle = true;
 
@@ -1220,11 +967,10 @@
       "aria-hidden",
       "false"
     );
+  }
 
-  };
 
-
-  const exitIdle = () => {
+  function exitIdle() {
 
     if (!state.idle) {
       return;
@@ -1245,273 +991,179 @@
       "true"
     );
 
-    window.scrollTo(
-      0,
-      savedScrollY
+    resetIdleTimer();
+  }
+
+
+  const interactionEvents = [
+    "pointermove",
+    "pointerdown",
+    "touchstart",
+    "wheel",
+    "keydown"
+  ];
+
+  interactionEvents.forEach((eventName) => {
+
+    window.addEventListener(
+      eventName,
+      resetIdleTimer,
+      {
+        passive: eventName !== "keydown"
+      }
     );
-
-    requestFrame();
-
-  };
+  });
 
 
-  const resetIdleTimer = () => {
-
-    if (!state.loaderComplete) {
-      return;
-    }
-
-    clearTimeout(idleTimer);
-
-    if (state.idle) {
-      exitIdle();
-    }
-
-    idleTimer =
-      setTimeout(
-        enterIdle,
-        IDLE_DELAY
-      );
-
-  };
-
-
-  interactionEvents.forEach(
-    eventName => {
-
-      window.addEventListener(
-        eventName,
-        () => {
-
-          if (state.idle) {
-            exitIdle();
-          }
-
-          if (
-            eventName !== "scroll"
-          ) {
-            resetIdleTimer();
-          }
-
-        },
-        {
-          passive: true
-        }
-      );
-
-    }
+  idleScreen.addEventListener(
+    "pointerdown",
+    exitIdle
   );
 
 
   /* ==========================================================
-     19. LOADER
-     ========================================================== */
+     LOADER
+  =========================================================== */
 
-  let loaderCompleted = false;
+  function completeLoader() {
 
-  const completeLoader = () => {
-
-    if (loaderCompleted) {
+    if (loaderFinished) {
       return;
     }
 
-    loaderCompleted = true;
-
+    loaderFinished = true;
     state.loaderComplete = true;
 
-    loader.classList.add(
-      "is-complete"
+    root.classList.add(
+      "is-loader-complete"
     );
 
-    window.setTimeout(
-      () => {
+    window.setTimeout(() => {
+      root.classList.remove(
+        "is-loader-complete"
+      );
+    }, 900);
 
-        loader.setAttribute(
-          "hidden",
-          ""
-        );
-
-        requestFrame();
-
-        resetIdleTimer();
-
-      },
-      state.reducedMotion
-        ? 50
-        : 850
-    );
-
-  };
-
-
-  const startLoader = () => {
-
-    if (!loader) {
-      state.loaderComplete = true;
-      return;
-    }
-
-    if (state.reducedMotion) {
-
-      completeLoader();
-
-      return;
-    }
-
-    window.setTimeout(
-      completeLoader,
-      5200
-    );
-
-    window.setTimeout(
-      completeLoader,
-      LOADER_MAX_WAIT
-    );
-
-  };
-
-
-  /* ==========================================================
-     20. IMAGE FAILURE
-     ========================================================== */
-
-  if (mapElement) {
-
-    mapElement.addEventListener(
-      "error",
-      () => {
-
-        const map =
-          mapElement.closest(
-            ".origin-map"
-          );
-
-        if (!map) {
-          return;
-        }
-
-        map.classList.add(
-          "is-missing"
-        );
-
-        mapElement.remove();
-
-      }
-    );
-
+    requestFrame();
+    resetIdleTimer();
   }
 
 
-  /* ==========================================================
-     21. REDUCED MOTION CHANGE
-     ========================================================== */
+  window.addEventListener(
+    "load",
+    () => {
 
-  const handleMotionChange = event => {
+      if (state.reducedMotion) {
+        window.setTimeout(
+          completeLoader,
+          80
+        );
+        return;
+      }
+
+      window.setTimeout(
+        completeLoader,
+        5200
+      );
+    },
+    {
+      once: true
+    }
+  );
+
+
+  /*
+    Hard fallback:
+    the experience must never remain blocked by
+    an asset/network problem.
+  */
+
+  window.setTimeout(
+    completeLoader,
+    state.reducedMotion
+      ? 900
+      : 7000
+  );
+
+
+  /* ==========================================================
+     REDUCED MOTION CHANGE
+  =========================================================== */
+
+  const motionQuery =
+    window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    );
+
+  function onMotionPreferenceChange(event) {
 
     state.reducedMotion =
       event.matches;
 
     if (state.reducedMotion) {
-      resetMagnetic();
+
+      magneticElements.forEach((element) => {
+
+        element.style.setProperty(
+          "--magnetic-x",
+          "0px"
+        );
+
+        element.style.setProperty(
+          "--magnetic-y",
+          "0px"
+        );
+      });
     }
 
     requestFrame();
-
-  };
+  }
 
 
   if (
     typeof motionQuery.addEventListener ===
     "function"
   ) {
-
     motionQuery.addEventListener(
       "change",
-      handleMotionChange
+      onMotionPreferenceChange
     );
-
   } else if (
     typeof motionQuery.addListener ===
     "function"
   ) {
-
     motionQuery.addListener(
-      handleMotionChange
+      onMotionPreferenceChange
     );
-
   }
 
 
   /* ==========================================================
-     22. NO-JS MARKER
-     ========================================================== */
+     VISIBILITY
+  =========================================================== */
 
-  document.documentElement.classList.remove(
-    "no-js"
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+
+      if (document.hidden) {
+        if (idleTimer) {
+          window.clearTimeout(idleTimer);
+        }
+      } else {
+        geometryDirty = true;
+        requestFrame();
+        resetIdleTimer();
+      }
+    }
   );
 
 
   /* ==========================================================
-     23. INITIAL STATE
-     ========================================================== */
+     INITIALIZATION
+  =========================================================== */
 
-  const initialize = () => {
-
-    state.reducedMotion =
-      motionQuery.matches;
-
-    state.lastScrollY =
-      window.scrollY;
-
-    const hashTarget =
-      getChapterFromHash();
-
-    if (hashTarget) {
-
-      window.requestAnimationFrame(
-        () => {
-
-          hashTarget.element.scrollIntoView({
-            behavior: "auto",
-            block: "start"
-          });
-
-          requestFrame();
-
-        }
-      );
-
-    } else {
-
-      requestFrame();
-
-    }
-
-    startLoader();
-
-  };
-
-
-  /* ==========================================================
-     24. WINDOW LOAD
-     ========================================================== */
-
-  if (
-    document.readyState === "complete"
-  ) {
-
-    initialize();
-
-  } else {
-
-    window.addEventListener(
-      "load",
-      initialize,
-      {
-        once: true
-      }
-    );
-
-  }
+  calculateGeometry();
+  updateState();
 
 })();
