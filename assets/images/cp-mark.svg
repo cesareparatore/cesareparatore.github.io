@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  role="img"
+  aria-labelledby="cp-title cp-description"
+>
+  <title id="cp-title">CP</title>
+
+  <desc id="cp-description">
+    Monogramma CP in nero inchiostro
+  </desc>
+
+  <g
+    id="cp-mark"
+    fill="#11110F"
+    fill-rule="evenodd"
+    clip-rule="evenodd"
+  >
+    <!-- Lettera C -->
+    <path
+      id="letter-c"
+      d="
+        M266 164
+        L248 196
+        H198
+        C153 196 123 222 123 260
+        C123 298 153 326 199 326
+        H229
+        L213 358
+        H195
+        C132 358 88 320 88 263
+        C88 205 136 164 195 164
+        Z
+      "
+    />
+
+    <!-- Lettera P -->
+    <path
+      id="letter-p"
+      transform="translate(-7 0)"
+      d="
+        M265 194
+        L243 233
+        H396
+        C417 233 429 241 429 255
+        C429 269 417 278 396 278
+        H270
+        L213 390
+        H256
+        L299 313
+        H397
+        C443 313 473 290 473 254
+        C473 218 443 194 394 194
+        Z
+      "
+    />
+  </g>
+</svg>
