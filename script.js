@@ -1,261 +1,160 @@
-/* ============================================================
-   MOVIMENTO / CON DIREZIONE
-   EXPERIENCE ENGINE
-   ============================================================ */
-
 (() => {
   "use strict";
 
-  document.documentElement.classList.add("js");
-
   const CONFIG = {
-    loaderMaxWait: 4200,
-    loaderMinimum: 900,
-    idleDelay: 18000,
-    scrollEndDelay: 120,
-    magneticMax: 4,
-    magneticRadius: 90
-  };
-
-  const DOM = {
-    body: document.body,
-    html: document.documentElement,
-
-    loader: document.getElementById("loader"),
-
-    header: document.getElementById("site-header"),
-    progressCurrent: document.getElementById("progress-current"),
-    progressFill: document.getElementById("progress-fill"),
-    progressPoint: document.getElementById("progress-point"),
-
-    previous: document.getElementById("previous-section"),
-    previousLabel: document.getElementById("previous-section-label"),
-    next: document.getElementById("next-section"),
-    nextLabel: document.getElementById("next-section-label"),
-
-    menuTrigger: document.getElementById("menu-trigger"),
-    menu: document.getElementById("site-menu"),
-    menuLinks: [...document.querySelectorAll("[data-menu-link]")],
-
-    idleMark: document.getElementById("idle-mark"),
-
-    sections: [...document.querySelectorAll("[data-chapter]")],
-    cover: document.getElementById("cover")
+    loaderDuration: 2700,
+    loaderFallback: 5000,
+    idleDelay: 45000,
+    magneticRadius: 90,
+    magneticStrength: 0.16
   };
 
   const prefersReducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)"
   );
 
-  const isTouch =
-    "ontouchstart" in window ||
-    navigator.maxTouchPoints > 0;
-
-  const STATE = {
+  const state = {
     currentIndex: 0,
     currentProgress: 0,
-    targetScroll: 0,
-    scrollY: window.scrollY,
-    viewportHeight: window.innerHeight,
-    ticking: false,
-    scrolling: false,
+    targetProgress: 0,
     menuOpen: false,
-    idleTimer: null,
-    scrollEndTimer: null,
-    lastInteraction: performance.now()
+    idle: false,
+    loaderDone: false,
+    rafId: null,
+    scrollDirty: false,
+    resizeDirty: false,
+    magneticX: 0,
+    magneticY: 0
   };
 
-  /* ==========================================================
-     HELPERS
-     ========================================================== */
+  const cover = document.querySelector("#cover");
+  const chapters = [...document.querySelectorAll("[data-chapter]")];
+  const allScenes = [cover, ...chapters];
+
+  const header = document.querySelector("#site-header");
+  const loader = document.querySelector("#loader");
+  const menu = document.querySelector("#site-menu");
+  const menuTrigger = document.querySelector("#menu-trigger");
+
+  const progressCurrent = document.querySelector("#progress-current");
+  const progressFill = document.querySelector("#progress-fill");
+  const progressPoint = document.querySelector("#progress-point");
+
+  const previousSection = document.querySelector("#previous-section");
+  const previousSectionLabel = document.querySelector("#previous-section-label");
+
+  const nextSection = document.querySelector("#next-section");
+  const nextSectionLabel = document.querySelector("#next-section-label");
+
+  const idleScreen = document.querySelector("#idle-screen");
+
+  const menuLinks = [...document.querySelectorAll("[data-menu-link]")];
+  const magneticElements = [...document.querySelectorAll(".magnetic")];
+
+  const root = document.documentElement;
 
   const clamp = (value, min = 0, max = 1) =>
     Math.min(max, Math.max(min, value));
 
-  const lerp = (a, b, t) =>
-    a + (b - a) * t;
+  const lerp = (a, b, t) => a + (b - a) * t;
 
-  const prefersMotion = () =>
-    !prefersReducedMotion.matches;
+  const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 
-  const getSectionTop = (section) => {
-    const rect = section.getBoundingClientRect();
-    return rect.top + window.scrollY;
-  };
+  const isTouch =
+    "ontouchstart" in window ||
+    navigator.maxTouchPoints > 0;
 
-  const getSectionProgress = (section) => {
-    const rect = section.getBoundingClientRect();
-    const height = Math.max(rect.height, 1);
-
-    return clamp(
-      (window.innerHeight * 0.48 - rect.top) / height
-    );
-  };
-
-  const setCssProgress = (section, progress) => {
-    section.style.setProperty(
-      "--local-progress",
-      progress.toFixed(4)
-    );
-  };
-
-  const safeFocus = (element) => {
-    if (!element) return;
-
-    try {
-      element.focus({ preventScroll: true });
-    } catch {
-      element.focus();
-    }
-  };
-
-  /* ==========================================================
+  /* ----------------------------------------------------------
      LOADER
-     ========================================================== */
+  ---------------------------------------------------------- */
 
-  const loader = {
-    startedAt: performance.now(),
-    finished: false,
+  function finishLoader() {
+    if (state.loaderDone) return;
 
-    finish() {
-      if (this.finished) return;
-      this.finished = true;
+    state.loaderDone = true;
 
-      const elapsed = performance.now() - this.startedAt;
-      const delay = prefersMotion()
-        ? Math.max(0, CONFIG.loaderMinimum - elapsed)
-        : 80;
+    if (!loader) return;
 
-      window.setTimeout(() => {
-        DOM.loader?.classList.add("is-hidden");
+    loader.classList.add("is-hidden");
+    document.body.classList.remove("is-loading");
 
-        window.setTimeout(() => {
-          if (DOM.loader) {
-            DOM.loader.hidden = true;
-          }
-        }, prefersMotion() ? 850 : 100);
-      }, delay);
-    }
-  };
-
-  const loaderFallback = window.setTimeout(
-    () => loader.finish(),
-    CONFIG.loaderMaxWait
-  );
-
-  if (document.readyState === "complete") {
     window.setTimeout(() => {
-      clearTimeout(loaderFallback);
-      loader.finish();
-    }, 50);
-  } else {
-    window.addEventListener(
-      "load",
-      () => {
-        clearTimeout(loaderFallback);
-        loader.finish();
-      },
-      { once: true }
-    );
+      loader.remove();
+    }, prefersReducedMotion.matches ? 50 : 900);
   }
 
-  /* ==========================================================
-     CHAPTER STATE
-     ========================================================== */
+  function initLoader() {
+    document.body.classList.add("is-loading");
 
-  const updateNavigation = () => {
-    const index = STATE.currentIndex;
-    const current = DOM.sections[index];
+    const minimumDelay = prefersReducedMotion.matches
+      ? 80
+      : CONFIG.loaderDuration;
 
-    if (!current) return;
+    const fallback = window.setTimeout(
+      finishLoader,
+      CONFIG.loaderFallback
+    );
 
-    const title =
-      current.dataset.title ||
-      "MOVIMENTO / CON DIREZIONE";
+    window.setTimeout(() => {
+      window.clearTimeout(fallback);
+      finishLoader();
+    }, minimumDelay);
+  }
 
-    DOM.progressCurrent.textContent = title;
+  /* ----------------------------------------------------------
+     CHAPTER METADATA
+  ---------------------------------------------------------- */
 
-    const total = DOM.sections.length;
+  const sceneMeta = allScenes.map((scene, index) => {
+    if (!scene) return null;
 
-    const globalProgress =
-      total <= 1
-        ? 0
-        : clamp(
-            (index + STATE.currentProgress) /
-            total
-          );
+    return {
+      scene,
+      index,
+      id: scene.id,
+      number:
+        scene.dataset.chapter ||
+        "00",
+      title:
+        scene.dataset.title ||
+        "MOVIMENTO / CON DIREZIONE"
+    };
+  }).filter(Boolean);
 
-    DOM.progressFill.style.width =
-      `${globalProgress * 100}%`;
+  function getSceneMeta(index) {
+    return sceneMeta[
+      Math.max(0, Math.min(sceneMeta.length - 1, index))
+    ];
+  }
 
-    DOM.progressPoint.style.left =
-      `${globalProgress * 100}%`;
+  /* ----------------------------------------------------------
+     SCROLL STATE
+  ---------------------------------------------------------- */
 
-    const previousIndex = index - 1;
-    const nextIndex = index + 1;
+  function calculateSceneProgress(scene) {
+    const rect = scene.getBoundingClientRect();
+    const viewport = window.innerHeight;
 
-    if (previousIndex >= 0) {
-      const previous = DOM.sections[previousIndex];
+    const travel = Math.max(1, rect.height - viewport);
+    const progress = -rect.top / travel;
 
-      DOM.previous.href =
-        `#${previous.id}`;
+    return clamp(progress);
+  }
 
-      DOM.previousLabel.textContent =
-        previous.dataset.chapter || "";
-
-      DOM.previous.classList.remove("is-disabled");
-      DOM.previous.removeAttribute("aria-hidden");
-      DOM.previous.removeAttribute("tabindex");
-      DOM.previous.setAttribute(
-        "aria-label",
-        `Vai alla sezione ${previous.dataset.chapter}`
-      );
-    } else {
-      DOM.previous.href = "#cover";
-      DOM.previousLabel.textContent = "";
-      DOM.previous.classList.add("is-disabled");
-      DOM.previous.setAttribute("aria-hidden", "true");
-      DOM.previous.setAttribute("tabindex", "-1");
-    }
-
-    if (nextIndex < total) {
-      const next = DOM.sections[nextIndex];
-
-      DOM.next.href =
-        `#${next.id}`;
-
-      DOM.nextLabel.textContent =
-        next.dataset.chapter || "";
-
-      DOM.next.classList.remove("is-disabled");
-      DOM.next.setAttribute(
-        "aria-label",
-        `Vai alla sezione ${next.dataset.chapter}`
-      );
-    } else {
-      DOM.next.href = "#footer";
-      DOM.nextLabel.textContent = "";
-      DOM.next.classList.add("is-disabled");
-      DOM.next.setAttribute("aria-hidden", "true");
-      DOM.next.setAttribute("tabindex", "-1");
-    }
-  };
-
-  const updateChapterState = () => {
-    const viewportCenter =
-      window.innerHeight * 0.5;
+  function calculateCurrentScene() {
+    const viewportCenter = window.innerHeight * 0.5;
 
     let bestIndex = 0;
     let bestDistance = Infinity;
 
-    DOM.sections.forEach((section, index) => {
-      const rect = section.getBoundingClientRect();
+    sceneMeta.forEach((meta, index) => {
+      const rect = meta.scene.getBoundingClientRect();
 
-      const sectionCenter =
-        rect.top + rect.height * 0.5;
+      const center =
+        rect.top +
+        Math.min(rect.height, window.innerHeight) * 0.5;
 
-      const distance =
-        Math.abs(sectionCenter - viewportCenter);
+      const distance = Math.abs(center - viewportCenter);
 
       if (distance < bestDistance) {
         bestDistance = distance;
@@ -263,451 +162,447 @@
       }
     });
 
-    STATE.currentIndex = bestIndex;
-
-    DOM.sections.forEach((section, index) => {
-      const progress = getSectionProgress(section);
-
-      setCssProgress(section, progress);
-
-      section.toggleAttribute(
-        "data-active",
-        index === bestIndex
-      );
-    });
-
-    STATE.currentProgress =
-      getSectionProgress(
-        DOM.sections[bestIndex]
-      );
-
-    updateNavigation();
-  };
-
-  /* ==========================================================
-     CENTRAL FRAME
-     ========================================================== */
-
-  const render = () => {
-    STATE.ticking = false;
-
-    if (STATE.menuOpen) return;
-
-    STATE.scrollY = window.scrollY;
-
-    updateChapterState();
-
-    DOM.body.style.setProperty(
-      "--scroll-progress",
-      clamp(
-        STATE.scrollY /
-        Math.max(
-          document.documentElement.scrollHeight -
-          window.innerHeight,
-          1
-        )
-      ).toFixed(4)
-    );
-  };
-
-  const requestRender = () => {
-    if (STATE.ticking) return;
-
-    STATE.ticking = true;
-    requestAnimationFrame(render);
-  };
-
-  /* ==========================================================
-     SCROLL
-     ========================================================== */
-
-  const onScroll = () => {
-    STATE.scrolling = true;
-
-    resetIdle();
-
-    if (STATE.scrollEndTimer) {
-      clearTimeout(STATE.scrollEndTimer);
-    }
-
-    STATE.scrollEndTimer = window.setTimeout(() => {
-      STATE.scrolling = false;
-    }, CONFIG.scrollEndDelay);
-
-    requestRender();
-  };
-
-  window.addEventListener(
-    "scroll",
-    onScroll,
-    { passive: true }
-  );
-
-  /* ==========================================================
-     RESIZE
-     ========================================================== */
-
-  let resizeTimer = null;
-
-  window.addEventListener("resize", () => {
-    if (resizeTimer) {
-      clearTimeout(resizeTimer);
-    }
-
-    resizeTimer = window.setTimeout(() => {
-      STATE.viewportHeight =
-        window.innerHeight;
-
-      requestRender();
-    }, 80);
-  });
-
-  /* ==========================================================
-     INTERSECTION OBSERVER
-     SEMANTIC STATE SUPPORT
-     ========================================================== */
-
-  if ("IntersectionObserver" in window) {
-    const observer =
-      new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            entry.target.toggleAttribute(
-              "data-near",
-              entry.isIntersecting
-            );
-          });
-
-          requestRender();
-        },
-        {
-          rootMargin: "20% 0px 20% 0px",
-          threshold: 0
-        }
-      );
-
-    DOM.sections.forEach((section) => {
-      observer.observe(section);
-    });
+    return bestIndex;
   }
 
-  /* ==========================================================
-     ANCHOR NAVIGATION
-     ========================================================== */
+  function readScrollState() {
+    if (state.menuOpen) return;
 
-  const getTargetElement = (href) => {
-    if (!href || !href.startsWith("#")) {
-      return null;
+    state.currentIndex = calculateCurrentScene();
+
+    const meta = getSceneMeta(state.currentIndex);
+
+    if (!meta) return;
+
+    state.targetProgress =
+      calculateSceneProgress(meta.scene);
+  }
+
+  /* ----------------------------------------------------------
+     RENDER STATE
+  ---------------------------------------------------------- */
+
+  function renderProgress() {
+    const meta = getSceneMeta(state.currentIndex);
+
+    if (!meta) return;
+
+    const progress = state.currentProgress;
+
+    root.style.setProperty(
+      "--chapter-progress",
+      progress.toFixed(4)
+    );
+
+    root.style.setProperty(
+      "--trajectory-progress",
+      easeOutCubic(progress).toFixed(4)
+    );
+
+    root.style.setProperty(
+      "--convergence-progress",
+      easeOutCubic(progress).toFixed(4)
+    );
+
+    root.style.setProperty(
+      "--encounter-progress",
+      easeOutCubic(progress).toFixed(4)
+    );
+
+    root.style.setProperty(
+      "--final-progress",
+      easeOutCubic(progress).toFixed(4)
+    );
+
+    if (progressFill) {
+      progressFill.style.width =
+        `${((meta.index) / (sceneMeta.length - 1)) * 100}%`;
     }
 
-    return document.getElementById(
-      href.slice(1)
+    if (progressPoint) {
+      progressPoint.style.left =
+        `${((meta.index) / (sceneMeta.length - 1)) * 100}%`;
+    }
+
+    if (progressCurrent) {
+      progressCurrent.textContent = meta.title;
+    }
+
+    updateNavigation(meta);
+  }
+
+  function renderFrame() {
+    state.rafId = null;
+
+    if (state.scrollDirty) {
+      readScrollState();
+      state.scrollDirty = false;
+    }
+
+    const target = state.targetProgress;
+
+    if (prefersReducedMotion.matches) {
+      state.currentProgress = target;
+    } else {
+      state.currentProgress = lerp(
+        state.currentProgress,
+        target,
+        0.18
+      );
+
+      if (
+        Math.abs(state.currentProgress - target) > 0.0005
+      ) {
+        requestRender();
+      }
+    }
+
+    renderProgress();
+
+    if (state.resizeDirty) {
+      state.resizeDirty = false;
+    }
+  }
+
+  function requestRender() {
+    if (state.rafId !== null) return;
+
+    state.rafId = window.requestAnimationFrame(
+      renderFrame
     );
-  };
+  }
 
-  const navigateTo = (element) => {
-    if (!element) return;
+  /* ----------------------------------------------------------
+     NAVIGATION
+  ---------------------------------------------------------- */
 
-    const top =
-      getSectionTop(element);
+  function updateNavigation(meta) {
+    const previous = sceneMeta[meta.index - 1];
+    const next = sceneMeta[meta.index + 1];
 
-    window.scrollTo({
-      top,
-      behavior: prefersMotion()
-        ? "smooth"
-        : "auto"
-    });
-  };
+    if (previous) {
+      previousSection.href = `#${previous.id}`;
+      previousSectionLabel.textContent =
+        previous.number;
 
-  const handleInternalLink = (event) => {
-    const href =
-      event.currentTarget.getAttribute("href");
+      previousSection.classList.remove("is-disabled");
+      previousSection.setAttribute(
+        "aria-hidden",
+        "false"
+      );
+      previousSection.tabIndex = 0;
+      previousSection.setAttribute(
+        "aria-label",
+        `Vai alla sezione ${previous.number}`
+      );
+    } else {
+      previousSection.classList.add("is-disabled");
+      previousSection.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+      previousSection.tabIndex = -1;
+    }
 
-    const target =
-      getTargetElement(href);
+    if (next) {
+      nextSection.href = `#${next.id}`;
+      nextSectionLabel.textContent = next.number;
+
+      nextSection.classList.remove("is-disabled");
+      nextSection.setAttribute(
+        "aria-label",
+        `Vai alla sezione ${next.number}`
+      );
+    } else {
+      nextSection.href = "#cover";
+      nextSectionLabel.textContent = "00";
+      nextSection.setAttribute(
+        "aria-label",
+        "Torna alla cover"
+      );
+    }
+  }
+
+  function scrollToScene(id) {
+    const target = document.getElementById(id);
 
     if (!target) return;
 
-    event.preventDefault();
+    closeMenu();
 
-    closeMenu({
-      restoreFocus: false
+    target.scrollIntoView({
+      behavior: prefersReducedMotion.matches
+        ? "auto"
+        : "smooth",
+      block: "start"
     });
+  }
 
-    navigateTo(target);
-
-    if (window.history?.pushState) {
-      window.history.pushState(
-        null,
-        "",
-        href
+  function bindNavigation() {
+    document.addEventListener("click", (event) => {
+      const link = event.target.closest(
+        'a[href^="#"]'
       );
+
+      if (!link) return;
+
+      const href = link.getAttribute("href");
+
+      if (!href || href === "#") return;
+
+      const target = document.querySelector(href);
+
+      if (!target) return;
+
+      event.preventDefault();
+
+      scrollToScene(target.id);
+    });
+  }
+
+  /* ----------------------------------------------------------
+     MENU
+  ---------------------------------------------------------- */
+
+  let menuFocusTarget = null;
+
+  function getMenuFocusable() {
+    return [
+      menuTrigger,
+      ...menuLinks
+    ].filter(Boolean);
+  }
+
+  function openMenu() {
+    if (state.menuOpen) return;
+
+    menuFocusTarget =
+      document.activeElement;
+
+    state.menuOpen = true;
+
+    document.body.classList.add("is-menu-open");
+
+    menuTrigger.setAttribute(
+      "aria-expanded",
+      "true"
+    );
+
+    menuTrigger.setAttribute(
+      "aria-label",
+      "Chiudi menu"
+    );
+
+    menu.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
+    window.setTimeout(() => {
+      const first =
+        menuLinks[0];
+
+      if (first) first.focus();
+    }, 50);
+  }
+
+  function closeMenu() {
+    if (!state.menuOpen) return;
+
+    state.menuOpen = false;
+
+    document.body.classList.remove("is-menu-open");
+
+    menuTrigger.setAttribute(
+      "aria-expanded",
+      "false"
+    );
+
+    menuTrigger.setAttribute(
+      "aria-label",
+      "Apri menu"
+    );
+
+    menu.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    if (
+      menuFocusTarget &&
+      typeof menuFocusTarget.focus === "function"
+    ) {
+      menuFocusTarget.focus({
+        preventScroll:true
+      });
     }
-  };
 
-  [
-    DOM.previous,
-    DOM.next,
-    DOM.menuTrigger
-  ].forEach((element) => {
-    if (!element) return;
-  });
+    menuFocusTarget = null;
+  }
 
-  document
-    .querySelectorAll('a[href^="#"]')
-    .forEach((link) => {
+  function toggleMenu() {
+    if (state.menuOpen) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  }
+
+  function bindMenu() {
+    if (!menuTrigger) return;
+
+    menuTrigger.addEventListener(
+      "click",
+      toggleMenu
+    );
+
+    menuLinks.forEach((link) => {
       link.addEventListener(
         "click",
-        (event) => {
-          const target =
-            getTargetElement(
-              link.getAttribute("href")
-            );
+        closeMenu
+      );
+    });
 
-          if (!target) return;
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        if (event.key === "Escape") {
+          closeMenu();
+          return;
+        }
 
-          if (
-            link.hasAttribute("data-menu-link")
-          ) {
-            event.preventDefault();
+        if (
+          event.key !== "Tab" ||
+          !state.menuOpen
+        ) {
+          return;
+        }
 
-            closeMenu({
-              restoreFocus: false
-            });
+        const focusables =
+          getMenuFocusable();
 
-            navigateTo(target);
+        const first =
+          focusables[0];
 
-            if (window.history?.pushState) {
-              window.history.pushState(
-                null,
-                "",
-                `#${target.id}`
-              );
-            }
+        const last =
+          focusables[focusables.length - 1];
 
-            return;
-          }
+        if (
+          event.shiftKey &&
+          document.activeElement === first
+        ) {
+          event.preventDefault();
+          last.focus();
+        } else if (
+          !event.shiftKey &&
+          document.activeElement === last
+        ) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    );
+  }
 
-          handleInternalLink(event);
+  /* ----------------------------------------------------------
+     IDLE
+  ---------------------------------------------------------- */
+
+  let idleTimer = null;
+
+  function resetIdleTimer() {
+    if (state.menuOpen) return;
+
+    state.idle = false;
+
+    if (idleScreen) {
+      idleScreen.classList.remove(
+        "is-visible"
+      );
+      idleScreen.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+    }
+
+    window.clearTimeout(idleTimer);
+
+    idleTimer = window.setTimeout(
+      enterIdle,
+      CONFIG.idleDelay
+    );
+  }
+
+  function enterIdle() {
+    if (
+      state.menuOpen ||
+      prefersReducedMotion.matches
+    ) {
+      return;
+    }
+
+    state.idle = true;
+
+    if (idleScreen) {
+      idleScreen.classList.add(
+        "is-visible"
+      );
+
+      idleScreen.setAttribute(
+        "aria-hidden",
+        "false"
+      );
+    }
+  }
+
+  function bindIdle() {
+    const events = [
+      "pointerdown",
+      "pointermove",
+      "wheel",
+      "touchstart",
+      "keydown",
+      "scroll"
+    ];
+
+    events.forEach((eventName) => {
+      window.addEventListener(
+        eventName,
+        resetIdleTimer,
+        {
+          passive:true
         }
       );
     });
 
-  /* ==========================================================
-     DEEP LINK / HASH
-     ========================================================== */
+    resetIdleTimer();
+  }
 
-  const resolveInitialHash = () => {
-    const hash = window.location.hash;
+  /* ----------------------------------------------------------
+     MAGNETIC INTERACTION
+  ---------------------------------------------------------- */
 
-    if (!hash) {
-      requestRender();
-      return;
-    }
-
-    const target =
-      getTargetElement(hash);
-
-    if (!target) {
-      requestRender();
-      return;
-    }
-
-    window.setTimeout(() => {
-      navigateTo(target);
-      requestRender();
-    }, 80);
-  };
-
-  window.addEventListener(
-    "popstate",
-    () => {
-      resolveInitialHash();
-    }
-  );
-
-  window.addEventListener(
-    "hashchange",
-    () => {
-      resolveInitialHash();
-    }
-  );
-
-  /* ==========================================================
-     MENU
-     ========================================================== */
-
-  let menuLastFocused = null;
-
-  const setMenuAccessibility = (open) => {
-    DOM.menu.setAttribute(
-      "aria-hidden",
-      String(!open)
+  function clearMagnetic() {
+    root.style.setProperty(
+      "--magnetic-x",
+      "0px"
     );
 
-    if (open) {
-      DOM.menu.removeAttribute("inert");
-    } else {
-      DOM.menu.setAttribute(
-        "inert",
-        ""
-      );
-    }
-
-    DOM.menuTrigger.setAttribute(
-      "aria-expanded",
-      String(open)
+    root.style.setProperty(
+      "--magnetic-y",
+      "0px"
     );
+  }
 
-    DOM.menuTrigger.setAttribute(
-      "aria-label",
-      open ? "Chiudi menu" : "Apri menu"
-    );
-  };
-
-  const openMenu = () => {
-    if (STATE.menuOpen) return;
-
-    menuLastFocused =
-      document.activeElement;
-
-    STATE.menuOpen = true;
-
-    DOM.body.classList.add(
-      "is-menu-open"
-    );
-
-    setMenuAccessibility(true);
-
-    resetIdle();
-
-    window.setTimeout(() => {
-      const first =
-        DOM.menu.querySelector(
-          "[data-menu-link]"
-        );
-
-      safeFocus(first);
-    }, 50);
-  };
-
-  const closeMenu = ({
-    restoreFocus = true
-  } = {}) => {
-    if (!STATE.menuOpen) return;
-
-    STATE.menuOpen = false;
-
-    DOM.body.classList.remove(
-      "is-menu-open"
-    );
-
-    setMenuAccessibility(false);
-
+  function bindMagnetic() {
     if (
-      restoreFocus &&
-      menuLastFocused &&
-      typeof menuLastFocused.focus === "function"
+      isTouch ||
+      prefersReducedMotion.matches
     ) {
-      safeFocus(menuLastFocused);
+      return;
     }
 
-    menuLastFocused = null;
-
-    requestRender();
-  };
-
-  DOM.menuTrigger.addEventListener(
-    "click",
-    () => {
-      if (STATE.menuOpen) {
-        closeMenu();
-      } else {
-        openMenu();
-      }
-    }
-  );
-
-  document.addEventListener(
-    "keydown",
-    (event) => {
-      if (event.key === "Escape") {
-        closeMenu();
-      }
-    }
-  );
-
-  /* ==========================================================
-     MENU FOCUS TRAP
-     ========================================================== */
-
-  DOM.menu.addEventListener(
-    "keydown",
-    (event) => {
-      if (
-        event.key !== "Tab" ||
-        !STATE.menuOpen
-      ) {
-        return;
-      }
-
-      const focusable =
-        [
-          ...DOM.menu.querySelectorAll(
-            'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
-          )
-        ].filter(
-          (element) =>
-            !element.hasAttribute("disabled")
-        );
-
-      if (!focusable.length) return;
-
-      const first = focusable[0];
-      const last =
-        focusable[focusable.length - 1];
-
-      if (
-        event.shiftKey &&
-        document.activeElement === first
-      ) {
-        event.preventDefault();
-        safeFocus(last);
-      } else if (
-        !event.shiftKey &&
-        document.activeElement === last
-      ) {
-        event.preventDefault();
-        safeFocus(first);
-      }
-    }
-  );
-
-  /* ==========================================================
-     MAGNETIC
-     ========================================================== */
-
-  const magneticElements = [
-    ...document.querySelectorAll(".magnetic")
-  ];
-
-  if (
-    !isTouch &&
-    prefersMotion()
-  ) {
     magneticElements.forEach((element) => {
-      const reset = () => {
-        element.style.setProperty(
-          "--magnetic-x",
-          "0px"
-        );
-
-        element.style.setProperty(
-          "--magnetic-y",
-          "0px"
-        );
-      };
-
       element.addEventListener(
         "pointermove",
         (event) => {
@@ -723,183 +618,310 @@
             (rect.top + rect.height / 2);
 
           const distance =
-            Math.hypot(x, y);
+            Math.sqrt(
+              x * x +
+              y * y
+            );
 
           if (
             distance >
             CONFIG.magneticRadius
           ) {
-            reset();
+            clearMagnetic();
             return;
           }
 
           const strength =
-            1 -
-            distance /
-            CONFIG.magneticRadius;
+            CONFIG.magneticStrength *
+            (1 - distance / CONFIG.magneticRadius);
+
+          const tx =
+            x * strength;
+
+          const ty =
+            y * strength;
 
           element.style.setProperty(
             "--magnetic-x",
-            `${x * strength * .045}px`
+            `${tx.toFixed(2)}px`
           );
 
           element.style.setProperty(
             "--magnetic-y",
-            `${y * strength * .045}px`
+            `${ty.toFixed(2)}px`
           );
         }
       );
 
       element.addEventListener(
         "pointerleave",
-        reset
+        () => {
+          element.style.setProperty(
+            "--magnetic-x",
+            "0px"
+          );
+
+          element.style.setProperty(
+            "--magnetic-y",
+            "0px"
+          );
+        }
       );
     });
   }
 
-  /* ==========================================================
-     IDLE
-     ========================================================== */
+  /* ----------------------------------------------------------
+     INTERSECTION OBSERVER
+     Semantic activation only.
+     Visual progression remains scroll-state driven.
+  ---------------------------------------------------------- */
 
-  const clearIdleTimer = () => {
-    if (STATE.idleTimer) {
-      clearTimeout(STATE.idleTimer);
-      STATE.idleTimer = null;
-    }
-  };
-
-  const resetIdle = () => {
-    clearIdleTimer();
-
-    DOM.body.classList.remove(
-      "is-idle"
-    );
-
+  function bindIntersectionObserver() {
     if (
-      STATE.menuOpen ||
-      prefersReducedMotion.matches
+      !("IntersectionObserver" in window)
     ) {
       return;
     }
 
-    STATE.lastInteraction =
-      performance.now();
-
-    STATE.idleTimer =
-      window.setTimeout(() => {
-        if (!STATE.menuOpen) {
-          DOM.body.classList.add(
-            "is-idle"
-          );
+    const observer =
+      new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            entry.target.classList.toggle(
+              "is-near",
+              entry.isIntersecting
+            );
+          });
+        },
+        {
+          rootMargin:"20% 0px 20% 0px",
+          threshold:0
         }
-      }, CONFIG.idleDelay);
-  };
-
-  [
-    "pointerdown",
-    "pointermove",
-    "wheel",
-    "touchstart",
-    "keydown"
-  ].forEach((eventName) => {
-    window.addEventListener(
-      eventName,
-      resetIdle,
-      {
-        passive: true
-      }
-    );
-  });
-
-  /* ==========================================================
-     REDUCED MOTION CHANGE
-     ========================================================== */
-
-  const handleMotionPreference = () => {
-    if (prefersReducedMotion.matches) {
-      DOM.body.classList.remove(
-        "is-idle"
       );
 
-      clearIdleTimer();
+    allScenes.forEach((scene) => {
+      if (scene) observer.observe(scene);
+    });
+  }
 
-      if (DOM.loader) {
-        DOM.loader.classList.add(
-          "is-hidden"
-        );
+  /* ----------------------------------------------------------
+     RESIZE
+  ---------------------------------------------------------- */
+
+  function bindResize() {
+    window.addEventListener(
+      "resize",
+      () => {
+        state.resizeDirty = true;
+        state.scrollDirty = true;
+        requestRender();
+      },
+      {
+        passive:true
       }
-    } else {
-      resetIdle();
-    }
-
-    requestRender();
-  };
-
-  if (
-    typeof prefersReducedMotion.addEventListener ===
-    "function"
-  ) {
-    prefersReducedMotion.addEventListener(
-      "change",
-      handleMotionPreference
-    );
-  } else if (
-    typeof prefersReducedMotion.addListener ===
-    "function"
-  ) {
-    prefersReducedMotion.addListener(
-      handleMotionPreference
     );
   }
 
-  /* ==========================================================
-     HISTORY INITIALIZATION
-     ========================================================== */
+  /* ----------------------------------------------------------
+     SCROLL
+  ---------------------------------------------------------- */
 
-  const preventBrowserJumpUntilReady = () => {
-    if (!window.location.hash) return;
+  function bindScroll() {
+    window.addEventListener(
+      "scroll",
+      () => {
+        state.scrollDirty = true;
+        requestRender();
+      },
+      {
+        passive:true
+      }
+    );
+  }
 
+  /* ----------------------------------------------------------
+     HISTORY / DEEP LINK
+  ---------------------------------------------------------- */
+
+  function handleInitialHash() {
     const hash =
       window.location.hash;
 
+    if (!hash) return;
+
     const target =
-      getTargetElement(hash);
+      document.querySelector(hash);
 
     if (!target) return;
 
-    window.scrollTo(
-      0,
-      0
-    );
-  };
+    window.setTimeout(() => {
+      target.scrollIntoView({
+        behavior:"auto",
+        block:"start"
+      });
 
-  preventBrowserJumpUntilReady();
+      state.scrollDirty = true;
+      requestRender();
+    }, 100);
+  }
 
-  /* ==========================================================
+  /* ----------------------------------------------------------
      INITIAL STATE
-     ========================================================== */
+  ---------------------------------------------------------- */
 
-  setMenuAccessibility(false);
+  function initializeState() {
+    state.currentIndex =
+      calculateCurrentScene();
 
-  DOM.sections.forEach(
-    (section) => {
-      setCssProgress(
-        section,
-        getSectionProgress(section)
+    const meta =
+      getSceneMeta(
+        state.currentIndex
       );
-    }
-  );
 
-  requestRender();
-  resetIdle();
+    state.targetProgress =
+      meta
+        ? calculateSceneProgress(meta.scene)
+        : 0;
+
+    state.currentProgress =
+      state.targetProgress;
+
+    renderProgress();
+  }
+
+  /* ----------------------------------------------------------
+     KEYBOARD CHAPTER NAVIGATION
+  ---------------------------------------------------------- */
+
+  function bindKeyboardNavigation() {
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        if (
+          state.menuOpen ||
+          event.metaKey ||
+          event.ctrlKey ||
+          event.altKey
+        ) {
+          return;
+        }
+
+        if (
+          event.key !== "ArrowDown" &&
+          event.key !== "ArrowUp"
+        ) {
+          return;
+        }
+
+        const direction =
+          event.key === "ArrowDown"
+            ? 1
+            : -1;
+
+        const nextIndex =
+          clamp(
+            state.currentIndex + direction,
+            0,
+            sceneMeta.length - 1
+          );
+
+        const target =
+          getSceneMeta(nextIndex);
+
+        if (!target) return;
+
+        event.preventDefault();
+
+        scrollToScene(
+          target.id
+        );
+      }
+    );
+  }
+
+  /* ----------------------------------------------------------
+     PERFORMANCE / VISIBILITY
+  ---------------------------------------------------------- */
+
+  function bindVisibility() {
+    document.addEventListener(
+      "visibilitychange",
+      () => {
+        if (
+          document.hidden &&
+          state.rafId !== null
+        ) {
+          window.cancelAnimationFrame(
+            state.rafId
+          );
+
+          state.rafId = null;
+        }
+
+        if (!document.hidden) {
+          state.scrollDirty = true;
+          requestRender();
+        }
+      }
+    );
+  }
+
+  /* ----------------------------------------------------------
+     START
+  ---------------------------------------------------------- */
+
+  function init() {
+    initLoader();
+
+    bindNavigation();
+    bindMenu();
+    bindIdle();
+    bindMagnetic();
+    bindIntersectionObserver();
+    bindResize();
+    bindScroll();
+    bindKeyboardNavigation();
+    bindVisibility();
+
+    initializeState();
+
+    requestRender();
+
+    handleInitialHash();
+  }
+
+  if (
+    document.readyState === "loading"
+  ) {
+    document.addEventListener(
+      "DOMContentLoaded",
+      init,
+      {
+        once:true
+      }
+    );
+  } else {
+    init();
+  }
 
   window.addEventListener(
     "load",
     () => {
-      resolveInitialHash();
+      if (!state.loaderDone) {
+        window.setTimeout(
+          finishLoader,
+          prefersReducedMotion.matches
+            ? 50
+            : 250
+        );
+      }
+
+      state.scrollDirty = true;
       requestRender();
     },
-    { once: true }
+    {
+      once:true
+    }
   );
 
 })();
