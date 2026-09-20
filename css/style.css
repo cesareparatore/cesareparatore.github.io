@@ -532,7 +532,7 @@ a {
 
 
 /* =========================================================
-   01 — LINEA IN AREA PROPRIA
+   01
    ========================================================= */
 
 .chapter--01 {
@@ -610,7 +610,7 @@ a {
 
 
 /* =========================================================
-   03 — TRAIETTORIE VINCOLATE
+   03 — DISPERSIONE TIPOGRAFICA
    ========================================================= */
 
 .chapter--03 {
@@ -639,70 +639,70 @@ a {
   position: absolute;
   left: clamp(20px, 6vw, 90px);
   right: clamp(20px, 6vw, 90px);
-  top: 53%;
+  top: 52%;
   bottom: 8%;
-  z-index: 1;
+  z-index: 2;
   pointer-events: none;
-}
-
-.path-system svg {
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.path {
-  fill: none;
-  stroke: var(--ink);
-  stroke-width: 1.2;
-  vector-effect: non-scaling-stroke;
-  stroke-dasharray: 1600;
-  stroke-dashoffset: calc(1600px * (1 - var(--trajectory-progress)));
 }
 
 .path-label {
   position: absolute;
   z-index: 2;
+
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: .1em;
   white-space: nowrap;
+
+  opacity: 0;
+  transform:
+    translate3d(
+      0,
+      calc((1 - var(--chapter-progress)) * 18px),
+      0
+    );
+  transition:
+    opacity .15s linear,
+    transform .8s var(--ease-out);
+}
+
+.chapter.is-near .path-label {
   opacity: var(--chapter-progress);
 }
 
 .path-label--digital {
-  left: 0;
-  top: 0;
+  left: 2%;
+  top: 8%;
 }
 
 .path-label--movement {
-  left: 24%;
-  top: 24%;
+  left: 28%;
+  top: 28%;
 }
 
 .path-label--sport {
-  left: 48%;
-  top: 43%;
+  left: 57%;
+  top: 12%;
 }
 
 .path-label--science {
-  left: 62%;
-  top: 59%;
+  left: 43%;
+  top: 53%;
 }
 
 .path-label--education {
-  left: 77%;
-  top: 74%;
+  left: 76%;
+  top: 43%;
 }
 
 .path-label--management {
-  right: 0;
-  bottom: 0;
+  left: 66%;
+  top: 78%;
 }
 
 
 /* =========================================================
-   04 — CONVERGENZA IN AREA DEDICATA
+   04 — CONVERGENZA SPAZIALE
    ========================================================= */
 
 .chapter--04 {
@@ -724,34 +724,26 @@ a {
   position: absolute;
   left: clamp(20px, 6vw, 90px);
   right: clamp(20px, 6vw, 90px);
-  top: 39%;
+  top: 38%;
   height: 43%;
-  z-index: 1;
+  z-index: 2;
   pointer-events: none;
-}
-
-.convergence__svg {
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.convergence-path {
-  fill: none;
-  stroke: var(--ink);
-  stroke-width: 1.25;
-  vector-effect: non-scaling-stroke;
-  stroke-dasharray: 1500;
-  stroke-dashoffset: calc(1500px * (1 - var(--convergence-progress)));
 }
 
 .convergence__mark {
   position: absolute;
   left: 50%;
   top: 50%;
+
   width: 72px;
   height: 72px;
-  transform: translate(-50%, -50%);
+
+  transform:
+    translate(-50%, -50%)
+    scale(
+      calc(.72 + var(--convergence-progress) * .28)
+    );
+
   z-index: 3;
 }
 
@@ -762,19 +754,80 @@ a {
 
 .convergence__label {
   position: absolute;
-  left: 0;
-  z-index: 4;
+
   font-family: var(--font-mono);
   font-size: 9px;
   letter-spacing: .1em;
+  white-space: nowrap;
+
   opacity: calc(var(--convergence-progress) * 1.1);
+
+  z-index: 4;
+
+  transition:
+    left .9s var(--ease-out),
+    top .9s var(--ease-out),
+    transform .9s var(--ease-out),
+    opacity .4s linear;
 }
 
-.convergence__label--1 { top: 3%; }
-.convergence__label--2 { top: 27%; }
-.convergence__label--3 { top: 46%; }
-.convergence__label--4 { top: 65%; }
-.convergence__label--5 { top: 89%; }
+
+/* Initial positions → final positions around CP */
+
+.convergence__label--1 {
+  left: 3%;
+  top: 4%;
+  transform:
+    translate3d(
+      calc(var(--convergence-progress) * 39%),
+      calc(var(--convergence-progress) * 43%),
+      0
+    );
+}
+
+.convergence__label--2 {
+  left: 18%;
+  top: 27%;
+  transform:
+    translate3d(
+      calc(var(--convergence-progress) * 30%),
+      calc(var(--convergence-progress) * 23%),
+      0
+    );
+}
+
+.convergence__label--3 {
+  left: 3%;
+  top: 48%;
+  transform:
+    translate3d(
+      calc(var(--convergence-progress) * 44%),
+      calc(var(--convergence-progress) * 0%),
+      0
+    );
+}
+
+.convergence__label--4 {
+  left: 14%;
+  top: 70%;
+  transform:
+    translate3d(
+      calc(var(--convergence-progress) * 34%),
+      calc(var(--convergence-progress) * -18%),
+      0
+    );
+}
+
+.convergence__label--5 {
+  left: 4%;
+  top: 91%;
+  transform:
+    translate3d(
+      calc(var(--convergence-progress) * 40%),
+      calc(var(--convergence-progress) * -38%),
+      0
+    );
+}
 
 .convergence__statement {
   position: absolute;
@@ -962,7 +1015,7 @@ a {
 
 
 /* =========================================================
-   07 — TRAIETTORIA CON AREA LIBERA CENTRALE
+   07
    ========================================================= */
 
 .chapter--07 {
@@ -1027,7 +1080,7 @@ a {
 
 
 /* =========================================================
-   08 — TRAIETTORIA SOTTO UNA FASCIA LIBERA
+   08 — TRAIETTORIA IN AREA SEPARATA
    ========================================================= */
 
 .chapter--08 {
@@ -1047,19 +1100,29 @@ a {
 
 .form-system {
   position: absolute;
+
   left: clamp(20px, 6vw, 90px);
   right: clamp(20px, 6vw, 90px);
-  top: 48%;
-  bottom: 8%;
+
+  /*
+   * La parte alta contiene esclusivamente le parole.
+   * La traiettoria vive nella fascia bassa.
+   */
+  top: 47%;
+  bottom: 7%;
+
   z-index: 1;
   pointer-events: none;
 }
 
 .form-system__svg {
   position: absolute;
-  inset: 0;
+  left: 0;
+  right: 0;
+  bottom: 4%;
   width: 100%;
-  height: 100%;
+  height: 30%;
+  overflow: visible;
 }
 
 .form-system__svg path {
@@ -1067,49 +1130,63 @@ a {
   stroke: var(--ink);
   stroke-width: 1.2;
   vector-effect: non-scaling-stroke;
-  stroke-dasharray: 1700;
-  stroke-dashoffset: calc(1700px * (1 - var(--trajectory-progress)));
+
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - var(--trajectory-progress));
+
+  pathLength: 1;
 }
 
 .form-word {
   position: absolute;
   z-index: 3;
+
   padding: 4px 6px;
+
   background: var(--ivory);
+
   font-family: var(--font-mono);
   font-size: clamp(10px, 1.1vw, 13px);
   letter-spacing: .13em;
+
   opacity: calc(.15 + var(--chapter-progress) * .85);
+
+  /*
+   * Tutte le parole restano nella fascia superiore.
+   * La traiettoria è fisicamente separata.
+   */
 }
 
 .form-word--1 {
   left: 0;
-  top: 70%;
+  top: 10%;
 }
 
 .form-word--2 {
-  left: 22%;
-  top: 48%;
+  left: 23%;
+  top: 35%;
 }
 
 .form-word--3 {
   left: 45%;
-  top: 62%;
+  top: 8%;
 }
 
 .form-word--4 {
   left: 68%;
-  top: 35%;
+  top: 32%;
 }
 
 .form-word--5 {
   right: 0;
-  top: 10%;
+  top: 5%;
 }
 
 
 /* =========================================================
    09 — DUE TRAIETTORIE CONVERGENTI
+   Effetto preservato:
+   il testo vive sopra le linee.
    ========================================================= */
 
 .chapter--09 {
@@ -1148,18 +1225,24 @@ a {
 .encounter__line span {
   position: absolute;
   top: -28px;
+
   padding: 3px 5px;
+
   background: var(--ivory);
+
   font-family: var(--font-mono);
   font-size: 9px;
   letter-spacing: .1em;
   white-space: nowrap;
+
+  z-index: 5;
 }
 
 .encounter__line--one {
   left: 0;
   top: 28%;
   width: 58%;
+
   transform:
     rotate(9deg)
     scaleX(var(--encounter-progress));
@@ -1173,6 +1256,7 @@ a {
   left: 42%;
   top: 72%;
   width: 58%;
+
   transform:
     rotate(-9deg)
     scaleX(var(--encounter-progress));
@@ -1186,11 +1270,17 @@ a {
   position: absolute;
   left: 71%;
   top: 50%;
+
   width: 8px;
   height: 8px;
+
   border-radius: 50%;
   background: var(--terracotta);
-  transform: translate(-50%, -50%) scale(var(--encounter-progress));
+
+  transform:
+    translate(-50%, -50%)
+    scale(var(--encounter-progress));
+
   z-index: 3;
 }
 
@@ -1198,17 +1288,24 @@ a {
   position: absolute;
   left: 18px;
   top: -5px;
+
   padding: 2px 5px;
+
   background: var(--ivory);
+
   font-family: var(--font-serif);
   font-size: 34px;
   white-space: nowrap;
+
   opacity: var(--encounter-progress);
+
+  z-index: 6;
 }
 
 
 /* =========================================================
    10 — DIREZIONE FINALE
+   Effetto preservato.
    ========================================================= */
 
 .chapter--10 {
@@ -1239,7 +1336,9 @@ a {
   position: absolute;
   left: 0;
   top: 56%;
+
   transform: scale(var(--final-progress));
+
   z-index: 3;
 }
 
@@ -1247,9 +1346,12 @@ a {
   position: absolute;
   left: 12%;
   top: 35%;
+
   z-index: 4;
+
   padding: 6px 8px;
   background: var(--ivory);
+
   opacity: var(--final-progress);
 }
 
@@ -1269,8 +1371,11 @@ a {
   stroke: var(--ink);
   stroke-width: 1.2;
   vector-effect: non-scaling-stroke;
-  stroke-dasharray: 1800;
-  stroke-dashoffset: calc(1800px * (1 - var(--final-progress)));
+
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - var(--final-progress));
+
+  pathLength: 1;
 }
 
 
@@ -1463,8 +1568,8 @@ a {
   .path-system {
     left: 20px;
     right: 20px;
-    top: 54%;
-    bottom: 8%;
+    top: 53%;
+    bottom: 7%;
   }
 
   .path-label {
@@ -1473,33 +1578,32 @@ a {
 
   .path-label--digital {
     left: 0;
-    top: 0;
+    top: 5%;
   }
 
   .path-label--movement {
-    left: 20%;
-    top: 23%;
+    left: 28%;
+    top: 26%;
   }
 
   .path-label--sport {
-    left: 40%;
-    top: 43%;
+    left: 58%;
+    top: 7%;
   }
 
   .path-label--science {
-    left: 52%;
-    top: 59%;
+    left: 38%;
+    top: 50%;
   }
 
   .path-label--education {
-    left: 66%;
-    top: 76%;
+    left: 67%;
+    top: 43%;
   }
 
   .path-label--management {
-    right: 0;
-    left: auto;
-    bottom: 0;
+    left: 54%;
+    top: 78%;
   }
 
   .chapter04 {
@@ -1573,12 +1677,42 @@ a {
   .form-system {
     left: 20px;
     right: 20px;
-    top: 48%;
-    bottom: 8%;
+    top: 50%;
+    bottom: 7%;
+  }
+
+  .form-system__svg {
+    bottom: 3%;
+    height: 25%;
   }
 
   .form-word {
     font-size: 8px;
+  }
+
+  .form-word--1 {
+    left: 0;
+    top: 8%;
+  }
+
+  .form-word--2 {
+    left: 18%;
+    top: 34%;
+  }
+
+  .form-word--3 {
+    left: 42%;
+    top: 7%;
+  }
+
+  .form-word--4 {
+    left: 64%;
+    top: 32%;
+  }
+
+  .form-word--5 {
+    right: 0;
+    top: 5%;
   }
 
   .chapter09 {
@@ -1680,6 +1814,26 @@ a {
     left: 0;
   }
 
+  .convergence__label--1 {
+    top: 5%;
+  }
+
+  .convergence__label--2 {
+    top: 27%;
+  }
+
+  .convergence__label--3 {
+    top: 49%;
+  }
+
+  .convergence__label--4 {
+    top: 71%;
+  }
+
+  .convergence__label--5 {
+    top: 91%;
+  }
+
   .convergence__statement p {
     font-size: 30px;
   }
@@ -1704,6 +1858,45 @@ a {
   .chapter--09,
   .chapter--10 {
     min-height: 190vh;
+  }
+
+  .form-system {
+    top: 49%;
+    bottom: 7%;
+  }
+
+  .form-system__svg {
+    bottom: 2%;
+    height: 22%;
+  }
+
+  .form-word {
+    font-size: 7px;
+  }
+
+  .form-word--1 {
+    left: 0;
+    top: 8%;
+  }
+
+  .form-word--2 {
+    left: 12%;
+    top: 34%;
+  }
+
+  .form-word--3 {
+    left: 39%;
+    top: 7%;
+  }
+
+  .form-word--4 {
+    left: 58%;
+    top: 33%;
+  }
+
+  .form-word--5 {
+    right: 0;
+    top: 5%;
   }
 
   .chapter09 > h2 {
