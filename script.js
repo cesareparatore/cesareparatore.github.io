@@ -6,31 +6,32 @@
      ======================================================= */
 
   const CFG = {
-    /*
-     * Il loader CSS arriva visivamente a circa 2.6s.
-     * Manteniamo una permanenza minima leggermente superiore
-     * per evitare che la pagina entri mentre la composizione
-     * è ancora in corso.
-     */
+    /* Loader */
     loaderMin: 2850,
     loaderMax: 4200,
 
+    /* Reveal */
     revealThreshold: 0.12,
 
+    /* Cursor */
     cursorLerp: 0.18,
 
+    /* Resize */
     resizeDebounce: 160,
 
+    /* Navigation */
     navOffset: 18,
-
     transitionMs: 620,
 
+    /* Trajectory */
     trajectoryLerp: 0.09,
     trajectoryDrift: 18,
 
+    /* Magnetic */
     magneticStrength: 0.12,
     magneticRadius: 90,
 
+    /* Standby */
     standbyDelay: 45000
   };
 
@@ -52,6 +53,8 @@
 
     menuReturn: null,
     standbyReturn: null,
+
+    cursorMoving: false,
 
     pointer: {
       x: innerWidth / 2,
@@ -76,11 +79,11 @@
      DOM HELPERS
      ======================================================= */
 
-  const q = selector => document.querySelector(selector);
+  const q = selector =>
+    document.querySelector(selector);
 
-  const qa = selector => [
-    ...document.querySelectorAll(selector)
-  ];
+  const qa = selector =>
+    [...document.querySelectorAll(selector)];
 
   const dom = {
     html: document.documentElement,
@@ -174,7 +177,9 @@
         'a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])'
       )
     ].filter(
-      el => !el.hidden && el.offsetParent !== null
+      el =>
+        !el.hidden &&
+        el.offsetParent !== null
     );
   }
 
@@ -184,7 +189,10 @@
 
     if ("inert" in el) {
       el.inert = value;
-    } else if (value) {
+      return;
+    }
+
+    if (value) {
       el.setAttribute("inert", "");
     } else {
       el.removeAttribute("inert");
@@ -214,13 +222,15 @@
       }
 
       resetStandby();
+      wakeRaf();
     };
 
     apply(mq.matches);
 
     mq.addEventListener?.(
       "change",
-      event => apply(event.matches)
+      event =>
+        apply(event.matches)
     );
   }
 
@@ -235,7 +245,8 @@
       return;
     }
 
-    const started = performance.now();
+    const started =
+      performance.now();
 
     let done = false;
 
@@ -253,7 +264,6 @@
       );
 
       setTimeout(() => {
-
         st.loaded = true;
 
         dom.loader.classList.add(
@@ -261,8 +271,8 @@
         );
 
         /*
-         * Deve essere leggermente superiore
-         * alla durata CSS dell'uscita.
+         * Lasciamo completare la dissolvenza
+         * prima di rimuovere il nodo dal DOM.
          */
         setTimeout(() => {
           dom.loader?.remove();
@@ -273,10 +283,13 @@
 
 
     /*
-     * Se tutte le risorse sono già caricate,
-     * partiamo subito ma rispettiamo loaderMin.
+     * Se la pagina è già completamente caricata,
+     * rispettiamo comunque la durata minima.
      */
-    if (document.readyState === "complete") {
+    if (
+      document.readyState ===
+      "complete"
+    ) {
       finish();
     } else {
       window.addEventListener(
@@ -288,8 +301,7 @@
 
 
     /*
-     * Fallback: impedisce che il loader
-     * resti bloccato indefinitamente.
+     * Fallback di sicurezza.
      */
     setTimeout(
       finish,
@@ -305,72 +317,81 @@
   function pageTransitionsInit() {
     if (!dom.transition) return;
 
-    dom.transitionLinks.forEach(link => {
+    dom.transitionLinks.forEach(
+      link => {
 
-      link.addEventListener("click", event => {
+        link.addEventListener(
+          "click",
+          event => {
 
-        if (
-          st.reduced ||
-          event.defaultPrevented ||
-          event.button !== 0 ||
-          event.metaKey ||
-          event.ctrlKey ||
-          event.shiftKey ||
-          event.altKey
-        ) {
-          return;
-        }
+            if (
+              st.reduced ||
+              event.defaultPrevented ||
+              event.button !== 0 ||
+              event.metaKey ||
+              event.ctrlKey ||
+              event.shiftKey ||
+              event.altKey
+            ) {
+              return;
+            }
 
-        const href =
-          link.getAttribute("href");
 
-        if (
-          !href ||
-          href.startsWith("#") ||
-          href.startsWith("mailto:") ||
-          href.startsWith("tel:") ||
-          link.hasAttribute("download")
-        ) {
-          return;
-        }
+            const href =
+              link.getAttribute("href");
 
-        let url;
+            if (
+              !href ||
+              href.startsWith("#") ||
+              href.startsWith("mailto:") ||
+              href.startsWith("tel:") ||
+              link.hasAttribute("download")
+            ) {
+              return;
+            }
 
-        try {
-          url = new URL(
-            href,
-            location.href
-          );
-        } catch {
-          return;
-        }
 
-        const sameDocument =
-          url.origin === location.origin &&
-          url.pathname === location.pathname &&
-          url.search === location.search &&
-          url.hash;
+            let url;
 
-        if (
-          url.origin !== location.origin ||
-          sameDocument
-        ) {
-          return;
-        }
+            try {
+              url = new URL(
+                href,
+                location.href
+              );
+            } catch {
+              return;
+            }
 
-        event.preventDefault();
 
-        dom.transition.classList.add(
-          "is-active"
+            const sameDocument =
+              url.origin === location.origin &&
+              url.pathname === location.pathname &&
+              url.search === location.search &&
+              !!url.hash;
+
+
+            if (
+              url.origin !== location.origin ||
+              sameDocument
+            ) {
+              return;
+            }
+
+
+            event.preventDefault();
+
+            dom.transition.classList.add(
+              "is-active"
+            );
+
+
+            setTimeout(() => {
+              location.href = url.href;
+            }, CFG.transitionMs);
+          }
         );
-
-        setTimeout(() => {
-          location.href = url.href;
-        }, CFG.transitionMs);
-
-      });
-
-    });
+      }
+    );
 
 
     window.addEventListener(
@@ -429,7 +450,7 @@
 
     requestAnimationFrame(() => {
       dom.menuLinks[0]?.focus({
-        preventScroll:true
+        preventScroll: true
       });
     });
   }
@@ -469,8 +490,8 @@
       true
     );
 
-    if (restore) {
 
+    if (restore) {
       const el =
         st.menuReturn;
 
@@ -480,15 +501,15 @@
         typeof el.focus === "function"
       ) {
         el.focus({
-          preventScroll:true
+          preventScroll: true
         });
       } else {
         dom.menuBtn?.focus({
-          preventScroll:true
+          preventScroll: true
         });
       }
-
     }
+
 
     st.menuReturn = null;
 
@@ -508,20 +529,22 @@
     );
 
 
-    dom.menuLinks.forEach(link => {
-
-      link.addEventListener(
-        "click",
-        () => menuClose(false)
-      );
-
-    });
+    dom.menuLinks.forEach(
+      link => {
+        link.addEventListener(
+          "click",
+          () => menuClose(false)
+        );
+      }
+    );
 
 
     dom.menu?.addEventListener(
       "click",
       event => {
-        if (event.target === dom.menu) {
+        if (
+          event.target === dom.menu
+        ) {
           menuClose();
         }
       }
@@ -561,7 +584,8 @@
         if (!els.length) return;
 
         const first = els[0];
-        const last = els[els.length - 1];
+        const last =
+          els[els.length - 1];
 
 
         if (
@@ -578,7 +602,6 @@
           event.preventDefault();
           first.focus();
         }
-
       }
     );
   }
@@ -589,7 +612,6 @@
      ======================================================= */
 
   function wowUpdate(i) {
-
     const s = section(i);
 
     if (!s) return;
@@ -623,7 +645,9 @@
     }
 
 
-    const first = i === 0;
+    const first =
+      i === 0;
+
     const last =
       i === total - 1;
 
@@ -670,7 +694,6 @@
         dom.prevLabel.textContent =
           secNum(i - 1);
       }
-
     }
 
 
@@ -684,15 +707,18 @@
           "Torna all'inizio"
         );
 
+
         const arrow =
           dom.next.querySelector(
             ".section-jump-arrow"
           );
 
+
         if (dom.nextLabel) {
           dom.nextLabel.textContent =
             "01";
         }
+
 
         if (arrow) {
           arrow.textContent = "↑";
@@ -710,21 +736,23 @@
           `Vai alla sezione ${secNum(i + 1)}`
         );
 
+
         const arrow =
           dom.next.querySelector(
             ".section-jump-arrow"
           );
+
 
         if (dom.nextLabel) {
           dom.nextLabel.textContent =
             secNum(i + 1);
         }
 
+
         if (arrow) {
           arrow.textContent = "→";
         }
       }
-
     }
   }
 
@@ -734,9 +762,11 @@
     updateHash = true
   ) {
 
-    const s = section(i);
+    const s =
+      section(i);
 
     if (!s) return;
+
 
     const y =
       window.scrollY +
@@ -746,10 +776,11 @@
 
 
     window.scrollTo({
-      top:Math.max(0,y),
-      behavior:motionOK()
-        ? "smooth"
-        : "auto"
+      top: Math.max(0, y),
+      behavior:
+        motionOK()
+          ? "smooth"
+          : "auto"
     });
 
 
@@ -779,6 +810,7 @@
     dom.prev?.addEventListener(
       "click",
       event => {
+
         event.preventDefault();
 
         if (st.active > 0) {
@@ -791,6 +823,7 @@
     dom.next?.addEventListener(
       "click",
       event => {
+
         event.preventDefault();
 
         goTo(
@@ -810,18 +843,23 @@
       return;
     }
 
-    const ref =
-      innerHeight * .52;
 
-    let best = st.active;
-    let dist = Infinity;
+    const ref =
+      innerHeight * 0.52;
+
+    let best =
+      st.active;
+
+    let dist =
+      Infinity;
 
 
     dom.sections.forEach(
-      (s,i) => {
+      (s, i) => {
 
         const r =
           s.getBoundingClientRect();
+
 
         if (
           r.bottom <= 0 ||
@@ -830,12 +868,14 @@
           return;
         }
 
+
         const d =
           Math.abs(
             r.top +
             r.height / 2 -
             ref
           );
+
 
         if (d < dist) {
           dist = d;
@@ -845,7 +885,9 @@
     );
 
 
-    if (best !== st.active) {
+    if (
+      best !== st.active
+    ) {
       wowUpdate(best);
     }
   }
@@ -863,7 +905,10 @@
       !("IntersectionObserver" in window)
     ) {
       dom.reveals.forEach(
-        el => el.classList.add("is-visible")
+        el =>
+          el.classList.add(
+            "is-visible"
+          )
       );
 
       return;
@@ -877,13 +922,17 @@
           entries.forEach(
             entry => {
 
-              if (!entry.isIntersecting) {
+              if (
+                !entry.isIntersecting
+              ) {
                 return;
               }
+
 
               entry.target.classList.add(
                 "is-visible"
               );
+
 
               io.unobserve(
                 entry.target
@@ -895,6 +944,7 @@
         {
           threshold:
             CFG.revealThreshold,
+
           rootMargin:
             "0px 0px -8% 0px"
         }
@@ -902,7 +952,8 @@
 
 
     dom.reveals.forEach(
-      el => io.observe(el)
+      el =>
+        io.observe(el)
     );
   }
 
@@ -953,26 +1004,29 @@
         const key =
           link.dataset.direction;
 
+
         link.addEventListener(
           "pointerenter",
-          () => set(key,true)
+          () => set(key, true)
         );
+
 
         link.addEventListener(
           "pointerleave",
-          () => set(key,false)
+          () => set(key, false)
         );
+
 
         link.addEventListener(
           "focusin",
-          () => set(key,true)
+          () => set(key, true)
         );
+
 
         link.addEventListener(
           "focusout",
-          () => set(key,false)
+          () => set(key, false)
         );
-
       }
     );
   }
@@ -1003,28 +1057,31 @@
         }
 
 
-        const els = qa(
-          `[data-node="${escaped}"],
-           [data-direction="${escaped}"]`
-        );
+        const els =
+          qa(
+            `[data-node="${escaped}"],
+             [data-direction="${escaped}"]`
+          );
 
 
-        const on = () =>
+        const on = () => {
           els.forEach(
             el =>
               el.classList.add(
                 "is-linked"
               )
           );
+        };
 
 
-        const off = () =>
+        const off = () => {
           els.forEach(
             el =>
               el.classList.remove(
                 "is-linked"
               )
           );
+        };
 
 
         link.addEventListener(
@@ -1032,21 +1089,23 @@
           on
         );
 
+
         link.addEventListener(
           "pointerleave",
           off
         );
+
 
         link.addEventListener(
           "focusin",
           on
         );
 
+
         link.addEventListener(
           "focusout",
           off
         );
-
       }
     );
   }
@@ -1083,8 +1142,11 @@
           "is-visible"
         );
 
+        st.cursorMoving = true;
+
+        wakeRaf();
       },
-      { passive:true }
+      { passive: true }
     );
 
 
@@ -1093,31 +1155,36 @@
 
         el.addEventListener(
           "pointerenter",
-          () =>
+          () => {
             dom.cursor.classList.add(
               "is-hovering"
-            )
+            );
+          }
         );
+
 
         el.addEventListener(
           "pointerleave",
-          () =>
+          () => {
             dom.cursor.classList.remove(
               "is-hovering"
-            )
+            );
+          }
         );
-
       }
     );
 
 
     window.addEventListener(
       "pointerleave",
-      () =>
+      () => {
         dom.cursor.classList.remove(
           "is-visible",
           "is-hovering"
-        )
+        );
+
+        st.cursorMoving = false;
+      }
     );
   }
 
@@ -1131,8 +1198,23 @@
       !fine() ||
       st.reduced
     ) {
+      st.cursorMoving = false;
       return false;
     }
+
+
+    if (!st.cursorMoving) {
+      return false;
+    }
+
+
+    const dx =
+      st.pointer.x -
+      st.cursor.x;
+
+    const dy =
+      st.pointer.y -
+      st.cursor.y;
 
 
     st.cursor.x =
@@ -1141,6 +1223,7 @@
         st.pointer.x,
         CFG.cursorLerp
       );
+
 
     st.cursor.y =
       lerp(
@@ -1166,7 +1249,34 @@
       ) translate(-50%,-50%)`;
 
 
-    return true;
+    /*
+     * Quando il ring ha quasi raggiunto
+     * il puntatore, possiamo fermare il RAF.
+     */
+    const settled =
+      Math.abs(dx) < 0.15 &&
+      Math.abs(dy) < 0.15;
+
+
+    if (settled) {
+      st.cursor.x =
+        st.pointer.x;
+
+      st.cursor.y =
+        st.pointer.y;
+
+      st.cursorMoving = false;
+
+      dom.ring.style.transform =
+        `translate3d(
+          ${st.cursor.x}px,
+          ${st.cursor.y}px,
+          0
+        ) translate(-50%,-50%)`;
+    }
+
+
+    return st.cursorMoving;
   }
 
 
@@ -1194,16 +1304,26 @@
             const r =
               el.getBoundingClientRect();
 
+
             const dx =
               event.clientX -
-              (r.left + r.width / 2);
+              (
+                r.left +
+                r.width / 2
+              );
+
 
             const dy =
               event.clientY -
-              (r.top + r.height / 2);
+              (
+                r.top +
+                r.height / 2
+              );
+
 
             const d =
-              Math.hypot(dx,dy);
+              Math.hypot(dx, dy);
+
 
             if (
               d >
@@ -1226,12 +1346,13 @@
               `${dx * k}px`
             );
 
+
             el.style.setProperty(
               "--magnetic-y",
               `${dy * k}px`
             );
           },
-          { passive:true }
+          { passive: true }
         );
 
 
@@ -1244,14 +1365,13 @@
               "0px"
             );
 
+
             el.style.setProperty(
               "--magnetic-y",
               "0px"
             );
-
           }
         );
-
       }
     );
   }
@@ -1276,6 +1396,7 @@
         "is-engaged"
       );
 
+
     const off = () =>
       dom.cta.classList.remove(
         "is-engaged"
@@ -1287,15 +1408,18 @@
       on
     );
 
+
     dom.contact.addEventListener(
       "pointerleave",
       off
     );
 
+
     dom.contact.addEventListener(
       "focusin",
       on
     );
+
 
     dom.contact.addEventListener(
       "focusout",
@@ -1310,14 +1434,17 @@
 
   function clearStandby() {
 
-    if (st.standbyTimer) {
-
-      clearTimeout(
-        st.standbyTimer
-      );
-
-      st.standbyTimer = 0;
+    if (!st.standbyTimer) {
+      return;
     }
+
+
+    clearTimeout(
+      st.standbyTimer
+    );
+
+
+    st.standbyTimer = 0;
   }
 
 
@@ -1340,6 +1467,7 @@
     st.standbyReturn =
       document.activeElement;
 
+
     clearStandby();
 
 
@@ -1347,9 +1475,11 @@
       "is-standby"
     );
 
+
     dom.standby.classList.add(
       "is-active"
     );
+
 
     dom.standby.setAttribute(
       "aria-hidden",
@@ -1364,7 +1494,7 @@
 
 
     dom.wake?.focus({
-      preventScroll:true
+      preventScroll: true
     });
   }
 
@@ -1386,9 +1516,11 @@
       "is-standby"
     );
 
+
     dom.standby.classList.remove(
       "is-active"
     );
+
 
     dom.standby.setAttribute(
       "aria-hidden",
@@ -1405,6 +1537,7 @@
     const el =
       st.standbyReturn;
 
+
     st.standbyReturn = null;
 
 
@@ -1416,7 +1549,7 @@
       requestAnimationFrame(
         () =>
           el.focus({
-            preventScroll:true
+            preventScroll: true
           })
       );
     }
@@ -1480,10 +1613,12 @@
           return;
         }
 
+
         event.preventDefault();
 
+
         dom.wake?.focus({
-          preventScroll:true
+          preventScroll: true
         });
       }
     );
@@ -1499,13 +1634,15 @@
 
         window.addEventListener(
           type,
-          () =>
-            st.standby
-              ? closeStandby()
-              : resetStandby(),
-          { passive:true }
+          () => {
+            if (st.standby) {
+              closeStandby();
+            } else {
+              resetStandby();
+            }
+          },
+          { passive: true }
         );
-
       }
     );
 
@@ -1519,7 +1656,6 @@
         } else {
           resetStandby();
         }
-
       }
     );
   }
@@ -1542,18 +1678,23 @@
       dom.sections[0]
         .getBoundingClientRect();
 
+
     const last =
-      dom.sections.at(-1)
-        .getBoundingClientRect();
+      dom.sections[
+        dom.sections.length - 1
+      ].getBoundingClientRect();
 
 
     const start =
-      first.top + scrollY;
+      first.top +
+      scrollY;
+
 
     const end =
       last.bottom +
       scrollY -
       innerHeight;
+
 
     const range =
       end - start;
@@ -1563,7 +1704,10 @@
       range <= 0
         ? 0
         : clamp(
-            (scrollY - start) / range,
+            (
+              scrollY -
+              start
+            ) / range,
             0,
             1
           );
@@ -1619,6 +1763,7 @@
     const cursorActive =
       cursorFrame();
 
+
     trajectoryFrame();
 
 
@@ -1626,7 +1771,7 @@
       Math.abs(
         st.traj.d -
         st.traj.td
-      ) > .02;
+      ) > 0.02;
 
 
     if (
@@ -1663,9 +1808,11 @@
     const raw =
       location.hash.slice(1);
 
+
     const i =
       dom.sections.findIndex(
-        s => s.id === raw
+        s =>
+          s.id === raw
       );
 
 
@@ -1770,9 +1917,8 @@
             ticking = false;
           }
         );
-
       },
-      { passive:true }
+      { passive: true }
     );
   }
 
@@ -1812,7 +1958,7 @@
             CFG.resizeDebounce
           );
       },
-      { passive:true }
+      { passive: true }
     );
   }
 
@@ -1830,9 +1976,12 @@
 
     st.active = 0;
 
+
     wowUpdate(0);
 
+
     trajectoryTargets();
+
 
     resetStandby();
   }
@@ -1900,7 +2049,6 @@
         ) {
           wakeRaf();
         }
-
       }
     );
 
@@ -1923,7 +2071,7 @@
     document.addEventListener(
       "DOMContentLoaded",
       init,
-      { once:true }
+      { once: true }
     );
 
   } else {
