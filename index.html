@@ -1,34 +1,57 @@
 <!doctype html>
-
 <html lang="it">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
   <title>Cesare Paratore — Movimento con Direzione</title>
-  <meta name="description" content="Cesare Paratore — Movimento con Direzione. Scienze Motorie, sport, educazione, management e digitale, tra esperienza, competenze e progetti.">
+
+  <meta
+    name="description"
+    content="Cesare Paratore — Movimento con Direzione. Scienze Motorie, sport, educazione, management e digitale, tra esperienza, competenze e progetti."
+  >
   <meta name="author" content="Cesare Paratore">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="theme-color" content="#F2EFE8">
   <meta name="color-scheme" content="light">
+
   <link rel="canonical" href="https://www.cesareparatore.it/">
-  <link rel="icon" type="image/svg" href="/assets/images/cp-mark.svg">
+  <link rel="icon" type="image/svg+xml" href="/assets/images/cp-mark.svg">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="image" href="/assets/images/cp-foto.webp" fetchpriority="high">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+  <link
+    rel="preload"
+    as="image"
+    href="/assets/images/cp-foto.webp"
+    fetchpriority="high"
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap"
+    rel="stylesheet"
+  >
+
   <link rel="stylesheet" href="/css/style.css">
 
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Cesare Paratore">
   <meta property="og:title" content="Cesare Paratore — Movimento con Direzione">
-  <meta property="og:description" content="Scienze Motorie, sport, educazione, management e digitale: un percorso costruito attraverso movimento, esperienza e connessioni.">
+  <meta
+    property="og:description"
+    content="Scienze Motorie, sport, educazione, management e digitale: un percorso costruito attraverso movimento, esperienza e connessioni."
+  >
   <meta property="og:url" content="https://www.cesareparatore.it/">
   <meta property="og:image" content="https://www.cesareparatore.it/assets/images/cp-foto.webp">
   <meta property="og:locale" content="it_IT">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Cesare Paratore — Movimento con Direzione">
-  <meta name="twitter:description" content="Scienze Motorie, sport, educazione, management e digitale.">
+  <meta
+    name="twitter:description"
+    content="Scienze Motorie, sport, educazione, management e digitale."
+  >
   <meta name="twitter:image" content="https://www.cesareparatore.it/assets/images/cp-foto.webp">
 
   <script type="application/ld+json">
@@ -60,541 +83,207 @@
         "name":"Cesare Paratore",
         "url":"https://www.cesareparatore.it/",
         "description":"Professionista con un percorso tra Scienze Motorie, sport, educazione, management e digitale.",
-        "knowsAbout":["Scienze Motorie","Sport","Running","Educazione","Management dello Sport","Digitale"]
+        "knowsAbout":[
+          "Scienze Motorie",
+          "Sport",
+          "Running",
+          "Educazione",
+          "Management dello Sport",
+          "Digitale"
+        ]
       }
     ]
   }
   </script>
-
-  <!-- ======================================================
-       FOOTER
-       ======================================================= -->
-
-  <style>
-    .site-footer .footer-inner {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-    }
-
-    .site-footer .footer-rule {
-      display: block;
-      height: 1px;
-      background: currentColor;
-      flex: 0 0 auto;
-    }
-
-    .site-footer .footer-rule--top {
-      width: clamp(140px, 24vw, 300px);
-      margin: clamp(2.75rem, 5vw, 4.5rem) auto clamp(2rem, 4vw, 3.5rem);
-    }
-
-    .site-footer .footer-rule--bottom {
-      width: clamp(64px, 11vw, 140px);
-      margin: clamp(2rem, 4vw, 3.5rem) auto clamp(2rem, 4vw, 3.5rem);
-    }
-
-    .site-footer .footer-motto {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.45em;
-      margin: 0;
-    }
-
-    .site-footer .footer-signature {
-      margin: 0;
-    }
-
-    /* ======================================================
-       LOADER + STANDBY
-       Sistema visivo condiviso
-       ======================================================= */
-
-    .page-loader,
-    .standby-screen {
-      background: var(--color-background, #F2EFE8);
-      color: var(--color-text, #111111);
-    }
-
-    .page-loader-inner,
-    .standby-center {
-      position: relative;
-      z-index: 2;
-    }
-
-    .page-loader-inner {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-    }
-
-    .loader-brand,
-    .standby-brand {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .loader-brand img,
-    .standby-brand img {
-      display: block;
-      width: clamp(56px, 7vw, 84px);
-      height: auto;
-    }
-
-    .loader-brand {
-      margin-bottom: clamp(2rem, 4vw, 3.5rem);
-    }
-
-    .standby-brand {
-      margin-bottom: clamp(2rem, 4vw, 3.5rem);
-    }
-
-    .loader-motto,
-    .standby-motto {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.45em;
-      margin: 0;
-      text-align: center;
-    }
-
-    .loader-signature,
-    .standby-signature {
-      margin: clamp(1.25rem, 2vw, 1.75rem) 0 0;
-    }
-
-    /*
-      La stessa grammatica visiva viene utilizzata
-      in entrambi i momenti: logo → traiettoria → concept → firma.
-    */
-
-    .page-loader .loader-trajectory,
-    .standby-screen .standby-atmosphere {
-      position: relative;
-      width: min(42vw, 360px);
-      height: 1px;
-      margin-inline: auto;
-    }
-
-    .page-loader .loader-trajectory {
-      margin-bottom: clamp(2rem, 4vw, 3.5rem);
-    }
-
-    .standby-screen .standby-atmosphere {
-      margin-bottom: clamp(2rem, 4vw, 3.5rem);
-    }
-
-    .page-loader .loader-line,
-    .standby-screen .standby-path {
-      position: absolute;
-      inset: 0;
-      display: block;
-      height: 1px;
-      background: currentColor;
-      transform-origin: left center;
-    }
-
-    .page-loader .loader-point,
-    .standby-screen .standby-point {
-      position: absolute;
-      top: 50%;
-      left: 0;
-      display: block;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: currentColor;
-      transform: translate(-50%, -50%);
-    }
-
-    /* Loader più lento e progressivo */
-    .page-loader .loader-line {
-      transform: scaleX(0);
-      animation: loader-trajectory-draw 2.4s cubic-bezier(.22, .61, .36, 1) forwards;
-    }
-
-    .page-loader .loader-point {
-      animation:
-        loader-point-move 2.4s cubic-bezier(.22, .61, .36, 1) forwards,
-        loader-point-breathe 1.8s ease-in-out 0.6s infinite;
-    }
-
-    .page-loader .loader-brand,
-    .page-loader .loader-motto,
-    .page-loader .loader-signature {
-      opacity: 0;
-      transform: translateY(12px);
-      animation: loader-content-in 1.1s cubic-bezier(.22, .61, .36, 1) forwards;
-    }
-
-    .page-loader .loader-brand {
-      animation-delay: 0.15s;
-    }
-
-    .page-loader .loader-motto {
-      animation-delay: 0.55s;
-    }
-
-    .page-loader .loader-signature {
-      animation-delay: 0.75s;
-    }
-
-    /*
-      Standby: stesso sistema, ma fermo.
-    */
-
-    .standby-screen .standby-path {
-      transform: scaleX(1);
-    }
-
-    .standby-screen .standby-point {
-      left: 100%;
-      animation: standby-point-breathe 2.2s ease-in-out infinite;
-    }
-
-    .standby-copy {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-    }
-
-    .standby-label,
-    .standby-touch {
-      display: block;
-    }
-
-    .standby-label {
-      margin-bottom: 0.9rem;
-    }
-
-    .standby-wake {
-      appearance: none;
-      border: 0;
-      background: transparent;
-      color: inherit;
-      font: inherit;
-      padding: 0.25rem 0;
-      cursor: pointer;
-    }
-
-    .standby-touch {
-      transition: transform 300ms ease, opacity 300ms ease;
-    }
-
-    .standby-wake:hover .standby-touch,
-    .standby-wake:focus-visible .standby-touch {
-      transform: translateY(-3px);
-      opacity: 0.65;
-    }
-
-    @keyframes loader-trajectory-draw {
-      from {
-        transform: scaleX(0);
-      }
-      to {
-        transform: scaleX(1);
-      }
-    }
-
-    @keyframes loader-point-move {
-      from {
-        left: 0;
-      }
-      to {
-        left: 100%;
-      }
-    }
-
-    @keyframes loader-point-breathe {
-      0%,
-      100% {
-        opacity: 1;
-        scale: 1;
-      }
-      50% {
-        opacity: 0.55;
-        scale: 0.72;
-      }
-    }
-
-    @keyframes loader-content-in {
-      from {
-        opacity: 0;
-        transform: translateY(12px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes standby-point-breathe {
-      0%,
-      100% {
-        opacity: 1;
-        scale: 1;
-      }
-      50% {
-        opacity: 0.55;
-        scale: 0.72;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .page-loader .loader-line,
-      .page-loader .loader-point,
-      .page-loader .loader-brand,
-      .page-loader .loader-motto,
-      .page-loader .loader-signature,
-      .standby-screen .standby-point {
-        animation: none;
-      }
-
-      .page-loader .loader-line {
-        transform: scaleX(1);
-      }
-
-      .page-loader .loader-point {
-        left: 100%;
-      }
-
-      .page-loader .loader-brand,
-      .page-loader .loader-motto,
-      .page-loader .loader-signature {
-        opacity: 1;
-        transform: none;
-      }
-    }
-
-    @media (max-width: 600px) {
-      .site-footer .footer-rule--top {
-        width: 52%;
-      }
-
-      .site-footer .footer-rule--bottom {
-        width: 24%;
-      }
-
-      .site-footer .footer-motto {
-        flex-wrap: wrap;
-      }
-
-      .page-loader .loader-trajectory,
-      .standby-screen .standby-atmosphere {
-        width: 56vw;
-      }
-    }
-  </style>
-
 </head>
 
 <body>
 
 <a class="skip-link" href="#main-content">Vai al contenuto</a>
 
-  <!-- ======================================================
-       LOADER
-       ======================================================= -->
+<!-- ======================================================
+     LOADER
+====================================================== -->
 
-  <div class="page-loader" aria-hidden="true">
+<div class="page-loader" aria-hidden="true">
+  <div class="page-loader-inner">
 
-```
-<div class="page-loader-inner">
+    <div class="loader-brand" aria-hidden="true">
+      <img
+        src="/assets/images/cp-mark.svg"
+        alt=""
+        width="72"
+        height="72"
+      >
+    </div>
 
-  <div class="loader-brand" aria-hidden="true">
+    <div class="loader-trajectory" aria-hidden="true">
+      <span class="loader-line"></span>
+      <span class="loader-point"></span>
+    </div>
+
+    <p class="loader-motto">
+      <span>MOVIMENTO</span>
+      <span aria-hidden="true">/</span>
+      <span>CON DIREZIONE.</span>
+    </p>
+
+    <p class="loader-signature">CESARE PARATORE</p>
+
+  </div>
+</div>
+
+<div class="page-transition" aria-hidden="true"></div>
+
+<div class="custom-cursor" aria-hidden="true">
+  <span class="custom-cursor-dot"></span>
+  <span class="custom-cursor-ring"></span>
+</div>
+
+<!-- ======================================================
+     HEADER
+====================================================== -->
+
+<header class="site-header">
+
+  <a
+    class="site-brand magnetic"
+    href="#01"
+    aria-label="Cesare Paratore — torna all'inizio"
+  >
     <img
       src="/assets/images/cp-mark.svg"
       alt=""
-      width="72"
-      height="72"
+      width="48"
+      height="48"
     >
+  </a>
+
+  <div class="wow-progress" aria-label="Navigazione del percorso">
+
+    <div
+      class="progress-label"
+      id="progress-current"
+      aria-live="polite"
+    >
+      IL MOVIMENTO È SOLO L'INIZIO.
+    </div>
+
+    <div class="progress-track" aria-hidden="true">
+      <span class="progress-fill" id="progress-fill"></span>
+      <span class="progress-point" id="progress-point"></span>
+    </div>
+
+    <div class="section-jump">
+
+      <a
+        id="previous-section"
+        class="section-jump-link section-jump-link--previous is-disabled"
+        href="#01"
+        aria-label="Sezione precedente"
+        aria-hidden="true"
+        tabindex="-1"
+      >
+        <span aria-hidden="true">←</span>
+        <span id="previous-section-label"></span>
+      </a>
+
+      <a
+        id="next-section"
+        class="section-jump-link section-jump-link--next"
+        href="#02"
+        aria-label="Vai alla sezione 02"
+      >
+        <span id="next-section-label">02</span>
+        <span aria-hidden="true" class="section-jump-arrow">→</span>
+      </a>
+
+    </div>
+
   </div>
 
-  <div class="loader-trajectory" aria-hidden="true">
-    <span class="loader-point"></span>
-    <span class="loader-line"></span>
-  </div>
+  <button
+    class="menu-trigger magnetic"
+    type="button"
+    aria-expanded="false"
+    aria-controls="site-menu"
+    aria-label="Apri menu"
+  >
+    <span class="menu-trigger-label">MENU</span>
 
-  <p class="loader-motto">
-    <span>MOVIMENTO</span>
-    <span aria-hidden="true">/</span>
-    <span>CON DIREZIONE.</span>
-  </p>
+    <span class="menu-trigger-icon" aria-hidden="true">
+      <span></span>
+      <span></span>
+    </span>
+  </button>
 
-  <p class="loader-signature">
-    CESARE PARATORE
-  </p>
+</header>
 
-</div>
-```
+<!-- ======================================================
+     MENU
+====================================================== -->
 
-  </div>
-
-  <div class="page-transition" aria-hidden="true"></div>
-
-  <div class="custom-cursor" aria-hidden="true">
-    <span class="custom-cursor-dot"></span>
-    <span class="custom-cursor-ring"></span>
-  </div>
-
-  <header class="site-header">
-
-```
-<a
-  class="site-brand magnetic"
-  href="#01"
-  aria-label="Cesare Paratore — torna all'inizio"
+<aside
+  class="site-menu"
+  id="site-menu"
+  aria-hidden="true"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Menu principale"
+  inert
 >
-  <img
-    src="/assets/images/cp-mark.svg"
-    alt=""
-    width="48"
-    height="48"
-  >
-</a>
+  <div class="site-menu-inner">
 
-<div class="wow-progress" aria-label="Navigazione del percorso">
+    <nav class="site-menu-nav" aria-label="Navigazione principale">
 
-  <div
-    class="progress-label"
-    id="progress-current"
-    aria-live="polite"
-  >
-    IL MOVIMENTO È SOLO L'INIZIO.
-  </div>
+      <a href="/chi-sono/">
+        <span>CHI SONO</span>
+      </a>
 
-  <div class="progress-track" aria-hidden="true">
-    <span class="progress-fill" id="progress-fill"></span>
-    <span class="progress-point" id="progress-point"></span>
-  </div>
+      <a href="/sport/">
+        <span>SPORT</span>
+      </a>
 
-  <div class="section-jump">
+      <a href="/scienze-motorie/">
+        <span>SCIENZE MOTORIE</span>
+      </a>
 
-    <a
-      id="previous-section"
-      class="section-jump-link section-jump-link--previous is-disabled"
-      href="#01"
-      aria-label="Sezione precedente"
-      aria-hidden="true"
-      tabindex="-1"
-    >
-      <span aria-hidden="true">←</span>
-      <span id="previous-section-label"></span>
-    </a>
+      <a href="/educazione/">
+        <span>EDUCAZIONE</span>
+      </a>
 
-    <a
-      id="next-section"
-      class="section-jump-link section-jump-link--next"
-      href="#02"
-      aria-label="Vai alla sezione 02"
-    >
-      <span id="next-section-label">02</span>
-      <span aria-hidden="true" class="section-jump-arrow">→</span>
-    </a>
+      <a href="/management-dello-sport/">
+        <span>MANAGEMENT</span>
+      </a>
+
+      <a href="/digitale/">
+        <span>DIGITALE</span>
+      </a>
+
+      <a href="/territorio/">
+        <span>TERRITORIO</span>
+      </a>
+
+      <a href="/contatti/">
+        <span>CONTATTI</span>
+      </a>
+
+    </nav>
 
   </div>
+</aside>
 
-</div>
+<main id="main-content">
 
-<button
-  class="menu-trigger magnetic"
-  type="button"
-  aria-expanded="false"
-  aria-controls="site-menu"
-  aria-label="Apri menu"
->
-  <span class="menu-trigger-label">MENU</span>
-  <span class="menu-trigger-icon" aria-hidden="true">
-    <span></span>
-    <span></span>
-  </span>
-</button>
-```
-
-  </header>
-
-  <!-- ======================================================
-       MENU
-       Numerazione rimossa: resta solo il testo.
-       ======================================================= -->
-
-  <aside
-    class="site-menu"
-    id="site-menu"
-    aria-hidden="true"
-    role="dialog"
-    aria-modal="true"
-    aria-label="Menu principale"
-    inert
-  >
-
-```
-<div class="site-menu-inner">
-
-  <nav
-    class="site-menu-nav"
-    aria-label="Navigazione principale"
-  >
-
-    <a href="/chi-sono/">
-      <span>CHI SONO</span>
-    </a>
-
-    <a href="/sport/">
-      <span>SPORT</span>
-    </a>
-
-    <a href="/scienze-motorie/">
-      <span>SCIENZE MOTORIE</span>
-    </a>
-
-    <a href="/educazione/">
-      <span>EDUCAZIONE</span>
-    </a>
-
-    <a href="/management-dello-sport/">
-      <span>MANAGEMENT</span>
-    </a>
-
-    <a href="/digitale/">
-      <span>DIGITALE</span>
-    </a>
-
-    <a href="/territorio/">
-      <span>TERRITORIO</span>
-    </a>
-
-    <a href="/contatti/">
-      <span>CONTATTI</span>
-    </a>
-
-  </nav>
-
-</div>
-```
-
-  </aside>
-
-  <main id="main-content">
-
-```
 <!-- ======================================================
      01 — OPENING
-======================================================= -->
+====================================================== -->
 
 <section
   class="home-section home-section--hero"
   id="01"
   data-section-title="IL MOVIMENTO È SOLO L'INIZIO."
 >
-
   <div class="section-inner section-inner--hero">
 
     <div class="section-title reveal">
@@ -602,7 +291,6 @@
     </div>
 
     <h1 class="hero-title reveal">
-
       <span class="hero-title-line hero-title-line--identity">
         <span class="hero-title-word">MOVIMENTO</span>
         <span class="identity-slash" aria-hidden="true">/</span>
@@ -611,7 +299,6 @@
       <span class="hero-title-line">
         CON DIREZIONE.
       </span>
-
     </h1>
 
     <div class="hero-intro editorial-copy reveal">
@@ -625,121 +312,65 @@
       class="hero-directions reveal"
       aria-label="Le cinque direzioni"
     >
-
-      <a
-        class="hero-direction"
-        href="/sport/"
-        data-direction="sport"
-      >
+      <a class="hero-direction" href="/sport/" data-direction="sport">
         SPORT
       </a>
 
-      <a
-        class="hero-direction"
-        href="/scienze-motorie/"
-        data-direction="scienze-motorie"
-      >
+      <a class="hero-direction" href="/scienze-motorie/" data-direction="scienze-motorie">
         SCIENZE MOTORIE
       </a>
 
-      <a
-        class="hero-direction"
-        href="/educazione/"
-        data-direction="educazione"
-      >
+      <a class="hero-direction" href="/educazione/" data-direction="educazione">
         EDUCAZIONE
       </a>
 
-      <a
-        class="hero-direction"
-        href="/management-dello-sport/"
-        data-direction="management"
-      >
+      <a class="hero-direction" href="/management-dello-sport/" data-direction="management">
         MANAGEMENT
       </a>
 
-      <a
-        class="hero-direction"
-        href="/digitale/"
-        data-direction="digitale"
-      >
+      <a class="hero-direction" href="/digitale/" data-direction="digitale">
         DIGITALE
       </a>
-
     </nav>
 
-    <div
-      class="direction-trajectory reveal"
-      aria-hidden="true"
-    >
+    <div class="direction-trajectory reveal" aria-hidden="true">
 
       <span class="direction-trajectory-line"></span>
 
-      <span
-        class="direction-node"
-        data-direction="sport"
-        style="left:8%;top:54%"
-      >
+      <span class="direction-node" data-direction="sport" style="left:8%;top:54%">
         <span class="direction-node-label">SPORT</span>
       </span>
 
-      <span
-        class="direction-node"
-        data-direction="scienze-motorie"
-        style="left:29%;top:42%"
-      >
-        <span class="direction-node-label">
-          SCIENZE MOTORIE
-        </span>
+      <span class="direction-node" data-direction="scienze-motorie" style="left:29%;top:42%">
+        <span class="direction-node-label">SCIENZE MOTORIE</span>
       </span>
 
-      <span
-        class="direction-node"
-        data-direction="educazione"
-        style="left:50%;top:50%"
-      >
-        <span class="direction-node-label">
-          EDUCAZIONE
-        </span>
+      <span class="direction-node" data-direction="educazione" style="left:50%;top:50%">
+        <span class="direction-node-label">EDUCAZIONE</span>
       </span>
 
-      <span
-        class="direction-node"
-        data-direction="management"
-        style="left:71%;top:39%"
-      >
-        <span class="direction-node-label">
-          MANAGEMENT
-        </span>
+      <span class="direction-node" data-direction="management" style="left:71%;top:39%">
+        <span class="direction-node-label">MANAGEMENT</span>
       </span>
 
-      <span
-        class="direction-node"
-        data-direction="digitale"
-        style="left:92%;top:48%"
-      >
-        <span class="direction-node-label">
-          DIGITALE
-        </span>
+      <span class="direction-node" data-direction="digitale" style="left:92%;top:48%">
+        <span class="direction-node-label">DIGITALE</span>
       </span>
 
     </div>
 
   </div>
-
 </section>
-
 
 <!-- ======================================================
      02 — ORIGINE
-======================================================= -->
+====================================================== -->
 
 <section
   class="home-section home-section--question"
   id="02"
   data-section-title="LA DOMANDA È CAMBIATA."
 >
-
   <div class="section-inner section-inner--narrow">
 
     <div class="section-title reveal">
@@ -754,22 +385,14 @@
 
       <p>
         Poi è arrivato
-        <a
-          class="narrative-link"
-          href="/sport/"
-          data-trajectory-node="sport"
-        >
+        <a class="narrative-link" href="/sport/" data-trajectory-node="sport">
           lo sport
         </a>.
       </p>
 
       <p>
         E dentro lo sport ho trovato
-        <a
-          class="narrative-link"
-          href="/sport/"
-          data-trajectory-node="sport"
-        >
+        <a class="narrative-link" href="/sport/" data-trajectory-node="sport">
           la corsa
         </a>.
         Prima come
@@ -790,10 +413,7 @@
         </a>.
       </p>
 
-      <div
-        class="editorial-sequence"
-        aria-label="Le tappe della pratica"
-      >
+      <div class="editorial-sequence" aria-label="Le tappe della pratica">
         <p>La pratica.</p>
         <p>L’allenamento.</p>
         <p>La fatica.</p>
@@ -856,22 +476,18 @@
       </p>
 
     </div>
-
   </div>
-
 </section>
-
 
 <!-- ======================================================
      03 — LE DIREZIONI
-======================================================= -->
+====================================================== -->
 
 <section
   class="home-section home-section--directions"
   id="03"
   data-section-title="UNA STRADA NON ERA ABBASTANZA."
 >
-
   <div class="section-inner section-inner--narrow">
 
     <div class="section-title reveal">
@@ -882,11 +498,7 @@
 
       <p>
         Ho incontrato
-        <a
-          class="narrative-link"
-          href="/educazione/"
-          data-trajectory-node="educazione"
-        >
+        <a class="narrative-link" href="/educazione/" data-trajectory-node="educazione">
           l'educazione
         </a>.
         Per capire cosa succede quando
@@ -896,11 +508,7 @@
 
       <p>
         Ho incontrato
-        <a
-          class="narrative-link"
-          href="/management-dello-sport/"
-          data-trajectory-node="management"
-        >
+        <a class="narrative-link" href="/management-dello-sport/" data-trajectory-node="management">
           il management
         </a>.
         Per capire cosa succede quando
@@ -910,11 +518,7 @@
 
       <p>
         Ho incontrato
-        <a
-          class="narrative-link"
-          href="/digitale/"
-          data-trajectory-node="digitale"
-        >
+        <a class="narrative-link" href="/digitale/" data-trajectory-node="digitale">
           il digitale
         </a>.
         Per capire come strumenti e connessioni
@@ -923,11 +527,7 @@
 
       <p>
         E sono tornato allo
-        <a
-          class="narrative-link"
-          href="/sport/"
-          data-trajectory-node="sport"
-        >
+        <a class="narrative-link" href="/sport/" data-trajectory-node="sport">
           sport
         </a>.
         Con occhi diversi.
@@ -941,73 +541,48 @@
 
     <div class="five-directions reveal">
 
-      <a
-        href="/sport/"
-        class="narrative-link"
-        data-trajectory-node="sport"
-      >
+      <a href="/sport/" class="narrative-link" data-trajectory-node="sport">
         SPORT
       </a>
 
-      <a
-        href="/scienze-motorie/"
-        class="narrative-link"
-        data-trajectory-node="scienze-motorie"
-      >
+      <a href="/scienze-motorie/" class="narrative-link" data-trajectory-node="scienze-motorie">
         SCIENZE MOTORIE
       </a>
 
-      <a
-        href="/educazione/"
-        class="narrative-link"
-        data-trajectory-node="educazione"
-      >
+      <a href="/educazione/" class="narrative-link" data-trajectory-node="educazione">
         EDUCAZIONE
       </a>
 
-      <a
-        href="/management-dello-sport/"
-        class="narrative-link"
-        data-trajectory-node="management"
-      >
+      <a href="/management-dello-sport/" class="narrative-link" data-trajectory-node="management">
         MANAGEMENT
       </a>
 
-      <a
-        href="/digitale/"
-        class="narrative-link"
-        data-trajectory-node="digitale"
-      >
+      <a href="/digitale/" class="narrative-link" data-trajectory-node="digitale">
         DIGITALE
       </a>
 
     </div>
 
     <div class="editorial-copy editorial-copy--large reveal">
-
       <p>
         Sembravano direzioni diverse.
         Ma continuavano a partire dallo stesso punto.
         <strong>Il movimento.</strong>
       </p>
-
     </div>
 
   </div>
-
 </section>
-
 
 <!-- ======================================================
      04 — CONNESSIONI
-======================================================= -->
+====================================================== -->
 
 <section
   class="home-section home-section--network"
   id="04"
   data-section-title="POI HO CAPITO CHE NON ERANO CINQUE STRADE."
 >
-
   <div class="section-inner section-inner--split">
 
     <div class="section-content">
@@ -1024,44 +599,24 @@
         </p>
 
         <p>
-          <a
-            class="narrative-link"
-            href="/sport/"
-            data-trajectory-node="sport"
-          >
+          <a class="narrative-link" href="/sport/" data-trajectory-node="sport">
             Lo sport
           </a>
           mi ha insegnato a misurarmi.
           Le
-          <a
-            class="narrative-link"
-            href="/scienze-motorie/"
-            data-trajectory-node="scienze-motorie"
-          >
+          <a class="narrative-link" href="/scienze-motorie/" data-trajectory-node="scienze-motorie">
             Scienze Motorie
           </a>
           mi hanno insegnato a comprendere.
-          <a
-            class="narrative-link"
-            href="/educazione/"
-            data-trajectory-node="educazione"
-          >
+          <a class="narrative-link" href="/educazione/" data-trajectory-node="educazione">
             L'educazione
           </a>
           mi ha insegnato a trasferire.
-          <a
-            class="narrative-link"
-            href="/management-dello-sport/"
-            data-trajectory-node="management"
-          >
+          <a class="narrative-link" href="/management-dello-sport/" data-trajectory-node="management">
             Il management
           </a>
           mi ha insegnato a progettare.
-          <a
-            class="narrative-link"
-            href="/digitale/"
-            data-trajectory-node="digitale"
-          >
+          <a class="narrative-link" href="/digitale/" data-trajectory-node="digitale">
             Il digitale
           </a>
           mi ha insegnato a connettere.
@@ -1089,13 +644,9 @@
         </p>
 
       </div>
-
     </div>
 
-    <div
-      class="network-visual"
-      aria-hidden="true"
-    >
+    <div class="network-visual" aria-hidden="true">
 
       <span class="network-line network-line--a"></span>
       <span class="network-line network-line--b"></span>
@@ -1103,48 +654,25 @@
       <span class="network-line network-line--d"></span>
       <span class="network-line network-line--e"></span>
 
-      <span
-        class="network-node network-node--sport"
-        data-node="sport"
-      ></span>
-
-      <span
-        class="network-node network-node--scienze-motorie"
-        data-node="scienze-motorie"
-      ></span>
-
-      <span
-        class="network-node network-node--educazione"
-        data-node="educazione"
-      ></span>
-
-      <span
-        class="network-node network-node--management"
-        data-node="management"
-      ></span>
-
-      <span
-        class="network-node network-node--digitale"
-        data-node="digitale"
-      ></span>
+      <span class="network-node network-node--sport" data-node="sport"></span>
+      <span class="network-node network-node--scienze-motorie" data-node="scienze-motorie"></span>
+      <span class="network-node network-node--educazione" data-node="educazione"></span>
+      <span class="network-node network-node--management" data-node="management"></span>
+      <span class="network-node network-node--digitale" data-node="digitale"></span>
 
     </div>
-
   </div>
-
 </section>
-
 
 <!-- ======================================================
      05 — PAUSA / METODO
-======================================================= -->
+====================================================== -->
 
 <section
   class="home-section home-section--pause"
   id="05"
   data-section-title="E LE CONNESSIONI, A VOLTE, PASSANO ANCHE DA UNA PAUSA."
 >
-
   <div class="section-inner section-inner--split">
 
     <div class="section-content">
@@ -1183,32 +711,25 @@
         </p>
 
       </div>
-
     </div>
 
-    <div
-      class="pause-trajectory"
-      aria-hidden="true"
-    >
+    <div class="pause-trajectory" aria-hidden="true">
       <span class="pause-trajectory-line"></span>
       <span class="pause-trajectory-point"></span>
     </div>
 
   </div>
-
 </section>
-
 
 <!-- ======================================================
      06 — TERRITORIO
-======================================================= -->
+====================================================== -->
 
 <section
   class="home-section home-section--territory"
   id="06"
   data-section-title="OGGI SO ANCHE DA DOVE PARTO."
 >
-
   <div class="section-inner section-inner--territory">
 
     <div class="territory-copy">
@@ -1219,10 +740,7 @@
 
       <div class="territory-location reveal">
 
-        <a
-          class="territory-card-place"
-          href="/territorio/"
-        >
+        <a class="territory-card-place" href="/territorio/">
           PARTINICO
         </a>
 
@@ -1242,10 +760,7 @@
           È qui che ha la sua base il mio lavoro.
           In presenza, per chi parte da qui
           e per chi arriva dai
-          <a
-            class="territory-inline-link"
-            href="/territorio/"
-          >
+          <a class="territory-inline-link" href="/territorio/">
             territori vicini
           </a>.
           Online, quando la distanza
@@ -1259,11 +774,9 @@
         </p>
 
       </div>
-
     </div>
 
     <div class="territory-map reveal">
-
       <iframe
         title="Stadio Comunale Giuseppe La Franca, Partinico — vista satellitare"
         src="https://www.google.com/maps?q=Stadio+Comunale+Giuseppe+La+Franca%2C+Viale+Aldo+Moro%2C+Partinico%2C+PA%2C+Italy&layer=satellite&output=embed"
@@ -1271,24 +784,20 @@
         referrerpolicy="no-referrer-when-downgrade"
         allowfullscreen
       ></iframe>
-
     </div>
 
   </div>
-
 </section>
-
 
 <!-- ======================================================
      07 — PRESENTE
-======================================================= -->
+====================================================== -->
 
 <section
   class="home-section home-section--present"
   id="07"
   data-section-title="DA QUI, IL PERCORSO CONTINUA."
 >
-
   <div class="section-inner section-inner--split section-inner--present">
 
     <div class="section-content">
@@ -1305,11 +814,7 @@
 
         <p>
           <strong>
-            <a
-              class="narrative-link"
-              href="/sport/"
-              data-trajectory-node="sport"
-            >
+            <a class="narrative-link" href="/sport/" data-trajectory-node="sport">
               Sport.
             </a>
           </strong>
@@ -1319,11 +824,7 @@
 
         <p>
           <strong>
-            <a
-              class="narrative-link"
-              href="/scienze-motorie/"
-              data-trajectory-node="scienze-motorie"
-            >
+            <a class="narrative-link" href="/scienze-motorie/" data-trajectory-node="scienze-motorie">
               Scienze Motorie.
             </a>
           </strong>
@@ -1334,11 +835,7 @@
 
         <p>
           <strong>
-            <a
-              class="narrative-link"
-              href="/educazione/"
-              data-trajectory-node="educazione"
-            >
+            <a class="narrative-link" href="/educazione/" data-trajectory-node="educazione">
               Educazione.
             </a>
           </strong>
@@ -1349,11 +846,7 @@
 
         <p>
           <strong>
-            <a
-              class="narrative-link"
-              href="/management-dello-sport/"
-              data-trajectory-node="management"
-            >
+            <a class="narrative-link" href="/management-dello-sport/" data-trajectory-node="management">
               Management.
             </a>
           </strong>
@@ -1364,11 +857,7 @@
 
         <p>
           <strong>
-            <a
-              class="narrative-link"
-              href="/digitale/"
-              data-trajectory-node="digitale"
-            >
+            <a class="narrative-link" href="/digitale/" data-trajectory-node="digitale">
               Digitale.
             </a>
           </strong>
@@ -1404,11 +893,9 @@
         </p>
 
       </div>
-
     </div>
 
     <figure class="present-portrait reveal">
-
       <img
         src="/assets/images/cp-foto.webp"
         alt="Cesare Paratore"
@@ -1417,24 +904,20 @@
         fetchpriority="high"
         decoding="async"
       >
-
     </figure>
 
   </div>
-
 </section>
-
 
 <!-- ======================================================
      08 — POSSIBILITÀ
-======================================================= -->
+====================================================== -->
 
 <section
   class="home-section home-section--possibility"
   id="08"
   data-section-title="NON È UN PUNTO DI ARRIVO."
 >
-
   <div class="section-inner section-inner--narrow">
 
     <div class="section-title reveal">
@@ -1472,22 +955,18 @@
       </p>
 
     </div>
-
   </div>
-
 </section>
-
 
 <!-- ======================================================
      09 — VISITATORE
-======================================================= -->
+====================================================== -->
 
 <section
   class="home-section home-section--question-for-you"
   id="09"
   data-section-title="FORSE È QUI CHE LA STORIA CAMBIA."
 >
-
   <div class="section-inner section-inner--question-for-you">
 
     <div class="section-title reveal">
@@ -1495,29 +974,24 @@
     </div>
 
     <div class="reader-question reveal">
-
       <h2>
         DA DOVE
         <span>PARTI?</span>
       </h2>
-
     </div>
 
   </div>
-
 </section>
-
 
 <!-- ======================================================
      10 — CONTATTO
-======================================================= -->
+====================================================== -->
 
 <section
   class="home-section home-section--cta"
   id="10"
   data-section-title="PARTIAMO DA QUELLO."
 >
-
   <div class="section-inner section-inner--cta">
 
     <div class="section-title reveal">
@@ -1588,118 +1062,102 @@
     </div>
 
   </div>
-
 </section>
-```
 
-  </main>
+</main>
 
-  <!-- ======================================================
-       STANDBY
-       Stesso sistema visivo del Loader
-       ======================================================= -->
+<!-- ======================================================
+     STANDBY
+====================================================== -->
 
-  <div
-    class="standby-screen"
-    aria-hidden="true"
-    inert
-  >
-
-```
 <div
-  class="standby-atmosphere"
+  class="standby-screen"
   aria-hidden="true"
+  inert
 >
-  <span class="standby-path"></span>
-  <span class="standby-point"></span>
-</div>
-
-<div class="standby-center">
-
-  <div class="standby-brand" aria-hidden="true">
-    <img
-      src="/assets/images/cp-mark.svg"
-      alt=""
-      width="72"
-      height="72"
-    >
+  <div class="standby-atmosphere" aria-hidden="true">
+    <span class="standby-path"></span>
+    <span class="standby-point"></span>
   </div>
 
-  <div class="standby-copy">
+  <div class="standby-center">
 
-    <span class="standby-label">
-      RIPRENDI
-    </span>
+    <div class="standby-brand" aria-hidden="true">
+      <img
+        src="/assets/images/cp-mark.svg"
+        alt=""
+        width="72"
+        height="72"
+      >
+    </div>
 
-    <button
-      class="standby-wake"
-      type="button"
-      aria-label="Riprendi il percorso"
-    >
-      <span class="standby-touch">
-        TOCCA
+    <div class="standby-copy">
+
+      <span class="standby-label">
+        RIPRENDI
       </span>
-    </button>
 
-    <span class="standby-signature">
+      <button
+        class="standby-wake"
+        type="button"
+        aria-label="Riprendi il percorso"
+      >
+        <span class="standby-touch">
+          TOCCA
+        </span>
+      </button>
+
+      <span class="standby-signature">
+        CESARE PARATORE
+      </span>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- ======================================================
+     FOOTER
+====================================================== -->
+
+<footer class="site-footer">
+  <div class="footer-inner">
+
+    <div class="footer-mark">
+      <img
+        src="/assets/images/cp-mark.svg"
+        alt=""
+        width="72"
+        height="72"
+        loading="lazy"
+        decoding="async"
+      >
+    </div>
+
+    <span
+      class="footer-rule footer-rule--top"
+      aria-hidden="true"
+    ></span>
+
+    <p class="footer-motto">
+      <span>MOVIMENTO</span>
+      <span aria-hidden="true">/</span>
+      <span>CON DIREZIONE.</span>
+    </p>
+
+    <span
+      class="footer-rule footer-rule--bottom"
+      aria-hidden="true"
+    ></span>
+
+    <p class="footer-signature">
       CESARE PARATORE
-    </span>
+    </p>
 
   </div>
+</footer>
 
-</div>
-```
-
-  </div>
-
-  <!-- ======================================================
-       FOOTER
-       Chiusura: segno / concept / firma
-       Nessuna navigazione secondaria
-  ======================================================= -->
-
-  <footer class="site-footer">
-
-```
-<div class="footer-inner">
-
-  <div class="footer-mark">
-    <img
-      src="/assets/images/cp-mark.svg"
-      alt=""
-      width="72"
-      height="72"
-      loading="lazy"
-      decoding="async"
-    >
-  </div>
-
-  <span
-    class="footer-rule footer-rule--top"
-    aria-hidden="true"
-  ></span>
-
-  <p class="footer-motto">
-    <span>MOVIMENTO</span>
-    <span aria-hidden="true">/</span>
-    <span>CON DIREZIONE.</span>
-  </p>
-
-  <span
-    class="footer-rule footer-rule--bottom"
-    aria-hidden="true"
-  ></span>
-
-  <p class="footer-signature">
-    CESARE PARATORE
-  </p>
-
-</div>
-```
-
-  </footer>
-
-  <script src="/script.js" defer></script>
+<script src="/script.js" defer></script>
 
 </body>
 </html>
