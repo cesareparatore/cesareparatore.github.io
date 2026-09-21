@@ -439,291 +439,351 @@
   }
 
 
-  /* ========================================================
-     SECTION / PROGRESS
-  ======================================================== */
+/* ========================================================
+   SECTION / PROGRESS
+======================================================== */
 
-  function getSectionTop(section) {
-    if (!section) return 0;
+function getHeaderHeight() {
+  return dom.header
+    ? dom.header.getBoundingClientRect().height
+    : 0;
+}
 
-    const rect =
-      section.getBoundingClientRect();
 
-    return (
-      window.scrollY +
-      rect.top -
-      (dom.header?.offsetHeight || 0) -
-      CFG.navOffset
-    );
+function getSectionTop(section) {
+  if (!section) return 0;
+
+  const rect =
+    section.getBoundingClientRect();
+
+  return (
+    window.scrollY +
+    rect.top -
+    getHeaderHeight() -
+    CFG.navOffset
+  );
+}
+
+
+function goTo(index, options = {}) {
+  if (!dom.sections.length) return;
+
+  const clamped = Math.max(
+    0,
+    Math.min(
+      index,
+      dom.sections.length - 1
+    )
+  );
+
+  const section =
+    dom.sections[clamped];
+
+  if (!section) return;
+
+  const target =
+    getSectionTop(section);
+
+  const behavior =
+    options.instant || st.reduced
+      ? "auto"
+      : "smooth";
+
+  window.scrollTo({
+    top: Math.max(0, target),
+    behavior
+  });
+
+  st.active = clamped;
+
+  wowUpdate(true);
+}
+
+
+function updateProgress(index) {
+  if (!dom.sections.length) return;
+
+  const clamped = Math.max(
+    0,
+    Math.min(
+      index,
+      dom.sections.length - 1
+    )
+  );
+
+  const section =
+    dom.sections[clamped];
+
+  if (!section) return;
+
+  st.active = clamped;
+
+  /* ----------------------------------------
+     Titolo sezione
+  ---------------------------------------- */
+
+  const title =
+    section.dataset.sectionTitle || "";
+
+  if (dom.progressCurrent) {
+    dom.progressCurrent.textContent =
+      title;
   }
 
 
-  function goTo(index, options = {}) {
-    if (!dom.sections.length) return;
+  /* ----------------------------------------
+     Progressione
+  ---------------------------------------- */
 
-    const clamped = Math.max(
-      0,
-      Math.min(
-        index,
-        dom.sections.length - 1
-      )
-    );
+  const progress =
+    dom.sections.length > 1
+      ? clamped /
+        (dom.sections.length - 1)
+      : 0;
 
-    const section =
-      dom.sections[clamped];
+  if (dom.progressFill) {
+    dom.progressFill.style.width =
+      `${progress * 100}%`;
+  }
 
-    if (!section) return;
-
-    const target =
-      getSectionTop(section);
-
-    const behavior =
-      options.instant || st.reduced
-        ? "auto"
-        : "smooth";
-
-    window.scrollTo({
-      top: Math.max(0, target),
-      behavior
-    });
-
-    st.active = clamped;
-
-    wowUpdate(true);
+  if (dom.progressPoint) {
+    dom.progressPoint.style.left =
+      `${progress * 100}%`;
   }
 
 
-  function wowUpdate(force = false) {
-    if (!dom.sections.length) return;
+  /* ----------------------------------------
+     Precedente
+  ---------------------------------------- */
 
-    const viewportCenter =
-      window.scrollY +
-      window.innerHeight * 0.42;
+  const previousIndex =
+    clamped - 1;
 
-    let closest = 0;
-    let distance = Infinity;
+  if (
+    dom.previous &&
+    dom.previousLabel
+  ) {
+    if (previousIndex >= 0) {
+      const number =
+        String(
+          previousIndex + 1
+        ).padStart(2, "0");
 
-    dom.sections.forEach(
-      (section, index) => {
-        const rect =
-          section.getBoundingClientRect();
+      dom.previous.classList.remove(
+        "is-disabled"
+      );
 
-        const center =
-          window.scrollY +
-          rect.top +
-          rect.height / 2;
+      dom.previous.setAttribute(
+        "aria-hidden",
+        "false"
+      );
 
-        const currentDistance =
-          Math.abs(
-            center -
-            viewportCenter
-          );
+      dom.previous.setAttribute(
+        "tabindex",
+        "0"
+      );
 
-        if (
-          currentDistance <
-          distance
-        ) {
-          distance =
-            currentDistance;
+      dom.previous.href =
+        `#${number}`;
 
-          closest = index;
-        }
-      }
+      dom.previousLabel.textContent =
+        number;
+
+    } else {
+      dom.previous.classList.add(
+        "is-disabled"
+      );
+
+      dom.previous.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+
+      dom.previous.setAttribute(
+        "tabindex",
+        "-1"
+      );
+
+      dom.previous.href =
+        "#01";
+
+      dom.previousLabel.textContent =
+        "";
+    }
+  }
+
+
+  /* ----------------------------------------
+     Successiva
+  ---------------------------------------- */
+
+  const nextIndex =
+    clamped + 1;
+
+  if (
+    dom.next &&
+    dom.nextLabel
+  ) {
+    if (
+      nextIndex <
+      dom.sections.length
+    ) {
+      const number =
+        String(
+          nextIndex + 1
+        ).padStart(2, "0");
+
+      dom.next.classList.remove(
+        "is-disabled"
+      );
+
+      dom.next.href =
+        `#${number}`;
+
+      dom.nextLabel.textContent =
+        number;
+
+      dom.next.setAttribute(
+        "aria-label",
+        `Vai alla sezione ${number}`
+      );
+
+    } else {
+      const finalNumber =
+        String(
+          dom.sections.length
+        ).padStart(2, "0");
+
+      dom.next.classList.add(
+        "is-disabled"
+      );
+
+      dom.next.href =
+        `#${finalNumber}`;
+
+      dom.nextLabel.textContent =
+        finalNumber;
+
+      dom.next.setAttribute(
+        "aria-label",
+        "Fine del percorso"
+      );
+    }
+  }
+}
+
+
+function wowUpdate(force = false) {
+  if (!dom.sections.length) return;
+
+  /*
+     Il punto di riferimento è appena sotto
+     l'header, non il centro della viewport.
+
+     Questo rende la navigazione dell'header
+     coerente con la sezione realmente visibile.
+  */
+
+  const headerHeight =
+    getHeaderHeight();
+
+  const reference =
+    window.scrollY +
+    headerHeight +
+    Math.min(
+      window.innerHeight * 0.18,
+      160
     );
 
-    if (
-      !force &&
-      closest === st.active
-    ) {
-      return;
-    }
+  let closest = 0;
+  let distance = Infinity;
 
-    st.active = closest;
+  dom.sections.forEach(
+    (section, index) => {
+      const rect =
+        section.getBoundingClientRect();
 
-    const section =
-      dom.sections[closest];
+      const top =
+        window.scrollY +
+        rect.top;
 
-    const title =
-      section?.dataset.sectionTitle ||
-      "";
-
-    if (dom.progressCurrent) {
-      dom.progressCurrent.textContent =
-        title;
-    }
-
-    const progress =
-      dom.sections.length > 1
-        ? closest /
-          (dom.sections.length - 1)
-        : 0;
-
-    if (dom.progressFill) {
-      dom.progressFill.style.width =
-        `${progress * 100}%`;
-    }
-
-    if (dom.progressPoint) {
-      dom.progressPoint.style.left =
-        `${progress * 100}%`;
-    }
-
-    const previousIndex =
-      closest - 1;
-
-    const nextIndex =
-      closest + 1;
-
-    if (
-      dom.previous &&
-      dom.previousLabel
-    ) {
-      if (previousIndex >= 0) {
-        const number =
-          String(
-            previousIndex + 1
-          ).padStart(2, "0");
-
-        dom.previous.classList.remove(
-          "is-disabled"
+      const currentDistance =
+        Math.abs(
+          top -
+          reference
         );
 
-        dom.previous.setAttribute(
-          "aria-hidden",
-          "false"
-        );
-
-        dom.previous.setAttribute(
-          "tabindex",
-          "0"
-        );
-
-        dom.previous.href =
-          `#${number}`;
-
-        dom.previousLabel.textContent =
-          number;
-      } else {
-        dom.previous.classList.add(
-          "is-disabled"
-        );
-
-        dom.previous.setAttribute(
-          "aria-hidden",
-          "true"
-        );
-
-        dom.previous.setAttribute(
-          "tabindex",
-          "-1"
-        );
-
-        dom.previous.href =
-          "#01";
-
-        dom.previousLabel.textContent =
-          "";
-      }
-    }
-
-    if (
-      dom.next &&
-      dom.nextLabel
-    ) {
       if (
-        nextIndex <
-        dom.sections.length
+        currentDistance <
+        distance
       ) {
-        const number =
-          String(
-            nextIndex + 1
-          ).padStart(2, "0");
+        distance =
+          currentDistance;
 
-        dom.next.classList.remove(
-          "is-disabled"
-        );
+        closest = index;
+      }
+    }
+  );
 
-        dom.next.href =
-          `#${number}`;
+  if (
+    !force &&
+    closest === st.active
+  ) {
+    return;
+  }
 
-        dom.nextLabel.textContent =
-          number;
+  updateProgress(closest);
+}
 
-        dom.next.setAttribute(
-          "aria-label",
-          `Vai alla sezione ${number}`
-        );
-      } else {
-        dom.next.classList.add(
-          "is-disabled"
-        );
 
-        dom.next.href =
-          `#${String(
-            dom.sections.length
-          ).padStart(2, "0")}`;
+function activeDetect() {
+  wowUpdate();
+}
 
-        dom.nextLabel.textContent =
-          String(
-            dom.sections.length
-          ).padStart(2, "0");
 
-        dom.next.setAttribute(
-          "aria-label",
-          "Fine del percorso"
+function wowInit() {
+  if (!dom.sections.length) return;
+
+  dom.previous?.addEventListener(
+    "click",
+    event => {
+      event.preventDefault();
+
+      if (st.active > 0) {
+        goTo(
+          st.active - 1
         );
       }
     }
-  }
+  );
 
+  dom.next?.addEventListener(
+    "click",
+    event => {
+      event.preventDefault();
 
-  function activeDetect() {
-    wowUpdate();
-  }
-
-
-  function wowInit() {
-    if (!dom.sections.length) return;
-
-    dom.previous?.addEventListener(
-      "click",
-      event => {
-        event.preventDefault();
-
-        if (st.active > 0) {
-          goTo(
-            st.active - 1
-          );
-        }
+      if (
+        st.active <
+        dom.sections.length - 1
+      ) {
+        goTo(
+          st.active + 1
+        );
       }
-    );
+    }
+  );
 
-    dom.next?.addEventListener(
-      "click",
-      event => {
-        event.preventDefault();
+  dom.brand?.addEventListener(
+    "click",
+    event => {
+      event.preventDefault();
 
-        if (
-          st.active <
-          dom.sections.length - 1
-        ) {
-          goTo(
-            st.active + 1
-          );
-        }
-      }
-    );
+      goTo(0);
+    }
+  );
 
-    dom.brand?.addEventListener(
-      "click",
-      event => {
-        event.preventDefault();
-        goTo(0);
-      }
-    );
-
-    activeDetect();
-  }
+  activeDetect();
+}
 
 
   /* ========================================================
@@ -1586,10 +1646,11 @@
         );
 
         st.resizeTimer =
-          window.setTimeout(() => {
-            trajectoryTargets();
-            wowUpdate(true);
-          }, CFG.resizeDebounce);
+  window.setTimeout(() => {
+    trajectoryTargets();
+    updateProgress(st.active);
+    wowUpdate(true);
+  }, CFG.resizeDebounce);
       },
       {
         passive: true
