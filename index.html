@@ -1,44 +1,35 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
 
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1, viewport-fit=cover"
-  />
+  >
 
   <meta
     name="description"
-    content="Cesare Paratore — sport, educazione, movimento, management e digitale."
-  />
+    content="Cesare Paratore — sport, educazione, management e digitale."
+  >
 
-  <meta name="theme-color" content="#0B0B0A" />
+  <meta name="theme-color" content="#F1EFE8">
 
   <title>Cesare Paratore</title>
 
-  <link rel="preload" href="assets/images/cp-mark.svg" as="image" />
-  <link rel="preload" href="assets/images/cp-foto.webp" as="image" />
+  <link rel="preload" href="assets/images/cp-mark.svg" as="image">
+  <link rel="preload" href="assets/images/cp-foto.webp" as="image">
 
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css">
 
   <script src="script.js" defer></script>
 </head>
 
-<body>
-
-  <!-- =========================================================
-       ACCESSIBILITY
-  ========================================================== -->
-
-  <a class="skip-link" href="#main-content">
-    Vai al contenuto
-  </a>
-
+<body id="top">
 
   <!-- =========================================================
        LOADER
-  ========================================================== -->
+       ========================================================= -->
 
   <div
     class="loader"
@@ -47,12 +38,11 @@
   >
     <div class="loader__inner">
 
-      <div class="loader__mark">
-        <img
-          src="assets/images/cp-mark.svg"
-          alt=""
-        />
-      </div>
+      <img
+        class="loader__logo"
+        src="assets/images/cp-mark.svg"
+        alt=""
+      >
 
       <div class="loader__name">
         CESARE PARATORE
@@ -63,35 +53,35 @@
 
 
   <!-- =========================================================
-       STANDBY
-  ========================================================== -->
+       STANDBY / QUIET MODE
+       ========================================================= -->
 
   <div
     class="standby"
     id="standby"
     aria-hidden="true"
   >
-    <div class="standby__word">
-      GUARDA.
-    </div>
+    <span>GUARDA.</span>
   </div>
 
 
   <!-- =========================================================
        HEADER
-  ========================================================== -->
+       CP A SINISTRA — MENU A DESTRA
+       SUPERFICIE CHIARA
+       ========================================================= -->
 
   <header class="site-header" id="site-header">
 
     <a
       class="site-header__brand"
       href="#top"
-      aria-label="Cesare Paratore — torna all'inizio"
+      aria-label="Cesare Paratore — Home"
     >
       <img
         src="assets/images/cp-mark.svg"
         alt="CP"
-      />
+      >
     </a>
 
     <button
@@ -101,7 +91,7 @@
       aria-expanded="false"
       aria-controls="global-menu"
     >
-      <span class="menu-toggle__label">MENU</span>
+      <span>MENU</span>
     </button>
 
   </header>
@@ -109,7 +99,7 @@
 
   <!-- =========================================================
        GLOBAL MENU
-  ========================================================== -->
+       ========================================================= -->
 
   <aside
     class="global-menu"
@@ -119,60 +109,19 @@
 
     <div class="global-menu__inner">
 
-      <div class="global-menu__top">
-
-        <div class="global-menu__eyebrow">
-          CESARE PARATORE
-        </div>
-
-        <button
-          class="global-menu__close"
-          id="menu-close"
-          type="button"
-          aria-label="Chiudi menu"
-        >
-          <span aria-hidden="true">×</span>
-        </button>
-
-      </div>
-
-
       <nav
         class="global-menu__nav"
         aria-label="Navigazione principale"
       >
 
-        <a href="chi-sono.html">
-          <span>Chi sono</span>
-        </a>
-
-        <a href="sport.html">
-          <span>Sport</span>
-        </a>
-
-        <a href="scienze-motorie.html">
-          <span>Scienze motorie</span>
-        </a>
-
-        <a href="educazione.html">
-          <span>Educazione</span>
-        </a>
-
-        <a href="management.html">
-          <span>Management</span>
-        </a>
-
-        <a href="digitale.html">
-          <span>Digitale</span>
-        </a>
-
-        <a href="territorio.html">
-          <span>Territorio</span>
-        </a>
-
-        <a href="contatti.html">
-          <span>Contatti</span>
-        </a>
+        <a href="chi-sono.html">Chi sono</a>
+        <a href="sport.html">Sport</a>
+        <a href="scienze-motorie.html">Scienze motorie</a>
+        <a href="educazione.html">Educazione</a>
+        <a href="management.html">Management</a>
+        <a href="digitale.html">Digitale</a>
+        <a href="territorio.html">Territorio</a>
+        <a href="contatti.html">Contatti</a>
 
       </nav>
 
@@ -182,122 +131,91 @@
 
 
   <!-- =========================================================
-       HOME SECTION NAVIGATION
-  ========================================================== -->
+       SECTION NAVIGATION
+       ========================================================= -->
 
   <nav
-    class="page-turn"
-    id="page-turn"
+    class="section-navigation"
+    id="section-navigation"
     aria-label="Navigazione del racconto"
   >
 
-    <div class="page-turn__title">
-      <span id="page-turn-title">GUARDA.</span>
-    </div>
+    <button
+      class="section-navigation__control section-navigation__control--prev"
+      id="section-prev"
+      type="button"
+      aria-label="Sezione precedente"
+      disabled
+    >
+      <span aria-hidden="true">←</span>
+    </button>
 
-    <div class="page-turn__track">
-
-      <button
-        class="page-turn__control page-turn__control--prev"
-        id="page-turn-prev"
-        type="button"
-        aria-label="Sezione precedente"
-      >
-        <span aria-hidden="true">←</span>
-      </button>
-
+    <div class="section-navigation__center">
 
       <div
-        class="page-turn__line"
-        aria-hidden="true"
+        class="section-navigation__title"
+        id="section-navigation-title"
       >
-        <span
-          class="page-turn__progress"
-          id="page-turn-progress"
-        ></span>
+        ARRIVAL
+      </div>
 
+      <div class="section-navigation__track">
         <span
-          class="page-turn__marker"
-          id="page-turn-marker"
+          class="section-navigation__marker"
+          id="section-navigation-marker"
         ></span>
       </div>
 
-
-      <button
-        class="page-turn__control page-turn__control--next"
-        id="page-turn-next"
-        type="button"
-        aria-label="Sezione successiva"
-      >
-        <span aria-hidden="true">→</span>
-      </button>
-
     </div>
+
+    <button
+      class="section-navigation__control section-navigation__control--next"
+      id="section-next"
+      type="button"
+      aria-label="Sezione successiva"
+    >
+      <span aria-hidden="true">→</span>
+    </button>
 
   </nav>
 
 
   <!-- =========================================================
        MAIN
-  ========================================================== -->
+       ========================================================= -->
 
-  <main
-    id="main-content"
-    class="home"
-  >
+  <main id="main-content">
+
 
     <!-- =======================================================
-         ARRIVAL
-    ======================================================== -->
+         01 — ARRIVAL
+         ======================================================= -->
 
     <section
-      class="story-section story-section--arrival"
+      class="narrative-section narrative-section--arrival"
       id="arrival"
-      data-section-title="GUARDA."
+      data-section
+      data-section-title="ARRIVAL"
       aria-labelledby="arrival-title"
     >
 
-      <div class="story-section__inner">
+      <div class="narrative-section__inner">
 
         <h1
-          class="arrival-title"
+          class="display display--xl"
           id="arrival-title"
+          data-reveal
         >
           GUARDA.
         </h1>
 
-        <div class="arrival-copy">
+        <div
+          class="narrative-copy"
+          data-reveal
+        >
+          <p>C'è sempre un altro modo di guardare.</p>
 
-          <p>
-            C'è sempre un altro modo di guardare.
-          </p>
-
-          <p>
-            Una cosa.
-          </p>
-
-          <p>
-            Un gesto.
-          </p>
-
-          <p>
-            Una persona.
-          </p>
-
-          <p>
-            Un problema.
-          </p>
-
-          <p>
-            A volte basta cambiare punto di vista
-            per vedere qualcosa che prima non c'era.
-          </p>
-
-          <p>
-            Forse è da lì
-            che comincia tutto.
-          </p>
-
+          <p>Forse è da lì che comincia tutto.</p>
         </div>
 
       </div>
@@ -306,72 +224,174 @@
 
 
     <!-- =======================================================
-         LA DOMANDA
-    ======================================================== -->
+         02 — LA DOMANDA
+         ======================================================= -->
 
     <section
-      class="story-section"
+      class="narrative-section"
       id="la-domanda"
+      data-section
       data-section-title="LA DOMANDA"
       aria-labelledby="la-domanda-title"
     >
 
-      <div class="story-section__inner">
+      <div class="narrative-section__inner">
 
         <h2
-          class="story-title"
+          class="section-heading"
           id="la-domanda-title"
+          data-reveal
         >
           LA DOMANDA
         </h2>
 
-        <div class="story-copy">
+        <div
+          class="narrative-copy"
+          data-reveal
+        >
 
           <p>
-            <strong>Alla fine degli anni Novanta arrivò il primo computer.</strong>
-          </p>
-
-          <p>
-            Prima ancora di chiedermi cosa potesse fare,
-            volevo capire come funzionava.
+            Alla fine degli anni Novanta arrivò il primo computer.
           </p>
 
           <p>
-            Il mouse.
+            Ricordo soprattutto una cosa.
           </p>
 
           <p>
-            Lo schermo.
+            La curiosità.
           </p>
 
           <p>
-            Quello che succedeva dentro.
+            Guardavo il mouse, lo schermo, quello che succedeva quando
+            muovevo qualcosa.
           </p>
 
           <p>
-            Ho iniziato così.
+            E mi chiedevo cosa ci fosse dietro.
           </p>
 
           <p>
-            <strong>Computer, programmi, Internet.</strong>
-          </p>
-
-          <p class="story-copy--stacked">
-            <strong>Aprire.</strong><br />
-            <strong>Configurare.</strong><br />
-            <strong>Aggiornare.</strong><br />
-            <strong>Risolvere.</strong>
+            Come funzionava.
           </p>
 
           <p>
-            E capire come far funzionare le cose un po' meglio.
+            Computer, programmi, Internet.
           </p>
 
           <p>
-            La domanda, in fondo, era sempre la stessa:
+            Poi arrivarono altre domande.
           </p>
 
-          <p class="story-emphasis">
+          <p>
+            Come si apre?
+          </p>
+
+          <p>
+            Come si configura?
+          </p>
+
+          <p>
+            Come si aggiorna?
+          </p>
+
+          <p>
+            Come si risolve?
+          </p>
+
+          <p>
+            Ho iniziato a capire che, per migliorare qualcosa,
+            prima bisogna capire come funziona.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =======================================================
+         03 — QUANDO LA DOMANDA CAMBIA OGGETTO
+         ======================================================= -->
+
+    <section
+      class="narrative-section"
+      id="quando-la-domanda-cambia-oggetto"
+      data-section
+      data-section-title="QUANDO LA DOMANDA CAMBIA OGGETTO"
+      aria-labelledby="domanda-cambia-title"
+    >
+
+      <div class="narrative-section__inner">
+
+        <h2
+          class="section-heading"
+          id="domanda-cambia-title"
+          data-reveal
+        >
+          QUANDO LA DOMANDA CAMBIA OGGETTO
+        </h2>
+
+        <div
+          class="narrative-copy"
+          data-reveal
+        >
+
+          <p>
+            A un certo punto la stessa domanda ha cambiato oggetto.
+          </p>
+
+          <p>
+            È arrivato il movimento.
+          </p>
+
+          <p>
+            E con il movimento lo sport.
+          </p>
+
+          <p>
+            Ho iniziato a chiedermi come funziona il corpo.
+          </p>
+
+          <p>
+            Come si muove.
+          </p>
+
+          <p>
+            Come può migliorare.
+          </p>
+
+          <p>
+            Come si può cambiare qualcosa per ottenere un risultato diverso.
+          </p>
+
+          <p>
+            Da atleta ho iniziato a vivere questa domanda sulla mia pelle.
+          </p>
+
+          <p>
+            Poi, come tecnico, ho iniziato a guardare il movimento
+            di qualcun altro.
+          </p>
+
+          <p>
+            A osservarlo.
+          </p>
+
+          <p>
+            Ad analizzarlo.
+          </p>
+
+          <p>
+            A cercare di capire cosa poteva essere cambiato.
+          </p>
+
+          <p>
+            La domanda era sempre la stessa.
+          </p>
+
+          <p>
             <strong>Come funziona?</strong>
           </p>
 
@@ -383,131 +403,75 @@
 
 
     <!-- =======================================================
-         QUANDO LA DOMANDA CAMBIA OGGETTO
-    ======================================================== -->
+         04 — APRIRE PER CAPIRE
+         ======================================================= -->
 
     <section
-      class="story-section"
-      id="domanda-cambia-oggetto"
-      data-section-title="QUANDO LA DOMANDA CAMBIA OGGETTO"
-      aria-labelledby="domanda-cambia-oggetto-title"
-    >
-
-      <div class="story-section__inner">
-
-        <h2
-          class="story-title"
-          id="domanda-cambia-oggetto-title"
-        >
-          QUANDO LA DOMANDA<br />
-          CAMBIA OGGETTO
-        </h2>
-
-        <div class="story-copy">
-
-          <p>
-            Poi quella domanda ha incontrato il movimento.
-          </p>
-
-          <p>
-            Lo sport.
-          </p>
-
-          <p class="story-copy--stacked">
-            <strong>Come funziona.</strong><br />
-            <strong>Come cambia.</strong><br />
-            <strong>Come può migliorare.</strong>
-          </p>
-
-          <p>
-            Ho iniziato a viverlo da atleta.
-            Poi a osservarlo e a guidarlo come tecnico.
-          </p>
-
-          <p>
-            E a quel punto è arrivato lo studio.
-          </p>
-
-          <p>
-            In un certo senso, ho fatto con il movimento
-            quello che avevo fatto con il primo computer:
-          </p>
-
-          <p class="story-emphasis">
-            <strong>ho iniziato a capire cosa c'era dentro.</strong>
-          </p>
-
-          <p>
-            Per capire perché funzionava in un certo modo.
-            E cosa poteva essere cambiato per farlo funzionare meglio.
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =======================================================
-         APRIRE PER CAPIRE
-    ======================================================== -->
-
-    <section
-      class="story-section"
+      class="narrative-section"
       id="aprire-per-capire"
+      data-section
       data-section-title="APRIRE PER CAPIRE"
-      aria-labelledby="aprire-per-capire-title"
+      aria-labelledby="aprire-title"
     >
 
-      <div class="story-section__inner">
+      <div class="narrative-section__inner">
 
         <h2
-          class="story-title"
-          id="aprire-per-capire-title"
+          class="section-heading"
+          id="aprire-title"
+          data-reveal
         >
-          APRIRE<br />
-          PER CAPIRE
+          APRIRE PER CAPIRE
         </h2>
 
-        <div class="story-copy">
+        <div
+          class="narrative-copy"
+          data-reveal
+        >
 
           <p>
-            A quel punto non mi bastava più osservare.
+            Per capire davvero qualcosa bisogna aprirla.
           </p>
 
           <p>
-            Volevo capire.
+            Guardare dentro.
           </p>
 
           <p>
-            Capire cosa c'è dietro un movimento.
-            Cosa lo rende possibile.
-            Cosa lo fa cambiare.
+            Studiare.
           </p>
 
           <p>
-            Lo studio è diventato un altro modo di fare
-            quello che avevo iniziato con il primo computer:
-          </p>
-
-          <p class="story-copy--stacked">
-            <strong>aprire.</strong><br />
-            <strong>guardare dentro.</strong><br />
-            <strong>capire come funziona.</strong>
+            Scomporre.
           </p>
 
           <p>
-            Scienze Motorie mi ha dato gli strumenti per farlo.
+            Ricostruire.
           </p>
 
           <p>
-            La curiosità era sempre la stessa.
+            Le Scienze Motorie sono diventate un altro modo per fare
+            la stessa cosa.
           </p>
 
           <p>
-            Solo, questa volta,
-            <strong>l'oggetto da capire era il movimento.</strong>
+            Capire il movimento.
+          </p>
+
+          <p>
+            Capire il corpo.
+          </p>
+
+          <p>
+            Capire cosa succede quando qualcosa cambia.
+          </p>
+
+          <p>
+            Lo studio non ha sostituito l'esperienza.
+          </p>
+
+          <p>
+            Mi ha dato un modo diverso di leggerla.
           </p>
 
         </div>
@@ -518,73 +482,78 @@
 
 
     <!-- =======================================================
-         QUANDO CAPISCI, PUOI INSEGNARE
-    ======================================================== -->
+         05 — QUANDO CAPISCI, PUOI INSEGNARE
+         ======================================================= -->
 
     <section
-      class="story-section"
-      id="quando-capisci"
+      class="narrative-section"
+      id="quando-capisci-puoi-insegnare"
+      data-section
       data-section-title="QUANDO CAPISCI, PUOI INSEGNARE"
-      aria-labelledby="quando-capisci-title"
+      aria-labelledby="insegnare-title"
     >
 
-      <div class="story-section__inner">
+      <div class="narrative-section__inner">
 
         <h2
-          class="story-title"
-          id="quando-capisci-title"
+          class="section-heading"
+          id="insegnare-title"
+          data-reveal
         >
-          QUANDO CAPISCI,<br />
-          PUOI INSEGNARE
+          QUANDO CAPISCI, PUOI INSEGNARE
         </h2>
 
-        <div class="story-copy">
+        <div
+          class="narrative-copy"
+          data-reveal
+        >
 
           <p>
-            Poi è arrivata la scuola.
+            A scuola la domanda cambia ancora.
           </p>
 
           <p>
-            E il movimento ha assunto un significato diverso.
+            Il movimento non è più soltanto qualcosa che devo capire io.
           </p>
 
           <p>
-            Non era più soltanto qualcosa da vivere,
-            osservare o studiare.
+            Diventa qualcosa che posso aiutare qualcun altro a scoprire.
           </p>
 
           <p>
-            Era qualcosa da
-            <strong>far vivere agli altri.</strong>
+            Insegnare significa osservare.
           </p>
 
           <p>
-            A scuola ho imparato che insegnare
-            non significa semplicemente spiegare.
-          </p>
-
-          <p class="story-copy--stacked">
-            Significa osservare.<br />
-            Ascoltare.<br />
-            Trovare un modo diverso per arrivare a ciascuno.
+            Ascoltare.
           </p>
 
           <p>
-            Creare le condizioni perché qualcuno possa
-            provare, sbagliare, capire.
+            Trovare un modo diverso per spiegare.
           </p>
 
           <p>
-            E riprovare.
+            Creare le condizioni perché qualcuno possa provare.
           </p>
 
           <p>
-            La domanda era ancora lì.
+            Sbagliare.
           </p>
 
           <p>
-            Solo che, questa volta,
-            <strong>non cercavo più soltanto una risposta per me.</strong>
+            Capire.
+          </p>
+
+          <p>
+            Riprovare.
+          </p>
+
+          <p>
+            La domanda non riguarda più soltanto me.
+          </p>
+
+          <p>
+            Riguarda anche la persona che ho davanti.
           </p>
 
         </div>
@@ -595,73 +564,91 @@
 
 
     <!-- =======================================================
-         ALLARGARE LO SGUARDO
-    ======================================================== -->
+         06 — ALLARGARE LO SGUARDO
+         ======================================================= -->
 
     <section
-      class="story-section"
+      class="narrative-section"
       id="allargare-lo-sguardo"
+      data-section
       data-section-title="ALLARGARE LO SGUARDO"
-      aria-labelledby="allargare-lo-sguardo-title"
+      aria-labelledby="sguardo-title"
     >
 
-      <div class="story-section__inner">
+      <div class="narrative-section__inner">
 
         <h2
-          class="story-title"
-          id="allargare-lo-sguardo-title"
+          class="section-heading"
+          id="sguardo-title"
+          data-reveal
         >
-          ALLARGARE<br />
-          LO SGUARDO
+          ALLARGARE LO SGUARDO
         </h2>
 
-        <div class="story-copy">
+        <div
+          class="narrative-copy"
+          data-reveal
+        >
 
           <p>
-            A un certo punto ho iniziato a guardare
-            lo sport da un'altra prospettiva.
+            Poi ho iniziato a guardare sistemi più grandi.
           </p>
 
           <p>
-            Non soltanto il movimento.
-            Ma tutto ciò che lo rende possibile.
+            Persone.
           </p>
 
-          <p class="story-copy--stacked">
-            Le persone.<br />
-            Le organizzazioni.<br />
-            I progetti.<br />
-            Le risorse.<br />
-            Le decisioni.
+          <p>
+            Organizzazioni.
           </p>
 
-          <p class="story-copy--stacked">
-            Come si costruisce un progetto.<br />
-            Come si organizza.<br />
-            Come si gestisce.<br />
+          <p>
+            Progetti.
+          </p>
+
+          <p>
+            Risorse.
+          </p>
+
+          <p>
+            Decisioni.
+          </p>
+
+          <p>
+            Il management mi ha dato un altro modo di osservare
+            il funzionamento delle cose.
+          </p>
+
+          <p>
+            Come si costruisce qualcosa.
+          </p>
+
+          <p>
+            Come si organizza.
+          </p>
+
+          <p>
+            Come si gestisce.
+          </p>
+
+          <p>
             Come può crescere.
           </p>
 
           <p>
-            È arrivata così la laurea in
-            <strong>Management dello Sport e delle Attività Motorie.</strong>
+            Ho studiato Management dello Sport e delle Attività Motorie.
           </p>
 
           <p>
-            Un modo diverso di comprendere lo stesso mondo.
+            La domanda era ancora la stessa.
           </p>
 
           <p>
-            La domanda era ancora la stessa:
-          </p>
-
-          <p class="story-emphasis">
             <strong>Come funziona?</strong>
           </p>
 
           <p>
-            Solo che adesso il campo di osservazione
-            era diventato più grande.
+            Solo che il campo era diventato più grande.
           </p>
 
         </div>
@@ -672,60 +659,58 @@
 
 
     <!-- =======================================================
-         UN FILO CHE RITORNA
-    ======================================================== -->
+         07 — UN FILO CHE RITORNA
+         ======================================================= -->
 
     <section
-      class="story-section"
+      class="narrative-section"
       id="un-filo-che-ritorna"
+      data-section
       data-section-title="UN FILO CHE RITORNA"
-      aria-labelledby="un-filo-che-ritorna-title"
+      aria-labelledby="filo-title"
     >
 
-      <div class="story-section__inner">
+      <div class="narrative-section__inner">
 
         <h2
-          class="story-title"
-          id="un-filo-che-ritorna-title"
+          class="section-heading"
+          id="filo-title"
+          data-reveal
         >
-          UN FILO<br />
-          CHE RITORNA
+          UN FILO CHE RITORNA
         </h2>
 
-        <div class="story-copy">
+        <div
+          class="narrative-copy"
+          data-reveal
+        >
 
           <p>
-            In fondo, il digitale non l'ho mai lasciato.
+            Poi il digitale è tornato nella mia vita in un altro modo.
           </p>
 
           <p>
-            È rimasto nella mia vita per tutti questi anni,
-            cambiando insieme a me.
+            Ho iniziato a studiare
+            <strong>come si costruiscono le pagcine Web.</strong>
           </p>
 
           <p>
-            Poi ho iniziato a studiare
-            <strong>come si costruisce un sito.</strong>
-          </p>
-
-          <p>
-            A capire come si struttura,
-            come prende forma,
+            A capire come si struttura una pagina,<br>
+            come prende forma,<br>
             come può diventare un'esperienza.
           </p>
 
           <p>
-            E mi è tornata in mente una cosa
-            che avevo già provato a fare anni prima.
+            E mi è tornata in mente una cosa che avevo già provato
+            a fare anni prima.
           </p>
 
           <p>
-            <strong>Costruire un sito.</strong>
+            <strong>Costruire per il Web.</strong>
           </p>
 
           <p>
-            Allora non avevo gli strumenti
-            per realizzarlo come lo immaginavo.
+            Allora non avevo gli strumenti per realizzarlo come lo immaginavo.
           </p>
 
           <p>
@@ -733,8 +718,7 @@
           </p>
 
           <p>
-            E ho capito che quella curiosità
-            non era mai scomparsa.
+            E ho capito che quella curiosità non era mai scomparsa.
           </p>
 
           <p>
@@ -743,11 +727,10 @@
 
           <p>
             Oggi mi piace l'idea di usare quello che ho imparato
-            per dare forma alle idee, alle storie
-            e alle identità delle persone.
+            per dare forma alle idee, alle storie e alle identità delle persone.
           </p>
 
-          <p class="story-emphasis">
+          <p>
             <strong>Costruire qualcosa che prima non c'era.</strong>
           </p>
 
@@ -756,7 +739,7 @@
           </p>
 
           <p>
-            E forse, domani,
+            E forse, domani,<br>
             anche per altri.
           </p>
 
@@ -768,70 +751,72 @@
 
 
     <!-- =======================================================
-         IL PUNTO DOVE TUTTO SI INCONTRA
-    ======================================================== -->
+         08 — IL PUNTO DOVE TUTTO SI INCONTRA
+         ======================================================= -->
 
     <section
-      class="story-section"
+      class="narrative-section"
       id="il-punto-dove-tutto-si-incontra"
+      data-section
       data-section-title="IL PUNTO DOVE TUTTO SI INCONTRA"
-      aria-labelledby="il-punto-title"
+      aria-labelledby="incontra-title"
     >
 
-      <div class="story-section__inner">
+      <div class="narrative-section__inner">
 
         <h2
-          class="story-title"
-          id="il-punto-title"
+          class="section-heading"
+          id="incontra-title"
+          data-reveal
         >
-          IL PUNTO DOVE<br />
-          TUTTO SI INCONTRA
+          IL PUNTO DOVE TUTTO SI INCONTRA
         </h2>
 
-        <div class="story-copy">
+        <div
+          class="narrative-copy"
+          data-reveal
+        >
 
           <p>
-            Oggi mi rendo conto
-            che quelle strade non erano poi così diverse.
-          </p>
-
-          <p class="story-copy--stacked">
-            Il movimento.<br />
-            Lo sport.<br />
-            L'educazione.<br />
-            Il management.<br />
-            Il digitale.
+            A questo punto le esperienze sembrano appartenere
+            a mondi diversi.
           </p>
 
           <p>
-            Ognuno mi ha insegnato a guardare le cose
-            da un punto di vista diverso.
+            Sport.
           </p>
 
           <p>
-            E forse è proprio questo che mi interessa:
-          </p>
-
-          <p class="story-emphasis">
-            <strong>
-              mettere in relazione ciò che,
-              a prima vista, sembra lontano.
-            </strong>
+            Educazione.
           </p>
 
           <p>
-            Capire cosa può nascere
-            quando idee, persone e competenze
-            si incontrano.
+            Progettazione.
           </p>
 
           <p>
-            Non so ancora dove porterà tutto questo.
+            Management.
           </p>
 
           <p>
-            Ma so che è qui
-            che voglio continuare a guardare.
+            Digitale.
+          </p>
+
+          <p>
+            Ma ognuna mi ha insegnato un modo diverso di guardare.
+          </p>
+
+          <p>
+            Quello che mi interessa è proprio il punto in cui
+            queste cose si incontrano.
+          </p>
+
+          <p>
+            Non per sommarle.
+          </p>
+
+          <p>
+            Ma per collegarle.
           </p>
 
         </div>
@@ -842,56 +827,74 @@
 
 
     <!-- =======================================================
-         OGGI
-    ======================================================== -->
+         09 — OGGI
+         ======================================================= -->
 
     <section
-      class="story-section"
+      class="narrative-section"
       id="oggi"
+      data-section
       data-section-title="OGGI"
       aria-labelledby="oggi-title"
     >
 
-      <div class="story-section__inner">
+      <div class="narrative-section__inner">
 
         <h2
-          class="story-title"
+          class="section-heading"
           id="oggi-title"
+          data-reveal
         >
           OGGI
         </h2>
 
-        <div class="story-copy">
+        <div
+          class="narrative-copy"
+          data-reveal
+        >
 
           <p>
-            Con il tempo ho capito
-            che tutte queste esperienze
-            mi hanno lasciato soprattutto
-            un modo di affrontare le cose.
+            Le esperienze lasciano un modo di affrontare le cose.
           </p>
 
-          <p class="story-copy--stacked">
-            <strong>Osservare.</strong><br />
-            <strong>Capire.</strong><br />
-            <strong>Collegare.</strong><br />
+          <p>
+            <strong>Osservare.</strong>
+          </p>
+
+          <p>
+            <strong>Capire.</strong>
+          </p>
+
+          <p>
+            <strong>Collegare.</strong>
+          </p>
+
+          <p>
             <strong>Costruire.</strong>
           </p>
 
           <p>
-            Non partire da una soluzione già pronta.
+            Non partire dalla soluzione già pronta.
           </p>
 
           <p>
-            Guardare ciò che c'è,
-            capire cosa serve
-            e trovare il modo di arrivare dove voglio.
+            Guardare ciò che esiste.
           </p>
 
-          <p class="story-emphasis">
-            <strong>
-              Partire da un obiettivo
-              e capire come arrivarci.
-            </strong>
+          <p>
+            Capire cosa serve.
+          </p>
+
+          <p>
+            Capire cosa manca.
+          </p>
+
+          <p>
+            Trovare un modo per arrivare dove si vuole arrivare.
+          </p>
+
+          <p>
+            Partire da un obiettivo e capire come arrivarci.
           </p>
 
         </div>
@@ -902,41 +905,50 @@
 
 
     <!-- =======================================================
-         L'OBIETTIVO
-    ======================================================== -->
+         10 — L'OBIETTIVO
+         ======================================================= -->
 
     <section
-      class="story-section"
+      class="narrative-section"
       id="l-obiettivo"
+      data-section
       data-section-title="L'OBIETTIVO"
       aria-labelledby="obiettivo-title"
     >
 
-      <div class="story-section__inner">
+      <div class="narrative-section__inner">
 
         <h2
-          class="story-title"
+          class="section-heading"
           id="obiettivo-title"
+          data-reveal
         >
           L'OBIETTIVO
         </h2>
 
-        <div class="story-copy">
+        <div
+          class="narrative-copy"
+          data-reveal
+        >
 
           <p>
-            <strong>Ogni obiettivo è diverso.</strong>
+            Ogni obiettivo è diverso.
           </p>
 
           <p>
-            E per arrivarci
-            bisogna prima capire
-            da dove partire.
+            Prima bisogna capire da dove si parte.
           </p>
 
-          <p class="story-copy--stacked">
-            Cosa c'è già.<br />
-            Cosa manca.<br />
-            Cosa può essere messo in relazione.
+          <p>
+            Cosa esiste.
+          </p>
+
+          <p>
+            Cosa manca.
+          </p>
+
+          <p>
+            Cosa può essere collegato.
           </p>
 
           <p>
@@ -947,10 +959,28 @@
             E costruire.
           </p>
 
-          <p class="story-emphasis">
-            <strong>
-              È così che mi piace affrontare le cose.
-            </strong>
+          <p>
+            Può essere un atleta che vuole migliorare.
+          </p>
+
+          <p>
+            Un progetto che deve prendere forma.
+          </p>
+
+          <p>
+            Un'idea che deve diventare reale.
+          </p>
+
+          <p>
+            Una persona che vuole costruire qualcosa di nuovo.
+          </p>
+
+          <p>
+            Si parte da lì.
+          </p>
+
+          <p>
+            <strong>Da quello che vuoi far succedere.</strong>
           </p>
 
         </div>
@@ -961,66 +991,93 @@
 
 
     <!-- =======================================================
-         DA QUI + PORTRAIT / POINT OF ENCOUNTER
-    ======================================================== -->
+         11 — DA QUI
+         ======================================================= -->
 
     <section
-      class="story-section story-section--encounter"
+      class="narrative-section"
       id="da-qui"
+      data-section
       data-section-title="DA QUI"
       aria-labelledby="da-qui-title"
     >
 
-      <div class="story-section__inner encounter">
+      <div class="narrative-section__inner">
 
-        <div class="encounter__copy">
+        <h2
+          class="section-heading"
+          id="da-qui-title"
+          data-reveal
+        >
+          DA QUI
+        </h2>
 
-          <h2
-            class="story-title"
-            id="da-qui-title"
-          >
-            DA QUI
-          </h2>
+        <div
+          class="narrative-copy"
+          data-reveal
+        >
 
-          <div class="story-copy">
+          <p>
+            Non so ancora esattamente dove porterà tutto questo.
+          </p>
 
-            <p>
-              Uno sportivo che vuole migliorare.
-            </p>
+          <p>
+            So però in quale direzione voglio continuare a muovermi.
+          </p>
 
-            <p>
-              Un progetto che deve prendere forma.
-            </p>
+          <p>
+            Verso il punto in cui sport, educazione e tecnologia
+            possono incontrarsi.
+          </p>
 
-            <p>
-              Un'idea che deve diventare reale.
-            </p>
-
-            <p>
-              Qualcuno che vuole costruire qualcosa di nuovo.
-            </p>
-
-            <p class="story-emphasis">
-              <strong>Si parte da lì.</strong>
-            </p>
-
-            <p>
-              Da quello che vuoi far succedere.
-            </p>
-
-          </div>
+          <p>
+            E generare qualcosa di nuovo.
+          </p>
 
         </div>
 
+      </div>
 
-        <figure class="encounter__portrait">
+    </section>
+
+
+    <!-- =======================================================
+         12 — PORTRAIT / POINT OF ENCOUNTER
+         TESTO + PERSONA SIMULTANEAMENTE
+         ======================================================= -->
+
+    <section
+      class="narrative-section narrative-section--portrait"
+      id="portrait"
+      data-section
+      data-section-title="PORTRAIT"
+      aria-labelledby="portrait-title"
+    >
+
+      <div class="portrait-layout">
+
+        <div class="portrait-layout__copy">
+
+          <h2
+            class="section-heading"
+            id="portrait-title"
+            data-reveal
+          >
+            CESARE PARATORE
+          </h2>
+
+        </div>
+
+        <figure
+          class="portrait-layout__image"
+          data-reveal
+        >
 
           <img
             src="assets/images/cp-foto.webp"
             alt="Cesare Paratore"
             loading="lazy"
-            decoding="async"
-          />
+          >
 
         </figure>
 
@@ -1030,37 +1087,41 @@
 
 
     <!-- =======================================================
-         CONTINUIAMO DA QUI
-    ======================================================== -->
+         13 — CONTINUIAMO DA QUI
+         ======================================================= -->
 
     <section
-      class="story-section story-section--closing"
+      class="narrative-section narrative-section--closing"
       id="continuiamo-da-qui"
+      data-section
       data-section-title="CONTINUIAMO DA QUI"
       aria-labelledby="closing-title"
     >
 
-      <div class="closing">
+      <div class="narrative-section__inner">
 
         <h2
-          class="closing__title"
+          class="display display--l"
           id="closing-title"
+          data-reveal
         >
           CONTINUIAMO DA QUI.
         </h2>
 
-        <div class="closing__content">
+        <div
+          class="closing-copy"
+          data-reveal
+        >
 
-          <p class="closing__name">
+          <p class="closing-name">
             CESARE PARATORE
           </p>
 
-          <p class="closing__text">
-            Se hai qualcosa che vuoi capire,
-            costruire o far evolvere,
+          <p>
+            Se hai qualcosa che vuoi capire, costruire o far evolvere,
           </p>
 
-          <p class="closing__cta">
+          <p>
             <strong>parliamone.</strong>
           </p>
 
@@ -1075,28 +1136,27 @@
 
   <!-- =========================================================
        FOOTER
-  ========================================================== -->
+       SUPERFICIE CHIARA
+       LOGO CP NERO A SINISTRA
+       CESARE PARATORE A DESTRA
+       ========================================================= -->
 
   <footer class="site-footer">
 
-    <div class="site-footer__inner">
-
-      <a
-        class="site-footer__brand"
-        href="#top"
-        aria-label="Cesare Paratore — torna all'inizio"
+    <a
+      class="site-footer__brand"
+      href="#top"
+      aria-label="Torna all'inizio"
+    >
+      <img
+        src="assets/images/cp-mark.svg"
+        alt="CP"
+        loading="lazy"
       >
-        <img
-          src="assets/images/cp-mark.svg"
-          alt="CP"
-        />
-      </a>
+    </a>
 
-
-      <div class="site-footer__signature">
-        CESARE PARATORE
-      </div>
-
+    <div class="site-footer__name">
+      CESARE PARATORE
     </div>
 
   </footer>
@@ -1104,13 +1164,14 @@
 
   <!-- =========================================================
        NOSCRIPT
-  ========================================================== -->
+       ========================================================= -->
 
   <noscript>
-    <div class="noscript">
+    <div class="noscript-message">
       <p>
-        Questa esperienza utilizza JavaScript per la navigazione narrativa.
-        Il contenuto rimane comunque disponibile nella pagina.
+        Questo sito utilizza alcune interazioni per accompagnare
+        la narrazione. Il contenuto principale rimane comunque
+        disponibile senza JavaScript.
       </p>
     </div>
   </noscript>
