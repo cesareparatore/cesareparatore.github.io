@@ -98,8 +98,9 @@
     nextLabel: document.querySelector("#next-section-label"),
 
     menu: document.querySelector("#site-menu"),
+
     menuLinks: [
-      ...document.querySelectorAll(".site-menu-nav a")
+      ...document.querySelectorAll("#site-menu a")
     ],
 
     sections: [
@@ -309,6 +310,10 @@
       "is-menu-open"
     );
 
+    dom.menu.classList.add(
+      "is-open"
+    );
+
     dom.menu.setAttribute(
       "aria-hidden",
       "false"
@@ -339,6 +344,10 @@
 
     dom.body.classList.remove(
       "is-menu-open"
+    );
+
+    dom.menu.classList.remove(
+      "is-open"
     );
 
     dom.menu.setAttribute(
@@ -380,9 +389,28 @@
       return;
     }
 
+    /* Stato iniziale */
+    dom.menu.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    dom.menu.setAttribute(
+      "inert",
+      ""
+    );
+
+    dom.menuTrigger.setAttribute(
+      "aria-expanded",
+      "false"
+    );
+
     dom.menuTrigger.addEventListener(
       "click",
-      () => {
+      event => {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (st.menuOpen) {
           menuClose();
         } else {
@@ -1399,7 +1427,9 @@
       if (!hash) return;
 
       const target =
-        document.querySelector(hash);
+        document.getElementById(
+          hash.slice(1)
+        );
 
       if (!target) return;
 
