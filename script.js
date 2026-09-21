@@ -6,7 +6,7 @@
   ======================================================== */
 
   const CFG = {
-    loaderMin: 2850,
+    loaderMin: 3200,
     loaderMax: 3800,
 
     revealThreshold: 0.12,
@@ -98,11 +98,17 @@
     nextLabel: document.querySelector("#next-section-label"),
 
     menu: document.querySelector("#site-menu"),
-    menuLinks: [...document.querySelectorAll(".site-menu-nav a")],
+    menuLinks: [
+      ...document.querySelectorAll(".site-menu-nav a")
+    ],
 
-    sections: [...document.querySelectorAll(".home-section")],
+    sections: [
+      ...document.querySelectorAll(".home-section")
+    ],
 
-    reveals: [...document.querySelectorAll(".reveal")],
+    reveals: [
+      ...document.querySelectorAll(".reveal")
+    ],
 
     narrativeLinks: [
       ...document.querySelectorAll("[data-trajectory-node]")
@@ -139,7 +145,9 @@
   function motionInit() {
     st.reduced =
       window.matchMedia &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
 
     if (st.reduced) {
       dom.body.classList.add("reduced-motion");
@@ -152,7 +160,10 @@
   ======================================================== */
 
   function loaderInit() {
-    if (!dom.loader) return;
+    if (!dom.loader) {
+      st.loaded = true;
+      return;
+    }
 
     const start = performance.now();
 
@@ -162,13 +173,21 @@
       st.loaded = true;
 
       const elapsed = performance.now() - start;
-      const remaining = Math.max(0, CFG.loaderMin - elapsed);
+
+      const remaining = Math.max(
+        0,
+        CFG.loaderMin - elapsed
+      );
 
       window.setTimeout(() => {
         dom.loader.classList.add("is-hidden");
 
         window.setTimeout(() => {
-          dom.loader.setAttribute("aria-hidden", "true");
+          dom.loader.setAttribute(
+            "aria-hidden",
+            "true"
+          );
+
           dom.loader.style.pointerEvents = "none";
         }, 850);
 
@@ -182,10 +201,17 @@
     if (document.readyState === "complete") {
       finish();
     } else {
-      window.addEventListener("load", finish, { once: true });
+      window.addEventListener(
+        "load",
+        finish,
+        { once: true }
+      );
     }
 
-    window.setTimeout(finish, CFG.loaderMax);
+    window.setTimeout(
+      finish,
+      CFG.loaderMax
+    );
   }
 
 
@@ -202,7 +228,16 @@
       if (!link) return;
       if (event.defaultPrevented) return;
       if (event.button !== 0) return;
-      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+      if (
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      ) {
+        return;
+      }
+
       if (link.target === "_blank") return;
       if (link.hasAttribute("download")) return;
 
@@ -216,7 +251,10 @@
       let url;
 
       try {
-        url = new URL(href, window.location.href);
+        url = new URL(
+          href,
+          window.location.href
+        );
       } catch {
         return;
       }
@@ -228,20 +266,32 @@
 
       if (sameDocument) return;
 
-      if (url.origin !== window.location.origin) return;
+      if (
+        url.origin !==
+        window.location.origin
+      ) {
+        return;
+      }
 
       event.preventDefault();
 
-      dom.transition.classList.add("is-active");
+      dom.transition.classList.add(
+        "is-active"
+      );
 
       window.setTimeout(() => {
         window.location.href = url.href;
       }, CFG.transitionMs);
     });
 
-    window.addEventListener("pageshow", () => {
-      dom.transition.classList.remove("is-active");
-    });
+    window.addEventListener(
+      "pageshow",
+      () => {
+        dom.transition.classList.remove(
+          "is-active"
+        );
+      }
+    );
   }
 
 
@@ -255,13 +305,26 @@
     st.menuOpen = true;
     st.menuReturn = document.activeElement;
 
-    dom.body.classList.add("is-menu-open");
+    dom.body.classList.add(
+      "is-menu-open"
+    );
 
-    dom.menu.setAttribute("aria-hidden", "false");
+    dom.menu.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
     dom.menu.removeAttribute("inert");
 
-    dom.menuTrigger?.setAttribute("aria-expanded", "true");
-    dom.menuTrigger?.setAttribute("aria-label", "Chiudi menu");
+    dom.menuTrigger?.setAttribute(
+      "aria-expanded",
+      "true"
+    );
+
+    dom.menuTrigger?.setAttribute(
+      "aria-label",
+      "Chiudi menu"
+    );
 
     window.setTimeout(() => {
       dom.menuLinks[0]?.focus();
@@ -274,15 +337,34 @@
 
     st.menuOpen = false;
 
-    dom.body.classList.remove("is-menu-open");
+    dom.body.classList.remove(
+      "is-menu-open"
+    );
 
-    dom.menu.setAttribute("aria-hidden", "true");
-    dom.menu.setAttribute("inert", "");
+    dom.menu.setAttribute(
+      "aria-hidden",
+      "true"
+    );
 
-    dom.menuTrigger?.setAttribute("aria-expanded", "false");
-    dom.menuTrigger?.setAttribute("aria-label", "Apri menu");
+    dom.menu.setAttribute(
+      "inert",
+      ""
+    );
 
-    if (restoreFocus && st.menuReturn instanceof HTMLElement) {
+    dom.menuTrigger?.setAttribute(
+      "aria-expanded",
+      "false"
+    );
+
+    dom.menuTrigger?.setAttribute(
+      "aria-label",
+      "Apri menu"
+    );
+
+    if (
+      restoreFocus &&
+      st.menuReturn instanceof HTMLElement
+    ) {
       st.menuReturn.focus();
     }
 
@@ -291,27 +373,41 @@
 
 
   function menuInit() {
-    if (!dom.menuTrigger || !dom.menu) return;
+    if (
+      !dom.menuTrigger ||
+      !dom.menu
+    ) {
+      return;
+    }
 
-    dom.menuTrigger.addEventListener("click", () => {
-      if (st.menuOpen) {
-        menuClose();
-      } else {
-        menuOpen();
+    dom.menuTrigger.addEventListener(
+      "click",
+      () => {
+        if (st.menuOpen) {
+          menuClose();
+        } else {
+          menuOpen();
+        }
       }
-    });
+    );
 
     dom.menuLinks.forEach(link => {
-      link.addEventListener("click", () => {
-        menuClose(false);
-      });
+      link.addEventListener(
+        "click",
+        () => {
+          menuClose(false);
+        }
+      );
     });
 
-    dom.menu.addEventListener("click", event => {
-      if (event.target === dom.menu) {
-        menuClose();
+    dom.menu.addEventListener(
+      "click",
+      event => {
+        if (event.target === dom.menu) {
+          menuClose();
+        }
       }
-    });
+    );
   }
 
 
@@ -322,7 +418,8 @@
   function getSectionTop(section) {
     if (!section) return 0;
 
-    const rect = section.getBoundingClientRect();
+    const rect =
+      section.getBoundingClientRect();
 
     return (
       window.scrollY +
@@ -338,18 +435,19 @@
 
     const clamped = Math.max(
       0,
-      Math.min(index, dom.sections.length - 1)
+      Math.min(
+        index,
+        dom.sections.length - 1
+      )
     );
 
-    const section = dom.sections[clamped];
+    const section =
+      dom.sections[clamped];
 
     if (!section) return;
 
     const target =
-      window.scrollY +
-      section.getBoundingClientRect().top -
-      (dom.header?.offsetHeight || 0) -
-      CFG.navOffset;
+      getSectionTop(section);
 
     const behavior =
       options.instant || st.reduced
@@ -362,6 +460,7 @@
     });
 
     st.active = clamped;
+
     wowUpdate(true);
   }
 
@@ -376,40 +475,59 @@
     let closest = 0;
     let distance = Infinity;
 
-    dom.sections.forEach((section, index) => {
-      const rect = section.getBoundingClientRect();
-      const center =
-        window.scrollY +
-        rect.top +
-        rect.height / 2;
+    dom.sections.forEach(
+      (section, index) => {
+        const rect =
+          section.getBoundingClientRect();
 
-      const currentDistance =
-        Math.abs(center - viewportCenter);
+        const center =
+          window.scrollY +
+          rect.top +
+          rect.height / 2;
 
-      if (currentDistance < distance) {
-        distance = currentDistance;
-        closest = index;
+        const currentDistance =
+          Math.abs(
+            center -
+            viewportCenter
+          );
+
+        if (
+          currentDistance <
+          distance
+        ) {
+          distance =
+            currentDistance;
+
+          closest = index;
+        }
       }
-    });
+    );
 
-    if (!force && closest === st.active) {
+    if (
+      !force &&
+      closest === st.active
+    ) {
       return;
     }
 
     st.active = closest;
 
-    const section = dom.sections[closest];
+    const section =
+      dom.sections[closest];
+
     const title =
       section?.dataset.sectionTitle ||
       "";
 
     if (dom.progressCurrent) {
-      dom.progressCurrent.textContent = title;
+      dom.progressCurrent.textContent =
+        title;
     }
 
     const progress =
       dom.sections.length > 1
-        ? closest / (dom.sections.length - 1)
+        ? closest /
+          (dom.sections.length - 1)
         : 0;
 
     if (dom.progressFill) {
@@ -422,56 +540,106 @@
         `${progress * 100}%`;
     }
 
-    const previousIndex = closest - 1;
-    const nextIndex = closest + 1;
+    const previousIndex =
+      closest - 1;
 
-    if (dom.previous && dom.previousLabel) {
+    const nextIndex =
+      closest + 1;
+
+    if (
+      dom.previous &&
+      dom.previousLabel
+    ) {
       if (previousIndex >= 0) {
-        dom.previous.classList.remove("is-disabled");
+        const number =
+          String(
+            previousIndex + 1
+          ).padStart(2, "0");
+
+        dom.previous.classList.remove(
+          "is-disabled"
+        );
+
         dom.previous.setAttribute(
           "aria-hidden",
           "false"
         );
+
         dom.previous.setAttribute(
           "tabindex",
           "0"
         );
+
         dom.previous.href =
-          `#${String(previousIndex + 1).padStart(2, "0")}`;
+          `#${number}`;
+
         dom.previousLabel.textContent =
-          String(previousIndex + 1).padStart(2, "0");
+          number;
       } else {
-        dom.previous.classList.add("is-disabled");
+        dom.previous.classList.add(
+          "is-disabled"
+        );
+
         dom.previous.setAttribute(
           "aria-hidden",
           "true"
         );
+
         dom.previous.setAttribute(
           "tabindex",
           "-1"
         );
-        dom.previous.href = "#01";
-        dom.previousLabel.textContent = "";
+
+        dom.previous.href =
+          "#01";
+
+        dom.previousLabel.textContent =
+          "";
       }
     }
 
-    if (dom.next && dom.nextLabel) {
-      if (nextIndex < dom.sections.length) {
-        dom.next.classList.remove("is-disabled");
-
+    if (
+      dom.next &&
+      dom.nextLabel
+    ) {
+      if (
+        nextIndex <
+        dom.sections.length
+      ) {
         const number =
-          String(nextIndex + 1).padStart(2, "0");
+          String(
+            nextIndex + 1
+          ).padStart(2, "0");
 
-        dom.next.href = `#${number}`;
-        dom.nextLabel.textContent = number;
+        dom.next.classList.remove(
+          "is-disabled"
+        );
+
+        dom.next.href =
+          `#${number}`;
+
+        dom.nextLabel.textContent =
+          number;
+
         dom.next.setAttribute(
           "aria-label",
           `Vai alla sezione ${number}`
         );
       } else {
-        dom.next.classList.add("is-disabled");
-        dom.next.href = "#10";
-        dom.nextLabel.textContent = "10";
+        dom.next.classList.add(
+          "is-disabled"
+        );
+
+        dom.next.href =
+          `#${String(
+            dom.sections.length
+          ).padStart(2, "0")}`;
+
+        dom.nextLabel.textContent =
+          String(
+            dom.sections.length
+          ).padStart(2, "0");
+
         dom.next.setAttribute(
           "aria-label",
           "Fine del percorso"
@@ -489,26 +657,42 @@
   function wowInit() {
     if (!dom.sections.length) return;
 
-    dom.previous?.addEventListener("click", event => {
-      event.preventDefault();
+    dom.previous?.addEventListener(
+      "click",
+      event => {
+        event.preventDefault();
 
-      if (st.active > 0) {
-        goTo(st.active - 1);
+        if (st.active > 0) {
+          goTo(
+            st.active - 1
+          );
+        }
       }
-    });
+    );
 
-    dom.next?.addEventListener("click", event => {
-      event.preventDefault();
+    dom.next?.addEventListener(
+      "click",
+      event => {
+        event.preventDefault();
 
-      if (st.active < dom.sections.length - 1) {
-        goTo(st.active + 1);
+        if (
+          st.active <
+          dom.sections.length - 1
+        ) {
+          goTo(
+            st.active + 1
+          );
+        }
       }
-    });
+    );
 
-    dom.brand?.addEventListener("click", event => {
-      event.preventDefault();
-      goTo(0);
-    });
+    dom.brand?.addEventListener(
+      "click",
+      event => {
+        event.preventDefault();
+        goTo(0);
+      }
+    );
 
     activeDetect();
   }
@@ -523,34 +707,51 @@
 
     if (st.reduced) {
       dom.reveals.forEach(item => {
-        item.classList.add("is-visible");
+        item.classList.add(
+          "is-visible"
+        );
       });
 
       return;
     }
 
-    if (!("IntersectionObserver" in window)) {
+    if (
+      !("IntersectionObserver" in window)
+    ) {
       dom.reveals.forEach(item => {
-        item.classList.add("is-visible");
+        item.classList.add(
+          "is-visible"
+        );
       });
 
       return;
     }
 
-    const observer = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      {
-        threshold: CFG.revealThreshold,
-        rootMargin: "0px 0px -8% 0px"
-      }
-    );
+    const observer =
+      new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            if (
+              entry.isIntersecting
+            ) {
+              entry.target.classList.add(
+                "is-visible"
+              );
+
+              observer.unobserve(
+                entry.target
+              );
+            }
+          });
+        },
+        {
+          threshold:
+            CFG.revealThreshold,
+
+          rootMargin:
+            "0px 0px -8% 0px"
+        }
+      );
 
     dom.reveals.forEach(item => {
       observer.observe(item);
@@ -585,7 +786,9 @@
     });
 
     document
-      .querySelectorAll(".five-directions a")
+      .querySelectorAll(
+        ".five-directions a"
+      )
       .forEach(item => {
         item.classList.toggle(
           "is-linked",
@@ -608,39 +811,60 @@
 
       if (!key) return;
 
-      item.addEventListener("mouseenter", () => {
-        clearDirectionState(key);
-      });
+      item.addEventListener(
+        "mouseenter",
+        () => {
+          clearDirectionState(key);
+        }
+      );
 
-      item.addEventListener("focus", () => {
-        clearDirectionState(key);
-      });
+      item.addEventListener(
+        "focus",
+        () => {
+          clearDirectionState(key);
+        }
+      );
 
-      item.addEventListener("mouseleave", () => {
-        clearDirectionState("");
-      });
+      item.addEventListener(
+        "mouseleave",
+        () => {
+          clearDirectionState("");
+        }
+      );
 
-      item.addEventListener("blur", () => {
-        clearDirectionState("");
-      });
+      item.addEventListener(
+        "blur",
+        () => {
+          clearDirectionState("");
+        }
+      );
     });
   }
 
 
   function narrativeInit() {
-    dom.narrativeLinks.forEach(link => {
-      const key = link.dataset.trajectoryNode;
+    dom.narrativeLinks.forEach(
+      link => {
+        const key =
+          link.dataset.trajectoryNode;
 
-      if (!key) return;
+        if (!key) return;
 
-      link.addEventListener("mouseenter", () => {
-        clearDirectionState(key);
-      });
+        link.addEventListener(
+          "mouseenter",
+          () => {
+            clearDirectionState(key);
+          }
+        );
 
-      link.addEventListener("focus", () => {
-        clearDirectionState(key);
-      });
-    });
+        link.addEventListener(
+          "focus",
+          () => {
+            clearDirectionState(key);
+          }
+        );
+      }
+    );
   }
 
 
@@ -649,31 +873,50 @@
   ======================================================== */
 
   function cursorRender() {
-    if (!dom.cursor || !dom.cursorDot || !dom.cursorRing) {
+    if (
+      !dom.cursor ||
+      !dom.cursorDot ||
+      !dom.cursorRing
+    ) {
       st.cursorRunning = false;
       return;
     }
 
     const dx =
-      st.pointer.x - st.cursor.x;
+      st.pointer.x -
+      st.cursor.x;
 
     const dy =
-      st.pointer.y - st.cursor.y;
+      st.pointer.y -
+      st.cursor.y;
 
-    st.cursor.x += dx * CFG.cursorLerp;
-    st.cursor.y += dy * CFG.cursorLerp;
+    st.cursor.x +=
+      dx * CFG.cursorLerp;
+
+    st.cursor.y +=
+      dy * CFG.cursorLerp;
 
     dom.cursorDot.style.transform =
-      `translate3d(${st.pointer.x - 3}px,${st.pointer.y - 3}px,0)`;
+      `translate3d(
+        ${st.pointer.x - 3}px,
+        ${st.pointer.y - 3}px,
+        0
+      )`;
 
     dom.cursorRing.style.transform =
-      `translate3d(${st.cursor.x - 15}px,${st.cursor.y - 15}px,0)`;
+      `translate3d(
+        ${st.cursor.x - 15}px,
+        ${st.cursor.y - 15}px,
+        0
+      )`;
 
     if (
       Math.abs(dx) > 0.2 ||
       Math.abs(dy) > 0.2
     ) {
-      requestAnimationFrame(cursorRender);
+      requestAnimationFrame(
+        cursorRender
+      );
     } else {
       st.cursorRunning = false;
     }
@@ -684,49 +927,76 @@
     if (
       !dom.cursor ||
       st.reduced ||
-      !window.matchMedia("(pointer:fine)").matches
+      !window.matchMedia(
+        "(pointer:fine)"
+      ).matches
     ) {
       return;
     }
 
     const move = event => {
-      st.pointer.x = event.clientX;
-      st.pointer.y = event.clientY;
+      st.pointer.x =
+        event.clientX;
 
-      dom.cursor.classList.add("is-visible");
+      st.pointer.y =
+        event.clientY;
+
+      dom.cursor.classList.add(
+        "is-visible"
+      );
 
       if (!st.cursorRunning) {
         st.cursorRunning = true;
-        requestAnimationFrame(cursorRender);
+
+        requestAnimationFrame(
+          cursorRender
+        );
       }
     };
 
     window.addEventListener(
       "pointermove",
       move,
-      { passive:true }
+      {
+        passive: true
+      }
     );
 
     window.addEventListener(
       "pointerleave",
       () => {
-        dom.cursor.classList.remove("is-visible");
+        dom.cursor.classList.remove(
+          "is-visible"
+        );
       }
     );
 
-    const hoverTargets = document.querySelectorAll(
-      "a, button, [role='button']"
+    const hoverTargets =
+      document.querySelectorAll(
+        "a, button, [role='button']"
+      );
+
+    hoverTargets.forEach(
+      target => {
+        target.addEventListener(
+          "mouseenter",
+          () => {
+            dom.cursor.classList.add(
+              "is-hovering"
+            );
+          }
+        );
+
+        target.addEventListener(
+          "mouseleave",
+          () => {
+            dom.cursor.classList.remove(
+              "is-hovering"
+            );
+          }
+        );
+      }
     );
-
-    hoverTargets.forEach(target => {
-      target.addEventListener("mouseenter", () => {
-        dom.cursor.classList.add("is-hovering");
-      });
-
-      target.addEventListener("mouseleave", () => {
-        dom.cursor.classList.remove("is-hovering");
-      });
-    });
   }
 
 
@@ -737,66 +1007,81 @@
   function magneticInit() {
     if (
       st.reduced ||
-      !window.matchMedia("(pointer:fine)").matches
+      !window.matchMedia(
+        "(pointer:fine)"
+      ).matches
     ) {
       return;
     }
 
-    dom.magnetic.forEach(element => {
+    dom.magnetic.forEach(
+      element => {
+        const reset = () => {
+          element.style.setProperty(
+            "--magnetic-x",
+            "0px"
+          );
 
-      const reset = () => {
-        element.style.setProperty(
-          "--magnetic-x",
-          "0px"
+          element.style.setProperty(
+            "--magnetic-y",
+            "0px"
+          );
+        };
+
+        element.addEventListener(
+          "pointermove",
+          event => {
+            const rect =
+              element.getBoundingClientRect();
+
+            const centerX =
+              rect.left +
+              rect.width / 2;
+
+            const centerY =
+              rect.top +
+              rect.height / 2;
+
+            const distanceX =
+              event.clientX -
+              centerX;
+
+            const distanceY =
+              event.clientY -
+              centerY;
+
+            const distance =
+              Math.hypot(
+                distanceX,
+                distanceY
+              );
+
+            if (
+              distance >
+              CFG.magneticRadius
+            ) {
+              reset();
+              return;
+            }
+
+            element.style.setProperty(
+              "--magnetic-x",
+              `${distanceX * CFG.magneticStrength}px`
+            );
+
+            element.style.setProperty(
+              "--magnetic-y",
+              `${distanceY * CFG.magneticStrength}px`
+            );
+          }
         );
 
-        element.style.setProperty(
-          "--magnetic-y",
-          "0px"
+        element.addEventListener(
+          "pointerleave",
+          reset
         );
-      };
-
-      element.addEventListener("pointermove", event => {
-
-        const rect =
-          element.getBoundingClientRect();
-
-        const centerX =
-          rect.left + rect.width / 2;
-
-        const centerY =
-          rect.top + rect.height / 2;
-
-        const distanceX =
-          event.clientX - centerX;
-
-        const distanceY =
-          event.clientY - centerY;
-
-        const distance =
-          Math.hypot(distanceX, distanceY);
-
-        if (distance > CFG.magneticRadius) {
-          reset();
-          return;
-        }
-
-        element.style.setProperty(
-          "--magnetic-x",
-          `${distanceX * CFG.magneticStrength}px`
-        );
-
-        element.style.setProperty(
-          "--magnetic-y",
-          `${distanceY * CFG.magneticStrength}px`
-        );
-      });
-
-      element.addEventListener(
-        "pointerleave",
-        reset
-      );
-    });
+      }
+    );
   }
 
 
@@ -805,21 +1090,44 @@
   ======================================================== */
 
   function ctaInit() {
-    if (!dom.ctaTrajectory || !dom.cta) return;
+    if (
+      !dom.ctaTrajectory ||
+      !dom.cta
+    ) {
+      return;
+    }
 
     const activate = () => {
-      dom.ctaTrajectory.classList.add("is-engaged");
+      dom.ctaTrajectory.classList.add(
+        "is-engaged"
+      );
     };
 
     const deactivate = () => {
-      dom.ctaTrajectory.classList.remove("is-engaged");
+      dom.ctaTrajectory.classList.remove(
+        "is-engaged"
+      );
     };
 
-    dom.cta.addEventListener("mouseenter", activate);
-    dom.cta.addEventListener("focus", activate);
+    dom.cta.addEventListener(
+      "mouseenter",
+      activate
+    );
 
-    dom.cta.addEventListener("mouseleave", deactivate);
-    dom.cta.addEventListener("blur", deactivate);
+    dom.cta.addEventListener(
+      "focus",
+      activate
+    );
+
+    dom.cta.addEventListener(
+      "mouseleave",
+      deactivate
+    );
+
+    dom.cta.addEventListener(
+      "blur",
+      deactivate
+    );
   }
 
 
@@ -829,7 +1137,10 @@
 
   function clearStandbyTimer() {
     if (st.standbyTimer) {
-      window.clearTimeout(st.standbyTimer);
+      window.clearTimeout(
+        st.standbyTimer
+      );
+
       st.standbyTimer = 0;
     }
   }
@@ -840,10 +1151,11 @@
 
     clearStandbyTimer();
 
-    st.standbyTimer = window.setTimeout(
-      openStandby,
-      CFG.standbyDelay
-    );
+    st.standbyTimer =
+      window.setTimeout(
+        openStandby,
+        CFG.standbyDelay
+      );
   }
 
 
@@ -851,24 +1163,34 @@
     if (
       st.standby ||
       st.menuOpen ||
-      document.visibilityState !== "visible"
+      !st.loaded ||
+      document.visibilityState !==
+        "visible"
     ) {
       return;
     }
 
     st.standby = true;
-    st.standbyReturn = document.activeElement;
 
-    dom.body.classList.add("is-standby");
+    st.standbyReturn =
+      document.activeElement;
 
-    dom.standby?.classList.add("is-active");
+    dom.body.classList.add(
+      "is-standby"
+    );
+
+    dom.standby?.classList.add(
+      "is-active"
+    );
 
     dom.standby?.setAttribute(
       "aria-hidden",
       "false"
     );
 
-    dom.standby?.removeAttribute("inert");
+    dom.standby?.removeAttribute(
+      "inert"
+    );
 
     window.setTimeout(() => {
       dom.standbyWake?.focus();
@@ -876,25 +1198,35 @@
   }
 
 
-  function closeStandby(restoreFocus = true) {
+  function closeStandby(
+    restoreFocus = true
+  ) {
     if (!st.standby) return;
 
     st.standby = false;
 
-    dom.body.classList.remove("is-standby");
+    dom.body.classList.remove(
+      "is-standby"
+    );
 
-    dom.standby?.classList.remove("is-active");
+    dom.standby?.classList.remove(
+      "is-active"
+    );
 
     dom.standby?.setAttribute(
       "aria-hidden",
       "true"
     );
 
-    dom.standby?.setAttribute("inert", "");
+    dom.standby?.setAttribute(
+      "inert",
+      ""
+    );
 
     if (
       restoreFocus &&
-      st.standbyReturn instanceof HTMLElement
+      st.standbyReturn instanceof
+        HTMLElement
     ) {
       st.standbyReturn.focus();
     }
@@ -910,7 +1242,9 @@
 
     dom.standbyWake?.addEventListener(
       "click",
-      () => closeStandby()
+      () => {
+        closeStandby();
+      }
     );
 
     [
@@ -927,7 +1261,8 @@
           }
         },
         {
-          passive:eventName !== "keydown"
+          passive:
+            eventName !== "keydown"
         }
       );
     });
@@ -935,7 +1270,10 @@
     document.addEventListener(
       "visibilitychange",
       () => {
-        if (document.visibilityState === "hidden") {
+        if (
+          document.visibilityState ===
+          "hidden"
+        ) {
           clearStandbyTimer();
         } else if (!st.standby) {
           resetStandby();
@@ -955,42 +1293,67 @@
     if (!dom.sections.length) return;
 
     const first =
-      dom.sections[0].getBoundingClientRect();
+      dom.sections[0];
 
     const last =
-      dom.sections[dom.sections.length - 1]
-        .getBoundingClientRect();
+      dom.sections[
+        dom.sections.length - 1
+      ];
+
+    const firstTop =
+      window.scrollY +
+      first.getBoundingClientRect().top;
+
+    const lastBottom =
+      window.scrollY +
+      last.getBoundingClientRect().bottom;
 
     const total =
       Math.max(
         1,
-        last.bottom - first.top
+        lastBottom - firstTop
       );
 
     const current =
-      window.scrollY -
-      (window.scrollY + first.top);
+      window.scrollY +
+      window.innerHeight * 0.42 -
+      firstTop;
 
     const progress =
       Math.max(
         0,
-        Math.min(1, current / total)
+        Math.min(
+          1,
+          current / total
+        )
       );
 
-    st.traj.tp = progress;
+    st.traj.tp =
+      progress;
+
     st.traj.td =
-      Math.sin(progress * Math.PI * 2) *
+      Math.sin(
+        progress *
+        Math.PI *
+        2
+      ) *
       CFG.trajectoryDrift;
   }
 
 
   function trajectoryFrame() {
     st.traj.p +=
-      (st.traj.tp - st.traj.p) *
+      (
+        st.traj.tp -
+        st.traj.p
+      ) *
       CFG.trajectoryLerp;
 
     st.traj.d +=
-      (st.traj.td - st.traj.d) *
+      (
+        st.traj.td -
+        st.traj.d
+      ) *
       CFG.trajectoryLerp;
 
     dom.body.style.setProperty(
@@ -1005,23 +1368,22 @@
   ======================================================== */
 
   function animationFrame() {
-    trajectoryTargets();
     trajectoryFrame();
 
-    wowUpdate();
-
     st.raf =
-      requestAnimationFrame(animationFrame);
+      requestAnimationFrame(
+        animationFrame
+      );
   }
 
 
   function animationInit() {
-    if (st.reduced) {
-      return;
-    }
+    if (st.reduced) return;
 
     st.raf =
-      requestAnimationFrame(animationFrame);
+      requestAnimationFrame(
+        animationFrame
+      );
   }
 
 
@@ -1030,9 +1392,7 @@
   ======================================================== */
 
   function hashInit() {
-
     const applyHash = () => {
-
       const hash =
         window.location.hash;
 
@@ -1050,7 +1410,7 @@
 
       window.setTimeout(() => {
         goTo(index, {
-          instant:true
+          instant: true
         });
       }, 100);
     };
@@ -1069,13 +1429,11 @@
   ======================================================== */
 
   function keyboardInit() {
-
     document.addEventListener(
       "keydown",
       event => {
 
         if (event.key === "Escape") {
-
           if (st.menuOpen) {
             menuClose();
             return;
@@ -1089,9 +1447,7 @@
         }
 
         if (st.menuOpen) {
-
           if (event.key === "Tab") {
-
             const focusable =
               dom.menu.querySelectorAll(
                 "a,button,[tabindex]:not([tabindex='-1'])"
@@ -1103,7 +1459,9 @@
               focusable[0];
 
             const last =
-              focusable[focusable.length - 1];
+              focusable[
+                focusable.length - 1
+              ];
 
             if (
               event.shiftKey &&
@@ -1160,13 +1518,11 @@
   ======================================================== */
 
   function scrollInit() {
-
     let ticking = false;
 
     window.addEventListener(
       "scroll",
       () => {
-
         resetStandby();
 
         if (ticking) return;
@@ -1176,12 +1532,12 @@
         requestAnimationFrame(() => {
           activeDetect();
           trajectoryTargets();
+
           ticking = false;
         });
-
       },
       {
-        passive:true
+        passive: true
       }
     );
   }
@@ -1192,26 +1548,21 @@
   ======================================================== */
 
   function resizeInit() {
-
     window.addEventListener(
       "resize",
       () => {
-
         window.clearTimeout(
           st.resizeTimer
         );
 
         st.resizeTimer =
           window.setTimeout(() => {
-
             trajectoryTargets();
             wowUpdate(true);
-
           }, CFG.resizeDebounce);
-
       },
       {
-        passive:true
+        passive: true
       }
     );
   }
@@ -1222,40 +1573,50 @@
   ======================================================== */
 
   function setInitial() {
-
     if (!dom.sections.length) return;
 
     st.active = 0;
 
     if (dom.progressCurrent) {
       dom.progressCurrent.textContent =
-        dom.sections[0].dataset.sectionTitle ||
+        dom.sections[0]
+          .dataset.sectionTitle ||
         "";
     }
 
     if (dom.progressFill) {
-      dom.progressFill.style.width = "0%";
+      dom.progressFill.style.width =
+        "0%";
     }
 
     if (dom.progressPoint) {
-      dom.progressPoint.style.left = "0%";
+      dom.progressPoint.style.left =
+        "0%";
     }
 
     if (dom.previous) {
-      dom.previous.classList.add("is-disabled");
+      dom.previous.classList.add(
+        "is-disabled"
+      );
+
       dom.previous.setAttribute(
         "aria-hidden",
         "true"
       );
+
       dom.previous.setAttribute(
         "tabindex",
         "-1"
       );
     }
 
-    if (dom.next) {
+    if (
+      dom.next &&
+      dom.nextLabel
+    ) {
       dom.next.href = "#02";
-      dom.nextLabel.textContent = "02";
+      dom.nextLabel.textContent =
+        "02";
     }
   }
 
@@ -1265,7 +1626,6 @@
   ======================================================== */
 
   function init() {
-
     motionInit();
 
     setInitial();
@@ -1310,11 +1670,14 @@
      BOOT
   ======================================================== */
 
-  if (document.readyState === "loading") {
+  if (
+    document.readyState ===
+    "loading"
+  ) {
     document.addEventListener(
       "DOMContentLoaded",
       init,
-      { once:true }
+      { once: true }
     );
   } else {
     init();
