@@ -1,192 +1,144 @@
-/* =========================================================
-   CESARE PARATORE — HOME
-   script.js
-   ========================================================= */
-
 (() => {
   "use strict";
 
-  /* =======================================================
+  /* =========================================================
+     CESARE PARATORE
+     MASTER — COPY LOCKED / PRE-CODE
+     JAVASCRIPT
+     ========================================================= */
+
+
+  /* =========================================================
      01 — DOM
-     ======================================================= */
+     ========================================================= */
 
   const body = document.body;
 
-  const loader = document.querySelector(".loader");
+  const loader = document.getElementById("loader");
 
-  const menuToggle = document.querySelector("[data-menu-toggle]");
-  const menuClose = document.querySelector("[data-menu-close]");
-  const globalMenu = document.querySelector(".global-menu");
-  const globalMenuLinks = document.querySelectorAll(".global-menu a");
+  const header = document.getElementById("site-header");
 
-  const pageTurn = document.querySelector(".page-turn");
-  const pageTurnTitle = document.querySelector(".page-turn__title");
-  const pageTurnMarker = document.querySelector(".page-turn__marker");
-  const pageTurnPrev = document.querySelector("[data-page-prev]");
-  const pageTurnNext = document.querySelector("[data-page-next]");
+  const menuToggle = document.getElementById("menu-toggle");
+  const globalMenu = document.getElementById("global-menu");
+
+  const sectionNavigation =
+    document.getElementById("section-navigation");
+
+  const sectionNavigationTitle =
+    document.getElementById("section-navigation-title");
+
+  const sectionNavigationMarker =
+    document.getElementById("section-navigation-marker");
+
+  const sectionPrev =
+    document.getElementById("section-prev");
+
+  const sectionNext =
+    document.getElementById("section-next");
+
+  const standby =
+    document.getElementById("standby");
 
   const sections = Array.from(
     document.querySelectorAll("[data-section]")
   );
 
   const revealElements = Array.from(
-    document.querySelectorAll(".reveal")
-  );
-
-  const standby = document.querySelector(".standby");
-
-  const prefersReducedMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)"
+    document.querySelectorAll("[data-reveal]")
   );
 
 
-  /* =======================================================
+  /* =========================================================
      02 — STATE
-     ======================================================= */
+     ========================================================= */
 
   let currentSectionIndex = 0;
 
-  let menuIsOpen = false;
+  let isMenuOpen = false;
+
+  let isStandbyActive = false;
+
+  let loaderComplete = false;
 
   let standbyTimer = null;
 
-  let standbyActive = false;
+  let scrollTimer = null;
 
-  let lastScrollY = 0;
+  let lastScrollY = window.scrollY;
 
-  let loaderFinished = false;
+  let isProgrammaticScroll = false;
 
 
-  /* =======================================================
+  /* =========================================================
      03 — HELPERS
-     ======================================================= */
+     ========================================================= */
 
   const clamp = (value, min, max) => {
     return Math.min(Math.max(value, min), max);
   };
 
 
-  const getHeaderHeight = () => {
-    const header = document.querySelector(".site-header");
-
-    if (!header) {
-      return 0;
-    }
-
-    return header.getBoundingClientRect().height;
-  };
-
-
   const getSectionTop = (section) => {
+    const headerHeight =
+      header?.getBoundingClientRect().height || 0;
+
     const rect = section.getBoundingClientRect();
 
-    return (
-      window.scrollY +
-      rect.top -
-      getHeaderHeight()
-    );
+    return window.scrollY + rect.top - headerHeight;
   };
 
 
-  const scrollToSection = (index) => {
-    if (!sections.length) {
-      return;
-    }
-
-    const safeIndex = clamp(
-      index,
-      0,
-      sections.length - 1
-    );
-
-    const section = sections[safeIndex];
-
-    if (!section) {
-      return;
-    }
-
-    const top = Math.max(
-      0,
-      getSectionTop(section)
-    );
-
-    window.scrollTo({
-      top,
-      behavior: prefersReducedMotion.matches
-        ? "auto"
-        : "smooth"
-    });
-  };
-
-
-  const setBodyLocked = (locked) => {
+  const updateBodyState = () => {
     body.classList.toggle(
-      "is-locked",
-      locked
+      "is-menu-open",
+      isMenuOpen
+    );
+
+    body.classList.toggle(
+      "is-standby",
+      isStandbyActive
     );
   };
 
 
-  /* =======================================================
+  /* =========================================================
      04 — LOADER
-     ======================================================= */
-
-  const finishLoader = () => {
-    if (loaderFinished) {
-      return;
-    }
-
-    loaderFinished = true;
-
-    if (!loader) {
-      return;
-    }
-
-    loader.classList.add("is-hidden");
-
-    window.setTimeout(() => {
-      loader.setAttribute("aria-hidden", "true");
-    }, 1000);
-  };
-
+     ========================================================= */
 
   const startLoader = () => {
     if (!loader) {
-      loaderFinished = true;
+      loaderComplete = true;
       return;
     }
 
-    if (prefersReducedMotion.matches) {
-      window.setTimeout(
-        finishLoader,
-        500
-      );
+    body.classList.add("is-loading");
 
-      return;
-    }
+    requestAnimationFrame(() => {
+      loader.classList.add("is-active");
+    });
 
-    /*
-     * The visual sequence is controlled primarily
-     * by CSS animations. JS only controls when the
-     * threshold disappears.
-     */
-    window.setTimeout(
-      finishLoader,
-      2600
-    );
+    window.setTimeout(() => {
+      loader.classList.add("is-hidden");
+
+      body.classList.remove("is-loading");
+
+      loaderComplete = true;
+
+      startStandbyTimer();
+    }, 2600);
   };
 
 
-  /* =======================================================
-     05 — GLOBAL MENU
-     ======================================================= */
+  /* =========================================================
+     05 — MENU
+     ========================================================= */
 
   const openMenu = () => {
-    if (!globalMenu || menuIsOpen) {
+    if (!globalMenu || !menuToggle) {
       return;
     }
 
-    menuIsOpen = true;
+    isMenuOpen = true;
 
     globalMenu.classList.add("is-open");
 
@@ -195,25 +147,23 @@
       "false"
     );
 
-    if (menuToggle) {
-      menuToggle.setAttribute(
-        "aria-expanded",
-        "true"
-      );
-    }
+    menuToggle.setAttribute(
+      "aria-expanded",
+      "true"
+    );
 
-    setBodyLocked(true);
+    updateBodyState();
 
-    resetStandbyTimer();
+    stopStandbyTimer();
   };
 
 
   const closeMenu = () => {
-    if (!globalMenu || !menuIsOpen) {
+    if (!globalMenu || !menuToggle) {
       return;
     }
 
-    menuIsOpen = false;
+    isMenuOpen = false;
 
     globalMenu.classList.remove("is-open");
 
@@ -222,60 +172,86 @@
       "true"
     );
 
-    if (menuToggle) {
-      menuToggle.setAttribute(
-        "aria-expanded",
-        "false"
-      );
-    }
+    menuToggle.setAttribute(
+      "aria-expanded",
+      "false"
+    );
 
-    setBodyLocked(false);
+    updateBodyState();
 
-    resetStandbyTimer();
+    startStandbyTimer();
   };
 
 
-  if (menuToggle) {
-    menuToggle.addEventListener(
-      "click",
-      openMenu
-    );
-  }
-
-
-  if (menuClose) {
-    menuClose.addEventListener(
-      "click",
-      closeMenu
-    );
-  }
-
-
-  globalMenuLinks.forEach((link) => {
-    link.addEventListener(
-      "click",
-      () => {
-        closeMenu();
-      }
-    );
-  });
-
-
-  document.addEventListener(
-    "keydown",
-    (event) => {
-      if (event.key === "Escape" && menuIsOpen) {
-        closeMenu();
-      }
+  const toggleMenu = () => {
+    if (isMenuOpen) {
+      closeMenu();
+    } else {
+      openMenu();
     }
+  };
+
+
+  menuToggle?.addEventListener(
+    "click",
+    toggleMenu
   );
 
 
-  /* =======================================================
-     06 — PAGE TURN
-     ======================================================= */
+  globalMenu?.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => {
+      closeMenu();
+    });
+  });
 
-  const updatePageTurn = (index) => {
+
+  /* =========================================================
+     06 — SECTION NAVIGATION
+     ========================================================= */
+
+  const updateSectionNavigation = () => {
+    if (!sections.length) {
+      return;
+    }
+
+    const currentSection =
+      sections[currentSectionIndex];
+
+    if (!currentSection) {
+      return;
+    }
+
+    const title =
+      currentSection.dataset.sectionTitle || "";
+
+    if (sectionNavigationTitle) {
+      sectionNavigationTitle.textContent = title;
+    }
+
+    if (sectionPrev) {
+      sectionPrev.disabled =
+        currentSectionIndex === 0;
+    }
+
+    if (sectionNext) {
+      sectionNext.disabled =
+        currentSectionIndex === sections.length - 1;
+    }
+
+    if (sectionNavigationMarker) {
+      const progress =
+        sections.length <= 1
+          ? 0
+          : currentSectionIndex /
+            (sections.length - 1);
+
+      sectionNavigationMarker.style.left =
+        `${progress * 100}%`;
+    }
+  };
+
+
+  const setCurrentSection = (index) => {
     if (!sections.length) {
       return;
     }
@@ -286,365 +262,309 @@
       sections.length - 1
     );
 
-    const section =
-      sections[currentSectionIndex];
-
-    if (!section) {
-      return;
-    }
-
-    const title =
-      section.dataset.sectionTitle ||
-      section.getAttribute("aria-label") ||
-      "";
-
-    if (pageTurnTitle) {
-      pageTurnTitle.textContent = title;
-    }
-
-    if (pageTurnMarker) {
-      const percentage =
-        sections.length <= 1
-          ? 0
-          : currentSectionIndex /
-            (sections.length - 1);
-
-      pageTurnMarker.style.left =
-        `${percentage * 100}%`;
-    }
-
-    if (pageTurnPrev) {
-      pageTurnPrev.disabled =
-        currentSectionIndex === 0;
-
-      pageTurnPrev.setAttribute(
-        "aria-disabled",
-        String(currentSectionIndex === 0)
-      );
-    }
-
-    if (pageTurnNext) {
-      pageTurnNext.disabled =
-        currentSectionIndex ===
-        sections.length - 1;
-
-      pageTurnNext.setAttribute(
-        "aria-disabled",
-        String(
-          currentSectionIndex ===
-          sections.length - 1
-        )
-      );
-    }
+    updateSectionNavigation();
   };
 
 
-  const goToPreviousSection = () => {
-    if (currentSectionIndex <= 0) {
+  const scrollToSection = (index) => {
+    if (!sections[index]) {
       return;
     }
 
-    scrollToSection(
-      currentSectionIndex - 1
-    );
+    setCurrentSection(index);
+
+    const targetTop =
+      getSectionTop(sections[index]);
+
+    isProgrammaticScroll = true;
+
+    window.scrollTo({
+      top: Math.max(0, targetTop),
+      behavior: "smooth"
+    });
+
+    window.setTimeout(() => {
+      isProgrammaticScroll = false;
+    }, 900);
   };
 
 
-  const goToNextSection = () => {
-    if (
-      currentSectionIndex >=
-      sections.length - 1
-    ) {
-      return;
-    }
-
-    scrollToSection(
-      currentSectionIndex + 1
-    );
-  };
-
-
-  if (pageTurnPrev) {
-    pageTurnPrev.addEventListener(
-      "click",
-      goToPreviousSection
-    );
-  }
-
-
-  if (pageTurnNext) {
-    pageTurnNext.addEventListener(
-      "click",
-      goToNextSection
-    );
-  }
-
-
-  /* =======================================================
-     07 — SECTION OBSERVER
-     ======================================================= */
-
-  if ("IntersectionObserver" in window) {
-    const sectionObserver =
-      new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) {
-              return;
-            }
-
-            const index =
-              sections.indexOf(entry.target);
-
-            if (index === -1) {
-              return;
-            }
-
-            updatePageTurn(index);
-          });
-        },
-        {
-          root: null,
-
-          /*
-           * The center of the viewport becomes
-           * the narrative reference point.
-           */
-          rootMargin:
-            "-35% 0px -35% 0px",
-
-          threshold: 0
-        }
-      );
-
-    sections.forEach((section) => {
-      sectionObserver.observe(section);
-    });
-  } else {
-    updatePageTurn(0);
-  }
-
-
-  /* =======================================================
-     08 — REVEAL OBSERVER
-     ======================================================= */
-
-  if (
-    "IntersectionObserver" in window &&
-    !prefersReducedMotion.matches
-  ) {
-    const revealObserver =
-      new IntersectionObserver(
-        (entries, observer) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) {
-              return;
-            }
-
-            entry.target.classList.add(
-              "is-visible"
-            );
-
-            observer.unobserve(
-              entry.target
-            );
-          });
-        },
-        {
-          root: null,
-          rootMargin: "0px 0px -10% 0px",
-          threshold: 0.05
-        }
-      );
-
-    revealElements.forEach((element) => {
-      revealObserver.observe(element);
-    });
-  } else {
-    revealElements.forEach((element) => {
-      element.classList.add(
-        "is-visible"
-      );
-    });
-  }
-
-
-  /* =======================================================
-     09 — KEYBOARD NAVIGATION
-     ======================================================= */
-
-  document.addEventListener(
-    "keydown",
-    (event) => {
-      /*
-       * Do not hijack keyboard input while the
-       * user is interacting with form fields.
-       */
-      const target = event.target;
-
-      const isTyping =
-        target instanceof HTMLInputElement ||
-        target instanceof HTMLTextAreaElement ||
-        target instanceof HTMLSelectElement ||
-        target.isContentEditable;
-
-      if (isTyping || menuIsOpen) {
-        return;
-      }
-
-      if (
-        event.key === "ArrowDown" ||
-        event.key === "PageDown"
-      ) {
-        event.preventDefault();
-
-        goToNextSection();
-
-        return;
-      }
-
-      if (
-        event.key === "ArrowUp" ||
-        event.key === "PageUp"
-      ) {
-        event.preventDefault();
-
-        goToPreviousSection();
-
-        return;
-      }
-
-      if (event.key === "Home") {
-        event.preventDefault();
-
-        scrollToSection(0);
-
-        return;
-      }
-
-      if (event.key === "End") {
-        event.preventDefault();
-
+  sectionPrev?.addEventListener(
+    "click",
+    () => {
+      if (currentSectionIndex > 0) {
         scrollToSection(
-          sections.length - 1
+          currentSectionIndex - 1
         );
       }
     }
   );
 
 
-  /* =======================================================
-     10 — STANDBY
-     ======================================================= */
+  sectionNext?.addEventListener(
+    "click",
+    () => {
+      if (
+        currentSectionIndex <
+        sections.length - 1
+      ) {
+        scrollToSection(
+          currentSectionIndex + 1
+        );
+      }
+    }
+  );
 
-  const showStandby = () => {
-    if (!standby || standbyActive) {
+
+  /* =========================================================
+     07 — SECTION OBSERVER
+     ========================================================= */
+
+  const sectionObserver =
+    new IntersectionObserver(
+      (entries) => {
+        const visibleEntries =
+          entries
+            .filter(
+              (entry) =>
+                entry.isIntersecting
+            )
+            .sort(
+              (a, b) =>
+                b.intersectionRatio -
+                a.intersectionRatio
+            );
+
+        if (!visibleEntries.length) {
+          return;
+        }
+
+        const section =
+          visibleEntries[0].target;
+
+        const index =
+          sections.indexOf(section);
+
+        if (index === -1) {
+          return;
+        }
+
+        setCurrentSection(index);
+      },
+      {
+        root: null,
+        rootMargin: "-30% 0px -30% 0px",
+        threshold: [0.1, 0.25, 0.5, 0.75]
+      }
+    );
+
+
+  sections.forEach((section) => {
+    sectionObserver.observe(section);
+  });
+
+
+  /* =========================================================
+     08 — SECTION NAVIGATION VISIBILITY
+     ========================================================= */
+
+  const updateSectionNavigationVisibility = () => {
+    if (!sectionNavigation) {
       return;
     }
 
-    if (menuIsOpen) {
+    const scrollY = window.scrollY;
+
+    const firstSection =
+      sections[0];
+
+    if (!firstSection) {
       return;
     }
 
-    standbyActive = true;
+    const firstSectionBottom =
+      firstSection.offsetTop +
+      firstSection.offsetHeight;
 
-    lastScrollY = window.scrollY;
+    const shouldShow =
+      scrollY > firstSectionBottom * 0.15;
 
-    standby.classList.add(
-      "is-visible"
+    sectionNavigation.classList.toggle(
+      "is-visible",
+      shouldShow
     );
-
-    standby.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-    setBodyLocked(true);
   };
 
 
-  const hideStandby = () => {
-    if (!standby || !standbyActive) {
+  /* =========================================================
+     09 — HEADER VISIBILITY
+     ========================================================= */
+
+  const updateHeaderVisibility = () => {
+    if (!header || isMenuOpen) {
       return;
     }
 
-    standbyActive = false;
+    const currentScrollY =
+      window.scrollY;
 
-    standby.classList.remove(
-      "is-visible"
-    );
+    if (currentScrollY <= 20) {
+      header.classList.remove("is-hidden");
+      lastScrollY = currentScrollY;
+      return;
+    }
 
-    standby.setAttribute(
-      "aria-hidden",
-      "true"
-    );
+    const difference =
+      currentScrollY - lastScrollY;
 
-    setBodyLocked(false);
+    if (difference > 8) {
+      header.classList.add("is-hidden");
+    }
 
-    window.requestAnimationFrame(() => {
-      window.scrollTo({
-        top: lastScrollY,
-        behavior: "auto"
-      });
-    });
+    if (difference < -8) {
+      header.classList.remove("is-hidden");
+    }
 
-    resetStandbyTimer();
+    lastScrollY = currentScrollY;
   };
 
 
-  const resetStandbyTimer = () => {
-    if (!standby) {
-      return;
-    }
+  /* =========================================================
+     10 — REVEAL
+     ========================================================= */
 
+  const revealObserver =
+    new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) {
+            return;
+          }
+
+          entry.target.classList.add(
+            "is-visible"
+          );
+
+          observer.unobserve(
+            entry.target
+          );
+        });
+      },
+      {
+        root: null,
+        rootMargin: "0px 0px -10% 0px",
+        threshold: 0.08
+      }
+    );
+
+
+  revealElements.forEach((element) => {
+    revealObserver.observe(element);
+  });
+
+
+  /* =========================================================
+     11 — STANDBY / QUIET MODE
+     ========================================================= */
+
+  const stopStandbyTimer = () => {
     if (standbyTimer) {
       window.clearTimeout(
         standbyTimer
       );
-    }
 
-    if (standbyActive || menuIsOpen) {
-      return;
+      standbyTimer = null;
     }
-
-    standbyTimer = window.setTimeout(
-      showStandby,
-      40000
-    );
   };
 
 
-  if (standby) {
-    standby.addEventListener(
-      "click",
-      hideStandby
+  const startStandbyTimer = () => {
+    stopStandbyTimer();
+
+    if (
+      !loaderComplete ||
+      isMenuOpen ||
+      isStandbyActive
+    ) {
+      return;
+    }
+
+    standbyTimer = window.setTimeout(() => {
+      activateStandby();
+    }, 40000);
+  };
+
+
+  const activateStandby = () => {
+    if (
+      isMenuOpen ||
+      isStandbyActive
+    ) {
+      return;
+    }
+
+    isStandbyActive = true;
+
+    standby?.classList.add(
+      "is-active"
     );
 
-    standby.addEventListener(
-      "pointerdown",
-      hideStandby
+    standby?.setAttribute(
+      "aria-hidden",
+      "false"
     );
-  }
+
+    updateBodyState();
+  };
+
+
+  const deactivateStandby = () => {
+    if (!isStandbyActive) {
+      return;
+    }
+
+    isStandbyActive = false;
+
+    standby?.classList.remove(
+      "is-active"
+    );
+
+    standby?.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    updateBodyState();
+
+    startStandbyTimer();
+  };
+
+
+  const registerActivity = () => {
+    if (isStandbyActive) {
+      deactivateStandby();
+      return;
+    }
+
+    if (
+      loaderComplete &&
+      !isMenuOpen
+    ) {
+      startStandbyTimer();
+    }
+  };
 
 
   [
-    "mousemove",
     "pointermove",
-    "wheel",
+    "pointerdown",
     "touchstart",
-    "touchmove",
     "keydown",
-    "scroll"
+    "wheel"
   ].forEach((eventName) => {
     window.addEventListener(
       eventName,
-      () => {
-        if (standbyActive) {
-          return;
-        }
-
-        resetStandbyTimer();
-      },
+      registerActivity,
       {
         passive: true
       }
@@ -652,64 +572,89 @@
   });
 
 
-  /* =======================================================
-     11 — PAGE TURN VISIBILITY
-     ======================================================= */
+  /* =========================================================
+     12 — KEYBOARD NAVIGATION
+     ========================================================= */
 
-  let pageTurnVisibilityTimer = null;
+  window.addEventListener(
+    "keydown",
+    (event) => {
 
-  const showPageTurn = () => {
-    if (!pageTurn) {
-      return;
+      if (event.key === "Escape") {
+
+        if (isMenuOpen) {
+          closeMenu();
+          return;
+        }
+
+        if (isStandbyActive) {
+          deactivateStandby();
+          return;
+        }
+      }
+
+
+      if (
+        event.key === "ArrowRight" &&
+        !isMenuOpen &&
+        !isStandbyActive
+      ) {
+        if (
+          currentSectionIndex <
+          sections.length - 1
+        ) {
+          scrollToSection(
+            currentSectionIndex + 1
+          );
+        }
+      }
+
+
+      if (
+        event.key === "ArrowLeft" &&
+        !isMenuOpen &&
+        !isStandbyActive
+      ) {
+        if (currentSectionIndex > 0) {
+          scrollToSection(
+            currentSectionIndex - 1
+          );
+        }
+      }
     }
-
-    pageTurn.classList.remove(
-      "is-hidden"
-    );
-  };
+  );
 
 
-  const hidePageTurnTemporarily = () => {
-    if (!pageTurn || menuIsOpen) {
-      return;
-    }
-
-    pageTurn.classList.add(
-      "is-hidden"
-    );
-
-    if (pageTurnVisibilityTimer) {
-      window.clearTimeout(
-        pageTurnVisibilityTimer
-      );
-    }
-
-    pageTurnVisibilityTimer =
-      window.setTimeout(
-        showPageTurn,
-        1400
-      );
-  };
-
-
-  let scrollTimeout = null;
+  /* =========================================================
+     13 — SCROLL
+     ========================================================= */
 
   window.addEventListener(
     "scroll",
     () => {
-      hidePageTurnTemporarily();
 
-      if (scrollTimeout) {
-        window.clearTimeout(
-          scrollTimeout
+      if (scrollTimer) {
+        window.cancelAnimationFrame(
+          scrollTimer
         );
       }
 
-      scrollTimeout =
-        window.setTimeout(
-          showPageTurn,
-          500
-        );
+      scrollTimer =
+        window.requestAnimationFrame(() => {
+
+          updateSectionNavigationVisibility();
+
+          updateHeaderVisibility();
+
+          if (
+            !isProgrammaticScroll &&
+            !isMenuOpen &&
+            !isStandbyActive
+          ) {
+            startStandbyTimer();
+          }
+
+        });
     },
     {
       passive: true
@@ -717,69 +662,15 @@
   );
 
 
-  /* =======================================================
-     12 — INITIAL STATE
-     ======================================================= */
-
-  updatePageTurn(0);
-
-  /*
-   * Avoid restoring a previous scroll position when
-   * entering the Home.
-   */
-  if ("scrollRestoration" in history) {
-    history.scrollRestoration =
-      "manual";
-  }
-
-  window.scrollTo(0, 0);
-
-  resetStandbyTimer();
-
-  startLoader();
-
-
-  /* =======================================================
-     13 — INITIAL REVEAL
-     ======================================================= */
-
-  if (prefersReducedMotion.matches) {
-    revealElements.forEach((element) => {
-      element.classList.add(
-        "is-visible"
-      );
-    });
-  }
-
-
-  /* =======================================================
+  /* =========================================================
      14 — RESIZE
-     ======================================================= */
-
-  let resizeTimer = null;
+     ========================================================= */
 
   window.addEventListener(
     "resize",
     () => {
-      if (resizeTimer) {
-        window.clearTimeout(
-          resizeTimer
-        );
-      }
-
-      resizeTimer =
-        window.setTimeout(
-          () => {
-            /*
-             * Recalculate the current narrative
-             * state after viewport changes.
-             */
-            updatePageTurn(
-              currentSectionIndex
-            );
-          },
-          150
-        );
+      updateSectionNavigation();
+      updateSectionNavigationVisibility();
     },
     {
       passive: true
@@ -787,72 +678,42 @@
   );
 
 
-  /* =======================================================
+  /* =========================================================
      15 — VISIBILITY
-     ======================================================= */
+     ========================================================= */
 
   document.addEventListener(
     "visibilitychange",
     () => {
-      if (
-        document.visibilityState ===
-        "hidden"
-      ) {
-        if (standbyTimer) {
-          window.clearTimeout(
-            standbyTimer
-          );
-        }
 
+      if (document.hidden) {
+        stopStandbyTimer();
         return;
       }
 
-      resetStandbyTimer();
+      if (
+        loaderComplete &&
+        !isMenuOpen &&
+        !isStandbyActive
+      ) {
+        startStandbyTimer();
+      }
     }
   );
 
 
-  /* =======================================================
-     16 — MENU LINK SAFETY
-     ======================================================= */
+  /* =========================================================
+     16 — INITIAL STATE
+     ========================================================= */
 
-  globalMenuLinks.forEach((link) => {
-    link.addEventListener(
-      "click",
-      () => {
-        /*
-         * Give the overlay enough time to disappear
-         * before the browser navigates.
-         */
-        globalMenu.classList.remove(
-          "is-open"
-        );
+  setCurrentSection(0);
 
-        menuIsOpen = false;
+  updateSectionNavigationVisibility();
 
-        setBodyLocked(false);
-      }
-    );
-  });
+  updateHeaderVisibility();
 
+  updateBodyState();
 
-  /* =======================================================
-     17 — EXPOSE MINIMAL DEBUG STATE
-     ======================================================= */
-
-  /*
-   * Useful during development without creating
-   * a visible debug interface.
-   */
-  window.CesareHome = {
-    getCurrentSection: () =>
-      currentSectionIndex,
-
-    getSections: () =>
-      sections,
-
-    goToSection: (index) =>
-      scrollToSection(index)
-  };
+  startLoader();
 
 })();
