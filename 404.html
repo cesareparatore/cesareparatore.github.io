@@ -1,445 +1,295 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-
-  <title>404 — Direzione non trovata | Cesare Paratore</title>
+  <meta charset="UTF-8">
 
   <meta
-    name="description"
-    content="Questa direzione non è stata trovata. Torna al percorso di Cesare Paratore — Movimento con Direzione."
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
   >
-  <meta name="author" content="Cesare Paratore">
-  <meta name="robots" content="noindex, follow">
-  <meta name="theme-color" content="#F2EFE8">
-  <meta name="color-scheme" content="light">
 
-  <link rel="icon" type="image/png" href="/assets/images/cp-mark.png">
+  <meta
+    name="robots"
+    content="noindex, nofollow"
+  >
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <meta
+    name="theme-color"
+    content="#F1EFE8"
+  >
+
+  <title>Pagina non trovata — Cesare Paratore</title>
 
   <link
-    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap"
     rel="stylesheet"
+    href="css/style.css"
   >
 
   <style>
-    :root {
-      --ivory: #F2EFE8;
-      --ink: #11110F;
-      --terracotta: #A64232;
-      --sand: #C9C0AF;
-      --stone: #77736B;
-
-      --font-serif: "Instrument Serif", Georgia, serif;
-      --font-sans: "DM Sans", Arial, sans-serif;
-      --font-mono: "DM Mono", monospace;
-
-      --ease-out: cubic-bezier(.16,1,.3,1);
-    }
-
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-    }
-
-    html {
-      min-height: 100%;
-      background: var(--ivory);
-    }
-
-    body {
-      min-height: 100svh;
-      margin: 0;
-      overflow-x: hidden;
-      background: var(--ivory);
-      color: var(--ink);
-      font-family: var(--font-sans);
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-    }
-
-    a,
-    button {
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    a {
-      color: inherit;
-    }
-
-    :focus {
-      outline: none;
-    }
-
-    :focus-visible {
-      outline: 2px solid var(--terracotta);
-      outline-offset: 6px;
-    }
+    /* =====================================================
+       404 — COHERENT ERROR PAGE
+       ===================================================== */
 
     .error-page {
-      position: relative;
       min-height: 100svh;
+
+      display: flex;
+      flex-direction: column;
+
+      background: #0B0B0A;
+      color: #F1EFE8;
+    }
+
+    .error-page__header {
+      height: 76px;
+
       display: flex;
       align-items: center;
-      padding: clamp(32px, 6vw, 80px);
+      justify-content: space-between;
+
+      padding: 0 5vw;
+
+      background: #F1EFE8;
+      color: #0B0B0A;
     }
 
-    .error-inner {
-      position: relative;
-      width: min(100%, 1500px);
-      margin: 0 auto;
-    }
+    .error-page__brand {
+      width: 42px;
+      height: 42px;
 
-    .error-mark {
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-
-    .error-mark img {
-      width: 48px;
-      height: 48px;
-      object-fit: contain;
-    }
-
-    .error-content {
-      width: min(100%, 1050px);
-      margin: 0 auto;
-      padding-top: clamp(70px, 10vw, 120px);
-    }
-
-    .error-index {
-      margin: 0 0 clamp(32px, 5vw, 64px);
-
-      color: var(--stone);
-      font-family: var(--font-mono);
-      font-size: 10px;
-      font-weight: 500;
-      letter-spacing: .14em;
-      line-height: 1.4;
-      text-transform: uppercase;
-    }
-
-    .error-title {
-      margin: 0;
-
-      font-family: var(--font-serif);
-      font-size: clamp(72px, 14vw, 210px);
-      font-weight: 400;
-      letter-spacing: -.055em;
-      line-height: .76;
-    }
-
-    .error-title span {
-      display: block;
-    }
-
-    .error-title .accent {
-      color: var(--terracotta);
-    }
-
-    .error-copy {
-      width: min(100%, 620px);
-      margin-top: clamp(56px, 8vw, 100px);
-
-      font-size: clamp(18px, 1.5vw, 23px);
-      line-height: 1.7;
-    }
-
-    .error-copy p {
-      margin: 0 0 1.35em;
-    }
-
-    .error-copy p:last-child {
-      margin-bottom: 0;
-    }
-
-    .error-emphasis {
-      font-family: var(--font-serif);
-      font-size: 1.35em;
-      line-height: 1.2;
-    }
-
-    .error-path {
-      position: relative;
-      width: min(100%, 900px);
-      height: 110px;
-      margin-top: clamp(50px, 7vw, 90px);
-    }
-
-    .error-line {
-      position: absolute;
-      left: 0;
-      right: 10%;
-      top: 50%;
-      height: 1px;
-
-      background: var(--sand);
-
-      transform: rotate(-3deg);
-      transform-origin: left center;
-    }
-
-    .error-point {
-      position: absolute;
-      right: 9.5%;
-      top: 50%;
-
-      width: 13px;
-      height: 13px;
-
-      border-radius: 50%;
-      background: var(--terracotta);
-
-      transform: translate(50%, -50%);
-      box-shadow: 0 0 0 9px rgba(166, 66, 50, .07);
-    }
-
-    .error-path-label {
-      position: absolute;
-      left: 0;
-      top: calc(50% + 28px);
-
-      color: var(--stone);
-      font-family: var(--font-mono);
-      font-size: 9px;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-    }
-
-    .error-action {
       display: inline-flex;
       align-items: center;
-      gap: 18px;
-
-      min-height: 52px;
-      margin-top: clamp(32px, 5vw, 58px);
-      padding: 8px 0;
-
-      color: var(--ink);
-      font-family: var(--font-mono);
-      font-size: clamp(12px, 1.1vw, 15px);
-      font-weight: 500;
-      letter-spacing: .04em;
-      text-decoration: none;
-
-      transition:
-        color .3s ease,
-        gap .45s var(--ease-out);
+      justify-content: center;
     }
 
-    .error-action::after {
-      content: "";
-
-      position: absolute;
-      width: 0;
-      height: 1px;
-      margin-top: 48px;
-
-      background: currentColor;
-
-      transition: width .45s var(--ease-out);
+    .error-page__brand img {
+      width: 100%;
+      height: auto;
     }
 
-    .error-action-arrow {
-      font-size: 1.4em;
-
-      transition: transform .45s var(--ease-out);
+    .error-page__menu {
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
     }
 
-    .error-action:hover,
-    .error-action:focus-visible {
-      color: var(--terracotta);
-      gap: 24px;
+    .error-page__main {
+      flex: 1;
+
+      display: flex;
+      align-items: center;
+
+      padding:
+        10vh 5vw
+        calc(10vh + 60px);
     }
 
-    .error-action:hover::after,
-    .error-action:focus-visible::after {
-      width: 255px;
+    .error-page__content {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
     }
 
-    .error-action:hover .error-action-arrow,
-    .error-action:focus-visible .error-action-arrow {
-      transform: translateX(6px);
+    .error-page__code {
+      margin: 0;
+
+      font-size: clamp(7rem, 22vw, 20rem);
+      line-height: 0.78;
+      letter-spacing: -0.075em;
+      font-weight: 400;
     }
 
-    .error-signature {
-      position: absolute;
-      right: 0;
-      bottom: 0;
-
-      color: var(--stone);
-      font-family: var(--font-mono);
-      font-size: 9px;
-      letter-spacing: .16em;
+    .error-page__message {
+      width: min(42rem, 100%);
+      margin-top: clamp(3rem, 7vw, 7rem);
     }
 
-    @media (max-width: 820px) {
-      .error-page {
-        padding: 28px 20px 48px;
-      }
+    .error-page__message p {
+      margin: 0 0 1.5em;
 
-      .error-mark img {
-        width: 40px;
-        height: 40px;
-      }
-
-      .error-content {
-        padding-top: 88px;
-      }
-
-      .error-title {
-        font-size: clamp(68px, 17vw, 125px);
-      }
-
-      .error-copy {
-        margin-top: 58px;
-        font-size: 18px;
-      }
-
-      .error-path {
-        height: 90px;
-        margin-top: 58px;
-      }
-
-      .error-line {
-        right: 8%;
-      }
-
-      .error-point {
-        right: 7.5%;
-      }
-
-      .error-signature {
-        position: static;
-        margin-top: 72px;
-      }
+      font-size: clamp(1.15rem, 1.35vw, 1.5rem);
+      line-height: 1.5;
+      letter-spacing: -0.018em;
     }
 
-    @media (max-width: 420px) {
-      .error-page {
-        padding: 24px 16px 40px;
-      }
+    .error-page__back {
+      display: inline-block;
 
-      .error-content {
-        padding-top: 82px;
-      }
+      margin-top: 1rem;
 
-      .error-title {
-        font-size: clamp(60px, 19vw, 92px);
-      }
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
 
-      .error-copy {
-        margin-top: 52px;
-        font-size: 17px;
-        line-height: 1.65;
-      }
+      border-bottom: 1px solid currentColor;
+      padding-bottom: 0.35rem;
 
-      .error-path {
-        height: 80px;
-        margin-top: 48px;
-      }
-
-      .error-path-label {
-        top: calc(50% + 22px);
-        font-size: 8px;
-      }
-
-      .error-action {
-        font-size: 11px;
-      }
-
-      .error-action:hover::after,
-      .error-action:focus-visible::after {
-        width: 220px;
-      }
+      transition: opacity 220ms ease;
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      .error-action,
-      .error-action::after,
-      .error-action-arrow {
-        transition: none;
-      }
+    .error-page__back:hover {
+      opacity: 0.5;
     }
 
-    @media print {
-      .error-path {
-        display: none;
+    .error-page__footer {
+      min-height: 110px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 2rem 5vw;
+
+      background: #F1EFE8;
+      color: #0B0B0A;
+    }
+
+    .error-page__footer-brand {
+      width: 42px;
+      height: 42px;
+    }
+
+    .error-page__footer-brand img {
+      width: 100%;
+      height: auto;
+    }
+
+    .error-page__footer-name {
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+    }
+
+    @media (max-width: 600px) {
+
+      .error-page__header {
+        height: 64px;
+        padding: 0 20px;
+      }
+
+      .error-page__brand {
+        width: 36px;
+        height: 36px;
+      }
+
+      .error-page__main {
+        padding:
+          8vh 20px
+          calc(8vh + 50px);
+      }
+
+      .error-page__code {
+        font-size: clamp(6rem, 27vw, 10rem);
+      }
+
+      .error-page__message {
+        margin-top: 3.5rem;
+      }
+
+      .error-page__message p {
+        font-size: 1.12rem;
+      }
+
+      .error-page__footer {
+        min-height: 96px;
+        padding: 1.5rem 20px;
+      }
+
+      .error-page__footer-brand {
+        width: 36px;
+        height: 36px;
+      }
+
+      .error-page__footer-name {
+        font-size: 0.7rem;
       }
     }
   </style>
 </head>
 
 <body>
-  <main class="error-page">
-    <div class="error-inner">
+
+  <div class="error-page">
+
+    <!-- HEADER -->
+
+    <header class="error-page__header">
 
       <a
-        class="error-mark"
+        class="error-page__brand"
         href="/"
-        aria-label="Cesare Paratore — torna all'inizio"
+        aria-label="Cesare Paratore — Home"
       >
         <img
-          src="/assets/images/cp-mark.png"
-          alt=""
-          width="48"
-          height="48"
+          src="assets/images/cp-mark.svg"
+          alt="CP"
         >
       </a>
 
-      <div class="error-content">
+      <div class="error-page__menu">
+        MENU
+      </div>
 
-        <p class="error-index">
-          404 / DIREZIONE NON TROVATA
+    </header>
+
+
+    <!-- MAIN -->
+
+    <main class="error-page__main">
+
+      <div class="error-page__content">
+
+        <p
+          class="error-page__code"
+          aria-label="Errore 404"
+        >
+          404
         </p>
 
-        <h1 class="error-title">
-          <span>HAI PRESO</span>
-          <span class="accent">UN'ALTRA</span>
-          <span>DIREZIONE.</span>
-        </h1>
+        <div class="error-page__message">
 
-        <div class="error-copy">
           <p>
-            Questa pagina non fa parte del percorso che stai cercando.
+            Questa pagina non è dove pensavi di trovarla.
           </p>
 
           <p>
-            Ma forse non è un errore.
-            A volte una deviazione serve a capire meglio
-            da dove ripartire.
+            Ma forse è un buon momento per tornare a guardare.
           </p>
 
-          <p class="error-emphasis">
-            Torniamo al punto da cui tutto comincia.
-          </p>
-        </div>
+          <a
+            class="error-page__back"
+            href="/"
+          >
+            Torna all'inizio
+          </a>
 
-        <div class="error-path" aria-hidden="true">
-          <span class="error-line"></span>
-          <span class="error-point"></span>
-          <span class="error-path-label">
-            punto di partenza
-          </span>
         </div>
-
-        <a class="error-action" href="/">
-          <span>Torna al percorso</span>
-          <span class="error-action-arrow" aria-hidden="true">→</span>
-        </a>
 
       </div>
 
-      <p class="error-signature">
-        CESARE PARATORE
-      </p>
+    </main>
 
-    </div>
-  </main>
+
+    <!-- FOOTER -->
+
+    <footer class="error-page__footer">
+
+      <a
+        class="error-page__footer-brand"
+        href="/"
+        aria-label="Cesare Paratore — Home"
+      >
+        <img
+          src="assets/images/cp-mark.svg"
+          alt="CP"
+        >
+      </a>
+
+      <div class="error-page__footer-name">
+        CESARE PARATORE
+      </div>
+
+    </footer>
+
+  </div>
+
 </body>
 </html>
