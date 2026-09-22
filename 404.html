@@ -1,27 +1,42 @@
-```html
 <!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="robots"
+    content="noindex, nofollow"
+  >
+
   <meta
     name="description"
-    content="Questa pagina non è dove pensavi di trovarla."
+    content="Pagina non trovata."
   >
-  <meta name="author" content="Cesare Paratore">
 
   <title>404 — Cesare Paratore</title>
 
-  <link rel="stylesheet" href="css/style.css">
+  <link
+    rel="stylesheet"
+    href="css/style.css"
+  >
 </head>
 
-<body class="error-page">
+<body class="page-404">
+
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
 
   <header class="site-header">
     <a
-      class="site-header__logo"
       href="index.html"
-      aria-label="Cesare Paratore — Torna all'inizio"
+      class="site-header__logo"
+      aria-label="Cesare Paratore — torna all'inizio"
     >
       <img
         src="assets/images/cp-mark.svg"
@@ -32,49 +47,82 @@
     <button
       class="menu-toggle"
       type="button"
-      aria-label="Apri menu"
+      aria-label="Apri il menu"
       aria-expanded="false"
       aria-controls="global-menu"
     >
-      MENU
+      <span>MENU</span>
     </button>
   </header>
 
+
+  <!-- =====================================================
+       GLOBAL MENU
+       ===================================================== -->
 
   <aside
     id="global-menu"
     class="global-menu"
     aria-hidden="true"
   >
-    <div class="global-menu__inner">
 
-      <nav
-        class="global-menu__nav"
-        aria-label="Navigazione principale"
-      >
-        <a href="chi-sono.html">Chi sono</a>
-        <a href="sport.html">Sport</a>
-        <a href="scienze-motorie.html">Scienze motorie</a>
-        <a href="educazione.html">Educazione</a>
-        <a href="management.html">Management</a>
-        <a href="digitale.html">Digitale</a>
-        <a href="territorio.html">Territorio</a>
-        <a href="contatti.html">Contatti</a>
-      </nav>
+    <nav class="global-menu__nav" aria-label="Navigazione principale">
 
-    </div>
+      <a href="index.html#chi-sono">
+        Chi sono
+      </a>
+
+      <a href="index.html#sport">
+        Sport
+      </a>
+
+      <a href="index.html#scienze-motorie">
+        Scienze motorie
+      </a>
+
+      <a href="index.html#educazione">
+        Educazione
+      </a>
+
+      <a href="index.html#management">
+        Management
+      </a>
+
+      <a href="index.html#digitale">
+        Digitale
+      </a>
+
+      <a href="index.html#territorio">
+        Territorio
+      </a>
+
+      <a href="index.html#contatti">
+        Contatti
+      </a>
+
+    </nav>
+
   </aside>
 
 
-  <main class="error-main">
+  <!-- =====================================================
+       404
+       ===================================================== -->
 
-    <section class="error-content">
+  <main class="page-404__main">
 
-      <p class="error-code">404</p>
+    <section
+      class="page-404__content"
+      aria-labelledby="error-title"
+    >
 
-      <div class="error-copy">
+      <p class="page-404__code">
+        404
+      </p>
 
-        <h1>
+      <div class="page-404__copy">
+
+        <h1 id="error-title">
           Questa pagina non è dove pensavi di trovarla.
         </h1>
 
@@ -83,8 +131,8 @@
         </p>
 
         <a
-          class="error-back"
           href="index.html"
+          class="page-404__link"
         >
           Torna all'inizio
         </a>
@@ -96,12 +144,16 @@
   </main>
 
 
+  <!-- =====================================================
+       FOOTER
+       ===================================================== -->
+
   <footer class="site-footer">
 
     <a
-      class="site-footer__logo"
       href="index.html"
-      aria-label="Cesare Paratore — Torna all'inizio"
+      class="site-footer__logo"
+      aria-label="Cesare Paratore — torna all'inizio"
     >
       <img
         src="assets/images/cp-mark.svg"
@@ -116,8 +168,11 @@
   </footer>
 
 
+  <!-- =====================================================
+       SCRIPT
+       ===================================================== -->
+
   <script src="script.js"></script>
 
 </body>
 </html>
-```
