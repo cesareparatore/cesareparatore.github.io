@@ -18,10 +18,14 @@
     content="noindex, nofollow"
   >
 
+  <meta
+    name="description"
+    content="Pagina non trovata — Cesare Paratore."
+  >
+
   <title>404 — Cesare Paratore</title>
 
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="404.css">
 </head>
 
 <body class="page-404">
@@ -34,8 +38,8 @@
 
     <a
       class="site-header__logo"
-      href="index.html"
-      aria-label="Torna all'inizio"
+      href="index.html#guarda"
+      aria-label="Cesare Paratore — torna all'inizio"
     >
       <img
         src="assets/images/cp-mark.svg"
@@ -49,7 +53,7 @@
       aria-expanded="false"
       aria-controls="global-menu"
     >
-      <span>MENU</span>
+      MENU
     </button>
 
   </header>
@@ -72,14 +76,33 @@
         aria-label="Navigazione principale"
       >
 
-        <a href="index.html#guarda">Chi sono</a>
-        <a href="index.html#movimento">Sport</a>
-        <a href="index.html#capire">Scienze motorie</a>
-        <a href="index.html#trasmettere">Educazione</a>
-        <a href="index.html#costruire">Management</a>
-        <a href="index.html#ritorna">Digitale</a>
-        <a href="index.html#qui">Territorio</a>
-        <a href="index.html#scrivimi">Contatti</a>
+        <a href="index.html#movimento">
+          Sport
+        </a>
+
+        <a href="index.html#capire">
+          Scienze motorie
+        </a>
+
+        <a href="index.html#trasmettere">
+          Educazione
+        </a>
+
+        <a href="index.html#costruire">
+          Management
+        </a>
+
+        <a href="index.html#ritorna">
+          Digitale
+        </a>
+
+        <a href="index.html#qui">
+          Territorio
+        </a>
+
+        <a href="index.html#scrivimi">
+          Contatti
+        </a>
 
       </nav>
 
@@ -89,7 +112,7 @@
 
 
   <!-- =========================================================
-       MAIN
+       404
   ========================================================== -->
 
   <main class="page-404__main">
@@ -99,32 +122,36 @@
       aria-labelledby="error-title"
     >
 
-      <div class="page-404__content">
+      <div class="page-404__inner">
 
         <p
-          class="page-404__code"
+          class="page-404__number"
           aria-hidden="true"
         >
           404
         </p>
 
-        <h1
-          class="page-404__title"
-          id="error-title"
-        >
-          Questa pagina non è dove pensavi di trovarla.
-        </h1>
+        <div class="page-404__content">
 
-        <p class="page-404__copy">
-          Ma forse è un buon momento per tornare a guardare.
-        </p>
+          <h1
+            class="page-404__title"
+            id="error-title"
+          >
+            Questa pagina non è dove pensavi di trovarla.
+          </h1>
 
-        <a
-          class="page-404__link"
-          href="index.html#guarda"
-        >
-          Torna all'inizio
-        </a>
+          <p class="page-404__text">
+            Ma forse è un buon momento per tornare a guardare.
+          </p>
+
+          <a
+            class="page-404__link"
+            href="index.html#guarda"
+          >
+            Torna all'inizio
+          </a>
+
+        </div>
 
       </div>
 
@@ -158,7 +185,7 @@
 
 
   <!-- =========================================================
-       MENU JS
+       MENU
   ========================================================== -->
 
   <script>
@@ -166,47 +193,96 @@
       "use strict";
 
       const body = document.body;
-      const menuToggle = document.querySelector(".menu-toggle");
-      const globalMenu = document.querySelector(".global-menu");
+      const menuToggle =
+        document.querySelector(".menu-toggle");
+      const globalMenu =
+        document.getElementById("global-menu");
 
-      if (!menuToggle || !globalMenu) return;
+      if (!menuToggle || !globalMenu) {
+        return;
+      }
 
       const closeMenu = () => {
-        menuToggle.setAttribute("aria-expanded", "false");
-        globalMenu.setAttribute("aria-hidden", "true");
-        globalMenu.classList.remove("is-open");
-        body.classList.remove("is-menu-open");
+
+        menuToggle.setAttribute(
+          "aria-expanded",
+          "false"
+        );
+
+        globalMenu.setAttribute(
+          "aria-hidden",
+          "true"
+        );
+
+        globalMenu.classList.remove(
+          "is-open"
+        );
+
+        body.classList.remove(
+          "is-menu-open"
+        );
       };
 
       const openMenu = () => {
-        menuToggle.setAttribute("aria-expanded", "true");
-        globalMenu.setAttribute("aria-hidden", "false");
-        globalMenu.classList.add("is-open");
-        body.classList.add("is-menu-open");
+
+        menuToggle.setAttribute(
+          "aria-expanded",
+          "true"
+        );
+
+        globalMenu.setAttribute(
+          "aria-hidden",
+          "false"
+        );
+
+        globalMenu.classList.add(
+          "is-open"
+        );
+
+        body.classList.add(
+          "is-menu-open"
+        );
       };
 
-      menuToggle.addEventListener("click", () => {
-        const isOpen =
-          menuToggle.getAttribute("aria-expanded") === "true";
+      menuToggle.addEventListener(
+        "click",
+        () => {
 
-        if (isOpen) {
-          closeMenu();
-        } else {
-          openMenu();
+          const isOpen =
+            menuToggle.getAttribute(
+              "aria-expanded"
+            ) === "true";
+
+          if (isOpen) {
+            closeMenu();
+          } else {
+            openMenu();
+          }
+
         }
-      });
+      );
 
       globalMenu
         .querySelectorAll("a")
         .forEach((link) => {
-          link.addEventListener("click", closeMenu);
+
+          link.addEventListener(
+            "click",
+            closeMenu
+          );
+
         });
 
-      document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") {
-          closeMenu();
+      document.addEventListener(
+        "keydown",
+        (event) => {
+
+          if (event.key === "Escape") {
+            closeMenu();
+          }
+
         }
-      });
+      );
 
     })();
   </script>
