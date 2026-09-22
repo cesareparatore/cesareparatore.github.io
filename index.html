@@ -84,15 +84,15 @@
   ========================================================== -->
 
   <aside
-    class="global-menu"
+    class="site-menu"
     id="global-menu"
     aria-hidden="true"
   >
 
-    <div class="global-menu__inner">
+    <div class="site-menu__inner">
 
       <nav
-        class="global-menu__nav"
+        class="site-menu__nav"
         aria-label="Navigazione principale"
       >
 
@@ -120,14 +120,13 @@
     id="main-content"
   >
 
-    <!-- =======================================================
-         01 — GUARDA.
-    ======================================================== -->
+    <!-- 01 — GUARDA. -->
 
     <section
       class="narrative-section narrative-section--opening"
       id="guarda"
       data-section="guarda"
+      data-title="GUARDA."
     >
 
       <div class="section__inner">
@@ -141,14 +140,13 @@
     </section>
 
 
-    <!-- =======================================================
-         02 — COME?
-    ======================================================== -->
+    <!-- 02 — COME? -->
 
     <section
       class="narrative-section"
       id="come"
       data-section="come"
+      data-title="COME?"
     >
 
       <div class="section__inner">
@@ -184,14 +182,13 @@
     </section>
 
 
-    <!-- =======================================================
-         03 — MOVIMENTO.
-    ======================================================== -->
+    <!-- 03 — MOVIMENTO. -->
 
     <section
       class="narrative-section"
       id="movimento"
       data-section="movimento"
+      data-title="MOVIMENTO."
     >
 
       <div class="section__inner">
@@ -229,14 +226,13 @@
     </section>
 
 
-    <!-- =======================================================
-         04 — CAPIRE.
-    ======================================================== -->
+    <!-- 04 — CAPIRE. -->
 
     <section
       class="narrative-section"
       id="capire"
       data-section="capire"
+      data-title="CAPIRE."
     >
 
       <div class="section__inner">
@@ -260,14 +256,13 @@
     </section>
 
 
-    <!-- =======================================================
-         05 — TRASMETTERE.
-    ======================================================== -->
+    <!-- 05 — TRASMETTERE. -->
 
     <section
       class="narrative-section"
       id="trasmettere"
       data-section="trasmettere"
+      data-title="TRASMETTERE."
     >
 
       <div class="section__inner">
@@ -297,14 +292,13 @@
     </section>
 
 
-    <!-- =======================================================
-         06 — COSTRUIRE.
-    ======================================================== -->
+    <!-- 06 — COSTRUIRE. -->
 
     <section
       class="narrative-section"
       id="costruire"
       data-section="costruire"
+      data-title="COSTRUIRE."
     >
 
       <div class="section__inner">
@@ -334,14 +328,13 @@
     </section>
 
 
-    <!-- =======================================================
-         07 — RITORNA.
-    ======================================================== -->
+    <!-- 07 — RITORNA. -->
 
     <section
       class="narrative-section"
       id="ritorna"
       data-section="ritorna"
+      data-title="RITORNA."
     >
 
       <div class="section__inner">
@@ -377,14 +370,13 @@
     </section>
 
 
-    <!-- =======================================================
-         08 — COLLEGARE.
-    ======================================================== -->
+    <!-- 08 — COLLEGARE. -->
 
     <section
       class="narrative-section"
       id="collegare"
       data-section="collegare"
+      data-title="COLLEGARE."
     >
 
       <div class="section__inner">
@@ -412,14 +404,13 @@
     </section>
 
 
-    <!-- =======================================================
-         09 — OGGI.
-    ======================================================== -->
+    <!-- 09 — OGGI. -->
 
     <section
       class="narrative-section"
       id="oggi"
       data-section="oggi"
+      data-title="OGGI."
     >
 
       <div class="section__inner">
@@ -453,14 +444,13 @@
     </section>
 
 
-    <!-- =======================================================
-         10 — OBIETTIVO.
-    ======================================================== -->
+    <!-- 10 — OBIETTIVO. -->
 
     <section
       class="narrative-section"
       id="obiettivo"
       data-section="obiettivo"
+      data-title="OBIETTIVO."
     >
 
       <div class="section__inner">
@@ -490,14 +480,13 @@
     </section>
 
 
-    <!-- =======================================================
-         11 — QUI.
-    ======================================================== -->
+    <!-- 11 — QUI. -->
 
     <section
       class="narrative-section narrative-section--territory"
       id="qui"
       data-section="qui"
+      data-title="QUI."
     >
 
       <div class="section__inner section__inner--split">
@@ -551,14 +540,13 @@
     </section>
 
 
-    <!-- =======================================================
-         12 — DA QUI.
-    ======================================================== -->
+    <!-- 12 — DA QUI. -->
 
     <section
       class="narrative-section"
       id="da-qui"
       data-section="da-qui"
+      data-title="DA QUI."
     >
 
       <div class="section__inner">
@@ -602,14 +590,13 @@
     </section>
 
 
-    <!-- =======================================================
-         13 — ECCOMI.
-    ======================================================== -->
+    <!-- 13 — ECCOMI. -->
 
     <section
       class="narrative-section narrative-section--portrait"
       id="eccomi"
       data-section="eccomi"
+      data-title="ECCOMI."
     >
 
       <div class="section__inner section__inner--split">
@@ -643,14 +630,13 @@
     </section>
 
 
-    <!-- =======================================================
-         14 — SCRIVIMI.
-    ======================================================== -->
+    <!-- 14 — SCRIVIMI. -->
 
     <section
       class="narrative-section narrative-section--contact"
       id="scrivimi"
       data-section="scrivimi"
+      data-title="SCRIVIMI."
     >
 
       <div class="section__inner">
@@ -682,6 +668,7 @@
       <button
         class="narrative-navigation__button narrative-navigation__button--prev"
         type="button"
+        data-narrative-prev
         aria-label="Sezione precedente"
         disabled
       >
@@ -690,6 +677,7 @@
 
       <div
         class="narrative-navigation__title"
+        data-active-title
         aria-live="polite"
       >
         GUARDA.
@@ -698,6 +686,7 @@
       <button
         class="narrative-navigation__button narrative-navigation__button--next"
         type="button"
+        data-narrative-next
         aria-label="Sezione successiva"
       >
         <span aria-hidden="true">→</span>
@@ -739,6 +728,7 @@
   <div
     class="standby"
     id="standby"
+    data-standby
     aria-hidden="true"
   >
 
@@ -750,7 +740,59 @@
 
 
   <!-- =========================================================
-       SCRIPTS
+       LOADER FAIL-SAFE
+       
+       Questo meccanismo NON dipende da script.js o GSAP.
+  ========================================================== -->
+
+  <script>
+    (function () {
+      'use strict';
+
+      var finished = false;
+
+      function hideLoader() {
+        if (finished) return;
+
+        finished = true;
+
+        var loader = document.getElementById('loader');
+
+        document.documentElement.classList.add('site-ready');
+
+        if (!loader) return;
+
+        loader.classList.add('is-hidden');
+
+        window.setTimeout(function () {
+          if (loader && loader.parentNode) {
+            loader.parentNode.removeChild(loader);
+          }
+        }, 900);
+      }
+
+      /*
+       * Il loader viene chiuso direttamente dal browser.
+       * Non aspetta GSAP, immagini, font o script.js.
+       */
+
+      window.setTimeout(hideLoader, 1800);
+
+      if (document.readyState !== 'loading') {
+        hideLoader();
+      } else {
+        document.addEventListener(
+          'DOMContentLoaded',
+          hideLoader,
+          { once: true }
+        );
+      }
+    })();
+  </script>
+
+
+  <!-- =========================================================
+       GSAP
   ========================================================== -->
 
   <script
