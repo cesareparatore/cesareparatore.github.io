@@ -185,6 +185,12 @@ button {
   position: absolute;
   top: 16px;
   left: var(--gutter);
+  width: 76px;
+  height: 76px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--light);
 }
 
 .menu-brand img {
