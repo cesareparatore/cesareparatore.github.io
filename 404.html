@@ -1,295 +1,123 @@
+```html
 <!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
+    name="description"
+    content="Questa pagina non è dove pensavi di trovarla."
   >
+  <meta name="author" content="Cesare Paratore">
 
-  <meta
-    name="robots"
-    content="noindex, nofollow"
-  >
+  <title>404 — Cesare Paratore</title>
 
-  <meta
-    name="theme-color"
-    content="#F1EFE8"
-  >
-
-  <title>Pagina non trovata — Cesare Paratore</title>
-
-  <link
-    rel="stylesheet"
-    href="css/style.css"
-  >
-
-  <style>
-    /* =====================================================
-       404 — COHERENT ERROR PAGE
-       ===================================================== */
-
-    .error-page {
-      min-height: 100svh;
-
-      display: flex;
-      flex-direction: column;
-
-      background: #0B0B0A;
-      color: #F1EFE8;
-    }
-
-    .error-page__header {
-      height: 76px;
-
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      padding: 0 5vw;
-
-      background: #F1EFE8;
-      color: #0B0B0A;
-    }
-
-    .error-page__brand {
-      width: 42px;
-      height: 42px;
-
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .error-page__brand img {
-      width: 100%;
-      height: auto;
-    }
-
-    .error-page__menu {
-      font-size: 0.8rem;
-      letter-spacing: 0.08em;
-    }
-
-    .error-page__main {
-      flex: 1;
-
-      display: flex;
-      align-items: center;
-
-      padding:
-        10vh 5vw
-        calc(10vh + 60px);
-    }
-
-    .error-page__content {
-      width: 100%;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
-    .error-page__code {
-      margin: 0;
-
-      font-size: clamp(7rem, 22vw, 20rem);
-      line-height: 0.78;
-      letter-spacing: -0.075em;
-      font-weight: 400;
-    }
-
-    .error-page__message {
-      width: min(42rem, 100%);
-      margin-top: clamp(3rem, 7vw, 7rem);
-    }
-
-    .error-page__message p {
-      margin: 0 0 1.5em;
-
-      font-size: clamp(1.15rem, 1.35vw, 1.5rem);
-      line-height: 1.5;
-      letter-spacing: -0.018em;
-    }
-
-    .error-page__back {
-      display: inline-block;
-
-      margin-top: 1rem;
-
-      font-size: 0.8rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-
-      border-bottom: 1px solid currentColor;
-      padding-bottom: 0.35rem;
-
-      transition: opacity 220ms ease;
-    }
-
-    .error-page__back:hover {
-      opacity: 0.5;
-    }
-
-    .error-page__footer {
-      min-height: 110px;
-
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      padding: 2rem 5vw;
-
-      background: #F1EFE8;
-      color: #0B0B0A;
-    }
-
-    .error-page__footer-brand {
-      width: 42px;
-      height: 42px;
-    }
-
-    .error-page__footer-brand img {
-      width: 100%;
-      height: auto;
-    }
-
-    .error-page__footer-name {
-      font-size: 0.8rem;
-      letter-spacing: 0.08em;
-    }
-
-    @media (max-width: 600px) {
-
-      .error-page__header {
-        height: 64px;
-        padding: 0 20px;
-      }
-
-      .error-page__brand {
-        width: 36px;
-        height: 36px;
-      }
-
-      .error-page__main {
-        padding:
-          8vh 20px
-          calc(8vh + 50px);
-      }
-
-      .error-page__code {
-        font-size: clamp(6rem, 27vw, 10rem);
-      }
-
-      .error-page__message {
-        margin-top: 3.5rem;
-      }
-
-      .error-page__message p {
-        font-size: 1.12rem;
-      }
-
-      .error-page__footer {
-        min-height: 96px;
-        padding: 1.5rem 20px;
-      }
-
-      .error-page__footer-brand {
-        width: 36px;
-        height: 36px;
-      }
-
-      .error-page__footer-name {
-        font-size: 0.7rem;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body>
+<body class="error-page">
 
-  <div class="error-page">
-
-    <!-- HEADER -->
-
-    <header class="error-page__header">
-
-      <a
-        class="error-page__brand"
-        href="/"
-        aria-label="Cesare Paratore — Home"
+  <header class="site-header">
+    <a
+      class="site-header__logo"
+      href="index.html"
+      aria-label="Cesare Paratore — Torna all'inizio"
+    >
+      <img
+        src="assets/images/cp-mark.svg"
+        alt="CP"
       >
-        <img
-          src="assets/images/cp-mark.svg"
-          alt="CP"
-        >
-      </a>
+    </a>
 
-      <div class="error-page__menu">
-        MENU
-      </div>
+    <button
+      class="menu-toggle"
+      type="button"
+      aria-label="Apri menu"
+      aria-expanded="false"
+      aria-controls="global-menu"
+    >
+      MENU
+    </button>
+  </header>
 
-    </header>
+
+  <aside
+    id="global-menu"
+    class="global-menu"
+    aria-hidden="true"
+  >
+    <div class="global-menu__inner">
+
+      <nav
+        class="global-menu__nav"
+        aria-label="Navigazione principale"
+      >
+        <a href="chi-sono.html">Chi sono</a>
+        <a href="sport.html">Sport</a>
+        <a href="scienze-motorie.html">Scienze motorie</a>
+        <a href="educazione.html">Educazione</a>
+        <a href="management.html">Management</a>
+        <a href="digitale.html">Digitale</a>
+        <a href="territorio.html">Territorio</a>
+        <a href="contatti.html">Contatti</a>
+      </nav>
+
+    </div>
+  </aside>
 
 
-    <!-- MAIN -->
+  <main class="error-main">
 
-    <main class="error-page__main">
+    <section class="error-content">
 
-      <div class="error-page__content">
+      <p class="error-code">404</p>
 
-        <p
-          class="error-page__code"
-          aria-label="Errore 404"
-        >
-          404
+      <div class="error-copy">
+
+        <h1>
+          Questa pagina non è dove pensavi di trovarla.
+        </h1>
+
+        <p>
+          Ma forse è un buon momento per tornare a guardare.
         </p>
 
-        <div class="error-page__message">
-
-          <p>
-            Questa pagina non è dove pensavi di trovarla.
-          </p>
-
-          <p>
-            Ma forse è un buon momento per tornare a guardare.
-          </p>
-
-          <a
-            class="error-page__back"
-            href="/"
-          >
-            Torna all'inizio
-          </a>
-
-        </div>
-
-      </div>
-
-    </main>
-
-
-    <!-- FOOTER -->
-
-    <footer class="error-page__footer">
-
-      <a
-        class="error-page__footer-brand"
-        href="/"
-        aria-label="Cesare Paratore — Home"
-      >
-        <img
-          src="assets/images/cp-mark.svg"
-          alt="CP"
+        <a
+          class="error-back"
+          href="index.html"
         >
-      </a>
+          Torna all'inizio
+        </a>
 
-      <div class="error-page__footer-name">
-        CESARE PARATORE
       </div>
 
-    </footer>
+    </section>
 
-  </div>
+  </main>
+
+
+  <footer class="site-footer">
+
+    <a
+      class="site-footer__logo"
+      href="index.html"
+      aria-label="Cesare Paratore — Torna all'inizio"
+    >
+      <img
+        src="assets/images/cp-mark.svg"
+        alt="CP"
+      >
+    </a>
+
+    <p class="site-footer__name">
+      CESARE PARATORE
+    </p>
+
+  </footer>
+
+
+  <script src="script.js"></script>
 
 </body>
 </html>
+```
