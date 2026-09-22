@@ -5,7 +5,12 @@
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <meta
+    name="theme-color"
+    content="#0B0B0A"
   >
 
   <meta
@@ -13,30 +18,24 @@
     content="noindex, nofollow"
   >
 
-  <meta
-    name="description"
-    content="Pagina non trovata."
-  >
-
   <title>404 — Cesare Paratore</title>
 
-  <link
-    rel="stylesheet"
-    href="css/style.css"
-  >
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="404.css">
 </head>
 
 <body class="page-404">
 
-  <!-- =====================================================
+  <!-- =========================================================
        HEADER
-       ===================================================== -->
+  ========================================================== -->
 
   <header class="site-header">
+
     <a
-      href="index.html"
       class="site-header__logo"
-      aria-label="Cesare Paratore — torna all'inizio"
+      href="index.html"
+      aria-label="Torna all'inizio"
     >
       <img
         src="assets/images/cp-mark.svg"
@@ -47,92 +46,82 @@
     <button
       class="menu-toggle"
       type="button"
-      aria-label="Apri il menu"
       aria-expanded="false"
       aria-controls="global-menu"
     >
       <span>MENU</span>
     </button>
+
   </header>
 
 
-  <!-- =====================================================
-       GLOBAL MENU
-       ===================================================== -->
+  <!-- =========================================================
+       MENU
+  ========================================================== -->
 
   <aside
-    id="global-menu"
     class="global-menu"
+    id="global-menu"
     aria-hidden="true"
   >
 
-    <nav class="global-menu__nav" aria-label="Navigazione principale">
+    <div class="global-menu__inner">
 
-      <a href="index.html#chi-sono">
-        Chi sono
-      </a>
+      <nav
+        class="global-menu__nav"
+        aria-label="Navigazione principale"
+      >
 
-      <a href="index.html#sport">
-        Sport
-      </a>
+        <a href="index.html#guarda">Chi sono</a>
+        <a href="index.html#movimento">Sport</a>
+        <a href="index.html#capire">Scienze motorie</a>
+        <a href="index.html#trasmettere">Educazione</a>
+        <a href="index.html#costruire">Management</a>
+        <a href="index.html#ritorna">Digitale</a>
+        <a href="index.html#qui">Territorio</a>
+        <a href="index.html#scrivimi">Contatti</a>
 
-      <a href="index.html#scienze-motorie">
-        Scienze motorie
-      </a>
+      </nav>
 
-      <a href="index.html#educazione">
-        Educazione
-      </a>
-
-      <a href="index.html#management">
-        Management
-      </a>
-
-      <a href="index.html#digitale">
-        Digitale
-      </a>
-
-      <a href="index.html#territorio">
-        Territorio
-      </a>
-
-      <a href="index.html#contatti">
-        Contatti
-      </a>
-
-    </nav>
+    </div>
 
   </aside>
 
 
-  <!-- =====================================================
-       404
-       ===================================================== -->
+  <!-- =========================================================
+       MAIN
+  ========================================================== -->
 
   <main class="page-404__main">
 
     <section
-      class="page-404__content"
+      class="page-404__section"
       aria-labelledby="error-title"
     >
 
-      <p class="page-404__code">
-        404
-      </p>
+      <div class="page-404__content">
 
-      <div class="page-404__copy">
+        <p
+          class="page-404__code"
+          aria-hidden="true"
+        >
+          404
+        </p>
 
-        <h1 id="error-title">
+        <h1
+          class="page-404__title"
+          id="error-title"
+        >
           Questa pagina non è dove pensavi di trovarla.
         </h1>
 
-        <p>
+        <p class="page-404__copy">
           Ma forse è un buon momento per tornare a guardare.
         </p>
 
         <a
-          href="index.html"
           class="page-404__link"
+          href="index.html#guarda"
         >
           Torna all'inizio
         </a>
@@ -144,16 +133,16 @@
   </main>
 
 
-  <!-- =====================================================
+  <!-- =========================================================
        FOOTER
-       ===================================================== -->
+  ========================================================== -->
 
   <footer class="site-footer">
 
     <a
-      href="index.html"
       class="site-footer__logo"
-      aria-label="Cesare Paratore — torna all'inizio"
+      href="index.html#guarda"
+      aria-label="Torna all'inizio"
     >
       <img
         src="assets/images/cp-mark.svg"
@@ -161,18 +150,66 @@
       >
     </a>
 
-    <p class="site-footer__name">
+    <div class="site-footer__name">
       CESARE PARATORE
-    </p>
+    </div>
 
   </footer>
 
 
-  <!-- =====================================================
-       SCRIPT
-       ===================================================== -->
+  <!-- =========================================================
+       MENU JS
+  ========================================================== -->
 
-  <script src="script.js"></script>
+  <script>
+    (() => {
+      "use strict";
+
+      const body = document.body;
+      const menuToggle = document.querySelector(".menu-toggle");
+      const globalMenu = document.querySelector(".global-menu");
+
+      if (!menuToggle || !globalMenu) return;
+
+      const closeMenu = () => {
+        menuToggle.setAttribute("aria-expanded", "false");
+        globalMenu.setAttribute("aria-hidden", "true");
+        globalMenu.classList.remove("is-open");
+        body.classList.remove("is-menu-open");
+      };
+
+      const openMenu = () => {
+        menuToggle.setAttribute("aria-expanded", "true");
+        globalMenu.setAttribute("aria-hidden", "false");
+        globalMenu.classList.add("is-open");
+        body.classList.add("is-menu-open");
+      };
+
+      menuToggle.addEventListener("click", () => {
+        const isOpen =
+          menuToggle.getAttribute("aria-expanded") === "true";
+
+        if (isOpen) {
+          closeMenu();
+        } else {
+          openMenu();
+        }
+      });
+
+      globalMenu
+        .querySelectorAll("a")
+        .forEach((link) => {
+          link.addEventListener("click", closeMenu);
+        });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          closeMenu();
+        }
+      });
+
+    })();
+  </script>
 
 </body>
 </html>
