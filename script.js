@@ -1,1090 +1,783 @@
 /* =========================================================
    CESARE PARATORE — HOME
-   JAVASCRIPT
-   Master-driven implementation
-========================================================= */
+   script.js
+   ========================================================= */
 
 (() => {
-  "use strict";
+  'use strict';
 
-  /* =======================================================
-     01 — ELEMENTS
-  ======================================================== */
+  /* =========================================================
+     DOM READY
+     ========================================================= */
 
-  const body = document.body;
-  const loader = document.getElementById("loader");
-  const menuToggle = document.querySelector(".menu-toggle");
-  const globalMenu = document.getElementById("global-menu");
+  const onReady = (callback) => {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', callback, { once: true });
+    } else {
+      callback();
+    }
+  };
 
-  const sections = Array.from(
-    document.querySelectorAll(".narrative-section")
-  );
-
-  const navigation = document.querySelector(".narrative-navigation");
-  const navigationTitle = document.querySelector(
-    ".narrative-navigation__title"
-  );
-
-  const previousButton = document.querySelector(
-    ".narrative-navigation__button--prev"
-  );
-
-  const nextButton = document.querySelector(
-    ".narrative-navigation__button--next"
-  );
-
-  const standby = document.getElementById("standby");
-
-
-  /* =======================================================
-     02 — STATE
-  ======================================================== */
-
-  let activeSectionIndex = 0;
-  let standbyTimer = null;
-  let loaderHidden = false;
-
-  const STANDBY_DELAY = 40000;
-
-  const sectionTitles = sections.map((section) => {
-    const title = section.querySelector(".section__title");
-
-    return title
-      ? title.textContent.trim()
-      : "";
-  });
-
-
-  /* =======================================================
-     03 — SAFE LOADER
+  /* =========================================================
+     LOADER
      
-     Il loader non dipende da GSAP, ScrollTrigger
-     o da nessun'altra parte del sistema.
-  ======================================================== */
+     IMPORTANTE:
+     Il loader viene gestito anche da un meccanismo autonomo
+     nell'HTML. Questa funzione è quindi solo un secondo livello
+     di sicurezza.
+     ========================================================= */
 
   const hideLoader = () => {
-    if (loaderHidden || !loader) return;
+    const loader = document.getElementById('loader');
 
-    loaderHidden = true;
+    if (!loader) {
+      document.documentElement.classList.add('site-ready');
+      return;
+    }
 
-    loader.classList.add("is-hidden");
-    loader.setAttribute("aria-hidden", "true");
+    document.documentElement.classList.add('site-ready');
+    loader.classList.add('is-hidden');
 
-    body.classList.remove("is-loading");
+    window.setTimeout(() => {
+      if (loader && loader.parentNode) {
+        loader.remove();
+      }
+    }, 900);
   };
 
-
-  body.classList.add("is-loading");
-
-
   /*
-     Prima possibilità:
-     DOM pronto.
-  */
+   * Non aspettiamo GSAP.
+   * Non aspettiamo immagini.
+   * Non aspettiamo font.
+   * Non aspettiamo IntersectionObserver.
+   */
 
-  if (document.readyState === "loading") {
-
-    document.addEventListener(
-      "DOMContentLoaded",
-      hideLoader,
-      { once: true }
-    );
-
-  } else {
-
+  onReady(() => {
     hideLoader();
 
-  }
-
+    initMenu();
+    initNavigation();
+    initSections();
+    initLinks();
+    initStandby();
+    initMotion();
+  });
 
   /*
-     Fallback assoluto.
-     Il loader non può restare bloccato
-     per un errore JavaScript.
-  */
+   * Failsafe assoluto:
+   * anche se una funzione successiva dovesse generare un errore,
+   * il loader deve comunque essere rimosso.
+   */
 
-  window.setTimeout(hideLoader, 2500);
-
-
-  /* =======================================================
-     04 — MENU
-  ======================================================== */
-
-  const closeMenu = () => {
-
-    if (!menuToggle || !globalMenu) return;
-
-    menuToggle.setAttribute(
-      "aria-expanded",
-      "false"
-    );
-
-    globalMenu.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-
-    globalMenu.classList.remove("is-open");
-
-    body.classList.remove("is-menu-open");
-
-  };
+  window.setTimeout(hideLoader, 2200);
 
 
-  const openMenu = () => {
+  /* =========================================================
+     MENU
+     ========================================================= */
 
-    if (!menuToggle || !globalMenu) return;
+  function initMenu() {
+    const menuButton = document.querySelector('.menu-toggle');
+    const menu = document.querySelector('.site-menu');
+    const menuLinks = document.querySelectorAll('.site-menu a');
 
-    menuToggle.setAttribute(
-      "aria-expanded",
-      "true"
-    );
+    if (!menuButton || !menu) return;
 
-    globalMenu.setAttribute(
-      "aria-hidden",
-      "false"
-    );
+    const closeMenu = () => {
+      menu.classList.remove('is-open');
+      menuButton.classList.remove('is-open');
+      menuButton.setAttribute('aria-expanded', 'false');
+      document.documentElement.classList.remove('menu-open');
+    };
 
-    globalMenu.classList.add("is-open");
+    const openMenu = () => {
+      menu.classList.add('is-open');
+      menuButton.classList.add('is-open');
+      menuButton.setAttribute('aria-expanded', 'true');
+      document.documentElement.classList.add('menu-open');
+    };
 
-    body.classList.add("is-menu-open");
-
-  };
-
-
-  if (menuToggle && globalMenu) {
-
-    menuToggle.addEventListener("click", () => {
-
-      const isOpen =
-        menuToggle.getAttribute("aria-expanded") === "true";
+    menuButton.addEventListener('click', () => {
+      const isOpen = menu.classList.contains('is-open');
 
       if (isOpen) {
         closeMenu();
       } else {
         openMenu();
       }
-
     });
 
+    menuLinks.forEach((link) => {
+      link.addEventListener('click', closeMenu);
+    });
 
-    globalMenu
-      .querySelectorAll("a")
-      .forEach((link) => {
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeMenu();
+      }
+    });
 
-        link.addEventListener(
-          "click",
-          closeMenu
-        );
+    document.addEventListener('click', (event) => {
+      if (!menu.classList.contains('is-open')) return;
 
-      });
-
+      if (
+        !menu.contains(event.target) &&
+        !menuButton.contains(event.target)
+      ) {
+        closeMenu();
+      }
+    });
   }
 
 
-  document.addEventListener("keydown", (event) => {
+  /* =========================================================
+     NARRATIVE NAVIGATION
+     ========================================================= */
 
-    if (event.key === "Escape") {
-      closeMenu();
-    }
+  function initNavigation() {
+    const navigation = document.querySelector('.narrative-navigation');
 
-  });
+    if (!navigation) return;
 
+    const previousButton = navigation.querySelector(
+      '[data-narrative-prev]'
+    );
 
-  /* =======================================================
-     05 — SECTION NAVIGATION
-  ======================================================== */
+    const nextButton = navigation.querySelector(
+      '[data-narrative-next]'
+    );
 
-  const updateNavigation = () => {
+    const sections = Array.from(
+      document.querySelectorAll('[data-section]')
+    );
 
-    if (!navigationTitle) return;
+    if (!sections.length) return;
 
-    navigationTitle.textContent =
-      sectionTitles[activeSectionIndex] || "";
+    let currentIndex = 0;
+
+    const getSectionIndex = () => {
+      let closestIndex = 0;
+      let closestDistance = Infinity;
+
+      sections.forEach((section, index) => {
+        const rect = section.getBoundingClientRect();
+        const distance = Math.abs(rect.top);
+
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = index;
+        }
+      });
+
+      return closestIndex;
+    };
+
+    const goToSection = (index) => {
+      if (!sections.length) return;
+
+      const normalizedIndex =
+        (index + sections.length) % sections.length;
+
+      const section = sections[normalizedIndex];
+
+      if (!section) return;
+
+      currentIndex = normalizedIndex;
+
+      section.scrollIntoView({
+        behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+        block: 'start'
+      });
+    };
 
     if (previousButton) {
+      previousButton.addEventListener('click', () => {
+        currentIndex = getSectionIndex();
 
-      previousButton.disabled =
-        activeSectionIndex === 0;
+        if (currentIndex <= 0) {
+          return;
+        }
 
+        goToSection(currentIndex - 1);
+      });
     }
 
     if (nextButton) {
+      nextButton.addEventListener('click', () => {
+        currentIndex = getSectionIndex();
 
-      nextButton.disabled = false;
-
-    }
-
-  };
-
-
-  const setActiveSection = (index) => {
-
-    if (!sections.length) return;
-
-    activeSectionIndex = Math.max(
-      0,
-      Math.min(index, sections.length - 1)
-    );
-
-    updateNavigation();
-
-  };
-
-
-  const scrollToSection = (index) => {
-
-    if (!sections.length) return;
-
-    let targetIndex = index;
-
-    /*
-       Previous from first section remains disabled.
-    */
-
-    if (targetIndex < 0) {
-      targetIndex = 0;
-    }
-
-    /*
-       Next from the final section loops
-       back to GUARDA.
-    */
-
-    if (targetIndex >= sections.length) {
-      targetIndex = 0;
-    }
-
-    const target = sections[targetIndex];
-
-    if (!target) return;
-
-    setActiveSection(targetIndex);
-
-    target.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
-
-  };
-
-
-  if (previousButton) {
-
-    previousButton.addEventListener(
-      "click",
-      () => {
-
-        if (activeSectionIndex <= 0) {
+        if (currentIndex >= sections.length - 1) {
+          goToSection(0);
           return;
         }
 
-        scrollToSection(
-          activeSectionIndex - 1
-        );
+        goToSection(currentIndex + 1);
+      });
+    }
 
+    document.addEventListener('keydown', (event) => {
+      if (
+        event.target instanceof HTMLInputElement ||
+        event.target instanceof HTMLTextAreaElement ||
+        event.target instanceof HTMLSelectElement
+      ) {
+        return;
       }
-    );
 
+      if (event.key === 'ArrowLeft') {
+        currentIndex = getSectionIndex();
+
+        if (currentIndex > 0) {
+          goToSection(currentIndex - 1);
+        }
+      }
+
+      if (event.key === 'ArrowRight') {
+        currentIndex = getSectionIndex();
+
+        if (currentIndex >= sections.length - 1) {
+          goToSection(0);
+        } else {
+          goToSection(currentIndex + 1);
+        }
+      }
+    });
   }
 
 
-  if (nextButton) {
+  /* =========================================================
+     SECTIONS / ACTIVE TITLE
+     ========================================================= */
 
-    nextButton.addEventListener(
-      "click",
-      () => {
-
-        scrollToSection(
-          activeSectionIndex + 1
-        );
-
-      }
+  function initSections() {
+    const sections = Array.from(
+      document.querySelectorAll('[data-section]')
     );
 
-  }
+    const navigation = document.querySelector('.narrative-navigation');
 
+    if (!sections.length || !navigation) return;
 
-  /* =======================================================
-     06 — KEYBOARD NAVIGATION
-  ======================================================== */
+    const activeTitle = navigation.querySelector(
+      '[data-active-title]'
+    );
 
-  document.addEventListener("keydown", (event) => {
+    const previousButton = navigation.querySelector(
+      '[data-narrative-prev]'
+    );
 
-    /*
-       Do not hijack keyboard arrows while
-       interacting with form controls.
-    */
+    if (!activeTitle) return;
 
-    const target = event.target;
+    const updateActiveSection = (section) => {
+      if (!section) return;
 
-    if (
-      target instanceof HTMLInputElement ||
-      target instanceof HTMLTextAreaElement ||
-      target instanceof HTMLSelectElement ||
-      target instanceof HTMLButtonElement
-    ) {
-      return;
-    }
+      const title =
+        section.getAttribute('data-title') ||
+        section.querySelector('.section-title')?.textContent ||
+        '';
 
+      activeTitle.textContent = title.trim();
 
-    if (event.key === "ArrowLeft") {
+      const index = sections.indexOf(section);
 
-      if (activeSectionIndex > 0) {
-
-        scrollToSection(
-          activeSectionIndex - 1
+      if (previousButton) {
+        previousButton.disabled = index <= 0;
+        previousButton.setAttribute(
+          'aria-disabled',
+          index <= 0 ? 'true' : 'false'
         );
-
       }
 
-    }
+      sections.forEach((item) => {
+        item.classList.toggle('is-active', item === section);
+      });
+    };
 
-
-    if (event.key === "ArrowRight") {
-
-      scrollToSection(
-        activeSectionIndex + 1
-      );
-
-    }
-
-  });
-
-
-  /* =======================================================
-     07 — ACTIVE SECTION OBSERVER
-  ======================================================== */
-
-  if (sections.length) {
-
-    const sectionObserver =
-      new IntersectionObserver(
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(
         (entries) => {
+          const visible = entries
+            .filter((entry) => entry.isIntersecting)
+            .sort(
+              (a, b) =>
+                b.intersectionRatio - a.intersectionRatio
+            );
 
-          const visibleSections =
-            entries
-              .filter(
-                (entry) => entry.isIntersecting
-              )
-              .sort(
-                (a, b) =>
-                  b.intersectionRatio -
-                  a.intersectionRatio
-              );
-
-          if (!visibleSections.length) {
-            return;
+          if (visible.length) {
+            updateActiveSection(visible[0].target);
           }
-
-          const active =
-            visibleSections[0].target;
-
-          const index =
-            sections.indexOf(active);
-
-          if (index !== -1) {
-            setActiveSection(index);
-          }
-
         },
         {
-          threshold: [0.2, 0.35, 0.5, 0.65, 0.8],
-          rootMargin:
-            "-10% 0px -10% 0px"
+          threshold: [0.15, 0.35, 0.6, 0.85],
+          rootMargin: '-10% 0px -10% 0px'
         }
       );
 
-
-    sections.forEach((section) => {
-      sectionObserver.observe(section);
-    });
-
+      sections.forEach((section) => {
+        observer.observe(section);
+      });
+    } else {
+      updateActiveSection(sections[0]);
+    }
   }
 
 
-  /* =======================================================
-     08 — INITIAL SECTION
-  ======================================================== */
+  /* =========================================================
+     INTERNAL LINKS
+     ========================================================= */
 
-  setActiveSection(0);
+  function initLinks() {
+    const links = document.querySelectorAll(
+      'a[href^="#"]'
+    );
 
+    links.forEach((link) => {
+      link.addEventListener('click', (event) => {
+        const href = link.getAttribute('href');
 
-  /* =======================================================
-     09 — NATIVE REVEAL
-     
-     Funziona anche senza GSAP.
-  ======================================================== */
+        if (!href || href === '#') return;
 
-  const revealTargets = document.querySelectorAll(
-    ".narrative-section:not(.narrative-section--opening)"
-  );
+        const target = document.querySelector(href);
 
-
-  if (
-    "IntersectionObserver" in window &&
-    revealTargets.length
-  ) {
-
-    const revealObserver =
-      new IntersectionObserver(
-        (entries, observer) => {
-
-          entries.forEach((entry) => {
-
-            if (!entry.isIntersecting) {
-              return;
-            }
-
-            entry.target.classList.add(
-              "is-visible"
-            );
-
-            observer.unobserve(
-              entry.target
-            );
-
-          });
-
-        },
-        {
-          threshold: 0.12,
-          rootMargin: "0px 0px -8% 0px"
-        }
-      );
-
-
-    revealTargets.forEach((section) => {
-      revealObserver.observe(section);
-    });
-
-  } else {
-
-    revealTargets.forEach((section) => {
-      section.classList.add("is-visible");
-    });
-
-  }
-
-
-  /* =======================================================
-     10 — INTERNAL LINKS
-  ======================================================== */
-
-  document
-    .querySelectorAll('a[href^="#"]')
-    .forEach((link) => {
-
-      link.addEventListener("click", (event) => {
-
-        const href =
-          link.getAttribute("href");
-
-        if (
-          !href ||
-          href === "#" ||
-          href.length < 2
-        ) {
-          return;
-        }
-
-        const target =
-          document.querySelector(href);
-
-        if (!target) {
-          return;
-        }
+        if (!target) return;
 
         event.preventDefault();
 
-        closeMenu();
-
-        const index =
-          sections.indexOf(target);
-
-        if (index !== -1) {
-          setActiveSection(index);
-        }
-
         target.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
+          behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+          block: 'start'
         });
 
-        /*
-           Mantiene l'URL coerente con la sezione
-           senza provocare un salto.
-        */
-
-        if (
-          window.history &&
-          window.history.replaceState
-        ) {
-
-          window.history.replaceState(
-            null,
-            "",
-            href
-          );
-
-        }
-
+        history.replaceState(null, '', href);
       });
-
     });
-
-
-  /* =======================================================
-     11 — STANDBY
-  ======================================================== */
-
-  const resetStandbyTimer = () => {
-
-    if (standbyTimer) {
-      window.clearTimeout(
-        standbyTimer
-      );
-    }
-
-    if (
-      document.hidden ||
-      !standby ||
-      body.classList.contains("is-menu-open")
-    ) {
-      return;
-    }
-
-    standbyTimer =
-      window.setTimeout(
-        enterStandby,
-        STANDBY_DELAY
-      );
-
-  };
-
-
-  function enterStandby() {
-
-    if (!standby) return;
-
-    if (
-      body.classList.contains("is-menu-open")
-    ) {
-      resetStandbyTimer();
-      return;
-    }
-
-    standby.classList.add(
-      "is-active"
-    );
-
-    standby.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-    body.classList.add(
-      "is-standby"
-    );
-
   }
 
 
-  const exitStandby = () => {
+  /* =========================================================
+     MOTION
+     
+     GSAP è completamente opzionale.
+     Se non viene caricato, il sito continua a funzionare.
+     ========================================================= */
+
+  function initMotion() {
+    if (prefersReducedMotion()) {
+      document.documentElement.classList.add(
+        'reduced-motion'
+      );
+
+      revealWithoutAnimation();
+      return;
+    }
+
+    /*
+     * Aspettiamo un solo frame per permettere al browser
+     * di completare il primo rendering.
+     */
+
+    requestAnimationFrame(() => {
+      if (window.gsap && window.ScrollTrigger) {
+        initGSAP();
+      } else {
+        revealWithoutGSAP();
+      }
+    });
+  }
+
+
+  /* =========================================================
+     FALLBACK MOTION
+     ========================================================= */
+
+  function revealWithoutAnimation() {
+    const elements = document.querySelectorAll(
+      '[data-reveal], [data-title-reveal], [data-body-reveal]'
+    );
+
+    elements.forEach((element) => {
+      element.classList.add('is-visible');
+    });
+  }
+
+  function revealWithoutGSAP() {
+    const elements = document.querySelectorAll(
+      '[data-reveal], [data-title-reveal], [data-body-reveal]'
+    );
+
+    elements.forEach((element) => {
+      element.classList.add('is-visible');
+    });
+
+    if (
+      'IntersectionObserver' in window
+    ) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          });
+        },
+        {
+          threshold: 0.12,
+          rootMargin: '0px 0px -8% 0px'
+        }
+      );
+
+      elements.forEach((element) => {
+        observer.observe(element);
+      });
+    }
+  }
+
+
+  /* =========================================================
+     GSAP
+     ========================================================= */
+
+  function initGSAP() {
+    const gsap = window.gsap;
+    const ScrollTrigger = window.ScrollTrigger;
+
+    if (!gsap || !ScrollTrigger) {
+      revealWithoutGSAP();
+      return;
+    }
+
+    try {
+      gsap.registerPlugin(ScrollTrigger);
+
+      initGSAPTitles(gsap, ScrollTrigger);
+      initGSAPBodies(gsap, ScrollTrigger);
+      initGSAPImages(gsap, ScrollTrigger);
+
+      ScrollTrigger.refresh();
+    } catch (error) {
+      /*
+       * Un errore nella motion layer NON deve compromettere
+       * il contenuto del sito.
+       */
+
+      console.error(
+        'GSAP motion initialization failed:',
+        error
+      );
+
+      revealWithoutGSAP();
+    }
+  }
+
+
+  /* =========================================================
+     GSAP — TITLES
+     ========================================================= */
+
+  function initGSAPTitles(gsap, ScrollTrigger) {
+    const titles = document.querySelectorAll(
+      '[data-title-reveal]'
+    );
+
+    titles.forEach((title) => {
+      gsap.fromTo(
+        title,
+        {
+          opacity: 0,
+          y: 32
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.9,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: title,
+            start: 'top 82%',
+            end: 'top 42%',
+            toggleActions:
+              'play none none reverse'
+          }
+        }
+      );
+    });
+  }
+
+
+  /* =========================================================
+     GSAP — BODY
+     ========================================================= */
+
+  function initGSAPBodies(gsap, ScrollTrigger) {
+    const bodies = document.querySelectorAll(
+      '[data-body-reveal]'
+    );
+
+    bodies.forEach((body) => {
+      gsap.fromTo(
+        body,
+        {
+          opacity: 0,
+          y: 24
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.9,
+          delay: 0.08,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: body,
+            start: 'top 84%',
+            end: 'top 50%',
+            toggleActions:
+              'play none none reverse'
+          }
+        }
+      );
+    });
+  }
+
+
+  /* =========================================================
+     GSAP — IMAGES
+     ========================================================= */
+
+  function initGSAPImages(gsap, ScrollTrigger) {
+    const images = document.querySelectorAll(
+      '[data-image-reveal]'
+    );
+
+    images.forEach((image) => {
+      gsap.fromTo(
+        image,
+        {
+          opacity: 0,
+          y: 24
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1.1,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: image,
+            start: 'top 84%',
+            end: 'top 48%',
+            toggleActions:
+              'play none none reverse'
+          }
+        }
+      );
+    });
+  }
+
+
+  /* =========================================================
+     STANDBY
+     
+     40 secondi di inattività.
+     Nessun cambio di scroll.
+     Nessuna navigazione automatica.
+     ========================================================= */
+
+  function initStandby() {
+    const standby = document.querySelector(
+      '[data-standby]'
+    );
 
     if (!standby) return;
 
-    standby.classList.remove(
-      "is-active"
-    );
+    const standbyDelay = 40000;
 
-    standby.setAttribute(
-      "aria-hidden",
-      "true"
-    );
+    let standbyTimer = null;
+    let isStandby = false;
 
-    body.classList.remove(
-      "is-standby"
-    );
+    const enterStandby = () => {
+      if (isStandby) return;
 
-    /*
-       Nessun scroll viene effettuato:
-       la pagina torna esattamente al punto
-       in cui si trovava.
-    */
+      isStandby = true;
 
-    resetStandbyTimer();
+      standby.classList.add('is-active');
+      document.documentElement.classList.add(
+        'standby-active'
+      );
+    };
 
-  };
+    const exitStandby = () => {
+      if (!isStandby) return;
 
+      isStandby = false;
 
-  [
-    "pointerdown",
-    "pointermove",
-    "wheel",
-    "touchstart",
-    "keydown"
-  ].forEach((eventName) => {
+      standby.classList.remove('is-active');
+      document.documentElement.classList.remove(
+        'standby-active'
+      );
 
-    document.addEventListener(
-      eventName,
-      () => {
+      resetTimer();
+    };
 
-        if (
-          standby &&
-          standby.classList.contains("is-active")
-        ) {
-          exitStandby();
-        }
-
-        resetStandbyTimer();
-
-      },
-      {
-        passive:
-          eventName !== "keydown"
+    const resetTimer = () => {
+      if (standbyTimer) {
+        window.clearTimeout(standbyTimer);
       }
-    );
 
-  });
+      standbyTimer = window.setTimeout(
+        enterStandby,
+        standbyDelay
+      );
+    };
 
+    const activityEvents = [
+      'pointerdown',
+      'pointermove',
+      'wheel',
+      'touchstart',
+      'keydown',
+      'scroll'
+    ];
 
-  if (standby) {
+    activityEvents.forEach((eventName) => {
+      window.addEventListener(
+        eventName,
+        () => {
+          if (isStandby) {
+            exitStandby();
+          } else {
+            resetTimer();
+          }
+        },
+        {
+          passive: true
+        }
+      );
+    });
 
     standby.addEventListener(
-      "click",
+      'click',
       exitStandby
     );
 
+    document.addEventListener(
+      'visibilitychange',
+      () => {
+        if (document.hidden) {
+          if (standbyTimer) {
+            window.clearTimeout(standbyTimer);
+          }
+        } else {
+          resetTimer();
+        }
+      }
+    );
+
+    resetTimer();
   }
 
 
-  resetStandbyTimer();
+  /* =========================================================
+     REDUCED MOTION
+     ========================================================= */
+
+  function prefersReducedMotion() {
+    return window.matchMedia &&
+      window.matchMedia(
+        '(prefers-reduced-motion: reduce)'
+      ).matches;
+  }
 
 
-  /* =======================================================
-     12 — VISIBILITY
-  ======================================================== */
+  /* =========================================================
+     RESIZE
+     ========================================================= */
 
-  document.addEventListener(
-    "visibilitychange",
+  let resizeTimer = null;
+
+  window.addEventListener(
+    'resize',
     () => {
-
-      if (document.hidden) {
-
-        if (standbyTimer) {
-          window.clearTimeout(
-            standbyTimer
-          );
-        }
-
-      } else {
-
-        resetStandbyTimer();
-
+      if (resizeTimer) {
+        window.clearTimeout(resizeTimer);
       }
 
+      resizeTimer = window.setTimeout(() => {
+        if (
+          window.ScrollTrigger &&
+          !prefersReducedMotion()
+        ) {
+          try {
+            window.ScrollTrigger.refresh();
+          } catch (error) {
+            console.warn(
+              'ScrollTrigger refresh failed:',
+              error
+            );
+          }
+        }
+      }, 150);
+    },
+    {
+      passive: true
     }
   );
 
 
-  /* =======================================================
-     13 — GSAP
-     
-     GSAP è un livello di enhancement.
-     La Home rimane funzionante anche senza GSAP.
-  ======================================================== */
+  /* =========================================================
+     PAGE VISIBILITY
+     ========================================================= */
 
-  const initGSAP = () => {
-
-    if (
-      typeof window.gsap === "undefined" ||
-      typeof window.ScrollTrigger === "undefined"
-    ) {
-      return;
-    }
-
-    const gsap = window.gsap;
-    const ScrollTrigger =
-      window.ScrollTrigger;
-
-
-    try {
-
-      gsap.registerPlugin(
-        ScrollTrigger
-      );
-
-
-      body.classList.add(
-        "gsap-enabled"
-      );
-
-
-      /* =====================================================
-         TITOLI
-      ==================================================== */
-
-      sections.forEach((section, index) => {
-
-        const title =
-          section.querySelector(
-            ".section__title"
-          );
-
-        if (!title) return;
-
-
-        if (
-          window.matchMedia(
-            "(prefers-reduced-motion: reduce)"
-          ).matches
-        ) {
-          return;
-        }
-
-
-        /*
-           La prima sezione entra immediatamente.
-        */
-
-        if (index === 0) {
-
-          gsap.fromTo(
-            title,
-            {
-              opacity: 0,
-              y: 30
-            },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 1.2,
-              ease: "power3.out",
-              delay: 0.25,
-              overwrite: "auto"
-            }
-          );
-
-          return;
-
-        }
-
-
-        gsap.fromTo(
-          title,
-          {
-            opacity: 0,
-            y: 34
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 1.05,
-            ease: "power3.out",
-            overwrite: "auto",
-            scrollTrigger: {
-              trigger: section,
-              start: "top 72%",
-              end: "top 28%",
-              toggleActions:
-                "play none none reverse"
-            }
+  document.addEventListener(
+    'visibilitychange',
+    () => {
+      if (
+        !document.hidden &&
+        window.ScrollTrigger &&
+        !prefersReducedMotion()
+      ) {
+        window.requestAnimationFrame(() => {
+          try {
+            window.ScrollTrigger.refresh();
+          } catch (error) {
+            console.warn(
+              'ScrollTrigger refresh failed:',
+              error
+            );
           }
-        );
-
-      });
-
-
-      /* =====================================================
-         BODY
-      ==================================================== */
-
-      sections.forEach((section) => {
-
-        const bodyContent =
-          section.querySelector(
-            ".section__body"
-          );
-
-        if (!bodyContent) return;
-
-
-        if (
-          window.matchMedia(
-            "(prefers-reduced-motion: reduce)"
-          ).matches
-        ) {
-          return;
-        }
-
-
-        gsap.fromTo(
-          bodyContent,
-          {
-            opacity: 0,
-            y: 22
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.9,
-            ease: "power3.out",
-            delay: 0.12,
-            overwrite: "auto",
-            scrollTrigger: {
-              trigger: section,
-              start: "top 62%",
-              end: "top 25%",
-              toggleActions:
-                "play none none reverse"
-            }
-          }
-        );
-
-      });
-
-
-      /* =====================================================
-         PORTRAIT
-      ==================================================== */
-
-      document
-        .querySelectorAll(".portrait img")
-        .forEach((image) => {
-
-          if (
-            window.matchMedia(
-              "(prefers-reduced-motion: reduce)"
-            ).matches
-          ) {
-            return;
-          }
-
-
-          gsap.fromTo(
-            image,
-            {
-              opacity: 0,
-              scale: 1.025
-            },
-            {
-              opacity: 1,
-              scale: 1,
-              duration: 1.3,
-              ease: "power3.out",
-              overwrite: "auto",
-              scrollTrigger: {
-                trigger: image,
-                start: "top 75%",
-                toggleActions:
-                  "play none none reverse"
-              }
-            }
-          );
-
         });
-
-
-      /* =====================================================
-         MAP
-      ==================================================== */
-
-      document
-        .querySelectorAll(".territory-map")
-        .forEach((map) => {
-
-          if (
-            window.matchMedia(
-              "(prefers-reduced-motion: reduce)"
-            ).matches
-          ) {
-            return;
-          }
-
-
-          gsap.fromTo(
-            map,
-            {
-              opacity: 0,
-              y: 24
-            },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 1,
-              ease: "power3.out",
-              overwrite: "auto",
-              scrollTrigger: {
-                trigger: map,
-                start: "top 78%",
-                toggleActions:
-                  "play none none reverse"
-              }
-            }
-          );
-
-        });
-
-
-      /*
-         Ricalcolo dopo il caricamento delle immagini.
-      */
-
-      window.addEventListener(
-        "load",
-        () => {
-
-          ScrollTrigger.refresh();
-
-        },
-        {
-          once: true
-        }
-      );
-
-
-      /*
-         Resize controllato.
-      */
-
-      let resizeTimer = null;
-
-      window.addEventListener(
-        "resize",
-        () => {
-
-          window.clearTimeout(
-            resizeTimer
-          );
-
-          resizeTimer =
-            window.setTimeout(
-              () => {
-                ScrollTrigger.refresh();
-              },
-              250
-            );
-
-        }
-      );
-
-
-    } catch (error) {
-
-      /*
-         GSAP non deve mai compromettere
-         il funzionamento della Home.
-      */
-
-      console.error(
-        "GSAP initialization error:",
-        error
-      );
-
-      body.classList.remove(
-        "gsap-enabled"
-      );
-
-    }
-
-  };
-
-
-  /* =======================================================
-     14 — GSAP LOAD
-  ======================================================== */
-
-  /*
-     Gli script GSAP sono caricati con defer.
-     Quando il DOM è pronto, attendiamo che le librerie
-     siano disponibili.
-  */
-
-  const waitForGSAP = () => {
-
-    if (
-      typeof window.gsap !== "undefined" &&
-      typeof window.ScrollTrigger !== "undefined"
-    ) {
-
-      initGSAP();
-
-      return;
-
-    }
-
-
-    let attempts = 0;
-
-    const maxAttempts = 40;
-
-    const interval =
-      window.setInterval(
-        () => {
-
-          attempts += 1;
-
-          if (
-            typeof window.gsap !== "undefined" &&
-            typeof window.ScrollTrigger !== "undefined"
-          ) {
-
-            window.clearInterval(
-              interval
-            );
-
-            initGSAP();
-
-            return;
-
-          }
-
-
-          if (
-            attempts >= maxAttempts
-          ) {
-
-            window.clearInterval(
-              interval
-            );
-
-          }
-
-        },
-        100
-      );
-
-  };
-
-
-  if (document.readyState === "loading") {
-
-    document.addEventListener(
-      "DOMContentLoaded",
-      waitForGSAP,
-      {
-        once: true
       }
-    );
-
-  } else {
-
-    waitForGSAP();
-
-  }
+    }
+  );
 
 
-  /* =======================================================
-     15 — START
-  ======================================================== */
+  /* =========================================================
+     WINDOW LOAD
+     
+     Non controlla il loader.
+     Serve solamente ad aggiornare ScrollTrigger dopo
+     il caricamento delle risorse.
+     ========================================================= */
 
-  /*
-     Il loader viene comunque chiuso
-     dal sistema indipendente definito all'inizio.
-  */
-
-  updateNavigation();
-  resetStandbyTimer();
+  window.addEventListener(
+    'load',
+    () => {
+      if (
+        window.ScrollTrigger &&
+        !prefersReducedMotion()
+      ) {
+        try {
+          window.ScrollTrigger.refresh();
+        } catch (error) {
+          console.warn(
+            'Final ScrollTrigger refresh failed:',
+            error
+          );
+        }
+      }
+    },
+    {
+      once: true
+    }
+  );
 
 })();
