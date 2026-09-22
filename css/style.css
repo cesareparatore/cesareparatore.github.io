@@ -47,8 +47,10 @@
 html {
   margin: 0;
   padding: 0;
+
   background: var(--color-bg);
   color: var(--color-primary);
+
   scroll-behavior: smooth;
 }
 
@@ -75,7 +77,8 @@ body {
   overflow-x: hidden;
 }
 
-body.is-locked {
+body.menu-open,
+body.standby-active {
   overflow: hidden;
 }
 
@@ -131,6 +134,7 @@ a {
 .loader {
   position: fixed;
   inset: 0;
+
   z-index: 1000;
 
   display: grid;
@@ -157,6 +161,7 @@ a {
   display: flex;
   flex-direction: column;
   align-items: center;
+
   gap: 1.25rem;
 
   text-align: center;
@@ -170,6 +175,7 @@ a {
 .loader__name {
   font-size: .78rem;
   line-height: 1;
+
   letter-spacing: .16em;
   font-weight: 500;
 }
@@ -181,6 +187,7 @@ a {
 
 .site-header {
   position: fixed;
+
   top: 0;
   left: 0;
   right: 0;
@@ -192,7 +199,10 @@ a {
   justify-content: space-between;
 
   height: 82px;
-  padding: 0 var(--grid-margin);
+
+  padding:
+    0
+    var(--grid-margin);
 
   background: var(--color-primary);
   color: var(--color-bg);
@@ -200,6 +210,7 @@ a {
 
 .site-header__logo {
   display: inline-flex;
+
   align-items: center;
   justify-content: center;
 
@@ -208,6 +219,8 @@ a {
 }
 
 .site-header__logo img {
+  display: block;
+
   width: 100%;
   height: auto;
 }
@@ -219,6 +232,7 @@ a {
 
   font-size: .78rem;
   line-height: 1;
+
   letter-spacing: .13em;
   text-transform: uppercase;
 }
@@ -262,7 +276,11 @@ a {
 
 .global-menu__inner {
   width: 100%;
-  padding: 120px var(--grid-margin) 80px;
+
+  padding:
+    120px
+    var(--grid-margin)
+    80px;
 }
 
 .global-menu__nav {
@@ -276,6 +294,7 @@ a {
 .global-menu__nav a {
   font-size: clamp(2.8rem, 6vw, 7rem);
   line-height: .92;
+
   letter-spacing: -.045em;
 
   transition:
@@ -324,12 +343,17 @@ a {
 }
 
 .section__heading {
-  margin: 0 0 3.5rem;
+  margin:
+    0
+    0
+    3.5rem;
 
   font-size: .78rem;
   line-height: 1;
+
   letter-spacing: .13em;
   text-transform: uppercase;
+
   font-weight: 500;
 
   color: var(--color-secondary);
@@ -340,13 +364,17 @@ a {
 
   font-size: var(--narrative-size);
   line-height: var(--narrative-line-height);
+
   font-weight: 400;
 
   color: var(--color-primary);
 }
 
 .section__text p {
-  margin: 0 0 1.35em;
+  margin:
+    0
+    0
+    1.35em;
 }
 
 .section__text p:last-child {
@@ -379,26 +407,18 @@ a {
 
 /* =========================================================
    09 — SECTION REVEAL
+   BASE STATIC
+   Nessun contenuto viene nascosto.
+   Gli effetti verranno aggiunti successivamente.
 ========================================================= */
 
 .narrative-section .section__content,
 .narrative-section .portrait-section,
 .narrative-section .contact-section,
 .narrative-section .territory {
-  opacity: 0;
-  transform: translateY(36px);
 
-  transition:
-    opacity var(--transition-slow),
-    transform var(--transition-slow);
-}
-
-.narrative-section.is-visible .section__content,
-.narrative-section.is-visible .portrait-section,
-.narrative-section.is-visible .contact-section,
-.narrative-section.is-visible .territory {
   opacity: 1;
-  transform: translateY(0);
+  transform: none;
 }
 
 
@@ -410,11 +430,13 @@ a {
   width: 100%;
 
   display: grid;
+
   grid-template-columns:
     minmax(0, 1fr)
     minmax(0, 1fr);
 
-  gap: clamp(3rem, 7vw, 9rem);
+  gap:
+    clamp(3rem, 7vw, 9rem);
 
   align-items: center;
 }
@@ -426,7 +448,9 @@ a {
 .territory__statement {
   margin-bottom: 2rem !important;
 
-  font-size: clamp(1rem, 1.1vw, 1.2rem);
+  font-size:
+    clamp(1rem, 1.1vw, 1.2rem);
+
   line-height: 1.35;
 
   letter-spacing: -.01em;
@@ -469,11 +493,13 @@ a {
   width: 100%;
 
   display: grid;
+
   grid-template-columns:
     minmax(0, 1fr)
     minmax(0, 1fr);
 
-  gap: clamp(3rem, 7vw, 9rem);
+  gap:
+    clamp(3rem, 7vw, 9rem);
 
   align-items: center;
 }
@@ -526,6 +552,7 @@ a {
 
 .narrative-navigation {
   position: fixed;
+
   left: 0;
   right: 0;
   bottom: 0;
@@ -535,13 +562,20 @@ a {
   min-height: 96px;
 
   display: grid;
-  grid-template-columns: 96px 1fr 96px;
+
+  grid-template-columns:
+    96px
+    1fr
+    96px;
+
   align-items: center;
 
   background: var(--color-primary);
   color: var(--color-bg);
 
-  border-top: 1px solid rgba(11, 11, 10, .12);
+  border-top:
+    1px solid
+    rgba(11, 11, 10, .12);
 }
 
 .narrative-navigation__arrow {
@@ -584,6 +618,7 @@ a {
 .narrative-navigation__title {
   font-size: .72rem;
   line-height: 1;
+
   letter-spacing: .12em;
   text-transform: uppercase;
 
@@ -596,11 +631,13 @@ a {
   width: min(360px, 42vw);
   height: 1px;
 
-  background: rgba(11, 11, 10, .28);
+  background:
+    rgba(11, 11, 10, .28);
 }
 
 .narrative-navigation__marker {
   position: absolute;
+
   top: 50%;
   left: 0;
 
@@ -640,6 +677,8 @@ a {
 }
 
 .site-footer__logo img {
+  display: block;
+
   width: 100%;
   height: auto;
 }
@@ -647,6 +686,7 @@ a {
 .site-footer__name {
   font-size: .78rem;
   line-height: 1;
+
   letter-spacing: .13em;
   font-weight: 500;
 }
@@ -686,6 +726,7 @@ a {
 .standby__word {
   font-size: var(--display-xl);
   line-height: .9;
+
   letter-spacing: -.055em;
 }
 
@@ -724,6 +765,7 @@ a {
 
   font-size: var(--display-xl);
   line-height: .82;
+
   letter-spacing: -.06em;
   font-weight: 400;
 }
@@ -735,7 +777,10 @@ a {
 }
 
 .error-page__content p {
-  margin: 0 0 1.2rem;
+  margin:
+    0
+    0
+    1.2rem;
 
   font-size: var(--narrative-size);
   line-height: var(--narrative-line-height);
@@ -748,10 +793,14 @@ a {
 
   font-size: .78rem;
   line-height: 1;
+
   letter-spacing: .12em;
   text-transform: uppercase;
 
-  border-bottom: 1px solid currentColor;
+  border-bottom:
+    1px solid
+    currentColor;
+
   padding-bottom: .4rem;
 }
 
@@ -802,6 +851,7 @@ a {
   .territory,
   .portrait-section {
     grid-template-columns: 1fr;
+
     gap: 4rem;
   }
 
@@ -814,7 +864,11 @@ a {
   }
 
   .narrative-navigation {
-    grid-template-columns: 72px 1fr 72px;
+    grid-template-columns:
+      72px
+      1fr
+      72px;
+
     min-height: 72px;
   }
 
@@ -845,6 +899,7 @@ a {
 
   .site-header {
     height: 64px;
+
     padding:
       0
       var(--grid-margin);
@@ -867,7 +922,8 @@ a {
   }
 
   .global-menu__nav a {
-    font-size: clamp(2.3rem, 11vw, 4.5rem);
+    font-size:
+      clamp(2.3rem, 11vw, 4.5rem);
   }
 
   .section__inner {
@@ -912,7 +968,10 @@ a {
   .narrative-navigation {
     min-height: 64px;
 
-    grid-template-columns: 56px 1fr 56px;
+    grid-template-columns:
+      56px
+      1fr
+      56px;
   }
 
   .narrative-navigation__arrow {
