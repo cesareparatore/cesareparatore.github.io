@@ -1,49 +1,43 @@
 (() => {
   "use strict";
 
-  const reduceMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)"
-  ).matches;
+  /* =======================================================
+     ELEMENTS
+     ======================================================= */
 
   const body = document.body;
 
-  const loader = document.getElementById("loader");
+  const loader = document.querySelector(".loader");
+  const standby = document.querySelector(".standby");
 
-  const menu = document.getElementById("siteMenu");
-  const menuTrigger = document.getElementById("menuTrigger");
-  const menuTriggerLabel =
-    document.getElementById("menuTriggerLabel");
-
-  const navPrev = document.getElementById("navPrev");
-  const navNext = document.getElementById("navNext");
-  const navTitle = document.getElementById("navTitle");
-
-  const standby = document.getElementById("standby");
+  const menuTrigger = document.querySelector(".menu-trigger");
+  const menu = document.querySelector(".site-menu");
+  const menuLinks = document.querySelectorAll(".site-menu-nav a");
 
   const sections = Array.from(
-    document.querySelectorAll(
-      "main > section[data-title]"
-    )
+    document.querySelectorAll(".story-section")
   );
 
-  let activeIndex = 0;
-  let standbyTimer = null;
-  let menuOpen = false;
+  const sectionNav = document.querySelector(".section-nav");
+  const sectionNavTitle = document.querySelector(".section-nav-title");
+  const previousButton = document.querySelector(".section-nav-prev");
+  const nextButton = document.querySelector(".section-nav-next");
+
+  const prefersReducedMotion =
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 
   /* =======================================================
      MENU
-
-     L'header non viene modificato.
-     Il menu occupa esclusivamente l'area sottostante.
+     L'HEADER NON VIENE MAI MODIFICATO.
      ======================================================= */
 
-  function setMenu(open) {
+  const setMenu = (open) => {
+    if (!menuTrigger || !menu) return;
 
-    menuOpen = open;
-
-    menu.classList.toggle(
-      "is-open",
-      open
+    menuTrigger.setAttribute(
+      "aria-expanded",
+      String(open)
     );
 
     menu.setAttribute(
@@ -51,485 +45,475 @@
       String(!open)
     );
 
-    menuTrigger.setAttribute(
-      "aria-expanded",
-      String(open)
-    );
+    menu.classList.toggle("is-open", open);
+    body.classList.toggle("menu-open", open);
+  };
 
-    menuTriggerLabel.textContent =
-      open ? "CHIUDI" : "MENU";
+  if (menuTrigger && menu) {
 
-    body.classList.toggle(
-      "menu-open",
-      open
-    );
+    menuTrigger.addEventListener("click", () => {
+      const isOpen =
+        menuTrigger.getAttribute("aria-expanded") === "true";
 
-    if (open) {
+      setMenu(!isOpen);
+    });
 
-      menu.style.opacity = "1";
-      menu.style.visibility = "visible";
+    menuLinks.forEach((link) => {
+      link.addEventListener("click", () => {
+        setMenu(false);
+      });
+    });
 
-    } else {
-
-      menu.style.opacity = "0";
-      menu.style.visibility = "hidden";
-
-    }
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        setMenu(false);
+      }
+    });
   }
 
-  menuTrigger.addEventListener(
-    "click",
-    () => {
-      setMenu(!menuOpen);
-    }
-  );
-
-  menu.addEventListener(
-    "click",
-    (event) => {
-
-      const link =
-        event.target.closest("a");
-
-      if (link) {
-        setMenu(false);
-      }
-    }
-  );
-
-  document.addEventListener(
-    "keydown",
-    (event) => {
-
-      if (
-        event.key === "Escape" &&
-        menuOpen
-      ) {
-        setMenu(false);
-        menuTrigger.focus();
-      }
-    }
-  );
 
   /* =======================================================
-     NAVIGAZIONE NARRATIVA
+     NARRATIVE NAVIGATION
      ======================================================= */
 
-  function updateNavigation(index) {
+  let activeIndex = 0;
 
-    if (!sections.length) {
-      return;
-    }
+  const updateNavigation = (index) => {
+
+    if (!sections.length) return;
 
     activeIndex = index;
 
-    navTitle.textContent =
-      sections[index].dataset.title || "";
+    const title =
+      sections[index].dataset.sectionTitle || "";
 
-    navPrev.disabled =
-      index === 0;
-
-    navPrev.setAttribute(
-      "aria-disabled",
-      String(index === 0)
-    );
-
-    const isLast =
-      index === sections.length - 1;
-
-    navNext.setAttribute(
-      "aria-label",
-      isLast
-        ? "Torna a GUARDA"
-        : "Sezione successiva"
-    );
-  }
-
-  function goToSection(index) {
-
-    const count = sections.length;
-
-    if (!count) {
-      return;
+    if (sectionNavTitle) {
+      sectionNavTitle.textContent = title;
     }
 
-    const targetIndex =
-      ((index % count) + count) % count;
+    if (previousButton) {
+      previousButton.disabled = index === 0;
+    }
 
-    sections[targetIndex].scrollIntoView({
-      behavior:
-        reduceMotion
-          ? "auto"
-          : "smooth",
+    if (nextButton) {
+      nextButton.disabled = false;
+    }
+  };
+
+
+  const scrollToSection = (index) => {
+
+    if (!sections.length) return;
+
+    const total = sections.length;
+
+    let targetIndex = index;
+
+    if (targetIndex < 0) {
+      targetIndex = 0;
+    }
+
+    if (targetIndex >= total) {
+      targetIndex = 0;
+    }
+
+    const target = sections[targetIndex];
+
+    if (!target) return;
+
+    updateNavigation(targetIndex);
+
+    target.scrollIntoView({
+      behavior: prefersReducedMotion ? "auto" : "smooth",
       block: "start"
     });
+  };
 
-    updateNavigation(
-      targetIndex
-    );
+
+  if (previousButton) {
+    previousButton.addEventListener("click", () => {
+      scrollToSection(activeIndex - 1);
+    });
   }
 
-  navPrev.addEventListener(
-    "click",
-    () => {
+  if (nextButton) {
+    nextButton.addEventListener("click", () => {
+      const nextIndex =
+        activeIndex === sections.length - 1
+          ? 0
+          : activeIndex + 1;
 
-      if (activeIndex > 0) {
-        goToSection(
-          activeIndex - 1
-        );
-      }
-    }
-  );
+      scrollToSection(nextIndex);
+    });
+  }
 
-  navNext.addEventListener(
-    "click",
-    () => {
-
-      if (
-        activeIndex ===
-        sections.length - 1
-      ) {
-        goToSection(0);
-      } else {
-        goToSection(
-          activeIndex + 1
-        );
-      }
-    }
-  );
 
   /* =======================================================
-     SECTION OBSERVER
+     ACTIVE SECTION OBSERVER
      ======================================================= */
 
-  function initNavigationObserver() {
+  if (sections.length) {
 
-    if (!sections.length) {
-      return;
-    }
+    const observer = new IntersectionObserver(
+      (entries) => {
 
-    const observer =
-      new IntersectionObserver(
-        (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort(
+            (a, b) =>
+              b.intersectionRatio - a.intersectionRatio
+          );
 
-          const visibleEntries =
-            entries
-              .filter(
-                (entry) =>
-                  entry.isIntersecting
-              )
-              .sort(
-                (a, b) =>
-                  b.intersectionRatio -
-                  a.intersectionRatio
-              );
+        if (!visible.length) return;
 
-          if (
-            !visibleEntries.length
-          ) {
-            return;
-          }
+        const current =
+          visible[0].target;
 
-          const index =
-            sections.indexOf(
-              visibleEntries[0].target
-            );
+        const index =
+          sections.indexOf(current);
 
-          if (index !== -1) {
-            updateNavigation(index);
-          }
-        },
-        {
-          root: null,
-
-          rootMargin:
-            "-30% 0px -45% 0px",
-
-          threshold: [
-            0.05,
-            0.2,
-            0.5,
-            0.8
-          ]
+        if (index !== -1) {
+          updateNavigation(index);
         }
-      );
-
-    sections.forEach(
-      (section) => {
-        observer.observe(section);
+      },
+      {
+        root: null,
+        threshold: [0.2, 0.4, 0.6],
+        rootMargin:
+          `-${getComputedStyle(document.documentElement)
+            .getPropertyValue("--header-h")} 0px -25% 0px`
       }
     );
+
+    sections.forEach((section) => {
+      observer.observe(section);
+    });
+
+    updateNavigation(0);
   }
+
 
   /* =======================================================
      MOTION
      ======================================================= */
 
-  function initMotion() {
-
-    if (reduceMotion) {
-      return;
-    }
+  const initMotion = () => {
 
     if (
-      !window.gsap ||
-      !window.ScrollTrigger
+      prefersReducedMotion ||
+      typeof window.gsap === "undefined"
     ) {
       return;
     }
 
-    gsap.registerPlugin(
-      ScrollTrigger
-    );
-
-    document
-      .querySelectorAll(
-        ".narrative-section, .context-section, .portrait-section"
-      )
-      .forEach(
-        (section) => {
-
-          const title =
-            section.querySelector(
-              ".section-title"
-            );
-
-          const content =
-            section.querySelector(
-              ".narrative-body"
-            );
-
-          const image =
-            section.querySelector(
-              ".portrait-frame"
-            );
-
-          if (title) {
-
-            gsap.fromTo(
-              title,
-              {
-                y: 34,
-                opacity: 0
-              },
-              {
-                y: 0,
-                opacity: 1,
-                duration: 1,
-                ease: "power2.out",
-
-                scrollTrigger: {
-                  trigger: section,
-                  start: "top 76%",
-                  once: true
-                }
-              }
-            );
-          }
-
-          if (content) {
-
-            gsap.fromTo(
-              content,
-              {
-                y: 24,
-                opacity: 0
-              },
-              {
-                y: 0,
-                opacity: 1,
-                duration: 1,
-                delay: 0.12,
-                ease: "power2.out",
-
-                scrollTrigger: {
-                  trigger: section,
-                  start: "top 70%",
-                  once: true
-                }
-              }
-            );
-          }
-
-          if (image) {
-
-            gsap.fromTo(
-              image,
-              {
-                y: 18,
-                opacity: 0
-              },
-              {
-                y: 0,
-                opacity: 1,
-                duration: 1,
-                delay: 0.16,
-                ease: "power2.out",
-
-                scrollTrigger: {
-                  trigger: section,
-                  start: "top 70%",
-                  once: true
-                }
-              }
-            );
-          }
-        }
-      );
-  }
-
-  /* =======================================================
-     STANDBY
-     ======================================================= */
-
-  function resetStandbyTimer() {
-
-    window.clearTimeout(
-      standbyTimer
-    );
-
-    if (menuOpen) {
-      return;
-    }
-
-    standbyTimer =
-      window.setTimeout(
-        () => {
-
-          standby.classList.add(
-            "is-active"
-          );
-
-          standby.setAttribute(
-            "aria-hidden",
-            "false"
-          );
-
-          body.classList.add(
-            "standby-active"
-          );
-
-        },
-        40000
-      );
-  }
-
-  function exitStandby() {
-
     if (
-      !standby.classList.contains(
-        "is-active"
-      )
+      typeof window.ScrollTrigger === "undefined"
     ) {
       return;
     }
 
-    standby.classList.remove(
-      "is-active"
-    );
+    gsap.registerPlugin(ScrollTrigger);
 
-    standby.setAttribute(
-      "aria-hidden",
-      "true"
-    );
+    sections.forEach((section) => {
 
-    body.classList.remove(
-      "standby-active"
-    );
+      const title =
+        section.querySelector(".section-title");
 
-    const current =
-      sections[activeIndex];
+      const bodyContent =
+        section.querySelector(".story-body");
 
-    if (current) {
+      const image =
+        section.querySelector(".portrait-frame");
 
-      current.scrollIntoView({
-        behavior:
-          reduceMotion
-            ? "auto"
-            : "smooth",
+      if (title) {
 
-        block: "start"
-      });
-    }
-  }
-
-  [
-    "pointermove",
-    "pointerdown",
-    "wheel",
-    "touchstart",
-    "keydown"
-  ].forEach(
-    (eventName) => {
-
-      window.addEventListener(
-        eventName,
-        () => {
-
-          if (
-            standby.classList.contains(
-              "is-active"
-            )
-          ) {
-            exitStandby();
+        gsap.fromTo(
+          title,
+          {
+            opacity: 0,
+            y: 44,
+            scale: .985
+          },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: .9,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: section,
+              start: "top 72%",
+              end: "top 28%",
+              toggleActions:
+                "play reverse play reverse"
+            }
           }
+        );
+      }
 
-          resetStandbyTimer();
-        },
-        {
-          passive:
-            eventName !== "keydown"
-        }
-      );
-    }
-  );
+      if (bodyContent) {
+
+        gsap.fromTo(
+          bodyContent,
+          {
+            opacity: 0,
+            y: 28
+          },
+          {
+            opacity: 1,
+            y: 0,
+            duration: .9,
+            delay: .08,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: section,
+              start: "top 64%",
+              end: "top 25%",
+              toggleActions:
+                "play reverse play reverse"
+            }
+          }
+        );
+      }
+
+      if (image) {
+
+        gsap.fromTo(
+          image,
+          {
+            opacity: 0,
+            y: 24
+          },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: section,
+              start: "top 65%",
+              end: "top 25%",
+              toggleActions:
+                "play reverse play reverse"
+            }
+          }
+        );
+      }
+    });
+  };
+
 
   /* =======================================================
      LOADER / SIPARIO
      ======================================================= */
 
-  function initLoader() {
+  const initLoader = () => {
 
-    if (!loader) {
+    if (!loader) return;
+
+    if (prefersReducedMotion) {
+
+      loader.style.opacity = "0";
+      loader.style.visibility = "hidden";
+
+      initMotion();
       return;
     }
 
-    const finish =
-      () => {
+    const loaderLogo =
+      loader.querySelector(".loader-logo");
 
-        loader.classList.add(
-          "is-hidden"
-        );
+    const loaderName =
+      loader.querySelector(".loader-name");
 
-        loader.setAttribute(
-          "aria-hidden",
-          "true"
-        );
+    const finish = () => {
 
-        resetStandbyTimer();
-      };
+      if (typeof window.gsap === "undefined") {
 
-    if (reduceMotion) {
-      finish();
-      return;
+        loader.style.opacity = "0";
+        loader.style.visibility = "hidden";
+
+        initMotion();
+        return;
+      }
+
+      const timeline =
+        gsap.timeline({
+          onComplete: () => {
+            loader.style.visibility = "hidden";
+            initMotion();
+          }
+        });
+
+      timeline
+        .to(loaderLogo, {
+          opacity: 0,
+          duration: .45,
+          ease: "power2.inOut"
+        })
+        .to(loaderName, {
+          opacity: 0,
+          duration: .35,
+          ease: "power2.inOut"
+        }, "<")
+        .to(loader, {
+          opacity: 0,
+          duration: .65,
+          ease: "power2.inOut"
+        });
+    };
+
+    if (
+      typeof window.gsap !== "undefined"
+    ) {
+
+      gsap.set(loaderLogo, {
+        opacity: 0,
+        y: 12
+      });
+
+      gsap.set(loaderName, {
+        opacity: 0,
+        y: 8
+      });
+
+      const timeline =
+        gsap.timeline();
+
+      timeline
+        .to(loaderLogo, {
+          opacity: 1,
+          y: 0,
+          duration: .7,
+          ease: "power2.out"
+        })
+        .to(loaderName, {
+          opacity: 1,
+          y: 0,
+          duration: .5,
+          ease: "power2.out"
+        }, "-=.25")
+        .to({}, {
+          duration: .45
+        })
+        .call(finish);
+
+    } else {
+
+      window.setTimeout(finish, 1400);
+    }
+  };
+
+
+  /* =======================================================
+     STANDBY
+     ======================================================= */
+
+  let standbyTimer = null;
+  let standbyActive = false;
+
+  const showStandby = () => {
+
+    if (!standby || standbyActive) return;
+
+    standbyActive = true;
+
+    standby.classList.add("is-active");
+    body.classList.add("standby-active");
+  };
+
+
+  const hideStandby = () => {
+
+    if (!standby || !standbyActive) return;
+
+    standbyActive = false;
+
+    standby.classList.remove("is-active");
+    body.classList.remove("standby-active");
+  };
+
+
+  const resetStandbyTimer = () => {
+
+    if (standbyTimer) {
+      window.clearTimeout(standbyTimer);
     }
 
-    window.setTimeout(
-      finish,
-      1400
+    if (standbyActive) {
+      hideStandby();
+    }
+
+    standbyTimer =
+      window.setTimeout(
+        showStandby,
+        40000
+      );
+  };
+
+
+  [
+    "mousemove",
+    "mousedown",
+    "touchstart",
+    "wheel",
+    "scroll",
+    "keydown"
+  ].forEach((eventName) => {
+
+    window.addEventListener(
+      eventName,
+      resetStandbyTimer,
+      {
+        passive: true
+      }
+    );
+  });
+
+
+  if (standby) {
+
+    standby.addEventListener(
+      "click",
+      hideStandby
     );
   }
 
+
   /* =======================================================
-     INIT
+     RESIZE
      ======================================================= */
 
-  updateNavigation(0);
+  let resizeTimer = null;
 
-  initNavigationObserver();
+  window.addEventListener(
+    "resize",
+    () => {
 
-  initMotion();
+      window.clearTimeout(resizeTimer);
 
+      resizeTimer =
+        window.setTimeout(() => {
+
+          if (
+            typeof window.ScrollTrigger !== "undefined"
+          ) {
+            ScrollTrigger.refresh();
+          }
+
+        }, 150);
+    },
+    {
+      passive: true
+    }
+  );
+
+
+  /* =======================================================
+     INITIALIZATION
+     ======================================================= */
+
+  resetStandbyTimer();
   initLoader();
 
 })();
