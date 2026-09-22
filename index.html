@@ -9,22 +9,16 @@
   >
 
   <meta
+    name="theme-color"
+    content="#0B0B0A"
+  >
+
+  <meta
     name="description"
     content="Cesare Paratore — sport, educazione, progettazione, management e digitale."
   >
 
-  <meta name="theme-color" content="#0B0B0A">
-
   <title>Cesare Paratore</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <!-- Font principale: sostituire con il file Neue Montreal locale se disponibile -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
-    rel="stylesheet"
-  >
 
   <link rel="stylesheet" href="style.css">
 </head>
@@ -38,14 +32,14 @@
   <div
     class="loader"
     id="loader"
-    aria-hidden="true"
+    aria-hidden="false"
   >
     <div class="loader__inner">
 
       <img
         class="loader__logo"
         src="assets/images/cp-mark.svg"
-        alt=""
+        alt="CP"
       >
 
       <div class="loader__name">
@@ -65,7 +59,7 @@
     <a
       class="site-header__logo"
       href="#guarda"
-      aria-label="Torna all'inizio"
+      aria-label="Cesare Paratore — torna all'inizio"
     >
       <img
         src="assets/images/cp-mark.svg"
@@ -79,14 +73,14 @@
       aria-expanded="false"
       aria-controls="global-menu"
     >
-      <span>MENU</span>
+      MENU
     </button>
 
   </header>
 
 
   <!-- =========================================================
-       GLOBAL MENU
+       MENU
   ========================================================== -->
 
   <aside
@@ -102,7 +96,6 @@
         aria-label="Navigazione principale"
       >
 
-        <a href="#guarda">Chi sono</a>
         <a href="#movimento">Sport</a>
         <a href="#capire">Scienze motorie</a>
         <a href="#trasmettere">Educazione</a>
@@ -119,11 +112,13 @@
 
 
   <!-- =========================================================
-       MAIN NARRATIVE
+       NARRATIVE
   ========================================================== -->
 
-  <main id="main-content" class="narrative">
-
+  <main
+    class="narrative"
+    id="main-content"
+  >
 
     <!-- =======================================================
          01 — GUARDA.
@@ -132,11 +127,10 @@
     <section
       class="narrative-section narrative-section--opening"
       id="guarda"
-      data-section="1"
-      data-title="GUARDA."
+      data-section="guarda"
     >
 
-      <div class="section__stage">
+      <div class="section__inner">
 
         <h1 class="section__title">
           GUARDA.
@@ -154,39 +148,34 @@
     <section
       class="narrative-section"
       id="come"
-      data-section="2"
-      data-title="COME?"
+      data-section="come"
     >
 
-      <div class="section__stage">
+      <div class="section__inner">
 
-        <div class="section__content">
+        <h2 class="section__title">
+          COME?
+        </h2>
 
-          <h2 class="section__title">
-            COME?
-          </h2>
+        <div class="section__body">
 
-          <div class="section__body">
+          <p>Ricordo il primo computer.</p>
 
-            <p>Ricordo il primo computer.</p>
+          <p>E quel mouse che si muoveva sullo schermo.</p>
 
-            <p>E quel mouse che si muoveva sullo schermo.</p>
+          <p>Ho iniziato a usarlo.</p>
 
-            <p>Ho iniziato a usarlo.</p>
+          <p>Poi mi sono chiesto cosa ci fosse dietro quel movimento.</p>
 
-            <p>Poi mi sono chiesto cosa ci fosse dietro quel movimento.</p>
+          <p>Come funzionava.</p>
 
-            <p>Come funzionava.</p>
+          <p>Così ho iniziato a cercare la risposta.</p>
 
-            <p>Così ho iniziato a cercare la risposta.</p>
+          <p>A capire cosa c'era dentro.</p>
 
-            <p>A capire cosa c'era dentro.</p>
+          <p>A scoprire cosa potevo fare.</p>
 
-            <p>A scoprire cosa potevo fare.</p>
-
-            <p>E, quando ho capito come funzionava, ho cercato di farlo funzionare meglio.</p>
-
-          </div>
+          <p>E, quando ho capito come funzionava, ho cercato di farlo funzionare meglio.</p>
 
         </div>
 
@@ -202,39 +191,36 @@
     <section
       class="narrative-section"
       id="movimento"
-      data-section="3"
-      data-title="MOVIMENTO."
+      data-section="movimento"
     >
 
-      <div class="section__stage">
+      <div class="section__inner">
 
-        <div class="section__content">
+        <h2 class="section__title">
+          MOVIMENTO.
+        </h2>
 
-          <h2 class="section__title">
-            MOVIMENTO.
-          </h2>
+        <div class="section__body">
 
-          <div class="section__body">
+          <p>Poi ho iniziato a guardare il movimento.</p>
 
-            <p>Poi ho iniziato a guardare il movimento.</p>
+          <p>Prima il mio.</p>
 
-            <p>Prima il mio.</p>
+          <p>Poi quello degli altri.</p>
 
-            <p>Poi quello degli altri.</p>
+          <p>Nello sport ho trovato un nuovo modo di vivere il movimento.</p>
 
-            <p>Nello sport ho trovato un nuovo modo di vivere il movimento.</p>
+          <p>Ho iniziato a misurarmi con i miei limiti.</p>
 
-            <p>Ho iniziato a misurarmi con i miei limiti.</p>
+          <p>A capire cosa potevo fare meglio.</p>
 
-            <p>A capire cosa potevo fare meglio.</p>
+          <p><strong>Nella corsa ho iniziato a capire davvero il movimento.</strong></p>
 
-            <p><strong>Nella corsa ho iniziato a capire davvero il movimento.</strong></p>
+          <p>Prima da atleta.</p>
 
-            <p>Prima da atleta.</p>
+          <p>Poi da tecnico.</p>
 
-            <p>Poi da tecnico.</p>
-
-          </div>
+          <p>Più lo vivevo, più volevo capire.</p>
 
         </div>
 
@@ -250,29 +236,22 @@
     <section
       class="narrative-section"
       id="capire"
-      data-section="4"
-      data-title="CAPIRE."
+      data-section="capire"
     >
 
-      <div class="section__stage">
+      <div class="section__inner">
 
-        <div class="section__content">
+        <h2 class="section__title">
+          CAPIRE.
+        </h2>
 
-          <h2 class="section__title">
-            CAPIRE.
-          </h2>
+        <div class="section__body">
 
-          <div class="section__body">
+          <p>Così ho iniziato a studiarlo.</p>
 
-            <p>Più lo vivevo, più volevo capire.</p>
+          <p>Ho cercato di capire cosa ci fosse dietro quello che vivevo.</p>
 
-            <p>Così ho iniziato a studiarlo.</p>
-
-            <p>Ho cercato di capire cosa ci fosse dietro quello che vivevo.</p>
-
-            <p>E ho iniziato a mettere insieme l'esperienza con quello che imparavo.</p>
-
-          </div>
+          <p>E ho iniziato a mettere insieme l'esperienza con quello che imparavo.</p>
 
         </div>
 
@@ -288,33 +267,28 @@
     <section
       class="narrative-section"
       id="trasmettere"
-      data-section="5"
-      data-title="TRASMETTERE."
+      data-section="trasmettere"
     >
 
-      <div class="section__stage">
+      <div class="section__inner">
 
-        <div class="section__content">
+        <h2 class="section__title">
+          TRASMETTERE.
+        </h2>
 
-          <h2 class="section__title">
-            TRASMETTERE.
-          </h2>
+        <div class="section__body">
 
-          <div class="section__body">
+          <p><strong>Quello che avevo scoperto è diventato qualcosa da trasmettere.</strong></p>
 
-            <p><strong>Quello che avevo scoperto è diventato qualcosa da trasmettere.</strong></p>
+          <p>Prima attraverso quello che avevo vissuto sul campo.</p>
 
-            <p>Prima attraverso quello che avevo vissuto sul campo.</p>
+          <p>Poi attraverso ciò che lo studio mi aveva dato.</p>
 
-            <p>Poi attraverso ciò che lo studio mi aveva dato.</p>
+          <p>Non ho trasmesso solo il movimento.</p>
 
-            <p>Non ho trasmesso solo il movimento.</p>
+          <p>Non ho trasmesso solo lo sport.</p>
 
-            <p>Non ho trasmesso solo lo sport.</p>
-
-            <p><strong>Ho iniziato a trasmettere anche quello che avevo imparato.</strong></p>
-
-          </div>
+          <p><strong>Ho iniziato a trasmettere anche quello che avevo imparato.</strong></p>
 
         </div>
 
@@ -330,33 +304,28 @@
     <section
       class="narrative-section"
       id="costruire"
-      data-section="6"
-      data-title="COSTRUIRE."
+      data-section="costruire"
     >
 
-      <div class="section__stage">
+      <div class="section__inner">
 
-        <div class="section__content">
+        <h2 class="section__title">
+          COSTRUIRE.
+        </h2>
 
-          <h2 class="section__title">
-            COSTRUIRE.
-          </h2>
+        <div class="section__body">
 
-          <div class="section__body">
+          <p>E ho continuato ad allargare lo sguardo.</p>
 
-            <p>E ho continuato ad allargare lo sguardo.</p>
+          <p>Ho iniziato a guardare lo sport anche da un'altra prospettiva.</p>
 
-            <p>Ho iniziato a guardare lo sport anche da un'altra prospettiva.</p>
+          <p>Ho iniziato a capire come funzionavano le cose.</p>
 
-            <p>Ho iniziato a capire come funzionavano le cose.</p>
+          <p>A cercare modi per farle funzionare meglio.</p>
 
-            <p>A cercare modi per farle funzionare meglio.</p>
+          <p>A progettare.</p>
 
-            <p>A progettare.</p>
-
-            <p>A capire come farle funzionare insieme.</p>
-
-          </div>
+          <p>A capire come farle funzionare insieme.</p>
 
         </div>
 
@@ -372,39 +341,34 @@
     <section
       class="narrative-section"
       id="ritorna"
-      data-section="7"
-      data-title="RITORNA."
+      data-section="ritorna"
     >
 
-      <div class="section__stage">
+      <div class="section__inner">
 
-        <div class="section__content">
+        <h2 class="section__title">
+          RITORNA.
+        </h2>
 
-          <h2 class="section__title">
-            RITORNA.
-          </h2>
+        <div class="section__body">
 
-          <div class="section__body">
+          <p><strong>E il digitale è tornato.</strong></p>
 
-            <p><strong>E il digitale è tornato.</strong></p>
+          <p>Ho iniziato a capire come si costruisce una pagina Web.</p>
 
-            <p>Ho iniziato a capire come si costruisce una pagina Web.</p>
+          <p>Come prende forma.</p>
 
-            <p>Come prende forma.</p>
+          <p>Come diventa un'esperienza.</p>
 
-            <p>Come diventa un'esperienza.</p>
+          <p>Allora non avevo gli strumenti per farla come la immaginavo.</p>
 
-            <p>Allora non avevo gli strumenti per farla come la immaginavo.</p>
+          <p>Oggi li ho.</p>
 
-            <p>Oggi li ho.</p>
+          <p>E posso usare quello che ho imparato per costruire pagine Web.</p>
 
-            <p>E posso usare quello che ho imparato per costruire pagine Web.</p>
+          <p>Prima per me.</p>
 
-            <p>Prima per me.</p>
-
-            <p>E forse, domani, anche per altri.</p>
-
-          </div>
+          <p>E forse, domani, anche per altri.</p>
 
         </div>
 
@@ -420,31 +384,26 @@
     <section
       class="narrative-section"
       id="collegare"
-      data-section="8"
-      data-title="COLLEGARE."
+      data-section="collegare"
     >
 
-      <div class="section__stage">
+      <div class="section__inner">
 
-        <div class="section__content">
+        <h2 class="section__title">
+          COLLEGARE.
+        </h2>
 
-          <h2 class="section__title">
-            COLLEGARE.
-          </h2>
+        <div class="section__body">
 
-          <div class="section__body">
+          <p>Ho attraversato esperienze diverse.</p>
 
-            <p>Ho attraversato esperienze diverse.</p>
+          <p>E in tutte ho ritrovato lo stesso modo di guardare.</p>
 
-            <p>E in tutte ho ritrovato lo stesso modo di guardare.</p>
+          <p>Capire.</p>
 
-            <p>Capire.</p>
+          <p>Collegare.</p>
 
-            <p>Collegare.</p>
-
-            <p>Costruire.</p>
-
-          </div>
+          <p>Costruire.</p>
 
         </div>
 
@@ -460,37 +419,32 @@
     <section
       class="narrative-section"
       id="oggi"
-      data-section="9"
-      data-title="OGGI."
+      data-section="oggi"
     >
 
-      <div class="section__stage">
+      <div class="section__inner">
 
-        <div class="section__content">
+        <h2 class="section__title">
+          OGGI.
+        </h2>
 
-          <h2 class="section__title">
-            OGGI.
-          </h2>
+        <div class="section__body">
 
-          <div class="section__body">
+          <p>Oggi è questo il modo in cui guardo ciò che ho davanti.</p>
 
-            <p>Oggi è questo il modo in cui guardo ciò che ho davanti.</p>
+          <p>Osservo.</p>
 
-            <p>Osservo.</p>
+          <p>Studio.</p>
 
-            <p>Studio.</p>
+          <p>Collego.</p>
 
-            <p>Collego.</p>
+          <p>Progetto.</p>
 
-            <p>Progetto.</p>
+          <p>Sviluppo.</p>
 
-            <p>Sviluppo.</p>
+          <p>E ogni volta parto dalla stessa cosa:</p>
 
-            <p>E ogni volta parto dalla stessa cosa:</p>
-
-            <p><strong>capire prima di intervenire.</strong></p>
-
-          </div>
+          <p><strong>capire prima di intervenire.</strong></p>
 
         </div>
 
@@ -506,33 +460,28 @@
     <section
       class="narrative-section"
       id="obiettivo"
-      data-section="10"
-      data-title="OBIETTIVO."
+      data-section="obiettivo"
     >
 
-      <div class="section__stage">
+      <div class="section__inner">
 
-        <div class="section__content">
+        <h2 class="section__title">
+          OBIETTIVO.
+        </h2>
 
-          <h2 class="section__title">
-            OBIETTIVO.
-          </h2>
+        <div class="section__body">
 
-          <div class="section__body">
+          <p>Tutto parte da un obiettivo.</p>
 
-            <p>Tutto parte da un obiettivo.</p>
+          <p>Da qualcosa che si vuole raggiungere.</p>
 
-            <p>Da qualcosa che si vuole raggiungere.</p>
+          <p>Da qualcosa che si vuole cambiare.</p>
 
-            <p>Da qualcosa che si vuole cambiare.</p>
+          <p>Da qualcosa che ancora non esiste.</p>
 
-            <p>Da qualcosa che ancora non esiste.</p>
+          <p><strong>DA DOVE SI PARTE CONTA.</strong></p>
 
-            <p><strong>DA DOVE SI PARTE CONTA.</strong></p>
-
-            <p><strong>IL CONTESTO CAMBIA LO SGUARDO.</strong></p>
-
-          </div>
+          <p><strong>IL CONTESTO CAMBIA LO SGUARDO.</strong></p>
 
         </div>
 
@@ -548,62 +497,52 @@
     <section
       class="narrative-section narrative-section--territory"
       id="qui"
-      data-section="11"
-      data-title="QUI."
+      data-section="qui"
     >
 
-      <div class="section__stage">
+      <div class="section__inner section__inner--split">
 
-        <div class="territory">
+        <div class="section__content">
 
-          <div class="territory__content">
+          <h2 class="section__title">
+            QUI.
+          </h2>
 
-            <h2 class="section__title">
-              QUI.
-            </h2>
+          <div class="section__body">
 
-            <div class="section__body">
+            <p>
+              Un luogo non è soltanto<br>
+              un punto sulla mappa.
+            </p>
 
-              <p>
-                Un luogo non è soltanto<br>
-                un punto sulla mappa.
-              </p>
+            <p>
+              È il luogo in cui il movimento<br>
+              viene vissuto, praticato e osservato.
+            </p>
 
-              <p>
-                È il luogo in cui il movimento<br>
-                viene vissuto, praticato e osservato.
-              </p>
+            <p>
+              Persone diverse.<br>
+              Esigenze diverse.
+            </p>
 
-              <p>
-                Persone diverse.<br>
-                Esigenze diverse.
-              </p>
-
-              <p>
-                Ma lo stesso punto di partenza:<br>
-                <strong>il movimento.</strong>
-              </p>
-
-            </div>
+            <p>
+              Ma lo stesso punto di partenza:<br>
+              <strong>il movimento.</strong>
+            </p>
 
           </div>
 
+        </div>
 
-          <div class="territory__map">
+        <div class="territory-map">
 
-            <div class="territory__map-frame">
-
-              <iframe
-                title="Stadio Comunale Giuseppe La Franca, Partinico"
-                src="https://www.google.com/maps?q=Stadio%20Comunale%20Giuseppe%20La%20Franca%2C%20Partinico&output=embed"
-                loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade"
-                allowfullscreen
-              ></iframe>
-
-            </div>
-
-          </div>
+          <iframe
+            src="https://www.google.com/maps?q=Stadio%20Comunale%20Giuseppe%20La%20Franca%2C%20Partinico&output=embed"
+            title="Stadio Comunale Giuseppe La Franca, Partinico"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen
+          ></iframe>
 
         </div>
 
@@ -619,62 +558,42 @@
     <section
       class="narrative-section"
       id="da-qui"
-      data-section="12"
-      data-title="DA QUI."
+      data-section="da-qui"
     >
 
-      <div class="section__stage">
+      <div class="section__inner">
 
-        <div class="section__content">
+        <h2 class="section__title">
+          DA QUI.
+        </h2>
 
-          <h2 class="section__title">
-            DA QUI.
-          </h2>
+        <div class="section__body">
 
-          <div class="section__body">
+          <p><strong>DA QUI,</strong></p>
 
-            <p>
-              <strong>DA QUI,</strong><br>
-              <strong>NON SOLO QUI.</strong>
-            </p>
+          <p><strong>NON SOLO QUI.</strong></p>
 
-            <p>È qui che il mio lavoro ha la sua base.</p>
+          <p>È qui che il mio lavoro ha la sua base.</p>
 
-            <p>
-              In presenza, per chi parte da qui<br>
-              e per chi arriva dai territori vicini.
-            </p>
+          <p>
+            In presenza, per chi parte da qui<br>
+            e per chi arriva dai territori vicini.
+          </p>
 
-            <p>
-              Online, quando la distanza<br>
-              non deve essere un limite.
-            </p>
+          <p>
+            Online, quando la distanza<br>
+            non deve essere un limite.
+          </p>
 
-            <p>
-              Ogni obiettivo<br>
-              ha un punto da cui partire.
-            </p>
+          <p>Ogni obiettivo ha un punto da cui partire.</p>
 
-            <p>
-              Capire da dove partire<br>
-              è già parte del lavoro.
-            </p>
+          <p>Capire da dove partire è già parte del lavoro.</p>
 
-            <p>
-              Da quel punto<br>
-              si può guardare avanti.
-            </p>
+          <p>Da quel punto si può guardare avanti.</p>
 
-            <p>
-              Verso un altro punto.
-            </p>
+          <p>Verso un altro punto.</p>
 
-            <p>
-              E da lì<br>
-              verso un nuovo obiettivo.
-            </p>
-
-          </div>
+          <p>E da lì verso un nuovo obiettivo.</p>
 
         </div>
 
@@ -690,39 +609,32 @@
     <section
       class="narrative-section narrative-section--portrait"
       id="eccomi"
-      data-section="13"
-      data-title="ECCOMI."
+      data-section="eccomi"
     >
 
-      <div class="section__stage">
+      <div class="section__inner section__inner--split">
 
-        <div class="portrait-section">
+        <div class="section__content">
 
-          <div class="portrait-section__content">
+          <h2 class="section__title">
+            ECCOMI.
+          </h2>
 
-            <h2 class="section__title">
-              ECCOMI.
-            </h2>
+          <div class="section__body">
 
-            <div class="section__body">
-
-              <p><strong>Sono qui.</strong></p>
-
-            </div>
+            <p><strong>Sono qui.</strong></p>
 
           </div>
 
+        </div>
 
-          <figure class="portrait-section__image">
+        <div class="portrait">
 
-            <img
-              src="assets/images/cp-foto.webp"
-              alt="Cesare Paratore"
-              loading="lazy"
-              decoding="async"
-            >
-
-          </figure>
+          <img
+            src="assets/images/cesare-paratore.jpg"
+            alt="Cesare Paratore"
+            loading="lazy"
+          >
 
         </div>
 
@@ -738,23 +650,18 @@
     <section
       class="narrative-section narrative-section--contact"
       id="scrivimi"
-      data-section="14"
-      data-title="SCRIVIMI."
+      data-section="scrivimi"
     >
 
-      <div class="section__stage">
+      <div class="section__inner">
 
-        <div class="contact-section">
+        <h2 class="section__title">
+          SCRIVIMI.
+        </h2>
 
-          <h2 class="section__title">
-            SCRIVIMI.
-          </h2>
+        <div class="section__body">
 
-          <div class="section__body">
-
-            <p><strong>Parlami del tuo obiettivo.</strong></p>
-
-          </div>
+          <p><strong>Parlami del tuo obiettivo.</strong></p>
 
         </div>
 
@@ -773,7 +680,7 @@
     >
 
       <button
-        class="narrative-navigation__arrow narrative-navigation__arrow--prev"
+        class="narrative-navigation__button narrative-navigation__button--prev"
         type="button"
         aria-label="Sezione precedente"
         disabled
@@ -789,7 +696,7 @@
       </div>
 
       <button
-        class="narrative-navigation__arrow narrative-navigation__arrow--next"
+        class="narrative-navigation__button narrative-navigation__button--next"
         type="button"
         aria-label="Sezione successiva"
       >
@@ -835,7 +742,7 @@
     aria-hidden="true"
   >
 
-    <div class="standby__word">
+    <div class="standby__title">
       GUARDA.
     </div>
 
@@ -843,23 +750,23 @@
 
 
   <!-- =========================================================
-       GSAP
+       SCRIPTS
   ========================================================== -->
 
   <script
     src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"
+    defer
   ></script>
 
   <script
     src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"
+    defer
   ></script>
 
-
-  <!-- =========================================================
-       SITE JS
-  ========================================================== -->
-
-  <script src="script.js"></script>
+  <script
+    src="script.js"
+    defer
+  ></script>
 
 </body>
 </html>
