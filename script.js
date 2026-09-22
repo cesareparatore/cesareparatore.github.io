@@ -1,8 +1,3 @@
-/* ============================================================
-   CESARE PARATORE — HOME
-   JS / GSAP / SCROLLTRIGGER
-============================================================ */
-
 (() => {
   "use strict";
 
@@ -20,18 +15,6 @@
     document.querySelectorAll(".narrative-section")
   );
 
-  const prevButton = document.querySelector(
-    "[data-narrative-prev]"
-  );
-
-  const nextButton = document.querySelector(
-    "[data-narrative-next]"
-  );
-
-  const activeTitle = document.querySelector(
-    "[data-active-title]"
-  );
-
 
   /* ==========================================================
      STATE
@@ -39,46 +22,7 @@
 
   let currentIndex = 0;
   let standbyTimer = null;
-  let isNavigating = false;
-
-
-  /* ==========================================================
-     HELPERS
-  ========================================================== */
-
-  const clamp = (value, min, max) => {
-    return Math.min(Math.max(value, min), max);
-  };
-
-
-  const updateNavigation = () => {
-    if (!prevButton || !nextButton || !activeTitle) {
-      return;
-    }
-
-    const section = sections[currentIndex];
-
-    if (!section) {
-      return;
-    }
-
-    activeTitle.textContent =
-      section.dataset.title || "";
-
-    prevButton.disabled =
-      currentIndex === 0;
-  };
-
-
-  const setCurrentSection = (index) => {
-    currentIndex = clamp(
-      index,
-      0,
-      sections.length - 1
-    );
-
-    updateNavigation();
-  };
+  let standbyActive = false;
 
 
   /* ==========================================================
@@ -86,9 +30,7 @@
   ========================================================== */
 
   const hideLoader = () => {
-    if (!loader) {
-      return;
-    }
+    if (!loader) return;
 
     loader.classList.add("is-hidden");
     loader.setAttribute("aria-hidden", "true");
@@ -102,7 +44,8 @@
 
     /*
       Il loader non dipende da GSAP.
-      Deve poter scomparire anche se GSAP/CDN non è disponibile.
+      La pagina può quindi entrare anche se
+      il motion engine non è disponibile.
     */
 
     window.setTimeout(hideLoader, 1200);
@@ -113,66 +56,61 @@
      MENU
   ========================================================== */
 
-  const closeMenu = () => {
-    if (!menuToggle || !siteMenu) {
-      return;
-    }
-
-    menuToggle.setAttribute(
-      "aria-expanded",
-      "false"
-    );
-
-    siteMenu.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-
-    siteMenu.classList.remove("is-open");
-
-    document.body.classList.remove("is-locked");
-  };
-
-
   const openMenu = () => {
-    if (!menuToggle || !siteMenu) {
-      return;
-    }
-
-    menuToggle.setAttribute(
-      "aria-expanded",
-      "true"
-    );
-
-    siteMenu.setAttribute(
-      "aria-hidden",
-      "false"
-    );
+    if (!menuToggle || !siteMenu) return;
 
     siteMenu.classList.add("is-open");
+
+    siteMenu.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
+    menuToggle.setAttribute(
+      "aria-expanded",
+      "true"
+    );
 
     document.body.classList.add("is-locked");
   };
 
 
-  const toggleMenu = () => {
-    if (!siteMenu) {
-      return;
-    }
+  const closeMenu = () => {
+    if (!menuToggle || !siteMenu) return;
 
-    if (siteMenu.classList.contains("is-open")) {
-      closeMenu();
-    } else {
-      openMenu();
-    }
+    siteMenu.classList.remove("is-open");
+
+    siteMenu.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    menuToggle.setAttribute(
+      "aria-expanded",
+      "false"
+    );
+
+    document.body.classList.remove("is-locked");
   };
 
 
   if (menuToggle) {
+
     menuToggle.addEventListener(
       "click",
-      toggleMenu
+      () => {
+
+        if (
+          siteMenu.classList.contains("is-open")
+        ) {
+          closeMenu();
+        } else {
+          openMenu();
+        }
+
+      }
     );
+
   }
 
 
@@ -180,9 +118,10 @@
     .querySelectorAll(".site-menu__nav a")
     .forEach((link) => {
 
-      link.addEventListener("click", () => {
-        closeMenu();
-      });
+      link.addEventListener(
+        "click",
+        closeMenu
+      );
 
     });
 
@@ -193,14 +132,7 @@
 
       if (event.key === "Escape") {
         closeMenu();
-
-        if (standby) {
-          standby.classList.remove("is-active");
-          standby.setAttribute(
-            "aria-hidden",
-            "true"
-          );
-        }
+        hideStandby();
       }
 
     }
@@ -209,43 +141,14 @@
 
   /* ==========================================================
      NARRATIVE NAVIGATION
+     NORMAL DOCUMENT FLOW
   ========================================================== */
 
-  const goToSection = (
-    index,
-    shouldLoop = false
-  ) => {
+  const scrollToSection = (index) => {
 
-    if (!sections.length || isNavigating) {
-      return;
-    }
+    if (!sections[index]) return;
 
-    let targetIndex = index;
-
-    if (
-      shouldLoop &&
-      targetIndex >= sections.length
-    ) {
-      targetIndex = 0;
-    }
-
-    targetIndex = clamp(
-      targetIndex,
-      0,
-      sections.length - 1
-    );
-
-    const target = sections[targetIndex];
-
-    if (!target) {
-      return;
-    }
-
-    isNavigating = true;
-
-    setCurrentSection(targetIndex);
-
-    target.scrollIntoView({
+    sections[index].scrollIntoView({
       behavior:
         window.matchMedia(
           "(prefers-reduced-motion: reduce)"
@@ -255,88 +158,154 @@
       block: "start"
     });
 
-    window.setTimeout(() => {
-      isNavigating = false;
-    }, 900);
-
     resetStandbyTimer();
+
   };
 
 
-  if (prevButton) {
-    prevButton.addEventListener(
-      "click",
-      () => {
-        if (currentIndex > 0) {
-          goToSection(currentIndex - 1);
-        }
-      }
-    );
-  }
+  document
+    .querySelectorAll("[data-next]")
+    .forEach((button) => {
 
+      button.addEventListener(
+        "click",
+        () => {
 
-  if (nextButton) {
-    nextButton.addEventListener(
-      "click",
-      () => {
+          if (
+            currentIndex ===
+            sections.length - 1
+          ) {
 
-        if (
-          currentIndex ===
-          sections.length - 1
-        ) {
-          goToSection(0, true);
-          return;
-        }
+            scrollToSection(0);
 
-        goToSection(currentIndex + 1);
-      }
-    );
-  }
+            return;
+          }
 
+          scrollToSection(
+            currentIndex + 1
+          );
 
-  /* ==========================================================
-     SECTION OBSERVER
-  ========================================================== */
-
-  if (sections.length) {
-
-    const sectionObserver =
-      new IntersectionObserver(
-        (entries) => {
-
-          entries.forEach((entry) => {
-
-            if (
-              entry.isIntersecting &&
-              entry.intersectionRatio >= 0.45
-            ) {
-
-              const index =
-                sections.indexOf(entry.target);
-
-              if (index !== -1) {
-                setCurrentSection(index);
-              }
-
-            }
-
-          });
-
-        },
-        {
-          threshold: [0.45, 0.6]
         }
       );
 
-    sections.forEach((section) => {
-      sectionObserver.observe(section);
     });
 
-  }
+
+  document
+    .querySelectorAll("[data-prev]")
+    .forEach((button) => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          if (currentIndex <= 0) {
+            return;
+          }
+
+          scrollToSection(
+            currentIndex - 1
+          );
+
+        }
+      );
+
+    });
 
 
   /* ==========================================================
-     GSAP MOTION
+     ACTIVE SECTION
+  ========================================================== */
+
+  const updateActiveSection = (index) => {
+
+    currentIndex = index;
+
+    document
+      .querySelectorAll(".narrative-navigation")
+      .forEach((navigation, navigationIndex) => {
+
+        const section =
+          navigation.closest(
+            ".narrative-section"
+          );
+
+        if (!section) return;
+
+        const sectionIndex =
+          sections.indexOf(section);
+
+        const title =
+          navigation.querySelector(
+            ".narrative-navigation__title"
+          );
+
+        const previous =
+          navigation.querySelector(
+            "[data-prev]"
+          );
+
+        if (title) {
+          title.textContent =
+            section.dataset.title || "";
+        }
+
+        if (previous) {
+          previous.disabled =
+            sectionIndex === 0;
+        }
+
+        /*
+          La navigazione appartiene alla singola
+          sezione e rimane nel normale document flow.
+        */
+
+        navigation.dataset.active =
+          sectionIndex === index
+            ? "true"
+            : "false";
+
+      });
+
+  };
+
+
+  const sectionObserver =
+    new IntersectionObserver(
+      (entries) => {
+
+        entries.forEach((entry) => {
+
+          if (
+            entry.isIntersecting &&
+            entry.intersectionRatio >= 0.45
+          ) {
+
+            const index =
+              sections.indexOf(entry.target);
+
+            if (index !== -1) {
+              updateActiveSection(index);
+            }
+
+          }
+
+        });
+
+      },
+      {
+        threshold: [0.45]
+      }
+    );
+
+
+  sections.forEach((section) => {
+    sectionObserver.observe(section);
+  });
+
+
+  /* ==========================================================
+     MOTION
   ========================================================== */
 
   const initMotion = () => {
@@ -357,17 +326,21 @@
       typeof window.ScrollTrigger !==
       "undefined"
     ) {
-      gsap.registerPlugin(ScrollTrigger);
+
+      gsap.registerPlugin(
+        ScrollTrigger
+      );
+
     }
 
 
     /* --------------------------------------------------------
-       INTRO
+       GUARDA.
     -------------------------------------------------------- */
 
     const introTitle =
       document.querySelector(
-        "#section-01 .section__title"
+        ".narrative-section--intro .section__title"
       );
 
     if (introTitle) {
@@ -376,14 +349,101 @@
         introTitle,
         {
           opacity: 0,
-          y: 28
+          y: 24
         },
         {
           opacity: 1,
           y: 0,
-          duration: 1.3,
+          duration: 1.25,
           ease: "power3.out",
-          delay: 0.45
+          delay: 0.35
+        }
+      );
+
+    }
+
+
+    if (
+      typeof window.ScrollTrigger ===
+      "undefined"
+    ) {
+      return;
+    }
+
+
+    /* --------------------------------------------------------
+       BODY
+    -------------------------------------------------------- */
+
+    sections
+      .filter(
+        (section) =>
+          section.id !== "section-01"
+      )
+      .forEach((section) => {
+
+        const body =
+          section.querySelector(
+            ".section__body"
+          );
+
+        if (!body) return;
+
+        gsap.fromTo(
+          body,
+          {
+            opacity: 0,
+            y: 28
+          },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: "power3.out",
+
+            scrollTrigger: {
+              trigger: section,
+              start: "top 72%",
+              end: "top 42%",
+              toggleActions:
+                "play none none reverse"
+            }
+
+          }
+        );
+
+      });
+
+
+    /* --------------------------------------------------------
+       TERRITORY
+    -------------------------------------------------------- */
+
+    const map =
+      document.querySelector(
+        ".territory-map"
+      );
+
+    if (map) {
+
+      gsap.fromTo(
+        map,
+        {
+          opacity: 0,
+          y: 24
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: "power3.out",
+
+          scrollTrigger: {
+            trigger: "#section-11",
+            start: "top 72%",
+            toggleActions:
+              "play none none reverse"
+          }
         }
       );
 
@@ -391,123 +451,36 @@
 
 
     /* --------------------------------------------------------
-       NARRATIVE BODY
+       PORTRAIT
     -------------------------------------------------------- */
 
-    if (
-      typeof window.ScrollTrigger !==
-      "undefined"
-    ) {
+    const portrait =
+      document.querySelector(
+        ".portrait"
+      );
 
-      sections
-        .filter(
-          (section) =>
-            section.id !== "section-01"
-        )
-        .forEach((section) => {
+    if (portrait) {
 
-          const body =
-            section.querySelector(
-              ".section__body"
-            );
+      gsap.fromTo(
+        portrait,
+        {
+          opacity: 0,
+          y: 24
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1.1,
+          ease: "power3.out",
 
-          if (!body) {
-            return;
+          scrollTrigger: {
+            trigger: "#section-13",
+            start: "top 72%",
+            toggleActions:
+              "play none none reverse"
           }
-
-          gsap.fromTo(
-            body,
-            {
-              opacity: 0,
-              y: 32
-            },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 1,
-              ease: "power3.out",
-
-              scrollTrigger: {
-                trigger: section,
-                start: "top 70%",
-                end: "top 35%",
-                toggleActions:
-                  "play none none reverse"
-              }
-            }
-          );
-
-        });
-
-
-      /* ------------------------------------------------------
-         TERRITORY MAP
-      ------------------------------------------------------ */
-
-      const map =
-        document.querySelector(
-          ".territory-map"
-        );
-
-      if (map) {
-
-        gsap.fromTo(
-          map,
-          {
-            opacity: 0,
-            y: 35
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 1.1,
-            ease: "power3.out",
-
-            scrollTrigger: {
-              trigger: "#section-11",
-              start: "top 70%",
-              toggleActions:
-                "play none none reverse"
-            }
-          }
-        );
-
-      }
-
-
-      /* ------------------------------------------------------
-         PORTRAIT
-      ------------------------------------------------------ */
-
-      const portrait =
-        document.querySelector(
-          ".portrait"
-        );
-
-      if (portrait) {
-
-        gsap.fromTo(
-          portrait,
-          {
-            opacity: 0,
-            y: 40
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 1.2,
-            ease: "power3.out",
-
-            scrollTrigger: {
-              trigger: "#section-13",
-              start: "top 70%",
-              toggleActions:
-                "play none none reverse"
-            }
-          }
-        );
-
-      }
+        }
+      );
 
     }
 
@@ -523,12 +496,14 @@
 
   const clearStandbyTimer = () => {
 
-    if (standbyTimer) {
+    if (standbyTimer !== null) {
+
       window.clearTimeout(
         standbyTimer
       );
 
       standbyTimer = null;
+
     }
 
   };
@@ -536,13 +511,13 @@
 
   const showStandby = () => {
 
-    if (!standby) {
-      return;
-    }
+    if (!standby) return;
 
-    closeMenu();
+    standbyActive = true;
 
-    standby.classList.add("is-active");
+    standby.classList.add(
+      "is-active"
+    );
 
     standby.setAttribute(
       "aria-hidden",
@@ -552,11 +527,11 @@
   };
 
 
-  const hideStandby = () => {
+  function hideStandby() {
 
-    if (!standby) {
-      return;
-    }
+    if (!standby) return;
+
+    standbyActive = false;
 
     standby.classList.remove(
       "is-active"
@@ -567,14 +542,16 @@
       "true"
     );
 
-  };
+  }
 
 
   const resetStandbyTimer = () => {
 
     clearStandbyTimer();
 
-    hideStandby();
+    if (standbyActive) {
+      hideStandby();
+    }
 
     standbyTimer =
       window.setTimeout(
@@ -596,26 +573,7 @@
     window.addEventListener(
       eventName,
       () => {
-
-        if (
-          standby &&
-          standby.classList.contains(
-            "is-active"
-          )
-        ) {
-
-          hideStandby();
-
-          /*
-            Dopo il ritorno dallo standby
-            il browser conserva la posizione
-            precedente del documento.
-          */
-
-        }
-
         resetStandbyTimer();
-
       },
       {
         passive: true
@@ -631,7 +589,7 @@
 
   const init = () => {
 
-    setCurrentSection(0);
+    updateActiveSection(0);
 
     startLoader();
 
