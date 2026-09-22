@@ -2,146 +2,337 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
+
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
   >
 
-  <meta name="theme-color" content="#0B0B0A">
+  <meta
+    name="robots"
+    content="noindex, follow"
+  >
 
-  <title>404 — Cesare Paratore</title>
-
-  <link rel="stylesheet" href="style.css">
+  <title>Pagina non trovata — Cesare Paratore</title>
 
   <style>
-    /* ========================================================
-       404 — COERENTE CON IL SISTEMA HOME
-    ======================================================== */
+    :root {
+      --light: #F1EFE8;
+      --dark: #0B0B0A;
+    }
 
-    .page-404 {
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100%;
+    }
+
+    body {
       min-height: 100svh;
 
       display: flex;
       flex-direction: column;
 
-      background: var(--bg);
-      color: var(--light);
+      background: var(--light);
+      color: var(--dark);
+
+      font-family:
+        "Neue Montreal",
+        "Helvetica Neue",
+        Helvetica,
+        Arial,
+        sans-serif;
+
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
 
-    .page-404__main {
-      flex: 1;
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
 
-      min-height: calc(100svh - 88px);
+    button {
+      font: inherit;
+    }
+
+    :focus-visible {
+      outline: 2px solid currentColor;
+      outline-offset: 5px;
+    }
+
+    .site-header {
+      position: relative;
+
+      width: 100%;
+
+      padding: 28px 5vw;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .site-logo {
+      display: block;
+      width: clamp(42px, 4vw, 62px);
+      height: auto;
+    }
+
+    .menu-toggle {
+      padding: 0;
+
+      border: 0;
+      background: none;
+
+      color: var(--dark);
+
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+
+      cursor: pointer;
+    }
+
+    .menu-toggle:hover {
+      opacity: 0.5;
+    }
+
+    .menu {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
 
       display: flex;
       align-items: center;
       justify-content: center;
 
-      padding:
-        8rem
-        var(--margin);
+      background: var(--light);
+      color: var(--dark);
+
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+
+      transition:
+        opacity 400ms ease,
+        visibility 400ms ease;
     }
 
-    .page-404__inner {
-      width: min(100%, 72rem);
+    .menu.is-open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .menu-close {
+      position: absolute;
+      top: 28px;
+      right: 5vw;
+
+      padding: 0;
+
+      border: 0;
+      background: none;
+
+      color: var(--dark);
+
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+
+      cursor: pointer;
+    }
+
+    .menu-list {
+      margin: 0;
+      padding: 0;
 
       display: flex;
       flex-direction: column;
       align-items: center;
 
+      list-style: none;
+    }
+
+    .menu-list a {
+      display: block;
+
+      font-size: clamp(2rem, 6vw, 6rem);
+      font-weight: 500;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      text-align: center;
+
+      transition: opacity 180ms ease;
+    }
+
+    .menu-list a:hover {
+      opacity: 0.4;
+    }
+
+    .error {
+      flex: 1;
+
+      min-height: 0;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 10vh 5vw;
+    }
+
+    .error-inner {
+      width: min(100%, 900px);
+
       text-align: center;
     }
 
-    .page-404__number {
-      margin: 0;
+    .error-code {
+      margin: 0 0 2rem;
 
-      font-size: var(--display-xl);
-      line-height: 0.82;
-      letter-spacing: -0.07em;
+      font-size: clamp(7rem, 20vw, 18rem);
       font-weight: 500;
+      line-height: 0.8;
+      letter-spacing: -0.07em;
     }
 
-    .page-404__text {
-      width: min(100%, 42rem);
+    .error-title {
+      margin: 0 auto 1.5rem;
 
-      margin: 3rem auto 0;
+      max-width: 800px;
 
-      font-size: var(--narrative);
-      line-height: 1.52;
-      letter-spacing: -0.012em;
+      font-size: clamp(2rem, 5vw, 5rem);
+      font-weight: 500;
+      line-height: 0.95;
+      letter-spacing: -0.05em;
     }
 
-    .page-404__text p {
-      margin: 0 0 1.25em;
+    .error-copy {
+      max-width: 580px;
+      margin: 0 auto;
+
+      font-size: clamp(1.15rem, 1.35vw, 1.5rem);
+      line-height: 1.5;
     }
 
-    .page-404__text p:last-child {
-      margin-bottom: 0;
-    }
+    .error-link {
+      display: inline-block;
 
-    .page-404__link {
-      display: inline-flex;
-      align-items: center;
-      gap: 1rem;
+      margin-top: 2.5rem;
 
-      margin-top: 3rem;
+      padding-bottom: 0.35rem;
 
-      color: var(--light);
+      border-bottom: 1px solid currentColor;
 
       font-size: 0.8rem;
-      letter-spacing: 0.1em;
+      font-weight: 500;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
 
-      border-bottom: 1px solid var(--light);
-      padding-bottom: 0.45rem;
-
-      transition:
-        opacity 0.35s ease,
-        transform 0.35s var(--ease);
+      transition: opacity 180ms ease;
     }
 
-    .page-404__link:hover {
-      opacity: 0.65;
-      transform: translateY(-2px);
+    .error-link:hover {
+      opacity: 0.5;
+    }
+
+    .site-footer {
+      width: 100%;
+
+      padding: 28px 5vw;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      background: var(--light);
+      color: var(--dark);
+    }
+
+    .footer-logo {
+      display: block;
+      width: clamp(42px, 4vw, 62px);
+      height: auto;
+    }
+
+    .footer-name {
+      margin: 0;
+
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
     @media (max-width: 767px) {
-
-      .page-404__main {
-        min-height: calc(100svh - 72px);
-
-        padding:
-          7rem
-          var(--margin);
+      .site-header {
+        padding: 20px;
       }
 
-      .page-404__text {
-        margin-top: 2.5rem;
+      .menu-close {
+        top: 20px;
+        right: 20px;
       }
 
-      .page-404__link {
-        margin-top: 2.5rem;
+      .error {
+        padding: 8vh 20px;
       }
 
+      .error-code {
+        margin-bottom: 1.5rem;
+        font-size: clamp(6rem, 30vw, 10rem);
+      }
+
+      .error-title {
+        font-size: clamp(2rem, 9vw, 3.5rem);
+      }
+
+      .error-copy {
+        font-size: 1.15rem;
+      }
+
+      .site-footer {
+        padding: 24px 20px;
+      }
+
+      .footer-logo {
+        width: 44px;
+      }
+
+      .footer-name {
+        font-size: 0.72rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        transition-duration: 0.01ms !important;
+      }
     }
   </style>
 </head>
 
-<body class="page-404">
-
-  <!-- ======================================================
-       HEADER
-  ======================================================= -->
+<body>
 
   <header class="site-header">
-
     <a
-      class="site-header__logo"
-      href="index.html#section-01"
-      aria-label="Cesare Paratore"
+      href="/"
+      aria-label="Cesare Paratore — Home"
     >
       <img
-        src="assets/images/cp-mark.svg"
+        class="site-logo"
+        src="/assets/images/cp-mark.svg"
         alt="CP"
       >
     </a>
@@ -154,200 +345,115 @@
     >
       MENU
     </button>
-
   </header>
 
-
-  <!-- ======================================================
-       MENU
-  ======================================================= -->
-
-  <aside
-    class="site-menu"
+  <div
+    class="menu"
     id="site-menu"
     aria-hidden="true"
   >
-
-    <nav
-      class="site-menu__nav"
-      aria-label="Navigazione principale"
+    <button
+      class="menu-close"
+      type="button"
     >
+      CHIUDI
+    </button>
 
-      <a href="index.html#section-01">GUARDA.</a>
-      <a href="index.html#section-02">COME?</a>
-      <a href="index.html#section-03">MOVIMENTO.</a>
-      <a href="index.html#section-04">CAPIRE.</a>
-      <a href="index.html#section-05">TRASMETTERE.</a>
-      <a href="index.html#section-06">COSTRUIRE.</a>
-      <a href="index.html#section-07">RITORNA.</a>
-      <a href="index.html#section-08">COLLEGARE.</a>
-      <a href="index.html#section-09">OGGI.</a>
-      <a href="index.html#section-10">OBIETTIVO.</a>
-      <a href="index.html#section-11">QUI.</a>
-      <a href="index.html#section-12">DA QUI.</a>
-      <a href="index.html#section-13">ECCOMI.</a>
-      <a href="index.html#section-14">SCRIVIMI.</a>
-
+    <nav aria-label="Navigazione principale">
+      <ul class="menu-list">
+        <li><a href="/chi-sono/">CHI SONO</a></li>
+        <li><a href="/sport/">SPORT</a></li>
+        <li><a href="/scienze-motorie/">SCIENZE MOTORIE</a></li>
+        <li><a href="/educazione/">EDUCAZIONE</a></li>
+        <li><a href="/management/">MANAGEMENT</a></li>
+        <li><a href="/digitale/">DIGITALE</a></li>
+        <li><a href="/territorio/">TERRITORIO</a></li>
+        <li><a href="/contatti/">CONTATTI</a></li>
+      </ul>
     </nav>
+  </div>
 
-  </aside>
+  <main class="error">
+    <div class="error-inner">
 
+      <p class="error-code">404</p>
 
-  <!-- ======================================================
-       404
-  ======================================================= -->
-
-  <main class="page-404__main">
-
-    <div class="page-404__inner">
-
-      <h1 class="page-404__number">
-        404
+      <h1 class="error-title">
+        Questa pagina non è dove pensavi di trovarla.
       </h1>
 
-      <div class="page-404__text">
-
-        <p>
-          Questa pagina non è dove pensavi di trovarla.
-        </p>
-
-        <p>
-          Ma forse è un buon momento per tornare a guardare.
-        </p>
-
-      </div>
+      <p class="error-copy">
+        Ma forse è un buon momento per tornare a guardare.
+      </p>
 
       <a
-        class="page-404__link"
-        href="index.html#section-01"
+        class="error-link"
+        href="/"
       >
-        Torna all'inizio
-        <span aria-hidden="true">→</span>
+        Torna all'inizio →
       </a>
 
     </div>
-
   </main>
 
-
-  <!-- ======================================================
-       FOOTER
-  ======================================================= -->
-
   <footer class="site-footer">
-
-    <div class="site-footer__logo">
+    <a
+      href="/"
+      aria-label="Cesare Paratore — Home"
+    >
       <img
-        src="assets/images/cp-mark.svg"
+        class="footer-logo"
+        src="/assets/images/cp-mark.svg"
         alt="CP"
       >
-    </div>
+    </a>
 
-    <div class="site-footer__name">
+    <p class="footer-name">
       CESARE PARATORE
-    </div>
-
+    </p>
   </footer>
-
-
-  <!-- ======================================================
-       MENU JS
-  ======================================================= -->
 
   <script>
     (() => {
       "use strict";
 
-      const menuToggle =
-        document.querySelector(".menu-toggle");
+      const menu = document.querySelector(".menu");
+      const menuToggle = document.querySelector(".menu-toggle");
+      const menuClose = document.querySelector(".menu-close");
 
-      const siteMenu =
-        document.getElementById("site-menu");
-
-      const menuLinks =
-        document.querySelectorAll(
-          ".site-menu__nav a"
-        );
-
-      if (!menuToggle || !siteMenu) {
-        return;
+      function openMenu() {
+        menu.classList.add("is-open");
+        menu.setAttribute("aria-hidden", "false");
+        menuToggle.setAttribute("aria-expanded", "true");
+        document.body.style.overflow = "hidden";
       }
 
-      const openMenu = () => {
-        siteMenu.classList.add("is-open");
+      function closeMenu() {
+        menu.classList.remove("is-open");
+        menu.setAttribute("aria-hidden", "true");
+        menuToggle.setAttribute("aria-expanded", "false");
+        document.body.style.overflow = "";
+      }
 
-        siteMenu.setAttribute(
-          "aria-hidden",
-          "false"
-        );
-
-        menuToggle.setAttribute(
-          "aria-expanded",
-          "true"
-        );
-
-        document.body.classList.add(
-          "is-locked"
-        );
-      };
-
-      const closeMenu = () => {
-        siteMenu.classList.remove(
-          "is-open"
-        );
-
-        siteMenu.setAttribute(
-          "aria-hidden",
-          "true"
-        );
-
-        menuToggle.setAttribute(
-          "aria-expanded",
-          "false"
-        );
-
-        document.body.classList.remove(
-          "is-locked"
-        );
-      };
-
-      menuToggle.addEventListener(
-        "click",
-        () => {
-
-          if (
-            siteMenu.classList.contains(
-              "is-open"
-            )
-          ) {
-            closeMenu();
-          } else {
-            openMenu();
-          }
-
+      menuToggle.addEventListener("click", () => {
+        if (menu.classList.contains("is-open")) {
+          closeMenu();
+        } else {
+          openMenu();
         }
-      );
-
-      menuLinks.forEach((link) => {
-        link.addEventListener(
-          "click",
-          closeMenu
-        );
       });
 
-      document.addEventListener(
-        "keydown",
-        (event) => {
+      menuClose.addEventListener("click", closeMenu);
 
-          if (
-            event.key === "Escape"
-          ) {
-            closeMenu();
-          }
-
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          closeMenu();
         }
-      );
+      });
 
+      menu.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", closeMenu);
+      });
     })();
   </script>
 
