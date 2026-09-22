@@ -2,216 +2,133 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <meta
     name="description"
-    content="Cesare Paratore — sport, educazione, studio, management e digitale. Un modo di guardare, capire, collegare e costruire."
+    content="Cesare Paratore — sport, scienze motorie, educazione, management e digitale."
   >
-
-  <meta
-    name="author"
-    content="Cesare Paratore"
-  >
+  <meta name="author" content="Cesare Paratore">
 
   <meta name="theme-color" content="#0B0B0A">
 
   <title>Cesare Paratore</title>
 
-  <!-- =========================================================
-       FONT
-       Sostituire con il caricamento/licenza effettivo di
-       Neue Montreal quando disponibile.
-  ========================================================== -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-
-  <!-- =========================================================
-       CSS
-  ========================================================== -->
   <link rel="stylesheet" href="css/style.css">
-
 </head>
 
 <body>
 
   <!-- =========================================================
-       PAGE
+       LOADER
   ========================================================== -->
 
-  <div class="site" id="site">
+  <div class="loader" id="loader">
+    <div class="loader__inner">
+      <img
+        class="loader__logo"
+        src="assets/images/cp-mark.svg"
+        alt="CP"
+      >
 
-    <!-- =======================================================
-         LOADER
-    ======================================================== -->
-
-    <div
-      class="loader"
-      id="loader"
-      aria-hidden="true"
-    >
-
-      <div class="loader__inner">
-
-        <img
-          class="loader__logo"
-          src="assets/images/cp-mark.svg"
-          alt=""
-        >
-
-        <div class="loader__name">
-          CESARE PARATORE
-        </div>
-
+      <div class="loader__name">
+        CESARE PARATORE
       </div>
+    </div>
+  </div>
+
+
+  <!-- =========================================================
+       HEADER
+  ========================================================== -->
+
+  <header class="site-header">
+
+    <a href="#guarda" class="site-header__logo" aria-label="Torna all'inizio">
+      <img
+        src="assets/images/cp-mark.svg"
+        alt="CP"
+      >
+    </a>
+
+    <button
+      class="menu-toggle"
+      type="button"
+      aria-label="Apri menu"
+      aria-expanded="false"
+      aria-controls="global-menu"
+    >
+      MENU
+    </button>
+
+  </header>
+
+
+  <!-- =========================================================
+       GLOBAL MENU
+  ========================================================== -->
+
+  <div class="global-menu" id="global-menu" aria-hidden="true">
+
+    <div class="global-menu__inner">
+
+      <nav class="global-menu__nav" aria-label="Navigazione principale">
+
+        <a href="#chi-sono">Chi sono</a>
+        <a href="#sport">Sport</a>
+        <a href="#scienze-motorie">Scienze motorie</a>
+        <a href="#educazione">Educazione</a>
+        <a href="#management">Management</a>
+        <a href="#digitale">Digitale</a>
+        <a href="#territorio">Territorio</a>
+        <a href="#contatti">Contatti</a>
+
+      </nav>
 
     </div>
 
-
-    <!-- =======================================================
-         HEADER
-    ======================================================== -->
-
-    <header
-      class="site-header"
-      id="site-header"
-    >
-
-      <a
-        class="site-header__logo"
-        href="#section-01"
-        aria-label="Torna all'inizio"
-      >
-
-        <img
-          src="assets/images/cp-mark.svg"
-          alt="CP"
-        >
-
-      </a>
+  </div>
 
 
-      <button
-        class="menu-toggle"
-        id="menu-toggle"
-        type="button"
-        aria-label="Apri menu"
-        aria-expanded="false"
-        aria-controls="global-menu"
-      >
+  <!-- =========================================================
+       MAIN
+  ========================================================== -->
 
-        <span class="menu-toggle__label">
-          MENU
-        </span>
-
-      </button>
-
-    </header>
+  <main>
 
 
     <!-- =======================================================
-         GLOBAL MENU
+         01 — GUARDA.
     ======================================================== -->
 
-    <aside
-      class="global-menu"
-      id="global-menu"
-      aria-hidden="true"
+    <section
+      class="narrative-section narrative-section--opening"
+      id="guarda"
+      data-section-title="GUARDA."
     >
 
-      <div class="global-menu__inner">
+      <div class="section__inner section__inner--opening">
 
-        <nav
-          class="global-menu__nav"
-          aria-label="Navigazione principale"
-        >
-
-          <a href="#">
-            Chi sono
-          </a>
-
-          <a href="#">
-            Sport
-          </a>
-
-          <a href="#">
-            Scienze motorie
-          </a>
-
-          <a href="#">
-            Educazione
-          </a>
-
-          <a href="#">
-            Management
-          </a>
-
-          <a href="#">
-            Digitale
-          </a>
-
-          <a href="#section-11">
-            Territorio
-          </a>
-
-          <a href="#section-14">
-            Contatti
-          </a>
-
-        </nav>
+        <h1 class="display-xl section__title">
+          GUARDA.
+        </h1>
 
       </div>
 
-    </aside>
+    </section>
 
 
     <!-- =======================================================
-         MAIN NARRATIVE
+         02 — LA DOMANDA
     ======================================================== -->
 
-    <main
-      class="home"
-      id="main-content"
+    <section
+      class="narrative-section"
+      id="la-domanda"
+      data-section-title="LA DOMANDA"
     >
 
-
-      <!-- =====================================================
-           01 — GUARDA.
-      ====================================================== -->
-
-      <section
-        class="narrative-section narrative-section--opening"
-        id="section-01"
-        data-section="01"
-        data-title="GUARDA."
-        tabindex="-1"
-      >
-
-        <div class="section__content section__content--center">
-
-          <h1 class="display display--xl section__title">
-            GUARDA.
-          </h1>
-
-        </div>
-
-      </section>
-
-
-      <!-- =====================================================
-           02 — LA DOMANDA
-      ====================================================== -->
-
-      <section
-        class="narrative-section narrative-section--text"
-        id="section-02"
-        data-section="02"
-        data-title="LA DOMANDA"
-        tabindex="-1"
-      >
+      <div class="section__inner">
 
         <div class="section__content">
 
@@ -219,7 +136,7 @@
             LA DOMANDA
           </h2>
 
-          <div class="narrative-copy">
+          <div class="section__text">
 
             <p>
               Ricordo il primo computer.
@@ -261,20 +178,22 @@
 
         </div>
 
-      </section>
+      </div>
+
+    </section>
 
 
-      <!-- =====================================================
-           03 — LA DOMANDA SI SPOSTA
-      ====================================================== -->
+    <!-- =======================================================
+         03 — LA DOMANDA SI SPOSTA
+    ======================================================== -->
 
-      <section
-        class="narrative-section narrative-section--text"
-        id="section-03"
-        data-section="03"
-        data-title="LA DOMANDA SI SPOSTA"
-        tabindex="-1"
-      >
+    <section
+      class="narrative-section"
+      id="la-domanda-si-sposta"
+      data-section-title="LA DOMANDA SI SPOSTA"
+    >
+
+      <div class="section__inner">
 
         <div class="section__content">
 
@@ -282,7 +201,7 @@
             LA DOMANDA SI SPOSTA
           </h2>
 
-          <div class="narrative-copy">
+          <div class="section__text">
 
             <p>
               Poi ho iniziato a guardare il movimento.
@@ -312,8 +231,8 @@
               A capire cosa potevo fare meglio.
             </p>
 
-            <p class="narrative-copy__emphasis">
-              Nella corsa ho iniziato a capirlo davvero.
+            <p>
+              <strong>Nella corsa ho iniziato a capirlo davvero.</strong>
             </p>
 
             <p>
@@ -328,20 +247,22 @@
 
         </div>
 
-      </section>
+      </div>
+
+    </section>
 
 
-      <!-- =====================================================
-           04 — STUDIARE
-      ====================================================== -->
+    <!-- =======================================================
+         04 — STUDIARE
+    ======================================================== -->
 
-      <section
-        class="narrative-section narrative-section--text"
-        id="section-04"
-        data-section="04"
-        data-title="STUDIARE"
-        tabindex="-1"
-      >
+    <section
+      class="narrative-section"
+      id="studiare"
+      data-section-title="STUDIARE"
+    >
+
+      <div class="section__inner">
 
         <div class="section__content">
 
@@ -349,7 +270,7 @@
             STUDIARE
           </h2>
 
-          <div class="narrative-copy">
+          <div class="section__text">
 
             <p>
               Più lo vivevo, più volevo capire.
@@ -375,20 +296,22 @@
 
         </div>
 
-      </section>
+      </div>
+
+    </section>
 
 
-      <!-- =====================================================
-           05 — EDUCAZIONE
-      ====================================================== -->
+    <!-- =======================================================
+         05 — EDUCAZIONE
+    ======================================================== -->
 
-      <section
-        class="narrative-section narrative-section--text"
-        id="section-05"
-        data-section="05"
-        data-title="EDUCAZIONE"
-        tabindex="-1"
-      >
+    <section
+      class="narrative-section"
+      id="educazione"
+      data-section-title="EDUCAZIONE"
+    >
+
+      <div class="section__inner">
 
         <div class="section__content">
 
@@ -396,7 +319,7 @@
             EDUCAZIONE
           </h2>
 
-          <div class="narrative-copy">
+          <div class="section__text">
 
             <p>
               Quello che avevo scoperto poteva diventare qualcosa da trasmettere.
@@ -426,20 +349,22 @@
 
         </div>
 
-      </section>
+      </div>
+
+    </section>
 
 
-      <!-- =====================================================
-           06 — ALLARGARE LO SGUARDO
-      ====================================================== -->
+    <!-- =======================================================
+         06 — ALLARGARE LO SGUARDO
+    ======================================================== -->
 
-      <section
-        class="narrative-section narrative-section--text"
-        id="section-06"
-        data-section="06"
-        data-title="ALLARGARE LO SGUARDO"
-        tabindex="-1"
-      >
+    <section
+      class="narrative-section"
+      id="allargare-lo-sguardo"
+      data-section-title="ALLARGARE LO SGUARDO"
+    >
+
+      <div class="section__inner">
 
         <div class="section__content">
 
@@ -447,7 +372,7 @@
             ALLARGARE LO SGUARDO
           </h2>
 
-          <div class="narrative-copy">
+          <div class="section__text">
 
             <p>
               E quel mondo continuava ad allargarsi.
@@ -477,20 +402,22 @@
 
         </div>
 
-      </section>
+      </div>
+
+    </section>
 
 
-      <!-- =====================================================
-           07 — UN FILO CHE RITORNA
-      ====================================================== -->
+    <!-- =======================================================
+         07 — UN FILO CHE RITORNA
+    ======================================================== -->
 
-      <section
-        class="narrative-section narrative-section--text"
-        id="section-07"
-        data-section="07"
-        data-title="UN FILO CHE RITORNA"
-        tabindex="-1"
-      >
+    <section
+      class="narrative-section"
+      id="un-filo-che-ritorna"
+      data-section-title="UN FILO CHE RITORNA"
+    >
+
+      <div class="section__inner">
 
         <div class="section__content">
 
@@ -498,7 +425,7 @@
             UN FILO CHE RITORNA
           </h2>
 
-          <div class="narrative-copy">
+          <div class="section__text">
 
             <p>
               E, studiando, sono tornato a qualcosa che avevo già incontrato anni prima.
@@ -540,20 +467,22 @@
 
         </div>
 
-      </section>
+      </div>
+
+    </section>
 
 
-      <!-- =====================================================
-           08 — IL PUNTO DOVE TUTTO SI INCONTRA
-      ====================================================== -->
+    <!-- =======================================================
+         08 — IL PUNTO DOVE TUTTO SI INCONTRA
+    ======================================================== -->
 
-      <section
-        class="narrative-section narrative-section--text"
-        id="section-08"
-        data-section="08"
-        data-title="IL PUNTO DOVE TUTTO SI INCONTRA"
-        tabindex="-1"
-      >
+    <section
+      class="narrative-section"
+      id="il-punto-dove-tutto-si-incontra"
+      data-section-title="IL PUNTO DOVE TUTTO SI INCONTRA"
+    >
+
+      <div class="section__inner">
 
         <div class="section__content">
 
@@ -561,7 +490,7 @@
             IL PUNTO DOVE TUTTO SI INCONTRA
           </h2>
 
-          <div class="narrative-copy">
+          <div class="section__text">
 
             <p>
               E allora ho iniziato a vedere il filo che passava attraverso tutto.
@@ -615,20 +544,22 @@
 
         </div>
 
-      </section>
+      </div>
+
+    </section>
 
 
-      <!-- =====================================================
-           09 — OGGI
-      ====================================================== -->
+    <!-- =======================================================
+         09 — OGGI
+    ======================================================== -->
 
-      <section
-        class="narrative-section narrative-section--text"
-        id="section-09"
-        data-section="09"
-        data-title="OGGI"
-        tabindex="-1"
-      >
+    <section
+      class="narrative-section"
+      id="oggi"
+      data-section-title="OGGI"
+    >
+
+      <div class="section__inner">
 
         <div class="section__content">
 
@@ -636,7 +567,7 @@
             OGGI
           </h2>
 
-          <div class="narrative-copy">
+          <div class="section__text">
 
             <p>
               Oggi non vedo più queste esperienze come parti separate.
@@ -670,28 +601,30 @@
               E ogni volta parto dalla stessa cosa:
             </p>
 
-            <p class="narrative-copy__emphasis">
-              capire prima di intervenire.
+            <p>
+              <strong>capire prima di intervenire.</strong>
             </p>
 
           </div>
 
         </div>
 
-      </section>
+      </div>
+
+    </section>
 
 
-      <!-- =====================================================
-           10 — L’OBIETTIVO
-      ====================================================== -->
+    <!-- =======================================================
+         10 — L'OBIETTIVO
+    ======================================================== -->
 
-      <section
-        class="narrative-section narrative-section--text"
-        id="section-10"
-        data-section="10"
-        data-title="L’OBIETTIVO"
-        tabindex="-1"
-      >
+    <section
+      class="narrative-section"
+      id="l-obiettivo"
+      data-section-title="L’OBIETTIVO"
+    >
+
+      <div class="section__inner">
 
         <div class="section__content">
 
@@ -699,7 +632,7 @@
             L’OBIETTIVO
           </h2>
 
-          <div class="narrative-copy">
+          <div class="section__text">
 
             <p>
               Tutto parte da un obiettivo.
@@ -721,72 +654,62 @@
 
         </div>
 
-      </section>
+      </div>
+
+    </section>
 
 
-      <!-- =====================================================
-           11 — TERRITORIO
-      ====================================================== -->
+    <!-- =======================================================
+         11 — TERRITORIO
+    ======================================================== -->
 
-      <section
-        class="narrative-section narrative-section--territory"
-        id="section-11"
-        data-section="11"
-        data-title="TERRITORIO"
-        tabindex="-1"
-      >
+    <section
+      class="narrative-section territory-section"
+      id="territorio"
+      data-section-title="TERRITORIO"
+    >
+
+      <div class="section__inner">
 
         <div class="territory">
 
-          <!-- ===============================================
-               TESTO
-          ================================================ -->
+          <!-- TESTO -->
 
           <div class="territory__content">
 
-            <h2 class="section__heading">
-              TERRITORIO
-            </h2>
-
-            <div class="territory__copy">
+            <div class="section__text">
 
               <p class="territory__statement">
-                <strong>
-                  DA DOVE SI PARTE CONTA.
-                </strong>
+                <strong>DA DOVE SI PARTE CONTA.</strong>
               </p>
 
               <p class="territory__statement">
-                <strong>
-                  IL CONTESTO CAMBIA LO SGUARDO.
-                </strong>
+                <strong>IL CONTESTO CAMBIA LO SGUARDO.</strong>
               </p>
 
               <p>
-                Un luogo non è soltanto<br>
+                Un luogo non è soltanto
                 un punto sulla mappa.
               </p>
 
               <p>
-                È il luogo in cui il movimento<br>
+                È il luogo in cui il movimento
                 viene vissuto, praticato e osservato.
               </p>
 
               <p>
-                Persone diverse.<br>
+                Persone diverse.
                 Esigenze diverse.
               </p>
 
               <p>
-                Ma lo stesso punto di partenza:<br>
+                Ma lo stesso punto di partenza:
                 <strong>il movimento.</strong>
               </p>
 
               <p class="territory__statement">
-                <strong>
-                  DA QUI,<br>
-                  NON SOLO QUI.
-                </strong>
+                <strong>DA QUI,</strong><br>
+                <strong>NON SOLO QUI.</strong>
               </p>
 
               <p>
@@ -794,12 +717,12 @@
               </p>
 
               <p>
-                In presenza, per chi parte da qui<br>
+                In presenza, per chi parte da qui
                 e per chi arriva dai territori vicini.
               </p>
 
               <p>
-                Online, quando la distanza<br>
+                Online, quando la distanza
                 non deve essere un limite.
               </p>
 
@@ -808,65 +731,45 @@
           </div>
 
 
-          <!-- ===============================================
-               MAPPA
-          ================================================ -->
+          <!-- MAPPA SATELLITARE -->
 
           <div class="territory__map">
 
-            <a
-              class="territory__map-link"
-              href="https://maps.app.goo.gl/qHx5WPiHzfCieAFe7"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Apri il territorio su Google Maps"
-            >
+            <div class="territory__map-frame">
 
-              <div class="territory__map-frame">
+              <iframe
+                src="https://www.google.com/maps?q=Stadio+Comunale+Giuseppe+La+Franca,+Partinico&output=embed&maptype=satellite"
+                width="100%"
+                height="100%"
+                style="border:0;"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                title="Stadio Comunale Giuseppe La Franca, Partinico — vista satellitare"
+              ></iframe>
 
-                <!--
-                  Il link ufficiale fornito viene mantenuto come
-                  riferimento del territorio.
-
-                  L'iframe può essere sostituito con l'embed
-                  Google Maps definitivo senza modificare il testo
-                  narrativo.
-                -->
-
-                <div class="territory__map-placeholder">
-
-                  <span>
-                    APRI LA MAPPA
-                  </span>
-
-                  <span aria-hidden="true">
-                    ↗
-                  </span>
-
-                </div>
-
-              </div>
-
-            </a>
+            </div>
 
           </div>
 
         </div>
 
-      </section>
+      </div>
+
+    </section>
 
 
-      <!-- =====================================================
-           12 — DA QUI
-      ====================================================== -->
+    <!-- =======================================================
+         12 — DA QUI
+    ======================================================== -->
 
-      <section
-        class="narrative-section narrative-section--text"
-        id="section-12"
-        data-section="12"
-        data-title="DA QUI"
-        tabindex="-1"
-      >
+    <section
+      class="narrative-section"
+      id="da-qui"
+      data-section-title="DA QUI"
+    >
+
+      <div class="section__inner">
 
         <div class="section__content">
 
@@ -874,20 +777,20 @@
             DA QUI
           </h2>
 
-          <div class="narrative-copy">
+          <div class="section__text">
 
             <p>
-              Ogni obiettivo<br>
+              Ogni obiettivo
               ha un punto da cui partire.
             </p>
 
             <p>
-              Capire qual è<br>
+              Capire qual è
               è già parte del lavoro.
             </p>
 
             <p>
-              Da quel punto<br>
+              Da quel punto
               si può guardare avanti.
             </p>
 
@@ -896,7 +799,7 @@
             </p>
 
             <p>
-              E da lì<br>
+              E da lì
               verso un nuovo obiettivo.
             </p>
 
@@ -904,233 +807,176 @@
 
         </div>
 
-      </section>
+      </div>
+
+    </section>
 
 
-      <!-- =====================================================
-           13 — ECCOMI.
-      ====================================================== -->
+    <!-- =======================================================
+         13 — ECCOMI.
+    ======================================================== -->
 
-      <section
-        class="narrative-section narrative-section--portrait"
-        id="section-13"
-        data-section="13"
-        data-title="ECCOMI."
-        tabindex="-1"
-      >
+    <section
+      class="narrative-section narrative-section--portrait"
+      id="chi-sono"
+      data-section-title="ECCOMI."
+    >
+
+      <div class="section__inner">
 
         <div class="portrait-section">
 
-          <!-- ===============================================
-               TESTO
-          ================================================ -->
-
           <div class="portrait-section__content">
 
-            <h2 class="section__heading">
+            <h2 class="display-l section__heading">
               ECCOMI.
             </h2>
 
-            <p class="portrait-section__statement">
-              Sono qui.
-            </p>
+            <div class="section__text">
 
-          </div>
-
-
-          <!-- ===============================================
-               RITRATTO
-          ================================================ -->
-
-          <figure class="portrait-section__image">
-
-            <img
-              src="assets/images/cp-foto.webp"
-              alt="Cesare Paratore"
-              loading="lazy"
-              decoding="async"
-            >
-
-          </figure>
-
-        </div>
-
-      </section>
-
-
-      <!-- =====================================================
-           14 — SCRIVIMI.
-      ====================================================== -->
-
-      <section
-        class="narrative-section narrative-section--contact"
-        id="section-14"
-        data-section="14"
-        data-title="SCRIVIMI."
-        tabindex="-1"
-      >
-
-        <div class="contact-section">
-
-          <div class="contact-section__content">
-
-            <h2 class="display display--l">
-              SCRIVIMI.
-            </h2>
-
-            <p class="contact-section__statement">
-              Parlami del tuo obiettivo.
-            </p>
-
-            <div class="contact-section__links">
-
-              <!--
-                Inserire qui i contatti reali quando disponibili.
-                Non vengono inventati nel Master.
-              -->
-
-              <a
-                href="#"
-                class="contact-link"
-                data-contact="phone"
-              >
-                Telefono
-              </a>
-
-              <a
-                href="#"
-                class="contact-link"
-                data-contact="email"
-              >
-                Email
-              </a>
+              <p>
+                <strong>Sono qui.</strong>
+              </p>
 
             </div>
 
           </div>
 
+
+          <div class="portrait-section__image">
+
+            <img
+              src="assets/images/cp-foto.webp"
+              alt="Cesare Paratore"
+              loading="lazy"
+            >
+
+          </div>
+
         </div>
 
-      </section>
+      </div>
+
+    </section>
 
 
-    </main>
+    <!-- =======================================================
+         14 — SCRIVIMI.
+    ======================================================== -->
+
+    <section
+      class="narrative-section narrative-section--contact"
+      id="contatti"
+      data-section-title="SCRIVIMI."
+    >
+
+      <div class="section__inner">
+
+        <div class="contact-section">
+
+          <h2 class="display-l section__heading">
+            SCRIVIMI.
+          </h2>
+
+          <div class="section__text">
+
+            <p>
+              <strong>Parlami del tuo obiettivo.</strong>
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
 
 
     <!-- =======================================================
          NARRATIVE NAVIGATION
     ======================================================== -->
 
-    <nav
+    <div
       class="narrative-navigation"
-      id="narrative-navigation"
       aria-label="Navigazione narrativa"
     >
 
       <button
         class="narrative-navigation__arrow narrative-navigation__arrow--prev"
-        id="section-prev"
         type="button"
         aria-label="Sezione precedente"
-        disabled
       >
-
-        <span aria-hidden="true">
-          ←
-        </span>
-
+        <span aria-hidden="true">←</span>
       </button>
 
+      <div class="narrative-navigation__center">
 
-      <div
-        class="narrative-navigation__track"
-        aria-hidden="true"
-      >
-
-        <span
-          class="narrative-navigation__title"
-          id="navigation-title"
-        >
+        <div class="narrative-navigation__title">
           GUARDA.
-        </span>
+        </div>
 
-        <span
-          class="narrative-navigation__line"
-        ></span>
+        <div class="narrative-navigation__line">
 
-        <span
-          class="narrative-navigation__marker"
-          id="navigation-marker"
-        ></span>
+          <span class="narrative-navigation__marker"></span>
+
+        </div>
 
       </div>
-
 
       <button
         class="narrative-navigation__arrow narrative-navigation__arrow--next"
-        id="section-next"
         type="button"
         aria-label="Sezione successiva"
       >
-
-        <span aria-hidden="true">
-          →
-        </span>
-
+        <span aria-hidden="true">→</span>
       </button>
 
-    </nav>
+    </div>
+
+  </main>
 
 
-    <!-- =======================================================
-         FOOTER
-    ======================================================== -->
+  <!-- =========================================================
+       FOOTER
+  ========================================================== -->
 
-    <footer
-      class="site-footer"
-      id="site-footer"
-    >
+  <footer class="site-footer">
 
-      <div class="site-footer__logo">
+    <div class="site-footer__logo">
 
-        <img
-          src="assets/images/cp-mark.svg"
-          alt="CP"
-        >
+      <img
+        src="assets/images/cp-mark.svg"
+        alt="CP"
+      >
 
-      </div>
+    </div>
 
-      <div class="site-footer__name">
-        CESARE PARATORE
-      </div>
+    <div class="site-footer__name">
+      CESARE PARATORE
+    </div>
 
-    </footer>
+  </footer>
 
 
-    <!-- =======================================================
-         STANDBY
-    ======================================================== -->
+  <!-- =========================================================
+       STANDBY
+  ========================================================== -->
 
-    <div
-      class="standby"
-      id="standby"
-      aria-hidden="true"
-    >
+  <div class="standby" aria-hidden="true">
 
-      <div class="standby__title">
-        GUARDA.
-      </div>
-
+    <div class="standby__word">
+      GUARDA.
     </div>
 
   </div>
 
 
   <!-- =========================================================
-       JAVASCRIPT
+       SCRIPT
   ========================================================== -->
 
-  <script src="script.js" defer></script>
+  <script src="script.js"></script>
 
 </body>
 </html>
