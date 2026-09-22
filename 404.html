@@ -1,55 +1,56 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  >
-
-  <meta
-    name="robots"
-    content="noindex, follow"
-  >
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, follow">
+  <meta name="theme-color" content="#0B0B0A">
 
   <title>Pagina non trovata — Cesare Paratore</title>
 
   <style>
     :root {
+      --bg: #0B0B0A;
+      --surface: #151513;
       --light: #F1EFE8;
-      --dark: #0B0B0A;
+      --secondary: #A7A49C;
+      --gutter: 5vw;
+      --header-h: 76px;
+      --micro: clamp(.75rem, .8vw, .85rem);
     }
 
     * {
       box-sizing: border-box;
     }
 
-    html,
-    body {
-      margin: 0;
-      min-width: 320px;
-      min-height: 100%;
+    html {
+      background: var(--bg);
+      color: var(--light);
     }
 
     body {
+      margin: 0;
       min-height: 100svh;
-
-      display: flex;
-      flex-direction: column;
-
       background: var(--light);
-      color: var(--dark);
-
-      font-family:
-        "Neue Montreal",
-        "Helvetica Neue",
-        Helvetica,
-        Arial,
-        sans-serif;
-
+      color: var(--bg);
+      font-family: "Neue Montreal", "Helvetica Neue", Helvetica, Arial, sans-serif;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
+      overflow-x: hidden;
+    }
+
+    body.menu-open {
+      overflow: hidden;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    button,
+    a {
+      font: inherit;
     }
 
     a {
@@ -58,258 +59,270 @@
     }
 
     button {
-      font: inherit;
-    }
-
-    :focus-visible {
-      outline: 2px solid currentColor;
-      outline-offset: 5px;
-    }
-
-    .site-header {
-      position: relative;
-
-      width: 100%;
-
-      padding: 28px 5vw;
-
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .site-logo {
-      display: block;
-      width: clamp(42px, 4vw, 62px);
-      height: auto;
-    }
-
-    .menu-toggle {
-      padding: 0;
-
       border: 0;
-      background: none;
-
-      color: var(--dark);
-
-      font-size: 0.8rem;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-
       cursor: pointer;
     }
 
-    .menu-toggle:hover {
-      opacity: 0.5;
-    }
+    /* =====================================================
+       HEADER
+       ===================================================== */
 
-    .menu {
+    .site-header {
       position: fixed;
-      inset: 0;
+      top: 0;
+      left: 0;
+      right: 0;
       z-index: 100;
-
+      height: var(--header-h);
+      padding: 0 var(--gutter);
       display: flex;
       align-items: center;
-      justify-content: center;
-
+      justify-content: space-between;
       background: var(--light);
-      color: var(--dark);
+      color: var(--bg);
+    }
 
+    .brand,
+    .menu-brand,
+    .footer-brand {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand img,
+    .menu-brand img,
+    .footer-brand img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+    }
+
+    .menu-trigger {
+      min-height: 44px;
+      padding: 0 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      color: var(--light);
+      border: 1px solid var(--bg);
+      font-size: var(--micro);
+      letter-spacing: .12em;
+      transition:
+        background-color .25s ease,
+        color .25s ease,
+        border-color .25s ease;
+    }
+
+    .menu-trigger:hover,
+    .menu-trigger:focus-visible {
+      background: var(--surface);
+    }
+
+    .menu-trigger:focus-visible {
+      outline: 2px solid var(--bg);
+      outline-offset: 4px;
+    }
+
+    /* =====================================================
+       MENU
+       ===================================================== */
+
+    .site-menu {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: grid;
+      place-items: center;
+      background: var(--bg);
+      color: var(--light);
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
-
-      transition:
-        opacity 400ms ease,
-        visibility 400ms ease;
     }
 
-    .menu.is-open {
-      opacity: 1;
-      visibility: visible;
+    .site-menu.is-open {
       pointer-events: auto;
+    }
+
+    .menu-brand {
+      position: absolute;
+      top: 16px;
+      left: var(--gutter);
     }
 
     .menu-close {
       position: absolute;
-      top: 28px;
-      right: 5vw;
-
+      top: 16px;
+      right: var(--gutter);
+      min-height: 44px;
       padding: 0;
-
-      border: 0;
-      background: none;
-
-      color: var(--dark);
-
-      font-size: 0.8rem;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-
-      cursor: pointer;
+      background: transparent;
+      color: var(--light);
+      font-size: var(--micro);
+      letter-spacing: .12em;
+      transition: opacity .25s ease;
     }
 
-    .menu-list {
-      margin: 0;
-      padding: 0;
-
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-
-      list-style: none;
+    .menu-close:hover,
+    .menu-close:focus-visible {
+      opacity: .65;
     }
 
-    .menu-list a {
-      display: block;
+    .menu-close:focus-visible {
+      outline: 2px solid var(--light);
+      outline-offset: 4px;
+    }
 
-      font-size: clamp(2rem, 6vw, 6rem);
-      font-weight: 500;
-      line-height: 0.95;
-      letter-spacing: -0.04em;
+    .menu-nav {
+      display: grid;
+      gap: clamp(10px, 1.2vh, 18px);
       text-align: center;
-
-      transition: opacity 180ms ease;
     }
 
-    .menu-list a:hover {
-      opacity: 0.4;
+    .menu-nav a {
+      font-size: clamp(2rem, 4.8vw, 5rem);
+      line-height: .95;
+      letter-spacing: -.035em;
+      transition: opacity .25s ease;
     }
 
-    .error {
-      flex: 1;
-
-      min-height: 0;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      padding: 10vh 5vw;
+    .menu-nav a:hover,
+    .menu-nav a:focus-visible {
+      opacity: .55;
     }
 
-    .error-inner {
-      width: min(100%, 900px);
+    .menu-nav a:focus-visible {
+      outline: none;
+    }
 
+    /* =====================================================
+       404
+       ===================================================== */
+
+    .error-page {
+      min-height: 100svh;
+      padding: calc(var(--header-h) + 8vh) var(--gutter) 8vh;
+      display: grid;
+      place-items: center;
       text-align: center;
+      background: var(--light);
+    }
+
+    .error-content {
+      width: min(100%, 760px);
     }
 
     .error-code {
-      margin: 0 0 2rem;
-
+      margin: 0 0 clamp(2rem, 5vh, 4rem);
       font-size: clamp(7rem, 20vw, 18rem);
+      line-height: .78;
+      letter-spacing: -.07em;
       font-weight: 500;
-      line-height: 0.8;
-      letter-spacing: -0.07em;
-    }
-
-    .error-title {
-      margin: 0 auto 1.5rem;
-
-      max-width: 800px;
-
-      font-size: clamp(2rem, 5vw, 5rem);
-      font-weight: 500;
-      line-height: 0.95;
-      letter-spacing: -0.05em;
     }
 
     .error-copy {
-      max-width: 580px;
       margin: 0 auto;
-
-      font-size: clamp(1.15rem, 1.35vw, 1.5rem);
-      line-height: 1.5;
+      max-width: 620px;
+      font-size: clamp(1.35rem, 2.4vw, 2.4rem);
+      line-height: 1.25;
+      letter-spacing: -.025em;
     }
 
     .error-link {
       display: inline-block;
-
-      margin-top: 2.5rem;
-
-      padding-bottom: 0.35rem;
-
-      border-bottom: 1px solid currentColor;
-
-      font-size: 0.8rem;
-      font-weight: 500;
-      letter-spacing: 0.08em;
+      margin-top: clamp(2rem, 5vh, 4rem);
+      font-size: var(--micro);
+      letter-spacing: .12em;
       text-transform: uppercase;
-
-      transition: opacity 180ms ease;
+      position: relative;
     }
 
-    .error-link:hover {
-      opacity: 0.5;
+    .error-link::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -.35rem;
+      height: 1px;
+      background: currentColor;
+      transform-origin: left center;
+      transform: scaleX(.35);
+      transition: transform .25s ease;
     }
+
+    .error-link:hover::after,
+    .error-link:focus-visible::after {
+      transform: scaleX(1);
+    }
+
+    .error-link:focus-visible {
+      outline: none;
+    }
+
+    /* =====================================================
+       FOOTER
+       ===================================================== */
 
     .site-footer {
-      width: 100%;
-
-      padding: 28px 5vw;
-
+      min-height: 116px;
+      padding: 28px var(--gutter);
       display: flex;
       align-items: center;
       justify-content: space-between;
-
+      gap: 24px;
       background: var(--light);
-      color: var(--dark);
-    }
-
-    .footer-logo {
-      display: block;
-      width: clamp(42px, 4vw, 62px);
-      height: auto;
+      color: var(--bg);
+      border-top: 1px solid rgba(11, 11, 10, .12);
     }
 
     .footer-name {
-      margin: 0;
-
-      font-size: 0.8rem;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      font-size: var(--micro);
+      letter-spacing: .12em;
     }
 
-    @media (max-width: 767px) {
+    /* =====================================================
+       MOBILE
+       ===================================================== */
+
+    @media (max-width: 900px) {
+      :root {
+        --gutter: 24px;
+        --header-h: 68px;
+      }
+
       .site-header {
-        padding: 20px;
+        padding: 0 var(--gutter);
+      }
+
+      .menu-brand {
+        top: 12px;
+        left: var(--gutter);
       }
 
       .menu-close {
-        top: 20px;
-        right: 20px;
+        top: 12px;
+        right: var(--gutter);
       }
 
-      .error {
-        padding: 8vh 20px;
+      .menu-nav a {
+        font-size: clamp(1.8rem, 8vw, 3.5rem);
       }
 
-      .error-code {
-        margin-bottom: 1.5rem;
-        font-size: clamp(6rem, 30vw, 10rem);
-      }
-
-      .error-title {
-        font-size: clamp(2rem, 9vw, 3.5rem);
-      }
-
-      .error-copy {
-        font-size: 1.15rem;
+      .error-page {
+        padding-top: calc(var(--header-h) + 6vh);
       }
 
       .site-footer {
-        padding: 24px 20px;
+        min-height: 96px;
+        padding: 22px var(--gutter);
       }
+    }
 
-      .footer-logo {
-        width: 44px;
-      }
-
-      .footer-name {
-        font-size: 0.72rem;
+    @media (max-width: 520px) {
+      .menu-nav a {
+        font-size: clamp(1.65rem, 9vw, 2.7rem);
       }
     }
 
@@ -317,7 +330,9 @@
       *,
       *::before,
       *::after {
-        transition-duration: 0.01ms !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
       }
     }
   </style>
@@ -327,69 +342,84 @@
 
   <header class="site-header">
     <a
+      class="brand"
       href="/"
-      aria-label="Cesare Paratore — Home"
+      aria-label="Cesare Paratore — torna all'inizio"
     >
       <img
-        class="site-logo"
         src="/assets/images/cp-mark.svg"
-        alt="CP"
+        alt="Cesare Paratore"
+        width="44"
+        height="44"
       >
     </a>
 
     <button
-      class="menu-toggle"
+      class="menu-trigger"
+      id="menuTrigger"
       type="button"
       aria-expanded="false"
-      aria-controls="site-menu"
+      aria-controls="siteMenu"
     >
       MENU
     </button>
   </header>
 
   <div
-    class="menu"
-    id="site-menu"
+    class="site-menu"
+    id="siteMenu"
     aria-hidden="true"
   >
+
+    <a
+      class="menu-brand"
+      href="/"
+      aria-label="Cesare Paratore — torna all'inizio"
+    >
+      <img
+        src="/assets/images/cp-mark.svg"
+        alt="Cesare Paratore"
+        width="44"
+        height="44"
+      >
+    </a>
+
     <button
       class="menu-close"
+      id="menuClose"
       type="button"
+      aria-label="Chiudi menu"
     >
       CHIUDI
     </button>
 
-    <nav aria-label="Navigazione principale">
-      <ul class="menu-list">
-        <li><a href="/chi-sono/">CHI SONO</a></li>
-        <li><a href="/sport/">SPORT</a></li>
-        <li><a href="/scienze-motorie/">SCIENZE MOTORIE</a></li>
-        <li><a href="/educazione/">EDUCAZIONE</a></li>
-        <li><a href="/management/">MANAGEMENT</a></li>
-        <li><a href="/digitale/">DIGITALE</a></li>
-        <li><a href="/territorio/">TERRITORIO</a></li>
-        <li><a href="/contatti/">CONTATTI</a></li>
-      </ul>
+    <nav
+      class="menu-nav"
+      aria-label="Navigazione principale"
+    >
+      <a href="/chi-sono/">CHI SONO</a>
+      <a href="/sport/">SPORT</a>
+      <a href="/scienze-motorie/">SCIENZE MOTORIE</a>
+      <a href="/educazione/">EDUCAZIONE</a>
+      <a href="/management/">MANAGEMENT</a>
+      <a href="/digitale/">DIGITALE</a>
+      <a href="/territorio/">TERRITORIO</a>
+      <a href="/contatti/">CONTATTI</a>
     </nav>
+
   </div>
 
-  <main class="error">
-    <div class="error-inner">
+  <main class="error-page">
+    <div class="error-content">
 
       <p class="error-code">404</p>
 
-      <h1 class="error-title">
-        Questa pagina non è dove pensavi di trovarla.
-      </h1>
-
       <p class="error-copy">
+        Questa pagina non è dove pensavi di trovarla.<br>
         Ma forse è un buon momento per tornare a guardare.
       </p>
 
-      <a
-        class="error-link"
-        href="/"
-      >
+      <a class="error-link" href="/">
         Torna all'inizio →
       </a>
 
@@ -397,62 +427,78 @@
   </main>
 
   <footer class="site-footer">
+
     <a
+      class="footer-brand"
       href="/"
-      aria-label="Cesare Paratore — Home"
+      aria-label="Cesare Paratore — torna all'inizio"
     >
       <img
-        class="footer-logo"
         src="/assets/images/cp-mark.svg"
-        alt="CP"
+        alt="Cesare Paratore"
+        width="44"
+        height="44"
       >
     </a>
 
-    <p class="footer-name">
+    <div class="footer-name">
       CESARE PARATORE
-    </p>
+    </div>
+
   </footer>
 
   <script>
     (() => {
       "use strict";
 
-      const menu = document.querySelector(".menu");
-      const menuToggle = document.querySelector(".menu-toggle");
-      const menuClose = document.querySelector(".menu-close");
+      const menu = document.getElementById("siteMenu");
+      const trigger = document.getElementById("menuTrigger");
+      const close = document.getElementById("menuClose");
 
-      function openMenu() {
-        menu.classList.add("is-open");
-        menu.setAttribute("aria-hidden", "false");
-        menuToggle.setAttribute("aria-expanded", "true");
-        document.body.style.overflow = "hidden";
-      }
+      function setMenu(open) {
+        menu.classList.toggle("is-open", open);
+        menu.setAttribute("aria-hidden", String(!open));
+        trigger.setAttribute("aria-expanded", String(open));
+        document.body.classList.toggle("menu-open", open);
 
-      function closeMenu() {
-        menu.classList.remove("is-open");
-        menu.setAttribute("aria-hidden", "true");
-        menuToggle.setAttribute("aria-expanded", "false");
-        document.body.style.overflow = "";
-      }
-
-      menuToggle.addEventListener("click", () => {
-        if (menu.classList.contains("is-open")) {
-          closeMenu();
+        if (open) {
+          menu.style.visibility = "visible";
+          menu.style.opacity = "1";
+          close.focus();
         } else {
-          openMenu();
+          menu.style.visibility = "hidden";
+          menu.style.opacity = "0";
+          trigger.focus();
         }
+      }
+
+      trigger.addEventListener("click", () => {
+        setMenu(true);
       });
 
-      menuClose.addEventListener("click", closeMenu);
+      close.addEventListener("click", () => {
+        setMenu(false);
+      });
 
-      document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") {
-          closeMenu();
+      menu.addEventListener("click", (event) => {
+        if (event.target === menu) {
+          setMenu(false);
         }
       });
 
       menu.querySelectorAll("a").forEach((link) => {
-        link.addEventListener("click", closeMenu);
+        link.addEventListener("click", () => {
+          setMenu(false);
+        });
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (
+          event.key === "Escape" &&
+          menu.classList.contains("is-open")
+        ) {
+          setMenu(false);
+        }
       });
     })();
   </script>
