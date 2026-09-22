@@ -16,6 +16,10 @@
   --nav-h: 96px;
 }
 
+/* =========================================================
+   RESET
+   ========================================================= */
+
 *,
 *::before,
 *::after {
@@ -23,22 +27,27 @@
 }
 
 html {
-  background: var(--bg);
   scroll-behavior: auto;
+  background: var(--bg);
 }
 
 body {
   margin: 0;
+  min-width: 320px;
+
   background: var(--bg);
   color: var(--light);
+
   font-family:
     "Neue Montreal",
     "Helvetica Neue",
     Helvetica,
     Arial,
     sans-serif;
+
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+
   overflow-x: hidden;
 }
 
@@ -62,22 +71,24 @@ a {
 }
 
 button {
-  border: 0;
   cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
 }
 
 a {
   color: inherit;
-  text-decoration: none;
 }
 
 :focus-visible {
   outline: 2px solid currentColor;
-  outline-offset: 4px;
+  outline-offset: 5px;
 }
 
 /* =========================================================
-   LOADER
+   LOADER / SIPARIO
    ========================================================= */
 
 .loader {
@@ -93,37 +104,64 @@ a {
 
   opacity: 1;
   visibility: visible;
-  pointer-events: auto;
-
-  transition:
-    opacity .65s ease,
-    visibility 0s linear 0s;
 }
 
-.loader.is-hidden {
+.loader-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.loader-logo {
+  width: clamp(54px, 6vw, 84px);
+  height: auto;
+}
+
+.loader-name {
+  font-size: var(--micro);
+  line-height: 1;
+  letter-spacing: .12em;
+}
+
+/* =========================================================
+   STANDBY
+   ========================================================= */
+
+.standby {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+
+  display: grid;
+  place-items: center;
+
+  background: var(--bg);
+  color: var(--light);
+
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
 
   transition:
-    opacity .65s ease,
-    visibility 0s linear .65s;
+    opacity .8s ease,
+    visibility 0s linear .8s;
 }
 
-.loader-inner {
-  display: grid;
-  justify-items: center;
-  gap: 18px;
+.standby.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+
+  transition:
+    opacity .8s ease,
+    visibility 0s linear 0s;
 }
 
-.loader-inner img {
-  width: 72px;
-  height: 72px;
-}
-
-.loader-inner span {
-  font-size: var(--micro);
-  letter-spacing: .14em;
+.standby span {
+  font-size: var(--display-l);
+  line-height: .9;
+  letter-spacing: -.045em;
 }
 
 /* =========================================================
@@ -133,11 +171,9 @@ a {
 .site-header {
   position: fixed;
   inset: 0 0 auto 0;
-
   z-index: 300;
 
   height: var(--header-h);
-
   padding: 0 var(--gutter);
 
   display: flex;
@@ -148,51 +184,47 @@ a {
   color: var(--bg);
 }
 
-.brand {
-  display: inline-flex;
+.site-logo {
+  display: flex;
   align-items: center;
-  justify-content: center;
+
+  width: 42px;
+  height: 42px;
+
+  text-decoration: none;
 }
 
-.brand img {
-  width: 44px;
-  height: 44px;
+.site-logo img {
+  width: 100%;
+  height: auto;
 }
 
 .menu-trigger {
   min-width: 92px;
   min-height: 44px;
-
   padding: 0 18px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
+  border: 1px solid var(--bg);
+
   background: var(--bg);
   color: var(--light);
 
-  border: 1px solid var(--bg);
-
   font-size: var(--micro);
+  line-height: 1;
   letter-spacing: .12em;
-
-  transition: opacity .25s ease;
-}
-
-.menu-trigger:hover {
-  opacity: .82;
 }
 
 /* =========================================================
    MENU
-   L'HEADER NON CAMBIA.
-   Il menu parte sotto l'header.
+   L'HEADER RESTA SEMPRE CHIARO.
    ========================================================= */
 
 .site-menu {
   position: fixed;
-
   top: var(--header-h);
   right: 0;
   bottom: 0;
@@ -211,33 +243,46 @@ a {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+
+  transition:
+    opacity .35s ease,
+    visibility 0s linear .35s;
 }
 
 .site-menu.is-open {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
+
+  transition:
+    opacity .35s ease,
+    visibility 0s linear 0s;
 }
 
-.menu-nav {
-  width: min(100%, 900px);
+.site-menu-nav {
+  width: 100%;
 
-  display: grid;
-  gap: clamp(14px, 2.2vh, 24px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
-  text-align: center;
+  gap: clamp(12px, 1.7vh, 24px);
 }
 
-.menu-nav a {
-  font-size: clamp(1.45rem, 3.2vw, 3.6rem);
+.site-menu-nav a {
+  color: var(--light);
+  text-decoration: none;
+
+  font-size: clamp(2rem, 5vw, 5rem);
   line-height: .95;
-  letter-spacing: -.025em;
+  letter-spacing: -.035em;
+  text-align: center;
 
   transition: opacity .25s ease;
 }
 
-.menu-nav a:hover {
-  opacity: .58;
+.site-menu-nav a:hover {
+  opacity: .5;
 }
 
 /* =========================================================
@@ -245,92 +290,24 @@ a {
    ========================================================= */
 
 main {
-  position: relative;
+  padding-top: var(--header-h);
 }
 
 /* =========================================================
-   NARRATIVE NAVIGATION
-   SEMPRE VISIBILE DURANTE LO SCROLL
+   STORY SECTIONS
    ========================================================= */
 
-.section-nav {
-  position: sticky;
-  top: var(--header-h);
+.story-section {
+  position: relative;
 
-  z-index: 120;
-
-  width: 100%;
-  min-height: var(--nav-h);
-
-  padding: 20px var(--gutter);
+  min-height: 100svh;
 
   display: grid;
-  grid-template-columns: 72px 1fr 72px;
   align-items: center;
-  gap: 20px;
 
-  background: var(--light);
-  color: var(--bg);
+  padding: clamp(72px, 10vh, 140px) var(--gutter);
 
-  border-bottom: 1px solid var(--line);
-}
-
-.section-nav-title {
-  text-align: center;
-
-  font-size: var(--micro);
-  letter-spacing: .12em;
-}
-
-.section-nav-arrow {
-  width: 56px;
-  height: 56px;
-
-  justify-self: center;
-
-  display: grid;
-  place-items: center;
-
-  border: 1px solid var(--bg);
-  border-radius: 50%;
-
-  background: transparent;
-  color: var(--bg);
-
-  font-size: 1.2rem;
-
-  transition:
-    background-color .25s ease,
-    color .25s ease,
-    opacity .25s ease;
-}
-
-.section-nav-arrow:hover:not(:disabled) {
-  background: var(--bg);
-  color: var(--light);
-}
-
-.section-nav-arrow:disabled {
-  opacity: .28;
-  cursor: default;
-}
-
-/* =========================================================
-   NARRATIVE SECTIONS
-   ========================================================= */
-
-.narrative-section {
-  position: relative;
-
-  min-height: calc(100svh - var(--nav-h));
-
-  padding: 10vh var(--gutter);
-
-  display: grid;
-  place-items: center;
-
-  scroll-margin-top:
-    calc(var(--header-h) + var(--nav-h));
+  overflow: clip;
 }
 
 .section-dark {
@@ -343,88 +320,101 @@ main {
   color: var(--bg);
 }
 
-.section-hero {
-  min-height: calc(100svh - var(--nav-h));
-}
+.section-inner {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
 
-.narrative-copy {
-  width: min(100%, 42rem);
+  display: grid;
+  justify-items: center;
+  align-content: center;
 
   text-align: center;
 }
 
 .section-title {
-  margin: 0 0 clamp(2rem, 5vh, 4rem);
+  margin: 0;
 
-  font-size: var(--display-l);
+  font-size: var(--display-xl);
   line-height: .9;
-  letter-spacing: -.055em;
+  letter-spacing: -.05em;
   font-weight: 500;
 }
 
-.section-hero .section-title {
-  margin: 0;
-  font-size: var(--display-xl);
-}
-
-.narrative-body {
-  display: grid;
-  gap: clamp(1.1rem, 2.2vh, 1.8rem);
+.story-body {
+  width: min(100%, 42rem);
+  margin-top: clamp(48px, 8vh, 100px);
 
   font-size: var(--narrative);
-  line-height: 1.52;
-  letter-spacing: -.012em;
+  line-height: 1.5;
+
+  text-align: center;
 }
 
-.narrative-body p {
-  margin: 0;
+.story-body p {
+  margin: 0 0 1.6em;
 }
 
-.narrative-body strong {
+.story-body p:last-child {
+  margin-bottom: 0;
+}
+
+.story-body strong {
   font-weight: 600;
 }
 
 /* =========================================================
-   QUI
+   OPENING
    ========================================================= */
 
-.context-section {
-  min-height: calc(100svh - var(--nav-h));
+.section-opening {
+  min-height: calc(100svh - var(--header-h));
+}
 
-  padding: 8vh var(--gutter);
+.section-opening .section-title {
+  font-size: clamp(5rem, 12vw, 13rem);
+}
+
+.section-opening .story-body {
+  max-width: 38rem;
+}
+
+/* =========================================================
+   PLACE / GOOGLE MAPS
+   ========================================================= */
+
+.section-place {
+  padding-top: clamp(72px, 9vh, 120px);
+  padding-bottom: clamp(72px, 9vh, 120px);
+}
+
+.place-grid {
+  width: 100%;
 
   display: grid;
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(0, 1fr);
-
-  gap: clamp(32px, 6vw, 96px);
-
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
 
-  scroll-margin-top:
-    calc(var(--header-h) + var(--nav-h));
+  gap: clamp(40px, 6vw, 96px);
 }
 
-.context-copy {
-  width: min(100%, 42rem);
+.place-copy {
+  display: grid;
+  justify-items: center;
 
   text-align: center;
-
-  justify-self: center;
 }
 
-.context-copy .section-title {
-  margin-bottom: clamp(2rem, 4vh, 3rem);
+.place-copy .story-body {
+  max-width: 36rem;
 }
 
 .map-frame {
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1 / 1;
 
+  background: var(--surface);
   overflow: hidden;
-
-  background: #d8d5cc;
 }
 
 .map-frame iframe {
@@ -435,45 +425,42 @@ main {
 }
 
 /* =========================================================
-   ECCOMI
-   FOTO CONTROLLATA
+   PERSON / PORTRAIT
    ========================================================= */
 
-.portrait-section {
-  min-height: calc(100svh - var(--nav-h));
-
-  padding: 8vh var(--gutter);
-
-  display: grid;
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(280px, 420px);
-
-  gap: clamp(40px, 8vw, 120px);
-
-  align-items: center;
-
-  scroll-margin-top:
-    calc(var(--header-h) + var(--nav-h));
+.section-person {
+  padding-top: clamp(72px, 9vh, 120px);
+  padding-bottom: clamp(72px, 9vh, 120px);
 }
 
-.portrait-copy {
-  width: min(100%, 42rem);
+.person-grid {
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+
+  gap: clamp(40px, 6vw, 96px);
+}
+
+.person-copy {
+  display: grid;
+  justify-items: center;
 
   text-align: center;
+}
 
-  justify-self: center;
+.person-copy .story-body {
+  max-width: 30rem;
 }
 
 .portrait-frame {
   width: min(100%, 420px);
-
   max-height: min(62svh, 620px);
 
   margin: 0 auto;
 
   overflow: hidden;
-
   background: var(--surface);
 }
 
@@ -490,8 +477,81 @@ main {
    CONTACT
    ========================================================= */
 
-.contact-section {
-  min-height: calc(100svh - var(--nav-h));
+.section-contact {
+  min-height: calc(100svh - var(--header-h));
+}
+
+/* =========================================================
+   NARRATIVE NAVIGATION
+   Sticky: sempre presente durante lo scroll.
+   ========================================================= */
+
+.section-nav {
+  position: sticky;
+  top: var(--header-h);
+
+  z-index: 120;
+
+  width: 100%;
+  min-height: var(--nav-h);
+
+  padding: 20px var(--gutter);
+
+  display: grid;
+  grid-template-columns: 72px 1fr 72px;
+  align-items: center;
+
+  gap: 20px;
+
+  background: var(--light);
+  color: var(--bg);
+
+  border-bottom: 1px solid var(--line);
+}
+
+.section-nav-title {
+  min-width: 0;
+
+  text-align: center;
+
+  font-size: var(--micro);
+  line-height: 1;
+  letter-spacing: .14em;
+}
+
+.section-nav-arrow {
+  width: 56px;
+  height: 56px;
+
+  justify-self: center;
+
+  display: grid;
+  place-items: center;
+
+  border: 0;
+  border-radius: 50%;
+
+  background: transparent;
+  color: var(--bg);
+
+  font-size: 1.5rem;
+  line-height: 1;
+
+  transition:
+    background .25s ease,
+    color .25s ease,
+    opacity .25s ease,
+    transform .25s ease;
+}
+
+.section-nav-arrow:not(:disabled):hover {
+  background: var(--bg);
+  color: var(--light);
+  transform: scale(1.04);
+}
+
+.section-nav-arrow:disabled {
+  opacity: .22;
 }
 
 /* =========================================================
@@ -499,9 +559,9 @@ main {
    ========================================================= */
 
 .site-footer {
-  min-height: 116px;
+  min-height: 88px;
 
-  padding: 28px var(--gutter);
+  padding: 24px var(--gutter);
 
   display: flex;
   align-items: center;
@@ -511,53 +571,27 @@ main {
 
   background: var(--light);
   color: var(--bg);
-
-  font-size: var(--micro);
-  letter-spacing: .1em;
 }
 
-.footer-brand {
-  display: inline-flex;
+.footer-logo {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
   align-items: center;
-  justify-content: center;
+
+  text-decoration: none;
 }
 
-.footer-brand img {
-  width: 44px;
-  height: 44px;
+.footer-logo img {
+  width: 100%;
+  height: auto;
 }
 
-/* =========================================================
-   STANDBY
-   ========================================================= */
-
-.standby {
-  position: fixed;
-  inset: 0;
-
-  z-index: 900;
-
-  display: grid;
-  place-items: center;
-
-  background: #080807;
-  color: var(--light);
-
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-.standby.is-active {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
-
-.standby span {
-  font-size: var(--display-xl);
-  line-height: .88;
-  letter-spacing: -.055em;
+.site-footer span {
+  font-size: var(--micro);
+  line-height: 1;
+  letter-spacing: .12em;
 }
 
 /* =========================================================
@@ -567,36 +601,21 @@ main {
 @media (max-width: 1024px) {
 
   :root {
-    --gutter: 32px;
-    --header-h: 72px;
-    --nav-h: 88px;
+    --gutter: 4vw;
   }
 
-  .context-section {
-    grid-template-columns: 1fr;
-
-    gap: 48px;
-
-    padding-top: 7vh;
-    padding-bottom: 7vh;
+  .place-grid,
+  .person-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .map-frame {
-    width: min(100%, 760px);
-    justify-self: center;
-  }
-
-  .portrait-section {
-    grid-template-columns: 1fr;
-
-    gap: 48px;
-
-    padding-top: 7vh;
-    padding-bottom: 7vh;
+    width: min(100%, 620px);
+    margin: 0 auto;
   }
 
   .portrait-frame {
-    width: min(58vw, 420px);
+    width: min(100%, 420px);
   }
 }
 
@@ -612,71 +631,64 @@ main {
     --nav-h: 76px;
   }
 
-  .brand img,
-  .footer-brand img {
-    width: 40px;
-    height: 40px;
+  .site-logo {
+    width: 38px;
+    height: 38px;
   }
 
   .menu-trigger {
-    min-width: 88px;
-    min-height: 44px;
-    padding-inline: 15px;
+    min-width: 84px;
+    min-height: 42px;
   }
 
   .site-menu {
-    padding: 28px var(--gutter);
+    padding: 32px 20px;
   }
 
-  .menu-nav {
-    gap: 16px;
+  .site-menu-nav {
+    gap: 14px;
   }
 
-  .menu-nav a {
-    font-size: clamp(1.35rem, 7vw, 2.1rem);
+  .site-menu-nav a {
+    font-size: clamp(1.8rem, 9vw, 3rem);
   }
 
-  .section-nav {
-    grid-template-columns: 52px 1fr 52px;
+  .story-section {
+    min-height: 100svh;
 
-    gap: 10px;
-
-    padding-inline: var(--gutter);
-  }
-
-  .section-nav-arrow {
-    width: 48px;
-    height: 48px;
-  }
-
-  .narrative-section {
-    min-height: calc(100svh - var(--nav-h));
-
-    padding: 8vh var(--gutter);
+    padding:
+      clamp(64px, 9vh, 96px)
+      20px;
   }
 
   .section-title {
-    margin-bottom: 2.2rem;
+    font-size: clamp(4rem, 17vw, 6rem);
   }
 
-  .narrative-body {
-    gap: 1.15rem;
+  .section-opening .section-title {
+    font-size: clamp(4.5rem, 19vw, 7rem);
   }
 
-  .context-section,
-  .portrait-section {
-    min-height: calc(100svh - var(--nav-h));
+  .story-body {
+    width: min(100%, 34rem);
+    margin-top: 48px;
 
-    padding: 8vh var(--gutter);
+    font-size: 1.15rem;
+    line-height: 1.5;
+  }
+
+  .place-grid,
+  .person-grid {
+    gap: 56px;
   }
 
   .map-frame {
+    width: 100%;
     aspect-ratio: 1 / 1;
   }
 
   .portrait-frame {
     width: min(76vw, 340px);
-
     max-height: 54svh;
   }
 
@@ -684,10 +696,26 @@ main {
     max-height: 54svh;
   }
 
-  .site-footer {
-    min-height: 104px;
+  .section-nav {
+    grid-template-columns: 56px 1fr 56px;
+    min-height: var(--nav-h);
+    padding: 12px 20px;
 
-    padding: 24px var(--gutter);
+    gap: 8px;
+  }
+
+  .section-nav-arrow {
+    width: 46px;
+    height: 46px;
+  }
+
+  .section-nav-title {
+    font-size: .72rem;
+  }
+
+  .site-footer {
+    min-height: 76px;
+    padding: 20px;
   }
 }
 
@@ -701,12 +729,11 @@ main {
     scroll-behavior: auto;
   }
 
-  *,
-  *::before,
-  *::after {
-    animation-duration: .01ms !important;
-    animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
-    transition-duration: .01ms !important;
+  .site-menu,
+  .site-menu-nav a,
+  .section-nav-arrow,
+  .standby,
+  .loader {
+    transition: none !important;
   }
 }
