@@ -2,44 +2,143 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
   >
 
-  <meta
-    name="theme-color"
-    content="#0B0B0A"
-  >
-
-  <meta
-    name="robots"
-    content="noindex, nofollow"
-  >
-
-  <meta
-    name="description"
-    content="Pagina non trovata — Cesare Paratore."
-  >
+  <meta name="theme-color" content="#0B0B0A">
 
   <title>404 — Cesare Paratore</title>
 
   <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* ========================================================
+       404 — COERENTE CON IL SISTEMA HOME
+    ======================================================== */
+
+    .page-404 {
+      min-height: 100svh;
+
+      display: flex;
+      flex-direction: column;
+
+      background: var(--bg);
+      color: var(--light);
+    }
+
+    .page-404__main {
+      flex: 1;
+
+      min-height: calc(100svh - 88px);
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding:
+        8rem
+        var(--margin);
+    }
+
+    .page-404__inner {
+      width: min(100%, 72rem);
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      text-align: center;
+    }
+
+    .page-404__number {
+      margin: 0;
+
+      font-size: var(--display-xl);
+      line-height: 0.82;
+      letter-spacing: -0.07em;
+      font-weight: 500;
+    }
+
+    .page-404__text {
+      width: min(100%, 42rem);
+
+      margin: 3rem auto 0;
+
+      font-size: var(--narrative);
+      line-height: 1.52;
+      letter-spacing: -0.012em;
+    }
+
+    .page-404__text p {
+      margin: 0 0 1.25em;
+    }
+
+    .page-404__text p:last-child {
+      margin-bottom: 0;
+    }
+
+    .page-404__link {
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+
+      margin-top: 3rem;
+
+      color: var(--light);
+
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+
+      border-bottom: 1px solid var(--light);
+      padding-bottom: 0.45rem;
+
+      transition:
+        opacity 0.35s ease,
+        transform 0.35s var(--ease);
+    }
+
+    .page-404__link:hover {
+      opacity: 0.65;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 767px) {
+
+      .page-404__main {
+        min-height: calc(100svh - 72px);
+
+        padding:
+          7rem
+          var(--margin);
+      }
+
+      .page-404__text {
+        margin-top: 2.5rem;
+      }
+
+      .page-404__link {
+        margin-top: 2.5rem;
+      }
+
+    }
+  </style>
 </head>
 
 <body class="page-404">
 
-  <!-- =========================================================
+  <!-- ======================================================
        HEADER
-  ========================================================== -->
+  ======================================================= -->
 
   <header class="site-header">
 
     <a
       class="site-header__logo"
-      href="index.html#guarda"
-      aria-label="Cesare Paratore — torna all'inizio"
+      href="index.html#section-01"
+      aria-label="Cesare Paratore"
     >
       <img
         src="assets/images/cp-mark.svg"
@@ -51,7 +150,7 @@
       class="menu-toggle"
       type="button"
       aria-expanded="false"
-      aria-controls="global-menu"
+      aria-controls="site-menu"
     >
       MENU
     </button>
@@ -59,123 +158,90 @@
   </header>
 
 
-  <!-- =========================================================
+  <!-- ======================================================
        MENU
-  ========================================================== -->
+  ======================================================= -->
 
   <aside
-    class="global-menu"
-    id="global-menu"
+    class="site-menu"
+    id="site-menu"
     aria-hidden="true"
   >
 
-    <div class="global-menu__inner">
+    <nav
+      class="site-menu__nav"
+      aria-label="Navigazione principale"
+    >
 
-      <nav
-        class="global-menu__nav"
-        aria-label="Navigazione principale"
-      >
+      <a href="index.html#section-01">GUARDA.</a>
+      <a href="index.html#section-02">COME?</a>
+      <a href="index.html#section-03">MOVIMENTO.</a>
+      <a href="index.html#section-04">CAPIRE.</a>
+      <a href="index.html#section-05">TRASMETTERE.</a>
+      <a href="index.html#section-06">COSTRUIRE.</a>
+      <a href="index.html#section-07">RITORNA.</a>
+      <a href="index.html#section-08">COLLEGARE.</a>
+      <a href="index.html#section-09">OGGI.</a>
+      <a href="index.html#section-10">OBIETTIVO.</a>
+      <a href="index.html#section-11">QUI.</a>
+      <a href="index.html#section-12">DA QUI.</a>
+      <a href="index.html#section-13">ECCOMI.</a>
+      <a href="index.html#section-14">SCRIVIMI.</a>
 
-        <a href="index.html#movimento">
-          Sport
-        </a>
-
-        <a href="index.html#capire">
-          Scienze motorie
-        </a>
-
-        <a href="index.html#trasmettere">
-          Educazione
-        </a>
-
-        <a href="index.html#costruire">
-          Management
-        </a>
-
-        <a href="index.html#ritorna">
-          Digitale
-        </a>
-
-        <a href="index.html#qui">
-          Territorio
-        </a>
-
-        <a href="index.html#scrivimi">
-          Contatti
-        </a>
-
-      </nav>
-
-    </div>
+    </nav>
 
   </aside>
 
 
-  <!-- =========================================================
+  <!-- ======================================================
        404
-  ========================================================== -->
+  ======================================================= -->
 
   <main class="page-404__main">
 
-    <section
-      class="page-404__section"
-      aria-labelledby="error-title"
-    >
+    <div class="page-404__inner">
 
-      <div class="page-404__inner">
+      <h1 class="page-404__number">
+        404
+      </h1>
 
-        <p
-          class="page-404__number"
-          aria-hidden="true"
-        >
-          404
+      <div class="page-404__text">
+
+        <p>
+          Questa pagina non è dove pensavi di trovarla.
         </p>
 
-        <div class="page-404__content">
-
-          <h1
-            class="page-404__title"
-            id="error-title"
-          >
-            Questa pagina non è dove pensavi di trovarla.
-          </h1>
-
-          <p class="page-404__text">
-            Ma forse è un buon momento per tornare a guardare.
-          </p>
-
-          <a
-            class="page-404__link"
-            href="index.html#guarda"
-          >
-            Torna all'inizio
-          </a>
-
-        </div>
+        <p>
+          Ma forse è un buon momento per tornare a guardare.
+        </p>
 
       </div>
 
-    </section>
+      <a
+        class="page-404__link"
+        href="index.html#section-01"
+      >
+        Torna all'inizio
+        <span aria-hidden="true">→</span>
+      </a>
+
+    </div>
 
   </main>
 
 
-  <!-- =========================================================
+  <!-- ======================================================
        FOOTER
-  ========================================================== -->
+  ======================================================= -->
 
   <footer class="site-footer">
 
-    <a
-      class="site-footer__logo"
-      href="index.html#guarda"
-      aria-label="Torna all'inizio"
-    >
+    <div class="site-footer__logo">
       <img
         src="assets/images/cp-mark.svg"
         alt="CP"
       >
-    </a>
+    </div>
 
     <div class="site-footer__name">
       CESARE PARATORE
@@ -184,63 +250,64 @@
   </footer>
 
 
-  <!-- =========================================================
-       MENU
-  ========================================================== -->
+  <!-- ======================================================
+       MENU JS
+  ======================================================= -->
 
   <script>
     (() => {
       "use strict";
 
-      const body = document.body;
       const menuToggle =
         document.querySelector(".menu-toggle");
-      const globalMenu =
-        document.getElementById("global-menu");
 
-      if (!menuToggle || !globalMenu) {
+      const siteMenu =
+        document.getElementById("site-menu");
+
+      const menuLinks =
+        document.querySelectorAll(
+          ".site-menu__nav a"
+        );
+
+      if (!menuToggle || !siteMenu) {
         return;
       }
 
-      const closeMenu = () => {
+      const openMenu = () => {
+        siteMenu.classList.add("is-open");
 
-        menuToggle.setAttribute(
-          "aria-expanded",
+        siteMenu.setAttribute(
+          "aria-hidden",
           "false"
         );
 
-        globalMenu.setAttribute(
-          "aria-hidden",
+        menuToggle.setAttribute(
+          "aria-expanded",
           "true"
         );
 
-        globalMenu.classList.remove(
-          "is-open"
-        );
-
-        body.classList.remove(
-          "is-menu-open"
+        document.body.classList.add(
+          "is-locked"
         );
       };
 
-      const openMenu = () => {
-
-        menuToggle.setAttribute(
-          "aria-expanded",
-          "true"
-        );
-
-        globalMenu.setAttribute(
-          "aria-hidden",
-          "false"
-        );
-
-        globalMenu.classList.add(
+      const closeMenu = () => {
+        siteMenu.classList.remove(
           "is-open"
         );
 
-        body.classList.add(
-          "is-menu-open"
+        siteMenu.setAttribute(
+          "aria-hidden",
+          "true"
+        );
+
+        menuToggle.setAttribute(
+          "aria-expanded",
+          "false"
+        );
+
+        document.body.classList.remove(
+          "is-locked"
         );
       };
 
@@ -248,12 +315,11 @@
         "click",
         () => {
 
-          const isOpen =
-            menuToggle.getAttribute(
-              "aria-expanded"
-            ) === "true";
-
-          if (isOpen) {
+          if (
+            siteMenu.classList.contains(
+              "is-open"
+            )
+          ) {
             closeMenu();
           } else {
             openMenu();
@@ -262,22 +328,20 @@
         }
       );
 
-      globalMenu
-        .querySelectorAll("a")
-        .forEach((link) => {
-
-          link.addEventListener(
-            "click",
-            closeMenu
-          );
-
-        });
+      menuLinks.forEach((link) => {
+        link.addEventListener(
+          "click",
+          closeMenu
+        );
+      });
 
       document.addEventListener(
         "keydown",
         (event) => {
 
-          if (event.key === "Escape") {
+          if (
+            event.key === "Escape"
+          ) {
             closeMenu();
           }
 
