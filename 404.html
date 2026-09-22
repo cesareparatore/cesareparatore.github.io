@@ -3,336 +3,86 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="noindex, follow">
-  <meta name="theme-color" content="#0B0B0A">
 
   <title>Pagina non trovata — Cesare Paratore</title>
 
+  <meta
+    name="description"
+    content="La pagina richiesta non è disponibile. Torna all'inizio del sito di Cesare Paratore."
+  >
+
+  <meta name="robots" content="noindex, follow">
+
+  <meta name="theme-color" content="#0B0B0A">
+
+  <link rel="stylesheet" href="/css/style.css">
+
   <style>
-    :root {
-      --bg: #0B0B0A;
-      --surface: #151513;
-      --light: #F1EFE8;
-      --secondary: #A7A49C;
-      --gutter: 5vw;
-      --header-h: 76px;
-      --micro: clamp(.75rem, .8vw, .85rem);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      background: var(--bg);
-      color: var(--light);
-    }
-
-    body {
-      margin: 0;
-      min-height: 100svh;
-      background: var(--light);
-      color: var(--bg);
-      font-family: "Neue Montreal", "Helvetica Neue", Helvetica, Arial, sans-serif;
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-      overflow-x: hidden;
-    }
-
-    body.menu-open {
-      overflow: hidden;
-    }
-
-    img {
-      display: block;
-      max-width: 100%;
-    }
-
-    button,
-    a {
-      font: inherit;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    button {
-      border: 0;
-      cursor: pointer;
-    }
-
-    /* =====================================================
-       HEADER
-       ===================================================== */
-
-    .site-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      height: var(--header-h);
-      padding: 0 var(--gutter);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--light);
-      color: var(--bg);
-    }
-
-    .brand,
-    .menu-brand,
-    .footer-brand {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .brand img,
-    .menu-brand img,
-    .footer-brand img {
-      width: 44px;
-      height: 44px;
-      object-fit: contain;
-    }
-
-    .menu-trigger {
-      min-height: 44px;
-      padding: 0 18px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--bg);
-      color: var(--light);
-      border: 1px solid var(--bg);
-      font-size: var(--micro);
-      letter-spacing: .12em;
-      transition:
-        background-color .25s ease,
-        color .25s ease,
-        border-color .25s ease;
-    }
-
-    .menu-trigger:hover,
-    .menu-trigger:focus-visible {
-      background: var(--surface);
-    }
-
-    .menu-trigger:focus-visible {
-      outline: 2px solid var(--bg);
-      outline-offset: 4px;
-    }
-
-    /* =====================================================
-       MENU
-       ===================================================== */
-
-    .site-menu {
-      position: fixed;
-      inset: 0;
-      z-index: 200;
-      display: grid;
-      place-items: center;
-      background: var(--bg);
-      color: var(--light);
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-    }
-
-    .site-menu.is-open {
-      pointer-events: auto;
-    }
-
-    .menu-brand {
-      position: absolute;
-      top: 16px;
-      left: var(--gutter);
-    }
-
-    .menu-close {
-      position: absolute;
-      top: 16px;
-      right: var(--gutter);
-      min-height: 44px;
-      padding: 0;
-      background: transparent;
-      color: var(--light);
-      font-size: var(--micro);
-      letter-spacing: .12em;
-      transition: opacity .25s ease;
-    }
-
-    .menu-close:hover,
-    .menu-close:focus-visible {
-      opacity: .65;
-    }
-
-    .menu-close:focus-visible {
-      outline: 2px solid var(--light);
-      outline-offset: 4px;
-    }
-
-    .menu-nav {
-      display: grid;
-      gap: clamp(10px, 1.2vh, 18px);
-      text-align: center;
-    }
-
-    .menu-nav a {
-      font-size: clamp(2rem, 4.8vw, 5rem);
-      line-height: .95;
-      letter-spacing: -.035em;
-      transition: opacity .25s ease;
-    }
-
-    .menu-nav a:hover,
-    .menu-nav a:focus-visible {
-      opacity: .55;
-    }
-
-    .menu-nav a:focus-visible {
-      outline: none;
-    }
-
-    /* =====================================================
-       404
-       ===================================================== */
-
     .error-page {
       min-height: 100svh;
       padding: calc(var(--header-h) + 8vh) var(--gutter) 8vh;
-      display: grid;
-      place-items: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      color: var(--light);
       text-align: center;
-      background: var(--light);
     }
 
     .error-content {
-      width: min(100%, 760px);
+      width: min(100%, 48rem);
+      display: grid;
+      justify-items: center;
+      gap: clamp(2rem, 6vh, 4rem);
     }
 
     .error-code {
-      margin: 0 0 clamp(2rem, 5vh, 4rem);
-      font-size: clamp(7rem, 20vw, 18rem);
-      line-height: .78;
-      letter-spacing: -.07em;
+      margin: 0;
+      font-size: var(--display-xl);
+      line-height: .88;
+      letter-spacing: -.055em;
       font-weight: 500;
     }
 
     .error-copy {
-      margin: 0 auto;
-      max-width: 620px;
-      font-size: clamp(1.35rem, 2.4vw, 2.4rem);
-      line-height: 1.25;
-      letter-spacing: -.025em;
+      margin: 0;
+      max-width: 38rem;
+      font-size: var(--narrative);
+      line-height: 1.52;
+      letter-spacing: -.012em;
     }
 
-    .error-link {
-      display: inline-block;
-      margin-top: clamp(2rem, 5vh, 4rem);
-      font-size: var(--micro);
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      position: relative;
-    }
-
-    .error-link::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: -.35rem;
-      height: 1px;
-      background: currentColor;
-      transform-origin: left center;
-      transform: scaleX(.35);
-      transition: transform .25s ease;
-    }
-
-    .error-link:hover::after,
-    .error-link:focus-visible::after {
-      transform: scaleX(1);
-    }
-
-    .error-link:focus-visible {
-      outline: none;
-    }
-
-    /* =====================================================
-       FOOTER
-       ===================================================== */
-
-    .site-footer {
-      min-height: 116px;
-      padding: 28px var(--gutter);
-      display: flex;
+    .error-back {
+      display: inline-flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 24px;
+      justify-content: center;
+      min-height: 52px;
+      padding: 0 24px;
       background: var(--light);
       color: var(--bg);
-      border-top: 1px solid rgba(11, 11, 10, .12);
-    }
-
-    .footer-name {
       font-size: var(--micro);
-      letter-spacing: .12em;
+      letter-spacing: .08em;
+      transition:
+        background-color .25s ease,
+        color .25s ease,
+        opacity .25s ease;
     }
 
-    /* =====================================================
-       MOBILE
-       ===================================================== */
+    .error-back:hover,
+    .error-back:focus-visible {
+      background: var(--surface);
+      color: var(--light);
+    }
+
+    .error-back:focus-visible {
+      outline: 2px solid var(--light);
+      outline-offset: 4px;
+    }
 
     @media (max-width: 900px) {
-      :root {
-        --gutter: 24px;
-        --header-h: 68px;
-      }
-
-      .site-header {
-        padding: 0 var(--gutter);
-      }
-
-      .menu-brand {
-        top: 12px;
-        left: var(--gutter);
-      }
-
-      .menu-close {
-        top: 12px;
-        right: var(--gutter);
-      }
-
-      .menu-nav a {
-        font-size: clamp(1.8rem, 8vw, 3.5rem);
-      }
-
       .error-page {
-        padding-top: calc(var(--header-h) + 6vh);
-      }
-
-      .site-footer {
-        min-height: 96px;
-        padding: 22px var(--gutter);
-      }
-    }
-
-    @media (max-width: 520px) {
-      .menu-nav a {
-        font-size: clamp(1.65rem, 9vw, 2.7rem);
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        animation-duration: .01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: .01ms !important;
+        padding-top: calc(var(--header-h) + 7vh);
+        padding-bottom: 7vh;
       }
     }
   </style>
@@ -340,7 +90,12 @@
 
 <body>
 
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
+
   <header class="site-header">
+
     <a
       class="brand"
       href="/"
@@ -363,7 +118,12 @@
     >
       MENU
     </button>
+
   </header>
+
+  <!-- =====================================================
+       MENU
+       ===================================================== -->
 
   <div
     class="site-menu"
@@ -409,22 +169,36 @@
 
   </div>
 
+  <!-- =====================================================
+       404
+       ===================================================== -->
+
   <main class="error-page">
+
     <div class="error-content">
 
       <p class="error-code">404</p>
 
       <p class="error-copy">
-        Questa pagina non è dove pensavi di trovarla.<br>
+        Questa pagina non è dove pensavi di trovarla.
+        <br>
         Ma forse è un buon momento per tornare a guardare.
       </p>
 
-      <a class="error-link" href="/">
+      <a
+        class="error-back"
+        href="/"
+      >
         Torna all'inizio →
       </a>
 
     </div>
+
   </main>
+
+  <!-- =====================================================
+       FOOTER
+       ===================================================== -->
 
   <footer class="site-footer">
 
@@ -452,31 +226,31 @@
       "use strict";
 
       const menu = document.getElementById("siteMenu");
-      const trigger = document.getElementById("menuTrigger");
-      const close = document.getElementById("menuClose");
+      const menuTrigger = document.getElementById("menuTrigger");
+      const menuClose = document.getElementById("menuClose");
 
       function setMenu(open) {
         menu.classList.toggle("is-open", open);
         menu.setAttribute("aria-hidden", String(!open));
-        trigger.setAttribute("aria-expanded", String(open));
+        menuTrigger.setAttribute("aria-expanded", String(open));
         document.body.classList.toggle("menu-open", open);
 
         if (open) {
           menu.style.visibility = "visible";
           menu.style.opacity = "1";
-          close.focus();
+          menuClose.focus();
         } else {
           menu.style.visibility = "hidden";
           menu.style.opacity = "0";
-          trigger.focus();
+          menuTrigger.focus();
         }
       }
 
-      trigger.addEventListener("click", () => {
+      menuTrigger.addEventListener("click", () => {
         setMenu(true);
       });
 
-      close.addEventListener("click", () => {
+      menuClose.addEventListener("click", () => {
         setMenu(false);
       });
 
