@@ -1,444 +1,454 @@
-(() => {
-  "use strict";
+/* =========================================================
+   CESARE PARATORE — MAIN SCRIPT
+   ========================================================= */
 
-  /* =========================================================
-     CESARE PARATORE — HOME
-     MASTER JAVASCRIPT
-     ========================================================= */
-
+document.addEventListener("DOMContentLoaded", () => {
   const body = document.body;
+
+  /* ---------------------------------------------------------
+     ELEMENTS
+     --------------------------------------------------------- */
+
   const loader = document.querySelector(".loader");
-  const menu = document.querySelector(".global-menu");
   const menuToggle = document.querySelector(".menu-toggle");
+  const menu = document.querySelector(".global-menu");
+  const menuLinks = document.querySelectorAll(".global-menu a");
 
   const sections = Array.from(
     document.querySelectorAll(".narrative-section")
-  );
-
-  const revealElements = Array.from(
-    document.querySelectorAll("[data-reveal]")
   );
 
   const navigation = document.querySelector(".narrative-navigation");
   const navigationTitle = document.querySelector(
     ".narrative-navigation__title"
   );
-
-  const previousButton = document.querySelector(
+  const navigationPrev = document.querySelector(
     ".narrative-navigation__arrow--prev"
   );
-
-  const nextButton = document.querySelector(
+  const navigationNext = document.querySelector(
     ".narrative-navigation__arrow--next"
   );
-
+  const navigationLine = document.querySelector(
+    ".narrative-navigation__line"
+  );
   const navigationMarker = document.querySelector(
     ".narrative-navigation__marker"
   );
 
   const standby = document.querySelector(".standby");
 
-  const prefersReducedMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)"
-  ).matches;
+  /* ---------------------------------------------------------
+     STATE
+     --------------------------------------------------------- */
 
+  let currentSectionIndex = 0;
+  let standbyTimer = null;
+  let isStandbyActive = false;
+  let isNavigating = false;
 
-  /* =========================================================
-     01 — HELPERS
-     ========================================================= */
-
-  const clamp = (value, min, max) => {
-    return Math.min(Math.max(value, min), max);
-  };
-
+  /* ---------------------------------------------------------
+     HELPERS
+     --------------------------------------------------------- */
 
   const getSectionTitle = (section) => {
     if (!section) return "";
 
-    const titleElement =
-      section.querySelector(".section__heading") ||
-      section.querySelector(".section__title");
-
-    if (!titleElement) return "";
-
-    return titleElement.textContent.trim();
+    return (
+      section.dataset.sectionTitle ||
+      section.querySelector("h1, h2, h3")?.textContent.trim() ||
+      ""
+    );
   };
 
-
-  const getSectionIndex = (section) => {
-    return sections.indexOf(section);
+  const getCurrentSection = () => {
+    return sections[currentSectionIndex];
   };
 
+  const scrollToSection = (index, behavior = "smooth") => {
+    if (!sections.length) return;
 
-  const scrollToSection = (section, instant = false) => {
-    if (!section) return;
+    const targetIndex = Math.max(
+      0,
+      Math.min(index, sections.length - 1)
+    );
 
-    section.scrollIntoView({
-      behavior:
-        instant || prefersReducedMotion
-          ? "auto"
-          : "smooth",
+    const target = sections[targetIndex];
+
+    if (!target) return;
+
+    currentSectionIndex = targetIndex;
+    isNavigating = true;
+
+    target.scrollIntoView({
+      behavior,
       block: "start"
     });
+
+    updateNavigation(targetIndex);
+    resetStandbyTimer();
+
+    window.setTimeout(() => {
+      isNavigating = false;
+    }, 900);
   };
 
-
-  /* =========================================================
-     02 — LOADER
-     ========================================================= */
+  /* ---------------------------------------------------------
+     LOADER
+     --------------------------------------------------------- */
 
   const hideLoader = () => {
     if (!loader) return;
 
     window.setTimeout(() => {
       loader.classList.add("is-hidden");
-    }, prefersReducedMotion ? 100 : 850);
+
+      window.setTimeout(() => {
+        loader.setAttribute("aria-hidden", "true");
+      }, 900);
+    }, 1200);
   };
 
+  hideLoader();
 
-  if (document.readyState === "complete") {
-    hideLoader();
-  } else {
-    window.addEventListener("load", hideLoader, {
-      once: true
-    });
-  }
+  /* ---------------------------------------------------------
+     MENU
+     --------------------------------------------------------- */
 
-
-  /* =========================================================
-     03 — MENU
-     ========================================================= */
-
-  const setMenuState = (isOpen) => {
+  const openMenu = () => {
     if (!menu || !menuToggle) return;
 
-    menu.classList.toggle("is-open", isOpen);
+    menu.classList.add("is-open");
+    menuToggle.classList.add("is-active");
 
-    menuToggle.setAttribute(
-      "aria-expanded",
-      String(isOpen)
-    );
+    menuToggle.setAttribute("aria-expanded", "true");
+    menu.setAttribute("aria-hidden", "false");
 
-    body.classList.toggle("is-locked", isOpen);
+    body.classList.add("menu-open");
+
+    resetStandbyTimer();
   };
 
+  const closeMenu = () => {
+    if (!menu || !menuToggle) return;
+
+    menu.classList.remove("is-open");
+    menuToggle.classList.remove("is-active");
+
+    menuToggle.setAttribute("aria-expanded", "false");
+    menu.setAttribute("aria-hidden", "true");
+
+    body.classList.remove("menu-open");
+
+    resetStandbyTimer();
+  };
+
+  const toggleMenu = () => {
+    if (!menu) return;
+
+    if (menu.classList.contains("is-open")) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  };
 
   if (menuToggle) {
-    menuToggle.addEventListener("click", () => {
-      const isOpen = menu?.classList.contains("is-open");
+    menuToggle.addEventListener("click", toggleMenu);
+  }
 
-      setMenuState(!isOpen);
+  menuLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      closeMenu();
+      resetStandbyTimer();
+    });
+  });
+
+  /* ---------------------------------------------------------
+     REVEAL SYSTEM
+     --------------------------------------------------------- */
+
+  const revealElements = document.querySelectorAll(
+    "[data-reveal], .reveal"
+  );
+
+  if ("IntersectionObserver" in window && revealElements.length) {
+    const revealObserver = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        });
+      },
+      {
+        threshold: 0.15,
+        rootMargin: "0px 0px -8% 0px"
+      }
+    );
+
+    revealElements.forEach((element) => {
+      revealObserver.observe(element);
+    });
+  } else {
+    revealElements.forEach((element) => {
+      element.classList.add("is-visible");
     });
   }
 
+  /* ---------------------------------------------------------
+     SECTION OBSERVER
+     --------------------------------------------------------- */
 
-  if (menu) {
-    const menuLinks = menu.querySelectorAll("a");
+  const updateCurrentSection = (index) => {
+    if (index < 0 || index >= sections.length) return;
 
-    menuLinks.forEach((link) => {
-      link.addEventListener("click", () => {
-        setMenuState(false);
-      });
+    currentSectionIndex = index;
+    updateNavigation(index);
+  };
+
+  if ("IntersectionObserver" in window && sections.length) {
+    const sectionObserver = new IntersectionObserver(
+      (entries) => {
+        const visibleSections = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort(
+            (a, b) =>
+              b.intersectionRatio - a.intersectionRatio
+          );
+
+        if (!visibleSections.length) return;
+
+        const visibleSection = visibleSections[0].target;
+        const index = sections.indexOf(visibleSection);
+
+        if (index !== -1) {
+          updateCurrentSection(index);
+        }
+      },
+      {
+        threshold: [0.15, 0.35, 0.55, 0.75],
+        rootMargin: "-10% 0px -10% 0px"
+      }
+    );
+
+    sections.forEach((section) => {
+      sectionObserver.observe(section);
     });
   }
 
+  /* ---------------------------------------------------------
+     NARRATIVE NAVIGATION
+     --------------------------------------------------------- */
+
+  const updateNavigation = (index) => {
+    if (!sections.length) return;
+
+    const section = sections[index];
+
+    if (navigationTitle) {
+      navigationTitle.textContent = getSectionTitle(section);
+    }
+
+    if (navigationPrev) {
+      navigationPrev.disabled = index === 0;
+      navigationPrev.setAttribute(
+        "aria-disabled",
+        index === 0 ? "true" : "false"
+      );
+    }
+
+    if (navigationNext) {
+      navigationNext.disabled = false;
+      navigationNext.setAttribute(
+        "aria-disabled",
+        "false"
+      );
+    }
+
+    if (navigationMarker && navigationLine) {
+      const percentage =
+        sections.length > 1
+          ? (index / (sections.length - 1)) * 100
+          : 0;
+
+      navigationMarker.style.left = `${percentage}%`;
+    }
+
+    if (navigation) {
+      navigation.dataset.current = String(index);
+    }
+  };
+
+  if (navigationPrev) {
+    navigationPrev.addEventListener("click", () => {
+      if (currentSectionIndex <= 0) return;
+
+      scrollToSection(currentSectionIndex - 1);
+    });
+  }
+
+  if (navigationNext) {
+    navigationNext.addEventListener("click", () => {
+      if (!sections.length) return;
+
+      /*
+       * Last section loops back to GUARDA.
+       */
+      if (currentSectionIndex >= sections.length - 1) {
+        scrollToSection(0);
+        return;
+      }
+
+      scrollToSection(currentSectionIndex + 1);
+    });
+  }
+
+  /* ---------------------------------------------------------
+     KEYBOARD NAVIGATION
+     --------------------------------------------------------- */
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
-      setMenuState(false);
+      if (menu?.classList.contains("is-open")) {
+        closeMenu();
+        return;
+      }
+
+      if (isStandbyActive) {
+        exitStandby();
+        return;
+      }
+    }
+
+    if (body.classList.contains("menu-open")) {
+      return;
+    }
+
+    if (event.key === "ArrowDown" || event.key === "PageDown") {
+      event.preventDefault();
+
+      if (currentSectionIndex < sections.length - 1) {
+        scrollToSection(currentSectionIndex + 1);
+      } else {
+        scrollToSection(0);
+      }
+
+      return;
+    }
+
+    if (event.key === "ArrowUp" || event.key === "PageUp") {
+      event.preventDefault();
+
+      if (currentSectionIndex > 0) {
+        scrollToSection(currentSectionIndex - 1);
+      }
+
+      return;
+    }
+
+    if (event.key === "Home") {
+      event.preventDefault();
+      scrollToSection(0);
+    }
+
+    if (event.key === "End") {
+      event.preventDefault();
+
+      if (sections.length) {
+        scrollToSection(sections.length - 1);
+      }
     }
   });
 
+  /* ---------------------------------------------------------
+     ANCHOR LINKS
+     --------------------------------------------------------- */
 
-  /* =========================================================
-     04 — REVEAL
-     ========================================================= */
+  document
+    .querySelectorAll('a[href^="#"]')
+    .forEach((link) => {
+      link.addEventListener("click", (event) => {
+        const href = link.getAttribute("href");
 
-  const revealObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
+        if (!href || href === "#") return;
 
-        entry.target.classList.add("is-revealed");
+        const target = document.querySelector(href);
 
-        revealObserver.unobserve(entry.target);
+        if (!target) return;
+
+        event.preventDefault();
+
+        const index = sections.indexOf(target);
+
+        if (index !== -1) {
+          scrollToSection(index);
+        } else {
+          target.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+        }
+
+        closeMenu();
+        resetStandbyTimer();
       });
-    },
-    {
-      threshold: 0.12,
-      rootMargin: "0px 0px -8% 0px"
-    }
-  );
+    });
 
-
-  revealElements.forEach((element) => {
-    revealObserver.observe(element);
-  });
-
-
-  /* =========================================================
-     05 — SECTION VISIBILITY
-     ========================================================= */
-
-  let activeSection = sections[0] || null;
-  let activeSectionIndex = 0;
-
-  const sectionObserver = new IntersectionObserver(
-    (entries) => {
-      const visibleEntries = entries
-        .filter((entry) => entry.isIntersecting)
-        .sort((a, b) => {
-          return b.intersectionRatio - a.intersectionRatio;
-        });
-
-      if (!visibleEntries.length) return;
-
-      const section = visibleEntries[0].target;
-
-      if (section === activeSection) return;
-
-      setActiveSection(section);
-    },
-    {
-      threshold: [
-        0.2,
-        0.35,
-        0.5,
-        0.65,
-        0.8
-      ]
-    }
-  );
-
-
-  sections.forEach((section) => {
-    sectionObserver.observe(section);
-  });
-
-
-  /* =========================================================
-     06 — NARRATIVE NAVIGATION
-     ========================================================= */
-
-  const updateNavigationMarker = () => {
-    if (!navigationMarker || sections.length <= 1) return;
-
-    const percentage =
-      activeSectionIndex /
-      (sections.length - 1);
-
-    const track = navigationMarker.parentElement;
-
-    if (!track) return;
-
-    const availableWidth =
-      track.getBoundingClientRect().width;
-
-    const markerWidth =
-      navigationMarker.getBoundingClientRect().width;
-
-    const position = clamp(
-      percentage *
-        Math.max(0, availableWidth - markerWidth),
-      0,
-      Math.max(0, availableWidth - markerWidth)
-    );
-
-    navigationMarker.style.transform =
-      `translateX(${position}px)`;
-  };
-
-
-  const updateNavigationButtons = () => {
-    if (!previousButton || !nextButton) return;
-
-    previousButton.disabled =
-      activeSectionIndex <= 0;
-
-    /*
-     * The final arrow remains enabled.
-     * From the last section it returns to GUARDA.
-     */
-    nextButton.disabled = false;
-  };
-
-
-  const updateNavigationTitle = () => {
-    if (!navigationTitle) return;
-
-    const title = getSectionTitle(activeSection);
-
-    navigationTitle.textContent = title;
-  };
-
-
-  const updateNavigation = () => {
-    updateNavigationTitle();
-    updateNavigationButtons();
-    updateNavigationMarker();
-  };
-
-
-  const setActiveSection = (section) => {
-    const index = getSectionIndex(section);
-
-    if (index === -1) return;
-
-    activeSection = section;
-    activeSectionIndex = index;
-
-    updateNavigation();
-  };
-
-
-  const goPrevious = () => {
-    if (activeSectionIndex <= 0) return;
-
-    const previousSection =
-      sections[activeSectionIndex - 1];
-
-    scrollToSection(previousSection);
-  };
-
-
-  const goNext = () => {
-    const lastIndex = sections.length - 1;
-
-    if (activeSectionIndex >= lastIndex) {
-      scrollToSection(sections[0]);
-      return;
-    }
-
-    const nextSection =
-      sections[activeSectionIndex + 1];
-
-    scrollToSection(nextSection);
-  };
-
-
-  if (previousButton) {
-    previousButton.addEventListener(
-      "click",
-      goPrevious
-    );
-  }
-
-
-  if (nextButton) {
-    nextButton.addEventListener(
-      "click",
-      goNext
-    );
-  }
-
-
-  /* =========================================================
-     07 — KEYBOARD NAVIGATION
-     ========================================================= */
-
-  document.addEventListener("keydown", (event) => {
-    if (body.classList.contains("is-locked")) {
-      return;
-    }
-
-    if (
-      event.key === "ArrowRight" ||
-      event.key === "ArrowDown"
-    ) {
-      event.preventDefault();
-      goNext();
-    }
-
-    if (
-      event.key === "ArrowLeft" ||
-      event.key === "ArrowUp"
-    ) {
-      event.preventDefault();
-      goPrevious();
-    }
-  });
-
-
-  /* =========================================================
-     08 — RESIZE
-     ========================================================= */
-
-  let resizeTimer = null;
-
-  window.addEventListener("resize", () => {
-    window.clearTimeout(resizeTimer);
-
-    resizeTimer = window.setTimeout(() => {
-      updateNavigation();
-    }, 100);
-  });
-
-
-  /* =========================================================
-     09 — STANDBY
-     ========================================================= */
+  /* ---------------------------------------------------------
+     STANDBY
+     --------------------------------------------------------- */
 
   const STANDBY_DELAY = 40000;
 
-  let standbyTimer = null;
-  let isStandby = false;
+  const enterStandby = () => {
+    if (!standby || isStandbyActive) return;
 
+    isStandbyActive = true;
+
+    standby.classList.add("is-active");
+    standby.setAttribute("aria-hidden", "false");
+
+    body.classList.add("standby-active");
+  };
+
+  const exitStandby = () => {
+    if (!standby || !isStandbyActive) return;
+
+    isStandbyActive = false;
+
+    standby.classList.remove("is-active");
+    standby.setAttribute("aria-hidden", "true");
+
+    body.classList.remove("standby-active");
+
+    resetStandbyTimer();
+  };
 
   const resetStandbyTimer = () => {
     window.clearTimeout(standbyTimer);
 
-    if (isStandby) {
-      return;
-    }
+    if (isStandbyActive) return;
 
     standbyTimer = window.setTimeout(
-      activateStandby,
+      enterStandby,
       STANDBY_DELAY
     );
   };
 
-
-  const activateStandby = () => {
-    if (!standby || isStandby) return;
-
-    isStandby = true;
-
-    standby.classList.add("is-active");
-
-    body.classList.add("is-locked");
-  };
-
-
-  const deactivateStandby = () => {
-    if (!standby || !isStandby) return;
-
-    isStandby = false;
-
-    standby.classList.remove("is-active");
-
-    body.classList.remove("is-locked");
-
-    /*
-     * The page remains at the exact point where the user
-     * stopped. No forced return to the beginning.
-     */
-    resetStandbyTimer();
-  };
-
-
   [
     "mousemove",
     "mousedown",
-    "wheel",
-    "touchstart",
     "keydown",
+    "touchstart",
+    "wheel",
     "scroll"
   ].forEach((eventName) => {
     window.addEventListener(
       eventName,
       () => {
-        if (isStandby) {
-          deactivateStandby();
+        if (isStandbyActive) {
+          exitStandby();
         } else {
           resetStandbyTimer();
         }
@@ -449,143 +459,48 @@
     );
   });
 
+  /* ---------------------------------------------------------
+     RESIZE
+     --------------------------------------------------------- */
 
-  if (standby) {
-    standby.addEventListener("click", () => {
-      deactivateStandby();
-    });
-  }
+  let resizeTimer = null;
 
+  window.addEventListener("resize", () => {
+    window.clearTimeout(resizeTimer);
 
-  /* =========================================================
-     10 — INITIAL STATE
-     ========================================================= */
+    resizeTimer = window.setTimeout(() => {
+      updateNavigation(currentSectionIndex);
+    }, 150);
+  });
+
+  /* ---------------------------------------------------------
+     INITIAL STATE
+     --------------------------------------------------------- */
 
   if (sections.length) {
-    activeSection = sections[0];
-    activeSectionIndex = 0;
-
-    updateNavigation();
+    updateNavigation(0);
   }
 
+  if (menu) {
+    menu.setAttribute("aria-hidden", "true");
+  }
+
+  if (menuToggle) {
+    menuToggle.setAttribute("aria-expanded", "false");
+  }
+
+  if (standby) {
+    standby.setAttribute("aria-hidden", "true");
+  }
 
   resetStandbyTimer();
 
+  /* ---------------------------------------------------------
+     OPENING REVEAL
+     --------------------------------------------------------- */
 
-  /* =========================================================
-     11 — SMOOTH ANCHOR LINKS
-     ========================================================= */
-
-  const internalLinks = document.querySelectorAll(
-    'a[href^="#"]'
-  );
-
-
-  internalLinks.forEach((link) => {
-    link.addEventListener("click", (event) => {
-      const href = link.getAttribute("href");
-
-      if (!href || href === "#") return;
-
-      const target = document.querySelector(href);
-
-      if (!target) return;
-
-      event.preventDefault();
-
-      setMenuState(false);
-
-      scrollToSection(target);
-    });
+  window.requestAnimationFrame(() => {
+    document.documentElement.classList.add("is-ready");
+    body.classList.add("is-ready");
   });
-
-
-  /* =========================================================
-     12 — INITIAL VISIBILITY
-     ========================================================= */
-
-  const firstSection = sections[0];
-
-  if (firstSection) {
-    firstSection.classList.add("is-visible");
-  }
-
-
-  /* =========================================================
-     13 — PORTRAIT SECTION
-     ========================================================= */
-
-  const portraitSection = document.querySelector(
-    ".portrait-section"
-  );
-
-
-  if (portraitSection) {
-    const portraitObserver =
-      new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-
-            portraitSection.classList.add(
-              "is-visible"
-            );
-
-            portraitObserver.unobserve(
-              portraitSection
-            );
-          });
-        },
-        {
-          threshold: 0.35
-        }
-      );
-
-    portraitObserver.observe(portraitSection);
-  }
-
-
-  /* =========================================================
-     14 — FIRST SECTION
-     ========================================================= */
-
-  const openingSection = document.querySelector(
-    ".narrative-section--opening"
-  );
-
-
-  if (openingSection) {
-    const openingObserver =
-      new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-
-            openingSection.classList.add(
-              "is-visible"
-            );
-
-            openingObserver.unobserve(
-              openingSection
-            );
-          });
-        },
-        {
-          threshold: 0.5
-        }
-      );
-
-    openingObserver.observe(openingSection);
-  }
-
-
-  /* =========================================================
-     15 — CLEANUP
-     ========================================================= */
-
-  window.addEventListener("pagehide", () => {
-    window.clearTimeout(standbyTimer);
-    window.clearTimeout(resizeTimer);
-  });
-
-})();
+});
