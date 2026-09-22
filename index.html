@@ -1,914 +1,667 @@
-/* =========================================================
-   CESARE PARATORE — HOME
-   style.css
-   ========================================================= */
-
-
-/* =========================================================
-   RESET
-   ========================================================= */
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-html {
-  margin: 0;
-  padding: 0;
-  background: #0B0B0A;
-  color: #F1EFE8;
-  scroll-behavior: smooth;
-  scroll-padding-top: 0;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  min-width: 320px;
-  background: #0B0B0A;
-  color: #F1EFE8;
-  font-family:
-    "Neue Montreal",
-    Helvetica,
-    Arial,
-    sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-img,
-svg,
-iframe {
-  display: block;
-}
-
-img {
-  max-width: 100%;
-}
-
-button,
-a {
-  font: inherit;
-}
-
-button {
-  border: 0;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-::selection {
-  background: #F1EFE8;
-  color: #0B0B0A;
-}
-
-
-/* =========================================================
-   VARIABLES
-   ========================================================= */
-
-:root {
-  --bg: #0B0B0A;
-  --surface: #151513;
-
-  --primary: #F1EFE8;
-  --secondary: #A7A49C;
-  --muted: #66645F;
-
-  --margin: 5vw;
-  --gutter: 1.5vw;
-
-  --header-height: 88px;
-
-  --display-xl: clamp(4.5rem, 10vw, 11rem);
-  --display-l: clamp(3rem, 7vw, 8rem);
-
-  --narrative-size: clamp(1.15rem, 1.35vw, 1.5rem);
-  --narrative-line: 1.55;
-
-  --micro-size: 0.8rem;
-
-  --transition-fast: 220ms ease;
-  --transition-medium: 500ms ease;
-  --transition-slow: 800ms ease;
-}
-
-
-/* =========================================================
-   LOADER
-   ========================================================= */
-
-.loader {
-  position: fixed;
-  inset: 0;
-  z-index: 99999;
-
-  display: grid;
-  place-items: center;
-
-  width: 100%;
-  height: 100svh;
-
-  background: var(--primary);
-  color: #0B0B0A;
-
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-
-  /*
-   * Fail-safe visuale:
-   * anche se JavaScript non viene eseguito,
-   * il loader non rimane bloccato.
-   */
-  animation:
-    loader-auto-hide 1ms linear 1800ms forwards;
-
-  will-change: opacity, visibility;
-}
-
-.loader.is-hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-
-  animation: none;
-}
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0B0B0A">
+  <meta name="description" content="Cesare Paratore">
+
+  <title>Cesare Paratore</title>
+
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="style.css">
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"
+    defer
+  ></script>
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"
+    defer
+  ></script>
+
+  <script src="script.js" defer></script>
+</head>
+
+<body>
+
+  <!-- =========================================================
+       LOADER
+  ========================================================== -->
+
+  <div class="loader" id="loader" aria-hidden="false">
+    <div class="loader__inner">
+      <img
+        class="loader__logo"
+        src="assets/images/cp-mark.svg"
+        alt="CP"
+      >
+
+      <div class="loader__name">
+        CESARE PARATORE
+      </div>
+    </div>
+  </div>
+
+
+  <!-- =========================================================
+       HEADER
+  ========================================================== -->
+
+  <header class="site-header">
+    <a
+      class="site-header__logo"
+      href="#section-01"
+      aria-label="Cesare Paratore — torna all'inizio"
+    >
+      <img
+        src="assets/images/cp-mark.svg"
+        alt="CP"
+      >
+    </a>
+
+    <button
+      class="menu-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-menu"
+    >
+      MENU
+    </button>
+  </header>
 
-.loader__inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  gap: 1.5rem;
-
-  text-align: center;
-}
-
-.loader__logo {
-  width: clamp(64px, 8vw, 110px);
-  height: auto;
-}
-
-.loader__name {
-  font-size: 0.8rem;
-  line-height: 1;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-@keyframes loader-auto-hide {
-  from {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-  }
-
-  to {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-  }
-}
-
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
-.site-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 9000;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  width: 100%;
-  height: var(--header-height);
-
-  padding:
-    0 var(--margin);
-
-  background: var(--primary);
-  color: #0B0B0A;
-}
-
-.site-header__logo {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.site-header__logo img {
-  width: clamp(42px, 4vw, 64px);
-  height: auto;
-}
-
-.menu-toggle {
-  appearance: none;
-
-  padding: 0;
 
-  background: transparent;
-  color: #0B0B0A;
-
-  cursor: pointer;
+  <!-- =========================================================
+       MENU
+  ========================================================== -->
 
-  font-size: var(--micro-size);
-  line-height: 1;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.menu-toggle:hover {
-  opacity: 0.55;
-}
-
-
-/* =========================================================
-   GLOBAL MENU
-   ========================================================= */
-
-.site-menu {
-  position: fixed;
-  inset: 0;
-  z-index: 8500;
+  <aside
+    class="site-menu"
+    id="site-menu"
+    aria-hidden="true"
+  >
+    <div class="site-menu__inner">
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+      <nav class="site-menu__nav" aria-label="Navigazione principale">
 
-  padding:
-    calc(var(--header-height) + 40px)
-    var(--margin)
-    40px;
+        <a href="#section-01">GUARDA.</a>
+        <a href="#section-02">COME?</a>
+        <a href="#section-03">MOVIMENTO.</a>
+        <a href="#section-04">CAPIRE.</a>
+        <a href="#section-05">TRASMETTERE.</a>
+        <a href="#section-06">COSTRUIRE.</a>
+        <a href="#section-07">RITORNA.</a>
+        <a href="#section-08">COLLEGARE.</a>
+        <a href="#section-09">OGGI.</a>
+        <a href="#section-10">OBIETTIVO.</a>
+        <a href="#section-11">QUI.</a>
+        <a href="#section-12">DA QUI.</a>
+        <a href="#section-13">ECCOMI.</a>
+        <a href="#section-14">SCRIVIMI.</a>
 
-  background: var(--primary);
-  color: #0B0B0A;
+      </nav>
 
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
+    </div>
+  </aside>
 
-  transition:
-    opacity var(--transition-medium),
-    visibility var(--transition-medium);
-}
 
-.site-menu.is-open {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
+  <!-- =========================================================
+       MAIN
+  ========================================================== -->
 
-.site-menu__inner {
-  width: 100%;
-  max-width: 1100px;
-}
+  <main id="main-content">
 
-.site-menu__nav {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 
-  gap: clamp(1rem, 2vw, 1.75rem);
+    <!-- =======================================================
+         01 — GUARDA.
+    ======================================================== -->
 
-  text-align: center;
-}
+    <section
+      class="narrative-section narrative-section--intro"
+      id="section-01"
+      data-title="GUARDA."
+    >
+      <div class="section__inner section__inner--intro">
 
-.site-menu__nav a {
-  font-size: clamp(2rem, 5vw, 5rem);
-  line-height: 0.95;
-  letter-spacing: -0.035em;
+        <h1 class="section__title">
+          GUARDA.
+        </h1>
 
-  transition:
-    opacity var(--transition-fast);
-}
+      </div>
+    </section>
 
-.site-menu__nav a:hover {
-  opacity: 0.45;
-}
 
-.menu-open {
-  overflow: hidden;
-}
+    <!-- =======================================================
+         02 — COME?
+    ======================================================== -->
 
+    <section
+      class="narrative-section"
+      id="section-02"
+      data-title="COME?"
+    >
+      <div class="section__inner">
 
-/* =========================================================
-   NARRATIVE
-   ========================================================= */
+        <div class="section__body">
 
-.narrative {
-  position: relative;
-  width: 100%;
-}
+          <p>Ricordo il primo computer.</p>
 
-.narrative-section {
-  position: relative;
+          <p>E quel mouse che si muoveva sullo schermo.</p>
 
-  min-height: 100svh;
+          <p>Ho iniziato a usarlo.</p>
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+          <p>Poi mi sono chiesto cosa ci fosse dietro quel movimento.</p>
 
-  padding:
-    calc(var(--header-height) + 8vh)
-    var(--margin)
-    12vh;
+          <p>Come funzionava.</p>
 
-  background: var(--bg);
-}
+          <p>Così ho iniziato a cercare la risposta.</p>
 
-.narrative-section--opening {
-  min-height: 100svh;
-  padding-top: var(--header-height);
-  padding-bottom: 0;
-}
+          <p>A capire cosa c'era dentro.</p>
 
-.section__inner {
-  width: min(100%, 42rem);
+          <p>A scoprire cosa potevo fare.</p>
 
-  margin-inline: auto;
+          <p>E, quando ho capito come funzionava, ho cercato di farlo funzionare meglio.</p>
 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+        </div>
 
-  text-align: center;
-}
+      </div>
+    </section>
 
-.section__title {
-  margin: 0;
 
-  color: var(--primary);
+    <!-- =======================================================
+         03 — MOVIMENTO.
+    ======================================================== -->
 
-  font-size: var(--display-l);
-  font-weight: 400;
-  line-height: 0.9;
-  letter-spacing: -0.055em;
+    <section
+      class="narrative-section"
+      id="section-03"
+      data-title="MOVIMENTO."
+    >
+      <div class="section__inner">
 
-  text-wrap: balance;
-}
+        <div class="section__body">
 
-.narrative-section--opening .section__title {
-  font-size: var(--display-xl);
-}
+          <p>Poi ho iniziato a guardare il movimento.</p>
 
-.section__body {
-  width: min(100%, 42rem);
+          <p>Prima il mio.</p>
 
-  margin-top: clamp(3rem, 7vw, 7rem);
+          <p>Poi quello degli altri.</p>
 
-  color: var(--secondary);
+          <p>Nello sport ho trovato un nuovo modo di vivere il movimento.</p>
 
-  font-size: var(--narrative-size);
-  font-weight: 400;
-  line-height: var(--narrative-line);
+          <p>Ho iniziato a misurarmi con i miei limiti.</p>
 
-  text-align: center;
-}
+          <p>A capire cosa potevo fare meglio.</p>
 
-.section__body p {
-  margin: 0;
-}
+          <p><strong>Nella corsa ho iniziato a capire davvero il movimento.</strong></p>
 
-.section__body p + p {
-  margin-top: 1.35em;
-}
+          <p>Prima da atleta.</p>
 
-.section__body strong {
-  color: var(--primary);
-  font-weight: 500;
-}
+          <p>Poi da tecnico.</p>
 
+        </div>
 
-/* =========================================================
-   SPLIT SECTIONS
-   ========================================================= */
+      </div>
+    </section>
 
-.section__inner--split {
-  width: min(100%, 1400px);
 
-  display: grid;
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(0, 1fr);
+    <!-- =======================================================
+         04 — CAPIRE.
+    ======================================================== -->
 
-  gap: clamp(2rem, 6vw, 8rem);
+    <section
+      class="narrative-section"
+      id="section-04"
+      data-title="CAPIRE."
+    >
+      <div class="section__inner">
 
-  align-items: center;
+        <div class="section__body">
 
-  text-align: left;
-}
+          <p>Più lo vivevo, più volevo capire.</p>
 
-.section__content {
-  min-width: 0;
-}
+          <p>Così ho iniziato a studiarlo.</p>
 
-.section__content .section__title {
-  text-align: left;
-}
+          <p>Ho cercato di capire cosa ci fosse dietro quello che vivevo.</p>
 
-.section__content .section__body {
-  margin-top: clamp(2rem, 4vw, 4rem);
-  text-align: left;
-}
+          <p>E ho iniziato a mettere insieme l'esperienza con quello che imparavo.</p>
 
+        </div>
 
-/* =========================================================
-   TERRITORY
-   ========================================================= */
+      </div>
+    </section>
 
-.territory-map {
-  position: relative;
 
-  width: 100%;
-  min-height: min(60vw, 620px);
+    <!-- =======================================================
+         05 — TRASMETTERE.
+    ======================================================== -->
 
-  overflow: hidden;
+    <section
+      class="narrative-section"
+      id="section-05"
+      data-title="TRASMETTERE."
+    >
+      <div class="section__inner">
 
-  background: var(--surface);
-}
+        <div class="section__body">
 
-.territory-map iframe {
-  width: 100%;
-  height: 100%;
-  min-height: min(60vw, 620px);
+          <p><strong>Quello che avevo scoperto è diventato qualcosa da trasmettere.</strong></p>
 
-  border: 0;
-}
+          <p>Prima attraverso quello che avevo vissuto sul campo.</p>
 
+          <p>Poi attraverso ciò che lo studio mi aveva dato.</p>
 
-/* =========================================================
-   PORTRAIT
-   ========================================================= */
+          <p>Non ho trasmesso solo il movimento.</p>
 
-.portrait {
-  position: relative;
+          <p>Non ho trasmesso solo lo sport.</p>
 
-  width: 100%;
-  max-width: 620px;
+          <p><strong>Ho iniziato a trasmettere anche quello che avevo imparato.</strong></p>
 
-  justify-self: end;
+        </div>
 
-  overflow: hidden;
+      </div>
+    </section>
 
-  background: var(--surface);
-}
 
-.portrait img {
-  width: 100%;
-  height: auto;
+    <!-- =======================================================
+         06 — COSTRUIRE.
+    ======================================================== -->
 
-  object-fit: cover;
-}
+    <section
+      class="narrative-section"
+      id="section-06"
+      data-title="COSTRUIRE."
+    >
+      <div class="section__inner">
 
+        <div class="section__body">
 
-/* =========================================================
-   CONTACT
-   ========================================================= */
+          <p>E ho continuato ad allargare lo sguardo.</p>
 
-.narrative-section--contact {
-  min-height: 100svh;
-}
+          <p>Ho iniziato a guardare lo sport anche da un'altra prospettiva.</p>
 
+          <p>Ho iniziato a capire come funzionavano le cose.</p>
 
-/* =========================================================
-   NARRATIVE NAVIGATION
-   ========================================================= */
+          <p>A cercare modi per farle funzionare meglio.</p>
 
-.narrative-navigation {
-  position: fixed;
-  left: 50%;
-  bottom: clamp(24px, 4vh, 48px);
-  z-index: 8000;
+          <p>A progettare.</p>
 
-  display: grid;
-  grid-template-columns: auto auto auto;
-  align-items: center;
+          <p>A capire come farle funzionare insieme.</p>
 
-  gap: clamp(1.5rem, 3vw, 3rem);
+        </div>
 
-  transform: translateX(-50%);
+      </div>
+    </section>
 
-  color: var(--primary);
 
-  pointer-events: none;
-}
+    <!-- =======================================================
+         07 — RITORNA.
+    ======================================================== -->
 
-.narrative-navigation__title {
-  min-width: clamp(120px, 15vw, 220px);
+    <section
+      class="narrative-section"
+      id="section-07"
+      data-title="RITORNA."
+    >
+      <div class="section__inner">
 
-  text-align: center;
+        <div class="section__body">
 
-  font-size: var(--micro-size);
-  line-height: 1;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+          <p><strong>E il digitale è tornato.</strong></p>
 
-  white-space: nowrap;
-}
+          <p>Ho iniziato a capire come si costruisce una pagina Web.</p>
 
-.narrative-navigation__button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+          <p>Come prende forma.</p>
 
-  width: 48px;
-  height: 48px;
+          <p>Come diventa un'esperienza.</p>
 
-  padding: 0;
+          <p>Allora non avevo gli strumenti per farla come la immaginavo.</p>
 
-  border: 1px solid rgba(241, 239, 232, 0.45);
-  border-radius: 50%;
+          <p>Oggi li ho.</p>
 
-  background: transparent;
-  color: var(--primary);
+          <p>E posso usare quello che ho imparato per costruire pagine Web.</p>
 
-  cursor: pointer;
+          <p>Prima per me.</p>
 
-  font-size: 1.1rem;
+          <p>E forse, domani, anche per altri.</p>
 
-  pointer-events: auto;
+        </div>
 
-  transition:
-    opacity var(--transition-fast),
-    border-color var(--transition-fast),
-    background var(--transition-fast);
-}
+      </div>
+    </section>
 
-.narrative-navigation__button:hover:not(:disabled) {
-  border-color: var(--primary);
-  background: var(--primary);
-  color: var(--bg);
-}
 
-.narrative-navigation__button:disabled {
-  opacity: 0.25;
-  cursor: default;
-}
+    <!-- =======================================================
+         08 — COLLEGARE.
+    ======================================================== -->
 
+    <section
+      class="narrative-section"
+      id="section-08"
+      data-title="COLLEGARE."
+    >
+      <div class="section__inner">
 
-/* =========================================================
-   FOOTER
-   ========================================================= */
+        <div class="section__body">
 
-.site-footer {
-  min-height: 180px;
+          <p>Ho attraversato esperienze diverse.</p>
 
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+          <p>E in tutte ho ritrovato lo stesso modo di guardare.</p>
 
-  padding:
-    40px var(--margin);
+          <p>Capire.</p>
 
-  background: var(--primary);
-  color: #0B0B0A;
-}
+          <p>Collegare.</p>
 
-.site-footer__logo {
-  display: inline-flex;
-}
+          <p>Costruire.</p>
 
-.site-footer__logo img {
-  width: clamp(42px, 4vw, 64px);
-  height: auto;
-}
+        </div>
 
-.site-footer__name {
-  font-size: var(--micro-size);
-  line-height: 1;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
+      </div>
+    </section>
 
 
-/* =========================================================
-   STANDBY
-   ========================================================= */
+    <!-- =======================================================
+         09 — OGGI.
+    ======================================================== -->
 
-.standby {
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
+    <section
+      class="narrative-section"
+      id="section-09"
+      data-title="OGGI."
+    >
+      <div class="section__inner">
 
-  display: grid;
-  place-items: center;
+        <div class="section__body">
 
-  background: #050505;
-  color: var(--primary);
+          <p>Oggi è questo il modo in cui guardo ciò che ho davanti.</p>
 
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
+          <p>Osservo.</p>
 
-  transition:
-    opacity 900ms ease,
-    visibility 900ms ease;
-}
+          <p>Studio.</p>
 
-.standby.is-active {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
+          <p>Collego.</p>
 
-.standby__title {
-  font-size: var(--display-l);
-  line-height: 0.9;
-  letter-spacing: -0.055em;
-}
+          <p>Progetto.</p>
 
+          <p>Sviluppo.</p>
 
-/* =========================================================
-   MOTION HOOKS
-   ========================================================= */
+          <p>E ogni volta parto dalla stessa cosa:</p>
 
-[data-title-reveal],
-[data-body-reveal],
-[data-image-reveal] {
-  will-change: opacity, transform;
-}
+          <p><strong>capire prima di intervenire.</strong></p>
 
-[data-title-reveal].is-visible,
-[data-body-reveal].is-visible,
-[data-image-reveal].is-visible {
-  opacity: 1;
-  transform: none;
-}
+        </div>
 
+      </div>
+    </section>
 
-/* =========================================================
-   SCROLL
-   ========================================================= */
 
-[id] {
-  scroll-margin-top: 0;
-}
+    <!-- =======================================================
+         10 — OBIETTIVO.
+    ======================================================== -->
 
+    <section
+      class="narrative-section"
+      id="section-10"
+      data-title="OBIETTIVO."
+    >
+      <div class="section__inner">
 
-/* =========================================================
-   TABLET
-   ========================================================= */
+        <div class="section__body">
 
-@media (max-width: 900px) {
+          <p>Tutto parte da un obiettivo.</p>
 
-  :root {
-    --margin: 32px;
-    --header-height: 76px;
-  }
+          <p>Da qualcosa che si vuole raggiungere.</p>
 
-  .section__inner--split {
-    grid-template-columns: 1fr;
-    gap: 4rem;
-  }
+          <p>Da qualcosa che si vuole cambiare.</p>
 
-  .section__content .section__title,
-  .section__content .section__body {
-    text-align: center;
-  }
+          <p>Da qualcosa che ancora non esiste.</p>
 
-  .portrait {
-    justify-self: center;
-    max-width: 600px;
-  }
+          <p><strong>DA DOVE SI PARTE CONTA.</strong></p>
 
-  .territory-map,
-  .territory-map iframe {
-    min-height: 55svh;
-  }
+          <p><strong>IL CONTESTO CAMBIA LO SGUARDO.</strong></p>
 
-}
+        </div>
 
+      </div>
+    </section>
 
-/* =========================================================
-   MOBILE
-   ========================================================= */
 
-@media (max-width: 600px) {
+    <!-- =======================================================
+         11 — QUI.
+    ======================================================== -->
 
-  :root {
-    --margin: 20px;
-    --header-height: 68px;
-  }
+    <section
+      class="narrative-section narrative-section--territory"
+      id="section-11"
+      data-title="QUI."
+    >
+      <div class="section__inner section__inner--split">
 
-  body {
-    font-size: 15px;
-  }
+        <div class="section__body">
 
-  .site-header {
-    padding-inline: var(--margin);
-  }
+          <p>
+            Un luogo non è soltanto<br>
+            un punto sulla mappa.
+          </p>
 
-  .site-header__logo img,
-  .site-footer__logo img {
-    width: 44px;
-  }
+          <p>
+            È il luogo in cui il movimento<br>
+            viene vissuto, praticato e osservato.
+          </p>
 
-  .narrative-section {
-    min-height: 100svh;
+          <p>
+            Persone diverse.<br>
+            Esigenze diverse.
+          </p>
 
-    padding:
-      calc(var(--header-height) + 48px)
-      var(--margin)
-      120px;
-  }
+          <p>
+            Ma lo stesso punto di partenza:<br>
+            <strong>il movimento.</strong>
+          </p>
 
-  .narrative-section--opening {
-    padding-top: var(--header-height);
-    padding-bottom: 0;
-  }
+        </div>
 
-  .section__title {
-    font-size: clamp(3rem, 15vw, 5rem);
-    line-height: 0.9;
-  }
+        <div class="territory-map">
+          <iframe
+            src="https://www.google.com/maps?q=Stadio%20Comunale%20Giuseppe%20La%20Franca%2C%20Partinico&output=embed&t=k"
+            title="Stadio Comunale Giuseppe La Franca, Partinico"
+            loading="lazy"
+            allowfullscreen
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
 
-  .narrative-section--opening .section__title {
-    font-size: clamp(4rem, 20vw, 7rem);
-  }
+      </div>
+    </section>
 
-  .section__body {
-    margin-top: 3rem;
 
-    font-size: clamp(1.08rem, 4.7vw, 1.3rem);
-    line-height: 1.55;
-  }
+    <!-- =======================================================
+         12 — DA QUI.
+    ======================================================== -->
 
-  .section__body p + p {
-    margin-top: 1.25em;
-  }
+    <section
+      class="narrative-section"
+      id="section-12"
+      data-title="DA QUI."
+    >
+      <div class="section__inner">
 
-  .site-menu__nav {
-    gap: 1.25rem;
-  }
+        <div class="section__body">
 
-  .site-menu__nav a {
-    font-size: clamp(2rem, 11vw, 4rem);
-  }
+          <p><strong>DA QUI,</strong></p>
 
-  .section__inner--split {
-    gap: 3rem;
-  }
+          <p><strong>NON SOLO QUI.</strong></p>
 
-  .territory-map,
-  .territory-map iframe {
-    min-height: 55svh;
-  }
+          <p>
+            È qui che il mio lavoro ha la sua base.
+          </p>
 
-  .narrative-navigation {
-    bottom: 20px;
+          <p>
+            In presenza, per chi parte da qui<br>
+            e per chi arriva dai territori vicini.
+          </p>
 
-    gap: 1rem;
-  }
+          <p>
+            Online, quando la distanza<br>
+            non deve essere un limite.
+          </p>
 
-  .narrative-navigation__title {
-    min-width: 90px;
-    font-size: 0.7rem;
-  }
+          <p>
+            Ogni obiettivo<br>
+            ha un punto da cui partire.
+          </p>
 
-  .narrative-navigation__button {
-    width: 42px;
-    height: 42px;
-  }
+          <p>
+            Capire da dove partire<br>
+            è già parte del lavoro.
+          </p>
 
-  .site-footer {
-    min-height: 140px;
+          <p>
+            Da quel punto<br>
+            si può guardare avanti.
+          </p>
 
-    padding:
-      32px var(--margin);
-  }
+          <p>
+            Verso un altro punto.
+          </p>
 
-}
+          <p>
+            E da lì<br>
+            verso un nuovo obiettivo.
+          </p>
 
+        </div>
 
-/* =========================================================
-   REDUCED MOTION
-   ========================================================= */
+      </div>
+    </section>
 
-@media (prefers-reduced-motion: reduce) {
 
-  html {
-    scroll-behavior: auto;
-  }
+    <!-- =======================================================
+         13 — ECCOMI.
+    ======================================================== -->
 
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+    <section
+      class="narrative-section narrative-section--portrait"
+      id="section-13"
+      data-title="ECCOMI."
+    >
+      <div class="section__inner section__inner--portrait">
 
-  .loader {
-    animation: none;
-  }
+        <div class="section__body">
 
-  .loader.is-hidden {
-    opacity: 0;
-    visibility: hidden;
-  }
+          <p><strong>Sono qui.</strong></p>
 
-}
+        </div>
 
+        <figure class="portrait">
+          <img
+            src="assets/images/cesare-paratore.jpg"
+            alt="Cesare Paratore"
+            loading="lazy"
+          >
+        </figure>
 
-/* =========================================================
-   404
-   ========================================================= */
+      </div>
+    </section>
 
-.page-404 {
-  min-height: 100svh;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    <!-- =======================================================
+         14 — SCRIVIMI.
+    ======================================================== -->
 
-  padding:
-    calc(var(--header-height) + 10vh)
-    var(--margin)
-    10vh;
+    <section
+      class="narrative-section narrative-section--contact"
+      id="section-14"
+      data-title="SCRIVIMI."
+    >
+      <div class="section__inner">
 
-  background: var(--bg);
-}
+        <div class="section__body">
 
-.page-404__inner {
-  width: min(100%, 900px);
+          <p><strong>Parlami del tuo obiettivo.</strong></p>
 
-  text-align: center;
-}
+        </div>
 
-.page-404__number {
-  margin: 0;
+      </div>
+    </section>
 
-  color: var(--primary);
+  </main>
 
-  font-size: var(--display-xl);
-  line-height: 0.82;
-  letter-spacing: -0.07em;
-  font-weight: 400;
-}
 
-.page-404__title {
-  margin: 4rem 0 0;
+  <!-- =========================================================
+       NARRATIVE NAVIGATION
+  ========================================================== -->
 
-  color: var(--primary);
+  <nav
+    class="narrative-navigation"
+    aria-label="Navigazione narrativa"
+  >
 
-  font-size: clamp(2rem, 4vw, 4rem);
-  line-height: 0.95;
-  letter-spacing: -0.04em;
-  font-weight: 400;
-}
+    <button
+      class="narrative-navigation__button narrative-navigation__button--prev"
+      type="button"
+      aria-label="Sezione precedente"
+      data-narrative-prev
+      disabled
+    >
+      <span aria-hidden="true">←</span>
+    </button>
 
-.page-404__text {
-  width: min(100%, 600px);
+    <div
+      class="narrative-navigation__title"
+      data-active-title
+      aria-live="polite"
+    >
+      GUARDA.
+    </div>
 
-  margin:
-    2rem auto 0;
+    <button
+      class="narrative-navigation__button narrative-navigation__button--next"
+      type="button"
+      aria-label="Sezione successiva"
+      data-narrative-next
+    >
+      <span aria-hidden="true">→</span>
+    </button>
 
-  color: var(--secondary);
+  </nav>
 
-  font-size: var(--narrative-size);
-  line-height: var(--narrative-line);
-}
 
-.page-404__link {
-  display: inline-flex;
+  <!-- =========================================================
+       FOOTER
+  ========================================================== -->
 
-  margin-top: 3rem;
+  <footer class="site-footer">
 
-  padding-bottom: 0.35rem;
+    <div class="site-footer__logo">
+      <img
+        src="assets/images/cp-mark.svg"
+        alt="CP"
+      >
+    </div>
 
-  border-bottom: 1px solid rgba(241, 239, 232, 0.45);
+    <div class="site-footer__name">
+      CESARE PARATORE
+    </div>
 
-  color: var(--primary);
+  </footer>
 
-  font-size: var(--micro-size);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 
-  transition:
-    opacity var(--transition-fast),
-    border-color var(--transition-fast);
-}
+  <!-- =========================================================
+       STANDBY
+  ========================================================== -->
 
-.page-404__link:hover {
-  opacity: 0.55;
-  border-color: var(--primary);
-}
+  <div
+    class="standby"
+    id="standby"
+    aria-hidden="true"
+    data-standby
+  >
+    <div class="standby__title">
+      GUARDA.
+    </div>
+  </div>
+
+</body>
+</html>
