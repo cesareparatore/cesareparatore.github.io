@@ -258,12 +258,6 @@
     goToSection(activeIndex + 1);
   });
 
-  /*
-    Fallback indipendente da GSAP:
-    mantiene aggiornata la section bar anche quando
-    GSAP/ScrollTrigger non è disponibile.
-  */
-
   function initNavigationObserver() {
     if (!sections.length) return;
 
