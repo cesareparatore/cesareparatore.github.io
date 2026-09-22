@@ -1,814 +1,914 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-  <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  >
-
-  <meta
-    name="theme-color"
-    content="#0B0B0A"
-  >
-
-  <meta
-    name="description"
-    content="Cesare Paratore — sport, educazione, progettazione, management e digitale."
-  >
-
-  <title>Cesare Paratore</title>
-
-  <link rel="stylesheet" href="style.css">
-</head>
+/* =========================================================
+   CESARE PARATORE — HOME
+   style.css
+   ========================================================= */
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+  background: #0B0B0A;
+  color: #F1EFE8;
+  scroll-behavior: smooth;
+  scroll-padding-top: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-width: 320px;
+  background: #0B0B0A;
+  color: #F1EFE8;
+  font-family:
+    "Neue Montreal",
+    Helvetica,
+    Arial,
+    sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+svg,
+iframe {
+  display: block;
+}
+
+img {
+  max-width: 100%;
+}
+
+button,
+a {
+  font: inherit;
+}
+
+button {
+  border: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: #F1EFE8;
+  color: #0B0B0A;
+}
+
+
+/* =========================================================
+   VARIABLES
+   ========================================================= */
+
+:root {
+  --bg: #0B0B0A;
+  --surface: #151513;
+
+  --primary: #F1EFE8;
+  --secondary: #A7A49C;
+  --muted: #66645F;
+
+  --margin: 5vw;
+  --gutter: 1.5vw;
+
+  --header-height: 88px;
+
+  --display-xl: clamp(4.5rem, 10vw, 11rem);
+  --display-l: clamp(3rem, 7vw, 8rem);
+
+  --narrative-size: clamp(1.15rem, 1.35vw, 1.5rem);
+  --narrative-line: 1.55;
+
+  --micro-size: 0.8rem;
+
+  --transition-fast: 220ms ease;
+  --transition-medium: 500ms ease;
+  --transition-slow: 800ms ease;
+}
+
+
+/* =========================================================
+   LOADER
+   ========================================================= */
+
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+
+  display: grid;
+  place-items: center;
+
+  width: 100%;
+  height: 100svh;
+
+  background: var(--primary);
+  color: #0B0B0A;
+
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+
+  /*
+   * Fail-safe visuale:
+   * anche se JavaScript non viene eseguito,
+   * il loader non rimane bloccato.
+   */
+  animation:
+    loader-auto-hide 1ms linear 1800ms forwards;
+
+  will-change: opacity, visibility;
+}
+
+.loader.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  animation: none;
+}
 
-<body>
-
-  <!-- =========================================================
-       LOADER
-  ========================================================== -->
-
-  <div
-    class="loader"
-    id="loader"
-    aria-hidden="false"
-  >
-    <div class="loader__inner">
-
-      <img
-        class="loader__logo"
-        src="assets/images/cp-mark.svg"
-        alt="CP"
-      >
+.loader__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 1.5rem;
+
+  text-align: center;
+}
+
+.loader__logo {
+  width: clamp(64px, 8vw, 110px);
+  height: auto;
+}
+
+.loader__name {
+  font-size: 0.8rem;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+@keyframes loader-auto-hide {
+  from {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9000;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  height: var(--header-height);
+
+  padding:
+    0 var(--margin);
+
+  background: var(--primary);
+  color: #0B0B0A;
+}
+
+.site-header__logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.site-header__logo img {
+  width: clamp(42px, 4vw, 64px);
+  height: auto;
+}
+
+.menu-toggle {
+  appearance: none;
+
+  padding: 0;
 
-      <div class="loader__name">
-        CESARE PARATORE
-      </div>
+  background: transparent;
+  color: #0B0B0A;
+
+  cursor: pointer;
 
-    </div>
-  </div>
+  font-size: var(--micro-size);
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.menu-toggle:hover {
+  opacity: 0.55;
+}
+
+
+/* =========================================================
+   GLOBAL MENU
+   ========================================================= */
+
+.site-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 8500;
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  <!-- =========================================================
-       HEADER
-  ========================================================== -->
+  padding:
+    calc(var(--header-height) + 40px)
+    var(--margin)
+    40px;
 
-  <header class="site-header">
+  background: var(--primary);
+  color: #0B0B0A;
 
-    <a
-      class="site-header__logo"
-      href="#guarda"
-      aria-label="Cesare Paratore — torna all'inizio"
-    >
-      <img
-        src="assets/images/cp-mark.svg"
-        alt="CP"
-      >
-    </a>
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 
-    <button
-      class="menu-toggle"
-      type="button"
-      aria-expanded="false"
-      aria-controls="global-menu"
-    >
-      MENU
-    </button>
+  transition:
+    opacity var(--transition-medium),
+    visibility var(--transition-medium);
+}
 
-  </header>
+.site-menu.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
 
+.site-menu__inner {
+  width: 100%;
+  max-width: 1100px;
+}
 
-  <!-- =========================================================
-       MENU
-  ========================================================== -->
+.site-menu__nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
-  <aside
-    class="site-menu"
-    id="global-menu"
-    aria-hidden="true"
-  >
+  gap: clamp(1rem, 2vw, 1.75rem);
 
-    <div class="site-menu__inner">
+  text-align: center;
+}
 
-      <nav
-        class="site-menu__nav"
-        aria-label="Navigazione principale"
-      >
+.site-menu__nav a {
+  font-size: clamp(2rem, 5vw, 5rem);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
 
-        <a href="#movimento">Sport</a>
-        <a href="#capire">Scienze motorie</a>
-        <a href="#trasmettere">Educazione</a>
-        <a href="#costruire">Management</a>
-        <a href="#ritorna">Digitale</a>
-        <a href="#qui">Territorio</a>
-        <a href="#scrivimi">Contatti</a>
+  transition:
+    opacity var(--transition-fast);
+}
 
-      </nav>
+.site-menu__nav a:hover {
+  opacity: 0.45;
+}
 
-    </div>
+.menu-open {
+  overflow: hidden;
+}
 
-  </aside>
 
+/* =========================================================
+   NARRATIVE
+   ========================================================= */
 
-  <!-- =========================================================
-       NARRATIVE
-  ========================================================== -->
+.narrative {
+  position: relative;
+  width: 100%;
+}
 
-  <main
-    class="narrative"
-    id="main-content"
-  >
+.narrative-section {
+  position: relative;
 
-    <!-- 01 — GUARDA. -->
+  min-height: 100svh;
 
-    <section
-      class="narrative-section narrative-section--opening"
-      id="guarda"
-      data-section="guarda"
-      data-title="GUARDA."
-    >
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-      <div class="section__inner">
+  padding:
+    calc(var(--header-height) + 8vh)
+    var(--margin)
+    12vh;
 
-        <h1 class="section__title">
-          GUARDA.
-        </h1>
+  background: var(--bg);
+}
 
-      </div>
+.narrative-section--opening {
+  min-height: 100svh;
+  padding-top: var(--header-height);
+  padding-bottom: 0;
+}
 
-    </section>
+.section__inner {
+  width: min(100%, 42rem);
 
+  margin-inline: auto;
 
-    <!-- 02 — COME? -->
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
-    <section
-      class="narrative-section"
-      id="come"
-      data-section="come"
-      data-title="COME?"
-    >
+  text-align: center;
+}
 
-      <div class="section__inner">
+.section__title {
+  margin: 0;
 
-        <h2 class="section__title">
-          COME?
-        </h2>
+  color: var(--primary);
 
-        <div class="section__body">
+  font-size: var(--display-l);
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: -0.055em;
 
-          <p>Ricordo il primo computer.</p>
+  text-wrap: balance;
+}
 
-          <p>E quel mouse che si muoveva sullo schermo.</p>
+.narrative-section--opening .section__title {
+  font-size: var(--display-xl);
+}
 
-          <p>Ho iniziato a usarlo.</p>
+.section__body {
+  width: min(100%, 42rem);
 
-          <p>Poi mi sono chiesto cosa ci fosse dietro quel movimento.</p>
+  margin-top: clamp(3rem, 7vw, 7rem);
 
-          <p>Come funzionava.</p>
+  color: var(--secondary);
 
-          <p>Così ho iniziato a cercare la risposta.</p>
+  font-size: var(--narrative-size);
+  font-weight: 400;
+  line-height: var(--narrative-line);
 
-          <p>A capire cosa c'era dentro.</p>
+  text-align: center;
+}
 
-          <p>A scoprire cosa potevo fare.</p>
+.section__body p {
+  margin: 0;
+}
 
-          <p>E, quando ho capito come funzionava, ho cercato di farlo funzionare meglio.</p>
+.section__body p + p {
+  margin-top: 1.35em;
+}
 
-        </div>
+.section__body strong {
+  color: var(--primary);
+  font-weight: 500;
+}
 
-      </div>
 
-    </section>
+/* =========================================================
+   SPLIT SECTIONS
+   ========================================================= */
 
+.section__inner--split {
+  width: min(100%, 1400px);
 
-    <!-- 03 — MOVIMENTO. -->
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
 
-    <section
-      class="narrative-section"
-      id="movimento"
-      data-section="movimento"
-      data-title="MOVIMENTO."
-    >
+  gap: clamp(2rem, 6vw, 8rem);
 
-      <div class="section__inner">
+  align-items: center;
 
-        <h2 class="section__title">
-          MOVIMENTO.
-        </h2>
+  text-align: left;
+}
 
-        <div class="section__body">
+.section__content {
+  min-width: 0;
+}
 
-          <p>Poi ho iniziato a guardare il movimento.</p>
+.section__content .section__title {
+  text-align: left;
+}
 
-          <p>Prima il mio.</p>
+.section__content .section__body {
+  margin-top: clamp(2rem, 4vw, 4rem);
+  text-align: left;
+}
 
-          <p>Poi quello degli altri.</p>
 
-          <p>Nello sport ho trovato un nuovo modo di vivere il movimento.</p>
+/* =========================================================
+   TERRITORY
+   ========================================================= */
 
-          <p>Ho iniziato a misurarmi con i miei limiti.</p>
+.territory-map {
+  position: relative;
 
-          <p>A capire cosa potevo fare meglio.</p>
+  width: 100%;
+  min-height: min(60vw, 620px);
 
-          <p><strong>Nella corsa ho iniziato a capire davvero il movimento.</strong></p>
+  overflow: hidden;
 
-          <p>Prima da atleta.</p>
+  background: var(--surface);
+}
 
-          <p>Poi da tecnico.</p>
+.territory-map iframe {
+  width: 100%;
+  height: 100%;
+  min-height: min(60vw, 620px);
 
-          <p>Più lo vivevo, più volevo capire.</p>
+  border: 0;
+}
 
-        </div>
 
-      </div>
+/* =========================================================
+   PORTRAIT
+   ========================================================= */
 
-    </section>
+.portrait {
+  position: relative;
 
+  width: 100%;
+  max-width: 620px;
 
-    <!-- 04 — CAPIRE. -->
+  justify-self: end;
 
-    <section
-      class="narrative-section"
-      id="capire"
-      data-section="capire"
-      data-title="CAPIRE."
-    >
+  overflow: hidden;
 
-      <div class="section__inner">
+  background: var(--surface);
+}
 
-        <h2 class="section__title">
-          CAPIRE.
-        </h2>
+.portrait img {
+  width: 100%;
+  height: auto;
 
-        <div class="section__body">
+  object-fit: cover;
+}
 
-          <p>Così ho iniziato a studiarlo.</p>
 
-          <p>Ho cercato di capire cosa ci fosse dietro quello che vivevo.</p>
+/* =========================================================
+   CONTACT
+   ========================================================= */
 
-          <p>E ho iniziato a mettere insieme l'esperienza con quello che imparavo.</p>
+.narrative-section--contact {
+  min-height: 100svh;
+}
 
-        </div>
 
-      </div>
+/* =========================================================
+   NARRATIVE NAVIGATION
+   ========================================================= */
 
-    </section>
+.narrative-navigation {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(24px, 4vh, 48px);
+  z-index: 8000;
 
+  display: grid;
+  grid-template-columns: auto auto auto;
+  align-items: center;
 
-    <!-- 05 — TRASMETTERE. -->
+  gap: clamp(1.5rem, 3vw, 3rem);
 
-    <section
-      class="narrative-section"
-      id="trasmettere"
-      data-section="trasmettere"
-      data-title="TRASMETTERE."
-    >
+  transform: translateX(-50%);
 
-      <div class="section__inner">
+  color: var(--primary);
 
-        <h2 class="section__title">
-          TRASMETTERE.
-        </h2>
+  pointer-events: none;
+}
 
-        <div class="section__body">
+.narrative-navigation__title {
+  min-width: clamp(120px, 15vw, 220px);
 
-          <p><strong>Quello che avevo scoperto è diventato qualcosa da trasmettere.</strong></p>
+  text-align: center;
 
-          <p>Prima attraverso quello che avevo vissuto sul campo.</p>
+  font-size: var(--micro-size);
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 
-          <p>Poi attraverso ciò che lo studio mi aveva dato.</p>
+  white-space: nowrap;
+}
 
-          <p>Non ho trasmesso solo il movimento.</p>
+.narrative-navigation__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-          <p>Non ho trasmesso solo lo sport.</p>
+  width: 48px;
+  height: 48px;
 
-          <p><strong>Ho iniziato a trasmettere anche quello che avevo imparato.</strong></p>
+  padding: 0;
 
-        </div>
+  border: 1px solid rgba(241, 239, 232, 0.45);
+  border-radius: 50%;
 
-      </div>
+  background: transparent;
+  color: var(--primary);
 
-    </section>
+  cursor: pointer;
 
+  font-size: 1.1rem;
 
-    <!-- 06 — COSTRUIRE. -->
+  pointer-events: auto;
 
-    <section
-      class="narrative-section"
-      id="costruire"
-      data-section="costruire"
-      data-title="COSTRUIRE."
-    >
+  transition:
+    opacity var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+}
 
-      <div class="section__inner">
+.narrative-navigation__button:hover:not(:disabled) {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--bg);
+}
 
-        <h2 class="section__title">
-          COSTRUIRE.
-        </h2>
+.narrative-navigation__button:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
 
-        <div class="section__body">
 
-          <p>E ho continuato ad allargare lo sguardo.</p>
+/* =========================================================
+   FOOTER
+   ========================================================= */
 
-          <p>Ho iniziato a guardare lo sport anche da un'altra prospettiva.</p>
+.site-footer {
+  min-height: 180px;
 
-          <p>Ho iniziato a capire come funzionavano le cose.</p>
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
-          <p>A cercare modi per farle funzionare meglio.</p>
+  padding:
+    40px var(--margin);
 
-          <p>A progettare.</p>
+  background: var(--primary);
+  color: #0B0B0A;
+}
 
-          <p>A capire come farle funzionare insieme.</p>
+.site-footer__logo {
+  display: inline-flex;
+}
 
-        </div>
+.site-footer__logo img {
+  width: clamp(42px, 4vw, 64px);
+  height: auto;
+}
 
-      </div>
+.site-footer__name {
+  font-size: var(--micro-size);
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
 
-    </section>
 
+/* =========================================================
+   STANDBY
+   ========================================================= */
 
-    <!-- 07 — RITORNA. -->
+.standby {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
 
-    <section
-      class="narrative-section"
-      id="ritorna"
-      data-section="ritorna"
-      data-title="RITORNA."
-    >
+  display: grid;
+  place-items: center;
 
-      <div class="section__inner">
+  background: #050505;
+  color: var(--primary);
 
-        <h2 class="section__title">
-          RITORNA.
-        </h2>
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 
-        <div class="section__body">
+  transition:
+    opacity 900ms ease,
+    visibility 900ms ease;
+}
 
-          <p><strong>E il digitale è tornato.</strong></p>
+.standby.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
 
-          <p>Ho iniziato a capire come si costruisce una pagina Web.</p>
+.standby__title {
+  font-size: var(--display-l);
+  line-height: 0.9;
+  letter-spacing: -0.055em;
+}
 
-          <p>Come prende forma.</p>
 
-          <p>Come diventa un'esperienza.</p>
+/* =========================================================
+   MOTION HOOKS
+   ========================================================= */
 
-          <p>Allora non avevo gli strumenti per farla come la immaginavo.</p>
+[data-title-reveal],
+[data-body-reveal],
+[data-image-reveal] {
+  will-change: opacity, transform;
+}
 
-          <p>Oggi li ho.</p>
+[data-title-reveal].is-visible,
+[data-body-reveal].is-visible,
+[data-image-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
 
-          <p>E posso usare quello che ho imparato per costruire pagine Web.</p>
 
-          <p>Prima per me.</p>
+/* =========================================================
+   SCROLL
+   ========================================================= */
 
-          <p>E forse, domani, anche per altri.</p>
+[id] {
+  scroll-margin-top: 0;
+}
 
-        </div>
 
-      </div>
+/* =========================================================
+   TABLET
+   ========================================================= */
 
-    </section>
+@media (max-width: 900px) {
 
+  :root {
+    --margin: 32px;
+    --header-height: 76px;
+  }
 
-    <!-- 08 — COLLEGARE. -->
+  .section__inner--split {
+    grid-template-columns: 1fr;
+    gap: 4rem;
+  }
 
-    <section
-      class="narrative-section"
-      id="collegare"
-      data-section="collegare"
-      data-title="COLLEGARE."
-    >
+  .section__content .section__title,
+  .section__content .section__body {
+    text-align: center;
+  }
 
-      <div class="section__inner">
+  .portrait {
+    justify-self: center;
+    max-width: 600px;
+  }
 
-        <h2 class="section__title">
-          COLLEGARE.
-        </h2>
+  .territory-map,
+  .territory-map iframe {
+    min-height: 55svh;
+  }
 
-        <div class="section__body">
+}
 
-          <p>Ho attraversato esperienze diverse.</p>
 
-          <p>E in tutte ho ritrovato lo stesso modo di guardare.</p>
+/* =========================================================
+   MOBILE
+   ========================================================= */
 
-          <p>Capire.</p>
+@media (max-width: 600px) {
 
-          <p>Collegare.</p>
+  :root {
+    --margin: 20px;
+    --header-height: 68px;
+  }
 
-          <p>Costruire.</p>
+  body {
+    font-size: 15px;
+  }
 
-        </div>
+  .site-header {
+    padding-inline: var(--margin);
+  }
 
-      </div>
+  .site-header__logo img,
+  .site-footer__logo img {
+    width: 44px;
+  }
 
-    </section>
+  .narrative-section {
+    min-height: 100svh;
 
+    padding:
+      calc(var(--header-height) + 48px)
+      var(--margin)
+      120px;
+  }
 
-    <!-- 09 — OGGI. -->
+  .narrative-section--opening {
+    padding-top: var(--header-height);
+    padding-bottom: 0;
+  }
 
-    <section
-      class="narrative-section"
-      id="oggi"
-      data-section="oggi"
-      data-title="OGGI."
-    >
+  .section__title {
+    font-size: clamp(3rem, 15vw, 5rem);
+    line-height: 0.9;
+  }
 
-      <div class="section__inner">
+  .narrative-section--opening .section__title {
+    font-size: clamp(4rem, 20vw, 7rem);
+  }
 
-        <h2 class="section__title">
-          OGGI.
-        </h2>
+  .section__body {
+    margin-top: 3rem;
 
-        <div class="section__body">
+    font-size: clamp(1.08rem, 4.7vw, 1.3rem);
+    line-height: 1.55;
+  }
 
-          <p>Oggi è questo il modo in cui guardo ciò che ho davanti.</p>
+  .section__body p + p {
+    margin-top: 1.25em;
+  }
 
-          <p>Osservo.</p>
+  .site-menu__nav {
+    gap: 1.25rem;
+  }
 
-          <p>Studio.</p>
+  .site-menu__nav a {
+    font-size: clamp(2rem, 11vw, 4rem);
+  }
 
-          <p>Collego.</p>
+  .section__inner--split {
+    gap: 3rem;
+  }
 
-          <p>Progetto.</p>
+  .territory-map,
+  .territory-map iframe {
+    min-height: 55svh;
+  }
 
-          <p>Sviluppo.</p>
+  .narrative-navigation {
+    bottom: 20px;
 
-          <p>E ogni volta parto dalla stessa cosa:</p>
+    gap: 1rem;
+  }
 
-          <p><strong>capire prima di intervenire.</strong></p>
+  .narrative-navigation__title {
+    min-width: 90px;
+    font-size: 0.7rem;
+  }
 
-        </div>
+  .narrative-navigation__button {
+    width: 42px;
+    height: 42px;
+  }
 
-      </div>
+  .site-footer {
+    min-height: 140px;
 
-    </section>
+    padding:
+      32px var(--margin);
+  }
 
+}
 
-    <!-- 10 — OBIETTIVO. -->
 
-    <section
-      class="narrative-section"
-      id="obiettivo"
-      data-section="obiettivo"
-      data-title="OBIETTIVO."
-    >
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
 
-      <div class="section__inner">
+@media (prefers-reduced-motion: reduce) {
 
-        <h2 class="section__title">
-          OBIETTIVO.
-        </h2>
+  html {
+    scroll-behavior: auto;
+  }
 
-        <div class="section__body">
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 
-          <p>Tutto parte da un obiettivo.</p>
+  .loader {
+    animation: none;
+  }
 
-          <p>Da qualcosa che si vuole raggiungere.</p>
+  .loader.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
 
-          <p>Da qualcosa che si vuole cambiare.</p>
+}
 
-          <p>Da qualcosa che ancora non esiste.</p>
 
-          <p><strong>DA DOVE SI PARTE CONTA.</strong></p>
+/* =========================================================
+   404
+   ========================================================= */
 
-          <p><strong>IL CONTESTO CAMBIA LO SGUARDO.</strong></p>
+.page-404 {
+  min-height: 100svh;
 
-        </div>
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-      </div>
+  padding:
+    calc(var(--header-height) + 10vh)
+    var(--margin)
+    10vh;
 
-    </section>
+  background: var(--bg);
+}
 
+.page-404__inner {
+  width: min(100%, 900px);
 
-    <!-- 11 — QUI. -->
+  text-align: center;
+}
 
-    <section
-      class="narrative-section narrative-section--territory"
-      id="qui"
-      data-section="qui"
-      data-title="QUI."
-    >
+.page-404__number {
+  margin: 0;
 
-      <div class="section__inner section__inner--split">
+  color: var(--primary);
 
-        <div class="section__content">
+  font-size: var(--display-xl);
+  line-height: 0.82;
+  letter-spacing: -0.07em;
+  font-weight: 400;
+}
 
-          <h2 class="section__title">
-            QUI.
-          </h2>
+.page-404__title {
+  margin: 4rem 0 0;
 
-          <div class="section__body">
+  color: var(--primary);
 
-            <p>
-              Un luogo non è soltanto<br>
-              un punto sulla mappa.
-            </p>
+  font-size: clamp(2rem, 4vw, 4rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  font-weight: 400;
+}
 
-            <p>
-              È il luogo in cui il movimento<br>
-              viene vissuto, praticato e osservato.
-            </p>
+.page-404__text {
+  width: min(100%, 600px);
 
-            <p>
-              Persone diverse.<br>
-              Esigenze diverse.
-            </p>
+  margin:
+    2rem auto 0;
 
-            <p>
-              Ma lo stesso punto di partenza:<br>
-              <strong>il movimento.</strong>
-            </p>
+  color: var(--secondary);
 
-          </div>
+  font-size: var(--narrative-size);
+  line-height: var(--narrative-line);
+}
 
-        </div>
+.page-404__link {
+  display: inline-flex;
 
-        <div class="territory-map">
+  margin-top: 3rem;
 
-          <iframe
-            src="https://www.google.com/maps?q=Stadio%20Comunale%20Giuseppe%20La%20Franca%2C%20Partinico&output=embed"
-            title="Stadio Comunale Giuseppe La Franca, Partinico"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-            allowfullscreen
-          ></iframe>
+  padding-bottom: 0.35rem;
 
-        </div>
+  border-bottom: 1px solid rgba(241, 239, 232, 0.45);
 
-      </div>
+  color: var(--primary);
 
-    </section>
+  font-size: var(--micro-size);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 
+  transition:
+    opacity var(--transition-fast),
+    border-color var(--transition-fast);
+}
 
-    <!-- 12 — DA QUI. -->
-
-    <section
-      class="narrative-section"
-      id="da-qui"
-      data-section="da-qui"
-      data-title="DA QUI."
-    >
-
-      <div class="section__inner">
-
-        <h2 class="section__title">
-          DA QUI.
-        </h2>
-
-        <div class="section__body">
-
-          <p><strong>DA QUI,</strong></p>
-
-          <p><strong>NON SOLO QUI.</strong></p>
-
-          <p>È qui che il mio lavoro ha la sua base.</p>
-
-          <p>
-            In presenza, per chi parte da qui<br>
-            e per chi arriva dai territori vicini.
-          </p>
-
-          <p>
-            Online, quando la distanza<br>
-            non deve essere un limite.
-          </p>
-
-          <p>Ogni obiettivo ha un punto da cui partire.</p>
-
-          <p>Capire da dove partire è già parte del lavoro.</p>
-
-          <p>Da quel punto si può guardare avanti.</p>
-
-          <p>Verso un altro punto.</p>
-
-          <p>E da lì verso un nuovo obiettivo.</p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- 13 — ECCOMI. -->
-
-    <section
-      class="narrative-section narrative-section--portrait"
-      id="eccomi"
-      data-section="eccomi"
-      data-title="ECCOMI."
-    >
-
-      <div class="section__inner section__inner--split">
-
-        <div class="section__content">
-
-          <h2 class="section__title">
-            ECCOMI.
-          </h2>
-
-          <div class="section__body">
-
-            <p><strong>Sono qui.</strong></p>
-
-          </div>
-
-        </div>
-
-        <div class="portrait">
-
-          <img
-            src="assets/images/cesare-paratore.jpg"
-            alt="Cesare Paratore"
-            loading="lazy"
-          >
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- 14 — SCRIVIMI. -->
-
-    <section
-      class="narrative-section narrative-section--contact"
-      id="scrivimi"
-      data-section="scrivimi"
-      data-title="SCRIVIMI."
-    >
-
-      <div class="section__inner">
-
-        <h2 class="section__title">
-          SCRIVIMI.
-        </h2>
-
-        <div class="section__body">
-
-          <p><strong>Parlami del tuo obiettivo.</strong></p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =======================================================
-         NARRATIVE NAVIGATION
-    ======================================================== -->
-
-    <nav
-      class="narrative-navigation"
-      aria-label="Navigazione narrativa"
-    >
-
-      <button
-        class="narrative-navigation__button narrative-navigation__button--prev"
-        type="button"
-        data-narrative-prev
-        aria-label="Sezione precedente"
-        disabled
-      >
-        <span aria-hidden="true">←</span>
-      </button>
-
-      <div
-        class="narrative-navigation__title"
-        data-active-title
-        aria-live="polite"
-      >
-        GUARDA.
-      </div>
-
-      <button
-        class="narrative-navigation__button narrative-navigation__button--next"
-        type="button"
-        data-narrative-next
-        aria-label="Sezione successiva"
-      >
-        <span aria-hidden="true">→</span>
-      </button>
-
-    </nav>
-
-  </main>
-
-
-  <!-- =========================================================
-       FOOTER
-  ========================================================== -->
-
-  <footer class="site-footer">
-
-    <a
-      class="site-footer__logo"
-      href="#guarda"
-      aria-label="Torna all'inizio"
-    >
-      <img
-        src="assets/images/cp-mark.svg"
-        alt="CP"
-      >
-    </a>
-
-    <div class="site-footer__name">
-      CESARE PARATORE
-    </div>
-
-  </footer>
-
-
-  <!-- =========================================================
-       STANDBY
-  ========================================================== -->
-
-  <div
-    class="standby"
-    id="standby"
-    data-standby
-    aria-hidden="true"
-  >
-
-    <div class="standby__title">
-      GUARDA.
-    </div>
-
-  </div>
-
-
-  <!-- =========================================================
-       LOADER FAIL-SAFE
-       
-       Questo meccanismo NON dipende da script.js o GSAP.
-  ========================================================== -->
-
-  <script>
-    (function () {
-      'use strict';
-
-      var finished = false;
-
-      function hideLoader() {
-        if (finished) return;
-
-        finished = true;
-
-        var loader = document.getElementById('loader');
-
-        document.documentElement.classList.add('site-ready');
-
-        if (!loader) return;
-
-        loader.classList.add('is-hidden');
-
-        window.setTimeout(function () {
-          if (loader && loader.parentNode) {
-            loader.parentNode.removeChild(loader);
-          }
-        }, 900);
-      }
-
-      /*
-       * Il loader viene chiuso direttamente dal browser.
-       * Non aspetta GSAP, immagini, font o script.js.
-       */
-
-      window.setTimeout(hideLoader, 1800);
-
-      if (document.readyState !== 'loading') {
-        hideLoader();
-      } else {
-        document.addEventListener(
-          'DOMContentLoaded',
-          hideLoader,
-          { once: true }
-        );
-      }
-    })();
-  </script>
-
-
-  <!-- =========================================================
-       GSAP
-  ========================================================== -->
-
-  <script
-    src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"
-    defer
-  ></script>
-
-  <script
-    src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"
-    defer
-  ></script>
-
-  <script
-    src="script.js"
-    defer
-  ></script>
-
-</body>
-</html>
+.page-404__link:hover {
+  opacity: 0.55;
+  border-color: var(--primary);
+}
