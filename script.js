@@ -1,622 +1,436 @@
+/* CESARE PARATORE — HOME
+   Master → Implementation
+   No autonomous content or design decisions.
+*/
+
 (() => {
   "use strict";
 
+  const reducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
 
-  /* ==========================================================
-     DOM
-  ========================================================== */
-
-  const loader = document.getElementById("loader");
-  const menuToggle = document.querySelector(".menu-toggle");
-  const siteMenu = document.getElementById("site-menu");
-  const standby = document.getElementById("standby");
+  const body = document.body;
+  const loader = document.querySelector("[data-loader]");
+  const menu = document.querySelector("[data-menu]");
+  const menuToggle = document.querySelector("[data-menu-toggle]");
+  const menuClose = document.querySelector("[data-menu-close]");
+  const standby = document.querySelector("[data-standby]");
 
   const sections = Array.from(
-    document.querySelectorAll(".narrative-section")
+    document.querySelectorAll("[data-section]")
   );
 
+  const titles = Array.from(
+    document.querySelectorAll("[data-section-title]")
+  );
 
-  /* ==========================================================
-     STATE
-  ========================================================== */
+  const prevButton = document.querySelector("[data-nav-prev]");
+  const nextButton = document.querySelector("[data-nav-next]");
+  const activeTitle = document.querySelector("[data-active-title]");
 
   let currentIndex = 0;
   let standbyTimer = null;
-  let standbyActive = false;
+  let isNavigating = false;
 
+  /* -------------------------------------------------------
+     LOADER / SIPARIO
+  ------------------------------------------------------- */
 
-  /* ==========================================================
-     LOADER
-  ========================================================== */
+  function enterSite() {
+    if (!loader) {
+      body.classList.add("is-ready");
+      return;
+    }
 
-  const hideLoader = () => {
-    if (!loader) return;
+    const enter = () => {
+      loader.classList.add("is-hidden");
+      body.classList.add("is-ready");
 
-    loader.classList.add("is-hidden");
-    loader.setAttribute("aria-hidden", "true");
+      window.setTimeout(() => {
+        loader.setAttribute("aria-hidden", "true");
+      }, reducedMotion ? 0 : 900);
+    };
 
-    document.body.classList.remove("is-locked");
-  };
+    if (reducedMotion) {
+      enter();
+      return;
+    }
 
-
-  const startLoader = () => {
-    document.body.classList.add("is-locked");
-
-    /*
-      Il loader non dipende da GSAP.
-      La pagina può quindi entrare anche se
-      il motion engine non è disponibile.
-    */
-
-    window.setTimeout(hideLoader, 1200);
-  };
-
-
-  /* ==========================================================
-     MENU
-  ========================================================== */
-
-  const openMenu = () => {
-    if (!menuToggle || !siteMenu) return;
-
-    siteMenu.classList.add("is-open");
-
-    siteMenu.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-    menuToggle.setAttribute(
-      "aria-expanded",
-      "true"
-    );
-
-    document.body.classList.add("is-locked");
-  };
-
-
-  const closeMenu = () => {
-    if (!menuToggle || !siteMenu) return;
-
-    siteMenu.classList.remove("is-open");
-
-    siteMenu.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-
-    menuToggle.setAttribute(
-      "aria-expanded",
-      "false"
-    );
-
-    document.body.classList.remove("is-locked");
-  };
-
-
-  if (menuToggle) {
-
-    menuToggle.addEventListener(
-      "click",
-      () => {
-
-        if (
-          siteMenu.classList.contains("is-open")
-        ) {
-          closeMenu();
-        } else {
-          openMenu();
-        }
-
-      }
-    );
-
+    window.setTimeout(enter, 1600);
   }
 
-
-  document
-    .querySelectorAll(".site-menu__nav a")
-    .forEach((link) => {
-
-      link.addEventListener(
-        "click",
-        closeMenu
-      );
-
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", enterSite, {
+      once: true
     });
+  } else {
+    enterSite();
+  }
 
+  /* -------------------------------------------------------
+     MENU
+  ------------------------------------------------------- */
 
-  document.addEventListener(
-    "keydown",
-    (event) => {
+  function openMenu() {
+    if (!menu) return;
 
-      if (event.key === "Escape") {
-        closeMenu();
-        hideStandby();
-      }
+    menu.classList.add("is-open");
+    menu.setAttribute("aria-hidden", "false");
+    body.classList.add("menu-open");
 
+    if (menuToggle) {
+      menuToggle.setAttribute("aria-expanded", "true");
     }
-  );
+  }
 
+  function closeMenu() {
+    if (!menu) return;
 
-  /* ==========================================================
-     NARRATIVE NAVIGATION
-     NORMAL DOCUMENT FLOW
-  ========================================================== */
+    menu.classList.remove("is-open");
+    menu.setAttribute("aria-hidden", "true");
+    body.classList.remove("menu-open");
 
-  const scrollToSection = (index) => {
+    if (menuToggle) {
+      menuToggle.setAttribute("aria-expanded", "false");
+    }
+  }
 
-    if (!sections[index]) return;
+  if (menuToggle) {
+    menuToggle.addEventListener("click", () => {
+      if (menu && menu.classList.contains("is-open")) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    });
+  }
 
-    sections[index].scrollIntoView({
-      behavior:
-        window.matchMedia(
-          "(prefers-reduced-motion: reduce)"
-        ).matches
-          ? "auto"
-          : "smooth",
+  if (menuClose) {
+    menuClose.addEventListener("click", closeMenu);
+  }
+
+  if (menu) {
+    menu.addEventListener("click", (event) => {
+      const link = event.target.closest("a");
+
+      if (link) {
+        closeMenu();
+      }
+    });
+  }
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeMenu();
+    }
+  });
+
+  /* -------------------------------------------------------
+     NARRATIVE SECTIONS
+  ------------------------------------------------------- */
+
+  function updateNavigation(index) {
+    currentIndex = index;
+
+    if (activeTitle && titles[index]) {
+      activeTitle.textContent = titles[index].textContent;
+    }
+
+    if (prevButton) {
+      prevButton.disabled = index === 0;
+      prevButton.setAttribute(
+        "aria-disabled",
+        index === 0 ? "true" : "false"
+      );
+    }
+
+    if (nextButton) {
+      nextButton.disabled = false;
+      nextButton.setAttribute("aria-disabled", "false");
+    }
+
+    sections.forEach((section, sectionIndex) => {
+      const isActive = sectionIndex === index;
+
+      section.classList.toggle("is-active", isActive);
+      section.setAttribute("aria-hidden", isActive ? "false" : "true");
+    });
+  }
+
+  function goToSection(index) {
+    if (!sections.length || isNavigating) return;
+
+    const targetIndex = Math.max(
+      0,
+      Math.min(index, sections.length - 1)
+    );
+
+    if (targetIndex === currentIndex) return;
+
+    isNavigating = true;
+
+    const currentSection = sections[currentIndex];
+    const targetSection = sections[targetIndex];
+
+    if (!currentSection || !targetSection) {
+      isNavigating = false;
+      return;
+    }
+
+    if (reducedMotion) {
+      currentSection.classList.remove("is-active");
+      targetSection.classList.add("is-active");
+      updateNavigation(targetIndex);
+
+      targetSection.scrollIntoView({
+        behavior: "auto",
+        block: "start"
+      });
+
+      isNavigating = false;
+      return;
+    }
+
+    targetSection.scrollIntoView({
+      behavior: "smooth",
       block: "start"
     });
 
-    resetStandbyTimer();
+    window.setTimeout(() => {
+      updateNavigation(targetIndex);
+      isNavigating = false;
+    }, 700);
+  }
 
-  };
+  function goPrevious() {
+    if (currentIndex <= 0) return;
+    goToSection(currentIndex - 1);
+  }
 
+  function goNext() {
+    if (!sections.length) return;
 
-  document
-    .querySelectorAll("[data-next]")
-    .forEach((button) => {
+    if (currentIndex >= sections.length - 1) {
+      goToSection(0);
+      return;
+    }
 
-      button.addEventListener(
-        "click",
-        () => {
+    goToSection(currentIndex + 1);
+  }
 
-          if (
-            currentIndex ===
-            sections.length - 1
-          ) {
+  if (prevButton) {
+    prevButton.addEventListener("click", goPrevious);
+  }
 
-            scrollToSection(0);
+  if (nextButton) {
+    nextButton.addEventListener("click", goNext);
+  }
 
-            return;
-          }
+  /* -------------------------------------------------------
+     ACTIVE SECTION DETECTION
+  ------------------------------------------------------- */
 
-          scrollToSection(
-            currentIndex + 1
-          );
-
-        }
-      );
-
-    });
-
-
-  document
-    .querySelectorAll("[data-prev]")
-    .forEach((button) => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          if (currentIndex <= 0) {
-            return;
-          }
-
-          scrollToSection(
-            currentIndex - 1
-          );
-
-        }
-      );
-
-    });
-
-
-  /* ==========================================================
-     ACTIVE SECTION
-  ========================================================== */
-
-  const updateActiveSection = (index) => {
-
-    currentIndex = index;
-
-    document
-      .querySelectorAll(".narrative-navigation")
-      .forEach((navigation, navigationIndex) => {
-
-        const section =
-          navigation.closest(
-            ".narrative-section"
-          );
-
-        if (!section) return;
-
-        const sectionIndex =
-          sections.indexOf(section);
-
-        const title =
-          navigation.querySelector(
-            ".narrative-navigation__title"
-          );
-
-        const previous =
-          navigation.querySelector(
-            "[data-prev]"
-          );
-
-        if (title) {
-          title.textContent =
-            section.dataset.title || "";
-        }
-
-        if (previous) {
-          previous.disabled =
-            sectionIndex === 0;
-        }
-
-        /*
-          La navigazione appartiene alla singola
-          sezione e rimane nel normale document flow.
-        */
-
-        navigation.dataset.active =
-          sectionIndex === index
-            ? "true"
-            : "false";
-
-      });
-
-  };
-
-
-  const sectionObserver =
-    new IntersectionObserver(
+  if ("IntersectionObserver" in window && sections.length) {
+    const observer = new IntersectionObserver(
       (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort(
+            (a, b) =>
+              b.intersectionRatio - a.intersectionRatio
+          );
 
-        entries.forEach((entry) => {
+        if (!visible.length || isNavigating) return;
 
-          if (
-            entry.isIntersecting &&
-            entry.intersectionRatio >= 0.45
-          ) {
+        const index = sections.indexOf(visible[0].target);
 
-            const index =
-              sections.indexOf(entry.target);
-
-            if (index !== -1) {
-              updateActiveSection(index);
-            }
-
-          }
-
-        });
-
+        if (index !== -1 && index !== currentIndex) {
+          updateNavigation(index);
+        }
       },
       {
-        threshold: [0.45]
+        threshold: [0.35, 0.55, 0.75],
+        rootMargin: "-10% 0px -10% 0px"
       }
     );
 
+    sections.forEach((section) => observer.observe(section));
+  }
 
-  sections.forEach((section) => {
-    sectionObserver.observe(section);
+  /* -------------------------------------------------------
+     KEYBOARD NAVIGATION
+  ------------------------------------------------------- */
+
+  document.addEventListener("keydown", (event) => {
+    if (body.classList.contains("menu-open")) return;
+
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      goPrevious();
+    }
+
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      goNext();
+    }
   });
 
+  /* -------------------------------------------------------
+     STANDBY
+  ------------------------------------------------------- */
 
-  /* ==========================================================
-     MOTION
-  ========================================================== */
+  function showStandby() {
+    if (!standby) return;
 
-  const initMotion = () => {
+    standby.classList.add("is-visible");
+    standby.setAttribute("aria-hidden", "false");
+  }
 
-    const reducedMotion =
-      window.matchMedia(
-        "(prefers-reduced-motion: reduce)"
-      ).matches;
+  function hideStandby() {
+    if (!standby) return;
+
+    standby.classList.remove("is-visible");
+    standby.setAttribute("aria-hidden", "true");
+  }
+
+  function resetStandbyTimer() {
+    if (!standby) return;
+
+    if (standbyTimer) {
+      window.clearTimeout(standbyTimer);
+    }
+
+    hideStandby();
+
+    standbyTimer = window.setTimeout(() => {
+      showStandby();
+    }, 40000);
+  }
+
+  [
+    "pointermove",
+    "pointerdown",
+    "wheel",
+    "touchstart",
+    "keydown",
+    "scroll"
+  ].forEach((eventName) => {
+    window.addEventListener(eventName, resetStandbyTimer, {
+      passive: eventName !== "keydown"
+    });
+  });
+
+  if (standby) {
+    standby.addEventListener("click", () => {
+      hideStandby();
+
+      const currentSection = sections[currentIndex];
+
+      if (currentSection) {
+        currentSection.scrollIntoView({
+          behavior: reducedMotion ? "auto" : "smooth",
+          block: "start"
+        });
+      }
+
+      resetStandbyTimer();
+    });
+  }
+
+  resetStandbyTimer();
+
+  /* -------------------------------------------------------
+     GSAP / SCROLLTRIGGER
+  ------------------------------------------------------- */
+
+  function initMotion() {
+    if (reducedMotion) return;
 
     if (
-      reducedMotion ||
-      typeof window.gsap === "undefined"
+      typeof window.gsap === "undefined" ||
+      typeof window.ScrollTrigger === "undefined"
     ) {
       return;
     }
 
-    if (
-      typeof window.ScrollTrigger !==
-      "undefined"
-    ) {
+    const gsap = window.gsap;
+    const ScrollTrigger = window.ScrollTrigger;
 
-      gsap.registerPlugin(
-        ScrollTrigger
+    gsap.registerPlugin(ScrollTrigger);
+
+    sections.forEach((section) => {
+      const title = section.querySelector(
+        "[data-section-heading]"
       );
 
-    }
-
-
-    /* --------------------------------------------------------
-       GUARDA.
-    -------------------------------------------------------- */
-
-    const introTitle =
-      document.querySelector(
-        ".narrative-section--intro .section__title"
+      const content = section.querySelector(
+        "[data-section-content]"
       );
 
-    if (introTitle) {
-
-      gsap.fromTo(
-        introTitle,
-        {
-          opacity: 0,
-          y: 24
-        },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1.25,
-          ease: "power3.out",
-          delay: 0.35
-        }
-      );
-
-    }
-
-
-    if (
-      typeof window.ScrollTrigger ===
-      "undefined"
-    ) {
-      return;
-    }
-
-
-    /* --------------------------------------------------------
-       BODY
-    -------------------------------------------------------- */
-
-    sections
-      .filter(
-        (section) =>
-          section.id !== "section-01"
-      )
-      .forEach((section) => {
-
-        const body =
-          section.querySelector(
-            ".section__body"
-          );
-
-        if (!body) return;
-
+      if (title) {
         gsap.fromTo(
-          body,
+          title,
           {
             opacity: 0,
-            y: 28
+            y: 24,
+            scale: 0.985
           },
           {
             opacity: 1,
             y: 0,
-            duration: 1,
-            ease: "power3.out",
-
+            scale: 1,
+            duration: 0.9,
+            ease: "power2.out",
             scrollTrigger: {
               trigger: section,
               start: "top 72%",
-              end: "top 42%",
-              toggleActions:
-                "play none none reverse"
+              once: true
             }
-
           }
         );
+      }
 
-      });
-
-
-    /* --------------------------------------------------------
-       TERRITORY
-    -------------------------------------------------------- */
-
-    const map =
-      document.querySelector(
-        ".territory-map"
-      );
-
-    if (map) {
-
-      gsap.fromTo(
-        map,
-        {
-          opacity: 0,
-          y: 24
-        },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1,
-          ease: "power3.out",
-
-          scrollTrigger: {
-            trigger: "#section-11",
-            start: "top 72%",
-            toggleActions:
-              "play none none reverse"
+      if (content) {
+        gsap.fromTo(
+          content,
+          {
+            opacity: 0,
+            y: 18
+          },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            delay: 0.12,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: section,
+              start: "top 66%",
+              once: true
+            }
           }
-        }
-      );
+        );
+      }
+    });
 
-    }
-
-
-    /* --------------------------------------------------------
-       PORTRAIT
-    -------------------------------------------------------- */
-
-    const portrait =
-      document.querySelector(
-        ".portrait"
-      );
-
-    if (portrait) {
-
-      gsap.fromTo(
-        portrait,
-        {
-          opacity: 0,
-          y: 24
-        },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1.1,
-          ease: "power3.out",
-
-          scrollTrigger: {
-            trigger: "#section-13",
-            start: "top 72%",
-            toggleActions:
-              "play none none reverse"
-          }
-        }
-      );
-
-    }
-
-  };
-
-
-  /* ==========================================================
-     STANDBY
-  ========================================================== */
-
-  const STANDBY_DELAY = 40000;
-
-
-  const clearStandbyTimer = () => {
-
-    if (standbyTimer !== null) {
-
-      window.clearTimeout(
-        standbyTimer
-      );
-
-      standbyTimer = null;
-
-    }
-
-  };
-
-
-  const showStandby = () => {
-
-    if (!standby) return;
-
-    standbyActive = true;
-
-    standby.classList.add(
-      "is-active"
-    );
-
-    standby.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-  };
-
-
-  function hideStandby() {
-
-    if (!standby) return;
-
-    standbyActive = false;
-
-    standby.classList.remove(
-      "is-active"
-    );
-
-    standby.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-
+    ScrollTrigger.refresh();
   }
 
-
-  const resetStandbyTimer = () => {
-
-    clearStandbyTimer();
-
-    if (standbyActive) {
-      hideStandby();
-    }
-
-    standbyTimer =
-      window.setTimeout(
-        showStandby,
-        STANDBY_DELAY
-      );
-
-  };
-
-
-  [
-    "pointerdown",
-    "pointermove",
-    "wheel",
-    "touchstart",
-    "keydown"
-  ].forEach((eventName) => {
-
-    window.addEventListener(
-      eventName,
-      () => {
-        resetStandbyTimer();
-      },
-      {
-        passive: true
-      }
-    );
-
-  });
-
-
-  /* ==========================================================
-     INITIALIZATION
-  ========================================================== */
-
-  const init = () => {
-
-    updateActiveSection(0);
-
-    startLoader();
-
-    initMotion();
-
-    resetStandbyTimer();
-
-  };
-
-
-  if (
-    document.readyState ===
-    "loading"
-  ) {
-
-    document.addEventListener(
-      "DOMContentLoaded",
-      init,
-      {
-        once: true
-      }
-    );
-
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initMotion, {
+      once: true
+    });
   } else {
+    initMotion();
+  }
 
-    init();
+  /* -------------------------------------------------------
+     INITIAL STATE
+  ------------------------------------------------------- */
 
+  if (sections.length) {
+    updateNavigation(0);
   }
 
 })();
