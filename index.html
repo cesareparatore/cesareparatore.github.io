@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#0B0B0A">
+
   <meta name="description" content="Cesare Paratore">
+  <meta name="theme-color" content="#0B0B0A">
 
   <title>Cesare Paratore</title>
 
-  <link rel="preconnect" href="https://cdn.jsdelivr.net">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="style.css">
 
   <script
     src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"
@@ -26,9 +26,7 @@
 
 <body>
 
-  <!-- =========================================================
-       LOADER
-  ========================================================== -->
+  <!-- LOADER -->
 
   <div class="loader" id="loader" aria-hidden="false">
     <div class="loader__inner">
@@ -37,23 +35,19 @@
         src="assets/images/cp-mark.svg"
         alt="CP"
       >
-
-      <div class="loader__name">
-        CESARE PARATORE
-      </div>
+      <div class="loader__name">CESARE PARATORE</div>
     </div>
   </div>
 
 
-  <!-- =========================================================
-       HEADER
-  ========================================================== -->
+  <!-- HEADER -->
 
   <header class="site-header">
+
     <a
       class="site-header__logo"
       href="#section-01"
-      aria-label="Cesare Paratore — torna all'inizio"
+      aria-label="Cesare Paratore"
     >
       <img
         src="assets/images/cp-mark.svg"
@@ -69,72 +63,80 @@
     >
       MENU
     </button>
+
   </header>
 
 
-  <!-- =========================================================
-       MENU
-  ========================================================== -->
+  <!-- MENU -->
 
   <aside
     class="site-menu"
     id="site-menu"
     aria-hidden="true"
   >
-    <div class="site-menu__inner">
-
-      <nav class="site-menu__nav" aria-label="Navigazione principale">
-
-        <a href="#section-01">GUARDA.</a>
-        <a href="#section-02">COME?</a>
-        <a href="#section-03">MOVIMENTO.</a>
-        <a href="#section-04">CAPIRE.</a>
-        <a href="#section-05">TRASMETTERE.</a>
-        <a href="#section-06">COSTRUIRE.</a>
-        <a href="#section-07">RITORNA.</a>
-        <a href="#section-08">COLLEGARE.</a>
-        <a href="#section-09">OGGI.</a>
-        <a href="#section-10">OBIETTIVO.</a>
-        <a href="#section-11">QUI.</a>
-        <a href="#section-12">DA QUI.</a>
-        <a href="#section-13">ECCOMI.</a>
-        <a href="#section-14">SCRIVIMI.</a>
-
-      </nav>
-
-    </div>
+    <nav
+      class="site-menu__nav"
+      aria-label="Navigazione principale"
+    >
+      <a href="#section-01">GUARDA.</a>
+      <a href="#section-02">COME?</a>
+      <a href="#section-03">MOVIMENTO.</a>
+      <a href="#section-04">CAPIRE.</a>
+      <a href="#section-05">TRASMETTERE.</a>
+      <a href="#section-06">COSTRUIRE.</a>
+      <a href="#section-07">RITORNA.</a>
+      <a href="#section-08">COLLEGARE.</a>
+      <a href="#section-09">OGGI.</a>
+      <a href="#section-10">OBIETTIVO.</a>
+      <a href="#section-11">QUI.</a>
+      <a href="#section-12">DA QUI.</a>
+      <a href="#section-13">ECCOMI.</a>
+      <a href="#section-14">SCRIVIMI.</a>
+    </nav>
   </aside>
 
 
-  <!-- =========================================================
-       MAIN
-  ========================================================== -->
+  <main>
 
-  <main id="main-content">
-
-
-    <!-- =======================================================
-         01 — GUARDA.
-    ======================================================== -->
+    <!-- 01 — GUARDA. -->
 
     <section
       class="narrative-section narrative-section--intro"
       id="section-01"
       data-title="GUARDA."
     >
-      <div class="section__inner section__inner--intro">
+      <div class="section__inner">
+        <h1 class="section__title">GUARDA.</h1>
+      </div>
 
-        <h1 class="section__title">
+      <div class="narrative-navigation">
+        <button
+          class="narrative-navigation__button"
+          type="button"
+          data-prev
+          disabled
+          aria-label="Sezione precedente"
+        >
+          <span aria-hidden="true">←</span>
+        </button>
+
+        <div class="narrative-navigation__title">
           GUARDA.
-        </h1>
+        </div>
 
+        <button
+          class="narrative-navigation__button"
+          type="button"
+          data-next
+          aria-label="Sezione successiva"
+        >
+          <span aria-hidden="true">→</span>
+        </button>
       </div>
     </section>
 
 
-    <!-- =======================================================
-         02 — COME?
-    ======================================================== -->
+    <!-- 02 — COME? -->
 
     <section
       class="narrative-section"
@@ -166,12 +168,22 @@
         </div>
 
       </div>
+
+      <div class="narrative-navigation">
+        <button class="narrative-navigation__button" type="button" data-prev aria-label="Sezione precedente">
+          <span aria-hidden="true">←</span>
+        </button>
+
+        <div class="narrative-navigation__title">COME?</div>
+
+        <button class="narrative-navigation__button" type="button" data-next aria-label="Sezione successiva">
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
     </section>
 
 
-    <!-- =======================================================
-         03 — MOVIMENTO.
-    ======================================================== -->
+    <!-- 03 — MOVIMENTO. -->
 
     <section
       class="narrative-section"
@@ -203,12 +215,22 @@
         </div>
 
       </div>
+
+      <div class="narrative-navigation">
+        <button class="narrative-navigation__button" type="button" data-prev aria-label="Sezione precedente">
+          <span aria-hidden="true">←</span>
+        </button>
+
+        <div class="narrative-navigation__title">MOVIMENTO.</div>
+
+        <button class="narrative-navigation__button" type="button" data-next aria-label="Sezione successiva">
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
     </section>
 
 
-    <!-- =======================================================
-         04 — CAPIRE.
-    ======================================================== -->
+    <!-- 04 — CAPIRE. -->
 
     <section
       class="narrative-section"
@@ -230,12 +252,22 @@
         </div>
 
       </div>
+
+      <div class="narrative-navigation">
+        <button class="narrative-navigation__button" type="button" data-prev aria-label="Sezione precedente">
+          <span aria-hidden="true">←</span>
+        </button>
+
+        <div class="narrative-navigation__title">CAPIRE.</div>
+
+        <button class="narrative-navigation__button" type="button" data-next aria-label="Sezione successiva">
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
     </section>
 
 
-    <!-- =======================================================
-         05 — TRASMETTERE.
-    ======================================================== -->
+    <!-- 05 — TRASMETTERE. -->
 
     <section
       class="narrative-section"
@@ -261,12 +293,22 @@
         </div>
 
       </div>
+
+      <div class="narrative-navigation">
+        <button class="narrative-navigation__button" type="button" data-prev aria-label="Sezione precedente">
+          <span aria-hidden="true">←</span>
+        </button>
+
+        <div class="narrative-navigation__title">TRASMETTERE.</div>
+
+        <button class="narrative-navigation__button" type="button" data-next aria-label="Sezione successiva">
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
     </section>
 
 
-    <!-- =======================================================
-         06 — COSTRUIRE.
-    ======================================================== -->
+    <!-- 06 — COSTRUIRE. -->
 
     <section
       class="narrative-section"
@@ -292,12 +334,22 @@
         </div>
 
       </div>
+
+      <div class="narrative-navigation">
+        <button class="narrative-navigation__button" type="button" data-prev aria-label="Sezione precedente">
+          <span aria-hidden="true">←</span>
+        </button>
+
+        <div class="narrative-navigation__title">COSTRUIRE.</div>
+
+        <button class="narrative-navigation__button" type="button" data-next aria-label="Sezione successiva">
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
     </section>
 
 
-    <!-- =======================================================
-         07 — RITORNA.
-    ======================================================== -->
+    <!-- 07 — RITORNA. -->
 
     <section
       class="narrative-section"
@@ -329,12 +381,22 @@
         </div>
 
       </div>
+
+      <div class="narrative-navigation">
+        <button class="narrative-navigation__button" type="button" data-prev aria-label="Sezione precedente">
+          <span aria-hidden="true">←</span>
+        </button>
+
+        <div class="narrative-navigation__title">RITORNA.</div>
+
+        <button class="narrative-navigation__button" type="button" data-next aria-label="Sezione successiva">
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
     </section>
 
 
-    <!-- =======================================================
-         08 — COLLEGARE.
-    ======================================================== -->
+    <!-- 08 — COLLEGARE. -->
 
     <section
       class="narrative-section"
@@ -358,12 +420,22 @@
         </div>
 
       </div>
+
+      <div class="narrative-navigation">
+        <button class="narrative-navigation__button" type="button" data-prev aria-label="Sezione precedente">
+          <span aria-hidden="true">←</span>
+        </button>
+
+        <div class="narrative-navigation__title">COLLEGARE.</div>
+
+        <button class="narrative-navigation__button" type="button" data-next aria-label="Sezione successiva">
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
     </section>
 
 
-    <!-- =======================================================
-         09 — OGGI.
-    ======================================================== -->
+    <!-- 09 — OGGI. -->
 
     <section
       class="narrative-section"
@@ -393,12 +465,22 @@
         </div>
 
       </div>
+
+      <div class="narrative-navigation">
+        <button class="narrative-navigation__button" type="button" data-prev aria-label="Sezione precedente">
+          <span aria-hidden="true">←</span>
+        </button>
+
+        <div class="narrative-navigation__title">OGGI.</div>
+
+        <button class="narrative-navigation__button" type="button" data-next aria-label="Sezione successiva">
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
     </section>
 
 
-    <!-- =======================================================
-         10 — OBIETTIVO.
-    ======================================================== -->
+    <!-- 10 — OBIETTIVO. -->
 
     <section
       class="narrative-section"
@@ -424,12 +506,22 @@
         </div>
 
       </div>
+
+      <div class="narrative-navigation">
+        <button class="narrative-navigation__button" type="button" data-prev aria-label="Sezione precedente">
+          <span aria-hidden="true">←</span>
+        </button>
+
+        <div class="narrative-navigation__title">OBIETTIVO.</div>
+
+        <button class="narrative-navigation__button" type="button" data-next aria-label="Sezione successiva">
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
     </section>
 
 
-    <!-- =======================================================
-         11 — QUI.
-    ======================================================== -->
+    <!-- 11 — QUI. -->
 
     <section
       class="narrative-section narrative-section--territory"
@@ -473,12 +565,22 @@
         </div>
 
       </div>
+
+      <div class="narrative-navigation">
+        <button class="narrative-navigation__button" type="button" data-prev aria-label="Sezione precedente">
+          <span aria-hidden="true">←</span>
+        </button>
+
+        <div class="narrative-navigation__title">QUI.</div>
+
+        <button class="narrative-navigation__button" type="button" data-next aria-label="Sezione successiva">
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
     </section>
 
 
-    <!-- =======================================================
-         12 — DA QUI.
-    ======================================================== -->
+    <!-- 12 — DA QUI. -->
 
     <section
       class="narrative-section"
@@ -493,9 +595,7 @@
 
           <p><strong>NON SOLO QUI.</strong></p>
 
-          <p>
-            È qui che il mio lavoro ha la sua base.
-          </p>
+          <p>È qui che il mio lavoro ha la sua base.</p>
 
           <p>
             In presenza, per chi parte da qui<br>
@@ -522,9 +622,7 @@
             si può guardare avanti.
           </p>
 
-          <p>
-            Verso un altro punto.
-          </p>
+          <p>Verso un altro punto.</p>
 
           <p>
             E da lì<br>
@@ -534,12 +632,22 @@
         </div>
 
       </div>
+
+      <div class="narrative-navigation">
+        <button class="narrative-navigation__button" type="button" data-prev aria-label="Sezione precedente">
+          <span aria-hidden="true">←</span>
+        </button>
+
+        <div class="narrative-navigation__title">DA QUI.</div>
+
+        <button class="narrative-navigation__button" type="button" data-next aria-label="Sezione successiva">
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
     </section>
 
 
-    <!-- =======================================================
-         13 — ECCOMI.
-    ======================================================== -->
+    <!-- 13 — ECCOMI. -->
 
     <section
       class="narrative-section narrative-section--portrait"
@@ -556,19 +664,29 @@
 
         <figure class="portrait">
           <img
-            src="assets/images/cp-foto.webp"
+            src="assets/images/cesare-paratore.jpg"
             alt="Cesare Paratore"
             loading="lazy"
           >
         </figure>
 
       </div>
+
+      <div class="narrative-navigation">
+        <button class="narrative-navigation__button" type="button" data-prev aria-label="Sezione precedente">
+          <span aria-hidden="true">←</span>
+        </button>
+
+        <div class="narrative-navigation__title">ECCOMI.</div>
+
+        <button class="narrative-navigation__button" type="button" data-next aria-label="Sezione successiva">
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
     </section>
 
 
-    <!-- =======================================================
-         14 — SCRIVIMI.
-    ======================================================== -->
+    <!-- 14 — SCRIVIMI. -->
 
     <section
       class="narrative-section narrative-section--contact"
@@ -584,53 +702,24 @@
         </div>
 
       </div>
+
+      <div class="narrative-navigation">
+        <button class="narrative-navigation__button" type="button" data-prev aria-label="Sezione precedente">
+          <span aria-hidden="true">←</span>
+        </button>
+
+        <div class="narrative-navigation__title">SCRIVIMI.</div>
+
+        <button class="narrative-navigation__button" type="button" data-next aria-label="Torna all'inizio">
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
     </section>
 
   </main>
 
 
-  <!-- =========================================================
-       NARRATIVE NAVIGATION
-  ========================================================== -->
-
-  <nav
-    class="narrative-navigation"
-    aria-label="Navigazione narrativa"
-  >
-
-    <button
-      class="narrative-navigation__button narrative-navigation__button--prev"
-      type="button"
-      aria-label="Sezione precedente"
-      data-narrative-prev
-      disabled
-    >
-      <span aria-hidden="true">←</span>
-    </button>
-
-    <div
-      class="narrative-navigation__title"
-      data-active-title
-      aria-live="polite"
-    >
-      GUARDA.
-    </div>
-
-    <button
-      class="narrative-navigation__button narrative-navigation__button--next"
-      type="button"
-      aria-label="Sezione successiva"
-      data-narrative-next
-    >
-      <span aria-hidden="true">→</span>
-    </button>
-
-  </nav>
-
-
-  <!-- =========================================================
-       FOOTER
-  ========================================================== -->
+  <!-- FOOTER -->
 
   <footer class="site-footer">
 
@@ -648,15 +737,12 @@
   </footer>
 
 
-  <!-- =========================================================
-       STANDBY
-  ========================================================== -->
+  <!-- STANDBY -->
 
   <div
     class="standby"
     id="standby"
     aria-hidden="true"
-    data-standby
   >
     <div class="standby__title">
       GUARDA.
