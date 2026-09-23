@@ -1,85 +1,145 @@
+/* =========================================================
+   CESARE PARATORE
+   Main script — V3.2
+   ========================================================= */
+
 (() => {
   "use strict";
 
-  /* =========================================================
+
+  /* =======================================================
      DOM
-     ========================================================= */
+     ======================================================= */
 
   const body = document.body;
-  const header = document.querySelector(".site-header");
-  const menu = document.querySelector(".site-menu");
-  const menuTrigger = document.querySelector(".menu-trigger");
+
+  const header =
+    document.querySelector(".site-header");
+
+  const menu =
+    document.querySelector(".site-menu");
+
+  const menuTrigger =
+    document.querySelector(".menu-trigger");
+
   const menuLinks = menu
     ? [...menu.querySelectorAll("a")]
     : [];
 
-  const main = document.querySelector("main");
-  const footer = document.querySelector(".site-footer");
+  const main =
+    document.querySelector("main");
 
-  const loader = document.querySelector(".loader");
-  const standby = document.querySelector(".standby");
+  const footer =
+    document.querySelector(".site-footer");
+
+  const loader =
+    document.querySelector(".loader");
+
+  const standby =
+    document.querySelector(".standby");
 
   const sections = [
     ...document.querySelectorAll(".story-section")
   ];
 
-  const nav = document.querySelector(".section-nav");
-  const prevButton = document.querySelector(".section-nav-prev");
-  const nextButton = document.querySelector(".section-nav-next");
-  const navTitle = document.querySelector(".section-nav-title");
+  const sectionNav =
+    document.querySelector(".section-nav");
 
-  const prefersReducedMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)"
-  );
+  const prevButton =
+    document.querySelector(".section-nav-prev");
+
+  const nextButton =
+    document.querySelector(".section-nav-next");
+
+  const navTitle =
+    document.querySelector(".section-nav-title");
 
 
-  /* =========================================================
+  /* =======================================================
      STATE
-     ========================================================= */
+     ======================================================= */
 
   let activeIndex = 0;
+
   let menuOpen = false;
+
   let lastFocusedElement = null;
 
   let standbyTimer = null;
+
   let standbyVisible = false;
 
+  let loaderHidden = false;
+
   let scrollTicking = false;
+
   let resizeTimer = null;
+
+  let activityQueued = false;
+
+
+  /* =======================================================
+     CONFIG
+     ======================================================= */
 
   const STANDBY_DELAY = 40000;
 
+  const reducedMotionQuery =
+    window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    );
 
-  /* =========================================================
+
+  /* =======================================================
+     GSAP
+     ======================================================= */
+
+  const GSAP =
+    window.gsap || null;
+
+  const ScrollTrigger =
+    window.ScrollTrigger || null;
+
+  const hasGSAP =
+    Boolean(GSAP);
+
+
+  /* =======================================================
      UTILITIES
-     ========================================================= */
+     ======================================================= */
 
-  const clamp = (value, min, max) =>
-    Math.min(Math.max(value, min), max);
+  const getReducedMotion = () => {
+    return reducedMotionQuery.matches;
+  };
 
 
   const getHeaderHeight = () => {
     return header
-      ? Math.ceil(header.getBoundingClientRect().height)
+      ? Math.ceil(
+          header.getBoundingClientRect().height
+        )
       : 0;
   };
 
 
-  const getReducedMotion = () => {
-    return prefersReducedMotion.matches;
+  const clamp = (
+    value,
+    min,
+    max
+  ) => {
+    return Math.min(
+      Math.max(value, min),
+      max
+    );
   };
 
 
-  const setBodyScrollLock = (locked) => {
-    body.classList.toggle("menu-open", locked);
-  };
-
-
-  /* =========================================================
-     MENU / ACCESSIBILITY
-     ========================================================= */
+  /* =======================================================
+     ACCESSIBILITY
+     ======================================================= */
 
   const setMainInert = (value) => {
+
     if (main) {
       if (value) {
         main.setAttribute("inert", "");
@@ -95,11 +155,21 @@
         footer.removeAttribute("inert");
       }
     }
+
   };
 
 
-  const updateMenuState = (open) => {
-    if (!menu || !menuTrigger) return;
+  /* =======================================================
+     MENU
+     ======================================================= */
+
+  const updateMenuState = (
+    open
+  ) => {
+
+    if (!menu || !menuTrigger) {
+      return;
+    }
 
     menuOpen = open;
 
@@ -113,21 +183,31 @@
       String(!open)
     );
 
-    menu.classList.toggle("is-open", open);
+    menu.classList.toggle(
+      "is-open",
+      open
+    );
 
-    setBodyScrollLock(open);
+    menuTrigger.classList.toggle(
+      "is-open",
+      open
+    );
+
+    body.classList.toggle(
+      "menu-open",
+      open
+    );
+
     setMainInert(open);
 
-    if (open) {
-      menuTrigger.classList.add("is-open");
-    } else {
-      menuTrigger.classList.remove("is-open");
-    }
   };
 
 
   const openMenu = () => {
-    if (menuOpen) return;
+
+    if (menuOpen) {
+      return;
+    }
 
     lastFocusedElement =
       document.activeElement instanceof HTMLElement
@@ -139,36 +219,46 @@
     window.requestAnimationFrame(() => {
       menuLinks[0]?.focus();
     });
+
   };
 
 
   const closeMenu = ({
     restoreFocus = true
   } = {}) => {
-    if (!menuOpen) return;
+
+    if (!menuOpen) {
+      return;
+    }
 
     updateMenuState(false);
 
     if (
       restoreFocus &&
       lastFocusedElement &&
-      typeof lastFocusedElement.focus === "function"
+      typeof lastFocusedElement.focus ===
+        "function"
     ) {
+
       window.requestAnimationFrame(() => {
         lastFocusedElement.focus();
       });
+
     }
 
     lastFocusedElement = null;
+
   };
 
 
   const toggleMenu = () => {
+
     if (menuOpen) {
       closeMenu();
     } else {
       openMenu();
     }
+
   };
 
 
@@ -179,132 +269,216 @@
 
 
   menuLinks.forEach((link) => {
-    link.addEventListener("click", () => {
-      closeMenu({
-        restoreFocus: false
-      });
-    });
+
+    link.addEventListener(
+      "click",
+      () => {
+        closeMenu({
+          restoreFocus: false
+        });
+      }
+    );
+
   });
 
+
+  /* =======================================================
+     MENU KEYBOARD
+     ======================================================= */
 
   document.addEventListener(
     "keydown",
     (event) => {
-      if (event.key === "Escape" && menuOpen) {
+
+      if (
+        event.key === "Escape" &&
+        menuOpen
+      ) {
+
         event.preventDefault();
+
         closeMenu();
+
         return;
       }
 
-      if (
-        event.key === "Tab" &&
-        menuOpen &&
-        menuLinks.length
-      ) {
-        const first = menuLinks[0];
-        const last = menuLinks[menuLinks.length - 1];
 
-        if (
-          event.shiftKey &&
-          document.activeElement === first
-        ) {
-          event.preventDefault();
-          last.focus();
-        } else if (
-          !event.shiftKey &&
-          document.activeElement === last
-        ) {
-          event.preventDefault();
-          first.focus();
-        }
+      if (
+        event.key !== "Tab" ||
+        !menuOpen ||
+        !menuLinks.length
+      ) {
+        return;
       }
+
+
+      const first =
+        menuLinks[0];
+
+      const last =
+        menuLinks[
+          menuLinks.length - 1
+        ];
+
+
+      if (
+        event.shiftKey &&
+        document.activeElement === first
+      ) {
+
+        event.preventDefault();
+
+        last.focus();
+
+      } else if (
+        !event.shiftKey &&
+        document.activeElement === last
+      ) {
+
+        event.preventDefault();
+
+        first.focus();
+
+      }
+
     }
   );
 
 
-  /* =========================================================
-     MENU LINK — INTERNAL SECTION SUPPORT
-     ========================================================= */
+  /* =======================================================
+     INTERNAL MENU LINKS
+     ======================================================= */
 
   menuLinks.forEach((link) => {
-    const href = link.getAttribute("href");
 
-    if (!href || !href.startsWith("#")) {
+    const href =
+      link.getAttribute("href");
+
+    if (
+      !href ||
+      !href.startsWith("#")
+    ) {
       return;
     }
 
-    link.addEventListener("click", (event) => {
-      const target = document.querySelector(href);
 
-      if (!target) return;
+    link.addEventListener(
+      "click",
+      (event) => {
 
-      event.preventDefault();
+        const target =
+          document.querySelector(href);
 
-      closeMenu({
-        restoreFocus: false
-      });
+        if (!target) {
+          return;
+        }
 
-      scrollToSection(
-        sections.indexOf(target)
-      );
-    });
+        event.preventDefault();
+
+        closeMenu({
+          restoreFocus: false
+        });
+
+        const index =
+          sections.indexOf(target);
+
+        if (index >= 0) {
+          scrollToSection(index);
+        }
+
+      }
+    );
+
   });
 
 
-  /* =========================================================
+  /* =======================================================
      SECTION NAVIGATION
-     ========================================================= */
+     ======================================================= */
 
-  const getSectionTitle = (section) => {
-    if (!section) return "";
+  const getSectionTitle = (
+    section
+  ) => {
+
+    if (!section) {
+      return "";
+    }
 
     const title =
-      section.querySelector(".story-title");
+      section.querySelector(
+        ".story-title"
+      );
 
     return title
       ? title.textContent.trim()
       : "";
+
   };
 
 
   const updateSectionNavigation = () => {
-    if (!sections.length) return;
 
-    const currentSection =
-      sections[activeIndex];
-
-    if (navTitle) {
-      navTitle.textContent =
-        getSectionTitle(currentSection);
+    if (!sections.length) {
+      return;
     }
 
-    if (prevButton) {
-      const disabled = activeIndex <= 0;
 
-      prevButton.disabled = disabled;
+    const current =
+      sections[activeIndex];
+
+
+    if (navTitle) {
+
+      navTitle.textContent =
+        getSectionTitle(current);
+
+    }
+
+
+    if (prevButton) {
+
+      const disabled =
+        activeIndex <= 0;
+
+      prevButton.disabled =
+        disabled;
+
       prevButton.setAttribute(
         "aria-disabled",
         String(disabled)
       );
+
     }
 
-    if (nextButton) {
-      const disabled =
-        activeIndex >= sections.length - 1;
 
-      nextButton.disabled = disabled;
+    if (nextButton) {
+
+      const disabled =
+        activeIndex >=
+        sections.length - 1;
+
+      nextButton.disabled =
+        disabled;
+
       nextButton.setAttribute(
         "aria-disabled",
         String(disabled)
       );
+
     }
 
-    sections.forEach((section, index) => {
-      section.dataset.active =
-        index === activeIndex
-          ? "true"
-          : "false";
-    });
+
+    sections.forEach(
+      (section, index) => {
+
+        section.dataset.active =
+          index === activeIndex
+            ? "true"
+            : "false";
+
+      }
+    );
+
   };
 
 
@@ -314,13 +488,18 @@
       force = false
     } = {}
   ) => {
-    if (!sections.length) return;
 
-    const nextIndex = clamp(
-      index,
-      0,
-      sections.length - 1
-    );
+    if (!sections.length) {
+      return;
+    }
+
+    const nextIndex =
+      clamp(
+        index,
+        0,
+        sections.length - 1
+      );
+
 
     if (
       !force &&
@@ -329,13 +508,19 @@
       return;
     }
 
-    activeIndex = nextIndex;
+
+    activeIndex =
+      nextIndex;
 
     updateSectionNavigation();
+
   };
 
 
-  const scrollToSection = (index) => {
+  const scrollToSection = (
+    index
+  ) => {
+
     if (
       index < 0 ||
       index >= sections.length
@@ -343,36 +528,48 @@
       return;
     }
 
-    const section = sections[index];
 
-    if (!section) return;
+    const section =
+      sections[index];
+
+    if (!section) {
+      return;
+    }
+
+
+    setActiveSection(index);
+
 
     const headerHeight =
       getHeaderHeight();
+
 
     const targetTop =
       window.scrollY +
       section.getBoundingClientRect().top -
       headerHeight;
 
-    const behavior =
-      getReducedMotion()
-        ? "auto"
-        : "smooth";
-
-    setActiveSection(index);
 
     window.scrollTo({
-      top: Math.max(0, targetTop),
-      behavior
+      top: Math.max(
+        0,
+        targetTop
+      ),
+      behavior:
+        getReducedMotion()
+          ? "auto"
+          : "smooth"
     });
+
   };
 
 
   prevButton?.addEventListener(
     "click",
     () => {
-      scrollToSection(activeIndex - 1);
+      scrollToSection(
+        activeIndex - 1
+      );
     }
   );
 
@@ -380,74 +577,137 @@
   nextButton?.addEventListener(
     "click",
     () => {
-      scrollToSection(activeIndex + 1);
+      scrollToSection(
+        activeIndex + 1
+      );
     }
   );
 
 
-  /* =========================================================
+  /* =======================================================
      ACTIVE SECTION ENGINE
-     
-     Single source of truth:
-     the section whose visual reading line is closest
-     to the viewport's upper narrative area.
-     ========================================================= */
+     ======================================================= */
 
-  const updateActiveSectionFromScroll = () => {
-    if (!sections.length) return;
+  const updateActiveSectionFromScroll =
+    () => {
 
-    const headerHeight =
-      getHeaderHeight();
+      if (!sections.length) {
+        return;
+      }
 
-    const readingLine =
-      headerHeight +
-      Math.min(
-        window.innerHeight * 0.28,
-        220
-      );
 
-    let closestIndex = activeIndex;
-    let closestDistance = Infinity;
+      const headerHeight =
+        getHeaderHeight();
 
-    sections.forEach((section, index) => {
-      const rect =
-        section.getBoundingClientRect();
 
-      const sectionCenter =
-        rect.top +
+      const readingLine =
+        headerHeight +
         Math.min(
-          rect.height * 0.5,
-          window.innerHeight * 0.5
+          window.innerHeight * 0.32,
+          260
         );
 
-      const distance =
-        Math.abs(sectionCenter - readingLine);
 
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestIndex = index;
+      let closestIndex =
+        activeIndex;
+
+      let closestDistance =
+        Infinity;
+
+
+      sections.forEach(
+        (section, index) => {
+
+          const rect =
+            section.getBoundingClientRect();
+
+
+          /*
+           * Se la reading line è dentro
+           * la sezione, quella è la sezione
+           * attiva.
+           */
+
+          if (
+            rect.top <= readingLine &&
+            rect.bottom >= readingLine
+          ) {
+
+            closestIndex =
+              index;
+
+            closestDistance =
+              0;
+
+            return;
+          }
+
+
+          /*
+           * Fallback per le zone tra
+           * una sezione e l'altra.
+           */
+
+          const distance =
+            readingLine < rect.top
+              ? rect.top -
+                readingLine
+              : readingLine -
+                rect.bottom;
+
+
+          if (
+            distance <
+            closestDistance
+          ) {
+
+            closestDistance =
+              distance;
+
+            closestIndex =
+              index;
+
+          }
+
+        }
+      );
+
+
+      if (
+        closestIndex !==
+        activeIndex
+      ) {
+
+        setActiveSection(
+          closestIndex
+        );
+
       }
-    });
 
-    if (
-      closestIndex !== activeIndex &&
-      closestDistance < window.innerHeight * 0.65
-    ) {
-      setActiveSection(closestIndex);
-    }
-  };
+    };
 
 
-  const requestScrollUpdate = () => {
-    if (scrollTicking) return;
+  const requestScrollUpdate =
+    () => {
 
-    scrollTicking = true;
+      if (scrollTicking) {
+        return;
+      }
 
-    window.requestAnimationFrame(() => {
-      updateActiveSectionFromScroll();
-      scrollTicking = false;
-    });
-  };
+      scrollTicking = true;
+
+
+      window.requestAnimationFrame(
+        () => {
+
+          updateActiveSectionFromScroll();
+
+          scrollTicking = false;
+
+        }
+      );
+
+    };
 
 
   window.addEventListener(
@@ -459,29 +719,22 @@
   );
 
 
-  /* =========================================================
-     GSAP
-     ========================================================= */
+  /* =======================================================
+     GSAP ANIMATIONS
+     ======================================================= */
 
-  const hasGSAP =
-    typeof window.gsap !== "undefined";
+  const animateSection = (
+    section
+  ) => {
 
-
-  const animateSection = (section) => {
-    if (!hasGSAP || !section) return;
-
-    if (getReducedMotion()) {
-      gsap.set(
-        section.querySelectorAll(
-          ".story-title, .story-body, .story-eyebrow, .story-index, .place-map, .portrait-frame, .contact-link"
-        ),
-        {
-          clearProps: "all"
-        }
-      );
-
+    if (
+      !hasGSAP ||
+      !section ||
+      getReducedMotion()
+    ) {
       return;
     }
+
 
     const title =
       section.querySelector(
@@ -514,25 +767,13 @@
       );
 
 
-    /* -------------------------------------------------------
-       Base
-       ------------------------------------------------------- */
-
-    gsap.set(
-      [title, bodyCopy, eyebrow, index, media, contact]
-        .filter(Boolean),
-      {
-        willChange: "transform, opacity"
-      }
-    );
-
-
-    /* -------------------------------------------------------
-       Default
-       ------------------------------------------------------- */
+    /* -----------------------------------------------------
+       Base title
+       ----------------------------------------------------- */
 
     if (title) {
-      gsap.fromTo(
+
+      GSAP.fromTo(
         title,
         {
           yPercent: 12,
@@ -543,6 +784,7 @@
           opacity: 1,
           duration: 1,
           ease: "power3.out",
+
           scrollTrigger: {
             trigger: section,
             start: "top 76%",
@@ -550,11 +792,17 @@
           }
         }
       );
+
     }
 
 
+    /* -----------------------------------------------------
+       Eyebrow
+       ----------------------------------------------------- */
+
     if (eyebrow) {
-      gsap.fromTo(
+
+      GSAP.fromTo(
         eyebrow,
         {
           y: 12,
@@ -566,6 +814,7 @@
           duration: 0.7,
           delay: 0.08,
           ease: "power2.out",
+
           scrollTrigger: {
             trigger: section,
             start: "top 78%",
@@ -573,11 +822,17 @@
           }
         }
       );
+
     }
 
 
+    /* -----------------------------------------------------
+       Body
+       ----------------------------------------------------- */
+
     if (bodyCopy) {
-      gsap.fromTo(
+
+      GSAP.fromTo(
         bodyCopy,
         {
           y: 18,
@@ -589,6 +844,7 @@
           duration: 0.9,
           delay: 0.16,
           ease: "power3.out",
+
           scrollTrigger: {
             trigger: section,
             start: "top 72%",
@@ -596,11 +852,17 @@
           }
         }
       );
+
     }
 
 
+    /* -----------------------------------------------------
+       Index
+       ----------------------------------------------------- */
+
     if (index) {
-      gsap.fromTo(
+
+      GSAP.fromTo(
         index,
         {
           opacity: 0
@@ -609,6 +871,7 @@
           opacity: 1,
           duration: 1,
           ease: "none",
+
           scrollTrigger: {
             trigger: section,
             start: "top 80%",
@@ -616,64 +879,146 @@
           }
         }
       );
+
     }
 
 
-    /* -------------------------------------------------------
-       GUARDa
-       ------------------------------------------------------- */
+    /* -----------------------------------------------------
+       GUARDA
+       ----------------------------------------------------- */
 
     if (
       section.classList.contains(
         "story-opening"
-      )
+      ) &&
+      title
     ) {
-      if (title) {
-        gsap.fromTo(
-          title,
-          {
-            yPercent: 18,
-            opacity: 0,
-            scale: 0.985
-          },
-          {
-            yPercent: 0,
-            opacity: 1,
-            scale: 1,
-            duration: 1.3,
-            ease: "power4.out",
-            scrollTrigger: {
-              trigger: section,
-              start: "top top",
-              once: true
-            }
+
+      GSAP.fromTo(
+        title,
+        {
+          yPercent: 18,
+          opacity: 0,
+          scale: 0.985
+        },
+        {
+          yPercent: 0,
+          opacity: 1,
+          scale: 1,
+          duration: 1.3,
+          ease: "power4.out",
+
+          scrollTrigger: {
+            trigger: section,
+            start: "top top",
+            once: true
           }
-        );
-      }
+        }
+      );
+
     }
 
 
-    /* -------------------------------------------------------
+    /* -----------------------------------------------------
        CAPIRE
-       ------------------------------------------------------- */
+       ----------------------------------------------------- */
 
     if (
       section.classList.contains(
         "story-understand"
-      )
+      ) &&
+      bodyCopy
     ) {
-      if (bodyCopy) {
-        gsap.fromTo(
-          bodyCopy,
+
+      GSAP.fromTo(
+        bodyCopy,
+        {
+          x: 30,
+          opacity: 0
+        },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 1,
+          ease: "power3.out",
+
+          scrollTrigger: {
+            trigger: section,
+            start: "top 70%",
+            once: true
+          }
+        }
+      );
+
+    }
+
+
+    /* -----------------------------------------------------
+       RITORNA
+       ----------------------------------------------------- */
+
+    if (
+      section.classList.contains(
+        "story-return"
+      ) &&
+      title
+    ) {
+
+      GSAP.fromTo(
+        title,
+        {
+          letterSpacing: "0.14em",
+          opacity: 0
+        },
+        {
+          letterSpacing: "normal",
+          opacity: 1,
+          duration: 1.2,
+          ease: "power3.out",
+
+          scrollTrigger: {
+            trigger: section,
+            start: "top 72%",
+            once: true
+          }
+        }
+      );
+
+    }
+
+
+    /* -----------------------------------------------------
+       COLLEGARE
+       ----------------------------------------------------- */
+
+    if (
+      section.classList.contains(
+        "story-connect"
+      ) &&
+      bodyCopy
+    ) {
+
+      const paragraphs =
+        bodyCopy.querySelectorAll(
+          "p"
+        );
+
+
+      if (paragraphs.length) {
+
+        GSAP.fromTo(
+          paragraphs,
           {
-            x: 30,
+            y: 16,
             opacity: 0
           },
           {
-            x: 0,
+            y: 0,
             opacity: 1,
-            duration: 1,
-            ease: "power3.out",
+            duration: 0.7,
+            stagger: 0.06,
+            ease: "power2.out",
+
             scrollTrigger: {
               trigger: section,
               start: "top 70%",
@@ -681,96 +1026,31 @@
             }
           }
         );
+
       }
+
     }
 
 
-    /* -------------------------------------------------------
-       RITORNA
-       ------------------------------------------------------- */
-
-    if (
-      section.classList.contains(
-        "story-return"
-      )
-    ) {
-      if (title) {
-        gsap.fromTo(
-          title,
-          {
-            letterSpacing: "0.14em",
-            opacity: 0
-          },
-          {
-            letterSpacing: "normal",
-            opacity: 1,
-            duration: 1.2,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: section,
-              start: "top 72%",
-              once: true
-            }
-          }
-        );
-      }
-    }
-
-
-    /* -------------------------------------------------------
-       COLLEGARE
-       ------------------------------------------------------- */
-
-    if (
-      section.classList.contains(
-        "story-connect"
-      )
-    ) {
-      if (bodyCopy) {
-        const paragraphs =
-          bodyCopy.querySelectorAll("p");
-
-        if (paragraphs.length) {
-          gsap.fromTo(
-            paragraphs,
-            {
-              y: 16,
-              opacity: 0
-            },
-            {
-              y: 0,
-              opacity: 1,
-              duration: 0.7,
-              stagger: 0.06,
-              ease: "power2.out",
-              scrollTrigger: {
-                trigger: section,
-                start: "top 70%",
-                once: true
-              }
-            }
-          );
-        }
-      }
-    }
-
-
-    /* -------------------------------------------------------
+    /* -----------------------------------------------------
        OGGI
-       ------------------------------------------------------- */
+       ----------------------------------------------------- */
 
     if (
       section.classList.contains(
         "story-today"
       )
     ) {
+
       const lead =
         section.querySelector(
           ".story-lead"
         );
 
+
       if (lead) {
-        gsap.fromTo(
+
+        GSAP.fromTo(
           lead,
           {
             y: 24,
@@ -781,6 +1061,7 @@
             opacity: 1,
             duration: 1.1,
             ease: "power4.out",
+
             scrollTrigger: {
               trigger: section,
               start: "top 72%",
@@ -788,178 +1069,232 @@
             }
           }
         );
+
       }
+
     }
 
 
-    /* -------------------------------------------------------
+    /* -----------------------------------------------------
        QUI
-       ------------------------------------------------------- */
+       ----------------------------------------------------- */
 
     if (
       section.classList.contains(
         "story-place"
-      )
+      ) &&
+      media
     ) {
-      if (media) {
-        gsap.fromTo(
-          media,
-          {
-            y: 20,
-            opacity: 0
-          },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 1,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: section,
-              start: "top 72%",
-              once: true
-            }
+
+      GSAP.fromTo(
+        media,
+        {
+          y: 20,
+          opacity: 0
+        },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1,
+          ease: "power3.out",
+
+          scrollTrigger: {
+            trigger: section,
+            start: "top 72%",
+            once: true
           }
-        );
-      }
+        }
+      );
+
     }
 
 
-    /* -------------------------------------------------------
+    /* -----------------------------------------------------
        ECCOMI
-       ------------------------------------------------------- */
+       ----------------------------------------------------- */
 
     if (
       section.classList.contains(
         "story-person"
-      )
+      ) &&
+      media
     ) {
-      if (media) {
-        gsap.fromTo(
-          media,
-          {
-            scale: 0.97,
-            opacity: 0
-          },
-          {
-            scale: 1,
-            opacity: 1,
-            duration: 1.2,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: section,
-              start: "top 72%",
-              once: true
-            }
+
+      GSAP.fromTo(
+        media,
+        {
+          scale: 0.97,
+          opacity: 0
+        },
+        {
+          scale: 1,
+          opacity: 1,
+          duration: 1.2,
+          ease: "power3.out",
+
+          scrollTrigger: {
+            trigger: section,
+            start: "top 72%",
+            once: true
           }
-        );
-      }
+        }
+      );
+
     }
 
 
-    /* -------------------------------------------------------
+    /* -----------------------------------------------------
        SCRIVIMI
-       ------------------------------------------------------- */
+       ----------------------------------------------------- */
 
     if (
       section.classList.contains(
         "story-contact"
-      )
+      ) &&
+      contact
     ) {
-      if (contact) {
-        gsap.fromTo(
-          contact,
-          {
-            y: 14,
-            opacity: 0
-          },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.8,
-            delay: 0.25,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: section,
-              start: "top 70%",
-              once: true
-            }
+
+      GSAP.fromTo(
+        contact,
+        {
+          y: 14,
+          opacity: 0
+        },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          delay: 0.25,
+          ease: "power3.out",
+
+          scrollTrigger: {
+            trigger: section,
+            start: "top 70%",
+            once: true
           }
-        );
-      }
+        }
+      );
+
     }
+
   };
 
 
   const initAnimations = () => {
-    if (!hasGSAP) return;
 
     if (
-      typeof window.ScrollTrigger !==
-      "undefined"
+      !hasGSAP ||
+      getReducedMotion()
     ) {
-      gsap.registerPlugin(
-        window.ScrollTrigger
+      return;
+    }
+
+
+    if (ScrollTrigger) {
+      GSAP.registerPlugin(
+        ScrollTrigger
       );
     }
+
 
     sections.forEach(
       animateSection
     );
 
-    window.requestAnimationFrame(() => {
-      if (
-        typeof window.ScrollTrigger !==
-        "undefined"
-      ) {
-        window.ScrollTrigger.refresh();
+
+    window.requestAnimationFrame(
+      () => {
+
+        if (ScrollTrigger) {
+          ScrollTrigger.refresh();
+        }
+
       }
-    });
+    );
+
   };
 
 
-  /* =========================================================
+  /* =======================================================
      LOADER
-     ========================================================= */
+     ======================================================= */
 
   const hideLoader = () => {
-    if (!loader) return;
 
-    if (getReducedMotion()) {
-      loader.classList.add("is-hidden");
+    if (
+      !loader ||
+      loaderHidden
+    ) {
       return;
     }
 
-    if (hasGSAP) {
-      gsap.to(loader, {
-        autoAlpha: 0,
-        duration: 0.7,
-        ease: "power2.out",
-        onComplete: () => {
-          loader.classList.add("is-hidden");
-        }
-      });
-    } else {
-      loader.classList.add("is-hidden");
+
+    loaderHidden = true;
+
+
+    if (getReducedMotion()) {
+
+      loader.classList.add(
+        "is-hidden"
+      );
+
+      return;
     }
+
+
+    if (hasGSAP) {
+
+      GSAP.to(
+        loader,
+        {
+          autoAlpha: 0,
+          duration: 0.7,
+          ease: "power2.out",
+
+          onComplete: () => {
+
+            loader.classList.add(
+              "is-hidden"
+            );
+
+          }
+        }
+      );
+
+    } else {
+
+      loader.classList.add(
+        "is-hidden"
+      );
+
+    }
+
   };
 
 
   const initLoader = () => {
-    if (!loader) return;
+
+    if (!loader) {
+      return;
+    }
+
 
     const minimumDisplayTime =
       getReducedMotion()
         ? 150
         : 700;
 
+
     const startedAt =
       performance.now();
 
 
     const finish = () => {
+
       const elapsed =
         performance.now() -
         startedAt;
+
 
       const remaining =
         Math.max(
@@ -968,10 +1303,12 @@
             elapsed
         );
 
+
       window.setTimeout(
         hideLoader,
         remaining
       );
+
     };
 
 
@@ -979,8 +1316,11 @@
       document.readyState ===
       "complete"
     ) {
+
       finish();
+
     } else {
+
       window.addEventListener(
         "load",
         finish,
@@ -988,42 +1328,58 @@
           once: true
         }
       );
+
     }
 
 
     /*
-      Failsafe: il sito non deve mai restare
-      bloccato dal loader.
-    */
+     * Failsafe assoluto.
+     * Il loader non deve mai bloccare
+     * l'accesso al sito.
+     */
+
     window.setTimeout(
       hideLoader,
       3500
     );
+
   };
 
 
-  /* =========================================================
+  /* =======================================================
      STANDBY
-     ========================================================= */
+     ======================================================= */
 
   const showStandby = () => {
-    if (!standby || standbyVisible) {
+
+    if (
+      !standby ||
+      standbyVisible
+    ) {
       return;
     }
 
+
     standbyVisible = true;
+
 
     standby.setAttribute(
       "aria-hidden",
       "false"
     );
 
+
     body.classList.add(
       "standby-active"
     );
 
-    if (hasGSAP && !getReducedMotion()) {
-      gsap.fromTo(
+
+    if (
+      hasGSAP &&
+      !getReducedMotion()
+    ) {
+
+      GSAP.fromTo(
         standby,
         {
           autoAlpha: 0
@@ -1031,41 +1387,74 @@
         {
           autoAlpha: 1,
           duration: 0.6,
-          ease: "power2.out"
+          ease: "power2.out",
+
+          onStart: () => {
+            standby.classList.add(
+              "is-visible"
+            );
+          }
         }
       );
+
     } else {
+
       standby.classList.add(
         "is-visible"
       );
+
     }
+
   };
 
 
   const hideStandby = () => {
-    if (!standby || !standbyVisible) {
+
+    if (
+      !standby ||
+      !standbyVisible
+    ) {
       return;
     }
 
+
     standbyVisible = false;
+
 
     body.classList.remove(
       "standby-active"
     );
 
-    if (hasGSAP && !getReducedMotion()) {
-      gsap.to(standby, {
-        autoAlpha: 0,
-        duration: 0.35,
-        ease: "power2.out",
-        onComplete: () => {
-          standby.setAttribute(
-            "aria-hidden",
-            "true"
-          );
+
+    if (
+      hasGSAP &&
+      !getReducedMotion()
+    ) {
+
+      GSAP.to(
+        standby,
+        {
+          autoAlpha: 0,
+          duration: 0.35,
+          ease: "power2.out",
+
+          onComplete: () => {
+
+            standby.classList.remove(
+              "is-visible"
+            );
+
+            standby.setAttribute(
+              "aria-hidden",
+              "true"
+            );
+
+          }
         }
-      });
+      );
+
     } else {
+
       standby.classList.remove(
         "is-visible"
       );
@@ -1074,48 +1463,59 @@
         "aria-hidden",
         "true"
       );
+
     }
+
   };
 
 
   const scheduleStandby = () => {
+
     window.clearTimeout(
       standbyTimer
     );
+
 
     standbyTimer =
       window.setTimeout(
         showStandby,
         STANDBY_DELAY
       );
+
   };
 
 
   const registerActivity = () => {
+
     if (standbyVisible) {
       hideStandby();
     }
 
     scheduleStandby();
+
   };
 
 
-  /*
-    Non registriamo pointermove a ogni singolo
-    movimento: viene limitato per evitare lavoro
-    inutile sul main thread.
-  */
-  let activityQueued = false;
-
   const handlePointerActivity = () => {
-    if (activityQueued) return;
+
+    if (activityQueued) {
+      return;
+    }
+
 
     activityQueued = true;
 
-    window.requestAnimationFrame(() => {
-      registerActivity();
-      activityQueued = false;
-    });
+
+    window.requestAnimationFrame(
+      () => {
+
+        registerActivity();
+
+        activityQueued = false;
+
+      }
+    );
+
   };
 
 
@@ -1125,73 +1525,85 @@
     "touchstart",
     "wheel",
     "keydown"
-  ].forEach((eventName) => {
-    window.addEventListener(
-      eventName,
-      handlePointerActivity,
-      {
-        passive:
-          eventName !== "keydown"
-      }
-    );
-  });
+  ].forEach(
+    (eventName) => {
 
-
-  /* =========================================================
-     VISIBILITY
-     ========================================================= */
-
-  document.addEventListener(
-    "visibilitychange",
-    () => {
-      if (
-        document.visibilityState ===
-        "hidden"
-      ) {
-        window.clearTimeout(
-          standbyTimer
-        );
-        return;
-      }
-
-      scheduleStandby();
-
-      if (hasGSAP) {
-        if (
-          typeof window.ScrollTrigger !==
-          "undefined"
-        ) {
-          window.ScrollTrigger.refresh();
+      window.addEventListener(
+        eventName,
+        handlePointerActivity,
+        {
+          passive:
+            eventName !==
+            "keydown"
         }
-      }
+      );
 
-      requestScrollUpdate();
     }
   );
 
 
-  /* =========================================================
-     RESIZE / ORIENTATION
-     ========================================================= */
+  /* =======================================================
+     VISIBILITY
+     ======================================================= */
+
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+
+      if (
+        document.visibilityState ===
+        "hidden"
+      ) {
+
+        window.clearTimeout(
+          standbyTimer
+        );
+
+        return;
+      }
+
+
+      scheduleStandby();
+
+      requestScrollUpdate();
+
+
+      if (ScrollTrigger) {
+        ScrollTrigger.refresh();
+      }
+
+    }
+  );
+
+
+  /* =======================================================
+     RESIZE
+     ======================================================= */
 
   const handleResize = () => {
+
     window.clearTimeout(
       resizeTimer
     );
 
-    resizeTimer =
-      window.setTimeout(() => {
-        updateSectionNavigation();
-        updateActiveSectionFromScroll();
 
-        if (
-          hasGSAP &&
-          typeof window.ScrollTrigger !==
-            "undefined"
-        ) {
-          window.ScrollTrigger.refresh();
-        }
-      }, 150);
+    resizeTimer =
+      window.setTimeout(
+        () => {
+
+          updateSectionNavigation();
+
+          updateActiveSectionFromScroll();
+
+
+          if (ScrollTrigger) {
+            ScrollTrigger.refresh();
+          }
+
+        },
+        150
+      );
+
   };
 
 
@@ -1213,14 +1625,95 @@
   );
 
 
-  /* =========================================================
-     INITIAL STATE
-     ========================================================= */
+  /* =======================================================
+     REDUCED MOTION CHANGE
+     ======================================================= */
+
+  const handleMotionPreferenceChange =
+    () => {
+
+      if (
+        getReducedMotion() &&
+        ScrollTrigger
+      ) {
+
+        ScrollTrigger.getAll()
+          .forEach(
+            (trigger) => {
+              trigger.kill();
+            }
+          );
+
+      }
+
+    };
+
+
+  if (
+    typeof reducedMotionQuery.addEventListener ===
+    "function"
+  ) {
+
+    reducedMotionQuery.addEventListener(
+      "change",
+      handleMotionPreferenceChange
+    );
+
+  } else if (
+    typeof reducedMotionQuery.addListener ===
+    "function"
+  ) {
+
+    reducedMotionQuery.addListener(
+      handleMotionPreferenceChange
+    );
+
+  }
+
+
+  /* =======================================================
+     PAGE SHOW
+     ======================================================= */
+
+  window.addEventListener(
+    "pageshow",
+    () => {
+
+      if (menuOpen) {
+
+        closeMenu({
+          restoreFocus: false
+        });
+
+      }
+
+
+      if (loader) {
+
+        window.setTimeout(
+          hideLoader,
+          2500
+        );
+
+      }
+
+    },
+    {
+      once: true
+    }
+  );
+
+
+  /* =======================================================
+     INITIALIZATION
+     ======================================================= */
 
   const init = () => {
+
     if (!sections.length) {
       return;
     }
+
 
     setActiveSection(
       0,
@@ -1229,53 +1722,21 @@
       }
     );
 
+
     updateActiveSectionFromScroll();
 
     initLoader();
+
     initAnimations();
 
     scheduleStandby();
+
   };
 
 
-  /* =========================================================
-     SAFETY
-     ========================================================= */
-
-  window.addEventListener(
-    "pageshow",
-    () => {
-      if (body.classList.contains("menu-open")) {
-        closeMenu({
-          restoreFocus: false
-        });
-      }
-
-      if (loader) {
-        window.setTimeout(
-          hideLoader,
-          2500
-        );
-      }
-    },
-    {
-      once: true
-    }
-  );
-
-
-  /*
-    Se il browser non supporta inert,
-    il sito rimane comunque utilizzabile.
-  */
-  if (
-    !("inert" in HTMLElement.prototype)
-  ) {
-    console.info(
-      "Inert non supportato nativamente dal browser."
-    );
-  }
-
+  /* =======================================================
+     START
+     ======================================================= */
 
   init();
 
