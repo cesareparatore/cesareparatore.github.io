@@ -5,6 +5,7 @@
    * ========================================================
    * CESARE PARATORE
    * Navigation / loader / narrative progression
+   * V2
    * ========================================================
    */
 
@@ -18,15 +19,22 @@
      DOM
      ======================================================== */
 
-  const loader = document.getElementById("site-loader");
+  const loader =
+    document.getElementById("site-loader");
 
-  const header = document.getElementById("site-header");
+  const header =
+    document.getElementById("site-header");
 
-  const menuToggle = document.getElementById("menu-toggle");
-  const menu = document.getElementById("site-menu");
-  const menuLinks = Array.from(
-    document.querySelectorAll(".menu-link")
-  );
+  const menuToggle =
+    document.getElementById("menu-toggle");
+
+  const menu =
+    document.getElementById("site-menu");
+
+  const menuLinks =
+    Array.from(
+      document.querySelectorAll(".menu-link")
+    );
 
   const activeChapter =
     document.getElementById("active-chapter");
@@ -52,10 +60,37 @@
   const brand =
     document.querySelector(".brand");
 
+  const main =
+    document.getElementById("main-content");
+
+  const footer =
+    document.querySelector(".site-footer");
+
   const sections =
     Array.from(
       document.querySelectorAll(".story-section")
     );
+
+
+  /* ========================================================
+     BASIC SAFETY
+     ======================================================== */
+
+  if (
+    !header ||
+    !menuToggle ||
+    !menu ||
+    !activeChapter ||
+    !previousButton ||
+    !nextButton ||
+    !nextArrowSymbol ||
+    !nextArrowLabel ||
+    !wowProgress ||
+    !wowDot ||
+    !sections.length
+  ) {
+    return;
+  }
 
 
   /* ========================================================
@@ -67,20 +102,44 @@
 
   let scrollFrame = null;
 
-  let loaderStartTimer = null;
+  let loaderMinTimer = null;
+  let loaderFallbackTimer = null;
   let loaderExitTimer = null;
+
+  let loaderStartedAt = 0;
+  let loaderFinished = false;
+
+  let lastFocusedElement = null;
 
   const reducedMotion =
     window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     );
 
+  /*
+   * Cache dell'ultimo stato applicato.
+   *
+   * Evita di riscrivere continuamente le stesse
+   * custom properties durante lo scroll.
+   */
+  const narrativeCache =
+    sections.map(() => ({
+      titleAlpha: null,
+      titleY: null,
+      contentAlpha: null,
+      contentY: null
+    }));
+
 
   /* ========================================================
      HELPERS
      ======================================================== */
 
-  const clamp = (value, min, max) => {
+  const clamp = (
+    value,
+    min,
+    max
+  ) => {
     return Math.min(
       Math.max(value, min),
       max
@@ -89,17 +148,14 @@
 
 
   const smoothStep = (value) => {
-    const t = clamp(value, 0, 1);
+    const t =
+      clamp(value, 0, 1);
 
     return t * t * (3 - 2 * t);
   };
 
 
   const getHeaderHeight = () => {
-    if (!header) {
-      return 134;
-    }
-
     return header.getBoundingClientRect().height;
   };
 
@@ -113,7 +169,10 @@
     section,
     behavior = "smooth"
   ) => {
-    if (!section) return;
+
+    if (!section) {
+      return;
+    }
 
     const headerHeight =
       getHeaderHeight();
@@ -133,103 +192,316 @@
   };
 
 
+  const isEditableTarget = (target) => {
+    if (!(target instanceof Element)) {
+      return false;
+    }
+
+    return Boolean(
+      target.closest(
+        "input, textarea, select, [contenteditable='true']"
+      )
+    );
+  };
+
+
+  const getFocusableMenuElements = () => {
+    return Array.from(
+      menu.querySelectorAll(
+        "a[href], button:not([disabled]), [tabindex]:not([tabindex='-1'])"
+      )
+    ).filter((element) => {
+      return (
+        !element.hasAttribute("disabled") &&
+        element.getAttribute("aria-hidden") !== "true"
+      );
+    });
+  };
+
+
+  const setPageInert = (locked) => {
+    [main, footer].forEach((element) => {
+      if (!element) {
+        return;
+      }
+
+      if (locked) {
+        element.setAttribute("inert", "");
+      } else {
+        element.removeAttribute("inert");
+      }
+    });
+  };
+
+
   /* ========================================================
      LOADER
      ======================================================== */
 
-  const startLoader = () => {
-    if (!loader) return;
+  const finishLoader = () => {
 
-    loader.classList.add("is-active");
+    if (!loader || loaderFinished) {
+      return;
+    }
 
-    const revealDuration =
+    loaderFinished = true;
+
+    if (loaderMinTimer !== null) {
+      window.clearTimeout(
+        loaderMinTimer
+      );
+
+      loaderMinTimer = null;
+    }
+
+    if (loaderFallbackTimer !== null) {
+      window.clearTimeout(
+        loaderFallbackTimer
+      );
+
+      loaderFallbackTimer = null;
+    }
+
+    loader.classList.add(
+      "is-exiting"
+    );
+
+    const exitDuration =
       reducedMotion.matches
-        ? 500
-        : 2300;
+        ? 20
+        : 1150;
 
-    loaderStartTimer =
+    loaderExitTimer =
       window.setTimeout(() => {
 
-        loader.classList.add(
+        loader.classList.remove(
+          "is-active"
+        );
+
+        loader.classList.remove(
           "is-exiting"
         );
 
-        loaderExitTimer =
-          window.setTimeout(() => {
+        loader.setAttribute(
+          "aria-hidden",
+          "true"
+        );
 
-            loader.classList.remove(
-              "is-active"
-            );
+        loaderExitTimer = null;
 
-            loader.classList.remove(
-              "is-exiting"
-            );
+      }, exitDuration);
+  };
 
-            loader.setAttribute(
-              "aria-hidden",
-              "true"
-            );
 
-          }, reducedMotion.matches ? 20 : 1150);
+  const tryFinishLoader = () => {
 
-      }, revealDuration);
+    if (!loader || loaderFinished) {
+      return;
+    }
+
+    const minimumDuration =
+      reducedMotion.matches
+        ? 0
+        : 900;
+
+    const elapsed =
+      performance.now() -
+      loaderStartedAt;
+
+    const remaining =
+      Math.max(
+        0,
+        minimumDuration - elapsed
+      );
+
+    if (remaining === 0) {
+      finishLoader();
+      return;
+    }
+
+    loaderMinTimer =
+      window.setTimeout(
+        finishLoader,
+        remaining
+      );
+  };
+
+
+  const startLoader = () => {
+
+    if (!loader) {
+      return;
+    }
+
+    loaderStartedAt =
+      performance.now();
+
+    loaderFinished = false;
+
+    loader.classList.add(
+      "is-active"
+    );
+
+    /*
+     * Se la pagina è già caricata, non aspettiamo
+     * inutilmente l'evento load.
+     */
+    if (
+      document.readyState ===
+      "complete"
+    ) {
+      tryFinishLoader();
+    } else {
+
+      window.addEventListener(
+        "load",
+        tryFinishLoader,
+        {
+          once: true
+        }
+      );
+    }
+
+    /*
+     * Fallback di sicurezza:
+     * il loader non può rimanere bloccato
+     * indefinitamente in caso di risorsa lenta.
+     */
+    loaderFallbackTimer =
+      window.setTimeout(
+        finishLoader,
+        reducedMotion.matches
+          ? 1000
+          : 4500
+      );
   };
 
 
   /* ========================================================
      MENU
-     ======================================================== */
+     * ======================================================== */
 
   const setMenuState = (open) => {
-    menuOpen = Boolean(open);
 
-    header.classList.toggle(
-      "menu-open",
-      menuOpen
-    );
+    const nextState =
+      Boolean(open);
 
-    menu.classList.toggle(
-      "is-open",
-      menuOpen
-    );
+    if (
+      nextState === menuOpen &&
+      menu.classList.contains(
+        "is-open"
+      )
+    ) {
+      return;
+    }
 
-    menu.setAttribute(
-      "aria-hidden",
-      String(!menuOpen)
-    );
+    if (nextState) {
 
-    menuToggle.setAttribute(
-      "aria-expanded",
-      String(menuOpen)
-    );
+      lastFocusedElement =
+        document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : menuToggle;
 
-    menuToggle.setAttribute(
-      "aria-label",
-      menuOpen
-        ? "Chiudi menu"
-        : "Apri menu"
-    );
+      menuOpen = true;
 
-    body.classList.toggle(
-      "menu-is-open",
-      menuOpen
-    );
+      header.classList.add(
+        "menu-open"
+      );
 
-    if (menuOpen) {
+      menu.classList.add(
+        "is-open"
+      );
 
-      window.setTimeout(() => {
+      menu.setAttribute(
+        "aria-hidden",
+        "false"
+      );
 
-        const firstLink =
-          menuLinks[0];
+      menuToggle.setAttribute(
+        "aria-expanded",
+        "true"
+      );
 
-        if (firstLink) {
-          firstLink.focus({
+      menuToggle.setAttribute(
+        "aria-label",
+        "Chiudi menu"
+      );
+
+      body.classList.add(
+        "menu-is-open"
+      );
+
+      setPageInert(true);
+
+      window.requestAnimationFrame(() => {
+
+        const focusable =
+          getFocusableMenuElements();
+
+        if (focusable.length) {
+          focusable[0].focus({
             preventScroll: true
           });
         }
 
-      }, 100);
+      });
+
+      return;
     }
+
+
+    /*
+     * CHIUSURA
+     */
+
+    menuOpen = false;
+
+    header.classList.remove(
+      "menu-open"
+    );
+
+    menu.classList.remove(
+      "is-open"
+    );
+
+    menu.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    menuToggle.setAttribute(
+      "aria-expanded",
+      "false"
+    );
+
+    menuToggle.setAttribute(
+      "aria-label",
+      "Apri menu"
+    );
+
+    body.classList.remove(
+      "menu-is-open"
+    );
+
+    setPageInert(false);
+
+    /*
+     * Restituisce il focus a chi aveva aperto il menu.
+     */
+    const focusTarget =
+      lastFocusedElement &&
+      document.contains(lastFocusedElement) &&
+      !lastFocusedElement.hasAttribute("disabled")
+        ? lastFocusedElement
+        : menuToggle;
+
+    window.requestAnimationFrame(() => {
+      focusTarget.focus({
+        preventScroll: true
+      });
+    });
+
+    lastFocusedElement = null;
   };
 
 
@@ -250,12 +522,17 @@
         const href =
           link.getAttribute("href");
 
-        if (!href || href.charAt(0) !== "#") {
+        if (
+          !href ||
+          !href.startsWith("#")
+        ) {
           return;
         }
 
         const target =
-          document.querySelector(href);
+          document.getElementById(
+            href.slice(1)
+          );
 
         if (!target) {
           return;
@@ -289,7 +566,6 @@
         );
       }
     );
-
   });
 
 
@@ -302,23 +578,31 @@
     updateHash = false
   ) => {
 
+    if (!sections.length) {
+      return;
+    }
+
     const safeIndex =
       clamp(
-        Number(index) || 0,
+        Number.isFinite(Number(index))
+          ? Number(index)
+          : 0,
         0,
         sections.length - 1
       );
 
-    activeIndex = safeIndex;
+    activeIndex =
+      safeIndex;
 
     const section =
       sections[safeIndex];
 
-    if (!section) return;
+    if (!section) {
+      return;
+    }
 
     const chapter =
-      section.dataset.chapter ||
-      "";
+      section.dataset.chapter || "";
 
     activeChapter.textContent =
       chapter;
@@ -350,7 +634,8 @@
        ------------------------------------ */
 
     const last =
-      safeIndex === sections.length - 1;
+      safeIndex ===
+      sections.length - 1;
 
     nextButton.classList.toggle(
       "is-return",
@@ -394,16 +679,30 @@
 
     const percentage =
       sections.length > 1
-        ? safeIndex /
-          (sections.length - 1) *
-          100
+        ? (
+            safeIndex /
+            (sections.length - 1)
+          ) * 100
         : 0;
 
-    wowProgress.style.width =
+    const percentageValue =
       `${percentage}%`;
 
-    wowDot.style.left =
-      `${percentage}%`;
+    if (
+      wowProgress.style.width !==
+      percentageValue
+    ) {
+      wowProgress.style.width =
+        percentageValue;
+    }
+
+    if (
+      wowDot.style.left !==
+      percentageValue
+    ) {
+      wowDot.style.left =
+        percentageValue;
+    }
 
 
     /* ------------------------------------
@@ -416,7 +715,6 @@
         section.id;
 
       if (id) {
-
         window.history.replaceState(
           null,
           "",
@@ -424,6 +722,38 @@
         );
       }
     }
+  };
+
+
+  /* ========================================================
+     NARRATIVE STYLE CACHE
+     ======================================================== */
+
+  const updateSectionVariable = (
+    section,
+    index,
+    key,
+    value
+  ) => {
+
+    if (
+      narrativeCache[index][key] ===
+      value
+    ) {
+      return;
+    }
+
+    narrativeCache[index][key] =
+      value;
+
+    section.style.setProperty(
+      `--${key.replace(
+        /[A-Z]/g,
+        (match) =>
+          `-${match.toLowerCase()}`
+      )}`,
+      value
+    );
   };
 
 
@@ -446,16 +776,24 @@
       getHeaderHeight();
 
     /*
-     * The anchor is intentionally below the header.
-     * This prevents the title of the next section from
-     * taking control too early.
+     * Anchor narrativo.
+     *
+     * Rimane sotto l'header e impedisce
+     * alla sezione successiva di prendere
+     * il controllo troppo presto.
      */
     const anchor =
       headerHeight +
-      (viewportHeight - headerHeight) * .38;
+      (
+        viewportHeight -
+        headerHeight
+      ) * .38;
 
-    let bestIndex = 0;
-    let bestDistance = Infinity;
+    let bestIndex =
+      activeIndex;
+
+    let bestDistance =
+      Infinity;
 
 
     sections.forEach(
@@ -470,83 +808,106 @@
             1
           );
 
-        /*
-         * Progress through the section.
-         */
+
+        /* --------------------------------
+           SECTION PROGRESS
+           -------------------------------- */
+
         const raw =
-          (anchor - rect.top) /
-          height;
+          (
+            anchor -
+            rect.top
+          ) / height;
 
         const progress =
-          clamp(raw, 0, 1);
+          clamp(
+            raw,
+            0,
+            1
+          );
 
 
-        /*
-         * TITLE
-         *
-         * At section entrance:
-         * title is strong.
-         *
-         * While scrolling:
-         * title fades away.
-         */
+        /* --------------------------------
+           TITLE
+           -------------------------------- */
+
         const titleFade =
           smoothStep(
             (progress - .05) / .42
           );
 
         const titleAlpha =
-          1 - titleFade;
+          (
+            1 -
+            titleFade
+          ).toFixed(3);
 
         const titleY =
-          -22 * titleFade;
+          `${(
+            -22 *
+            titleFade
+          ).toFixed(1)}px`;
 
 
-        /*
-         * CONTENT
-         *
-         * Appears after the title,
-         * then becomes fully readable.
-         */
+        /* --------------------------------
+           CONTENT
+           -------------------------------- */
+
         const contentReveal =
           smoothStep(
             (progress - .14) / .42
           );
 
         const contentAlpha =
-          .18 +
-          (.82 * contentReveal);
+          (
+            .18 +
+            (.82 * contentReveal)
+          ).toFixed(3);
 
         const contentY =
-          32 * (1 - contentReveal);
+          `${(
+            32 *
+            (1 - contentReveal)
+          ).toFixed(1)}px`;
 
 
-        section.style.setProperty(
-          "--title-alpha",
-          titleAlpha.toFixed(3)
+        /* --------------------------------
+           WRITE ONLY WHEN CHANGED
+           -------------------------------- */
+
+        updateSectionVariable(
+          section,
+          index,
+          "titleAlpha",
+          titleAlpha
         );
 
-        section.style.setProperty(
-          "--title-y",
-          `${titleY.toFixed(1)}px`
+        updateSectionVariable(
+          section,
+          index,
+          "titleY",
+          titleY
         );
 
-        section.style.setProperty(
-          "--content-alpha",
-          contentAlpha.toFixed(3)
+        updateSectionVariable(
+          section,
+          index,
+          "contentAlpha",
+          contentAlpha
         );
 
-        section.style.setProperty(
-          "--content-y",
-          `${contentY.toFixed(1)}px`
+        updateSectionVariable(
+          section,
+          index,
+          "contentY",
+          contentY
         );
 
 
-        /*
-         * Determine the chapter from the section
-         * whose narrative anchor is closest to the
-         * current viewport anchor.
-         */
+        /* --------------------------------
+           ACTIVE CHAPTER
+           -------------------------------- */
+
         const narrativePoint =
           rect.top +
           Math.min(
@@ -556,7 +917,8 @@
 
         const distance =
           Math.abs(
-            narrativePoint - anchor
+            narrativePoint -
+            anchor
           );
 
         const visible =
@@ -567,14 +929,20 @@
           visible &&
           distance < bestDistance
         ) {
-          bestDistance = distance;
-          bestIndex = index;
+          bestDistance =
+            distance;
+
+          bestIndex =
+            index;
         }
       }
     );
 
 
-    if (bestIndex !== activeIndex) {
+    if (
+      bestIndex !==
+      activeIndex
+    ) {
       setActiveSection(
         bestIndex,
         false
@@ -585,7 +953,9 @@
 
   const requestNarrativeUpdate = () => {
 
-    if (scrollFrame !== null) {
+    if (
+      scrollFrame !== null
+    ) {
       return;
     }
 
@@ -629,13 +999,20 @@
       const targetIndex =
         activeIndex - 1;
 
+      const target =
+        sections[targetIndex];
+
+      if (!target) {
+        return;
+      }
+
       setActiveSection(
         targetIndex,
         true
       );
 
       scrollToSection(
-        sections[targetIndex],
+        target,
         reducedMotion.matches
           ? "auto"
           : "smooth"
@@ -645,7 +1022,7 @@
 
 
   /* ========================================================
-     NEXT / RETURN TO START
+     NEXT / RETURN
      ======================================================== */
 
   nextButton.addEventListener(
@@ -659,13 +1036,16 @@
 
       if (last) {
 
+        const firstSection =
+          sections[0];
+
         setActiveSection(
           0,
           true
         );
 
         scrollToSection(
-          sections[0],
+          firstSection,
           reducedMotion.matches
             ? "auto"
             : "smooth"
@@ -678,13 +1058,20 @@
       const targetIndex =
         activeIndex + 1;
 
+      const target =
+        sections[targetIndex];
+
+      if (!target) {
+        return;
+      }
+
       setActiveSection(
         targetIndex,
         true
       );
 
       scrollToSection(
-        sections[targetIndex],
+        target,
         reducedMotion.matches
           ? "auto"
           : "smooth"
@@ -697,27 +1084,30 @@
      BRAND
      ======================================================== */
 
-  brand.addEventListener(
-    "click",
-    (event) => {
+  if (brand) {
 
-      event.preventDefault();
+    brand.addEventListener(
+      "click",
+      (event) => {
 
-      setMenuState(false);
+        event.preventDefault();
 
-      setActiveSection(
-        0,
-        true
-      );
+        setMenuState(false);
 
-      scrollToSection(
-        sections[0],
-        reducedMotion.matches
-          ? "auto"
-          : "smooth"
-      );
-    }
-  );
+        setActiveSection(
+          0,
+          true
+        );
+
+        scrollToSection(
+          sections[0],
+          reducedMotion.matches
+            ? "auto"
+            : "smooth"
+        );
+      }
+    );
+  }
 
 
   /* ========================================================
@@ -728,33 +1118,87 @@
     "keydown",
     (event) => {
 
-      if (event.key === "Escape") {
+      /* --------------------------------
+         ESCAPE
+         -------------------------------- */
 
-        if (menuOpen) {
+      if (
+        event.key === "Escape" &&
+        menuOpen
+      ) {
+        event.preventDefault();
 
-          setMenuState(false);
-
-          menuToggle.focus();
-        }
+        setMenuState(false);
 
         return;
       }
 
 
-      const target =
-        event.target;
+      /* --------------------------------
+         FOCUS TRAP
+         -------------------------------- */
 
       if (
-        target instanceof
-          HTMLInputElement ||
-        target instanceof
-          HTMLTextAreaElement ||
-        target instanceof
-          HTMLSelectElement
+        event.key === "Tab" &&
+        menuOpen
+      ) {
+
+        const focusable =
+          getFocusableMenuElements();
+
+        if (!focusable.length) {
+          event.preventDefault();
+          return;
+        }
+
+        const first =
+          focusable[0];
+
+        const last =
+          focusable[
+            focusable.length - 1
+          ];
+
+        if (
+          event.shiftKey &&
+          document.activeElement === first
+        ) {
+          event.preventDefault();
+
+          last.focus();
+
+          return;
+        }
+
+        if (
+          !event.shiftKey &&
+          document.activeElement === last
+        ) {
+          event.preventDefault();
+
+          first.focus();
+
+          return;
+        }
+      }
+
+
+      /* --------------------------------
+         EDITABLE ELEMENTS
+         -------------------------------- */
+
+      if (
+        isEditableTarget(
+          event.target
+        )
       ) {
         return;
       }
 
+
+      /* --------------------------------
+         ARROW NAVIGATION
+         -------------------------------- */
 
       if (
         event.key === "ArrowLeft" &&
@@ -797,10 +1241,20 @@
       return;
     }
 
-    const id =
-      decodeURIComponent(
-        hash.slice(1)
-      );
+    let id = "";
+
+    try {
+      id =
+        decodeURIComponent(
+          hash.slice(1)
+        );
+    } catch {
+      return;
+    }
+
+    if (!id) {
+      return;
+    }
 
     const target =
       document.getElementById(id);
@@ -821,6 +1275,9 @@
       false
     );
 
+    /*
+     * Aspettiamo il primo layout completo.
+     */
     window.setTimeout(
       () => {
 
@@ -832,7 +1289,7 @@
         );
 
       },
-      60
+      80
     );
   };
 
@@ -850,50 +1307,46 @@
   sections.forEach(
     (section, index) => {
 
-      if (index === 0) {
+      const initialState =
+        index === 0
+          ? {
+              titleAlpha: "1",
+              titleY: "0px",
+              contentAlpha: "1",
+              contentY: "0px"
+            }
+          : {
+              titleAlpha: "0.15",
+              titleY: "-10px",
+              contentAlpha: "0.18",
+              contentY: "32px"
+            };
 
-        section.style.setProperty(
-          "--title-alpha",
-          "1"
-        );
 
-        section.style.setProperty(
-          "--title-y",
-          "0px"
-        );
+      narrativeCache[index] = {
+        ...initialState
+      };
 
-        section.style.setProperty(
-          "--content-alpha",
-          "1"
-        );
 
-        section.style.setProperty(
-          "--content-y",
-          "0px"
-        );
+      section.style.setProperty(
+        "--title-alpha",
+        initialState.titleAlpha
+      );
 
-      } else {
+      section.style.setProperty(
+        "--title-y",
+        initialState.titleY
+      );
 
-        section.style.setProperty(
-          "--title-alpha",
-          "0.15"
-        );
+      section.style.setProperty(
+        "--content-alpha",
+        initialState.contentAlpha
+      );
 
-        section.style.setProperty(
-          "--title-y",
-          "-10px"
-        );
-
-        section.style.setProperty(
-          "--content-alpha",
-          "0.18"
-        );
-
-        section.style.setProperty(
-          "--content-y",
-          "32px"
-        );
-      }
+      section.style.setProperty(
+        "--content-y",
+        initialState.contentY
+      );
     }
   );
 
@@ -907,17 +1360,17 @@
   requestNarrativeUpdate();
 
 
-  /*
-   * Loader is enhancement only.
-   * If this script never runs, .site-loader remains
-   * display:none and the website is immediately usable.
-   */
+  /* ========================================================
+     LOADER START
+     ======================================================== */
+
   startLoader();
 
 
-  /*
-   * Restore URL hash after initialization.
-   */
+  /* ========================================================
+     RESTORE HASH
+     ======================================================== */
+
   if (window.location.hash) {
     handleHash();
   }
@@ -931,22 +1384,38 @@
     "pagehide",
     () => {
 
-      if (loaderStartTimer !== null) {
+      if (
+        loaderMinTimer !== null
+      ) {
         window.clearTimeout(
-          loaderStartTimer
+          loaderMinTimer
         );
       }
 
-      if (loaderExitTimer !== null) {
+      if (
+        loaderFallbackTimer !== null
+      ) {
+        window.clearTimeout(
+          loaderFallbackTimer
+        );
+      }
+
+      if (
+        loaderExitTimer !== null
+      ) {
         window.clearTimeout(
           loaderExitTimer
         );
       }
 
-      if (scrollFrame !== null) {
+      if (
+        scrollFrame !== null
+      ) {
         window.cancelAnimationFrame(
           scrollFrame
         );
+
+        scrollFrame = null;
       }
     }
   );
