@@ -5,7 +5,7 @@
    * ========================================================
    * CESARE PARATORE
    * Navigation / loader / narrative progression
-   * V2
+   * V2.1
    * ========================================================
    */
 
@@ -59,6 +59,9 @@
 
   const brand =
     document.querySelector(".brand");
+
+  const footerMark =
+    document.querySelector(".footer-mark");
 
   const main =
     document.getElementById("main-content");
@@ -116,11 +119,12 @@
       "(prefers-reduced-motion: reduce)"
     );
 
+
   /*
    * Cache dell'ultimo stato applicato.
    *
-   * Evita di riscrivere continuamente le stesse
-   * custom properties durante lo scroll.
+   * Evita di riscrivere inutilmente le custom
+   * properties durante ogni frame di scroll.
    */
   const narrativeCache =
     sections.map(() => ({
@@ -208,35 +212,136 @@
   const getFocusableMenuElements = () => {
     return Array.from(
       menu.querySelectorAll(
-        "a[href], button:not([disabled]), [tabindex]:not([tabindex='-1'])"
+        [
+          "a[href]",
+          "button:not([disabled])",
+          "input:not([disabled])",
+          "textarea:not([disabled])",
+          "select:not([disabled])",
+          "[tabindex]:not([tabindex='-1'])"
+        ].join(",")
       )
     ).filter((element) => {
+
+      const hidden =
+        element.getAttribute(
+          "aria-hidden"
+        ) === "true";
+
+      const style =
+        window.getComputedStyle(
+          element
+        );
+
       return (
-        !element.hasAttribute("disabled") &&
-        element.getAttribute("aria-hidden") !== "true"
+        !hidden &&
+        style.display !== "none" &&
+        style.visibility !== "hidden"
       );
     });
   };
 
 
   const setPageInert = (locked) => {
-    [main, footer].forEach((element) => {
-      if (!element) {
-        return;
-      }
 
-      if (locked) {
-        element.setAttribute("inert", "");
-      } else {
-        element.removeAttribute("inert");
+    [main, footer].forEach(
+      (element) => {
+
+        if (!element) {
+          return;
+        }
+
+        if (locked) {
+          element.setAttribute(
+            "inert",
+            ""
+          );
+        } else {
+          element.removeAttribute(
+            "inert"
+          );
+        }
       }
-    });
+    );
+  };
+
+
+  const navigateToSection = (
+    index,
+    updateHash = true
+  ) => {
+
+    const targetIndex =
+      clamp(
+        Number(index),
+        0,
+        sections.length - 1
+      );
+
+    const target =
+      sections[targetIndex];
+
+    if (!target) {
+      return;
+    }
+
+    setActiveSection(
+      targetIndex,
+      updateHash
+    );
+
+    scrollToSection(
+      target,
+      reducedMotion.matches
+        ? "auto"
+        : "smooth"
+    );
   };
 
 
   /* ========================================================
      LOADER
      ======================================================== */
+
+  const exitLoader = () => {
+
+    if (!loader) {
+      return;
+    }
+
+    loader.classList.add(
+      "is-exiting"
+    );
+
+    const exitDuration =
+      reducedMotion.matches
+        ? 20
+        : 1150;
+
+    loaderExitTimer =
+      window.setTimeout(
+        () => {
+
+          loader.classList.remove(
+            "is-active"
+          );
+
+          loader.classList.remove(
+            "is-exiting"
+          );
+
+          loader.setAttribute(
+            "aria-hidden",
+            "true"
+          );
+
+          loaderExitTimer = null;
+
+        },
+        exitDuration
+      );
+  };
+
 
   const finishLoader = () => {
 
@@ -262,43 +367,6 @@
       loaderFallbackTimer = null;
     }
 
-    loader.classList.add(
-      "is-exiting"
-    );
-
-    const exitDuration =
-      reducedMotion.matches
-        ? 20
-        : 1150;
-
-    loaderExitTimer =
-      window.setTimeout(() => {
-
-        loader.classList.remove(
-          "is-active"
-        );
-
-        loader.classList.remove(
-          "is-exiting"
-        );
-
-        loader.setAttribute(
-          "aria-hidden",
-          "true"
-        );
-
-        loaderExitTimer = null;
-
-      }, exitDuration);
-  };
-
-
-  const tryFinishLoader = () => {
-
-    if (!loader || loaderFinished) {
-      return;
-    }
-
     const minimumDuration =
       reducedMotion.matches
         ? 0
@@ -314,16 +382,18 @@
         minimumDuration - elapsed
       );
 
-    if (remaining === 0) {
-      finishLoader();
+    if (remaining > 0) {
+
+      loaderMinTimer =
+        window.setTimeout(
+          exitLoader,
+          remaining
+        );
+
       return;
     }
 
-    loaderMinTimer =
-      window.setTimeout(
-        finishLoader,
-        remaining
-      );
+    exitLoader();
   };
 
 
@@ -342,20 +412,28 @@
       "is-active"
     );
 
+    loader.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
     /*
-     * Se la pagina è già caricata, non aspettiamo
-     * inutilmente l'evento load.
+     * Se la pagina è già completamente caricata,
+     * procediamo subito rispettando comunque
+     * la durata minima dell'animazione.
      */
     if (
       document.readyState ===
       "complete"
     ) {
-      tryFinishLoader();
+
+      finishLoader();
+
     } else {
 
       window.addEventListener(
         "load",
-        tryFinishLoader,
+        finishLoader,
         {
           once: true
         }
@@ -363,9 +441,9 @@
     }
 
     /*
-     * Fallback di sicurezza:
-     * il loader non può rimanere bloccato
-     * indefinitamente in caso di risorsa lenta.
+     * Fallback:
+     * nessuna risorsa può bloccare il loader
+     * per un tempo indefinito.
      */
     loaderFallbackTimer =
       window.setTimeout(
@@ -379,9 +457,12 @@
 
   /* ========================================================
      MENU
-     * ======================================================== */
+     ======================================================== */
 
-  const setMenuState = (open) => {
+  const setMenuState = (
+    open,
+    restoreFocus = true
+  ) => {
 
     const nextState =
       Boolean(open);
@@ -394,6 +475,11 @@
     ) {
       return;
     }
+
+
+    /* ------------------------------------
+       OPEN
+       ------------------------------------ */
 
     if (nextState) {
 
@@ -433,26 +519,37 @@
 
       setPageInert(true);
 
-      window.requestAnimationFrame(() => {
 
-        const focusable =
-          getFocusableMenuElements();
+      /*
+       * Aspettiamo un frame per permettere
+       * al menu di entrare nel DOM visivo.
+       */
+      window.requestAnimationFrame(
+        () => {
 
-        if (focusable.length) {
-          focusable[0].focus({
-            preventScroll: true
-          });
+          if (!menuOpen) {
+            return;
+          }
+
+          const focusable =
+            getFocusableMenuElements();
+
+          if (focusable.length) {
+
+            focusable[0].focus({
+              preventScroll: true
+            });
+          }
         }
-
-      });
+      );
 
       return;
     }
 
 
-    /*
-     * CHIUSURA
-     */
+    /* ------------------------------------
+       CLOSE
+       ------------------------------------ */
 
     menuOpen = false;
 
@@ -485,21 +582,35 @@
 
     setPageInert(false);
 
-    /*
-     * Restituisce il focus a chi aveva aperto il menu.
-     */
-    const focusTarget =
-      lastFocusedElement &&
-      document.contains(lastFocusedElement) &&
-      !lastFocusedElement.hasAttribute("disabled")
-        ? lastFocusedElement
-        : menuToggle;
 
-    window.requestAnimationFrame(() => {
-      focusTarget.focus({
-        preventScroll: true
-      });
-    });
+    /*
+     * Il focus viene ripristinato soltanto quando
+     * richiesto. Per esempio, quando si clicca un
+     * link del menu, possiamo lasciare il focus sul
+     * pulsante oppure evitare un salto visivo.
+     */
+    if (restoreFocus) {
+
+      const focusTarget =
+        lastFocusedElement &&
+        document.contains(
+          lastFocusedElement
+        ) &&
+        !lastFocusedElement.hasAttribute(
+          "disabled"
+        )
+          ? lastFocusedElement
+          : menuToggle;
+
+      window.requestAnimationFrame(
+        () => {
+
+          focusTarget.focus({
+            preventScroll: true
+          });
+        }
+      );
+    }
 
     lastFocusedElement = null;
   };
@@ -508,65 +619,83 @@
   menuToggle.addEventListener(
     "click",
     () => {
-      setMenuState(!menuOpen);
+
+      setMenuState(
+        !menuOpen
+      );
     }
   );
 
 
-  menuLinks.forEach((link) => {
+  /* ========================================================
+     MENU LINKS
+     ======================================================== */
 
-    link.addEventListener(
-      "click",
-      (event) => {
+  menuLinks.forEach(
+    (link) => {
 
-        const href =
-          link.getAttribute("href");
+      link.addEventListener(
+        "click",
+        (event) => {
 
-        if (
-          !href ||
-          !href.startsWith("#")
-        ) {
-          return;
-        }
+          const href =
+            link.getAttribute("href");
 
-        const target =
-          document.getElementById(
-            href.slice(1)
-          );
+          if (
+            !href ||
+            !href.startsWith("#")
+          ) {
+            return;
+          }
 
-        if (!target) {
-          return;
-        }
+          let id = "";
 
-        event.preventDefault();
+          try {
+            id =
+              decodeURIComponent(
+                href.slice(1)
+              );
+          } catch {
+            return;
+          }
 
-        const index =
-          getSectionIndex(target);
+          if (!id) {
+            return;
+          }
 
-        setMenuState(false);
+          const target =
+            document.getElementById(id);
 
-        if (index >= 0) {
-          setActiveSection(
-            index,
+          if (!target) {
+            return;
+          }
+
+          const index =
+            getSectionIndex(target);
+
+          if (index < 0) {
+            return;
+          }
+
+          event.preventDefault();
+
+          /*
+           * Chiudiamo il menu senza riportare
+           * il focus al pulsante.
+           */
+          setMenuState(
+            false,
             false
           );
+
+          navigateToSection(
+            index,
+            true
+          );
         }
-
-        scrollToSection(
-          target,
-          reducedMotion.matches
-            ? "auto"
-            : "smooth"
-        );
-
-        window.history.replaceState(
-          null,
-          "",
-          href
-        );
-      }
-    );
-  });
+      );
+    }
+  );
 
 
   /* ========================================================
@@ -582,10 +711,15 @@
       return;
     }
 
+    const numericIndex =
+      Number(index);
+
     const safeIndex =
       clamp(
-        Number.isFinite(Number(index))
-          ? Number(index)
+        Number.isFinite(
+          numericIndex
+        )
+          ? numericIndex
           : 0,
         0,
         sections.length - 1
@@ -601,11 +735,13 @@
       return;
     }
 
-    const chapter =
-      section.dataset.chapter || "";
+
+    /* ------------------------------------
+       CHAPTER
+       ------------------------------------ */
 
     activeChapter.textContent =
-      chapter;
+      section.dataset.chapter || "";
 
 
     /* ------------------------------------
@@ -709,16 +845,19 @@
        HASH
        ------------------------------------ */
 
-    if (updateHash) {
+    if (updateHash && section.id) {
 
-      const id =
-        section.id;
+      const nextHash =
+        `#${section.id}`;
 
-      if (id) {
+      if (
+        window.location.hash !==
+        nextHash
+      ) {
         window.history.replaceState(
           null,
           "",
-          `#${id}`
+          nextHash
         );
       }
     }
@@ -776,11 +915,9 @@
       getHeaderHeight();
 
     /*
-     * Anchor narrativo.
-     *
-     * Rimane sotto l'header e impedisce
-     * alla sezione successiva di prendere
-     * il controllo troppo presto.
+     * Punto narrativo:
+     * evita che il cambio capitolo avvenga
+     * appena una sezione entra dal basso.
      */
     const anchor =
       headerHeight +
@@ -996,26 +1133,9 @@
         return;
       }
 
-      const targetIndex =
-        activeIndex - 1;
-
-      const target =
-        sections[targetIndex];
-
-      if (!target) {
-        return;
-      }
-
-      setActiveSection(
-        targetIndex,
+      navigateToSection(
+        activeIndex - 1,
         true
-      );
-
-      scrollToSection(
-        target,
-        reducedMotion.matches
-          ? "auto"
-          : "smooth"
       );
     }
   );
@@ -1033,81 +1153,61 @@
         activeIndex ===
         sections.length - 1;
 
-
       if (last) {
 
-        const firstSection =
-          sections[0];
-
-        setActiveSection(
+        navigateToSection(
           0,
           true
         );
 
-        scrollToSection(
-          firstSection,
-          reducedMotion.matches
-            ? "auto"
-            : "smooth"
-        );
-
         return;
       }
 
-
-      const targetIndex =
-        activeIndex + 1;
-
-      const target =
-        sections[targetIndex];
-
-      if (!target) {
-        return;
-      }
-
-      setActiveSection(
-        targetIndex,
+      navigateToSection(
+        activeIndex + 1,
         true
-      );
-
-      scrollToSection(
-        target,
-        reducedMotion.matches
-          ? "auto"
-          : "smooth"
       );
     }
   );
 
 
   /* ========================================================
-     BRAND
+     BRAND / FOOTER
      ======================================================== */
 
-  if (brand) {
+  const bindReturnToStart = (element) => {
 
-    brand.addEventListener(
+    if (!element) {
+      return;
+    }
+
+    element.addEventListener(
       "click",
       (event) => {
 
         event.preventDefault();
 
-        setMenuState(false);
+        setMenuState(
+          false,
+          false
+        );
 
-        setActiveSection(
+        navigateToSection(
           0,
           true
         );
-
-        scrollToSection(
-          sections[0],
-          reducedMotion.matches
-            ? "auto"
-            : "smooth"
-        );
       }
     );
-  }
+  };
+
+
+  bindReturnToStart(
+    brand
+  );
+
+  bindReturnToStart(
+    footerMark
+  );
 
 
   /* ========================================================
@@ -1126,9 +1226,13 @@
         event.key === "Escape" &&
         menuOpen
       ) {
+
         event.preventDefault();
 
-        setMenuState(false);
+        setMenuState(
+          false,
+          true
+        );
 
         return;
       }
@@ -1163,6 +1267,7 @@
           event.shiftKey &&
           document.activeElement === first
         ) {
+
           event.preventDefault();
 
           last.focus();
@@ -1174,6 +1279,7 @@
           !event.shiftKey &&
           document.activeElement === last
         ) {
+
           event.preventDefault();
 
           first.focus();
@@ -1221,8 +1327,6 @@
         event.preventDefault();
 
         nextButton.click();
-
-        return;
       }
     }
   );
@@ -1244,11 +1348,14 @@
     let id = "";
 
     try {
+
       id =
         decodeURIComponent(
           hash.slice(1)
         );
+
     } catch {
+
       return;
     }
 
@@ -1287,6 +1394,8 @@
             ? "auto"
             : "smooth"
         );
+
+        requestNarrativeUpdate();
 
       },
       80
@@ -1390,6 +1499,8 @@
         window.clearTimeout(
           loaderMinTimer
         );
+
+        loaderMinTimer = null;
       }
 
       if (
@@ -1398,6 +1509,8 @@
         window.clearTimeout(
           loaderFallbackTimer
         );
+
+        loaderFallbackTimer = null;
       }
 
       if (
@@ -1406,6 +1519,8 @@
         window.clearTimeout(
           loaderExitTimer
         );
+
+        loaderExitTimer = null;
       }
 
       if (
@@ -1417,6 +1532,12 @@
 
         scrollFrame = null;
       }
+
+      body.classList.remove(
+        "menu-is-open"
+      );
+
+      setPageInert(false);
     }
   );
 
