@@ -1328,4 +1328,26 @@ main {
     background: white;
     color: black;
   }
+   /* =========================================================
+   EMERGENCY LOADER FAILSAFE
+   La pagina NON può rimanere nera se JS non parte.
+   ========================================================= */
+
+.site-loader {
+  display: none !important;
+}
+
+body.is-loading {
+  overflow: auto !important;
+}
+
+.story-opening {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.opening-title {
+  opacity: 1 !important;
+  transform: none !important;
+}
 }
