@@ -1,306 +1,249 @@
-/* ============================================================
-   CESARE PARATORE
-   V3.3 — MAXIMUM QUALITY
-   ============================================================ */
-
 (() => {
   "use strict";
 
-
-  /* ==========================================================
-     01. DOM
-     ========================================================== */
+  /*
+   * CESARE PARATORE
+   * Homepage interaction layer
+   *
+   * Principles:
+   * - navigation must work without animation
+   * - GSAP is progressive enhancement
+   * - no circular section navigation
+   * - menu is keyboard accessible
+   * - reduced motion is respected dynamically
+   * - active section is determined by a reading line
+   */
 
   const body = document.body;
   const html = document.documentElement;
 
-  const loader = document.getElementById("site-loader");
-  const standby = document.getElementById("standby");
+  const loader = document.getElementById("loader");
+  const loaderInner = loader?.querySelector(".loader-inner");
 
-  const header = document.querySelector(".site-header");
+  const standby = document.getElementById("standby");
 
   const menu = document.getElementById("menu");
   const menuTrigger = document.getElementById("menu-trigger");
   const menuLabel = menuTrigger?.querySelector(".menu-label");
-  const menuLinks = Array.from(
-    document.querySelectorAll("[data-menu-link]")
-  );
 
   const main = document.getElementById("main-content");
   const footer = document.querySelector(".site-footer");
+
+  const sectionNav = document.getElementById("section-nav");
+  const sectionPrev = document.getElementById("section-prev");
+  const sectionNext = document.getElementById("section-next");
+  const sectionTitle = document.getElementById("section-title");
+
+  const year = document.getElementById("current-year");
 
   const sections = Array.from(
     document.querySelectorAll(".story-section")
   );
 
-  const sectionNav = document.getElementById("section-nav");
-  const sectionNavTitle = document.getElementById("section-nav-title");
-
-  const prevButton = document.getElementById("nav-prev");
-  const nextButton = document.getElementById("nav-next");
-
-  const currentYear = document.getElementById("current-year");
-
-
-  /* ==========================================================
-     02. EXTERNAL MOTION ENGINE
-     ========================================================== */
+  const menuLinks = menu
+    ? Array.from(menu.querySelectorAll("a"))
+    : [];
 
   const GSAP = window.gsap || null;
   const ScrollTrigger = window.ScrollTrigger || null;
 
-
-  /* ==========================================================
-     03. CONFIG
-     ========================================================== */
-
   const CONFIG = {
     standbyDelay: 40000,
     loaderFailsafe: 3500,
-    activeLineViewportRatio: 0.32,
+
+    activeLineRatio: 0.32,
     activeLineMax: 260,
+
     scrollOffset: 12,
-    pointerActivityThrottle: 700
+
+    pointerThrottle: 700
   };
 
-
-  /* ==========================================================
-     04. STATE
-     ========================================================== */
-
-  let menuOpen = false;
   let activeIndex = 0;
-
-  let standbyTimer = null;
+  let menuOpen = false;
+  let loaderHidden = false;
   let standbyVisible = false;
 
-  let loaderHidden = false;
+  let standbyTimer = null;
+  let pointerActivityTimer = null;
 
-  let scrollFrame = null;
+  let previousFocusedElement = null;
   let resizeFrame = null;
-
-  let lastActivityTime = 0;
+  let pointerFrame = null;
 
   let reducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)"
   ).matches;
 
-  let animationsInitialized = false;
+  /* --------------------------------
+     UTILITIES
+  -------------------------------- */
 
-  const motionQuery = window.matchMedia(
-    "(prefers-reduced-motion: reduce)"
-  );
-
-
-  /* ==========================================================
-     05. UTILS
-     ========================================================== */
-
-  const clamp = (value, min, max) => {
-    return Math.min(Math.max(value, min), max);
-  };
-
+  const clamp = (value, min, max) =>
+    Math.min(Math.max(value, min), max);
 
   const getHeaderHeight = () => {
-    return header?.getBoundingClientRect().height || 76;
+    const header = document.querySelector(".site-header");
+
+    return header
+      ? header.getBoundingClientRect().height
+      : 0;
   };
 
+  const isVisible = (element) => {
+    if (!element) return false;
 
-  const getSectionNavHeight = () => {
-    return sectionNav?.getBoundingClientRect().height || 86;
+    const style = window.getComputedStyle(element);
+
+    return (
+      style.display !== "none" &&
+      style.visibility !== "hidden" &&
+      Number(style.opacity) !== 0
+    );
   };
 
+  /* --------------------------------
+     MENU ACCESSIBILITY
+  -------------------------------- */
 
-  const isPageHidden = () => {
-    return document.hidden;
-  };
-
-
-  /* ==========================================================
-     06. MENU ACCESSIBILITY
-     ========================================================== */
-
-  function setMenuTabState(disabled) {
+  const setMenuTabState = (disabled) => {
     menuLinks.forEach((link) => {
       if (disabled) {
+        link.dataset.previousTabindex =
+          link.getAttribute("tabindex") ?? "";
         link.setAttribute("tabindex", "-1");
-        return;
+      } else {
+        const previous =
+          link.dataset.previousTabindex;
+
+        if (previous) {
+          link.setAttribute("tabindex", previous);
+        } else {
+          link.removeAttribute("tabindex");
+        }
+
+        delete link.dataset.previousTabindex;
       }
-
-      link.removeAttribute("tabindex");
     });
-  }
+  };
 
-
-  function setInert(element, inert) {
-    if (!element) {
-      return;
-    }
+  const setInert = (element, value) => {
+    if (!element) return;
 
     if ("inert" in element) {
-      element.inert = inert;
-    }
-
-    if (inert) {
-      element.setAttribute("inert", "");
+      element.inert = value;
     } else {
-      element.removeAttribute("inert");
-    }
-  }
-
-
-  function setBackgroundInteractionDisabled(disabled) {
-    setInert(main, disabled);
-    setInert(footer, disabled);
-
-    if (main) {
-      if (disabled) {
-        main.setAttribute("aria-hidden", "true");
+      if (value) {
+        element.setAttribute("aria-hidden", "true");
       } else {
-        main.removeAttribute("aria-hidden");
+        element.removeAttribute("aria-hidden");
       }
     }
+  };
 
-    if (footer) {
-      if (disabled) {
-        footer.setAttribute("aria-hidden", "true");
-      } else {
-        footer.removeAttribute("aria-hidden");
-      }
-    }
-  }
+  const updateMenuLabel = () => {
+    if (!menuTrigger) return;
 
-
-  function updateMenuLabel(open) {
-    if (!menuTrigger) {
-      return;
-    }
+    const label = menuOpen ? "Chiudi menu" : "Apri menu";
 
     menuTrigger.setAttribute(
       "aria-label",
-      open ? "Chiudi menu" : "Apri menu"
+      label
     );
 
     if (menuLabel) {
-      menuLabel.textContent = open ? "Chiudi" : "Menu";
+      menuLabel.textContent = menuOpen
+        ? "Chiudi"
+        : "Menu";
     }
-  }
+  };
 
+  const setBackgroundInteraction = (disabled) => {
+    setInert(main, disabled);
+    setInert(footer, disabled);
+  };
 
-  function updateMenuState(open) {
-    menuOpen = open;
+  const updateMenuState = (open, options = {}) => {
+    if (!menu || !menuTrigger) return;
 
-    if (!menu || !menuTrigger) {
-      return;
-    }
+    menuOpen = Boolean(open);
 
-    menu.classList.toggle("is-open", open);
-    menuTrigger.classList.toggle("is-open", open);
+    menu.classList.toggle(
+      "is-open",
+      menuOpen
+    );
+
+    body.classList.toggle(
+      "menu-open",
+      menuOpen
+    );
 
     menu.setAttribute(
       "aria-hidden",
-      String(!open)
+      String(!menuOpen)
     );
 
     menuTrigger.setAttribute(
       "aria-expanded",
-      String(open)
+      String(menuOpen)
     );
 
-    setInert(menu, !open);
-    setMenuTabState(!open);
-    setBackgroundInteractionDisabled(open);
+    setMenuTabState(!menuOpen);
+    setBackgroundInteraction(menuOpen);
 
-    body.classList.toggle("menu-open", open);
-
-    updateMenuLabel(open);
-
-    if (open) {
-      hideStandby();
-      clearStandbyTimer();
-    } else {
-      scheduleStandby();
-    }
-  }
-
-
-  function getMenuFocusableElements() {
-    if (!menu) {
-      return [];
-    }
-
-    return Array.from(
-      menu.querySelectorAll(
-        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
-      )
-    ).filter((element) => {
-      return !element.hasAttribute("disabled");
-    });
-  }
-
-
-  let lastFocusedElement = null;
-
-
-  function openMenu() {
     if (menuOpen) {
-      return;
+      menu.removeAttribute("inert");
+    } else {
+      menu.setAttribute("inert", "");
     }
 
-    lastFocusedElement = document.activeElement;
+    updateMenuLabel();
 
-    updateMenuState(true);
-
-    requestAnimationFrame(() => {
-      const focusable = getMenuFocusableElements();
-
-      if (focusable.length) {
-        focusable[0].focus();
+    if (menuOpen) {
+      if (!options.skipFocus) {
+        window.requestAnimationFrame(() => {
+          menuLinks[0]?.focus();
+        });
       }
-    });
-  }
-
-
-  function closeMenu(options = {}) {
-    if (!menuOpen) {
-      return;
-    }
-
-    const {
-      restoreFocus = true
-    } = options;
-
-    updateMenuState(false);
-
-    if (
-      restoreFocus &&
-      lastFocusedElement &&
-      typeof lastFocusedElement.focus === "function"
+    } else if (
+      !options.skipRestoreFocus &&
+      previousFocusedElement
     ) {
-      requestAnimationFrame(() => {
-        lastFocusedElement.focus();
+      window.requestAnimationFrame(() => {
+        previousFocusedElement.focus?.();
       });
     }
+  };
 
-    lastFocusedElement = null;
-  }
+  const openMenu = () => {
+    if (menuOpen) return;
 
+    previousFocusedElement =
+      document.activeElement;
 
-  function toggleMenu() {
-    if (menuOpen) {
-      closeMenu();
-    } else {
-      openMenu();
-    }
-  }
+    updateMenuState(true);
+  };
 
+  const closeMenu = () => {
+    if (!menuOpen) return;
 
-  function trapMenuFocus(event) {
+    updateMenuState(false);
+  };
+
+  /* --------------------------------
+     FOCUS TRAP
+  -------------------------------- */
+
+  const trapFocus = (event) => {
     if (!menuOpen || event.key !== "Tab") {
       return;
     }
 
-    const focusable = getMenuFocusableElements();
+    const focusable = menuLinks.filter(
+      (element) =>
+        !element.hasAttribute("disabled") &&
+        element.getAttribute("tabindex") !== "-1"
+    );
 
     if (!focusable.length) {
       event.preventDefault();
@@ -314,847 +257,942 @@
     if (event.shiftKey && document.activeElement === first) {
       event.preventDefault();
       last.focus();
-      return;
-    }
-
-    if (!event.shiftKey && document.activeElement === last) {
+    } else if (
+      !event.shiftKey &&
+      document.activeElement === last
+    ) {
       event.preventDefault();
       first.focus();
     }
-  }
+  };
 
+  /* --------------------------------
+     MENU EVENTS
+  -------------------------------- */
 
-  menuTrigger?.addEventListener("click", toggleMenu);
+  menuTrigger?.addEventListener(
+    "click",
+    () => {
+      if (menuOpen) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    }
+  );
+
+  menuLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      closeMenu();
+    });
+  });
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && menuOpen) {
-      event.preventDefault();
       closeMenu();
       return;
     }
 
-    trapMenuFocus(event);
+    trapFocus(event);
   });
 
+  /* --------------------------------
+     SECTION NAVIGATION
+  -------------------------------- */
 
-  menuLinks.forEach((link) => {
-    link.addEventListener("click", () => {
-      closeMenu({
-        restoreFocus: false
-      });
-    });
-  });
+  const getSectionTitle = (section) => {
+    const title =
+      section?.querySelector(".story-title");
 
+    return title?.textContent
+      ?.trim()
+      .replace(/\s+/g, " ") || "";
+  };
 
-  /* ==========================================================
-     07. SECTION NAVIGATION
-     ========================================================== */
-
-  function setActiveSection(index) {
-    if (!sections.length) {
-      return;
-    }
-
-    const nextIndex = clamp(
-      index,
-      0,
-      sections.length - 1
-    );
-
-    activeIndex = nextIndex;
-
+  const updateSectionNav = () => {
     const section = sections[activeIndex];
 
-    if (!section) {
-      return;
+    if (!section) return;
+
+    const title = getSectionTitle(section);
+
+    if (sectionTitle) {
+      sectionTitle.textContent = title;
     }
 
-    const label =
-      section.dataset.label ||
-      section.querySelector(".story-eyebrow")?.textContent?.trim() ||
-      "";
-
-    if (sectionNavTitle) {
-      sectionNavTitle.textContent = label;
+    if (sectionPrev) {
+      sectionPrev.disabled =
+        activeIndex <= 0;
     }
 
-    if (prevButton) {
-      prevButton.disabled = activeIndex <= 0;
-
-      prevButton.setAttribute(
-        "aria-disabled",
-        String(activeIndex <= 0)
-      );
-    }
-
-    if (nextButton) {
-      nextButton.disabled =
+    if (sectionNext) {
+      sectionNext.disabled =
         activeIndex >= sections.length - 1;
-
-      nextButton.setAttribute(
-        "aria-disabled",
-        String(activeIndex >= sections.length - 1)
-      );
     }
+
+    const isLight =
+      section.classList.contains("story-light");
 
     if (sectionNav) {
-      const isLight = section.classList.contains("story-light");
-
-      sectionNav.dataset.theme = isLight
-        ? "light"
-        : "dark";
+      sectionNav.dataset.theme =
+        isLight ? "light" : "dark";
     }
 
     html.dataset.activeSection =
-      section.id || String(activeIndex + 1);
-  }
+      String(activeIndex);
+  };
 
+  const getReadingLine = () => {
+    const headerHeight =
+      getHeaderHeight();
 
-  function getActiveSection() {
-    if (!sections.length) {
-      return 0;
-    }
+    const offset = Math.min(
+      window.innerHeight *
+        CONFIG.activeLineRatio,
+      CONFIG.activeLineMax
+    );
 
-    const viewportHeight = window.innerHeight;
+    return headerHeight + offset;
+  };
+
+  const findActiveSection = () => {
+    if (!sections.length) return;
 
     const readingLine =
-      getHeaderHeight() +
-      Math.min(
-        viewportHeight * CONFIG.activeLineViewportRatio,
-        CONFIG.activeLineMax
-      );
+      getReadingLine();
 
-    let containingSection = null;
+    let containingIndex = -1;
 
-    for (const section of sections) {
-      const rect = section.getBoundingClientRect();
+    sections.forEach((section, index) => {
+      const rect =
+        section.getBoundingClientRect();
 
       if (
         rect.top <= readingLine &&
         rect.bottom > readingLine
       ) {
-        containingSection = section;
-        break;
+        containingIndex = index;
       }
+    });
+
+    if (containingIndex >= 0) {
+      setActiveSection(containingIndex);
+      return;
     }
 
-    if (containingSection) {
-      return sections.indexOf(containingSection);
-    }
-
-    let nearestIndex = 0;
-    let nearestDistance = Infinity;
+    let closestIndex = 0;
+    let closestDistance = Infinity;
 
     sections.forEach((section, index) => {
-      const rect = section.getBoundingClientRect();
+      const rect =
+        section.getBoundingClientRect();
 
-      const distance = Math.abs(
-        rect.top - readingLine
-      );
+      const distance =
+        Math.abs(rect.top - readingLine);
 
-      if (distance < nearestDistance) {
-        nearestDistance = distance;
-        nearestIndex = index;
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = index;
       }
     });
 
-    return nearestIndex;
-  }
+    setActiveSection(closestIndex);
+  };
 
+  const setActiveSection = (index) => {
+    const nextIndex = clamp(
+      index,
+      0,
+      Math.max(0, sections.length - 1)
+    );
 
-  function updateActiveSection() {
-    if (scrollFrame) {
+    if (nextIndex === activeIndex) {
+      updateSectionNav();
       return;
     }
 
-    scrollFrame = requestAnimationFrame(() => {
-      scrollFrame = null;
+    activeIndex = nextIndex;
 
-      const nextIndex = getActiveSection();
+    updateSectionNav();
+  };
 
-      if (nextIndex !== activeIndex) {
-        setActiveSection(nextIndex);
-      } else {
-        setActiveSection(activeIndex);
-      }
-    });
-  }
+  const getScrollTarget = (section) => {
+    const rect =
+      section.getBoundingClientRect();
 
+    const currentScroll =
+      window.scrollY ||
+      window.pageYOffset;
 
-  function scrollToSection(index, smooth = true) {
-    if (!sections[index]) {
-      return;
-    }
+    const headerOffset =
+      getHeaderHeight();
 
-    const section = sections[index];
+    return (
+      currentScroll +
+      rect.top -
+      headerOffset -
+      CONFIG.scrollOffset
+    );
+  };
 
-    const absoluteTop =
-      window.scrollY +
-      section.getBoundingClientRect().top;
+  const scrollToSection = (index) => {
+    if (!sections[index]) return;
 
     const target =
-      absoluteTop -
-      getHeaderHeight() -
-      CONFIG.scrollOffset;
-
-    window.scrollTo({
-      top: Math.max(0, target),
-      behavior:
-        smooth && !reducedMotion
-          ? "smooth"
-          : "auto"
-    });
-
-    setActiveSection(index);
-  }
-
-
-  prevButton?.addEventListener("click", () => {
-    if (activeIndex > 0) {
-      scrollToSection(activeIndex - 1);
-    }
-  });
-
-
-  nextButton?.addEventListener("click", () => {
-    if (activeIndex < sections.length - 1) {
-      scrollToSection(activeIndex + 1);
-    }
-  });
-
-
-  /* ==========================================================
-     08. SCROLL / ACTIVE SECTION
-     ========================================================== */
-
-  window.addEventListener(
-    "scroll",
-    updateActiveSection,
-    { passive: true }
-  );
-
-
-  /* ==========================================================
-     09. GSAP STORY ANIMATIONS
-     ========================================================== */
-
-  function killStoryScrollTriggers() {
-    if (!ScrollTrigger) {
-      return;
-    }
-
-    ScrollTrigger.getAll().forEach((trigger) => {
-      const id = trigger.vars?.id || "";
-
-      if (id.startsWith("story-")) {
-        trigger.kill();
-      }
-    });
-  }
-
-
-  function initStoryAnimations() {
-    if (!GSAP || !ScrollTrigger) {
-      return;
-    }
-
-    killStoryScrollTriggers();
-
-    animationsInitialized = false;
+      getScrollTarget(sections[index]);
 
     if (reducedMotion) {
-      sections.forEach((section) => {
-        GSAP.set(
-          section.querySelectorAll(
-            ".story-title, .story-body, .story-eyebrow, .place-map, .person-frame"
-          ),
-          {
-            clearProps: "all"
-          }
-        );
+      window.scrollTo({
+        top: target,
+        behavior: "auto"
       });
-
-      ScrollTrigger.refresh();
-
-      animationsInitialized = true;
-
       return;
     }
+
+    window.scrollTo({
+      top: target,
+      behavior: "smooth"
+    });
+  };
+
+  sectionPrev?.addEventListener(
+    "click",
+    () => {
+      if (activeIndex <= 0) return;
+
+      scrollToSection(
+        activeIndex - 1
+      );
+    }
+  );
+
+  sectionNext?.addEventListener(
+    "click",
+    () => {
+      if (
+        activeIndex >=
+        sections.length - 1
+      ) {
+        return;
+      }
+
+      scrollToSection(
+        activeIndex + 1
+      );
+    }
+  );
+
+  /* --------------------------------
+     ACTIVE SECTION OBSERVER
+  -------------------------------- */
+
+  let activeObserver = null;
+
+  const initSectionObserver = () => {
+    if (activeObserver) {
+      activeObserver.disconnect();
+    }
+
+    if (
+      !("IntersectionObserver" in window)
+    ) {
+      window.addEventListener(
+        "scroll",
+        findActiveSection,
+        { passive: true }
+      );
+
+      findActiveSection();
+      return;
+    }
+
+    activeObserver =
+      new IntersectionObserver(
+        () => {
+          findActiveSection();
+        },
+        {
+          threshold: [
+            0,
+            0.15,
+            0.35,
+            0.6,
+            0.85
+          ]
+        }
+      );
+
+    sections.forEach((section) => {
+      activeObserver.observe(section);
+    });
+
+    findActiveSection();
+  };
+
+  /* --------------------------------
+     GSAP
+  -------------------------------- */
+
+  let storyTriggers = [];
+
+  const killStoryAnimations = () => {
+    storyTriggers.forEach((trigger) => {
+      try {
+        trigger.kill();
+      } catch {
+        /* no-op */
+      }
+    });
+
+    storyTriggers = [];
+
+    if (ScrollTrigger) {
+      ScrollTrigger.getAll()
+        .filter(
+          (trigger) =>
+            trigger.vars?.id?.startsWith(
+              "story-"
+            )
+        )
+        .forEach((trigger) => {
+          trigger.kill();
+        });
+    }
+  };
+
+  const registerTrigger = (animation) => {
+    if (animation) {
+      storyTriggers.push(animation);
+    }
+  };
+
+  const initStoryAnimations = () => {
+    if (!GSAP || !ScrollTrigger || reducedMotion) {
+      return;
+    }
+
+    killStoryAnimations();
 
     GSAP.registerPlugin(ScrollTrigger);
 
-    sections.forEach((section) => {
+    sections.forEach((section, index) => {
       const title =
         section.querySelector(".story-title");
 
-      const bodyCopy =
-        section.querySelector(".story-body");
+      const bodyElements =
+        section.querySelectorAll(
+          ".story-body p, .story-lead"
+        );
 
-      const eyebrow =
-        section.querySelector(".story-eyebrow");
+      const meta =
+        section.querySelector(".story-meta");
 
-      const map =
-        section.querySelector(".place-map");
+      const frame =
+        section.querySelector(
+          ".place-map, .person-frame"
+        );
 
-      const personFrame =
-        section.querySelector(".person-frame");
+      /*
+       * Opening
+       */
+      if (
+        section.classList.contains(
+          "story-opening"
+        )
+      ) {
+        GSAP.set(title, {
+          opacity: 0,
+          y: 50
+        });
 
-      const opening =
-        section.classList.contains("story-opening");
+        GSAP.set(bodyElements, {
+          opacity: 0,
+          y: 24
+        });
 
-      const understand =
-        section.classList.contains("story-understand");
+        registerTrigger(
+          GSAP.to(title, {
+            opacity: 1,
+            y: 0,
+            duration: 1.15,
+            ease: "power4.out",
+            scrollTrigger: {
+              id: `story-${index}-title`,
+              trigger: section,
+              start: "top 75%",
+              once: true
+            }
+          })
+        );
 
-      const returnSection =
-        section.classList.contains("story-return");
+        registerTrigger(
+          GSAP.to(bodyElements, {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            stagger: 0.08,
+            delay: 0.22,
+            ease: "power3.out",
+            scrollTrigger: {
+              id: `story-${index}-body`,
+              trigger: section,
+              start: "top 68%",
+              once: true
+            }
+          })
+        );
 
-      const connect =
-        section.classList.contains("story-connect");
+        return;
+      }
 
-      const today =
-        section.classList.contains("story-today");
+      /*
+       * Understand
+       */
+      if (
+        section.classList.contains(
+          "story-understand"
+        )
+      ) {
+        GSAP.set(title, {
+          opacity: 0,
+          x: -40
+        });
 
-      const tl = GSAP.timeline({
-        id: `story-${section.id}`,
-        defaults: {
-          ease: "power3.out"
-        },
-        scrollTrigger: {
-          id: `story-${section.id}`,
-          trigger: section,
-          start: "top 72%",
-          once: true
+        GSAP.set(bodyElements, {
+          opacity: 0,
+          y: 25
+        });
+
+        registerTrigger(
+          GSAP.to(title, {
+            opacity: 1,
+            x: 0,
+            duration: 0.9,
+            ease: "power3.out",
+            scrollTrigger: {
+              id: `story-${index}-title`,
+              trigger: section,
+              start: "top 70%",
+              once: true
+            }
+          })
+        );
+
+        registerTrigger(
+          GSAP.to(bodyElements, {
+            opacity: 1,
+            y: 0,
+            duration: 0.75,
+            stagger: 0.1,
+            ease: "power3.out",
+            scrollTrigger: {
+              id: `story-${index}-body`,
+              trigger: section,
+              start: "top 65%",
+              once: true
+            }
+          })
+        );
+
+        return;
+      }
+
+      /*
+       * Return
+       */
+      if (
+        section.classList.contains(
+          "story-return"
+        )
+      ) {
+        GSAP.set(title, {
+          opacity: 0,
+          scale: 0.94,
+          y: 30
+        });
+
+        GSAP.set(bodyElements, {
+          opacity: 0,
+          y: 20
+        });
+
+        registerTrigger(
+          GSAP.to(title, {
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            duration: 1.15,
+            ease: "power4.out",
+            scrollTrigger: {
+              id: `story-${index}-title`,
+              trigger: section,
+              start: "top 70%",
+              once: true
+            }
+          })
+        );
+
+        registerTrigger(
+          GSAP.to(bodyElements, {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            stagger: 0.08,
+            delay: 0.25,
+            ease: "power3.out",
+            scrollTrigger: {
+              id: `story-${index}-body`,
+              trigger: section,
+              start: "top 62%",
+              once: true
+            }
+          })
+        );
+
+        return;
+      }
+
+      /*
+       * Connect
+       */
+      if (
+        section.classList.contains(
+          "story-connect"
+        )
+      ) {
+        GSAP.set(title, {
+          opacity: 0,
+          y: 30
+        });
+
+        GSAP.set(bodyElements, {
+          opacity: 0,
+          y: 20
+        });
+
+        registerTrigger(
+          GSAP.to(title, {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: "power4.out",
+            scrollTrigger: {
+              id: `story-${index}-title`,
+              trigger: section,
+              start: "top 68%",
+              once: true
+            }
+          })
+        );
+
+        registerTrigger(
+          GSAP.to(bodyElements, {
+            opacity: 1,
+            y: 0,
+            duration: 0.65,
+            stagger: 0.08,
+            delay: 0.2,
+            ease: "power3.out",
+            scrollTrigger: {
+              id: `story-${index}-body`,
+              trigger: section,
+              start: "top 60%",
+              once: true
+            }
+          })
+        );
+
+        return;
+      }
+
+      /*
+       * Today
+       */
+      if (
+        section.classList.contains(
+          "story-today"
+        )
+      ) {
+        GSAP.set(title, {
+          opacity: 0,
+          y: 35
+        });
+
+        GSAP.set(bodyElements, {
+          opacity: 0,
+          y: 25
+        });
+
+        registerTrigger(
+          GSAP.to(title, {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: "power4.out",
+            scrollTrigger: {
+              id: `story-${index}-title`,
+              trigger: section,
+              start: "top 70%",
+              once: true
+            }
+          })
+        );
+
+        registerTrigger(
+          GSAP.to(bodyElements, {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            stagger: 0.1,
+            delay: 0.18,
+            ease: "power3.out",
+            scrollTrigger: {
+              id: `story-${index}-body`,
+              trigger: section,
+              start: "top 60%",
+              once: true
+            }
+          })
+        );
+
+        return;
+      }
+
+      /*
+       * Generic sections
+       */
+      GSAP.set(
+        [meta, title],
+        {
+          opacity: 0,
+          y: 28
         }
+      );
+
+      GSAP.set(bodyElements, {
+        opacity: 0,
+        y: 22
       });
 
+      registerTrigger(
+        GSAP.to([meta, title], {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          stagger: 0.06,
+          ease: "power3.out",
+          scrollTrigger: {
+            id: `story-${index}-header`,
+            trigger: section,
+            start: "top 72%",
+            once: true
+          }
+        })
+      );
 
-      /* --------------------------------------------------------
-         EYEBROW
-         -------------------------------------------------------- */
+      registerTrigger(
+        GSAP.to(bodyElements, {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          stagger: 0.08,
+          delay: 0.15,
+          ease: "power3.out",
+          scrollTrigger: {
+            id: `story-${index}-body`,
+            trigger: section,
+            start: "top 64%",
+            once: true
+          }
+        })
+      );
 
-      if (eyebrow) {
-        tl.fromTo(
-          eyebrow,
-          {
-            opacity: 0,
-            y: 16
-          },
-          {
+      if (frame) {
+        GSAP.set(frame, {
+          opacity: 0,
+          y: 30
+        });
+
+        registerTrigger(
+          GSAP.to(frame, {
             opacity: 1,
             y: 0,
-            duration: 0.55
-          },
-          0
-        );
-      }
-
-
-      /* --------------------------------------------------------
-         OPENING
-         -------------------------------------------------------- */
-
-      if (opening) {
-        if (title) {
-          tl.fromTo(
-            title,
-            {
-              opacity: 0,
-              y: 70,
-              scale: 0.98
-            },
-            {
-              opacity: 1,
-              y: 0,
-              scale: 1,
-              duration: 1.05
-            },
-            0.05
-          );
-        }
-
-        if (bodyCopy) {
-          tl.fromTo(
-            bodyCopy,
-            {
-              opacity: 0,
-              y: 32
-            },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.7
-            },
-            0.35
-          );
-        }
-
-        return;
-      }
-
-
-      /* --------------------------------------------------------
-         CAPIRE
-         -------------------------------------------------------- */
-
-      if (understand) {
-        if (title) {
-          tl.fromTo(
-            title,
-            {
-              opacity: 0,
-              x: -35
-            },
-            {
-              opacity: 1,
-              x: 0,
-              duration: 0.8
-            },
-            0.05
-          );
-        }
-
-        if (bodyCopy) {
-          const paragraphs =
-            bodyCopy.querySelectorAll("p");
-
-          tl.fromTo(
-            paragraphs,
-            {
-              opacity: 0,
-              y: 24
-            },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.6,
-              stagger: 0.12
-            },
-            0.25
-          );
-        }
-
-        return;
-      }
-
-
-      /* --------------------------------------------------------
-         RITORNA
-         -------------------------------------------------------- */
-
-      if (returnSection) {
-        if (title) {
-          tl.fromTo(
-            title,
-            {
-              opacity: 0,
-              x: -50
-            },
-            {
-              opacity: 1,
-              x: 0,
-              duration: 0.9
-            },
-            0.05
-          );
-        }
-
-        if (bodyCopy) {
-          tl.fromTo(
-            bodyCopy,
-            {
-              opacity: 0,
-              y: 30
-            },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.7
-            },
-            0.35
-          );
-        }
-
-        return;
-      }
-
-
-      /* --------------------------------------------------------
-         COLLEGARE
-         -------------------------------------------------------- */
-
-      if (connect) {
-        if (title) {
-          tl.fromTo(
-            title,
-            {
-              opacity: 0,
-              y: 30
-            },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.75
-            },
-            0.05
-          );
-        }
-
-        const paragraphs =
-          bodyCopy?.querySelectorAll("p");
-
-        if (paragraphs?.length) {
-          tl.fromTo(
-            paragraphs,
-            {
-              opacity: 0,
-              y: 18
-            },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.45,
-              stagger: 0.08
-            },
-            0.28
-          );
-        }
-
-        return;
-      }
-
-
-      /* --------------------------------------------------------
-         OGGI
-         -------------------------------------------------------- */
-
-      if (today) {
-        if (title) {
-          tl.fromTo(
-            title,
-            {
-              opacity: 0,
-              y: 55
-            },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.9
-            },
-            0.05
-          );
-        }
-
-        const lead =
-          section.querySelector(".story-body-lead");
-
-        const finalLine =
-          section.querySelector(".story-today-final");
-
-        if (lead) {
-          tl.fromTo(
-            lead,
-            {
-              opacity: 0,
-              y: 25
-            },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.6
-            },
-            0.3
-          );
-        }
-
-        if (finalLine) {
-          tl.fromTo(
-            finalLine,
-            {
-              opacity: 0,
-              y: 20
-            },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.55
-            },
-            0.5
-          );
-        }
-
-        return;
-      }
-
-
-      /* --------------------------------------------------------
-         PLACE
-         -------------------------------------------------------- */
-
-      if (map) {
-        tl.fromTo(
-          map,
-          {
-            opacity: 0,
-            y: 30
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.75
-          },
-          0.25
-        );
-      }
-
-
-      /* --------------------------------------------------------
-         PERSON
-         -------------------------------------------------------- */
-
-      if (personFrame) {
-        tl.fromTo(
-          personFrame,
-          {
-            opacity: 0,
-            y: 35,
-            scale: 0.985
-          },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.9
-          },
-          0.2
-        );
-      }
-
-
-      /* --------------------------------------------------------
-         GENERIC STORY
-         -------------------------------------------------------- */
-
-      if (title) {
-        tl.fromTo(
-          title,
-          {
-            opacity: 0,
-            y: 36
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8
-          },
-          0.08
-        );
-      }
-
-      if (bodyCopy) {
-        tl.fromTo(
-          bodyCopy,
-          {
-            opacity: 0,
-            y: 24
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.65
-          },
-          0.28
+            duration: 0.9,
+            ease: "power3.out",
+            scrollTrigger: {
+              id: `story-${index}-frame`,
+              trigger: section,
+              start: "top 70%",
+              once: true
+            }
+          })
         );
       }
     });
 
-    animationsInitialized = true;
-
     ScrollTrigger.refresh();
-  }
+  };
 
+  /* --------------------------------
+     LOADER
+  -------------------------------- */
 
-  /* ==========================================================
-     10. LOADER
-     ========================================================== */
-
-  function hideLoader() {
+  const hideLoader = () => {
     if (loaderHidden || !loader) {
       return;
     }
 
     loaderHidden = true;
 
-    if (reducedMotion || !GSAP) {
-      loader.classList.add("is-hidden");
+    if (!GSAP || reducedMotion) {
+      loader.style.display = "none";
       return;
     }
+
+    GSAP.to(loaderInner, {
+      opacity: 0,
+      duration: 0.3,
+      ease: "power2.out"
+    });
 
     GSAP.to(loader, {
-      autoAlpha: 0,
-      duration: 0.65,
-      ease: "power2.out",
+      opacity: 0,
+      duration: 0.7,
+      delay: 0.15,
+      ease: "power3.inOut",
       onComplete: () => {
-        loader.classList.add("is-hidden");
+        loader.style.display = "none";
       }
     });
-  }
+  };
 
+  const initLoader = () => {
+    if (!loader) return;
 
-  function initLoader() {
-    if (!loader) {
+    if (reducedMotion || !GSAP) {
+      hideLoader();
       return;
     }
 
-    window.addEventListener(
-      "load",
-      hideLoader,
-      { once: true }
-    );
+    GSAP.set(loaderInner, {
+      opacity: 0,
+      y: 8
+    });
+
+    GSAP.to(loaderInner, {
+      opacity: 1,
+      y: 0,
+      duration: 0.7,
+      ease: "power3.out"
+    });
 
     window.setTimeout(
       hideLoader,
       CONFIG.loaderFailsafe
     );
-  }
+  };
 
+  window.addEventListener(
+    "load",
+    () => {
+      hideLoader();
+    },
+    { once: true }
+  );
 
-  /* ==========================================================
-     11. STANDBY
-     ========================================================== */
+  /* --------------------------------
+     STANDBY
+  -------------------------------- */
 
-  function clearStandbyTimer() {
-    if (standbyTimer) {
-      window.clearTimeout(standbyTimer);
-      standbyTimer = null;
+  const hideStandby = () => {
+    if (!standby || !standbyVisible) {
+      return;
     }
-  }
 
+    standbyVisible = false;
 
-  function showStandby() {
+    body.classList.remove(
+      "standby-active"
+    );
+
+    standby.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    if (!GSAP || reducedMotion) {
+      standby.style.opacity = "0";
+      standby.style.visibility = "hidden";
+      return;
+    }
+
+    GSAP.to(standby, {
+      opacity: 0,
+      duration: 0.45,
+      ease: "power2.out",
+      onComplete: () => {
+        standby.style.visibility =
+          "hidden";
+      }
+    });
+  };
+
+  const showStandby = () => {
     if (
       !standby ||
+      standbyVisible ||
       menuOpen ||
-      isPageHidden()
+      document.hidden
     ) {
       return;
     }
 
     standbyVisible = true;
 
-    standby.classList.add("is-visible");
-    standby.setAttribute("aria-hidden", "false");
-  }
+    body.classList.add(
+      "standby-active"
+    );
 
+    standby.setAttribute(
+      "aria-hidden",
+      "false"
+    );
 
-  function hideStandby() {
-    if (!standby) {
+    standby.style.visibility =
+      "visible";
+
+    if (!GSAP || reducedMotion) {
+      standby.style.opacity = "1";
       return;
     }
 
-    standbyVisible = false;
+    GSAP.to(standby, {
+      opacity: 1,
+      duration: 0.7,
+      ease: "power3.out"
+    });
+  };
 
-    standby.classList.remove("is-visible");
-    standby.setAttribute("aria-hidden", "true");
-  }
+  const resetStandbyTimer = () => {
+    window.clearTimeout(
+      standbyTimer
+    );
 
+    hideStandby();
 
-  function scheduleStandby() {
-    clearStandbyTimer();
+    standbyTimer = window.setTimeout(
+      showStandby,
+      CONFIG.standbyDelay
+    );
+  };
 
-    if (
-      menuOpen ||
-      isPageHidden()
-    ) {
+  const handleActivity = () => {
+    if (pointerFrame) {
       return;
     }
 
-    standbyTimer = window.setTimeout(() => {
-      if (
-        !menuOpen &&
-        !isPageHidden()
-      ) {
-        showStandby();
-      }
-    }, CONFIG.standbyDelay);
-  }
+    pointerFrame =
+      window.requestAnimationFrame(() => {
+        pointerFrame = null;
 
+        resetStandbyTimer();
+      });
+  };
 
-  function registerActivity(event) {
-    const now = performance.now();
-
-    if (
-      event?.type === "pointermove" &&
-      now - lastActivityTime <
-      CONFIG.pointerActivityThrottle
-    ) {
-      return;
-    }
-
-    lastActivityTime = now;
-
-    if (standbyVisible) {
-      hideStandby();
-    }
-
-    if (!menuOpen) {
-      scheduleStandby();
-    }
-  }
-
+  /* --------------------------------
+     ACTIVITY EVENTS
+  -------------------------------- */
 
   [
-    "pointerdown",
     "keydown",
+    "click",
     "wheel",
     "touchstart",
     "scroll"
   ].forEach((eventName) => {
     window.addEventListener(
       eventName,
-      registerActivity,
+      handleActivity,
       {
-        passive: eventName !== "keydown"
+        passive:
+          eventName !== "keydown" &&
+          eventName !== "click"
       }
     );
   });
 
-
   window.addEventListener(
     "pointermove",
-    registerActivity,
+    () => {
+      if (pointerActivityTimer) {
+        return;
+      }
+
+      pointerActivityTimer =
+        window.setTimeout(() => {
+          pointerActivityTimer = null;
+          resetStandbyTimer();
+        }, CONFIG.pointerThrottle);
+    },
     { passive: true }
   );
 
+  /* --------------------------------
+     VISIBILITY
+  -------------------------------- */
 
-  standby?.addEventListener(
-    "click",
+  document.addEventListener(
+    "visibilitychange",
     () => {
-      hideStandby();
-      scheduleStandby();
-    }
-  );
+      if (document.hidden) {
+        window.clearTimeout(
+          standbyTimer
+        );
+        return;
+      }
 
-
-  /* ==========================================================
-     12. RESPONSIVE / VIEWPORT
-     ========================================================== */
-
-  function refreshLayout() {
-    if (resizeFrame) {
-      return;
-    }
-
-    resizeFrame = requestAnimationFrame(() => {
-      resizeFrame = null;
-
-      updateActiveSection();
+      resetStandbyTimer();
 
       if (ScrollTrigger) {
         ScrollTrigger.refresh();
       }
-    });
-  }
 
+      findActiveSection();
+    }
+  );
+
+  window.addEventListener(
+    "pageshow",
+    () => {
+      if (ScrollTrigger) {
+        ScrollTrigger.refresh();
+      }
+
+      findActiveSection();
+      resetStandbyTimer();
+    }
+  );
+
+  /* --------------------------------
+     RESIZE / ORIENTATION
+  -------------------------------- */
+
+  const refreshLayout = () => {
+    if (resizeFrame) {
+      return;
+    }
+
+    resizeFrame =
+      window.requestAnimationFrame(() => {
+        resizeFrame = null;
+
+        findActiveSection();
+
+        if (ScrollTrigger) {
+          ScrollTrigger.refresh();
+        }
+      });
+  };
 
   window.addEventListener(
     "resize",
@@ -1162,162 +1200,159 @@
     { passive: true }
   );
 
-
   window.addEventListener(
     "orientationchange",
-    refreshLayout,
+    () => {
+      window.setTimeout(
+        refreshLayout,
+        150
+      );
+    },
     { passive: true }
   );
 
+  /* --------------------------------
+     REDUCED MOTION
+  -------------------------------- */
 
-  /* ==========================================================
-     13. VISIBILITY / BFCACHE
-     ========================================================== */
+  const reducedMotionQuery =
+    window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    );
 
-  document.addEventListener(
-    "visibilitychange",
-    () => {
-      if (document.hidden) {
-        clearStandbyTimer();
-        return;
+  const handleReducedMotionChange = (
+    event
+  ) => {
+    reducedMotion = event.matches;
+
+    if (reducedMotion) {
+      killStoryAnimations();
+
+      if (ScrollTrigger) {
+        ScrollTrigger.refresh();
       }
 
-      scheduleStandby();
-      updateActiveSection();
+      hideStandby();
+    } else {
+      initStoryAnimations();
 
       if (ScrollTrigger) {
         ScrollTrigger.refresh();
       }
     }
-  );
-
-
-  window.addEventListener(
-    "pageshow",
-    (event) => {
-      if (menuOpen) {
-        closeMenu({
-          restoreFocus: false
-        });
-      }
-
-      if (event.persisted && ScrollTrigger) {
-        ScrollTrigger.refresh();
-      }
-
-      updateActiveSection();
-      scheduleStandby();
-    }
-  );
-
-
-  /* ==========================================================
-     14. REDUCED MOTION
-     ========================================================== */
-
-  function handleMotionPreferenceChange() {
-    reducedMotion = motionQuery.matches;
-
-    html.classList.toggle(
-      "reduced-motion",
-      reducedMotion
-    );
-
-    initStoryAnimations();
-
-    if (reducedMotion) {
-      hideStandby();
-    }
-
-    updateActiveSection();
-  }
-
+  };
 
   if (
-    typeof motionQuery.addEventListener === "function"
+    typeof reducedMotionQuery.addEventListener ===
+    "function"
   ) {
-    motionQuery.addEventListener(
+    reducedMotionQuery.addEventListener(
       "change",
-      handleMotionPreferenceChange
+      handleReducedMotionChange
     );
-  } else if (
-    typeof motionQuery.addListener === "function"
-  ) {
-    motionQuery.addListener(
-      handleMotionPreferenceChange
+  } else {
+    reducedMotionQuery.addListener(
+      handleReducedMotionChange
     );
   }
 
+  /* --------------------------------
+     HASH NAVIGATION
+  -------------------------------- */
 
-  /* ==========================================================
-     15. INITIAL HASH
-     ========================================================== */
+  const scrollToHash = () => {
+    const hash =
+      window.location.hash;
 
-  function handleInitialHash() {
-    if (!window.location.hash) {
+    if (!hash) return;
+
+    let target = null;
+
+    try {
+      target =
+        document.querySelector(hash);
+    } catch {
       return;
     }
 
-    const rawId =
-      window.location.hash.slice(1);
+    if (!target) return;
 
-    if (!rawId) {
-      return;
-    }
-
-    const target =
-      document.getElementById(rawId);
-
-    if (!target || !sections.includes(target)) {
-      return;
-    }
-
-    const index =
-      sections.indexOf(target);
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        scrollToSection(index, false);
-      });
+    window.requestAnimationFrame(() => {
+      window.setTimeout(() => {
+        scrollToSection(
+          sections.indexOf(target)
+        );
+      }, 80);
     });
-  }
+  };
 
+  window.addEventListener(
+    "hashchange",
+    scrollToHash
+  );
 
-  /* ==========================================================
-     16. CURRENT YEAR
-     ========================================================== */
+  /* --------------------------------
+     YEAR
+  -------------------------------- */
 
-  if (currentYear) {
-    currentYear.textContent =
+  if (year) {
+    year.textContent =
       String(new Date().getFullYear());
   }
 
+  /* --------------------------------
+     INITIAL STATE
+  -------------------------------- */
 
-  /* ==========================================================
-     17. INITIALIZATION
-     ========================================================== */
+  const init = () => {
+    /*
+     * Closed menu must be truly non-interactive
+     * from the very first frame.
+     */
+    updateMenuState(false, {
+      skipFocus: true,
+      skipRestoreFocus: true
+    });
 
-  function init() {
-    updateMenuState(false);
+    updateSectionNav();
 
-    setActiveSection(0);
+    initSectionObserver();
 
     initLoader();
 
     initStoryAnimations();
 
-    handleInitialHash();
+    scrollToHash();
 
-    updateActiveSection();
+    /*
+     * Hash navigation can change the active
+     * section after layout has settled.
+     */
+    window.setTimeout(
+      findActiveSection,
+      120
+    );
 
-    scheduleStandby();
+    resetStandbyTimer();
 
     if (ScrollTrigger) {
-      ScrollTrigger.refresh();
+      window.setTimeout(
+        () => ScrollTrigger.refresh(),
+        150
+      );
     }
+  };
+
+  if (
+    document.readyState ===
+    "loading"
+  ) {
+    document.addEventListener(
+      "DOMContentLoaded",
+      init,
+      { once: true }
+    );
+  } else {
+    init();
   }
-
-
-  init();
-
 })();
