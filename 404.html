@@ -1,29 +1,33 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
 
-  <title>Pagina non trovata — Cesare Paratore</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <title>404 — Cesare Paratore</title>
 
   <meta
     name="description"
-    content="La pagina che stai cercando non è disponibile."
+    content="La pagina richiesta non è disponibile."
   >
 
   <meta name="robots" content="noindex, follow">
+  <meta name="theme-color" content="#0B0B0A">
+  <meta name="color-scheme" content="dark">
 
-  <meta name="theme-color" content="#F1EFE8">
+  <link rel="canonical" href="https://cesareparatore.github.io/404.html">
+  <link rel="icon" type="image/svg+xml" href="/assets/images/cp-mark.svg">
 
   <style>
     :root {
       --bg: #0B0B0A;
       --light: #F1EFE8;
       --secondary: #A7A49C;
-      --muted: #66645F;
-
       --gutter: 5vw;
-      --header-h: 76px;
     }
 
     * {
@@ -31,47 +35,129 @@
     }
 
     html {
-      background: var(--light);
+      min-height: 100%;
     }
 
     body {
       margin: 0;
-      min-width: 320px;
       min-height: 100svh;
 
-      background: var(--light);
-      color: var(--bg);
+      display: grid;
+      place-items: center;
+
+      padding:
+        4rem
+        var(--gutter)
+        5rem;
+
+      background: var(--bg);
+      color: var(--light);
 
       font-family:
-        "Neue Montreal",
-        "Helvetica Neue",
-        Helvetica,
         Arial,
+        Helvetica,
         sans-serif;
 
       -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-
-      overflow-x: hidden;
     }
 
-    body.menu-open {
-      overflow: hidden;
+    main {
+      width: min(100%, 1100px);
     }
 
-    img {
-      display: block;
-      max-width: 100%;
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 2rem;
+
+      margin-bottom: clamp(5rem, 15vh, 10rem);
     }
 
-    a {
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+
       color: inherit;
       text-decoration: none;
+
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
     }
 
-    button {
-      font: inherit;
-      cursor: pointer;
+    .brand img {
+      width: 28px;
+      height: 28px;
+
+      filter: invert(1);
+    }
+
+    .eyebrow {
+      margin: 0 0 1.5rem;
+
+      color: var(--secondary);
+
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+    }
+
+    h1 {
+      margin: 0;
+
+      font-size: clamp(5rem, 18vw, 13rem);
+      line-height: 0.8;
+      letter-spacing: -0.08em;
+    }
+
+    .message {
+      max-width: 650px;
+
+      margin-top: clamp(3rem, 7vw, 6rem);
+
+      font-size: clamp(1.25rem, 2vw, 2rem);
+      line-height: 1.35;
+    }
+
+    .message p {
+      margin: 0;
+    }
+
+    .message p + p {
+      margin-top: 0.75em;
+      color: var(--secondary);
+    }
+
+    .home-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.9rem;
+
+      margin-top: 3rem;
+
+      padding-bottom: 0.5rem;
+
+      border-bottom: 2px solid currentColor;
+
+      color: inherit;
+      text-decoration: none;
+
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+
+      transition:
+        gap 220ms ease,
+        opacity 220ms ease;
+    }
+
+    .home-link:hover,
+    .home-link:focus-visible {
+      gap: 1.4rem;
+      opacity: 0.65;
     }
 
     :focus-visible {
@@ -79,481 +165,75 @@
       outline-offset: 5px;
     }
 
-    /* =====================================================
-       HEADER
-       ===================================================== */
-
-    .site-header {
-      position: fixed;
-      inset: 0 0 auto 0;
-      z-index: 300;
-
-      height: var(--header-h);
-      padding: 0 var(--gutter);
-
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      background: var(--light);
-      color: var(--bg);
-    }
-
-    .site-logo {
-      width: 42px;
-      height: 42px;
-
-      display: flex;
-      align-items: center;
-    }
-
-    .site-logo img {
-      width: 100%;
-      height: auto;
-    }
-
-    .menu-trigger {
-      min-width: 92px;
-      min-height: 44px;
-      padding: 0 18px;
-
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-
-      border: 1px solid var(--bg);
-
-      background: var(--bg);
-      color: var(--light);
-
-      font-size: .8rem;
-      line-height: 1;
-      letter-spacing: .12em;
-    }
-
-    /* =====================================================
-       MENU
-       ===================================================== */
-
-    .site-menu {
-      position: fixed;
-      top: var(--header-h);
-      right: 0;
-      bottom: 0;
-      left: 0;
-
-      z-index: 250;
-
-      display: grid;
-      place-items: center;
-
-      padding: 48px var(--gutter);
-
-      background: var(--bg);
-      color: var(--light);
-
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-
-      transition:
-        opacity .35s ease,
-        visibility 0s linear .35s;
-    }
-
-    .site-menu.is-open {
-      opacity: 1;
-      visibility: visible;
-      pointer-events: auto;
-
-      transition:
-        opacity .35s ease,
-        visibility 0s linear 0s;
-    }
-
-    .site-menu-nav {
-      width: 100%;
-
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-
-      gap: clamp(12px, 1.7vh, 24px);
-    }
-
-    .site-menu-nav a {
-      color: var(--light);
-
-      font-size: clamp(2rem, 5vw, 5rem);
-      line-height: .95;
-      letter-spacing: -.035em;
-      text-align: center;
-
-      transition: opacity .25s ease;
-    }
-
-    .site-menu-nav a:hover {
-      opacity: .5;
-    }
-
-    /* =====================================================
-       404
-       ===================================================== */
-
-    .error-page {
-      min-height: 100svh;
-      padding-top: var(--header-h);
-
-      display: grid;
-      grid-template-rows: 1fr auto;
-    }
-
-    .error-section {
-      min-height: calc(100svh - var(--header-h));
-
-      display: grid;
-      place-items: center;
-
-      padding: 8vh var(--gutter);
-    }
-
-    .error-content {
-      width: min(100%, 820px);
-      margin: 0 auto;
-
-      text-align: center;
-    }
-
-    .error-code {
-      margin: 0 0 clamp(28px, 4vh, 48px);
-
-      color: var(--muted);
-
-      font-size: .8rem;
-      line-height: 1;
-      letter-spacing: .14em;
-    }
-
-    .error-content h1 {
-      margin: 0;
-
-      font-size: clamp(3rem, 7vw, 7rem);
-      line-height: .92;
-      letter-spacing: -.045em;
-      font-weight: 500;
-    }
-
-    .error-message {
-      max-width: 42rem;
-      margin: clamp(32px, 5vh, 56px) auto 0;
-
-      color: var(--secondary);
-
-      font-size: clamp(1.15rem, 1.35vw, 1.5rem);
-      line-height: 1.5;
-    }
-
-    .error-link {
-      display: inline-block;
-
-      margin-top: clamp(36px, 6vh, 64px);
-      padding-bottom: 8px;
-
-      border-bottom: 1px solid var(--bg);
-
-      font-size: .8rem;
-      line-height: 1;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-
-      transition: opacity .25s ease;
-    }
-
-    .error-link:hover {
-      opacity: .5;
-    }
-
-    /* =====================================================
-       FOOTER
-       ===================================================== */
-
-    .site-footer {
-      min-height: 88px;
-
-      padding: 24px var(--gutter);
-
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      gap: 24px;
-
-      background: var(--light);
-      color: var(--bg);
-    }
-
-    .footer-logo {
-      width: 38px;
-      height: 38px;
-
-      display: flex;
-      align-items: center;
-    }
-
-    .footer-logo img {
-      width: 100%;
-      height: auto;
-    }
-
-    .site-footer span {
-      font-size: .8rem;
-      line-height: 1;
-      letter-spacing: .12em;
-    }
-
-    /* =====================================================
-       MOBILE
-       ===================================================== */
-
-    @media (max-width: 640px) {
-
+    @media (max-width: 600px) {
       :root {
-        --gutter: 20px;
-        --header-h: 68px;
+        --gutter: 6vw;
       }
 
-      .site-logo {
-        width: 38px;
-        height: 38px;
+      .top {
+        margin-bottom: 6rem;
       }
 
-      .menu-trigger {
-        min-width: 84px;
-        min-height: 42px;
-      }
-
-      .site-menu {
-        padding: 32px 20px;
-      }
-
-      .site-menu-nav {
-        gap: 14px;
-      }
-
-      .site-menu-nav a {
-        font-size: clamp(1.8rem, 9vw, 3rem);
-      }
-
-      .error-section {
-        padding: 48px 20px;
-      }
-
-      .error-content h1 {
-        font-size: clamp(2.8rem, 13vw, 4.5rem);
-      }
-
-      .error-message {
-        font-size: 1.15rem;
-      }
-
-      .site-footer {
-        min-height: 76px;
-        padding: 20px;
+      .brand span {
+        display: none;
       }
     }
-
-    /* =====================================================
-       REDUCED MOTION
-       ===================================================== */
 
     @media (prefers-reduced-motion: reduce) {
-
-      .site-menu,
-      .site-menu-nav a,
-      .error-link {
-        transition: none;
+      *,
+      *::before,
+      *::after {
+        transition: none !important;
       }
     }
   </style>
 </head>
 
 <body>
+  <main>
 
-  <!-- HEADER -->
-
-  <header class="site-header">
-
-    <a
-      class="site-logo"
-      href="/"
-      aria-label="Cesare Paratore — Home"
-    >
-      <img
-        src="/assets/images/cp-mark.svg"
-        alt="CP"
-        width="42"
-        height="42"
-      >
-    </a>
-
-    <button
-      class="menu-trigger"
-      type="button"
-      aria-expanded="false"
-      aria-controls="site-menu"
-    >
-      MENU
-    </button>
-
-  </header>
-
-
-  <!-- MENU -->
-
-  <aside
-    class="site-menu"
-    id="site-menu"
-    aria-hidden="true"
-  >
-
-    <nav
-      class="site-menu-nav"
-      aria-label="Navigazione principale"
-    >
-
-      <a href="/chi-sono/">CHI SONO</a>
-      <a href="/sport/">SPORT</a>
-      <a href="/scienze-motorie/">SCIENZE MOTORIE</a>
-      <a href="/educazione/">EDUCAZIONE</a>
-      <a href="/management/">MANAGEMENT</a>
-      <a href="/digitale/">DIGITALE</a>
-      <a href="/territorio/">TERRITORIO</a>
-      <a href="/contatti/">CONTATTI</a>
-
-    </nav>
-
-  </aside>
-
-
-  <!-- 404 -->
-
-  <main class="error-page">
-
-    <section
-      class="error-section"
-      aria-labelledby="error-title"
-    >
-
-      <div class="error-content">
-
-        <p
-          class="error-code"
-          aria-hidden="true"
-        >
-          404
-        </p>
-
-        <h1 id="error-title">
-          Questa pagina non è dove pensavi di trovarla.
-        </h1>
-
-        <p class="error-message">
-          Ma forse è un buon momento per tornare a guardare.
-        </p>
-
-        <a
-          class="error-link"
-          href="/"
-        >
-          Torna all'inizio →
-        </a>
-
-      </div>
-
-    </section>
-
-
-    <!-- FOOTER -->
-
-    <footer class="site-footer">
-
+    <div class="top">
       <a
-        class="footer-logo"
+        class="brand"
         href="/"
         aria-label="Cesare Paratore — Home"
       >
         <img
           src="/assets/images/cp-mark.svg"
-          alt="CP"
-          width="38"
-          height="38"
+          alt=""
+          width="512"
+          height="512"
         >
+        <span>CESARE PARATORE</span>
       </a>
 
-      <span>CESARE PARATORE</span>
+      <span
+        class="eyebrow"
+        aria-hidden="true"
+      >
+        404
+      </span>
+    </div>
 
-    </footer>
+    <p class="eyebrow">PAGINA NON TROVATA</p>
+
+    <h1>404.</h1>
+
+    <div class="message">
+      <p>Questa pagina non esiste.</p>
+      <p>
+        Ma puoi tornare da dove sei partito.
+      </p>
+    </div>
+
+    <a
+      class="home-link"
+      href="/"
+    >
+      TORNA ALLA HOME
+      <span aria-hidden="true">→</span>
+    </a>
 
   </main>
-
-
-  <!-- MENU SCRIPT -->
-
-  <script>
-    (() => {
-      "use strict";
-
-      const body = document.body;
-      const trigger = document.querySelector(".menu-trigger");
-      const menu = document.querySelector(".site-menu");
-      const links = document.querySelectorAll(".site-menu-nav a");
-
-      if (!trigger || !menu) {
-        return;
-      }
-
-      const setMenu = (open) => {
-        trigger.setAttribute(
-          "aria-expanded",
-          String(open)
-        );
-
-        menu.setAttribute(
-          "aria-hidden",
-          String(!open)
-        );
-
-        menu.classList.toggle(
-          "is-open",
-          open
-        );
-
-        body.classList.toggle(
-          "menu-open",
-          open
-        );
-      };
-
-      trigger.addEventListener("click", () => {
-        const open =
-          trigger.getAttribute("aria-expanded") === "true";
-
-        setMenu(!open);
-      });
-
-      links.forEach((link) => {
-        link.addEventListener("click", () => {
-          setMenu(false);
-        });
-      });
-
-      document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") {
-          setMenu(false);
-        }
-      });
-    })();
-  </script>
-
 </body>
 </html>
