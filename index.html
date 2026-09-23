@@ -1,110 +1,48 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale</title>
+  <title>Cesare Paratore — Sport, Scienze Motorie, Educazione, Management e Digitale</title>
 
   <meta
     name="description"
-    content="Cesare Paratore: un percorso tra sport, scienze motorie, educazione, management e digitale. Osservare, capire, collegare e costruire."
+    content="Cesare Paratore: sport, scienze motorie, educazione, management e digitale. Un percorso trasversale tra esperienza, studio, progettazione e territorio."
   >
 
   <meta name="author" content="Cesare Paratore">
-  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="robots" content="index, follow">
 
   <link rel="canonical" href="https://cesareparatore.github.io/">
 
-  <meta name="theme-color" content="#0B0B0A">
-  <meta name="color-scheme" content="dark light">
-
-  <link
-    rel="icon"
-    href="/assets/images/cp-mark.svg"
-    type="image/svg+xml"
-  >
-
-  <link
-    rel="preload"
-    href="/assets/images/cp-mark.svg"
-    as="image"
-    type="image/svg+xml"
-  >
-
-  <meta
-    property="og:type"
-    content="website"
-  >
-
-  <meta
-    property="og:locale"
-    content="it_IT"
-  >
-
-  <meta
-    property="og:title"
-    content="Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale"
-  >
-
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="Cesare Paratore — Sport, Scienze Motorie, Educazione, Management e Digitale">
   <meta
     property="og:description"
-    content="Un percorso tra sport, scienze motorie, educazione, management e digitale."
+    content="Un percorso tra sport, studio, educazione, progettazione, digitale e territorio."
   >
+  <meta property="og:url" content="https://cesareparatore.github.io/">
+  <meta property="og:image" content="https://cesareparatore.github.io/assets/images/cp.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
 
-  <meta
-    property="og:url"
-    content="https://cesareparatore.github.io/"
-  >
-
-  <meta
-    property="og:image"
-    content="https://cesareparatore.github.io/assets/images/cp.jpg"
-  >
-
-  <meta
-    property="og:image:width"
-    content="1200"
-  >
-
-  <meta
-    property="og:image:height"
-    content="630"
-  >
-
-  <meta
-    property="og:image:alt"
-    content="Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale"
-  >
-
-  <meta
-    name="twitter:card"
-    content="summary_large_image"
-  >
-
-  <meta
-    name="twitter:title"
-    content="Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale"
-  >
-
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Cesare Paratore">
   <meta
     name="twitter:description"
-    content="Un percorso tra sport, scienze motorie, educazione, management e digitale."
+    content="Sport, scienze motorie, educazione, management, digitale e territorio."
   >
+  <meta name="twitter:image" content="https://cesareparatore.github.io/assets/images/cp.jpg">
 
-  <meta
-    name="twitter:image"
-    content="https://cesareparatore.github.io/assets/images/cp.jpg"
-  >
+  <link rel="icon" href="/assets/images/cp-mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
 
-  <link
-    rel="stylesheet"
-    href="/css/style.css"
-  >
+  <script>
+    document.documentElement.classList.add("js");
+  </script>
 
   <script type="application/ld+json">
   {
@@ -113,42 +51,24 @@
     "name": "Cesare Paratore",
     "url": "https://cesareparatore.github.io/",
     "image": "https://cesareparatore.github.io/assets/images/cp-foto.webp",
-    "jobTitle": "Professionista tra sport, scienze motorie, educazione, management e digitale",
-    "description": "Percorso professionale trasversale tra sport, scienze motorie, educazione, management e digitale.",
-    "knowsAbout": [
-      "Sport",
-      "Scienze motorie",
-      "Educazione",
-      "Management",
-      "Digitale"
-    ]
+    "jobTitle": "Professionista multidisciplinare",
+    "description": "Percorso professionale tra sport, scienze motorie, educazione, management, digitale e territorio."
   }
   </script>
 </head>
 
 <body>
 
-  <!--
-    FALLBACK PRINCIPALE:
-    Il sito è visibile anche senza JavaScript.
-    Il loader viene attivato esclusivamente da JS come progressive enhancement.
-  -->
+  <a class="skip-link" href="#main-content">Vai al contenuto</a>
 
-  <a
-    class="skip-link"
-    href="#main-content"
-  >
-    Salta al contenuto
-  </a>
+  <!-- =========================================================
+       LOADER / OPENING
+       ========================================================= -->
+  <div class="site-loader" id="site-loader" aria-hidden="true">
+    <div class="loader-curtain loader-curtain-left"></div>
+    <div class="loader-curtain loader-curtain-right"></div>
 
-  <!-- CINEMATIC INTRO -->
-  <div
-    class="site-loader"
-    id="site-loader"
-    aria-hidden="true"
-  >
     <div class="loader-inner">
-
       <div class="loader-mark-wrap">
         <img
           class="loader-mark"
@@ -159,21 +79,19 @@
         >
       </div>
 
-      <div class="loader-line" aria-hidden="true"></div>
+      <div class="loader-line" aria-hidden="true">
+        <span></span>
+      </div>
 
-      <p class="loader-name">
-        CESARE PARATORE
-      </p>
-
+      <p class="loader-name">CESARE PARATORE</p>
     </div>
   </div>
 
 
-  <!-- HEADER -->
-  <header
-    class="site-header"
-    id="site-header"
-  >
+  <!-- =========================================================
+       HEADER
+       ========================================================= -->
+  <header class="site-header" id="site-header">
 
     <div class="header-main">
 
@@ -220,7 +138,9 @@
     </div>
 
 
-    <!-- WOW BAR -->
+    <!-- =======================================================
+         WOW BAR
+         ======================================================= -->
     <div class="wow-bar">
 
       <button
@@ -243,18 +163,12 @@
           id="wow-progress"
         ></span>
 
-        <span
-          class="wow-dot wow-dot-start"
-        ></span>
-
+        <span class="wow-dot wow-dot-start"></span>
         <span
           class="wow-dot wow-dot-active"
           id="wow-dot-active"
         ></span>
-
-        <span
-          class="wow-dot wow-dot-end"
-        ></span>
+        <span class="wow-dot wow-dot-end"></span>
       </div>
 
       <button
@@ -263,7 +177,16 @@
         type="button"
         aria-label="Capitolo successivo"
       >
-        <span aria-hidden="true">→</span>
+        <span
+          class="wow-arrow-symbol"
+          id="next-arrow-symbol"
+          aria-hidden="true"
+        >→</span>
+
+        <span
+          class="wow-arrow-label"
+          id="next-arrow-label"
+        >AVANTI</span>
       </button>
 
     </div>
@@ -271,679 +194,514 @@
   </header>
 
 
-  <!-- MENU EDITORIALE -->
+  <!-- =========================================================
+       MENU
+       ========================================================= -->
   <aside
-    class="menu-overlay"
+    class="site-menu"
     id="site-menu"
     aria-hidden="true"
   >
+    <nav
+      class="menu-navigation"
+      aria-label="Navigazione principale"
+    >
 
-    <div class="menu-inner">
+      <a href="#eccomi" class="menu-link">CHI SONO</a>
+      <a href="#movimento" class="menu-link">SPORT</a>
+      <a href="#capire" class="menu-link">SCIENZE MOTORIE</a>
+      <a href="#trasmettere" class="menu-link">EDUCAZIONE</a>
+      <a href="#costruire" class="menu-link">MANAGEMENT</a>
+      <a href="#ritorna" class="menu-link">DIGITALE</a>
+      <a href="#qui" class="menu-link">TERRITORIO</a>
+      <a href="#scrivimi" class="menu-link">CONTATTI</a>
 
-      <nav
-        class="menu-links"
-        aria-label="Navigazione principale"
-      >
-
-        <a href="#eccomi">CHI SONO</a>
-        <a href="#movimento">SPORT</a>
-        <a href="#capire">SCIENZE MOTORIE</a>
-        <a href="#trasmettere">EDUCAZIONE</a>
-        <a href="#costruire">MANAGEMENT</a>
-        <a href="#ritorna">DIGITALE</a>
-        <a href="#qui">TERRITORIO</a>
-        <a href="#scrivimi">CONTATTI</a>
-
-      </nav>
-
-    </div>
-
+    </nav>
   </aside>
 
 
+  <!-- =========================================================
+       MAIN
+       ========================================================= -->
   <main id="main-content">
 
-    <!-- =========================================================
-         01 — GUARDA
-         Prima cosa visibile: SOLO GUARDA.
-    ========================================================== -->
 
+    <!-- 01 — GUARDA -->
     <section
-      class="story story-dark story-opening"
+      class="story-section story-opening section-dark"
       id="guarda"
-      data-title="GUARDA."
-      data-index="1"
-      aria-labelledby="title-guarda"
+      data-chapter="GUARDA."
     >
-
-      <div class="story-inner opening-inner">
-
-        <div class="story-title-wrap">
-          <h1
-            class="story-title opening-title"
-            id="title-guarda"
-          >
-            GUARDA.
-          </h1>
-        </div>
-
+      <div class="opening-title-wrap">
+        <h1 class="story-title">GUARDA.</h1>
       </div>
-
     </section>
 
 
-    <!-- =========================================================
-         02 — COME?
-    ========================================================== -->
-
+    <!-- 02 — COME? -->
     <section
-      class="story story-light"
+      class="story-section section-light"
       id="come"
-      data-title="COME?"
-      data-index="2"
-      aria-labelledby="title-come"
+      data-chapter="COME?"
     >
-
-      <div class="story-inner">
+      <div class="story-grid">
 
         <div class="story-heading">
-          <h2
-            class="story-title"
-            id="title-come"
-          >
-            COME?
-          </h2>
-        </div>
-
-        <div class="story-content story-content-narrow">
-
-          <p class="narrative">
-            Prima di fare qualcosa, guardo.
-          </p>
-
-          <p class="narrative">
-            Da piccolo ho incontrato un computer.
-          </p>
-
-          <p class="narrative">
-            Non sapevo ancora cosa fosse. Volevo capire.
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =========================================================
-         03 — MOVIMENTO / SPORT
-    ========================================================== -->
-
-    <section
-      class="story story-dark"
-      id="movimento"
-      data-title="SPORT"
-      data-index="3"
-      aria-labelledby="title-movimento"
-    >
-
-      <div class="story-inner story-split">
-
-        <div class="story-heading">
-          <h2
-            class="story-title"
-            id="title-movimento"
-          >
-            SPORT
-          </h2>
+          <p class="story-kicker">02</p>
+          <h2 class="story-title">COME?</h2>
         </div>
 
         <div class="story-content">
+          <p class="story-lead">
+            Prima di fare qualcosa, guardo.
+          </p>
 
-          <p class="narrative">
+          <p>
+            Da piccolo ho incontrato un computer.
+          </p>
+
+          <p>
+            Non sapevo ancora cosa fosse.
+            Volevo capire.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- 03 — SPORT -->
+    <section
+      class="story-section section-dark"
+      id="movimento"
+      data-chapter="SPORT"
+    >
+      <div class="story-grid">
+
+        <div class="story-heading">
+          <p class="story-kicker">03</p>
+          <h2 class="story-title">SPORT</h2>
+        </div>
+
+        <div class="story-content">
+          <p class="story-lead">
             Poi ho iniziato a muovermi.
           </p>
 
-          <p class="narrative">
+          <p>
             A correre, giocare, provare.
           </p>
 
-          <p class="narrative">
-            Lo sport è diventato un modo per conoscere me stesso e ciò che mi circondava.
+          <p>
+            Lo sport è diventato un modo per conoscere
+            me stesso e ciò che mi circondava.
           </p>
 
           <div class="story-divider"></div>
 
-          <p class="narrative narrative-small">
-            Prima atleta.<br>
+          <p>
+            Prima atleta.
+          </p>
+
+          <p>
             Poi tecnico.
           </p>
 
-          <p class="narrative">
-            Il movimento non è rimasto soltanto qualcosa da praticare.
+          <p>
+            Il movimento non è rimasto soltanto
+            qualcosa da praticare.
           </p>
 
-          <p class="narrative">
-            È diventato qualcosa da osservare, studiare e comprendere.
+          <p>
+            È diventato qualcosa da osservare,
+            studiare e comprendere.
           </p>
-
         </div>
 
       </div>
-
     </section>
 
 
-    <!-- =========================================================
-         04 — SCIENZE MOTORIE
-    ========================================================== -->
-
+    <!-- 04 — SCIENZE MOTORIE -->
     <section
-      class="story story-light"
+      class="story-section section-light"
       id="capire"
-      data-title="SCIENZE MOTORIE"
-      data-index="4"
-      aria-labelledby="title-capire"
+      data-chapter="SCIENZE MOTORIE"
     >
-
-      <div class="story-inner story-split">
+      <div class="story-grid">
 
         <div class="story-heading">
-          <h2
-            class="story-title"
-            id="title-capire"
-          >
-            SCIENZE<br>
-            MOTORIE
-          </h2>
+          <p class="story-kicker">04</p>
+          <h2 class="story-title">SCIENZE<br>MOTORIE</h2>
         </div>
 
         <div class="story-content">
-
-          <p class="narrative">
-            Studiare il movimento ha cambiato il modo di guardarlo.
+          <p class="story-lead">
+            Studiare il movimento ha cambiato
+            il modo di guardarlo.
           </p>
 
-          <p class="narrative">
-            L'esperienza e lo studio hanno iniziato a parlarsi.
+          <p>
+            L'esperienza e lo studio hanno iniziato
+            a parlarsi.
           </p>
 
-          <p class="narrative">
-            La pratica poneva domande. La teoria aiutava a cercare risposte.
+          <p>
+            La pratica poneva domande.
+            La teoria aiutava a cercare risposte.
           </p>
-
         </div>
 
       </div>
-
     </section>
 
 
-    <!-- =========================================================
-         05 — EDUCAZIONE
-    ========================================================== -->
-
+    <!-- 05 — EDUCAZIONE -->
     <section
-      class="story story-dark"
+      class="story-section section-dark"
       id="trasmettere"
-      data-title="EDUCAZIONE"
-      data-index="5"
-      aria-labelledby="title-trasmettere"
+      data-chapter="EDUCAZIONE"
     >
-
-      <div class="story-inner story-split">
+      <div class="story-grid">
 
         <div class="story-heading">
-          <h2
-            class="story-title"
-            id="title-trasmettere"
-          >
-            EDUCAZIONE
-          </h2>
+          <p class="story-kicker">05</p>
+          <h2 class="story-title">EDUCAZIONE</h2>
         </div>
 
         <div class="story-content">
-
-          <p class="narrative">
+          <p class="story-lead">
             Ciò che si comprende può essere condiviso.
           </p>
 
-          <p class="narrative">
-            Insegnare significa trasformare esperienza, conoscenza e metodo in qualcosa che possa diventare utile ad altri.
+          <p>
+            Insegnare significa trasformare esperienza,
+            conoscenza e metodo in qualcosa che possa
+            diventare utile ad altri.
           </p>
-
         </div>
 
       </div>
-
     </section>
 
 
-    <!-- =========================================================
-         06 — MANAGEMENT
-    ========================================================== -->
-
+    <!-- 06 — MANAGEMENT -->
     <section
-      class="story story-light"
+      class="story-section section-light"
       id="costruire"
-      data-title="MANAGEMENT"
-      data-index="6"
-      aria-labelledby="title-costruire"
+      data-chapter="MANAGEMENT"
     >
-
-      <div class="story-inner story-split">
+      <div class="story-grid">
 
         <div class="story-heading">
-          <h2
-            class="story-title"
-            id="title-costruire"
-          >
-            MANAGEMENT
-          </h2>
+          <p class="story-kicker">06</p>
+          <h2 class="story-title">MANAGEMENT</h2>
         </div>
 
         <div class="story-content">
-
-          <p class="narrative">
+          <p class="story-lead">
             A un certo punto non basta più capire.
           </p>
 
-          <p class="narrative">
+          <p>
             Bisogna progettare.
           </p>
 
-          <p class="narrative">
-            Organizzare persone, strumenti, risorse e processi per trasformare un'idea in qualcosa di concreto.
+          <p>
+            Organizzare persone, strumenti, risorse
+            e processi per trasformare un'idea
+            in qualcosa di concreto.
           </p>
-
         </div>
 
       </div>
-
     </section>
 
 
-    <!-- =========================================================
-         07 — DIGITALE
-    ========================================================== -->
-
+    <!-- 07 — DIGITALE -->
     <section
-      class="story story-dark"
+      class="story-section section-dark"
       id="ritorna"
-      data-title="DIGITALE"
-      data-index="7"
-      aria-labelledby="title-ritorna"
+      data-chapter="DIGITALE"
     >
-
-      <div class="story-inner story-split">
+      <div class="story-grid">
 
         <div class="story-heading">
-          <h2
-            class="story-title"
-            id="title-ritorna"
-          >
-            DIGITALE
-          </h2>
+          <p class="story-kicker">07</p>
+          <h2 class="story-title">DIGITALE</h2>
         </div>
 
         <div class="story-content">
-
-          <p class="narrative">
+          <p class="story-lead">
             Quel computer dell'inizio ritorna.
           </p>
 
-          <p class="narrative">
-            Non più soltanto come oggetto da osservare, ma come strumento per costruire.
+          <p>
+            Non più soltanto come oggetto da osservare,
+            ma come strumento per costruire.
           </p>
 
-          <p class="narrative">
+          <p>
             Pagine. Sistemi. Esperienze digitali.
           </p>
-
         </div>
 
       </div>
-
     </section>
 
 
-    <!-- =========================================================
-         08 — COLLEGARE
-    ========================================================== -->
-
+    <!-- 08 — COLLEGARE -->
     <section
-      class="story story-light"
+      class="story-section section-light story-connecting"
       id="collegare"
-      data-title="COLLEGARE"
-      data-index="8"
-      aria-labelledby="title-collegare"
+      data-chapter="COLLEGARE"
     >
-
-      <div class="story-inner story-connection">
+      <div class="story-grid">
 
         <div class="story-heading">
-          <h2
-            class="story-title"
-            id="title-collegare"
-          >
-            COLLEGARE
-          </h2>
+          <p class="story-kicker">08</p>
+          <h2 class="story-title">COLLEGARE</h2>
         </div>
 
-        <div class="connection-list">
+        <div class="story-content story-list-content">
 
-          <span>Sport.</span>
-          <span>Scienze motorie.</span>
-          <span>Educazione.</span>
-          <span>Management.</span>
-          <span>Digitale.</span>
+          <div class="connection-list">
+            <span>Sport.</span>
+            <span>Scienze motorie.</span>
+            <span>Educazione.</span>
+            <span>Management.</span>
+            <span>Digitale.</span>
+          </div>
 
-        </div>
+          <div class="story-divider"></div>
 
-        <div class="story-content story-content-narrow">
+          <p class="story-lead">
+            Non sono percorsi separati.
+          </p>
 
-          <p class="narrative">
-            Non sono percorsi separati. Sono punti di uno stesso sistema.
+          <p>
+            Sono punti di uno stesso sistema.
           </p>
 
         </div>
 
       </div>
-
     </section>
 
 
-    <!-- =========================================================
-         09 — OGGI
-    ========================================================== -->
-
+    <!-- 09 — OGGI -->
     <section
-      class="story story-dark"
+      class="story-section section-dark"
       id="oggi"
-      data-title="OGGI"
-      data-index="9"
-      aria-labelledby="title-oggi"
+      data-chapter="OGGI"
     >
-
-      <div class="story-inner story-split">
+      <div class="story-grid">
 
         <div class="story-heading">
-          <h2
-            class="story-title"
-            id="title-oggi"
-          >
-            OGGI
-          </h2>
+          <p class="story-kicker">09</p>
+          <h2 class="story-title">OGGI</h2>
         </div>
 
         <div class="story-content">
-
-          <p class="lead-statement">
-            Osservare.<br>
-            Studiare.<br>
-            Collegare.<br>
-            Progettare.<br>
-            Sviluppare.
+          <p class="story-lead">
+            Osservare. Studiare. Collegare.
+            Progettare. Sviluppare.
           </p>
 
-          <p class="narrative">
-            Un approccio trasversale per affrontare problemi e costruire soluzioni.
+          <p>
+            Un approccio trasversale per affrontare
+            problemi e costruire soluzioni.
           </p>
 
-          <p class="narrative">
+          <p>
             Capire prima di intervenire.
           </p>
-
         </div>
 
       </div>
-
     </section>
 
 
-    <!-- =========================================================
-         10 — OBIETTIVO
-    ========================================================== -->
-
+    <!-- 10 — OBIETTIVO -->
     <section
-      class="story story-light"
+      class="story-section section-light"
       id="obiettivo"
-      data-title="OBIETTIVO"
-      data-index="10"
-      aria-labelledby="title-obiettivo"
+      data-chapter="OBIETTIVO"
     >
-
-      <div class="story-inner story-split">
+      <div class="story-grid">
 
         <div class="story-heading">
-          <h2
-            class="story-title"
-            id="title-obiettivo"
-          >
-            OBIETTIVO
-          </h2>
+          <p class="story-kicker">10</p>
+          <h2 class="story-title">OBIETTIVO</h2>
         </div>
 
         <div class="story-content">
-
-          <p class="narrative">
+          <p class="story-lead">
             Ogni progetto parte da una domanda.
           </p>
 
-          <p class="narrative">
+          <p>
             Qual è l'obiettivo?
           </p>
 
-          <p class="narrative">
+          <p>
             Qual è il contesto?
           </p>
 
-          <p class="narrative">
+          <p>
             Cosa serve davvero?
           </p>
 
-          <p class="narrative">
+          <p>
             Da qui nasce il lavoro.
           </p>
-
         </div>
 
       </div>
-
     </section>
 
 
-    <!-- =========================================================
-         11 — TERRITORIO
-    ========================================================== -->
-
+    <!-- 11 — TERRITORIO -->
     <section
-      class="story story-dark story-territory"
+      class="story-section section-dark story-location"
       id="qui"
-      data-title="TERRITORIO"
-      data-index="11"
-      aria-labelledby="title-qui"
+      data-chapter="TERRITORIO"
     >
-
-      <div class="story-inner story-territory-inner">
+      <div class="story-grid">
 
         <div class="story-heading">
-          <h2
-            class="story-title"
-            id="title-qui"
-          >
-            TERRITORIO
-          </h2>
+          <p class="story-kicker">11</p>
+          <h2 class="story-title">TERRITORIO</h2>
         </div>
 
-        <div class="territory-grid">
+        <div class="story-content">
+          <p class="story-lead">
+            Ogni percorso parte da un luogo.
+          </p>
 
-          <div class="story-content">
+          <p>
+            Un territorio, una comunità, un contesto.
+          </p>
 
-            <p class="narrative">
-              Ogni percorso parte da un luogo.
-            </p>
+          <p>
+            È da qui che si osserva ciò che accade
+            e si decide dove andare.
+          </p>
 
-            <p class="narrative">
-              Un territorio, una comunità, un contesto.
-            </p>
-
-            <p class="narrative">
-              È da qui che si osserva ciò che accade e si decide dove andare.
-            </p>
-
-          </div>
-
-          <div class="map-frame">
+          <div class="map-wrap">
             <iframe
-              title="Territorio di riferimento"
-              src="https://www.google.com/maps?q=Stadio%20Comunale%20Giuseppe%20La%20Franca%2C%20Partinico&output=embed"
+              title="Mappa del territorio di riferimento"
+              src="https://www.google.com/maps?q=Stadio+Comunale+Giuseppe+La+Franca,+Partinico&output=embed"
               loading="lazy"
               referrerpolicy="no-referrer-when-downgrade"
             ></iframe>
           </div>
-
         </div>
 
       </div>
-
     </section>
 
 
-    <!-- =========================================================
-         12 — DA QUI
-    ========================================================== -->
-
+    <!-- 12 — DA QUI -->
     <section
-      class="story story-light"
+      class="story-section section-light"
       id="da-qui"
-      data-title="DA QUI"
-      data-index="12"
-      aria-labelledby="title-da-qui"
+      data-chapter="DA QUI"
     >
-
-      <div class="story-inner story-split">
+      <div class="story-grid">
 
         <div class="story-heading">
-          <h2
-            class="story-title"
-            id="title-da-qui"
-          >
-            DA QUI
-          </h2>
+          <p class="story-kicker">12</p>
+          <h2 class="story-title">DA QUI</h2>
         </div>
 
         <div class="story-content">
-
-          <p class="lead-statement">
-            Una base in presenza<br>
-            e online.
+          <p class="story-lead">
+            Una base in presenza e online.
           </p>
 
-          <p class="narrative">
+          <p>
             Il luogo è il punto di partenza.
           </p>
 
-          <p class="narrative">
-            Il digitale permette di estendere il percorso, collegare persone e costruire possibilità.
+          <p>
+            Il digitale permette di estendere il percorso,
+            collegare persone e costruire possibilità.
           </p>
-
         </div>
 
       </div>
-
     </section>
 
 
-    <!-- =========================================================
-         13 — CHI SONO
-    ========================================================== -->
-
+    <!-- 13 — CHI SONO -->
     <section
-      class="story story-dark story-portrait"
+      class="story-section section-dark story-profile"
       id="eccomi"
-      data-title="CHI SONO"
-      data-index="13"
-      aria-labelledby="title-eccomi"
+      data-chapter="CHI SONO"
     >
-
-      <div class="story-inner portrait-grid">
+      <div class="story-grid profile-grid">
 
         <div class="story-heading">
-          <h2
-            class="story-title"
-            id="title-eccomi"
-          >
-            CHI SONO
-          </h2>
+          <p class="story-kicker">13</p>
+          <h2 class="story-title">CHI SONO</h2>
         </div>
-
-        <figure class="portrait">
-
-          <img
-            src="/assets/images/cp-foto.webp"
-            alt="Cesare Paratore"
-            width="753"
-            height="941"
-            loading="lazy"
-            decoding="async"
-          >
-
-        </figure>
 
         <div class="story-content">
 
-          <p class="narrative">
-            Questo percorso non è una somma di ruoli.
-          </p>
+          <div class="portrait-wrap">
+            <img
+              src="/assets/images/cp-foto.webp"
+              alt="Cesare Paratore"
+              width="753"
+              height="941"
+              loading="lazy"
+            >
+          </div>
 
-          <p class="narrative">
-            È il risultato di esperienze diverse che nel tempo hanno iniziato a dialogare.
-          </p>
+          <div class="profile-copy">
+            <p class="story-lead">
+              Questo percorso non è una somma di ruoli.
+            </p>
 
-          <p class="narrative">
-            Sport. Studio. Educazione. Progetto. Digitale.
-          </p>
+            <p>
+              È il risultato di esperienze diverse
+              che nel tempo hanno iniziato a dialogare.
+            </p>
+
+            <p>
+              Sport. Studio. Educazione. Progetto. Digitale.
+            </p>
+          </div>
 
         </div>
 
       </div>
-
     </section>
 
 
-    <!-- =========================================================
-         14 — CONTATTI
-    ========================================================== -->
-
+    <!-- 14 — CONTATTI -->
     <section
-      class="story story-light story-contact"
+      class="story-section section-light story-contact"
       id="scrivimi"
-      data-title="CONTATTI"
-      data-index="14"
-      aria-labelledby="title-scrivimi"
+      data-chapter="CONTATTI"
     >
+      <div class="contact-inner">
 
-      <div class="story-inner contact-inner">
+        <p class="story-kicker">14</p>
 
-        <div class="story-heading">
-          <h2
-            class="story-title"
-            id="title-scrivimi"
-          >
-            CONTATTI
-          </h2>
-        </div>
+        <h2 class="story-title">
+          CONTATTI
+        </h2>
 
-        <div class="contact-content">
-
-          <p class="lead-statement">
+        <div class="contact-copy">
+          <p class="story-lead">
             Parlami del tuo obiettivo.
           </p>
 
-          <p class="narrative">
-            Un progetto, un'idea, una domanda o semplicemente un punto da cui partire.
+          <p>
+            Un progetto, un'idea, una domanda
+            o semplicemente un punto da cui partire.
           </p>
 
           <a
@@ -953,17 +711,17 @@
             SCRIVIMI
             <span aria-hidden="true">↗</span>
           </a>
-
         </div>
 
       </div>
-
     </section>
 
   </main>
 
 
-  <!-- FOOTER -->
+  <!-- =========================================================
+       FOOTER
+       ========================================================= -->
   <footer class="site-footer">
 
     <div class="footer-inner">
