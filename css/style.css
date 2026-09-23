@@ -1,1356 +1,1252 @@
-/* =========================================================
-   CESARE PARATORE
-   Main stylesheet — V3.2
-   ========================================================= */
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
 
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
 
-/* =========================================================
-   ROOT
-   ========================================================= */
+  <meta
+    name="description"
+    content="Cesare Paratore: un percorso tra sport, scienze motorie, educazione, management e digitale. Un modo di osservare, capire, collegare e costruire."
+  >
 
-:root {
-  --bg: #0B0B0A;
-  --surface: #151513;
-  --surface-2: #1C1C19;
+  <meta
+    name="robots"
+    content="index, follow, max-image-preview:large"
+  >
 
-  --light: #F1EFE8;
-  --secondary: #A7A49C;
-  --muted: #66645F;
+  <meta name="author" content="Cesare Paratore">
+  <meta name="theme-color" content="#0B0B0A">
+  <meta name="color-scheme" content="dark light">
 
-  --line: rgba(241, 239, 232, 0.16);
-  --line-dark: rgba(11, 11, 10, 0.16);
+  <title>
+    Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale
+  </title>
 
-  --header-h: 76px;
-  --nav-h: 96px;
+  <!--
+    SOSTITUIRE con il dominio reale del sito.
+    Esempio:
+    https://www.esempio.it/
+  -->
+  <link
+    rel="canonical"
+    href="https://www.tuodominio.it/"
+  >
 
-  --gutter: 5vw;
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href="/assets/images/cp-mark.svg"
+  >
 
-  --content-max: 1400px;
-  --text-max: 42rem;
-  --narrow-max: 30rem;
+  <link
+    rel="preload"
+    as="image"
+    href="/assets/images/cp-mark.svg"
+  >
 
-  --display-xl: clamp(4.5rem, 10vw, 11rem);
-  --display-l: clamp(3.5rem, 7vw, 8rem);
-  --display-m: clamp(2.75rem, 5vw, 5.5rem);
+  <meta
+    property="og:type"
+    content="website"
+  >
 
-  --narrative: clamp(1.15rem, 1.35vw, 1.5rem);
-  --body-large: clamp(1.35rem, 1.8vw, 2rem);
-  --micro: clamp(0.72rem, 0.78vw, 0.84rem);
+  <meta
+    property="og:title"
+    content="Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale"
+  >
 
-  --tracking-tight: -0.045em;
-  --tracking-normal: -0.02em;
+  <meta
+    property="og:description"
+    content="Un percorso tra sport, scienze motorie, educazione, management e digitale. Un modo di osservare, capire, collegare e costruire."
+  >
 
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-soft: cubic-bezier(0.25, 0.8, 0.25, 1);
+  <meta
+    property="og:url"
+    content="https://www.tuodominio.it/"
+  >
 
-  --duration-fast: 220ms;
-  --duration-base: 420ms;
-  --duration-slow: 700ms;
-}
+  <meta
+    property="og:site_name"
+    content="Cesare Paratore"
+  >
 
+  <!--
+    Inserire quando sarà disponibile una vera immagine Open Graph:
+    <meta property="og:image" content="https://www.tuodominio.it/assets/images/og.jpg">
+  -->
 
-/* =========================================================
-   RESET
-   ========================================================= */
+  <meta
+    name="twitter:card"
+    content="summary_large_image"
+  >
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+  <meta
+    name="twitter:title"
+    content="Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale"
+  >
 
-html {
-  min-height: 100%;
-  overflow-x: clip;
-  background: var(--bg);
-  color: var(--light);
-  scroll-behavior: smooth;
-  text-rendering: optimizeLegibility;
-  -webkit-text-size-adjust: 100%;
-}
+  <meta
+    name="twitter:description"
+    content="Un percorso tra sport, scienze motorie, educazione, management e digitale."
+  >
 
-body {
-  min-height: 100%;
-  margin: 0;
-  overflow-x: clip;
-  background: var(--bg);
-  color: var(--light);
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  <link
+    rel="preconnect"
+    href="https://cdn.jsdelivr.net"
+  >
 
-@supports not (overflow: clip) {
-  html,
-  body {
-    overflow-x: hidden;
+  <script
+    src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"
+    defer
+  ></script>
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"
+    defer
+  ></script>
+
+  <link
+    rel="stylesheet"
+    href="/style.css"
+  >
+
+  <script
+    src="/script.js"
+    defer
+  ></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "name": "Cesare Paratore",
+    "description": "Un percorso tra sport, scienze motorie, educazione, management e digitale.",
+    "mainEntity": {
+      "@type": "Person",
+      "name": "Cesare Paratore",
+      "jobTitle": [
+        "Atleta",
+        "Tecnico",
+        "Educatore"
+      ]
+    }
   }
-}
-
-body.menu-open,
-body.standby-active {
-  overflow: hidden;
-}
-
-img,
-svg,
-video,
-iframe {
-  display: block;
-  max-width: 100%;
-}
-
-img {
-  height: auto;
-}
-
-button,
-input,
-textarea,
-select {
-  font: inherit;
-}
-
-button,
-a {
-  -webkit-tap-highlight-color: transparent;
-}
-
-button {
-  color: inherit;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-button,
-a {
-  cursor: pointer;
-}
-
-::selection {
-  background: var(--light);
-  color: var(--bg);
-}
-
-
-/* =========================================================
-   ACCESSIBILITY
-   ========================================================= */
-
-:where(
-  a,
-  button,
-  input,
-  textarea,
-  select
-):focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 5px;
-}
-
-:where(
-  a,
-  button
-):focus:not(:focus-visible) {
-  outline: none;
-}
-
-
-/* =========================================================
-   LOADER
-   ========================================================= */
-
-.loader {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-
-  display: grid;
-  place-items: center;
-
-  background: var(--bg);
-  color: var(--light);
-
-  opacity: 1;
-  visibility: visible;
-}
-
-.loader.is-hidden {
-  pointer-events: none;
-  visibility: hidden;
-}
-
-.loader-inner {
-  display: grid;
-  justify-items: center;
-  gap: 1.25rem;
-}
+  </script>
+
+  <noscript>
+    <style>
+      .site-loader,
+      .standby {
+        display: none !important;
+      }
+
+      body {
+        overflow: auto !important;
+      }
+
+      .site-menu {
+        position: static !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        transform: none !important;
+      }
+    </style>
+  </noscript>
+</head>
+
+<body>
+
+  <a
+    class="skip-link"
+    href="#main-content"
+  >
+    Vai al contenuto
+  </a>
+
+  <!-- =========================================================
+       LOADER
+  ========================================================== -->
+
+  <div
+    class="site-loader"
+    aria-hidden="false"
+  >
+    <div class="loader-inner">
+      <img
+        src="/assets/images/cp-mark.svg"
+        alt=""
+        width="42"
+        height="42"
+        decoding="async"
+      >
+
+      <span class="loader-name">
+        CESARE PARATORE
+      </span>
+    </div>
+  </div>
+
+
+  <!-- =========================================================
+       STANDBY
+  ========================================================== -->
+
+  <div
+    class="standby"
+    aria-hidden="true"
+  >
+    <span>GUARDA.</span>
+  </div>
+
+
+  <!-- =========================================================
+       HEADER
+  ========================================================== -->
+
+  <header class="site-header">
+
+    <a
+      class="site-logo"
+      href="/"
+      aria-label="Cesare Paratore — Home"
+    >
+      <img
+        src="/assets/images/cp-mark.svg"
+        alt=""
+        width="42"
+        height="42"
+        decoding="async"
+      >
+    </a>
+
+    <button
+      class="menu-trigger"
+      type="button"
+      aria-expanded="false"
+      aria-controls="menu"
+      aria-label="Apri menu"
+    >
+      <span class="menu-trigger-label">
+        Menu
+      </span>
+
+      <span
+        class="menu-trigger-icon"
+        aria-hidden="true"
+      >
+        <span></span>
+        <span></span>
+      </span>
+    </button>
+
+  </header>
+
+
+  <!-- =========================================================
+       OVERLAY MENU
+  ========================================================== -->
+
+  <aside
+    class="site-menu"
+    id="menu"
+    aria-hidden="true"
+    aria-label="Menu principale"
+  >
+    <div class="site-menu-inner">
+
+      <div class="site-menu-meta">
+        <span>Indice</span>
+        <span>01—08</span>
+      </div>
+
+      <nav
+        class="site-menu-nav"
+        aria-label="Navigazione principale"
+      >
+
+        <a href="/chi-sono/">
+          <span>01</span>
+          <strong>Chi sono</strong>
+        </a>
+
+        <a href="/sport/">
+          <span>02</span>
+          <strong>Sport</strong>
+        </a>
+
+        <a href="/scienze-motorie/">
+          <span>03</span>
+          <strong>Scienze motorie</strong>
+        </a>
 
-.loader-mark img {
-  width: 42px;
-  height: 42px;
-}
+        <a href="/educazione/">
+          <span>04</span>
+          <strong>Educazione</strong>
+        </a>
 
-.loader-name {
-  margin: 0;
+        <a href="/management/">
+          <span>05</span>
+          <strong>Management</strong>
+        </a>
+
+        <a href="/digitale/">
+          <span>06</span>
+          <strong>Digitale</strong>
+        </a>
 
-  color: var(--secondary);
+        <a href="/territorio/">
+          <span>07</span>
+          <strong>Territorio</strong>
+        </a>
 
-  font-size: var(--micro);
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
+        <a href="/contatti/">
+          <span>08</span>
+          <strong>Contatti</strong>
+        </a>
 
+      </nav>
 
-/* =========================================================
-   STANDBY
-   ========================================================= */
+      <div class="site-menu-footer">
+        <span>Sport / Educazione / Progetto / Digitale</span>
+        <span>Cesare Paratore</span>
+      </div>
 
-.standby {
-  position: fixed;
-  inset: 0;
-  z-index: 900;
+    </div>
+  </aside>
 
-  display: grid;
-  place-items: center;
 
-  padding: var(--gutter);
+  <!-- =========================================================
+       MAIN NARRATIVE
+  ========================================================== -->
 
-  background: var(--bg);
-  color: var(--light);
+  <main
+    id="main-content"
+    tabindex="-1"
+  >
+
+
+    <!-- =======================================================
+         01 — GUARDA
+    ======================================================== -->
 
-  opacity: 0;
-  visibility: hidden;
+    <section
+      class="story-section story-opening"
+      id="guarda"
+      data-section-title="Guarda"
+      aria-labelledby="title-guarda"
+    >
 
-  pointer-events: none;
-}
+      <div class="story-inner">
 
-.standby.is-visible {
-  opacity: 1;
-  visibility: visible;
-}
+        <div class="story-index" aria-hidden="true">
+          01
+        </div>
 
-.standby span {
-  font-size: clamp(3rem, 9vw, 10rem);
-  font-weight: 700;
-  letter-spacing: var(--tracking-tight);
-  line-height: 0.9;
-}
+        <div class="story-content">
 
+          <span class="story-eyebrow">
+            Prima di fare
+          </span>
 
-/* =========================================================
-   HEADER
-   ========================================================= */
+          <h1
+            class="story-title"
+            id="title-guarda"
+          >
+            GUARDA.
+          </h1>
 
-.site-header {
-  position: fixed;
-  inset: 0 0 auto;
-  z-index: 800;
+          <div class="story-body">
 
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+            <p>
+              Prima di fare qualcosa, guardo.
+            </p>
 
-  min-height: var(--header-h);
+            <p>
+              Da piccolo ho incontrato un computer.
+            </p>
 
-  padding:
-    env(safe-area-inset-top)
-    var(--gutter)
-    0;
+            <p>
+              Non sapevo ancora cosa fosse.
+              Volevo capire.
+            </p>
 
-  background:
-    linear-gradient(
-      to bottom,
-      rgba(11, 11, 10, 0.92),
-      rgba(11, 11, 10, 0)
-    );
+          </div>
 
-  pointer-events: none;
-}
+        </div>
 
-.site-header > * {
-  pointer-events: auto;
-}
+      </div>
 
-.site-logo {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+    </section>
 
-  width: 42px;
-  height: 42px;
-}
 
-.site-logo img {
-  width: 42px;
-  height: 42px;
-}
+    <!-- =======================================================
+         02 — COME
+    ======================================================== -->
 
-.menu-trigger {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.8rem;
+    <section
+      class="story-section story-movement story-light"
+      id="come"
+      data-section-title="Come?"
+      aria-labelledby="title-come"
+    >
 
-  min-height: 42px;
-  padding: 0;
+      <div class="story-inner">
 
-  border: 0;
-  background: transparent;
+        <div class="story-index" aria-hidden="true">
+          02
+        </div>
 
-  color: var(--light);
+        <div class="story-content">
 
-  font-size: var(--micro);
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
+          <span class="story-eyebrow">
+            Il corpo
+          </span>
 
-.menu-trigger-icon {
-  display: grid;
-  gap: 4px;
+          <h2
+            class="story-title"
+            id="title-come"
+          >
+            COME?
+          </h2>
 
-  width: 18px;
-}
+          <div class="story-body">
 
-.menu-trigger-icon span {
-  display: block;
+            <p>
+              Poi ho iniziato a muovermi.
+            </p>
 
-  width: 100%;
-  height: 1px;
+            <p>
+              A correre, giocare, provare.
+            </p>
 
-  background: currentColor;
+            <p>
+              Lo sport è diventato un modo
+              per conoscere me stesso
+              e ciò che mi circondava.
+            </p>
 
-  transform-origin: center;
+          </div>
 
-  transition:
-    transform var(--duration-base) var(--ease-out),
-    opacity var(--duration-fast) ease;
-}
+        </div>
 
-.menu-trigger.is-open .menu-trigger-icon span:first-child {
-  transform: translateY(2.5px) rotate(45deg);
-}
+      </div>
 
-.menu-trigger.is-open .menu-trigger-icon span:last-child {
-  transform: translateY(-2.5px) rotate(-45deg);
-}
+    </section>
 
 
-/* =========================================================
-   MENU
-   ========================================================= */
+    <!-- =======================================================
+         03 — MOVIMENTO
+    ======================================================== -->
 
-.site-menu {
-  position: fixed;
-  inset: 0;
-  z-index: 700;
+    <section
+      class="story-section story-movement"
+      id="movimento"
+      data-section-title="Movimento"
+      aria-labelledby="title-movimento"
+    >
 
-  padding:
-    calc(var(--header-h) + 3rem)
-    var(--gutter)
-    4rem;
+      <div class="story-inner">
 
-  background: var(--bg);
-  color: var(--light);
+        <div class="story-index" aria-hidden="true">
+          03
+        </div>
 
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
+        <div class="story-content">
 
-  overflow-y: auto;
+          <span class="story-eyebrow">
+            Pratica
+          </span>
 
-  transition:
-    opacity var(--duration-base) var(--ease-soft),
-    visibility 0s linear var(--duration-base);
-}
+          <h2
+            class="story-title"
+            id="title-movimento"
+          >
+            MOVIMENTO.
+          </h2>
 
-.site-menu.is-open {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
+          <div class="story-body">
 
-  transition:
-    opacity var(--duration-base) var(--ease-soft),
-    visibility 0s linear 0s;
-}
+            <p class="story-lead">
+              Prima atleta.
+              <br>
+              Poi tecnico.
+            </p>
 
-.site-menu-inner {
-  width: min(100%, var(--content-max));
-  margin-inline: auto;
-}
+            <p>
+              Il movimento non è rimasto
+              soltanto qualcosa da praticare.
+            </p>
 
-.site-menu-label {
-  margin: 0 0 2rem;
+            <p>
+              È diventato qualcosa da osservare,
+              studiare e comprendere.
+            </p>
 
-  color: var(--muted);
+          </div>
 
-  font-size: var(--micro);
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
+        </div>
 
-.site-menu-nav ul {
-  display: grid;
+      </div>
 
-  margin: 0;
-  padding: 0;
+    </section>
 
-  list-style: none;
-}
 
-.site-menu-nav li {
-  border-top: 1px solid var(--line);
-}
+    <!-- =======================================================
+         04 — CAPIRE
+    ======================================================== -->
 
-.site-menu-nav li:last-child {
-  border-bottom: 1px solid var(--line);
-}
+    <section
+      class="story-section story-understand story-light"
+      id="capire"
+      data-section-title="Capire"
+      aria-labelledby="title-capire"
+    >
 
-.site-menu-nav a {
-  display: grid;
-  grid-template-columns: 4rem 1fr;
-  gap: 1rem;
-  align-items: baseline;
+      <div class="story-inner">
 
-  padding: 1rem 0;
+        <div class="story-index" aria-hidden="true">
+          04
+        </div>
 
-  transition:
-    opacity var(--duration-fast) ease,
-    transform var(--duration-base) var(--ease-out);
-}
+        <div class="story-content">
 
-.site-menu-nav a span:first-child {
-  color: var(--muted);
+          <span class="story-eyebrow">
+            Studio
+          </span>
 
-  font-size: var(--micro);
-  letter-spacing: 0.08em;
-}
+          <h2
+            class="story-title"
+            id="title-capire"
+          >
+            CAPIRE.
+          </h2>
 
-.site-menu-nav a span:last-child {
-  font-size: clamp(2rem, 4.5vw, 5rem);
-  font-weight: 600;
-  letter-spacing: var(--tracking-tight);
-  line-height: 0.95;
-}
+          <div class="story-body">
 
-@media (hover: hover) {
-  .site-menu-nav a:hover {
-    opacity: 0.55;
-    transform: translateX(0.5rem);
-  }
-}
+            <p>
+              Studiare il movimento ha cambiato
+              il modo di guardarlo.
+            </p>
 
+            <p>
+              L'esperienza e lo studio hanno
+              iniziato a parlarsi.
+            </p>
 
-/* =========================================================
-   MAIN
-   ========================================================= */
+            <p>
+              La pratica poneva domande.
+              La teoria aiutava a cercare risposte.
+            </p>
 
-main {
-  position: relative;
+          </div>
 
-  padding-top: var(--header-h);
-}
+        </div>
 
+      </div>
 
-/* =========================================================
-   STORY BASE
-   ========================================================= */
+    </section>
 
-.story-section {
-  position: relative;
 
-  min-height: 100svh;
+    <!-- =======================================================
+         05 — TRASMETTERE
+    ======================================================== -->
 
-  display: grid;
-  align-items: center;
+    <section
+      class="story-section story-light"
+      id="trasmettere"
+      data-section-title="Trasmettere"
+      aria-labelledby="title-trasmettere"
+    >
 
-  padding:
-    clamp(7rem, 12vw, 11rem)
-    var(--gutter);
+      <div class="story-inner">
 
-  background: var(--bg);
-  color: var(--light);
+        <div class="story-index" aria-hidden="true">
+          05
+        </div>
 
-  overflow: clip;
-}
+        <div class="story-content">
 
-@supports not (overflow: clip) {
-  .story-section {
-    overflow: hidden;
-  }
-}
+          <span class="story-eyebrow">
+            Condivisione
+          </span>
 
-.story-section:nth-of-type(even) {
-  background: var(--light);
-  color: var(--bg);
-}
+          <h2
+            class="story-title"
+            id="title-trasmettere"
+          >
+            TRASMETTERE.
+          </h2>
 
-.story-inner {
-  position: relative;
+          <div class="story-body">
 
-  width: min(100%, var(--content-max));
-  margin-inline: auto;
-}
+            <p>
+              Ciò che si comprende può essere condiviso.
+            </p>
 
-.story-content {
-  width: min(100%, var(--text-max));
-}
+            <p>
+              Insegnare significa trasformare esperienza,
+              conoscenza e metodo in qualcosa che
+              possa diventare utile ad altri.
+            </p>
 
-.story-eyebrow {
-  margin: 0 0 clamp(1.5rem, 3vw, 3rem);
+          </div>
 
-  color: var(--muted);
+        </div>
 
-  font-size: var(--micro);
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  line-height: 1;
-  text-transform: uppercase;
-}
+      </div>
 
-.story-section:nth-of-type(even) .story-eyebrow {
-  color: rgba(11, 11, 10, 0.52);
-}
+    </section>
 
-.story-title {
-  margin: 0;
 
-  font-size: var(--display-l);
-  font-weight: 700;
-  letter-spacing: var(--tracking-tight);
-  line-height: 0.84;
-  text-wrap: balance;
-}
+    <!-- =======================================================
+         06 — COSTRUIRE
+    ======================================================== -->
 
-.story-body {
-  width: min(100%, var(--text-max));
+    <section
+      class="story-section story-build"
+      id="costruire"
+      data-section-title="Costruire"
+      aria-labelledby="title-costruire"
+    >
 
-  margin-top: clamp(2.5rem, 5vw, 5rem);
+      <div class="story-inner">
 
-  font-size: var(--narrative);
-  font-weight: 400;
-  letter-spacing: var(--tracking-normal);
-  line-height: 1.42;
-}
+        <div class="story-index" aria-hidden="true">
+          06
+        </div>
 
-.story-body p {
-  max-width: 42rem;
-  margin: 0;
-}
+        <div class="story-content">
 
-.story-body p + p {
-  margin-top: 1.4em;
-}
+          <span class="story-eyebrow">
+            Progetto
+          </span>
 
-.story-lead {
-  max-width: 34rem !important;
+          <h2
+            class="story-title"
+            id="title-costruire"
+          >
+            COSTRUIRE.
+          </h2>
 
-  font-size: var(--body-large);
-  font-weight: 500;
-  line-height: 1.15;
-}
+          <div class="story-body">
 
-.story-index {
-  position: absolute;
-  top: 0;
-  right: 0;
+            <p>
+              A un certo punto non basta più capire.
+            </p>
 
-  color: var(--muted);
+            <p class="story-lead">
+              Bisogna progettare.
+            </p>
 
-  font-size: var(--micro);
-  font-weight: 600;
-  letter-spacing: 0.12em;
-}
+            <p>
+              Organizzare persone, strumenti,
+              risorse e processi per trasformare
+              un'idea in qualcosa di concreto.
+            </p>
 
-.story-section:nth-of-type(even) .story-index {
-  color: rgba(11, 11, 10, 0.4);
-}
+          </div>
 
+        </div>
 
-/* =========================================================
-   OPENING — GUARDA
-   ========================================================= */
+      </div>
 
-.story-opening {
-  min-height: calc(100svh - var(--header-h));
+    </section>
 
-  align-items: end;
 
-  padding-bottom:
-    clamp(7rem, 14vh, 12rem);
-}
+    <!-- =======================================================
+         07 — RITORNA
+    ======================================================== -->
 
-.story-opening .story-content {
-  width: 100%;
-}
+    <section
+      class="story-section story-return"
+      id="ritorna"
+      data-section-title="Ritorna"
+      aria-labelledby="title-ritorna"
+    >
 
-.story-opening .story-title {
-  font-size: var(--display-xl);
-  line-height: 0.76;
-}
+      <div class="story-inner">
 
-.story-opening .story-body {
-  max-width: 34rem;
-}
+        <div class="story-index" aria-hidden="true">
+          07
+        </div>
 
+        <div class="story-content">
 
-/* =========================================================
-   MOVIMENTO
-   ========================================================= */
+          <span class="story-eyebrow">
+            Digitale
+          </span>
 
-.story-movement .story-content {
-  max-width: 52rem;
-}
+          <h2
+            class="story-title"
+            id="title-ritorna"
+          >
+            RITORNA.
+          </h2>
 
-.story-movement .story-body {
-  max-width: 40rem;
-}
+          <div class="story-body">
 
+            <p>
+              Quel computer dell'inizio ritorna.
+            </p>
 
-/* =========================================================
-   CAPIRE
-   ========================================================= */
+            <p>
+              Non più soltanto come oggetto da osservare,
+              ma come strumento per costruire.
+            </p>
 
-.story-understand .story-inner {
-  display: grid;
-  grid-template-columns:
-    minmax(0, 1.15fr)
-    minmax(18rem, 0.85fr);
-  gap: clamp(3rem, 8vw, 10rem);
-  align-items: end;
-}
+            <p class="story-lead">
+              Pagine.
+              Sistemi.
+              Esperienze digitali.
+            </p>
 
-.story-understand .story-body {
-  margin-top: 0;
-}
+          </div>
 
+        </div>
 
-/* =========================================================
-   COSTRUIRE
-   ========================================================= */
+      </div>
 
-.story-build {
-  background: var(--light);
-  color: var(--bg);
-}
+    </section>
 
-.story-build .story-content {
-  max-width: 54rem;
-}
 
+    <!-- =======================================================
+         08 — COLLEGARE
+    ======================================================== -->
 
-/* =========================================================
-   RITORNA
-   ========================================================= */
+    <section
+      class="story-section story-connect story-light"
+      id="collegare"
+      data-section-title="Collegare"
+      aria-labelledby="title-collegare"
+    >
 
-.story-return {
-  background: var(--surface);
-  color: var(--light);
-}
+      <div class="story-inner">
 
-.story-return .story-eyebrow,
-.story-return .story-index {
-  color: #77756F;
-}
+        <div class="story-index" aria-hidden="true">
+          08
+        </div>
 
-.story-return .story-body {
-  max-width: 36rem;
-}
+        <div class="story-content">
 
+          <span class="story-eyebrow">
+            Sistema
+          </span>
 
-/* =========================================================
-   COLLEGARE
-   ========================================================= */
+          <h2
+            class="story-title"
+            id="title-collegare"
+          >
+            COLLEGARE.
+          </h2>
 
-.story-connect {
-  min-height: 110svh;
+          <div class="story-body">
 
-  text-align: center;
-}
+            <p class="story-connect-word">
+              Sport.
+            </p>
 
-.story-connect .story-inner {
-  display: grid;
-  place-items: center;
-}
+            <p class="story-connect-word">
+              Scienze motorie.
+            </p>
 
-.story-connect .story-content {
-  width: min(100%, 55rem);
-}
+            <p class="story-connect-word">
+              Educazione.
+            </p>
 
-.story-connect .story-body {
-  margin-inline: auto;
-}
+            <p class="story-connect-word">
+              Management.
+            </p>
 
-.story-connect .story-body p {
-  margin-inline: auto;
-}
+            <p class="story-connect-word">
+              Digitale.
+            </p>
 
-.story-connect .story-body p:not(:last-child) {
-  font-size: clamp(1.6rem, 3vw, 3.5rem);
-  font-weight: 600;
-  letter-spacing: -0.04em;
-  line-height: 0.95;
-}
+            <p class="story-connect-final">
+              Non sono percorsi separati.
+              Sono punti di uno stesso sistema.
+            </p>
 
-.story-connect .story-body p:last-child {
-  max-width: 34rem;
-  margin-top: 3rem;
-}
+          </div>
 
+        </div>
 
-/* =========================================================
-   OGGI
-   ========================================================= */
+      </div>
 
-.story-today {
-  background: var(--light);
-  color: var(--bg);
-}
+    </section>
 
-.story-today .story-content {
-  width: min(100%, 80rem);
-}
 
-.story-today .story-title {
-  font-size: var(--display-xl);
-}
+    <!-- =======================================================
+         09 — OGGI
+    ======================================================== -->
 
-.story-today .story-body {
-  max-width: 58rem;
-}
+    <section
+      class="story-section story-today"
+      id="oggi"
+      data-section-title="Oggi"
+      aria-labelledby="title-oggi"
+    >
 
+      <div class="story-inner">
 
-/* =========================================================
-   OBIETTIVO
-   ========================================================= */
+        <div class="story-index" aria-hidden="true">
+          09
+        </div>
 
-.story-objective .story-content {
-  max-width: 52rem;
-}
+        <div class="story-content">
 
-.story-objective .story-body {
-  max-width: 34rem;
-}
+          <span class="story-eyebrow">
+            Presente
+          </span>
 
+          <h2
+            class="story-title"
+            id="title-oggi"
+          >
+            OGGI.
+          </h2>
 
-/* =========================================================
-   PLACE
-   ========================================================= */
+          <div class="story-body">
 
-.story-place {
-  min-height: 105svh;
-}
+            <p class="story-lead">
+              Osservare.
+              Studiare.
+              Collegare.
+              Progettare.
+              Sviluppare.
+            </p>
 
-.place-grid {
-  display: grid;
-  grid-template-columns:
-    minmax(0, 0.85fr)
-    minmax(20rem, 1.15fr);
+            <p>
+              Un approccio trasversale per affrontare
+              problemi e costruire soluzioni.
+            </p>
 
-  gap: clamp(3rem, 8vw, 9rem);
-  align-items: center;
-}
+            <p class="story-manifesto">
+              Capire prima di intervenire.
+            </p>
 
-.place-content {
-  max-width: 40rem;
-}
+          </div>
 
-.place-map {
-  width: 100%;
-}
+        </div>
 
-.map-frame {
-  position: relative;
+      </div>
 
-  width: 100%;
-  aspect-ratio: 4 / 3;
+    </section>
 
-  overflow: hidden;
 
-  background: var(--surface-2);
-}
+    <!-- =======================================================
+         10 — OBIETTIVO
+    ======================================================== -->
 
-.map-frame iframe {
-  width: 100%;
-  height: 100%;
+    <section
+      class="story-section story-objective story-light"
+      id="obiettivo"
+      data-section-title="Obiettivo"
+      aria-labelledby="title-obiettivo"
+    >
 
-  border: 0;
+      <div class="story-inner">
 
-  filter: grayscale(1) contrast(0.92);
-}
+        <div class="story-index" aria-hidden="true">
+          10
+        </div>
 
-.map-caption {
-  margin: 1rem 0 0;
+        <div class="story-content">
 
-  color: var(--muted);
+          <span class="story-eyebrow">
+            Metodo
+          </span>
 
-  font-size: var(--micro);
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
+          <h2
+            class="story-title"
+            id="title-obiettivo"
+          >
+            OBIETTIVO.
+          </h2>
 
+          <div class="story-body">
 
-/* =========================================================
-   DA QUI
-   ========================================================= */
+            <p>
+              Ogni progetto parte da una domanda.
+            </p>
 
-.story-from-here {
-  background: var(--surface);
-  color: var(--light);
-}
+            <p class="story-lead">
+              Qual è l'obiettivo?
+            </p>
 
-.story-from-here .story-content {
-  max-width: 50rem;
-}
+            <p>
+              Qual è il contesto?
+            </p>
 
+            <p>
+              Cosa serve davvero?
+            </p>
 
-/* =========================================================
-   PERSON
-   ========================================================= */
+            <p>
+              Da qui nasce il lavoro.
+            </p>
 
-.story-person {
-  min-height: 105svh;
+          </div>
 
-  background: var(--light);
-  color: var(--bg);
-}
+        </div>
 
-.person-grid {
-  display: grid;
-  grid-template-columns:
-    minmax(18rem, 0.85fr)
-    minmax(0, 1fr);
+      </div>
 
-  gap: clamp(3rem, 8vw, 9rem);
-  align-items: center;
-}
+    </section>
 
-.person-frame {
-  width: 100%;
-  overflow: hidden;
-}
 
-.portrait-frame {
-  background: #D8D5CC;
-}
+    <!-- =======================================================
+         11 — QUI
+    ======================================================== -->
 
-.portrait-frame img {
-  width: 100%;
-  height: auto;
+    <section
+      class="story-section story-place"
+      id="qui"
+      data-section-title="Qui"
+      aria-labelledby="title-qui"
+    >
 
-  aspect-ratio: 4 / 5;
+      <div class="story-inner section-place">
 
-  object-fit: cover;
-}
+        <div class="story-index" aria-hidden="true">
+          11
+        </div>
 
-.person-content {
-  max-width: 48rem;
-}
+        <div class="story-content">
 
-.story-person .story-eyebrow,
-.story-person .story-index {
-  color: rgba(11, 11, 10, 0.48);
-}
+          <span class="story-eyebrow">
+            Territorio
+          </span>
 
+          <h2
+            class="story-title"
+            id="title-qui"
+          >
+            QUI.
+          </h2>
 
-/* =========================================================
-   CONTACT
-   ========================================================= */
+          <div class="story-body">
 
-.story-contact {
-  min-height: 100svh;
+            <p>
+              Ogni percorso parte da un luogo.
+            </p>
 
-  align-items: end;
+            <p>
+              Un territorio, una comunità,
+              un contesto.
+            </p>
 
-  padding-bottom:
-    clamp(8rem, 15vh, 13rem);
-}
+            <p>
+              È da qui che si osserva ciò che accade
+              e si decide dove andare.
+            </p>
 
-.story-contact .story-content {
-  max-width: 60rem;
-}
+          </div>
 
-.story-contact .story-title {
-  font-size: var(--display-xl);
-}
+        </div>
 
-.story-contact .story-body {
-  max-width: 38rem;
-}
+        <div class="place-map">
 
-.contact-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 1rem;
+          <iframe
+            title="Mappa dello Stadio Comunale Giuseppe La Franca, Partinico"
+            src="https://www.google.com/maps?q=Stadio+Comunale+Giuseppe+La+Franca,+Partinico&output=embed"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen
+          ></iframe>
 
-  margin-top: clamp(2.5rem, 5vw, 4rem);
+        </div>
 
-  padding-bottom: 0.7rem;
+      </div>
 
-  border-bottom: 1px solid currentColor;
+    </section>
 
-  font-size: var(--narrative);
-  font-weight: 600;
 
-  transition:
-    opacity var(--duration-fast) ease,
-    gap var(--duration-base) var(--ease-out);
-}
+    <!-- =======================================================
+         12 — DA QUI
+    ======================================================== -->
 
-@media (hover: hover) {
-  .contact-link:hover {
-    gap: 1.5rem;
-    opacity: 0.6;
-  }
-}
+    <section
+      class="story-section story-from-here story-light"
+      id="da-qui"
+      data-section-title="Da qui"
+      aria-labelledby="title-da-qui"
+    >
 
+      <div class="story-inner">
 
-/* =========================================================
-   SECTION NAVIGATION
-   ========================================================= */
+        <div class="story-index" aria-hidden="true">
+          12
+        </div>
 
-.section-nav {
-  position: sticky;
-  bottom: 0;
-  z-index: 500;
+        <div class="story-content">
 
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
+          <span class="story-eyebrow">
+            Presenza / Online
+          </span>
 
-  min-height: var(--nav-h);
+          <h2
+            class="story-title"
+            id="title-da-qui"
+          >
+            DA QUI.
+          </h2>
 
-  padding:
-    1rem
-    var(--gutter)
-    max(
-      1rem,
-      env(safe-area-inset-bottom)
-    );
+          <div class="story-body">
 
-  border-top: 1px solid var(--line);
+            <p class="story-lead">
+              Una base in presenza e online.
+            </p>
 
-  background: rgba(11, 11, 10, 0.94);
-  color: var(--light);
+            <p>
+              Il luogo è il punto di partenza.
+            </p>
 
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
+            <p>
+              Il digitale permette di estendere
+              il percorso, collegare persone
+              e costruire possibilità.
+            </p>
 
-.section-nav button {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
+          </div>
 
-  min-height: 44px;
-  padding: 0;
+        </div>
 
-  border: 0;
-  background: transparent;
+      </div>
 
-  color: inherit;
+    </section>
 
-  font-size: var(--micro);
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
 
-  transition:
-    opacity var(--duration-fast) ease;
-}
+    <!-- =======================================================
+         13 — ECCOMI
+    ======================================================== -->
 
-.section-nav-prev {
-  justify-self: start;
-}
+    <section
+      class="story-section story-person"
+      id="eccomi"
+      data-section-title="Eccomi"
+      aria-labelledby="title-eccomi"
+    >
 
-.section-nav-next {
-  justify-self: end;
-}
+      <div class="story-inner section-person">
 
-.section-nav-title {
-  color: var(--secondary);
+        <div class="story-index" aria-hidden="true">
+          13
+        </div>
 
-  font-size: var(--micro);
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-align: center;
-  text-transform: uppercase;
-}
+        <div class="story-content">
 
-.section-nav button:disabled {
-  cursor: default;
-  opacity: 0.22;
-}
+          <span class="story-eyebrow">
+            Persona
+          </span>
 
-@media (hover: hover) {
-  .section-nav button:not(:disabled):hover {
-    opacity: 0.55;
-  }
-}
+          <h2
+            class="story-title"
+            id="title-eccomi"
+          >
+            ECCOMI.
+          </h2>
 
+          <div class="story-body">
 
-/* =========================================================
-   FOOTER
-   ========================================================= */
+            <p>
+              Questo percorso non è una somma di ruoli.
+            </p>
 
-.site-footer {
-  padding:
-    6rem
-    var(--gutter)
-    calc(
-      6rem +
-      env(safe-area-inset-bottom)
-    );
+            <p>
+              È il risultato di esperienze diverse
+              che nel tempo hanno iniziato a dialogare.
+            </p>
 
-  background: var(--bg);
-  color: var(--light);
+            <p class="story-lead">
+              Sport.
+              Studio.
+              Educazione.
+              Progetto.
+              Digitale.
+            </p>
 
-  border-top: 1px solid var(--line);
-}
+          </div>
 
-.footer-inner {
-  width: min(100%, var(--content-max));
-  margin-inline: auto;
-}
+        </div>
 
-.footer-logo {
-  display: inline-flex;
+        <figure class="person-frame">
 
-  width: 42px;
-  height: 42px;
+          <div class="portrait-frame">
 
-  margin-bottom: 3rem;
-}
+            <img
+              src="/assets/images/cp-foto.webp"
+              alt="Cesare Paratore"
+              loading="lazy"
+              decoding="async"
+            >
 
-.footer-logo img {
-  width: 42px;
-  height: 42px;
-}
+          </div>
 
-.footer-name {
-  margin: 0;
+          <figcaption>
+            Cesare Paratore
+          </figcaption>
 
-  font-size: clamp(2rem, 5vw, 5rem);
-  font-weight: 700;
-  letter-spacing: var(--tracking-tight);
-  line-height: 0.9;
-}
+        </figure>
 
-.footer-description {
-  margin: 2rem 0 0;
+      </div>
 
-  color: var(--secondary);
+    </section>
 
-  font-size: var(--micro);
-  letter-spacing: 0.1em;
-  line-height: 1.5;
-  text-transform: uppercase;
-}
 
+    <!-- =======================================================
+         14 — SCRIVIMI
+    ======================================================== -->
 
-/* =========================================================
-   LARGE DESKTOP
-   ========================================================= */
+    <section
+      class="story-section story-contact story-light"
+      id="scrivimi"
+      data-section-title="Scrivimi"
+      aria-labelledby="title-scrivimi"
+    >
 
-@media (min-width: 1440px) {
+      <div class="story-inner">
 
-  :root {
-    --gutter: 4vw;
-  }
+        <div class="story-index" aria-hidden="true">
+          14
+        </div>
 
-  .story-understand .story-inner,
-  .place-grid,
-  .person-grid {
-    gap: 10rem;
-  }
+        <div class="story-content">
 
-}
+          <span class="story-eyebrow">
+            Contatto
+          </span>
 
+          <h2
+            class="story-title"
+            id="title-scrivimi"
+          >
+            SCRIVIMI.
+          </h2>
 
-/* =========================================================
-   TABLET
-   ========================================================= */
+          <div class="story-body">
 
-@media (max-width: 1024px) {
+            <p class="story-lead">
+              Parlami del tuo obiettivo.
+            </p>
 
-  :root {
-    --header-h: 70px;
-    --nav-h: 82px;
-    --gutter: 6vw;
-  }
+            <p>
+              Un progetto, un'idea, una domanda
+              o semplicemente un punto da cui partire.
+            </p>
 
-  .story-section {
-    min-height: 100svh;
-    padding-block: 7rem;
-  }
+            <a
+              class="contact-link"
+              href="/contatti/"
+            >
+              <span>Parliamone</span>
+              <span aria-hidden="true">↗</span>
+            </a>
 
-  .story-understand .story-inner,
-  .place-grid,
-  .person-grid {
-    grid-template-columns: 1fr;
-    gap: 4rem;
-  }
+          </div>
 
-  .story-understand .story-body {
-    margin-top: 2rem;
-  }
+        </div>
 
-  .place-map {
-    max-width: 44rem;
-  }
+      </div>
 
-  .person-frame {
-    max-width: 38rem;
-  }
+    </section>
 
-}
 
+    <!-- =======================================================
+         NARRATIVE NAVIGATION
+    ======================================================== -->
 
-/* =========================================================
-   MOBILE
-   ========================================================= */
+    <nav
+      class="section-nav"
+      aria-label="Navigazione narrativa"
+      data-theme="dark"
+    >
 
-@media (max-width: 640px) {
+      <button
+        type="button"
+        data-nav-prev
+        aria-label="Sezione precedente"
+        aria-disabled="true"
+        disabled
+      >
+        <span aria-hidden="true">←</span>
+        <span class="nav-button-label">
+          Prima
+        </span>
+      </button>
 
-  :root {
-    --header-h: 64px;
-    --nav-h: 76px;
-    --gutter: 6vw;
+      <div
+        class="section-nav-center"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        <span class="section-nav-count">
+          Storia
+        </span>
 
-    --display-xl: clamp(4rem, 18vw, 7rem);
-    --display-l: clamp(3.1rem, 14vw, 5rem);
-  }
+        <span
+          class="section-nav-title"
+          data-nav-title
+        >
+          Guarda
+        </span>
+      </div>
 
-  .site-header {
-    min-height: var(--header-h);
-  }
+      <button
+        type="button"
+        data-nav-next
+        aria-label="Sezione successiva"
+      >
+        <span class="nav-button-label">
+          Dopo
+        </span>
+        <span aria-hidden="true">→</span>
+      </button>
 
-  .site-menu {
-    padding-top: calc(var(--header-h) + 2rem);
-  }
+    </nav>
 
-  .site-menu-nav a {
-    grid-template-columns: 2.5rem 1fr;
-    gap: 0.5rem;
+  </main>
 
-    padding-block: 0.9rem;
-  }
 
-  .site-menu-nav a span:last-child {
-    font-size: clamp(1.8rem, 8vw, 3rem);
-  }
+  <!-- =========================================================
+       FOOTER
+  ========================================================== -->
 
-  .story-section {
-    min-height: 100svh;
+  <footer class="site-footer">
 
-    padding:
-      6.5rem
-      var(--gutter)
-      6.5rem;
-  }
+    <a
+      class="footer-logo"
+      href="/"
+      aria-label="Cesare Paratore — Home"
+    >
+      <img
+        src="/assets/images/cp-mark.svg"
+        alt=""
+        width="42"
+        height="42"
+        loading="lazy"
+        decoding="async"
+      >
+    </a>
 
-  .story-opening {
-    min-height: calc(100svh - var(--header-h));
+    <div class="footer-name">
+      CESARE PARATORE
+    </div>
 
-    padding-bottom: 7rem;
-  }
+    <div class="footer-meta">
+      <span>
+        Sport / Educazione / Progetto / Digitale
+      </span>
 
-  .story-eyebrow {
-    margin-bottom: 1.75rem;
-  }
+      <span>
+        © <span data-current-year></span>
+      </span>
+    </div>
 
-  .story-title {
-    line-height: 0.86;
-  }
+  </footer>
 
-  .story-body {
-    margin-top: 2.5rem;
-
-    font-size: 1.15rem;
-    line-height: 1.48;
-  }
-
-  .story-index {
-    top: 1rem;
-    right: 0;
-  }
-
-  .story-connect {
-    min-height: 100svh;
-  }
-
-  .story-connect .story-body p:not(:last-child) {
-    font-size: clamp(1.5rem, 8vw, 2.5rem);
-  }
-
-  .place-grid,
-  .person-grid {
-    gap: 3rem;
-  }
-
-  .map-frame {
-    aspect-ratio: 1 / 1;
-  }
-
-  .person-frame {
-    max-width: none;
-  }
-
-  .portrait-frame img {
-    aspect-ratio: 4 / 5;
-  }
-
-  .section-nav {
-    grid-template-columns: 1fr auto 1fr;
-
-    min-height: var(--nav-h);
-
-    padding-inline: var(--gutter);
-  }
-
-  .section-nav button {
-    gap: 0.45rem;
-    font-size: 0.68rem;
-  }
-
-  .section-nav-title {
-    max-width: 7rem;
-
-    overflow: hidden;
-
-    font-size: 0.65rem;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .footer-name {
-    font-size: clamp(2rem, 10vw, 3.5rem);
-  }
-
-}
-
-
-/* =========================================================
-   VERY SMALL DEVICES
-   ========================================================= */
-
-@media (max-width: 380px) {
-
-  :root {
-    --gutter: 5vw;
-  }
-
-  .menu-trigger-label {
-    display: none;
-  }
-
-  .story-section {
-    padding-block: 5.5rem;
-  }
-
-  .story-body {
-    font-size: 1.08rem;
-  }
-
-  .section-nav button span:last-child {
-    display: none;
-  }
-
-}
-
-
-/* =========================================================
-   LANDSCAPE MOBILE
-   ========================================================= */
-
-@media (
-  max-width: 900px
-) and (
-  orientation: landscape
-) {
-
-  .story-section {
-    min-height: auto;
-    padding-block: 7rem;
-  }
-
-  .story-opening {
-    min-height: 100svh;
-  }
-
-}
-
-
-/* =========================================================
-   REDUCED MOTION
-   ========================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-
-  html {
-    scroll-behavior: auto;
-  }
-
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto !important;
-
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-
-    transition-duration: 0.01ms !important;
-  }
-
-  .site-menu {
-    transition: none;
-  }
-
-  .contact-link,
-  .menu-trigger-icon span,
-  .site-menu-nav a {
-    transition: none;
-  }
-
-}
-
-
-/* =========================================================
-   PRINT
-   ========================================================= */
-
-@media print {
-
-  .site-header,
-  .site-menu,
-  .section-nav,
-  .loader,
-  .standby {
-    display: none !important;
-  }
-
-  body,
-  .story-section,
-  .site-footer {
-    background: #fff !important;
-    color: #000 !important;
-  }
-
-  .story-section {
-    min-height: auto;
-    padding-block: 3rem;
-    page-break-inside: avoid;
-  }
-
-}
+</body>
+</html>
