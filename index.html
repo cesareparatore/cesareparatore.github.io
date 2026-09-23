@@ -1,7 +1,7 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
 
   <meta
     name="viewport"
@@ -13,9 +13,12 @@
     content="Cesare Paratore: un percorso tra sport, scienze motorie, educazione, management e digitale. Un modo di osservare, capire, collegare e costruire."
   >
 
-  <meta name="author" content="Cesare Paratore">
-  <meta name="robots" content="index, follow">
+  <meta
+    name="robots"
+    content="index, follow, max-image-preview:large"
+  >
 
+  <meta name="author" content="Cesare Paratore">
   <meta name="theme-color" content="#0B0B0A">
   <meta name="color-scheme" content="dark light">
 
@@ -23,8 +26,15 @@
     Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale
   </title>
 
-  <!-- Sostituire "/" con il dominio assoluto definitivo -->
-  <link rel="canonical" href="/">
+  <!--
+    SOSTITUIRE con il dominio reale del sito.
+    Esempio:
+    https://www.esempio.it/
+  -->
+  <link
+    rel="canonical"
+    href="https://www.tuodominio.it/"
+  >
 
   <link
     rel="icon"
@@ -34,12 +44,10 @@
 
   <link
     rel="preload"
-    href="/assets/images/cp-mark.svg"
     as="image"
-    type="image/svg+xml"
+    href="/assets/images/cp-mark.svg"
   >
 
-  <!-- Open Graph -->
   <meta
     property="og:type"
     content="website"
@@ -57,7 +65,7 @@
 
   <meta
     property="og:url"
-    content="/"
+    content="https://www.tuodominio.it/"
   >
 
   <meta
@@ -66,15 +74,10 @@
   >
 
   <!--
-  Quando avremo una vera immagine social:
-
-  <meta
-    property="og:image"
-    content="https://DOMINIO.IT/assets/images/og-image.jpg"
-  >
+    Inserire quando sarà disponibile una vera immagine Open Graph:
+    <meta property="og:image" content="https://www.tuodominio.it/assets/images/og.jpg">
   -->
 
-  <!-- Twitter / X -->
   <meta
     name="twitter:card"
     content="summary_large_image"
@@ -90,17 +93,11 @@
     content="Un percorso tra sport, scienze motorie, educazione, management e digitale."
   >
 
-  <!--
-  <meta
-    name="twitter:image"
-    content="https://DOMINIO.IT/assets/images/og-image.jpg"
+  <link
+    rel="preconnect"
+    href="https://cdn.jsdelivr.net"
   >
-  -->
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="/style.css">
-
-  <!-- GSAP -->
   <script
     src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"
     defer
@@ -111,15 +108,21 @@
     defer
   ></script>
 
-  <!-- JS -->
-  <script src="/script.js" defer></script>
+  <link
+    rel="stylesheet"
+    href="/style.css"
+  >
 
-  <!-- Structured Data -->
+  <script
+    src="/script.js"
+    defer
+  ></script>
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "ProfilePage",
-    "name": "Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale",
+    "name": "Cesare Paratore",
     "description": "Un percorso tra sport, scienze motorie, educazione, management e digitale.",
     "mainEntity": {
       "@type": "Person",
@@ -132,55 +135,77 @@
     }
   }
   </script>
+
+  <noscript>
+    <style>
+      .site-loader,
+      .standby {
+        display: none !important;
+      }
+
+      body {
+        overflow: auto !important;
+      }
+
+      .site-menu {
+        position: static !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        transform: none !important;
+      }
+    </style>
+  </noscript>
 </head>
 
 <body>
 
-  <!-- ======================================================
+  <a
+    class="skip-link"
+    href="#main-content"
+  >
+    Vai al contenuto
+  </a>
+
+  <!-- =========================================================
        LOADER
-       ====================================================== -->
+  ========================================================== -->
 
   <div
-    class="loader"
-    id="loader"
-    aria-hidden="true"
+    class="site-loader"
+    aria-hidden="false"
   >
     <div class="loader-inner">
+      <img
+        src="/assets/images/cp-mark.svg"
+        alt=""
+        width="42"
+        height="42"
+        decoding="async"
+      >
 
-      <div class="loader-mark">
-        <img
-          src="/assets/images/cp-mark.svg"
-          alt=""
-          width="42"
-          height="42"
-          decoding="async"
-        >
-      </div>
-
-      <p class="loader-name">
+      <span class="loader-name">
         CESARE PARATORE
-      </p>
-
+      </span>
     </div>
   </div>
 
 
-  <!-- ======================================================
+  <!-- =========================================================
        STANDBY
-       ====================================================== -->
+  ========================================================== -->
 
   <div
     class="standby"
-    id="standby"
     aria-hidden="true"
   >
     <span>GUARDA.</span>
   </div>
 
 
-  <!-- ======================================================
+  <!-- =========================================================
        HEADER
-       ====================================================== -->
+  ========================================================== -->
 
   <header class="site-header">
 
@@ -203,6 +228,7 @@
       type="button"
       aria-expanded="false"
       aria-controls="menu"
+      aria-label="Apri menu"
     >
       <span class="menu-trigger-label">
         Menu
@@ -220,119 +246,111 @@
   </header>
 
 
-  <!-- ======================================================
-       MENU
-       ====================================================== -->
+  <!-- =========================================================
+       OVERLAY MENU
+  ========================================================== -->
 
   <aside
     class="site-menu"
     id="menu"
     aria-hidden="true"
+    aria-label="Menu principale"
   >
-
     <div class="site-menu-inner">
 
-      <p class="site-menu-label">
-        Navigazione
-      </p>
+      <div class="site-menu-meta">
+        <span>Indice</span>
+        <span>01—08</span>
+      </div>
 
       <nav
         class="site-menu-nav"
         aria-label="Navigazione principale"
       >
 
-        <ul>
+        <a href="/chi-sono/">
+          <span>01</span>
+          <strong>Chi sono</strong>
+        </a>
 
-          <li>
-            <a href="/chi-sono/">
-              <span>01</span>
-              <span>Chi sono</span>
-            </a>
-          </li>
+        <a href="/sport/">
+          <span>02</span>
+          <strong>Sport</strong>
+        </a>
 
-          <li>
-            <a href="/sport/">
-              <span>02</span>
-              <span>Sport</span>
-            </a>
-          </li>
+        <a href="/scienze-motorie/">
+          <span>03</span>
+          <strong>Scienze motorie</strong>
+        </a>
 
-          <li>
-            <a href="/scienze-motorie/">
-              <span>03</span>
-              <span>Scienze motorie</span>
-            </a>
-          </li>
+        <a href="/educazione/">
+          <span>04</span>
+          <strong>Educazione</strong>
+        </a>
 
-          <li>
-            <a href="/educazione/">
-              <span>04</span>
-              <span>Educazione</span>
-            </a>
-          </li>
+        <a href="/management/">
+          <span>05</span>
+          <strong>Management</strong>
+        </a>
 
-          <li>
-            <a href="/management/">
-              <span>05</span>
-              <span>Management</span>
-            </a>
-          </li>
+        <a href="/digitale/">
+          <span>06</span>
+          <strong>Digitale</strong>
+        </a>
 
-          <li>
-            <a href="/digitale/">
-              <span>06</span>
-              <span>Digitale</span>
-            </a>
-          </li>
+        <a href="/territorio/">
+          <span>07</span>
+          <strong>Territorio</strong>
+        </a>
 
-          <li>
-            <a href="/territorio/">
-              <span>07</span>
-              <span>Territorio</span>
-            </a>
-          </li>
-
-          <li>
-            <a href="/contatti/">
-              <span>08</span>
-              <span>Contatti</span>
-            </a>
-          </li>
-
-        </ul>
+        <a href="/contatti/">
+          <span>08</span>
+          <strong>Contatti</strong>
+        </a>
 
       </nav>
 
-    </div>
+      <div class="site-menu-footer">
+        <span>Sport / Educazione / Progetto / Digitale</span>
+        <span>Cesare Paratore</span>
+      </div>
 
+    </div>
   </aside>
 
 
-  <!-- ======================================================
-       MAIN
-       ====================================================== -->
+  <!-- =========================================================
+       MAIN NARRATIVE
+  ========================================================== -->
 
-  <main id="main-content">
+  <main
+    id="main-content"
+    tabindex="-1"
+  >
 
 
-    <!-- ====================================================
+    <!-- =======================================================
          01 — GUARDA
-         ==================================================== -->
+    ======================================================== -->
 
     <section
       class="story-section story-opening"
       id="guarda"
-      data-section="guarda"
+      data-section-title="Guarda"
       aria-labelledby="title-guarda"
     >
 
       <div class="story-inner">
 
+        <div class="story-index" aria-hidden="true">
+          01
+        </div>
+
         <div class="story-content">
 
-          <p class="story-eyebrow">
-            01 / INIZIO
-          </p>
+          <span class="story-eyebrow">
+            Prima di fare
+          </span>
 
           <h1
             class="story-title"
@@ -344,13 +362,11 @@
           <div class="story-body">
 
             <p>
-              Prima di fare qualcosa,
-              guardo.
+              Prima di fare qualcosa, guardo.
             </p>
 
             <p>
-              Da piccolo ho incontrato
-              un computer.
+              Da piccolo ho incontrato un computer.
             </p>
 
             <p>
@@ -362,36 +378,33 @@
 
         </div>
 
-        <span
-          class="story-index"
-          aria-hidden="true"
-        >
-          01
-        </span>
-
       </div>
 
     </section>
 
 
-    <!-- ====================================================
+    <!-- =======================================================
          02 — COME
-         ==================================================== -->
+    ======================================================== -->
 
     <section
-      class="story-section"
+      class="story-section story-movement story-light"
       id="come"
-      data-section="come"
+      data-section-title="Come?"
       aria-labelledby="title-come"
     >
 
       <div class="story-inner">
 
+        <div class="story-index" aria-hidden="true">
+          02
+        </div>
+
         <div class="story-content">
 
-          <p class="story-eyebrow">
-            02 / MOVIMENTO
-          </p>
+          <span class="story-eyebrow">
+            Il corpo
+          </span>
 
           <h2
             class="story-title"
@@ -407,50 +420,46 @@
             </p>
 
             <p>
-              A correre, giocare,
-              provare.
+              A correre, giocare, provare.
             </p>
 
             <p>
-              Lo sport è diventato
-              un modo per conoscere
-              me stesso e ciò che mi circondava.
+              Lo sport è diventato un modo
+              per conoscere me stesso
+              e ciò che mi circondava.
             </p>
 
           </div>
 
         </div>
 
-        <span
-          class="story-index"
-          aria-hidden="true"
-        >
-          02
-        </span>
-
       </div>
 
     </section>
 
 
-    <!-- ====================================================
+    <!-- =======================================================
          03 — MOVIMENTO
-         ==================================================== -->
+    ======================================================== -->
 
     <section
       class="story-section story-movement"
       id="movimento"
-      data-section="movimento"
+      data-section-title="Movimento"
       aria-labelledby="title-movimento"
     >
 
       <div class="story-inner">
 
+        <div class="story-index" aria-hidden="true">
+          03
+        </div>
+
         <div class="story-content">
 
-          <p class="story-eyebrow">
-            03 / SPORT
-          </p>
+          <span class="story-eyebrow">
+            Pratica
+          </span>
 
           <h2
             class="story-title"
@@ -461,11 +470,9 @@
 
           <div class="story-body">
 
-            <p>
+            <p class="story-lead">
               Prima atleta.
-            </p>
-
-            <p>
+              <br>
               Poi tecnico.
             </p>
 
@@ -475,44 +482,41 @@
             </p>
 
             <p>
-              È diventato qualcosa
-              da osservare, studiare e comprendere.
+              È diventato qualcosa da osservare,
+              studiare e comprendere.
             </p>
 
           </div>
 
         </div>
 
-        <span
-          class="story-index"
-          aria-hidden="true"
-        >
-          03
-        </span>
-
       </div>
 
     </section>
 
 
-    <!-- ====================================================
+    <!-- =======================================================
          04 — CAPIRE
-         ==================================================== -->
+    ======================================================== -->
 
     <section
-      class="story-section story-understand"
+      class="story-section story-understand story-light"
       id="capire"
-      data-section="capire"
+      data-section-title="Capire"
       aria-labelledby="title-capire"
     >
 
       <div class="story-inner">
 
+        <div class="story-index" aria-hidden="true">
+          04
+        </div>
+
         <div class="story-content">
 
-          <p class="story-eyebrow">
-            04 / STUDIO
-          </p>
+          <span class="story-eyebrow">
+            Studio
+          </span>
 
           <h2
             class="story-title"
@@ -524,13 +528,13 @@
           <div class="story-body">
 
             <p>
-              Studiare il movimento
-              ha cambiato il modo di guardarlo.
+              Studiare il movimento ha cambiato
+              il modo di guardarlo.
             </p>
 
             <p>
-              L'esperienza e lo studio
-              hanno iniziato a parlarsi.
+              L'esperienza e lo studio hanno
+              iniziato a parlarsi.
             </p>
 
             <p>
@@ -542,36 +546,33 @@
 
         </div>
 
-        <span
-          class="story-index"
-          aria-hidden="true"
-        >
-          04
-        </span>
-
       </div>
 
     </section>
 
 
-    <!-- ====================================================
+    <!-- =======================================================
          05 — TRASMETTERE
-         ==================================================== -->
+    ======================================================== -->
 
     <section
-      class="story-section"
+      class="story-section story-light"
       id="trasmettere"
-      data-section="trasmettere"
+      data-section-title="Trasmettere"
       aria-labelledby="title-trasmettere"
     >
 
       <div class="story-inner">
 
+        <div class="story-index" aria-hidden="true">
+          05
+        </div>
+
         <div class="story-content">
 
-          <p class="story-eyebrow">
-            05 / EDUCAZIONE
-          </p>
+          <span class="story-eyebrow">
+            Condivisione
+          </span>
 
           <h2
             class="story-title"
@@ -583,52 +584,46 @@
           <div class="story-body">
 
             <p>
-              Ciò che si comprende
-              può essere condiviso.
+              Ciò che si comprende può essere condiviso.
             </p>
 
             <p>
-              Insegnare significa
-              trasformare esperienza,
-              conoscenza e metodo
-              in qualcosa che possa
-              diventare utile ad altri.
+              Insegnare significa trasformare esperienza,
+              conoscenza e metodo in qualcosa che
+              possa diventare utile ad altri.
             </p>
 
           </div>
 
         </div>
 
-        <span
-          class="story-index"
-          aria-hidden="true"
-        >
-          05
-        </span>
-
       </div>
 
     </section>
 
 
-    <!-- ====================================================
+    <!-- =======================================================
          06 — COSTRUIRE
-         ==================================================== -->
+    ======================================================== -->
 
     <section
       class="story-section story-build"
       id="costruire"
-      data-section="costruire"
+      data-section-title="Costruire"
       aria-labelledby="title-costruire"
     >
 
       <div class="story-inner">
 
+        <div class="story-index" aria-hidden="true">
+          06
+        </div>
+
         <div class="story-content">
 
-          <p class="story-eyebrow">
-            06 / MANAGEMENT
-          </p>
+          <span class="story-eyebrow">
+            Progetto
+          </span>
 
           <h2
             class="story-title"
@@ -640,55 +635,50 @@
           <div class="story-body">
 
             <p>
-              A un certo punto
-              non basta più capire.
+              A un certo punto non basta più capire.
             </p>
 
-            <p>
+            <p class="story-lead">
               Bisogna progettare.
             </p>
 
             <p>
-              Organizzare persone,
-              strumenti, risorse e processi
-              per trasformare un'idea
-              in qualcosa di concreto.
+              Organizzare persone, strumenti,
+              risorse e processi per trasformare
+              un'idea in qualcosa di concreto.
             </p>
 
           </div>
 
         </div>
 
-        <span
-          class="story-index"
-          aria-hidden="true"
-        >
-          06
-        </span>
-
       </div>
 
     </section>
 
 
-    <!-- ====================================================
+    <!-- =======================================================
          07 — RITORNA
-         ==================================================== -->
+    ======================================================== -->
 
     <section
       class="story-section story-return"
       id="ritorna"
-      data-section="ritorna"
+      data-section-title="Ritorna"
       aria-labelledby="title-ritorna"
     >
 
       <div class="story-inner">
 
+        <div class="story-index" aria-hidden="true">
+          07
+        </div>
+
         <div class="story-content">
 
-          <p class="story-eyebrow">
-            07 / DIGITALE
-          </p>
+          <span class="story-eyebrow">
+            Digitale
+          </span>
 
           <h2
             class="story-title"
@@ -700,18 +690,15 @@
           <div class="story-body">
 
             <p>
-              Quel computer dell'inizio
-              ritorna.
+              Quel computer dell'inizio ritorna.
             </p>
 
             <p>
-              Non più soltanto come
-              oggetto da osservare,
-              ma come strumento
-              per costruire.
+              Non più soltanto come oggetto da osservare,
+              ma come strumento per costruire.
             </p>
 
-            <p>
+            <p class="story-lead">
               Pagine.
               Sistemi.
               Esperienze digitali.
@@ -721,36 +708,33 @@
 
         </div>
 
-        <span
-          class="story-index"
-          aria-hidden="true"
-        >
-          07
-        </span>
-
       </div>
 
     </section>
 
 
-    <!-- ====================================================
+    <!-- =======================================================
          08 — COLLEGARE
-         ==================================================== -->
+    ======================================================== -->
 
     <section
-      class="story-section story-connect"
+      class="story-section story-connect story-light"
       id="collegare"
-      data-section="collegare"
+      data-section-title="Collegare"
       aria-labelledby="title-collegare"
     >
 
       <div class="story-inner">
 
+        <div class="story-index" aria-hidden="true">
+          08
+        </div>
+
         <div class="story-content">
 
-          <p class="story-eyebrow">
-            08 / CONNESSIONI
-          </p>
+          <span class="story-eyebrow">
+            Sistema
+          </span>
 
           <h2
             class="story-title"
@@ -761,27 +745,27 @@
 
           <div class="story-body">
 
-            <p>
+            <p class="story-connect-word">
               Sport.
             </p>
 
-            <p>
+            <p class="story-connect-word">
               Scienze motorie.
             </p>
 
-            <p>
+            <p class="story-connect-word">
               Educazione.
             </p>
 
-            <p>
+            <p class="story-connect-word">
               Management.
             </p>
 
-            <p>
+            <p class="story-connect-word">
               Digitale.
             </p>
 
-            <p>
+            <p class="story-connect-final">
               Non sono percorsi separati.
               Sono punti di uno stesso sistema.
             </p>
@@ -790,36 +774,33 @@
 
         </div>
 
-        <span
-          class="story-index"
-          aria-hidden="true"
-        >
-          08
-        </span>
-
       </div>
 
     </section>
 
 
-    <!-- ====================================================
+    <!-- =======================================================
          09 — OGGI
-         ==================================================== -->
+    ======================================================== -->
 
     <section
       class="story-section story-today"
       id="oggi"
-      data-section="oggi"
+      data-section-title="Oggi"
       aria-labelledby="title-oggi"
     >
 
       <div class="story-inner">
 
+        <div class="story-index" aria-hidden="true">
+          09
+        </div>
+
         <div class="story-content">
 
-          <p class="story-eyebrow">
-            09 / OGGI
-          </p>
+          <span class="story-eyebrow">
+            Presente
+          </span>
 
           <h2
             class="story-title"
@@ -839,12 +820,11 @@
             </p>
 
             <p>
-              Un approccio trasversale
-              per affrontare problemi
-              e costruire soluzioni.
+              Un approccio trasversale per affrontare
+              problemi e costruire soluzioni.
             </p>
 
-            <p>
+            <p class="story-manifesto">
               Capire prima di intervenire.
             </p>
 
@@ -852,36 +832,33 @@
 
         </div>
 
-        <span
-          class="story-index"
-          aria-hidden="true"
-        >
-          09
-        </span>
-
       </div>
 
     </section>
 
 
-    <!-- ====================================================
+    <!-- =======================================================
          10 — OBIETTIVO
-         ==================================================== -->
+    ======================================================== -->
 
     <section
-      class="story-section story-objective"
+      class="story-section story-objective story-light"
       id="obiettivo"
-      data-section="obiettivo"
+      data-section-title="Obiettivo"
       aria-labelledby="title-obiettivo"
     >
 
       <div class="story-inner">
 
+        <div class="story-index" aria-hidden="true">
+          10
+        </div>
+
         <div class="story-content">
 
-          <p class="story-eyebrow">
-            10 / DIREZIONE
-          </p>
+          <span class="story-eyebrow">
+            Metodo
+          </span>
 
           <h2
             class="story-title"
@@ -893,11 +870,10 @@
           <div class="story-body">
 
             <p>
-              Ogni progetto parte
-              da una domanda.
+              Ogni progetto parte da una domanda.
             </p>
 
-            <p>
+            <p class="story-lead">
               Qual è l'obiettivo?
             </p>
 
@@ -917,120 +893,100 @@
 
         </div>
 
-        <span
-          class="story-index"
-          aria-hidden="true"
-        >
-          10
-        </span>
-
       </div>
 
     </section>
 
 
-    <!-- ====================================================
+    <!-- =======================================================
          11 — QUI
-         ==================================================== -->
+    ======================================================== -->
 
     <section
-      class="story-section story-place section-place"
+      class="story-section story-place"
       id="qui"
-      data-section="qui"
+      data-section-title="Qui"
       aria-labelledby="title-qui"
     >
 
-      <div class="story-inner">
+      <div class="story-inner section-place">
 
-        <div class="place-grid">
+        <div class="story-index" aria-hidden="true">
+          11
+        </div>
 
-          <div class="story-content place-content">
+        <div class="story-content">
 
-            <p class="story-eyebrow">
-              11 / TERRITORIO
+          <span class="story-eyebrow">
+            Territorio
+          </span>
+
+          <h2
+            class="story-title"
+            id="title-qui"
+          >
+            QUI.
+          </h2>
+
+          <div class="story-body">
+
+            <p>
+              Ogni percorso parte da un luogo.
             </p>
 
-            <h2
-              class="story-title"
-              id="title-qui"
-            >
-              QUI.
-            </h2>
+            <p>
+              Un territorio, una comunità,
+              un contesto.
+            </p>
 
-            <div class="story-body">
-
-              <p>
-                Ogni percorso parte
-                da un luogo.
-              </p>
-
-              <p>
-                Un territorio,
-                una comunità,
-                un contesto.
-              </p>
-
-              <p>
-                È da qui che si osserva
-                ciò che accade e si decide
-                dove andare.
-              </p>
-
-            </div>
-
-          </div>
-
-          <div class="place-map">
-
-            <div class="map-frame">
-
-              <iframe
-                src="https://www.google.com/maps?q=Stadio+Comunale+Giuseppe+La+Franca,+Partinico&output=embed"
-                title="Mappa dello Stadio Comunale Giuseppe La Franca di Partinico"
-                loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade"
-              ></iframe>
-
-            </div>
-
-            <p class="map-caption">
-              Partinico
+            <p>
+              È da qui che si osserva ciò che accade
+              e si decide dove andare.
             </p>
 
           </div>
 
         </div>
 
-        <span
-          class="story-index"
-          aria-hidden="true"
-        >
-          11
-        </span>
+        <div class="place-map">
+
+          <iframe
+            title="Mappa dello Stadio Comunale Giuseppe La Franca, Partinico"
+            src="https://www.google.com/maps?q=Stadio+Comunale+Giuseppe+La+Franca,+Partinico&output=embed"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen
+          ></iframe>
+
+        </div>
 
       </div>
 
     </section>
 
 
-    <!-- ====================================================
+    <!-- =======================================================
          12 — DA QUI
-         ==================================================== -->
+    ======================================================== -->
 
     <section
-      class="story-section story-from-here"
+      class="story-section story-from-here story-light"
       id="da-qui"
-      data-section="da-qui"
+      data-section-title="Da qui"
       aria-labelledby="title-da-qui"
     >
 
       <div class="story-inner">
 
+        <div class="story-index" aria-hidden="true">
+          12
+        </div>
+
         <div class="story-content">
 
-          <p class="story-eyebrow">
-            12 / BASE
-          </p>
+          <span class="story-eyebrow">
+            Presenza / Online
+          </span>
 
           <h2
             class="story-title"
@@ -1041,20 +997,17 @@
 
           <div class="story-body">
 
-            <p>
-              Una base in presenza
-              e online.
+            <p class="story-lead">
+              Una base in presenza e online.
             </p>
 
             <p>
-              Il luogo è il punto
-              di partenza.
+              Il luogo è il punto di partenza.
             </p>
 
             <p>
-              Il digitale permette
-              di estendere il percorso,
-              collegare persone
+              Il digitale permette di estendere
+              il percorso, collegare persone
               e costruire possibilità.
             </p>
 
@@ -1062,34 +1015,67 @@
 
         </div>
 
-        <span
-          class="story-index"
-          aria-hidden="true"
-        >
-          12
-        </span>
-
       </div>
 
     </section>
 
 
-    <!-- ====================================================
+    <!-- =======================================================
          13 — ECCOMI
-         ==================================================== -->
+    ======================================================== -->
 
     <section
-      class="story-section story-person section-person"
+      class="story-section story-person"
       id="eccomi"
-      data-section="eccomi"
+      data-section-title="Eccomi"
       aria-labelledby="title-eccomi"
     >
 
-      <div class="story-inner">
+      <div class="story-inner section-person">
 
-        <div class="person-grid">
+        <div class="story-index" aria-hidden="true">
+          13
+        </div>
 
-          <figure class="person-frame portrait-frame">
+        <div class="story-content">
+
+          <span class="story-eyebrow">
+            Persona
+          </span>
+
+          <h2
+            class="story-title"
+            id="title-eccomi"
+          >
+            ECCOMI.
+          </h2>
+
+          <div class="story-body">
+
+            <p>
+              Questo percorso non è una somma di ruoli.
+            </p>
+
+            <p>
+              È il risultato di esperienze diverse
+              che nel tempo hanno iniziato a dialogare.
+            </p>
+
+            <p class="story-lead">
+              Sport.
+              Studio.
+              Educazione.
+              Progetto.
+              Digitale.
+            </p>
+
+          </div>
+
+        </div>
+
+        <figure class="person-frame">
+
+          <div class="portrait-frame">
 
             <img
               src="/assets/images/cp-foto.webp"
@@ -1098,80 +1084,41 @@
               decoding="async"
             >
 
-          </figure>
-
-          <div class="story-content person-content">
-
-            <p class="story-eyebrow">
-              13 / PERSONA
-            </p>
-
-            <h2
-              class="story-title"
-              id="title-eccomi"
-            >
-              ECCOMI.
-            </h2>
-
-            <div class="story-body">
-
-              <p>
-                Questo percorso
-                non è una somma di ruoli.
-              </p>
-
-              <p>
-                È il risultato
-                di esperienze diverse
-                che nel tempo
-                hanno iniziato
-                a dialogare.
-              </p>
-
-              <p>
-                Sport.
-                Studio.
-                Educazione.
-                Progetto.
-                Digitale.
-              </p>
-
-            </div>
-
           </div>
 
-        </div>
+          <figcaption>
+            Cesare Paratore
+          </figcaption>
 
-        <span
-          class="story-index"
-          aria-hidden="true"
-        >
-          13
-        </span>
+        </figure>
 
       </div>
 
     </section>
 
 
-    <!-- ====================================================
+    <!-- =======================================================
          14 — SCRIVIMI
-         ==================================================== -->
+    ======================================================== -->
 
     <section
-      class="story-section story-contact"
+      class="story-section story-contact story-light"
       id="scrivimi"
-      data-section="scrivimi"
+      data-section-title="Scrivimi"
       aria-labelledby="title-scrivimi"
     >
 
       <div class="story-inner">
 
+        <div class="story-index" aria-hidden="true">
+          14
+        </div>
+
         <div class="story-content">
 
-          <p class="story-eyebrow">
-            14 / CONTATTO
-          </p>
+          <span class="story-eyebrow">
+            Contatto
+          </span>
 
           <h2
             class="story-title"
@@ -1187,72 +1134,75 @@
             </p>
 
             <p>
-              Un progetto,
-              un'idea,
-              una domanda
-              o semplicemente
-              un punto da cui partire.
+              Un progetto, un'idea, una domanda
+              o semplicemente un punto da cui partire.
             </p>
+
+            <a
+              class="contact-link"
+              href="/contatti/"
+            >
+              <span>Parliamone</span>
+              <span aria-hidden="true">↗</span>
+            </a>
 
           </div>
 
-          <!-- Inserire l'indirizzo email reale -->
-          <a
-            class="contact-link"
-            href="mailto:"
-            aria-label="Scrivi a Cesare Paratore via email"
-          >
-            <span>Contattami</span>
-            <span aria-hidden="true">↗</span>
-          </a>
-
         </div>
-
-        <span
-          class="story-index"
-          aria-hidden="true"
-        >
-          14
-        </span>
 
       </div>
 
     </section>
 
 
-    <!-- ====================================================
-         NAVIGAZIONE NARRATIVA
-         ==================================================== -->
+    <!-- =======================================================
+         NARRATIVE NAVIGATION
+    ======================================================== -->
 
     <nav
       class="section-nav"
       aria-label="Navigazione narrativa"
+      data-theme="dark"
     >
 
       <button
-        class="section-nav-prev"
         type="button"
+        data-nav-prev
         aria-label="Sezione precedente"
         aria-disabled="true"
         disabled
       >
         <span aria-hidden="true">←</span>
-        <span>Indietro</span>
+        <span class="nav-button-label">
+          Prima
+        </span>
       </button>
 
       <div
-        class="section-nav-title"
+        class="section-nav-center"
         aria-live="polite"
+        aria-atomic="true"
       >
-        GUARDA.
+        <span class="section-nav-count">
+          Storia
+        </span>
+
+        <span
+          class="section-nav-title"
+          data-nav-title
+        >
+          Guarda
+        </span>
       </div>
 
       <button
-        class="section-nav-next"
         type="button"
+        data-nav-next
         aria-label="Sezione successiva"
       >
-        <span>Avanti</span>
+        <span class="nav-button-label">
+          Dopo
+        </span>
         <span aria-hidden="true">→</span>
       </button>
 
@@ -1261,37 +1211,39 @@
   </main>
 
 
-  <!-- ======================================================
+  <!-- =========================================================
        FOOTER
-       ====================================================== -->
+  ========================================================== -->
 
   <footer class="site-footer">
 
-    <div class="footer-inner">
-
-      <a
-        class="footer-logo"
-        href="/"
-        aria-label="Cesare Paratore — Home"
+    <a
+      class="footer-logo"
+      href="/"
+      aria-label="Cesare Paratore — Home"
+    >
+      <img
+        src="/assets/images/cp-mark.svg"
+        alt=""
+        width="42"
+        height="42"
+        loading="lazy"
+        decoding="async"
       >
-        <img
-          src="/assets/images/cp-mark.svg"
-          alt=""
-          width="42"
-          height="42"
-          loading="lazy"
-          decoding="async"
-        >
-      </a>
+    </a>
 
-      <p class="footer-name">
-        CESARE PARATORE
-      </p>
+    <div class="footer-name">
+      CESARE PARATORE
+    </div>
 
-      <p class="footer-description">
-        Sport · Scienze Motorie · Educazione · Management · Digitale
-      </p>
+    <div class="footer-meta">
+      <span>
+        Sport / Educazione / Progetto / Digitale
+      </span>
 
+      <span>
+        © <span data-current-year></span>
+      </span>
     </div>
 
   </footer>
