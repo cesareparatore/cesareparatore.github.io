@@ -1,1252 +1,1586 @@
-<!doctype html>
-<html lang="it">
-<head>
-  <meta charset="utf-8">
+/* ============================================================
+   CESARE PARATORE
+   V3.3 — MAXIMUM QUALITY
+   ============================================================ */
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  >
 
-  <meta
-    name="description"
-    content="Cesare Paratore: un percorso tra sport, scienze motorie, educazione, management e digitale. Un modo di osservare, capire, collegare e costruire."
-  >
+/* ============================================================
+   01. TOKENS
+   ============================================================ */
 
-  <meta
-    name="robots"
-    content="index, follow, max-image-preview:large"
-  >
+:root {
+  --bg: #0B0B0A;
+  --surface: #151513;
+  --surface-2: #1D1D1A;
 
-  <meta name="author" content="Cesare Paratore">
-  <meta name="theme-color" content="#0B0B0A">
-  <meta name="color-scheme" content="dark light">
+  --light: #F1EFE8;
+  --secondary: #A7A49C;
+  --muted: #66645F;
 
-  <title>
-    Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale
-  </title>
+  --line-dark: rgba(241, 239, 232, 0.15);
+  --line-light: rgba(11, 11, 10, 0.15);
 
-  <!--
-    SOSTITUIRE con il dominio reale del sito.
-    Esempio:
-    https://www.esempio.it/
-  -->
-  <link
-    rel="canonical"
-    href="https://www.tuodominio.it/"
-  >
+  --gutter: clamp(1.25rem, 5vw, 5vw);
 
-  <link
-    rel="icon"
-    type="image/svg+xml"
-    href="/assets/images/cp-mark.svg"
-  >
+  --header-h: 76px;
+  --nav-h: 86px;
 
-  <link
-    rel="preload"
-    as="image"
-    href="/assets/images/cp-mark.svg"
-  >
+  --content-max: 1280px;
+  --text-max: 42rem;
+  --narrow-max: 32rem;
 
-  <meta
-    property="og:type"
-    content="website"
-  >
+  --display-xl: clamp(4.5rem, 10vw, 11rem);
+  --display-l: clamp(3.2rem, 7vw, 8rem);
+  --display-m: clamp(2.5rem, 5vw, 5.5rem);
+  --display-s: clamp(2rem, 3.8vw, 4rem);
 
-  <meta
-    property="og:title"
-    content="Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale"
-  >
+  --narrative: clamp(1.12rem, 1.35vw, 1.5rem);
+  --body-large: clamp(1.35rem, 2vw, 2.2rem);
+  --micro: clamp(0.7rem, 0.8vw, 0.85rem);
 
-  <meta
-    property="og:description"
-    content="Un percorso tra sport, scienze motorie, educazione, management e digitale. Un modo di osservare, capire, collegare e costruire."
-  >
+  --tracking-tight: -0.045em;
+  --tracking-medium: -0.02em;
+  --tracking-wide: 0.08em;
 
-  <meta
-    property="og:url"
-    content="https://www.tuodominio.it/"
-  >
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 
-  <meta
-    property="og:site_name"
-    content="Cesare Paratore"
-  >
+  --duration-fast: 180ms;
+  --duration-medium: 420ms;
+  --duration-slow: 700ms;
+}
 
-  <!--
-    Inserire quando sarà disponibile una vera immagine Open Graph:
-    <meta property="og:image" content="https://www.tuodominio.it/assets/images/og.jpg">
-  -->
 
-  <meta
-    name="twitter:card"
-    content="summary_large_image"
-  >
+/* ============================================================
+   02. RESET
+   ============================================================ */
 
-  <meta
-    name="twitter:title"
-    content="Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale"
-  >
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
-  <meta
-    name="twitter:description"
-    content="Un percorso tra sport, scienze motorie, educazione, management e digitale."
-  >
+html {
+  min-width: 320px;
+  background: var(--bg);
+  scroll-behavior: auto;
+  scrollbar-gutter: stable;
+  scroll-padding-top:
+    calc(var(--header-h) + env(safe-area-inset-top, 0px));
+}
 
-  <link
-    rel="preconnect"
-    href="https://cdn.jsdelivr.net"
-  >
+body {
+  min-width: 320px;
+  margin: 0;
+  background: var(--bg);
+  color: var(--light);
 
-  <script
-    src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"
-    defer
-  ></script>
+  font-family:
+    Inter,
+    ui-sans-serif,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Helvetica,
+    Arial,
+    sans-serif;
 
-  <script
-    src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"
-    defer
-  ></script>
+  font-size: 16px;
+  line-height: 1.5;
 
-  <link
-    rel="stylesheet"
-    href="/style.css"
-  >
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
 
-  <script
-    src="/script.js"
-    defer
-  ></script>
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "ProfilePage",
-    "name": "Cesare Paratore",
-    "description": "Un percorso tra sport, scienze motorie, educazione, management e digitale.",
-    "mainEntity": {
-      "@type": "Person",
-      "name": "Cesare Paratore",
-      "jobTitle": [
-        "Atleta",
-        "Tecnico",
-        "Educatore"
-      ]
-    }
+@supports not (overflow: clip) {
+  body {
+    overflow-x: hidden;
   }
-  </script>
-
-  <noscript>
-    <style>
-      .site-loader,
-      .standby {
-        display: none !important;
-      }
-
-      body {
-        overflow: auto !important;
-      }
-
-      .site-menu {
-        position: static !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        pointer-events: auto !important;
-        transform: none !important;
-      }
-    </style>
-  </noscript>
-</head>
-
-<body>
-
-  <a
-    class="skip-link"
-    href="#main-content"
-  >
-    Vai al contenuto
-  </a>
-
-  <!-- =========================================================
-       LOADER
-  ========================================================== -->
-
-  <div
-    class="site-loader"
-    aria-hidden="false"
-  >
-    <div class="loader-inner">
-      <img
-        src="/assets/images/cp-mark.svg"
-        alt=""
-        width="42"
-        height="42"
-        decoding="async"
-      >
-
-      <span class="loader-name">
-        CESARE PARATORE
-      </span>
-    </div>
-  </div>
-
-
-  <!-- =========================================================
-       STANDBY
-  ========================================================== -->
-
-  <div
-    class="standby"
-    aria-hidden="true"
-  >
-    <span>GUARDA.</span>
-  </div>
-
-
-  <!-- =========================================================
-       HEADER
-  ========================================================== -->
-
-  <header class="site-header">
-
-    <a
-      class="site-logo"
-      href="/"
-      aria-label="Cesare Paratore — Home"
-    >
-      <img
-        src="/assets/images/cp-mark.svg"
-        alt=""
-        width="42"
-        height="42"
-        decoding="async"
-      >
-    </a>
-
-    <button
-      class="menu-trigger"
-      type="button"
-      aria-expanded="false"
-      aria-controls="menu"
-      aria-label="Apri menu"
-    >
-      <span class="menu-trigger-label">
-        Menu
-      </span>
-
-      <span
-        class="menu-trigger-icon"
-        aria-hidden="true"
-      >
-        <span></span>
-        <span></span>
-      </span>
-    </button>
-
-  </header>
-
-
-  <!-- =========================================================
-       OVERLAY MENU
-  ========================================================== -->
-
-  <aside
-    class="site-menu"
-    id="menu"
-    aria-hidden="true"
-    aria-label="Menu principale"
-  >
-    <div class="site-menu-inner">
-
-      <div class="site-menu-meta">
-        <span>Indice</span>
-        <span>01—08</span>
-      </div>
-
-      <nav
-        class="site-menu-nav"
-        aria-label="Navigazione principale"
-      >
-
-        <a href="/chi-sono/">
-          <span>01</span>
-          <strong>Chi sono</strong>
-        </a>
-
-        <a href="/sport/">
-          <span>02</span>
-          <strong>Sport</strong>
-        </a>
-
-        <a href="/scienze-motorie/">
-          <span>03</span>
-          <strong>Scienze motorie</strong>
-        </a>
+}
+
+img,
+svg,
+video,
+canvas,
+iframe {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  border: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+a {
+  touch-action: manipulation;
+}
+
+::selection {
+  background: var(--light);
+  color: var(--bg);
+}
+
+
+/* ============================================================
+   03. ACCESSIBILITY
+   ============================================================ */
+
+:where(a, button, iframe):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 5px;
+}
+
+.skip-link {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1200;
+
+  padding: 0.8rem 1rem;
+
+  background: var(--light);
+  color: var(--bg);
+
+  font-size: 0.9rem;
+  font-weight: 700;
+
+  transform: translateY(-200%);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+
+/* ============================================================
+   04. LOADER
+   ============================================================ */
+
+.site-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+
+  display: grid;
+  place-items: center;
+
+  background: var(--bg);
+  color: var(--light);
+
+  opacity: 1;
+  visibility: visible;
+
+  transition:
+    opacity 600ms var(--ease-out),
+    visibility 600ms var(--ease-out);
+}
+
+.site-loader.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loader-inner {
+  display: grid;
+  justify-items: center;
+  gap: 1.25rem;
+}
+
+.loader-mark {
+  width: 42px;
+  height: 42px;
+}
+
+.loader-name {
+  margin: 0;
+
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+
+  color: var(--secondary);
+}
+
+
+/* ============================================================
+   05. STANDBY
+   ============================================================ */
+
+.standby {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+
+  display: grid;
+  place-items: center;
+
+  background: var(--bg);
+  color: var(--light);
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transition:
+    opacity 500ms var(--ease-out),
+    visibility 500ms var(--ease-out);
+}
+
+.standby.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.standby-word {
+  display: block;
+
+  font-size: clamp(4rem, 12vw, 12rem);
+  font-weight: 800;
+  line-height: 0.8;
+  letter-spacing: var(--tracking-tight);
+}
+
+
+/* ============================================================
+   06. HEADER
+   ============================================================ */
+
+.site-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 800;
+
+  height:
+    calc(
+      var(--header-h) +
+      env(safe-area-inset-top, 0px)
+    );
+
+  padding:
+    env(safe-area-inset-top, 0px)
+    var(--gutter)
+    0;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(11, 11, 10, 0.78),
+      rgba(11, 11, 10, 0)
+    );
+}
+
+.site-logo,
+.menu-trigger {
+  pointer-events: auto;
+}
+
+.site-logo {
+  width: 42px;
+  height: 42px;
+  margin-bottom: calc((var(--header-h) - 42px) / 2);
+
+  display: block;
+}
+
+.site-logo img {
+  width: 42px;
+  height: 42px;
+}
+
+.menu-trigger {
+  min-width: 96px;
+  height: 42px;
+  margin-bottom: calc((var(--header-h) - 42px) / 2);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+
+  padding: 0 0.9rem;
+
+  background: transparent;
+  color: var(--light);
+
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  transition:
+    color var(--duration-fast) ease,
+    opacity var(--duration-fast) ease;
+}
+
+.menu-trigger:hover {
+  opacity: 0.65;
+}
+
+.menu-label {
+  line-height: 1;
+}
+
+.menu-icon {
+  position: relative;
+
+  width: 18px;
+  height: 12px;
+
+  display: block;
+}
+
+.menu-icon span {
+  position: absolute;
+  left: 0;
+
+  width: 18px;
+  height: 1px;
+
+  background: currentColor;
+
+  transform-origin: center;
+
+  transition:
+    transform 420ms var(--ease-out),
+    top 420ms var(--ease-out);
+}
+
+.menu-icon span:first-child {
+  top: 3px;
+}
+
+.menu-icon span:last-child {
+  top: 9px;
+}
+
+.menu-trigger.is-open .menu-icon span:first-child {
+  top: 6px;
+  transform: rotate(45deg);
+}
+
+.menu-trigger.is-open .menu-icon span:last-child {
+  top: 6px;
+  transform: rotate(-45deg);
+}
+
+
+/* ============================================================
+   07. MENU
+   ============================================================ */
+
+.site-menu {
+  position: fixed;
+  top:
+    calc(
+      var(--header-h) +
+      env(safe-area-inset-top, 0px)
+    );
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 700;
+
+  padding:
+    clamp(2rem, 6vw, 6rem)
+    var(--gutter)
+    calc(
+      3rem +
+      env(safe-area-inset-bottom, 0px)
+    );
+
+  background: var(--bg);
+  color: var(--light);
+
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transform: translateY(-1rem);
+
+  transition:
+    opacity 380ms var(--ease-out),
+    visibility 380ms var(--ease-out),
+    transform 500ms var(--ease-out);
+}
+
+.site-menu.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.site-menu-inner {
+  width: min(100%, var(--content-max));
+  min-height: 100%;
+
+  margin-inline: auto;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.site-menu-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  margin-bottom: clamp(2rem, 5vw, 4rem);
+
+  color: var(--secondary);
+
+  font-size: var(--micro);
+  font-weight: 700;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+.site-menu-index {
+  color: var(--muted);
+}
+
+.site-menu-nav {
+  display: grid;
+}
+
+.site-menu-nav a {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  align-items: baseline;
+
+  padding-block: clamp(0.7rem, 1.5vw, 1.2rem);
+
+  border-bottom: 1px solid var(--line-dark);
+
+  transition:
+    color var(--duration-medium) var(--ease-out),
+    padding-left var(--duration-medium) var(--ease-out);
+}
+
+.site-menu-nav a:first-child {
+  border-top: 1px solid var(--line-dark);
+}
+
+.site-menu-nav a span {
+  color: var(--muted);
+
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.site-menu-nav a strong {
+  font-size: clamp(2rem, 5vw, 5.5rem);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: var(--tracking-tight);
+}
+
+.site-menu-nav a:hover {
+  padding-left: 0.5rem;
+  color: var(--secondary);
+}
+
+.site-menu-footer {
+  margin: auto 0 0;
+
+  padding-top: 3rem;
+
+  color: var(--muted);
+
+  font-size: var(--micro);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+
+/* ============================================================
+   08. MAIN
+   ============================================================ */
+
+main {
+  position: relative;
+
+  padding-top:
+    calc(
+      var(--header-h) +
+      env(safe-area-inset-top, 0px)
+    );
+}
+
+body.menu-open {
+  overflow: hidden;
+}
+
+
+/* ============================================================
+   09. STORY BASE
+   ============================================================ */
+
+.story-section {
+  position: relative;
+
+  min-height: 100svh;
+
+  padding:
+    clamp(6rem, 10vh, 9rem)
+    var(--gutter)
+    calc(
+      clamp(6rem, 10vh, 9rem) +
+      var(--nav-h) +
+      env(safe-area-inset-bottom, 0px)
+    );
+
+  display: grid;
+  align-items: center;
+
+  overflow: clip;
+
+  background: var(--bg);
+  color: var(--light);
+}
+
+@supports not (overflow: clip) {
+  .story-section {
+    overflow: hidden;
+  }
+}
+
+.story-dark {
+  background: var(--bg);
+  color: var(--light);
+
+  --story-line: var(--line-dark);
+  --story-secondary: var(--secondary);
+  --story-muted: var(--muted);
+}
+
+.story-light {
+  background: var(--light);
+  color: var(--bg);
+
+  --story-line: var(--line-light);
+  --story-secondary: #56544E;
+  --story-muted: #77746C;
+}
+
+.story-content {
+  width: min(100%, var(--content-max));
+  margin-inline: auto;
+}
+
+.story-inner {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.25fr)
+    minmax(18rem, 0.75fr);
+  align-items: end;
+  gap: clamp(2rem, 8vw, 10rem);
+}
+
+.story-eyebrow {
+  margin: 0 0 clamp(2rem, 5vw, 4rem);
+
+  color: var(--story-secondary);
+
+  font-size: var(--micro);
+  font-weight: 700;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+.story-index {
+  display: inline-block;
+  min-width: 2.5rem;
+  margin-right: 0.75rem;
+
+  color: var(--story-muted);
+}
+
+.story-title {
+  max-width: 12ch;
+  margin: 0;
+
+  font-size: var(--display-l);
+  font-weight: 750;
+  line-height: 0.88;
+  letter-spacing: var(--tracking-tight);
+  text-wrap: balance;
+}
+
+.story-body {
+  width: min(100%, var(--text-max));
+  margin-left: auto;
+
+  font-size: var(--narrative);
+  line-height: 1.55;
+}
+
+.story-body p {
+  margin: 0 0 1.5rem;
+}
+
+.story-body p:last-child {
+  margin-bottom: 0;
+}
+
+.story-body-lead {
+  font-size: var(--body-large);
+  line-height: 1.15;
+  letter-spacing: var(--tracking-medium);
+}
+
+
+/* ============================================================
+   10. OPENING — GUARDA
+   ============================================================ */
+
+.story-opening {
+  min-height: max(100svh, 760px);
+}
+
+.story-content-opening .story-title {
+  max-width: 11ch;
+
+  font-size: var(--display-xl);
+  line-height: 0.79;
+}
+
+.story-body-opening {
+  padding-bottom: 0.5rem;
+}
+
+
+/* ============================================================
+   11. MOVIMENTO
+   ============================================================ */
+
+.story-movement .story-title {
+  max-width: 9ch;
+}
+
+
+/* ============================================================
+   12. CAPIRE
+   ============================================================ */
+
+.story-understand-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(18rem, 0.65fr);
+  align-items: end;
+  gap: clamp(3rem, 10vw, 12rem);
+}
+
+.story-understand-grid .story-title {
+  max-width: 10ch;
+}
+
+
+/* ============================================================
+   13. COSTRUIRE
+   ============================================================ */
+
+.story-build-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.15fr)
+    minmax(18rem, 0.85fr);
+  gap: clamp(3rem, 9vw, 11rem);
+  align-items: end;
+}
+
+.story-build-grid .story-title {
+  max-width: 9ch;
+}
+
+
+/* ============================================================
+   14. RITORNA
+   ============================================================ */
+
+.story-return {
+  background: var(--surface);
+}
+
+.story-return-inner {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(18rem, 0.65fr);
+  gap: clamp(3rem, 9vw, 11rem);
+  align-items: end;
+}
+
+.story-return .story-title {
+  max-width: 9ch;
+}
+
+.story-return-list {
+  color: var(--light);
+
+  font-size: clamp(1.5rem, 2.5vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: var(--tracking-medium);
+}
+
+
+/* ============================================================
+   15. COLLEGARE
+   ============================================================ */
+
+.story-content-centered {
+  text-align: center;
+}
+
+.story-content-centered .story-eyebrow {
+  text-align: left;
+}
+
+.story-connect-inner {
+  width: min(100%, 980px);
+  margin-inline: auto;
+}
+
+.story-connect .story-title {
+  max-width: none;
+
+  font-size: var(--display-m);
+}
+
+.story-body-connect {
+  width: auto;
+  margin: clamp(3rem, 7vw, 6rem) auto 0;
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0.3em 0.7em;
+
+  font-size: clamp(1.5rem, 3.5vw, 4rem);
+  line-height: 1;
+
+  text-align: center;
+}
+
+.story-body-connect p {
+  margin: 0;
+}
+
+.story-body-connect .story-connect-conclusion {
+  flex-basis: 100%;
+
+  margin-top: clamp(2rem, 5vw, 4rem);
+
+  font-size: var(--narrative);
+  line-height: 1.5;
+
+  color: var(--story-secondary);
+}
+
+
+/* ============================================================
+   16. OGGI
+   ============================================================ */
+
+.story-today-inner {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.25fr)
+    minmax(18rem, 0.75fr);
+  gap: clamp(3rem, 8vw, 9rem);
+  align-items: end;
+}
+
+.story-today .story-title {
+  max-width: 8ch;
+
+  font-size: clamp(4rem, 8vw, 8.5rem);
+  line-height: 0.84;
+}
+
+.story-today-final {
+  margin-top: clamp(2rem, 5vw, 5rem) !important;
+
+  font-size: var(--body-large);
+  line-height: 1.1;
+
+  color: var(--light);
+}
+
+
+/* ============================================================
+   17. OBIETTIVO
+   ============================================================ */
+
+.story-objective-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.1fr)
+    minmax(18rem, 0.9fr);
+  align-items: end;
+  gap: clamp(3rem, 9vw, 10rem);
+}
+
+.story-objective .story-title {
+  max-width: 9ch;
+}
+
+.story-objective .story-body p {
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--story-line);
+}
+
+
+/* ============================================================
+   18. QUI — PLACE
+   ============================================================ */
+
+.section-place {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 0.8fr)
+    minmax(20rem, 1.2fr);
+  align-items: stretch;
+  gap: clamp(2rem, 6vw, 7rem);
+}
+
+.story-place-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.story-place .story-title {
+  max-width: 8ch;
+}
+
+.place-map {
+  min-height: min(62vw, 620px);
+
+  overflow: hidden;
+
+  border: 1px solid var(--line-dark);
+
+  background: var(--surface);
+}
+
+.place-map iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+
+  border: 0;
+
+  filter: grayscale(1) contrast(0.9);
+}
+
+
+/* ============================================================
+   19. DA QUI
+   ============================================================ */
+
+.story-from-here-inner {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(18rem, 0.7fr);
+  align-items: end;
+  gap: clamp(3rem, 10vw, 12rem);
+}
+
+.story-from-here .story-title {
+  max-width: 9ch;
+}
+
+
+/* ============================================================
+   20. ECCOMI — PERSON
+   ============================================================ */
+
+.section-person {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 0.85fr)
+    minmax(20rem, 1.15fr);
+  align-items: end;
+  gap: clamp(2rem, 7vw, 8rem);
+}
+
+.person-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.story-person .story-title {
+  max-width: 8ch;
+}
+
+.person-list {
+  margin-top: clamp(2rem, 5vw, 4rem) !important;
+
+  font-size: clamp(1.5rem, 2.4vw, 2.6rem);
+  line-height: 1.05;
+}
+
+.person-frame {
+  margin: 0;
+}
+
+.portrait-frame {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+
+  overflow: hidden;
+
+  background: var(--surface);
+}
+
+.portrait-frame img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  filter: grayscale(1);
+}
+
+
+/* ============================================================
+   21. SCRIVIMI
+   ============================================================ */
+
+.story-content-contact {
+  width: min(100%, 1100px);
+}
 
-        <a href="/educazione/">
-          <span>04</span>
-          <strong>Educazione</strong>
-        </a>
+.story-contact-inner {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.1fr)
+    minmax(18rem, 0.9fr);
+  gap: clamp(3rem, 10vw, 12rem);
+  align-items: end;
+}
+
+.story-contact .story-title {
+  max-width: 8ch;
+}
+
+.contact-link {
+  width: max-content;
+  max-width: 100%;
+
+  margin-top: clamp(2rem, 5vw, 4rem);
+  padding-bottom: 0.6rem;
 
-        <a href="/management/">
-          <span>05</span>
-          <strong>Management</strong>
-        </a>
-
-        <a href="/digitale/">
-          <span>06</span>
-          <strong>Digitale</strong>
-        </a>
+  display: inline-flex;
+  align-items: center;
+  gap: 1.25rem;
 
-        <a href="/territorio/">
-          <span>07</span>
-          <strong>Territorio</strong>
-        </a>
+  border-bottom: 1px solid currentColor;
+
+  font-size: clamp(1.1rem, 1.5vw, 1.4rem);
+  font-weight: 700;
+
+  transition:
+    gap var(--duration-medium) var(--ease-out),
+    opacity var(--duration-fast) ease;
+}
+
+.contact-link:hover {
+  gap: 2rem;
+  opacity: 0.65;
+}
+
 
-        <a href="/contatti/">
-          <span>08</span>
-          <strong>Contatti</strong>
-        </a>
+/* ============================================================
+   22. PERSISTENT NARRATIVE NAV
+   ============================================================ */
+
+.section-nav {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 500;
 
-      </nav>
+  min-height:
+    calc(
+      var(--nav-h) +
+      env(safe-area-inset-bottom, 0px)
+    );
+
+  padding:
+    0
+    var(--gutter)
+    env(safe-area-inset-bottom, 0px);
+
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+
+  background: rgba(11, 11, 10, 0.92);
+  color: var(--light);
+
+  border-top: 1px solid var(--line-dark);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  transition:
+    background-color 350ms ease,
+    color 350ms ease,
+    border-color 350ms ease;
+}
+
+.section-nav[data-theme="light"] {
+  background: rgba(241, 239, 232, 0.93);
+  color: var(--bg);
+
+  border-top-color: var(--line-light);
+}
+
+.section-nav-button {
+  width: max-content;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+
+  padding: 0.75rem 0;
+
+  background: transparent;
+  color: inherit;
+
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  transition:
+    opacity var(--duration-fast) ease,
+    transform var(--duration-medium) var(--ease-out);
+}
+
+.section-nav-button:first-child {
+  justify-self: start;
+}
+
+.section-nav-button-next {
+  justify-self: end;
+}
+
+.section-nav-button:hover:not(:disabled) {
+  opacity: 0.6;
+}
+
+.section-nav-button:first-child:hover:not(:disabled) {
+  transform: translateX(-0.25rem);
+}
+
+.section-nav-button-next:hover:not(:disabled) {
+  transform: translateX(0.25rem);
+}
+
+.section-nav-button:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.section-nav-title {
+  margin: 0;
 
-      <div class="site-menu-footer">
-        <span>Sport / Educazione / Progetto / Digitale</span>
-        <span>Cesare Paratore</span>
-      </div>
-
-    </div>
-  </aside>
-
-
-  <!-- =========================================================
-       MAIN NARRATIVE
-  ========================================================== -->
-
-  <main
-    id="main-content"
-    tabindex="-1"
-  >
-
-
-    <!-- =======================================================
-         01 — GUARDA
-    ======================================================== -->
-
-    <section
-      class="story-section story-opening"
-      id="guarda"
-      data-section-title="Guarda"
-      aria-labelledby="title-guarda"
-    >
-
-      <div class="story-inner">
-
-        <div class="story-index" aria-hidden="true">
-          01
-        </div>
-
-        <div class="story-content">
-
-          <span class="story-eyebrow">
-            Prima di fare
-          </span>
-
-          <h1
-            class="story-title"
-            id="title-guarda"
-          >
-            GUARDA.
-          </h1>
-
-          <div class="story-body">
-
-            <p>
-              Prima di fare qualcosa, guardo.
-            </p>
-
-            <p>
-              Da piccolo ho incontrato un computer.
-            </p>
-
-            <p>
-              Non sapevo ancora cosa fosse.
-              Volevo capire.
-            </p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =======================================================
-         02 — COME
-    ======================================================== -->
-
-    <section
-      class="story-section story-movement story-light"
-      id="come"
-      data-section-title="Come?"
-      aria-labelledby="title-come"
-    >
-
-      <div class="story-inner">
-
-        <div class="story-index" aria-hidden="true">
-          02
-        </div>
-
-        <div class="story-content">
-
-          <span class="story-eyebrow">
-            Il corpo
-          </span>
-
-          <h2
-            class="story-title"
-            id="title-come"
-          >
-            COME?
-          </h2>
-
-          <div class="story-body">
-
-            <p>
-              Poi ho iniziato a muovermi.
-            </p>
-
-            <p>
-              A correre, giocare, provare.
-            </p>
-
-            <p>
-              Lo sport è diventato un modo
-              per conoscere me stesso
-              e ciò che mi circondava.
-            </p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =======================================================
-         03 — MOVIMENTO
-    ======================================================== -->
-
-    <section
-      class="story-section story-movement"
-      id="movimento"
-      data-section-title="Movimento"
-      aria-labelledby="title-movimento"
-    >
-
-      <div class="story-inner">
-
-        <div class="story-index" aria-hidden="true">
-          03
-        </div>
-
-        <div class="story-content">
-
-          <span class="story-eyebrow">
-            Pratica
-          </span>
-
-          <h2
-            class="story-title"
-            id="title-movimento"
-          >
-            MOVIMENTO.
-          </h2>
-
-          <div class="story-body">
-
-            <p class="story-lead">
-              Prima atleta.
-              <br>
-              Poi tecnico.
-            </p>
-
-            <p>
-              Il movimento non è rimasto
-              soltanto qualcosa da praticare.
-            </p>
-
-            <p>
-              È diventato qualcosa da osservare,
-              studiare e comprendere.
-            </p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =======================================================
-         04 — CAPIRE
-    ======================================================== -->
-
-    <section
-      class="story-section story-understand story-light"
-      id="capire"
-      data-section-title="Capire"
-      aria-labelledby="title-capire"
-    >
-
-      <div class="story-inner">
-
-        <div class="story-index" aria-hidden="true">
-          04
-        </div>
-
-        <div class="story-content">
-
-          <span class="story-eyebrow">
-            Studio
-          </span>
-
-          <h2
-            class="story-title"
-            id="title-capire"
-          >
-            CAPIRE.
-          </h2>
-
-          <div class="story-body">
-
-            <p>
-              Studiare il movimento ha cambiato
-              il modo di guardarlo.
-            </p>
-
-            <p>
-              L'esperienza e lo studio hanno
-              iniziato a parlarsi.
-            </p>
-
-            <p>
-              La pratica poneva domande.
-              La teoria aiutava a cercare risposte.
-            </p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =======================================================
-         05 — TRASMETTERE
-    ======================================================== -->
-
-    <section
-      class="story-section story-light"
-      id="trasmettere"
-      data-section-title="Trasmettere"
-      aria-labelledby="title-trasmettere"
-    >
-
-      <div class="story-inner">
-
-        <div class="story-index" aria-hidden="true">
-          05
-        </div>
-
-        <div class="story-content">
-
-          <span class="story-eyebrow">
-            Condivisione
-          </span>
-
-          <h2
-            class="story-title"
-            id="title-trasmettere"
-          >
-            TRASMETTERE.
-          </h2>
-
-          <div class="story-body">
-
-            <p>
-              Ciò che si comprende può essere condiviso.
-            </p>
-
-            <p>
-              Insegnare significa trasformare esperienza,
-              conoscenza e metodo in qualcosa che
-              possa diventare utile ad altri.
-            </p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =======================================================
-         06 — COSTRUIRE
-    ======================================================== -->
-
-    <section
-      class="story-section story-build"
-      id="costruire"
-      data-section-title="Costruire"
-      aria-labelledby="title-costruire"
-    >
-
-      <div class="story-inner">
-
-        <div class="story-index" aria-hidden="true">
-          06
-        </div>
-
-        <div class="story-content">
-
-          <span class="story-eyebrow">
-            Progetto
-          </span>
-
-          <h2
-            class="story-title"
-            id="title-costruire"
-          >
-            COSTRUIRE.
-          </h2>
-
-          <div class="story-body">
-
-            <p>
-              A un certo punto non basta più capire.
-            </p>
-
-            <p class="story-lead">
-              Bisogna progettare.
-            </p>
-
-            <p>
-              Organizzare persone, strumenti,
-              risorse e processi per trasformare
-              un'idea in qualcosa di concreto.
-            </p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =======================================================
-         07 — RITORNA
-    ======================================================== -->
-
-    <section
-      class="story-section story-return"
-      id="ritorna"
-      data-section-title="Ritorna"
-      aria-labelledby="title-ritorna"
-    >
-
-      <div class="story-inner">
-
-        <div class="story-index" aria-hidden="true">
-          07
-        </div>
-
-        <div class="story-content">
-
-          <span class="story-eyebrow">
-            Digitale
-          </span>
-
-          <h2
-            class="story-title"
-            id="title-ritorna"
-          >
-            RITORNA.
-          </h2>
-
-          <div class="story-body">
-
-            <p>
-              Quel computer dell'inizio ritorna.
-            </p>
-
-            <p>
-              Non più soltanto come oggetto da osservare,
-              ma come strumento per costruire.
-            </p>
-
-            <p class="story-lead">
-              Pagine.
-              Sistemi.
-              Esperienze digitali.
-            </p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =======================================================
-         08 — COLLEGARE
-    ======================================================== -->
-
-    <section
-      class="story-section story-connect story-light"
-      id="collegare"
-      data-section-title="Collegare"
-      aria-labelledby="title-collegare"
-    >
-
-      <div class="story-inner">
-
-        <div class="story-index" aria-hidden="true">
-          08
-        </div>
-
-        <div class="story-content">
-
-          <span class="story-eyebrow">
-            Sistema
-          </span>
-
-          <h2
-            class="story-title"
-            id="title-collegare"
-          >
-            COLLEGARE.
-          </h2>
-
-          <div class="story-body">
-
-            <p class="story-connect-word">
-              Sport.
-            </p>
-
-            <p class="story-connect-word">
-              Scienze motorie.
-            </p>
-
-            <p class="story-connect-word">
-              Educazione.
-            </p>
-
-            <p class="story-connect-word">
-              Management.
-            </p>
-
-            <p class="story-connect-word">
-              Digitale.
-            </p>
-
-            <p class="story-connect-final">
-              Non sono percorsi separati.
-              Sono punti di uno stesso sistema.
-            </p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =======================================================
-         09 — OGGI
-    ======================================================== -->
-
-    <section
-      class="story-section story-today"
-      id="oggi"
-      data-section-title="Oggi"
-      aria-labelledby="title-oggi"
-    >
-
-      <div class="story-inner">
-
-        <div class="story-index" aria-hidden="true">
-          09
-        </div>
-
-        <div class="story-content">
-
-          <span class="story-eyebrow">
-            Presente
-          </span>
-
-          <h2
-            class="story-title"
-            id="title-oggi"
-          >
-            OGGI.
-          </h2>
-
-          <div class="story-body">
-
-            <p class="story-lead">
-              Osservare.
-              Studiare.
-              Collegare.
-              Progettare.
-              Sviluppare.
-            </p>
-
-            <p>
-              Un approccio trasversale per affrontare
-              problemi e costruire soluzioni.
-            </p>
-
-            <p class="story-manifesto">
-              Capire prima di intervenire.
-            </p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =======================================================
-         10 — OBIETTIVO
-    ======================================================== -->
-
-    <section
-      class="story-section story-objective story-light"
-      id="obiettivo"
-      data-section-title="Obiettivo"
-      aria-labelledby="title-obiettivo"
-    >
-
-      <div class="story-inner">
-
-        <div class="story-index" aria-hidden="true">
-          10
-        </div>
-
-        <div class="story-content">
-
-          <span class="story-eyebrow">
-            Metodo
-          </span>
-
-          <h2
-            class="story-title"
-            id="title-obiettivo"
-          >
-            OBIETTIVO.
-          </h2>
-
-          <div class="story-body">
-
-            <p>
-              Ogni progetto parte da una domanda.
-            </p>
-
-            <p class="story-lead">
-              Qual è l'obiettivo?
-            </p>
-
-            <p>
-              Qual è il contesto?
-            </p>
-
-            <p>
-              Cosa serve davvero?
-            </p>
-
-            <p>
-              Da qui nasce il lavoro.
-            </p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =======================================================
-         11 — QUI
-    ======================================================== -->
-
-    <section
-      class="story-section story-place"
-      id="qui"
-      data-section-title="Qui"
-      aria-labelledby="title-qui"
-    >
-
-      <div class="story-inner section-place">
-
-        <div class="story-index" aria-hidden="true">
-          11
-        </div>
-
-        <div class="story-content">
-
-          <span class="story-eyebrow">
-            Territorio
-          </span>
-
-          <h2
-            class="story-title"
-            id="title-qui"
-          >
-            QUI.
-          </h2>
-
-          <div class="story-body">
-
-            <p>
-              Ogni percorso parte da un luogo.
-            </p>
-
-            <p>
-              Un territorio, una comunità,
-              un contesto.
-            </p>
-
-            <p>
-              È da qui che si osserva ciò che accade
-              e si decide dove andare.
-            </p>
-
-          </div>
-
-        </div>
-
-        <div class="place-map">
-
-          <iframe
-            title="Mappa dello Stadio Comunale Giuseppe La Franca, Partinico"
-            src="https://www.google.com/maps?q=Stadio+Comunale+Giuseppe+La+Franca,+Partinico&output=embed"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-            allowfullscreen
-          ></iframe>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =======================================================
-         12 — DA QUI
-    ======================================================== -->
-
-    <section
-      class="story-section story-from-here story-light"
-      id="da-qui"
-      data-section-title="Da qui"
-      aria-labelledby="title-da-qui"
-    >
-
-      <div class="story-inner">
-
-        <div class="story-index" aria-hidden="true">
-          12
-        </div>
-
-        <div class="story-content">
-
-          <span class="story-eyebrow">
-            Presenza / Online
-          </span>
-
-          <h2
-            class="story-title"
-            id="title-da-qui"
-          >
-            DA QUI.
-          </h2>
-
-          <div class="story-body">
-
-            <p class="story-lead">
-              Una base in presenza e online.
-            </p>
-
-            <p>
-              Il luogo è il punto di partenza.
-            </p>
-
-            <p>
-              Il digitale permette di estendere
-              il percorso, collegare persone
-              e costruire possibilità.
-            </p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =======================================================
-         13 — ECCOMI
-    ======================================================== -->
-
-    <section
-      class="story-section story-person"
-      id="eccomi"
-      data-section-title="Eccomi"
-      aria-labelledby="title-eccomi"
-    >
-
-      <div class="story-inner section-person">
-
-        <div class="story-index" aria-hidden="true">
-          13
-        </div>
-
-        <div class="story-content">
-
-          <span class="story-eyebrow">
-            Persona
-          </span>
-
-          <h2
-            class="story-title"
-            id="title-eccomi"
-          >
-            ECCOMI.
-          </h2>
-
-          <div class="story-body">
-
-            <p>
-              Questo percorso non è una somma di ruoli.
-            </p>
-
-            <p>
-              È il risultato di esperienze diverse
-              che nel tempo hanno iniziato a dialogare.
-            </p>
-
-            <p class="story-lead">
-              Sport.
-              Studio.
-              Educazione.
-              Progetto.
-              Digitale.
-            </p>
-
-          </div>
-
-        </div>
-
-        <figure class="person-frame">
-
-          <div class="portrait-frame">
-
-            <img
-              src="/assets/images/cp-foto.webp"
-              alt="Cesare Paratore"
-              loading="lazy"
-              decoding="async"
-            >
-
-          </div>
-
-          <figcaption>
-            Cesare Paratore
-          </figcaption>
-
-        </figure>
-
-      </div>
-
-    </section>
-
-
-    <!-- =======================================================
-         14 — SCRIVIMI
-    ======================================================== -->
-
-    <section
-      class="story-section story-contact story-light"
-      id="scrivimi"
-      data-section-title="Scrivimi"
-      aria-labelledby="title-scrivimi"
-    >
-
-      <div class="story-inner">
-
-        <div class="story-index" aria-hidden="true">
-          14
-        </div>
-
-        <div class="story-content">
-
-          <span class="story-eyebrow">
-            Contatto
-          </span>
-
-          <h2
-            class="story-title"
-            id="title-scrivimi"
-          >
-            SCRIVIMI.
-          </h2>
-
-          <div class="story-body">
-
-            <p class="story-lead">
-              Parlami del tuo obiettivo.
-            </p>
-
-            <p>
-              Un progetto, un'idea, una domanda
-              o semplicemente un punto da cui partire.
-            </p>
-
-            <a
-              class="contact-link"
-              href="/contatti/"
-            >
-              <span>Parliamone</span>
-              <span aria-hidden="true">↗</span>
-            </a>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =======================================================
-         NARRATIVE NAVIGATION
-    ======================================================== -->
-
-    <nav
-      class="section-nav"
-      aria-label="Navigazione narrativa"
-      data-theme="dark"
-    >
-
-      <button
-        type="button"
-        data-nav-prev
-        aria-label="Sezione precedente"
-        aria-disabled="true"
-        disabled
-      >
-        <span aria-hidden="true">←</span>
-        <span class="nav-button-label">
-          Prima
-        </span>
-      </button>
-
-      <div
-        class="section-nav-center"
-        aria-live="polite"
-        aria-atomic="true"
-      >
-        <span class="section-nav-count">
-          Storia
-        </span>
-
-        <span
-          class="section-nav-title"
-          data-nav-title
-        >
-          Guarda
-        </span>
-      </div>
-
-      <button
-        type="button"
-        data-nav-next
-        aria-label="Sezione successiva"
-      >
-        <span class="nav-button-label">
-          Dopo
-        </span>
-        <span aria-hidden="true">→</span>
-      </button>
-
-    </nav>
-
-  </main>
-
-
-  <!-- =========================================================
-       FOOTER
-  ========================================================== -->
-
-  <footer class="site-footer">
-
-    <a
-      class="footer-logo"
-      href="/"
-      aria-label="Cesare Paratore — Home"
-    >
-      <img
-        src="/assets/images/cp-mark.svg"
-        alt=""
-        width="42"
-        height="42"
-        loading="lazy"
-        decoding="async"
-      >
-    </a>
-
-    <div class="footer-name">
-      CESARE PARATORE
-    </div>
-
-    <div class="footer-meta">
-      <span>
-        Sport / Educazione / Progetto / Digitale
-      </span>
-
-      <span>
-        © <span data-current-year></span>
-      </span>
-    </div>
-
-  </footer>
-
-</body>
-</html>
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+
+  text-align: center;
+}
+
+
+/* ============================================================
+   23. FOOTER
+   ============================================================ */
+
+.site-footer {
+  padding:
+    5rem
+    var(--gutter)
+    calc(
+      5rem +
+      var(--nav-h) +
+      env(safe-area-inset-bottom, 0px)
+    );
+
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: end;
+  gap: 2rem;
+
+  background: var(--bg);
+  color: var(--light);
+
+  border-top: 1px solid var(--line-dark);
+}
+
+.footer-logo {
+  width: 42px;
+  height: 42px;
+}
+
+.footer-logo img {
+  width: 42px;
+  height: 42px;
+}
+
+.footer-name,
+.footer-description,
+.footer-copy {
+  margin: 0;
+}
+
+.footer-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.footer-description,
+.footer-copy {
+  color: var(--secondary);
+
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.footer-copy {
+  text-align: right;
+}
+
+
+/* ============================================================
+   24. LARGE DESKTOP
+   ============================================================ */
+
+@media (min-width: 1440px) {
+
+  .story-section {
+    padding-left: max(var(--gutter), calc((100vw - 1440px) / 2));
+    padding-right: max(var(--gutter), calc((100vw - 1440px) / 2));
+  }
+
+  .site-menu {
+    padding-left: max(var(--gutter), calc((100vw - 1440px) / 2));
+    padding-right: max(var(--gutter), calc((100vw - 1440px) / 2));
+  }
+
+  .section-nav {
+    padding-left: max(var(--gutter), calc((100vw - 1440px) / 2));
+    padding-right: max(var(--gutter), calc((100vw - 1440px) / 2));
+  }
+
+}
+
+
+/* ============================================================
+   25. TABLET
+   ============================================================ */
+
+@media (max-width: 1024px) {
+
+  .story-inner,
+  .story-understand-grid,
+  .story-build-grid,
+  .story-return-inner,
+  .story-today-inner,
+  .story-objective-grid,
+  .story-from-here-inner,
+  .story-contact-inner,
+  .section-place,
+  .section-person {
+    grid-template-columns: 1fr;
+  }
+
+  .story-title,
+  .story-content-opening .story-title,
+  .story-today .story-title {
+    max-width: 11ch;
+  }
+
+  .story-body {
+    margin-left: 0;
+  }
+
+  .story-understand-grid,
+  .story-build-grid,
+  .story-return-inner,
+  .story-today-inner,
+  .story-objective-grid,
+  .story-from-here-inner,
+  .story-contact-inner,
+  .section-place,
+  .section-person {
+    gap: 3rem;
+  }
+
+  .place-map {
+    min-height: 48svh;
+  }
+
+  .portrait-frame {
+    max-width: 620px;
+  }
+
+  .site-footer {
+    grid-template-columns: auto 1fr;
+  }
+
+  .footer-copy {
+    grid-column: 2;
+    text-align: left;
+  }
+
+}
+
+
+/* ============================================================
+   26. MOBILE
+   ============================================================ */
+
+@media (max-width: 640px) {
+
+  :root {
+    --header-h: 68px;
+    --nav-h: 72px;
+  }
+
+  .site-header {
+    background:
+      linear-gradient(
+        to bottom,
+        rgba(11, 11, 10, 0.9),
+        rgba(11, 11, 10, 0)
+      );
+  }
+
+  .site-logo,
+  .site-logo img {
+    width: 36px;
+    height: 36px;
+  }
+
+  .site-logo {
+    margin-bottom: calc((var(--header-h) - 36px) / 2);
+  }
+
+  .menu-trigger {
+    min-width: auto;
+    height: 36px;
+    margin-bottom: calc((var(--header-h) - 36px) / 2);
+  }
+
+  .site-menu {
+    padding-top: 2rem;
+  }
+
+  .site-menu-nav a {
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+  }
+
+  .site-menu-nav a strong {
+    font-size: clamp(1.8rem, 8vw, 3rem);
+  }
+
+  .story-section {
+    min-height: 100svh;
+
+    padding-top: 6rem;
+    padding-bottom:
+      calc(
+        5rem +
+        var(--nav-h) +
+        env(safe-area-inset-bottom, 0px)
+      );
+  }
+
+  .story-opening {
+    min-height: 100svh;
+  }
+
+  .story-eyebrow {
+    margin-bottom: 2.5rem;
+  }
+
+  .story-title,
+  .story-content-opening .story-title {
+    font-size: clamp(3.4rem, 15vw, 6rem);
+    line-height: 0.86;
+  }
+
+  .story-content-opening .story-title {
+    font-size: clamp(4rem, 17vw, 7rem);
+  }
+
+  .story-body {
+    font-size: 1.08rem;
+    line-height: 1.5;
+  }
+
+  .story-body-lead {
+    font-size: 1.4rem;
+  }
+
+  .story-return-list,
+  .person-list {
+    font-size: 1.65rem;
+  }
+
+  .story-body-connect {
+    margin-top: 3rem;
+
+    display: block;
+
+    font-size: 2rem;
+    line-height: 1.1;
+  }
+
+  .story-body-connect p {
+    margin-bottom: 0.55rem;
+  }
+
+  .story-body-connect .story-connect-conclusion {
+    margin-top: 2.5rem;
+  }
+
+  .place-map {
+    min-height: 54svh;
+  }
+
+  .section-nav-button {
+    font-size: 0.64rem;
+  }
+
+  .section-nav-title {
+    max-width: 8rem;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .site-footer {
+    padding-top: 4rem;
+    padding-bottom:
+      calc(
+        4rem +
+        var(--nav-h) +
+        env(safe-area-inset-bottom, 0px)
+      );
+
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .footer-copy {
+    grid-column: auto;
+  }
+
+  .footer-copy {
+    text-align: left;
+  }
+
+}
+
+
+/* ============================================================
+   27. VERY SMALL DEVICES
+   ============================================================ */
+
+@media (max-width: 380px) {
+
+  .story-title,
+  .story-content-opening .story-title {
+    font-size: clamp(3rem, 16vw, 4.8rem);
+  }
+
+  .section-nav {
+    grid-template-columns: 1fr auto 1fr;
+  }
+
+  .section-nav-button span:not([aria-hidden="true"]) {
+    display: none;
+  }
+
+  .section-nav-button {
+    gap: 0;
+  }
+
+}
+
+
+/* ============================================================
+   28. LANDSCAPE MOBILE
+   ============================================================ */
+
+@media (max-height: 520px) and (orientation: landscape) {
+
+  .story-section {
+    min-height: 130svh;
+
+    padding-top: 5rem;
+    padding-bottom:
+      calc(
+        5rem +
+        var(--nav-h) +
+        env(safe-area-inset-bottom, 0px)
+      );
+  }
+
+  .story-title,
+  .story-content-opening .story-title {
+    font-size: clamp(3rem, 10vw, 5.5rem);
+  }
+
+  .story-eyebrow {
+    margin-bottom: 1.5rem;
+  }
+
+}
+
+
+/* ============================================================
+   29. HOVER-CAPABLE DEVICES
+   ============================================================ */
+
+@media (hover: hover) and (pointer: fine) {
+
+  .site-menu-nav a {
+    transition:
+      color var(--duration-medium) var(--ease-out),
+      padding-left var(--duration-medium) var(--ease-out);
+  }
+
+}
+
+
+/* ============================================================
+   30. REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+}
+
+
+/* ============================================================
+   31. PRINT
+   ============================================================ */
+
+@media print {
+
+  .site-header,
+  .site-menu,
+  .site-loader,
+  .standby,
+  .section-nav,
+  .skip-link {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  .story-section,
+  .story-dark,
+  .story-light,
+  .story-return {
+    min-height: auto;
+    padding: 3rem 0;
+    background: #fff !important;
+    color: #000 !important;
+    break-inside: avoid;
+  }
+
+  .story-title {
+    max-width: none;
+    font-size: 3rem;
+  }
+
+  .story-body {
+    color: #000;
+  }
+
+  .place-map {
+    display: none;
+  }
+
+  .site-footer {
+    background: #fff;
+    color: #000;
+  }
+
+}
