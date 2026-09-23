@@ -61,10 +61,15 @@
 
   <a class="skip-link" href="#main-content">Vai al contenuto</a>
 
-  <!-- =========================================================
-       LOADER / OPENING
-       ========================================================= -->
-  <div class="site-loader" id="site-loader" aria-hidden="true">
+  <!-- =====================================================
+       LOADER
+       ===================================================== -->
+
+  <div
+    class="site-loader"
+    id="site-loader"
+    aria-hidden="true"
+  >
     <div class="loader-curtain loader-curtain-left"></div>
     <div class="loader-curtain loader-curtain-right"></div>
 
@@ -88,9 +93,10 @@
   </div>
 
 
-  <!-- =========================================================
+  <!-- =====================================================
        HEADER
-       ========================================================= -->
+       ===================================================== -->
+
   <header class="site-header" id="site-header">
 
     <div class="header-main">
@@ -123,13 +129,14 @@
         type="button"
         aria-expanded="false"
         aria-controls="site-menu"
+        aria-label="Apri menu"
       >
-        <span class="menu-label">MENU</span>
+        <span class="menu-label">
+          <span class="menu-label-open">MENU</span>
+          <span class="menu-label-close">CHIUDI</span>
+        </span>
 
-        <span
-          class="menu-icon"
-          aria-hidden="true"
-        >
+        <span class="menu-icon" aria-hidden="true">
           <span></span>
           <span></span>
         </span>
@@ -138,9 +145,10 @@
     </div>
 
 
-    <!-- =======================================================
+    <!-- ===================================================
          WOW BAR
-         ======================================================= -->
+         =================================================== -->
+
     <div class="wow-bar">
 
       <button
@@ -153,21 +161,12 @@
         <span aria-hidden="true">←</span>
       </button>
 
-      <div
-        class="wow-track"
-        aria-hidden="true"
-      >
+      <div class="wow-track" aria-hidden="true">
         <span class="wow-track-line"></span>
-        <span
-          class="wow-progress"
-          id="wow-progress"
-        ></span>
+        <span class="wow-progress" id="wow-progress"></span>
 
         <span class="wow-dot wow-dot-start"></span>
-        <span
-          class="wow-dot wow-dot-active"
-          id="wow-dot-active"
-        ></span>
+        <span class="wow-dot wow-dot-active" id="wow-dot-active"></span>
         <span class="wow-dot wow-dot-end"></span>
       </div>
 
@@ -194,9 +193,10 @@
   </header>
 
 
-  <!-- =========================================================
+  <!-- =====================================================
        MENU
-       ========================================================= -->
+       ===================================================== -->
+
   <aside
     class="site-menu"
     id="site-menu"
@@ -220,13 +220,14 @@
   </aside>
 
 
-  <!-- =========================================================
+  <!-- =====================================================
        MAIN
-       ========================================================= -->
+       ===================================================== -->
+
   <main id="main-content">
 
 
-    <!-- 01 — GUARDA -->
+    <!-- 01 -->
     <section
       class="story-section story-opening section-dark"
       id="guarda"
@@ -238,7 +239,7 @@
     </section>
 
 
-    <!-- 02 — COME? -->
+    <!-- 02 -->
     <section
       class="story-section section-light"
       id="come"
@@ -270,7 +271,7 @@
     </section>
 
 
-    <!-- 03 — SPORT -->
+    <!-- 03 -->
     <section
       class="story-section section-dark"
       id="movimento"
@@ -284,6 +285,7 @@
         </div>
 
         <div class="story-content">
+
           <p class="story-lead">
             Poi ho iniziato a muovermi.
           </p>
@@ -299,13 +301,9 @@
 
           <div class="story-divider"></div>
 
-          <p>
-            Prima atleta.
-          </p>
+          <p>Prima atleta.</p>
 
-          <p>
-            Poi tecnico.
-          </p>
+          <p>Poi tecnico.</p>
 
           <p>
             Il movimento non è rimasto soltanto
@@ -316,13 +314,14 @@
             È diventato qualcosa da osservare,
             studiare e comprendere.
           </p>
+
         </div>
 
       </div>
     </section>
 
 
-    <!-- 04 — SCIENZE MOTORIE -->
+    <!-- 04 -->
     <section
       class="story-section section-light"
       id="capire"
@@ -332,10 +331,13 @@
 
         <div class="story-heading">
           <p class="story-kicker">04</p>
-          <h2 class="story-title">SCIENZE<br>MOTORIE</h2>
+          <h2 class="story-title">
+            SCIENZE<br class="desktop-break"> MOTORIE
+          </h2>
         </div>
 
         <div class="story-content">
+
           <p class="story-lead">
             Studiare il movimento ha cambiato
             il modo di guardarlo.
@@ -350,13 +352,14 @@
             La pratica poneva domande.
             La teoria aiutava a cercare risposte.
           </p>
+
         </div>
 
       </div>
     </section>
 
 
-    <!-- 05 — EDUCAZIONE -->
+    <!-- 05 -->
     <section
       class="story-section section-dark"
       id="trasmettere"
@@ -370,6 +373,7 @@
         </div>
 
         <div class="story-content">
+
           <p class="story-lead">
             Ciò che si comprende può essere condiviso.
           </p>
@@ -379,13 +383,14 @@
             conoscenza e metodo in qualcosa che possa
             diventare utile ad altri.
           </p>
+
         </div>
 
       </div>
     </section>
 
 
-    <!-- 06 — MANAGEMENT -->
+    <!-- 06 -->
     <section
       class="story-section section-light"
       id="costruire"
@@ -399,26 +404,26 @@
         </div>
 
         <div class="story-content">
+
           <p class="story-lead">
             A un certo punto non basta più capire.
           </p>
 
-          <p>
-            Bisogna progettare.
-          </p>
+          <p>Bisogna progettare.</p>
 
           <p>
             Organizzare persone, strumenti, risorse
             e processi per trasformare un'idea
             in qualcosa di concreto.
           </p>
+
         </div>
 
       </div>
     </section>
 
 
-    <!-- 07 — DIGITALE -->
+    <!-- 07 -->
     <section
       class="story-section section-dark"
       id="ritorna"
@@ -432,6 +437,7 @@
         </div>
 
         <div class="story-content">
+
           <p class="story-lead">
             Quel computer dell'inizio ritorna.
           </p>
@@ -444,26 +450,27 @@
           <p>
             Pagine. Sistemi. Esperienze digitali.
           </p>
+
         </div>
 
       </div>
     </section>
 
 
-    <!-- 08 — COLLEGARE -->
+    <!-- 08 -->
     <section
-      class="story-section section-light story-connecting"
+      class="story-section section-light"
       id="collegare"
       data-chapter="COLLEGARE"
     >
-      <div class="story-grid">
+      <div class="story-grid story-grid-connecting">
 
         <div class="story-heading">
           <p class="story-kicker">08</p>
           <h2 class="story-title">COLLEGARE</h2>
         </div>
 
-        <div class="story-content story-list-content">
+        <div class="story-content">
 
           <div class="connection-list">
             <span>Sport.</span>
@@ -489,7 +496,7 @@
     </section>
 
 
-    <!-- 09 — OGGI -->
+    <!-- 09 -->
     <section
       class="story-section section-dark"
       id="oggi"
@@ -503,6 +510,7 @@
         </div>
 
         <div class="story-content">
+
           <p class="story-lead">
             Osservare. Studiare. Collegare.
             Progettare. Sviluppare.
@@ -516,13 +524,14 @@
           <p>
             Capire prima di intervenire.
           </p>
+
         </div>
 
       </div>
     </section>
 
 
-    <!-- 10 — OBIETTIVO -->
+    <!-- 10 -->
     <section
       class="story-section section-light"
       id="obiettivo"
@@ -536,34 +545,26 @@
         </div>
 
         <div class="story-content">
+
           <p class="story-lead">
             Ogni progetto parte da una domanda.
           </p>
 
-          <p>
-            Qual è l'obiettivo?
-          </p>
+          <p>Qual è l'obiettivo?</p>
+          <p>Qual è il contesto?</p>
+          <p>Cosa serve davvero?</p>
 
-          <p>
-            Qual è il contesto?
-          </p>
+          <p>Da qui nasce il lavoro.</p>
 
-          <p>
-            Cosa serve davvero?
-          </p>
-
-          <p>
-            Da qui nasce il lavoro.
-          </p>
         </div>
 
       </div>
     </section>
 
 
-    <!-- 11 — TERRITORIO -->
+    <!-- 11 -->
     <section
-      class="story-section section-dark story-location"
+      class="story-section section-dark"
       id="qui"
       data-chapter="TERRITORIO"
     >
@@ -575,6 +576,7 @@
         </div>
 
         <div class="story-content">
+
           <p class="story-lead">
             Ogni percorso parte da un luogo.
           </p>
@@ -596,13 +598,14 @@
               referrerpolicy="no-referrer-when-downgrade"
             ></iframe>
           </div>
+
         </div>
 
       </div>
     </section>
 
 
-    <!-- 12 — DA QUI -->
+    <!-- 12 -->
     <section
       class="story-section section-light"
       id="da-qui"
@@ -616,6 +619,7 @@
         </div>
 
         <div class="story-content">
+
           <p class="story-lead">
             Una base in presenza e online.
           </p>
@@ -628,15 +632,16 @@
             Il digitale permette di estendere il percorso,
             collegare persone e costruire possibilità.
           </p>
+
         </div>
 
       </div>
     </section>
 
 
-    <!-- 13 — CHI SONO -->
+    <!-- 13 -->
     <section
-      class="story-section section-dark story-profile"
+      class="story-section section-dark"
       id="eccomi"
       data-chapter="CHI SONO"
     >
@@ -660,6 +665,7 @@
           </div>
 
           <div class="profile-copy">
+
             <p class="story-lead">
               Questo percorso non è una somma di ruoli.
             </p>
@@ -672,6 +678,7 @@
             <p>
               Sport. Studio. Educazione. Progetto. Digitale.
             </p>
+
           </div>
 
         </div>
@@ -680,9 +687,9 @@
     </section>
 
 
-    <!-- 14 — CONTATTI -->
+    <!-- 14 -->
     <section
-      class="story-section section-light story-contact"
+      class="story-section story-contact section-light"
       id="scrivimi"
       data-chapter="CONTATTI"
     >
@@ -695,6 +702,7 @@
         </h2>
 
         <div class="contact-copy">
+
           <p class="story-lead">
             Parlami del tuo obiettivo.
           </p>
@@ -711,6 +719,7 @@
             SCRIVIMI
             <span aria-hidden="true">↗</span>
           </a>
+
         </div>
 
       </div>
@@ -719,9 +728,10 @@
   </main>
 
 
-  <!-- =========================================================
+  <!-- =====================================================
        FOOTER
-       ========================================================= -->
+       ===================================================== -->
+
   <footer class="site-footer">
 
     <div class="footer-inner">
