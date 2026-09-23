@@ -5,7 +5,7 @@
    * ========================================================
    * CESARE PARATORE
    * Navigation / loader / narrative progression
-   * V2.1
+   * V3
    * ========================================================
    */
 
@@ -60,9 +60,6 @@
   const brand =
     document.querySelector(".brand");
 
-  const footerMark =
-    document.querySelector(".footer-mark");
-
   const main =
     document.getElementById("main-content");
 
@@ -90,6 +87,7 @@
     !nextArrowLabel ||
     !wowProgress ||
     !wowDot ||
+    !main ||
     !sections.length
   ) {
     return;
@@ -114,18 +112,20 @@
 
   let lastFocusedElement = null;
 
+  /*
+   * Durante una navigazione programmata non permettiamo
+   * al rilevamento automatico dello scroll di sovrascrivere
+   * immediatamente la sezione scelta dall'utente.
+   */
+  let navigationLock = null;
+  let navigationFrame = null;
+  let navigationTimer = null;
+
   const reducedMotion =
     window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     );
 
-
-  /*
-   * Cache dell'ultimo stato applicato.
-   *
-   * Evita di riscrivere inutilmente le custom
-   * properties durante ogni frame di scroll.
-   */
   const narrativeCache =
     sections.map(() => ({
       titleAlpha: null,
@@ -169,13 +169,15 @@
   };
 
 
-  const scrollToSection = (
-    section,
-    behavior = "smooth"
-  ) => {
+  /*
+   * Calcola la posizione documentale reale della sezione,
+   * tenendo conto dell'header fisso e del limite inferiore
+   * della pagina.
+   */
+  const getScrollTarget = (section) => {
 
     if (!section) {
-      return;
+      return 0;
     }
 
     const headerHeight =
@@ -184,19 +186,48 @@
     const rect =
       section.getBoundingClientRect();
 
-    const targetTop =
+    const documentTop =
       window.scrollY +
-      rect.top -
-      headerHeight;
+      rect.top;
+
+    const maxScroll =
+      Math.max(
+        0,
+        document.documentElement.scrollHeight -
+        window.innerHeight
+      );
+
+    return clamp(
+      documentTop - headerHeight,
+      0,
+      maxScroll
+    );
+  };
+
+
+  const scrollToSection = (
+    section,
+    behavior = "smooth"
+  ) => {
+
+    if (!section) {
+      return 0;
+    }
+
+    const targetTop =
+      getScrollTarget(section);
 
     window.scrollTo({
-      top: Math.max(0, targetTop),
+      top: targetTop,
       behavior
     });
+
+    return targetTop;
   };
 
 
   const isEditableTarget = (target) => {
+
     if (!(target instanceof Element)) {
       return false;
     }
@@ -210,33 +241,16 @@
 
 
   const getFocusableMenuElements = () => {
+
     return Array.from(
       menu.querySelectorAll(
-        [
-          "a[href]",
-          "button:not([disabled])",
-          "input:not([disabled])",
-          "textarea:not([disabled])",
-          "select:not([disabled])",
-          "[tabindex]:not([tabindex='-1'])"
-        ].join(",")
+        "a[href], button:not([disabled]), [tabindex]:not([tabindex='-1'])"
       )
     ).filter((element) => {
 
-      const hidden =
-        element.getAttribute(
-          "aria-hidden"
-        ) === "true";
-
-      const style =
-        window.getComputedStyle(
-          element
-        );
-
       return (
-        !hidden &&
-        style.display !== "none" &&
-        style.visibility !== "hidden"
+        !element.hasAttribute("disabled") &&
+        element.getAttribute("aria-hidden") !== "true"
       );
     });
   };
@@ -244,104 +258,24 @@
 
   const setPageInert = (locked) => {
 
-    [main, footer].forEach(
-      (element) => {
+    [main, footer].forEach((element) => {
 
-        if (!element) {
-          return;
-        }
-
-        if (locked) {
-          element.setAttribute(
-            "inert",
-            ""
-          );
-        } else {
-          element.removeAttribute(
-            "inert"
-          );
-        }
+      if (!element) {
+        return;
       }
-    );
-  };
 
-
-  const navigateToSection = (
-    index,
-    updateHash = true
-  ) => {
-
-    const targetIndex =
-      clamp(
-        Number(index),
-        0,
-        sections.length - 1
-      );
-
-    const target =
-      sections[targetIndex];
-
-    if (!target) {
-      return;
-    }
-
-    setActiveSection(
-      targetIndex,
-      updateHash
-    );
-
-    scrollToSection(
-      target,
-      reducedMotion.matches
-        ? "auto"
-        : "smooth"
-    );
+      if (locked) {
+        element.setAttribute("inert", "");
+      } else {
+        element.removeAttribute("inert");
+      }
+    });
   };
 
 
   /* ========================================================
      LOADER
      ======================================================== */
-
-  const exitLoader = () => {
-
-    if (!loader) {
-      return;
-    }
-
-    loader.classList.add(
-      "is-exiting"
-    );
-
-    const exitDuration =
-      reducedMotion.matches
-        ? 20
-        : 1150;
-
-    loaderExitTimer =
-      window.setTimeout(
-        () => {
-
-          loader.classList.remove(
-            "is-active"
-          );
-
-          loader.classList.remove(
-            "is-exiting"
-          );
-
-          loader.setAttribute(
-            "aria-hidden",
-            "true"
-          );
-
-          loaderExitTimer = null;
-
-        },
-        exitDuration
-      );
-  };
-
 
   const finishLoader = () => {
 
@@ -367,6 +301,43 @@
       loaderFallbackTimer = null;
     }
 
+    loader.classList.add(
+      "is-exiting"
+    );
+
+    const exitDuration =
+      reducedMotion.matches
+        ? 20
+        : 1150;
+
+    loaderExitTimer =
+      window.setTimeout(() => {
+
+        loader.classList.remove(
+          "is-active"
+        );
+
+        loader.classList.remove(
+          "is-exiting"
+        );
+
+        loader.setAttribute(
+          "aria-hidden",
+          "true"
+        );
+
+        loaderExitTimer = null;
+
+      }, exitDuration);
+  };
+
+
+  const tryFinishLoader = () => {
+
+    if (!loader || loaderFinished) {
+      return;
+    }
+
     const minimumDuration =
       reducedMotion.matches
         ? 0
@@ -382,18 +353,16 @@
         minimumDuration - elapsed
       );
 
-    if (remaining > 0) {
-
-      loaderMinTimer =
-        window.setTimeout(
-          exitLoader,
-          remaining
-        );
-
+    if (remaining === 0) {
+      finishLoader();
       return;
     }
 
-    exitLoader();
+    loaderMinTimer =
+      window.setTimeout(
+        finishLoader,
+        remaining
+      );
   };
 
 
@@ -412,39 +381,22 @@
       "is-active"
     );
 
-    loader.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-    /*
-     * Se la pagina è già completamente caricata,
-     * procediamo subito rispettando comunque
-     * la durata minima dell'animazione.
-     */
     if (
       document.readyState ===
       "complete"
     ) {
-
-      finishLoader();
-
+      tryFinishLoader();
     } else {
 
       window.addEventListener(
         "load",
-        finishLoader,
+        tryFinishLoader,
         {
           once: true
         }
       );
     }
 
-    /*
-     * Fallback:
-     * nessuna risorsa può bloccare il loader
-     * per un tempo indefinito.
-     */
     loaderFallbackTimer =
       window.setTimeout(
         finishLoader,
@@ -459,10 +411,7 @@
      MENU
      ======================================================== */
 
-  const setMenuState = (
-    open,
-    restoreFocus = true
-  ) => {
+  const setMenuState = (open) => {
 
     const nextState =
       Boolean(open);
@@ -475,11 +424,6 @@
     ) {
       return;
     }
-
-
-    /* ------------------------------------
-       OPEN
-       ------------------------------------ */
 
     if (nextState) {
 
@@ -519,37 +463,22 @@
 
       setPageInert(true);
 
+      window.requestAnimationFrame(() => {
 
-      /*
-       * Aspettiamo un frame per permettere
-       * al menu di entrare nel DOM visivo.
-       */
-      window.requestAnimationFrame(
-        () => {
+        const focusable =
+          getFocusableMenuElements();
 
-          if (!menuOpen) {
-            return;
-          }
-
-          const focusable =
-            getFocusableMenuElements();
-
-          if (focusable.length) {
-
-            focusable[0].focus({
-              preventScroll: true
-            });
-          }
+        if (focusable.length) {
+          focusable[0].focus({
+            preventScroll: true
+          });
         }
-      );
+
+      });
 
       return;
     }
 
-
-    /* ------------------------------------
-       CLOSE
-       ------------------------------------ */
 
     menuOpen = false;
 
@@ -582,35 +511,18 @@
 
     setPageInert(false);
 
+    const focusTarget =
+      lastFocusedElement &&
+      document.contains(lastFocusedElement) &&
+      !lastFocusedElement.hasAttribute("disabled")
+        ? lastFocusedElement
+        : menuToggle;
 
-    /*
-     * Il focus viene ripristinato soltanto quando
-     * richiesto. Per esempio, quando si clicca un
-     * link del menu, possiamo lasciare il focus sul
-     * pulsante oppure evitare un salto visivo.
-     */
-    if (restoreFocus) {
-
-      const focusTarget =
-        lastFocusedElement &&
-        document.contains(
-          lastFocusedElement
-        ) &&
-        !lastFocusedElement.hasAttribute(
-          "disabled"
-        )
-          ? lastFocusedElement
-          : menuToggle;
-
-      window.requestAnimationFrame(
-        () => {
-
-          focusTarget.focus({
-            preventScroll: true
-          });
-        }
-      );
-    }
+    window.requestAnimationFrame(() => {
+      focusTarget.focus({
+        preventScroll: true
+      });
+    });
 
     lastFocusedElement = null;
   };
@@ -619,81 +531,7 @@
   menuToggle.addEventListener(
     "click",
     () => {
-
-      setMenuState(
-        !menuOpen
-      );
-    }
-  );
-
-
-  /* ========================================================
-     MENU LINKS
-     ======================================================== */
-
-  menuLinks.forEach(
-    (link) => {
-
-      link.addEventListener(
-        "click",
-        (event) => {
-
-          const href =
-            link.getAttribute("href");
-
-          if (
-            !href ||
-            !href.startsWith("#")
-          ) {
-            return;
-          }
-
-          let id = "";
-
-          try {
-            id =
-              decodeURIComponent(
-                href.slice(1)
-              );
-          } catch {
-            return;
-          }
-
-          if (!id) {
-            return;
-          }
-
-          const target =
-            document.getElementById(id);
-
-          if (!target) {
-            return;
-          }
-
-          const index =
-            getSectionIndex(target);
-
-          if (index < 0) {
-            return;
-          }
-
-          event.preventDefault();
-
-          /*
-           * Chiudiamo il menu senza riportare
-           * il focus al pulsante.
-           */
-          setMenuState(
-            false,
-            false
-          );
-
-          navigateToSection(
-            index,
-            true
-          );
-        }
-      );
+      setMenuState(!menuOpen);
     }
   );
 
@@ -711,15 +549,10 @@
       return;
     }
 
-    const numericIndex =
-      Number(index);
-
     const safeIndex =
       clamp(
-        Number.isFinite(
-          numericIndex
-        )
-          ? numericIndex
+        Number.isFinite(Number(index))
+          ? Number(index)
           : 0,
         0,
         sections.length - 1
@@ -734,11 +567,6 @@
     if (!section) {
       return;
     }
-
-
-    /* ------------------------------------
-       CHAPTER
-       ------------------------------------ */
 
     activeChapter.textContent =
       section.dataset.chapter || "";
@@ -845,23 +673,213 @@
        HASH
        ------------------------------------ */
 
-    if (updateHash && section.id) {
-
-      const nextHash =
-        `#${section.id}`;
-
-      if (
-        window.location.hash !==
-        nextHash
-      ) {
-        window.history.replaceState(
-          null,
-          "",
-          nextHash
-        );
-      }
+    if (
+      updateHash &&
+      section.id
+    ) {
+      window.history.replaceState(
+        null,
+        "",
+        `#${section.id}`
+      );
     }
   };
+
+
+  /* ========================================================
+     NAVIGATION LOCK
+     ======================================================== */
+
+  const stopNavigationMonitor = () => {
+
+    if (navigationFrame !== null) {
+      window.cancelAnimationFrame(
+        navigationFrame
+      );
+
+      navigationFrame = null;
+    }
+
+    if (navigationTimer !== null) {
+      window.clearTimeout(
+        navigationTimer
+      );
+
+      navigationTimer = null;
+    }
+  };
+
+
+  const releaseNavigationLock = (
+    syncToViewport = true
+  ) => {
+
+    if (!navigationLock) {
+      return;
+    }
+
+    const lockedIndex =
+      navigationLock.index;
+
+    navigationLock = null;
+
+    stopNavigationMonitor();
+
+    if (syncToViewport) {
+      updateNarrative();
+    } else {
+      setActiveSection(
+        lockedIndex,
+        false
+      );
+    }
+  };
+
+
+  const monitorNavigation = () => {
+
+    if (!navigationLock) {
+      return;
+    }
+
+    const distance =
+      Math.abs(
+        window.scrollY -
+        navigationLock.targetTop
+      );
+
+    if (
+      reducedMotion.matches ||
+      distance <= 3
+    ) {
+      releaseNavigationLock(false);
+      return;
+    }
+
+    if (
+      performance.now() >=
+      navigationLock.deadline
+    ) {
+      releaseNavigationLock(true);
+      return;
+    }
+
+    navigationFrame =
+      window.requestAnimationFrame(
+        monitorNavigation
+      );
+  };
+
+
+  const navigateToSection = (
+    index,
+    updateHash = true
+  ) => {
+
+    const safeIndex =
+      clamp(
+        Number.isFinite(Number(index))
+          ? Number(index)
+          : 0,
+        0,
+        sections.length - 1
+      );
+
+    const target =
+      sections[safeIndex];
+
+    if (!target) {
+      return;
+    }
+
+    stopNavigationMonitor();
+
+    setActiveSection(
+      safeIndex,
+      updateHash
+    );
+
+    const behavior =
+      reducedMotion.matches
+        ? "auto"
+        : "smooth";
+
+    const targetTop =
+      scrollToSection(
+        target,
+        behavior
+      );
+
+    if (behavior === "auto") {
+
+      navigationLock = null;
+
+      requestNarrativeUpdate();
+
+      return;
+    }
+
+    navigationLock = {
+      index: safeIndex,
+      targetTop,
+      deadline:
+        performance.now() + 2200
+    };
+
+    navigationFrame =
+      window.requestAnimationFrame(
+        monitorNavigation
+      );
+  };
+
+
+  /* ========================================================
+     MENU LINKS
+     ======================================================== */
+
+  menuLinks.forEach((link) => {
+
+    link.addEventListener(
+      "click",
+      (event) => {
+
+        const href =
+          link.getAttribute("href");
+
+        if (
+          !href ||
+          !href.startsWith("#")
+        ) {
+          return;
+        }
+
+        const target =
+          document.getElementById(
+            href.slice(1)
+          );
+
+        if (!target) {
+          return;
+        }
+
+        event.preventDefault();
+
+        const index =
+          getSectionIndex(target);
+
+        if (index < 0) {
+          return;
+        }
+
+        setMenuState(false);
+
+        navigateToSection(
+          index,
+          true
+        );
+      }
+    );
+  });
 
 
   /* ========================================================
@@ -900,6 +918,86 @@
      FIND ACTIVE SECTION
      ======================================================== */
 
+  /*
+   * La sezione attiva è quella che contiene realmente
+   * il punto di lettura sotto l'header.
+   *
+   * Questo sostituisce il precedente confronto tra
+   * "narrativePoint" e distanza dall'anchor, che poteva
+   * scegliere una sezione non coerente con la posizione
+   * effettiva del viewport.
+   */
+  const getViewportActiveIndex = () => {
+
+    const viewportHeight =
+      window.innerHeight;
+
+    const headerHeight =
+      getHeaderHeight();
+
+    const anchor =
+      headerHeight +
+      (
+        viewportHeight -
+        headerHeight
+      ) * .38;
+
+    let containingIndex = -1;
+
+    sections.forEach(
+      (section, index) => {
+
+        const rect =
+          section.getBoundingClientRect();
+
+        if (
+          rect.top <= anchor &&
+          rect.bottom > anchor
+        ) {
+          containingIndex =
+            index;
+        }
+      }
+    );
+
+    if (
+      containingIndex >= 0
+    ) {
+      return containingIndex;
+    }
+
+    let nearestIndex = 0;
+    let nearestDistance = Infinity;
+
+    sections.forEach(
+      (section, index) => {
+
+        const rect =
+          section.getBoundingClientRect();
+
+        const distance =
+          Math.abs(
+            rect.top -
+            anchor
+          );
+
+        if (
+          distance <
+          nearestDistance
+        ) {
+          nearestDistance =
+            distance;
+
+          nearestIndex =
+            index;
+        }
+      }
+    );
+
+    return nearestIndex;
+  };
+
+
   const updateNarrative = () => {
 
     scrollFrame = null;
@@ -914,23 +1012,12 @@
     const headerHeight =
       getHeaderHeight();
 
-    /*
-     * Punto narrativo:
-     * evita che il cambio capitolo avvenga
-     * appena una sezione entra dal basso.
-     */
     const anchor =
       headerHeight +
       (
         viewportHeight -
         headerHeight
       ) * .38;
-
-    let bestIndex =
-      activeIndex;
-
-    let bestDistance =
-      Infinity;
 
 
     sections.forEach(
@@ -1039,49 +1126,27 @@
           "contentY",
           contentY
         );
-
-
-        /* --------------------------------
-           ACTIVE CHAPTER
-           -------------------------------- */
-
-        const narrativePoint =
-          rect.top +
-          Math.min(
-            height * .35,
-            viewportHeight * .42
-          );
-
-        const distance =
-          Math.abs(
-            narrativePoint -
-            anchor
-          );
-
-        const visible =
-          rect.bottom > headerHeight &&
-          rect.top < viewportHeight;
-
-        if (
-          visible &&
-          distance < bestDistance
-        ) {
-          bestDistance =
-            distance;
-
-          bestIndex =
-            index;
-        }
       }
     );
 
 
+    /*
+     * Se siamo dentro una navigazione programmata,
+     * manteniamo la destinazione richiesta dall'utente.
+     */
+    if (navigationLock) {
+      return;
+    }
+
+    const viewportIndex =
+      getViewportActiveIndex();
+
     if (
-      bestIndex !==
+      viewportIndex !==
       activeIndex
     ) {
       setActiveSection(
-        bestIndex,
+        viewportIndex,
         false
       );
     }
@@ -1119,6 +1184,28 @@
       passive: true
     }
   );
+
+
+  /*
+   * Browser che supportano scrollend:
+   * sincronizzazione immediata alla fine dello scroll.
+   */
+  if (
+    "onscrollend" in window
+  ) {
+
+    window.addEventListener(
+      "scrollend",
+      () => {
+
+        if (navigationLock) {
+          releaseNavigationLock(true);
+        } else {
+          requestNarrativeUpdate();
+        }
+      }
+    );
+  }
 
 
   /* ========================================================
@@ -1172,25 +1259,18 @@
 
 
   /* ========================================================
-     BRAND / FOOTER
+     BRAND
      ======================================================== */
 
-  const bindReturnToStart = (element) => {
+  if (brand) {
 
-    if (!element) {
-      return;
-    }
-
-    element.addEventListener(
+    brand.addEventListener(
       "click",
       (event) => {
 
         event.preventDefault();
 
-        setMenuState(
-          false,
-          false
-        );
+        setMenuState(false);
 
         navigateToSection(
           0,
@@ -1198,16 +1278,7 @@
         );
       }
     );
-  };
-
-
-  bindReturnToStart(
-    brand
-  );
-
-  bindReturnToStart(
-    footerMark
-  );
+  }
 
 
   /* ========================================================
@@ -1229,10 +1300,7 @@
 
         event.preventDefault();
 
-        setMenuState(
-          false,
-          true
-        );
+        setMenuState(false);
 
         return;
       }
@@ -1348,14 +1416,11 @@
     let id = "";
 
     try {
-
       id =
         decodeURIComponent(
           hash.slice(1)
         );
-
     } catch {
-
       return;
     }
 
@@ -1377,25 +1442,16 @@
       return;
     }
 
-    setActiveSection(
-      index,
-      false
-    );
-
     /*
      * Aspettiamo il primo layout completo.
      */
     window.setTimeout(
       () => {
 
-        scrollToSection(
-          target,
-          reducedMotion.matches
-            ? "auto"
-            : "smooth"
+        navigateToSection(
+          index,
+          false
         );
-
-        requestNarrativeUpdate();
 
       },
       80
@@ -1431,11 +1487,9 @@
               contentY: "32px"
             };
 
-
       narrativeCache[index] = {
         ...initialState
       };
-
 
       section.style.setProperty(
         "--title-alpha",
@@ -1499,8 +1553,6 @@
         window.clearTimeout(
           loaderMinTimer
         );
-
-        loaderMinTimer = null;
       }
 
       if (
@@ -1509,8 +1561,6 @@
         window.clearTimeout(
           loaderFallbackTimer
         );
-
-        loaderFallbackTimer = null;
       }
 
       if (
@@ -1519,9 +1569,9 @@
         window.clearTimeout(
           loaderExitTimer
         );
-
-        loaderExitTimer = null;
       }
+
+      stopNavigationMonitor();
 
       if (
         scrollFrame !== null
@@ -1532,12 +1582,6 @@
 
         scrollFrame = null;
       }
-
-      body.classList.remove(
-        "menu-is-open"
-      );
-
-      setPageInert(false);
     }
   );
 
