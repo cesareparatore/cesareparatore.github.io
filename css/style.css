@@ -1,20 +1,46 @@
+/* =========================================================
+   CESARE PARATORE — SITE SYSTEM V2
+   Art direction:
+   editorial / human / precise / restrained
+   ========================================================= */
+
 :root {
   --bg: #0B0B0A;
   --surface: #151513;
   --light: #F1EFE8;
   --secondary: #A7A49C;
   --muted: #66645F;
-  --line: rgba(11, 11, 10, .16);
+  --line: rgba(11, 11, 10, 0.16);
 
-  --display-xl: clamp(4.5rem, 10vw, 11rem);
-  --display-l: clamp(3rem, 7vw, 8rem);
-  --narrative: clamp(1.15rem, 1.35vw, 1.5rem);
-  --micro: clamp(.75rem, .8vw, .85rem);
+  --header-h: 76px;
+  --nav-h: 88px;
 
   --gutter: 5vw;
-  --header-h: 76px;
-  --nav-h: 96px;
+  --content-max: 1280px;
+  --text-max: 42rem;
+  --narrow-max: 34rem;
+
+  --display-xl: clamp(4.5rem, 10vw, 11rem);
+  --display-l: clamp(3.25rem, 7vw, 8rem);
+  --display-m: clamp(2.25rem, 4.5vw, 5rem);
+
+  --narrative: clamp(1.08rem, 1.3vw, 1.45rem);
+  --body: clamp(1rem, 1.05vw, 1.15rem);
+  --micro: clamp(0.7rem, 0.75vw, 0.82rem);
+
+  --tracking-tight: -0.055em;
+  --tracking-display: -0.065em;
+  --tracking-micro: 0.12em;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-linear: cubic-bezier(0.25, 0.1, 0.25, 1);
+
+  --duration-fast: 220ms;
+  --duration-base: 420ms;
+  --duration-slow: 800ms;
 }
+
 
 /* =========================================================
    RESET
@@ -27,28 +53,23 @@
 }
 
 html {
-  scroll-behavior: auto;
+  margin: 0;
+  padding: 0;
   background: var(--bg);
+  color: var(--light);
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
   margin: 0;
   min-width: 320px;
-
+  min-height: 100%;
+  overflow-x: hidden;
   background: var(--bg);
   color: var(--light);
-
-  font-family:
-    "Neue Montreal",
-    "Helvetica Neue",
-    Helvetica,
-    Arial,
-    sans-serif;
-
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-
-  overflow-x: hidden;
 }
 
 body.menu-open,
@@ -57,41 +78,74 @@ body.standby-active {
 }
 
 img,
+svg,
+video,
 iframe {
   display: block;
+  max-width: 100%;
 }
 
 img {
-  max-width: 100%;
+  height: auto;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
 }
 
 button,
 a {
-  font: inherit;
+  -webkit-tap-highlight-color: transparent;
 }
 
 button {
-  cursor: pointer;
-}
-
-button:disabled {
-  cursor: default;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: inherit;
 }
 
 a {
   color: inherit;
 }
 
+::selection {
+  background: var(--light);
+  color: var(--bg);
+}
+
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
 :focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 5px;
 }
 
+[aria-hidden="true"] {
+  pointer-events: none;
+}
+
+.reduced-motion *,
+.reduced-motion *::before,
+.reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+  transition-duration: 0.01ms !important;
+}
+
+
 /* =========================================================
-   LOADER / SIPARIO
+   LOADER
    ========================================================= */
 
-.loader {
+#loader {
   position: fixed;
   inset: 0;
   z-index: 1000;
@@ -99,36 +153,65 @@ a {
   display: grid;
   place-items: center;
 
-  background: var(--light);
-  color: var(--bg);
+  width: 100%;
+  height: 100svh;
 
-  opacity: 1;
-  visibility: visible;
+  background: var(--bg);
+  color: var(--light);
+
+  isolation: isolate;
+}
+
+#loader::after {
+  content: "";
+
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: 6vh;
+
+  height: 1px;
+
+  background: rgba(241, 239, 232, 0.14);
 }
 
 .loader-inner {
+  position: relative;
+  z-index: 1;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
+  gap: 1.25rem;
+
+  text-align: center;
 }
 
 .loader-logo {
-  width: clamp(54px, 6vw, 84px);
+  width: clamp(48px, 6vw, 76px);
   height: auto;
 }
 
 .loader-name {
+  margin: 0;
+
   font-size: var(--micro);
   line-height: 1;
-  letter-spacing: .12em;
+  font-weight: 500;
+  letter-spacing: var(--tracking-micro);
+  text-transform: uppercase;
 }
+
+#loader.is-done {
+  pointer-events: none;
+}
+
 
 /* =========================================================
    STANDBY
    ========================================================= */
 
-.standby {
+#standby {
   position: fixed;
   inset: 0;
   z-index: 900;
@@ -136,7 +219,7 @@ a {
   display: grid;
   place-items: center;
 
-  background: var(--bg);
+  background: rgba(11, 11, 10, 0.96);
   color: var(--light);
 
   opacity: 0;
@@ -144,25 +227,41 @@ a {
   pointer-events: none;
 
   transition:
-    opacity .8s ease,
-    visibility 0s linear .8s;
+    opacity 700ms var(--ease-soft),
+    visibility 0s linear 700ms;
 }
 
-.standby.is-active {
+#standby.is-active {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
 
   transition:
-    opacity .8s ease,
+    opacity 700ms var(--ease-soft),
     visibility 0s linear 0s;
 }
 
-.standby span {
-  font-size: var(--display-l);
-  line-height: .9;
-  letter-spacing: -.045em;
+.standby-content {
+  display: grid;
+  gap: 1rem;
+  place-items: center;
+
+  text-align: center;
 }
+
+.standby-content span {
+  font-size: clamp(3rem, 9vw, 9rem);
+  line-height: 0.85;
+  letter-spacing: var(--tracking-display);
+}
+
+.standby-content small {
+  font-size: var(--micro);
+  letter-spacing: var(--tracking-micro);
+  text-transform: uppercase;
+  color: var(--secondary);
+}
+
 
 /* =========================================================
    HEADER
@@ -170,22 +269,30 @@ a {
 
 .site-header {
   position: fixed;
-  inset: 0 0 auto 0;
-  z-index: 300;
-
-  height: var(--header-h);
-  padding: 0 var(--gutter);
+  top: 0;
+  left: 0;
+  z-index: 500;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  background: var(--light);
-  color: var(--bg);
+  width: 100%;
+  height: var(--header-h);
+
+  padding: 0 var(--gutter);
+
+  color: var(--light);
+
+  pointer-events: none;
+}
+
+.site-header > * {
+  pointer-events: auto;
 }
 
 .site-logo {
-  display: flex;
+  display: inline-flex;
   align-items: center;
 
   width: 42px;
@@ -194,546 +301,1156 @@ a {
   text-decoration: none;
 }
 
-.site-logo img {
+.site-logo img,
+.site-logo svg {
   width: 100%;
   height: auto;
 }
 
 .menu-trigger {
-  min-width: 92px;
-  min-height: 44px;
-  padding: 0 18px;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  border: 1px solid var(--bg);
+  min-width: 72px;
+  height: 42px;
+  padding: 0 0.8rem;
 
-  background: var(--bg);
+  border: 1px solid rgba(241, 239, 232, 0.32);
+
   color: var(--light);
 
   font-size: var(--micro);
   line-height: 1;
-  letter-spacing: .12em;
+  letter-spacing: var(--tracking-micro);
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  transition:
+    background-color var(--duration-base) var(--ease-out),
+    color var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out);
 }
 
+.menu-trigger:hover {
+  background: var(--light);
+  color: var(--bg);
+  border-color: var(--light);
+}
+
+
 /* =========================================================
-   MENU
-   L'HEADER RESTA SEMPRE CHIARO.
+   OVERLAY MENU
    ========================================================= */
 
 .site-menu {
   position: fixed;
-  top: var(--header-h);
-  right: 0;
-  bottom: 0;
-  left: 0;
+  inset: var(--header-h) 0 0;
+  z-index: 450;
 
-  z-index: 250;
+  display: flex;
+  align-items: center;
 
-  display: grid;
-  place-items: center;
+  min-height: calc(100svh - var(--header-h));
 
-  padding: clamp(32px, 7vh, 72px) var(--gutter);
+  padding:
+    clamp(3rem, 8vh, 7rem)
+    var(--gutter);
 
-  background: var(--bg);
-  color: var(--light);
+  background: var(--light);
+  color: var(--bg);
 
   opacity: 0;
   visibility: hidden;
-  pointer-events: none;
+  transform: translateY(-1.5rem);
 
   transition:
-    opacity .35s ease,
-    visibility 0s linear .35s;
+    opacity 450ms var(--ease-out),
+    transform 650ms var(--ease-out),
+    visibility 0s linear 650ms;
 }
 
 .site-menu.is-open {
   opacity: 1;
   visibility: visible;
-  pointer-events: auto;
+  transform: translateY(0);
 
   transition:
-    opacity .35s ease,
+    opacity 450ms var(--ease-out),
+    transform 650ms var(--ease-out),
     visibility 0s linear 0s;
 }
 
-.site-menu-nav {
+.site-menu-inner {
   width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+}
+
+.site-menu ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 0;
+
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+.site-menu li {
+  border-top: 1px solid var(--line);
+}
+
+.site-menu li:nth-last-child(-n + 2) {
+  border-bottom: 1px solid var(--line);
+}
+
+.site-menu a {
+  position: relative;
 
   display: flex;
-  flex-direction: column;
   align-items: center;
 
-  gap: clamp(12px, 1.7vh, 24px);
-}
+  min-height: clamp(72px, 9vh, 110px);
+  padding: 0 0.1rem;
 
-.site-menu-nav a {
-  color: var(--light);
   text-decoration: none;
 
-  font-size: clamp(2rem, 5vw, 5rem);
-  line-height: .95;
-  letter-spacing: -.035em;
-  text-align: center;
+  font-size: clamp(1.6rem, 3.4vw, 4rem);
+  line-height: 0.95;
+  letter-spacing: var(--tracking-tight);
 
-  transition: opacity .25s ease;
+  transition:
+    padding-left var(--duration-base) var(--ease-out),
+    opacity var(--duration-base) var(--ease-out);
 }
 
-.site-menu-nav a:hover {
-  opacity: .5;
+.site-menu a::before {
+  content: "";
+
+  position: absolute;
+  left: 0;
+  top: 50%;
+
+  width: 0;
+  height: 1px;
+
+  background: currentColor;
+
+  transform: translateY(-50%);
+
+  transition:
+    width var(--duration-base) var(--ease-out);
 }
+
+.site-menu a:hover {
+  padding-left: 2.25rem;
+}
+
+.site-menu a:hover::before {
+  width: 1.5rem;
+}
+
 
 /* =========================================================
    MAIN
    ========================================================= */
 
 main {
+  position: relative;
   padding-top: var(--header-h);
 }
 
+
 /* =========================================================
-   STORY SECTIONS
+   STORY SECTIONS — BASE
    ========================================================= */
 
 .story-section {
   position: relative;
 
-  min-height: 100svh;
-
   display: grid;
   align-items: center;
 
-  padding: clamp(72px, 10vh, 140px) var(--gutter);
+  min-height: 100svh;
+
+  padding:
+    clamp(5rem, 10vh, 9rem)
+    var(--gutter);
 
   overflow: clip;
+
+  isolation: isolate;
 }
 
-.section-dark {
+.story-section::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  z-index: -1;
+
+  pointer-events: none;
+}
+
+.story-section > * {
+  width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
+}
+
+.story-section:nth-of-type(odd) {
   background: var(--bg);
   color: var(--light);
 }
 
-.section-light {
+.story-section:nth-of-type(even) {
   background: var(--light);
   color: var(--bg);
 }
 
-.section-inner {
-  width: 100%;
-  max-width: 100%;
-  margin: 0 auto;
 
-  display: grid;
-  justify-items: center;
-  align-content: center;
+/* =========================================================
+   STORY TYPOGRAPHY
+   ========================================================= */
 
-  text-align: center;
-}
-
-.section-title {
+.story-title {
   margin: 0;
 
+  max-width: 100%;
+
   font-size: var(--display-xl);
-  line-height: .9;
-  letter-spacing: -.05em;
+  line-height: 0.82;
   font-weight: 500;
+
+  letter-spacing: var(--tracking-display);
+
+  text-wrap: balance;
 }
 
 .story-body {
-  width: min(100%, 42rem);
-  margin-top: clamp(48px, 8vh, 100px);
+  max-width: var(--text-max);
+  margin-top: clamp(2rem, 5vh, 4.5rem);
 
   font-size: var(--narrative);
   line-height: 1.5;
+  font-weight: 400;
 
-  text-align: center;
+  text-wrap: pretty;
 }
 
 .story-body p {
-  margin: 0 0 1.6em;
+  margin: 0;
 }
 
-.story-body p:last-child {
-  margin-bottom: 0;
+.story-body p + p {
+  margin-top: 1.25em;
 }
 
-.story-body strong {
-  font-weight: 600;
+.story-eyebrow,
+.story-index {
+  display: block;
+
+  margin-bottom: 1.5rem;
+
+  font-size: var(--micro);
+  line-height: 1;
+  font-weight: 500;
+
+  letter-spacing: var(--tracking-micro);
+  text-transform: uppercase;
+
+  color: var(--secondary);
 }
+
+.story-section:nth-of-type(even) .story-eyebrow,
+.story-section:nth-of-type(even) .story-index {
+  color: rgba(11, 11, 10, 0.54);
+}
+
 
 /* =========================================================
-   OPENING
+   STANDARD NARRATIVE LAYOUT
    ========================================================= */
 
-.section-opening {
+.story-section > .story-content,
+.story-section > .story-inner {
+  display: grid;
+  align-content: center;
+
+  width: 100%;
+  min-height: min(76svh, 880px);
+}
+
+
+/* =========================================================
+   OPENING — GUARDA.
+   ========================================================= */
+
+.story-section:first-of-type {
   min-height: calc(100svh - var(--header-h));
+
+  padding-top: clamp(3rem, 8vh, 6rem);
+  padding-bottom: clamp(4rem, 10vh, 8rem);
 }
 
-.section-opening .section-title {
-  font-size: clamp(5rem, 12vw, 13rem);
+.story-section:first-of-type .story-title {
+  max-width: 90vw;
+
+  font-size: clamp(
+    5rem,
+    15vw,
+    14rem
+  );
+
+  line-height: 0.76;
 }
 
-.section-opening .story-body {
+.story-section:first-of-type .story-body {
+  max-width: 34rem;
+}
+
+
+/* =========================================================
+   MOVIMENTO.
+   ========================================================= */
+
+.story-section:nth-of-type(3) .story-title {
+  max-width: 8ch;
+}
+
+.story-section:nth-of-type(3) .story-body {
+  max-width: 34rem;
+}
+
+
+/* =========================================================
+   CAPIRE.
+   ========================================================= */
+
+.story-section:nth-of-type(4) .story-content,
+.story-section:nth-of-type(4) .story-inner {
+  grid-template-columns:
+    minmax(0, 0.9fr)
+    minmax(0, 1.1fr);
+
+  gap: clamp(2rem, 8vw, 10rem);
+  align-items: end;
+}
+
+.story-section:nth-of-type(4) .story-title {
+  align-self: start;
+}
+
+.story-section:nth-of-type(4) .story-body {
+  margin-top: 0;
+  align-self: end;
+}
+
+
+/* =========================================================
+   COSTRUIRE.
+   ========================================================= */
+
+.story-section:nth-of-type(6) .story-title {
+  max-width: 7ch;
+}
+
+.story-section:nth-of-type(6) .story-body {
   max-width: 38rem;
 }
 
+
 /* =========================================================
-   PLACE / GOOGLE MAPS
+   RITORNA.
    ========================================================= */
 
-.section-place {
-  padding-top: clamp(72px, 9vh, 120px);
-  padding-bottom: clamp(72px, 9vh, 120px);
+.story-section:nth-of-type(7) {
+  background: var(--surface);
 }
 
-.place-grid {
-  width: 100%;
-
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: center;
-
-  gap: clamp(40px, 6vw, 96px);
+.story-section:nth-of-type(7) .story-title {
+  font-size: var(--display-l);
 }
 
-.place-copy {
-  display: grid;
-  justify-items: center;
-
-  text-align: center;
-}
-
-.place-copy .story-body {
+.story-section:nth-of-type(7) .story-body {
   max-width: 36rem;
 }
 
-.map-frame {
-  width: 100%;
-  aspect-ratio: 1 / 1;
 
-  background: var(--surface);
-  overflow: hidden;
+/* =========================================================
+   COLLEGARE.
+   ========================================================= */
+
+.story-section:nth-of-type(8) .story-content,
+.story-section:nth-of-type(8) .story-inner {
+  text-align: center;
+  justify-items: center;
 }
 
-.map-frame iframe {
+.story-section:nth-of-type(8) .story-title {
+  max-width: 8ch;
+}
+
+.story-section:nth-of-type(8) .story-body {
+  max-width: var(--narrow-max);
+}
+
+
+/* =========================================================
+   OGGI. — MANIFESTO
+   ========================================================= */
+
+.story-section:nth-of-type(9) {
+  min-height: 110svh;
+}
+
+.story-section:nth-of-type(9) .story-title {
+  font-size: var(--display-l);
+  max-width: 9ch;
+}
+
+.story-section:nth-of-type(9) .story-body {
+  max-width: 42rem;
+
+  font-size: clamp(
+    1.2rem,
+    1.7vw,
+    1.7rem
+  );
+
+  line-height: 1.42;
+}
+
+
+/* =========================================================
+   OBIETTIVO.
+   ========================================================= */
+
+.story-section:nth-of-type(10) .story-title {
+  max-width: 8ch;
+}
+
+.story-section:nth-of-type(10) .story-body {
+  max-width: 38rem;
+}
+
+
+/* =========================================================
+   PLACE — QUI.
+   ========================================================= */
+
+.section-place {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap: clamp(2.5rem, 7vw, 9rem);
+
+  align-items: center;
+
+  width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
+}
+
+.section-place .story-title {
+  max-width: 6ch;
+}
+
+.section-place .story-body {
+  margin-top: 2rem;
+}
+
+.place-map {
+  position: relative;
+
+  width: 100%;
+  aspect-ratio: 4 / 5;
+
+  overflow: hidden;
+
+  background: var(--surface);
+}
+
+.place-map iframe {
   width: 100%;
   height: 100%;
 
   border: 0;
+
+  filter: grayscale(1) contrast(0.92);
 }
 
+
 /* =========================================================
-   PERSON / PORTRAIT
+   DA QUI.
+   ========================================================= */
+
+.story-section:nth-of-type(12) .story-title {
+  max-width: 7ch;
+}
+
+.story-section:nth-of-type(12) .story-body {
+  max-width: 38rem;
+}
+
+
+/* =========================================================
+   PERSON — ECCOMI.
    ========================================================= */
 
 .section-person {
-  padding-top: clamp(72px, 9vh, 120px);
-  padding-bottom: clamp(72px, 9vh, 120px);
-}
-
-.person-grid {
-  width: 100%;
-
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+
+  grid-template-columns:
+    minmax(0, 0.8fr)
+    minmax(0, 1.2fr);
+
+  gap: clamp(2.5rem, 8vw, 10rem);
+
   align-items: center;
 
-  gap: clamp(40px, 6vw, 96px);
+  width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
 }
 
-.person-copy {
-  display: grid;
-  justify-items: center;
+.section-person .story-title {
+  max-width: 7ch;
+}
+
+.person-frame,
+.portrait-frame {
+  position: relative;
+
+  width: 100%;
+  max-width: 620px;
+
+  aspect-ratio: 4 / 5;
+
+  overflow: hidden;
+
+  background: var(--surface);
+}
+
+.person-frame img,
+.portrait-frame img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  filter: grayscale(100%);
+
+  transition:
+    filter 900ms var(--ease-soft),
+    transform 1200ms var(--ease-soft);
+}
+
+.person-frame:hover img,
+.portrait-frame:hover img {
+  filter: grayscale(0%);
+  transform: scale(1.015);
+}
+
+
+/* =========================================================
+   CONTACT — SCRIVIMI.
+   ========================================================= */
+
+.story-section:last-of-type {
+  min-height: calc(100svh - var(--nav-h));
+
+  padding-top: clamp(7rem, 15vh, 13rem);
+  padding-bottom: clamp(8rem, 18vh, 15rem);
 
   text-align: center;
 }
 
-.person-copy .story-body {
+.story-section:last-of-type .story-content,
+.story-section:last-of-type .story-inner {
+  justify-items: center;
+  text-align: center;
+}
+
+.story-section:last-of-type .story-title {
+  font-size: clamp(
+    4.25rem,
+    12vw,
+    12rem
+  );
+
+  line-height: 0.78;
+}
+
+.story-section:last-of-type .story-body {
   max-width: 30rem;
 }
 
-.portrait-frame {
-  width: min(100%, 420px);
-  max-height: min(62svh, 620px);
+.story-section:last-of-type a {
+  position: relative;
 
-  margin: 0 auto;
+  display: inline-block;
 
-  overflow: hidden;
-  background: var(--surface);
+  margin-top: 2rem;
+  padding-bottom: 0.5rem;
+
+  text-decoration: none;
+
+  font-size: var(--narrative);
 }
 
-.portrait-frame img {
+.story-section:last-of-type a::after {
+  content: "";
+
+  position: absolute;
+  left: 0;
+  bottom: 0;
+
   width: 100%;
-  height: auto;
+  height: 1px;
 
-  max-height: min(62svh, 620px);
+  background: currentColor;
 
-  object-fit: contain;
+  transform-origin: right center;
+  transform: scaleX(0);
+
+  transition:
+    transform 500ms var(--ease-out);
 }
 
-/* =========================================================
-   CONTACT
-   ========================================================= */
-
-.section-contact {
-  min-height: calc(100svh - var(--header-h));
+.story-section:last-of-type a:hover::after {
+  transform-origin: left center;
+  transform: scaleX(1);
 }
+
 
 /* =========================================================
    NARRATIVE NAVIGATION
-   Sticky: sempre presente durante lo scroll.
    ========================================================= */
 
 .section-nav {
   position: sticky;
   top: var(--header-h);
-
   z-index: 120;
 
-  width: 100%;
-  min-height: var(--nav-h);
-
-  padding: 20px var(--gutter);
-
   display: grid;
-  grid-template-columns: 72px 1fr 72px;
+  grid-template-columns:
+    minmax(72px, auto)
+    1fr
+    minmax(72px, auto);
+
   align-items: center;
 
-  gap: 20px;
+  min-height: var(--nav-h);
 
-  background: var(--light);
-  color: var(--bg);
+  padding:
+    0
+    var(--gutter);
 
-  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--light);
+
+  border-top: 1px solid rgba(241, 239, 232, 0.12);
+  border-bottom: 1px solid rgba(241, 239, 232, 0.12);
 }
 
-.section-nav-title {
-  min-width: 0;
+.section-nav button {
+  display: inline-flex;
+  align-items: center;
 
-  text-align: center;
+  min-height: 44px;
 
   font-size: var(--micro);
   line-height: 1;
-  letter-spacing: .14em;
-}
+  letter-spacing: var(--tracking-micro);
+  text-transform: uppercase;
 
-.section-nav-arrow {
-  width: 56px;
-  height: 56px;
-
-  justify-self: center;
-
-  display: grid;
-  place-items: center;
-
-  border: 0;
-  border-radius: 50%;
-
-  background: transparent;
-  color: var(--bg);
-
-  font-size: 1.5rem;
-  line-height: 1;
+  cursor: pointer;
 
   transition:
-    background .25s ease,
-    color .25s ease,
-    opacity .25s ease,
-    transform .25s ease;
+    opacity var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
 }
 
-.section-nav-arrow:not(:disabled):hover {
-  background: var(--bg);
-  color: var(--light);
-  transform: scale(1.04);
+.section-nav button:hover:not(:disabled) {
+  transform: translateX(4px);
 }
 
-.section-nav-arrow:disabled {
-  opacity: .22;
+.section-nav button:first-child:hover:not(:disabled) {
+  transform: translateX(-4px);
 }
+
+.section-nav button:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.section-nav-title {
+  justify-self: center;
+
+  max-width: 18rem;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  font-size: var(--micro);
+  line-height: 1;
+  font-weight: 500;
+
+  letter-spacing: var(--tracking-micro);
+  text-transform: uppercase;
+
+  color: var(--secondary);
+}
+
 
 /* =========================================================
    FOOTER
    ========================================================= */
 
 .site-footer {
-  min-height: 88px;
-
-  padding: 24px var(--gutter);
-
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  gap: 24px;
+  min-height: 180px;
 
-  background: var(--light);
-  color: var(--bg);
+  padding:
+    3rem
+    var(--gutter);
+
+  background: var(--bg);
+  color: var(--light);
+
+  border-top: 1px solid rgba(241, 239, 232, 0.12);
 }
 
-.footer-logo {
-  width: 38px;
-  height: 38px;
-
-  display: flex;
-  align-items: center;
-
-  text-decoration: none;
+.site-footer-logo {
+  width: 42px;
 }
 
-.footer-logo img {
-  width: 100%;
-  height: auto;
-}
+.site-footer-name {
+  margin: 0;
 
-.site-footer span {
   font-size: var(--micro);
   line-height: 1;
-  letter-spacing: .12em;
+  letter-spacing: var(--tracking-micro);
+  text-transform: uppercase;
 }
+
+
+/* =========================================================
+   LARGE DESKTOP
+   ========================================================= */
+
+@media (min-width: 1440px) {
+  :root {
+    --gutter: 6vw;
+  }
+
+  .story-section {
+    padding-top: 10rem;
+    padding-bottom: 10rem;
+  }
+
+  .story-section:first-of-type .story-title {
+    font-size: clamp(9rem, 13vw, 15rem);
+  }
+}
+
 
 /* =========================================================
    TABLET
    ========================================================= */
 
 @media (max-width: 1024px) {
-
   :root {
-    --gutter: 4vw;
+    --header-h: 70px;
+    --nav-h: 78px;
+    --gutter: 6vw;
   }
 
-  .place-grid,
-  .person-grid {
-    grid-template-columns: minmax(0, 1fr);
+  .story-section {
+    min-height: 100svh;
+    padding:
+      5.5rem
+      var(--gutter);
   }
 
-  .map-frame {
-    width: min(100%, 620px);
-    margin: 0 auto;
+  .story-section > .story-content,
+  .story-section > .story-inner {
+    min-height: auto;
   }
 
+  .story-section:nth-of-type(4) .story-content,
+  .story-section:nth-of-type(4) .story-inner {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .section-place,
+  .section-person {
+    grid-template-columns: 1fr;
+    gap: 3.5rem;
+  }
+
+  .section-place .story-title,
+  .section-person .story-title {
+    max-width: none;
+  }
+
+  .place-map,
+  .person-frame,
   .portrait-frame {
-    width: min(100%, 420px);
+    max-width: 100%;
+  }
+
+  .story-section:nth-of-type(9) {
+    min-height: 100svh;
+  }
+
+  .site-menu ul {
+    grid-template-columns: 1fr;
+  }
+
+  .site-menu li:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+
+  .site-menu li:last-child {
+    border-bottom: 1px solid var(--line);
   }
 }
+
 
 /* =========================================================
    MOBILE
    ========================================================= */
 
 @media (max-width: 640px) {
-
   :root {
-    --gutter: 20px;
-    --header-h: 68px;
-    --nav-h: 76px;
+    --header-h: 62px;
+    --nav-h: 70px;
+    --gutter: 6vw;
+
+    --display-xl: clamp(
+      3.7rem,
+      17vw,
+      6.5rem
+    );
+
+    --display-l: clamp(
+      3rem,
+      14vw,
+      5.5rem
+    );
+
+    --narrative: 1.08rem;
+    --micro: 0.68rem;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  .site-header {
+    height: var(--header-h);
   }
 
   .site-logo {
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
   }
 
   .menu-trigger {
-    min-width: 84px;
-    min-height: 42px;
+    min-width: 66px;
+    height: 38px;
+    padding-inline: 0.7rem;
   }
+
+  /* -------------------------------------------------------
+     MENU
+     ------------------------------------------------------- */
 
   .site-menu {
-    padding: 32px 20px;
+    inset: var(--header-h) 0 0;
+
+    min-height: calc(100svh - var(--header-h));
+
+    padding:
+      2rem
+      var(--gutter);
   }
 
-  .site-menu-nav {
-    gap: 14px;
+  .site-menu a {
+    min-height: 68px;
+
+    font-size: clamp(
+      1.45rem,
+      8vw,
+      2.5rem
+    );
   }
 
-  .site-menu-nav a {
-    font-size: clamp(1.8rem, 9vw, 3rem);
+  .site-menu a:hover {
+    padding-left: 0;
+  }
+
+  .site-menu a::before {
+    display: none;
+  }
+
+  /* -------------------------------------------------------
+     STORY
+     ------------------------------------------------------- */
+
+  main {
+    padding-top: var(--header-h);
   }
 
   .story-section {
-    min-height: 100svh;
+    min-height: auto;
 
     padding:
-      clamp(64px, 9vh, 96px)
-      20px;
+      clamp(5rem, 12vh, 7rem)
+      var(--gutter);
   }
 
-  .section-title {
-    font-size: clamp(4rem, 17vw, 6rem);
+  .story-section > .story-content,
+  .story-section > .story-inner {
+    min-height: calc(100svh - var(--header-h) - 8rem);
   }
 
-  .section-opening .section-title {
-    font-size: clamp(4.5rem, 19vw, 7rem);
+  .story-title {
+    line-height: 0.84;
   }
 
   .story-body {
-    width: min(100%, 34rem);
-    margin-top: 48px;
+    margin-top: 2.5rem;
 
-    font-size: 1.15rem;
-    line-height: 1.5;
+    line-height: 1.48;
   }
 
-  .place-grid,
-  .person-grid {
-    gap: 56px;
+  /* -------------------------------------------------------
+     OPENING
+     ------------------------------------------------------- */
+
+  .story-section:first-of-type {
+    min-height: calc(100svh - var(--header-h));
+
+    padding-top: 2rem;
+    padding-bottom: 4rem;
   }
 
-  .map-frame {
-    width: 100%;
+  .story-section:first-of-type .story-title {
+    font-size: clamp(
+      4.2rem,
+      19vw,
+      7rem
+    );
+
+    line-height: 0.74;
+  }
+
+  /* -------------------------------------------------------
+     CAPIRE
+     ------------------------------------------------------- */
+
+  .story-section:nth-of-type(4) .story-content,
+  .story-section:nth-of-type(4) .story-inner {
+    gap: 2rem;
+  }
+
+  /* -------------------------------------------------------
+     PLACE
+     ------------------------------------------------------- */
+
+  .section-place,
+  .section-person {
+    gap: 2.5rem;
+  }
+
+  .place-map {
     aspect-ratio: 1 / 1;
   }
 
+  /* -------------------------------------------------------
+     PERSON
+     ------------------------------------------------------- */
+
+  .person-frame,
   .portrait-frame {
-    width: min(76vw, 340px);
-    max-height: 54svh;
+    aspect-ratio: 4 / 5;
   }
 
-  .portrait-frame img {
-    max-height: 54svh;
-  }
+  /* -------------------------------------------------------
+     NAV
+     ------------------------------------------------------- */
 
   .section-nav {
-    grid-template-columns: 56px 1fr 56px;
     min-height: var(--nav-h);
-    padding: 12px 20px;
 
-    gap: 8px;
+    grid-template-columns:
+      1fr
+      auto
+      1fr;
+
+    padding-inline: var(--gutter);
   }
 
-  .section-nav-arrow {
-    width: 46px;
-    height: 46px;
+  .section-nav button {
+    min-height: 42px;
   }
 
   .section-nav-title {
-    font-size: .72rem;
+    max-width: 8rem;
   }
 
+  .section-nav-next {
+    justify-self: end;
+  }
+
+  /* -------------------------------------------------------
+     CONTACT
+     ------------------------------------------------------- */
+
+  .story-section:last-of-type {
+    min-height: calc(100svh - var(--nav-h));
+
+    padding-top: 7rem;
+    padding-bottom: 8rem;
+  }
+
+  .story-section:last-of-type .story-title {
+    font-size: clamp(
+      4rem,
+      18vw,
+      7rem
+    );
+  }
+
+  /* -------------------------------------------------------
+     FOOTER
+     ------------------------------------------------------- */
+
   .site-footer {
-    min-height: 76px;
-    padding: 20px;
+    min-height: 140px;
+
+    padding-block: 2.5rem;
   }
 }
+
+
+/* =========================================================
+   VERY SMALL DEVICES
+   ========================================================= */
+
+@media (max-width: 380px) {
+  :root {
+    --gutter: 5.5vw;
+  }
+
+  .story-section:first-of-type .story-title {
+    font-size: 3.9rem;
+  }
+
+  .section-nav-title {
+    max-width: 7rem;
+  }
+
+  .menu-trigger {
+    min-width: 62px;
+    padding-inline: 0.5rem;
+  }
+}
+
+
+/* =========================================================
+   LANDSCAPE MOBILE
+   ========================================================= */
+
+@media (
+  max-width: 900px
+) and (
+  orientation: landscape
+) {
+  .story-section {
+    min-height: auto;
+    padding-block: 5rem;
+  }
+
+  .story-section > .story-content,
+  .story-section > .story-inner {
+    min-height: auto;
+  }
+
+  .story-section:first-of-type {
+    min-height: 100svh;
+  }
+
+  .site-menu {
+    overflow-y: auto;
+  }
+
+  .site-menu a {
+    min-height: 56px;
+  }
+}
+
+
+/* =========================================================
+   HOVER CAPABILITY
+   ========================================================= */
+
+@media (hover: none) {
+  .menu-trigger:hover {
+    background: transparent;
+    color: var(--light);
+    border-color: rgba(241, 239, 232, 0.32);
+  }
+
+  .person-frame:hover img,
+  .portrait-frame:hover img {
+    filter: grayscale(100%);
+    transform: none;
+  }
+
+  .section-nav button:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
 
 /* =========================================================
    REDUCED MOTION
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-
   html {
     scroll-behavior: auto;
   }
 
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
   .site-menu,
-  .site-menu-nav a,
-  .section-nav-arrow,
-  .standby,
-  .loader {
-    transition: none !important;
+  .site-menu.is-open,
+  #standby,
+  #standby.is-active {
+    transform: none;
   }
 }
