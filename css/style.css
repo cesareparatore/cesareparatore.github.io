@@ -1,6 +1,6 @@
 /* =========================================================
    CESARE PARATORE
-   Editorial / cinematic system
+   Cinematic / editorial system
    ========================================================= */
 
 :root {
@@ -19,13 +19,12 @@
   --content-max: 1500px;
   --text-max: 700px;
 
-  --display-xl: clamp(5rem, 13vw, 13rem);
-  --display-l: clamp(3.4rem, 8vw, 8rem);
-  --display-m: clamp(2.5rem, 5vw, 5.5rem);
+  --display-xl: clamp(5rem, 12vw, 12.5rem);
+  --display-l: clamp(3rem, 7vw, 7.5rem);
 
   --body-large: clamp(1.35rem, 2vw, 2rem);
-  --narrative: clamp(1.15rem, 1.45vw, 1.55rem);
-  --micro: clamp(0.7rem, 0.8vw, 0.84rem);
+  --narrative: clamp(1.12rem, 1.4vw, 1.5rem);
+  --micro: clamp(.68rem, .78vw, .82rem);
 
   --gutter: clamp(22px, 5vw, 76px);
 
@@ -33,12 +32,11 @@
   --wow-h: 58px;
   --header-h: calc(var(--header-main-h) + var(--wow-h));
 
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --ease-in-out: cubic-bezier(.65, 0, .35, 1);
 
   --duration-fast: 220ms;
   --duration: 600ms;
-  --duration-slow: 1000ms;
 }
 
 
@@ -53,13 +51,14 @@
 }
 
 html {
-  scroll-behavior: smooth;
   background: var(--bg);
+  scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
   min-width: 320px;
+
   background: var(--bg);
   color: var(--light);
 
@@ -72,11 +71,11 @@ body {
     "Segoe UI",
     sans-serif;
 
-  font-weight: 400;
   line-height: 1.55;
 
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+
   overflow-x: hidden;
 }
 
@@ -123,7 +122,7 @@ a {
   background: var(--light);
   color: var(--ink);
 
-  font-size: 0.8rem;
+  font-size: .8rem;
   text-decoration: none;
 
   transform: translateY(-150%);
@@ -142,8 +141,6 @@ a {
 
 /* =========================================================
    LOADER
-   Progressive enhancement:
-   without JS the loader never appears.
    ========================================================= */
 
 .site-loader {
@@ -151,17 +148,18 @@ a {
 }
 
 .js .site-loader {
-  display: flex;
   position: fixed;
   inset: 0;
   z-index: 9999;
 
+  display: flex;
   align-items: center;
   justify-content: center;
 
-  overflow: hidden;
-  pointer-events: none;
   visibility: hidden;
+  overflow: hidden;
+
+  pointer-events: none;
 }
 
 .js .site-loader.is-active {
@@ -171,25 +169,22 @@ a {
 
 .loader-curtain {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 51%;
+  inset-block: 0;
+
+  width: 50%;
 
   background: var(--bg);
 
   transition:
-    transform 1100ms var(--ease-in-out),
-    opacity 500ms ease;
+    transform 1100ms var(--ease-in-out);
 }
 
 .loader-curtain-left {
   left: 0;
-  transform: translateX(0);
 }
 
 .loader-curtain-right {
   right: 0;
-  transform: translateX(0);
 }
 
 .site-loader.is-exiting .loader-curtain-left {
@@ -204,20 +199,20 @@ a {
   position: relative;
   z-index: 2;
 
-  width: min(360px, 70vw);
+  width: min(360px, 72vw);
 
   display: flex;
   flex-direction: column;
   align-items: center;
 
   transition:
-    opacity 500ms var(--ease-out),
-    transform 800ms var(--ease-out);
+    opacity 450ms ease,
+    transform 700ms var(--ease-out);
 }
 
 .site-loader.is-exiting .loader-inner {
   opacity: 0;
-  transform: translateY(-14px);
+  transform: translateY(-12px);
 }
 
 .loader-mark-wrap {
@@ -226,8 +221,6 @@ a {
 
   display: grid;
   place-items: center;
-
-  overflow: hidden;
 }
 
 .loader-mark {
@@ -237,19 +230,19 @@ a {
   filter: invert(1);
 
   opacity: 0;
+  transform: scale(.82);
 
-  transform: scale(0.82);
-
-  animation: loaderMarkIn 700ms var(--ease-out) 100ms forwards;
+  animation:
+    loader-mark-in 700ms var(--ease-out) 100ms forwards;
 }
 
 .loader-line {
-  width: min(260px, 60vw);
+  width: min(260px, 62vw);
   height: 1px;
 
   margin-top: 30px;
 
-  background: rgba(241, 239, 232, 0.16);
+  background: rgba(241, 239, 232, .18);
 
   overflow: hidden;
 }
@@ -262,10 +255,11 @@ a {
 
   background: var(--light);
 
-  transform-origin: left center;
   transform: scaleX(0);
+  transform-origin: left center;
 
-  animation: loaderLineIn 1000ms var(--ease-out) 350ms forwards;
+  animation:
+    loader-line-in 950ms var(--ease-out) 350ms forwards;
 }
 
 .loader-name {
@@ -273,31 +267,34 @@ a {
 
   color: var(--light);
 
-  font-size: 0.72rem;
+  font-size: .72rem;
+  font-weight: 500;
+  letter-spacing: .24em;
   line-height: 1;
-  letter-spacing: 0.24em;
+
   text-transform: uppercase;
 
   opacity: 0;
   transform: translateY(8px);
 
-  animation: loaderNameIn 700ms var(--ease-out) 650ms forwards;
+  animation:
+    loader-name-in 650ms var(--ease-out) 650ms forwards;
 }
 
-@keyframes loaderMarkIn {
+@keyframes loader-mark-in {
   to {
     opacity: 1;
     transform: scale(1);
   }
 }
 
-@keyframes loaderLineIn {
+@keyframes loader-line-in {
   to {
     transform: scaleX(1);
   }
 }
 
-@keyframes loaderNameIn {
+@keyframes loader-name-in {
   to {
     opacity: 1;
     transform: translateY(0);
@@ -311,29 +308,28 @@ a {
 
 .site-header {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  inset: 0 0 auto;
+
   z-index: 900;
 
   height: var(--header-h);
 
   background: var(--bg);
-  border-bottom: 1px solid rgba(241, 239, 232, 0.09);
-
   color: var(--light);
+
+  border-bottom: 1px solid rgba(241, 239, 232, .09);
 }
 
 .header-main {
   height: var(--header-main-h);
 
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
 
-  padding: 0 var(--gutter);
+  padding-inline: var(--gutter);
 
-  border-bottom: 1px solid rgba(241, 239, 232, 0.08);
+  border-bottom: 1px solid rgba(241, 239, 232, .08);
 }
 
 .brand {
@@ -360,27 +356,28 @@ a {
 }
 
 .brand:hover .brand-mark {
-  transform: scale(1.06);
+  transform: scale(1.05);
 }
 
 .active-chapter {
   justify-self: center;
 
-  min-width: 0;
+  max-width: 45vw;
 
-  color: var(--light);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
-  font-size: 0.72rem;
+  font-size: .72rem;
   font-weight: 600;
-  letter-spacing: 0.22em;
+  letter-spacing: .2em;
   line-height: 1;
 
   text-transform: uppercase;
-  white-space: nowrap;
 
   transition:
-    opacity 260ms ease,
-    transform 500ms var(--ease-out);
+    opacity 250ms ease,
+    transform 350ms var(--ease-out);
 }
 
 .site-header.menu-open .active-chapter {
@@ -392,13 +389,13 @@ a {
 .menu-toggle {
   justify-self: end;
 
-  min-width: 112px;
+  min-width: 110px;
   height: 46px;
 
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 14px;
+  gap: 13px;
 
   padding: 0;
 
@@ -406,44 +403,46 @@ a {
   background: transparent;
 
   cursor: pointer;
-
-  text-transform: uppercase;
 }
 
 .menu-label {
   position: relative;
 
-  min-width: 50px;
+  min-width: 52px;
+  height: 1em;
 
-  font-size: 0.72rem;
+  display: block;
+
+  font-size: .72rem;
   font-weight: 600;
-  letter-spacing: 0.2em;
+  letter-spacing: .19em;
   line-height: 1;
 
   text-align: right;
+  text-transform: uppercase;
 }
 
-.menu-label::after {
-  content: "CHIUDI";
-
+.menu-label-open,
+.menu-label-close {
   position: absolute;
-  top: 0;
-  right: 0;
-
-  opacity: 0;
-  transform: translateY(7px);
+  inset: 0;
 
   transition:
-    opacity 260ms ease,
-    transform 260ms var(--ease-out);
+    opacity 220ms ease,
+    transform 320ms var(--ease-out);
 }
 
-.site-header.menu-open .menu-label {
-  color: transparent;
+.menu-label-close {
+  opacity: 0;
+  transform: translateY(6px);
 }
 
-.site-header.menu-open .menu-label::after {
-  color: var(--light);
+.site-header.menu-open .menu-label-open {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.site-header.menu-open .menu-label-close {
   opacity: 1;
   transform: translateY(0);
 }
@@ -453,8 +452,6 @@ a {
 
   width: 24px;
   height: 18px;
-
-  display: block;
 }
 
 .menu-icon span {
@@ -467,8 +464,8 @@ a {
   background: currentColor;
 
   transition:
-    transform 350ms var(--ease-out),
-    top 350ms var(--ease-out);
+    top 300ms var(--ease-out),
+    transform 300ms var(--ease-out);
 }
 
 .menu-icon span:first-child {
@@ -498,15 +495,15 @@ a {
   height: var(--wow-h);
 
   display: grid;
-  grid-template-columns: 64px minmax(0, 1fr) 100px;
+  grid-template-columns: 54px minmax(0, 1fr) 92px;
   align-items: center;
   gap: 16px;
 
-  padding: 0 var(--gutter);
+  padding-inline: var(--gutter);
 }
 
 .wow-arrow {
-  min-width: 46px;
+  min-width: 44px;
   height: 40px;
 
   display: inline-flex;
@@ -514,7 +511,7 @@ a {
   justify-content: center;
   gap: 8px;
 
-  border: 1px solid rgba(241, 239, 232, 0.22);
+  border: 1px solid rgba(241, 239, 232, .24);
   border-radius: 999px;
 
   background: transparent;
@@ -538,11 +535,11 @@ a {
 }
 
 .wow-arrow:active:not(:disabled) {
-  transform: translateY(1px) scale(0.98);
+  transform: translateY(1px);
 }
 
 .wow-arrow:disabled {
-  opacity: 0.24;
+  opacity: .25;
   cursor: default;
 }
 
@@ -554,14 +551,14 @@ a {
 .wow-arrow-label {
   display: none;
 
-  font-size: 0.6rem;
+  font-size: .58rem;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: .14em;
   line-height: 1;
 }
 
 .wow-arrow-next.is-return {
-  min-width: 92px;
+  min-width: 90px;
 }
 
 .wow-arrow-next.is-return .wow-arrow-label {
@@ -571,6 +568,7 @@ a {
 .wow-track {
   position: relative;
 
+  width: 100%;
   height: 18px;
 
   display: flex;
@@ -579,12 +577,11 @@ a {
 
 .wow-track-line {
   position: absolute;
-  left: 0;
-  right: 0;
+  inset-inline: 0;
 
   height: 1px;
 
-  background: rgba(241, 239, 232, 0.18);
+  background: rgba(241, 239, 232, .2);
 }
 
 .wow-progress {
@@ -596,7 +593,7 @@ a {
 
   background: var(--light);
 
-  transition: width 550ms var(--ease-out);
+  transition: width 500ms var(--ease-out);
 }
 
 .wow-dot {
@@ -605,7 +602,7 @@ a {
   width: 7px;
   height: 7px;
 
-  border: 1px solid rgba(241, 239, 232, 0.65);
+  border: 1px solid rgba(241, 239, 232, .6);
   border-radius: 50%;
 
   background: var(--bg);
@@ -630,54 +627,60 @@ a {
   border-color: var(--light);
   background: var(--light);
 
-  box-shadow: 0 0 0 4px rgba(241, 239, 232, 0.08);
+  box-shadow:
+    0 0 0 4px rgba(241, 239, 232, .08);
 
   transition:
-    left 550ms var(--ease-out),
-    box-shadow 400ms ease;
+    left 500ms var(--ease-out),
+    box-shadow 350ms ease;
 }
 
 
 /* =========================================================
-   MENU OVERLAY
+   MENU
    ========================================================= */
 
 .site-menu {
   position: fixed;
-  top: var(--header-h);
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 850;
+  inset: var(--header-h) 0 0;
+
+  z-index: 950;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
   padding:
-    clamp(34px, 6vh, 70px)
-    var(--gutter);
+    34px
+    var(--gutter)
+    50px;
 
   background: var(--bg);
   color: var(--light);
 
-  opacity: 0;
   visibility: hidden;
+  opacity: 0;
   pointer-events: none;
 
-  transform: translateY(-10px);
+  transform: translateY(-12px);
 
   transition:
+    visibility 0s linear 350ms,
     opacity 350ms ease,
-    transform 500ms var(--ease-out),
-    visibility 350ms;
+    transform 500ms var(--ease-out);
 }
 
 .site-menu.is-open {
-  opacity: 1;
   visibility: visible;
+  opacity: 1;
   pointer-events: auto;
+
   transform: translateY(0);
+
+  transition:
+    visibility 0s linear 0s,
+    opacity 350ms ease,
+    transform 500ms var(--ease-out);
 }
 
 .menu-navigation {
@@ -687,34 +690,34 @@ a {
   flex-direction: column;
   align-items: center;
 
-  gap: clamp(12px, 2vh, 22px);
+  gap: clamp(10px, 1.55vh, 20px);
 
   max-height: 100%;
   overflow-y: auto;
 
-  padding: 10px 0 30px;
+  padding: 10px 20px 30px;
 }
 
 .menu-link {
-  display: block;
+  flex: 0 0 auto;
 
   color: var(--light);
 
-  font-size: clamp(1.4rem, 3vw, 3.2rem);
+  font-size: clamp(1.35rem, 2.8vw, 3rem);
   font-weight: 500;
   line-height: 1.05;
-  letter-spacing: -0.025em;
+  letter-spacing: -.025em;
 
   text-align: center;
   text-decoration: none;
 
   opacity: 0;
-  transform: translateY(18px);
+  transform: translateY(14px);
 
   transition:
-    color var(--duration-fast) ease,
-    opacity 450ms var(--ease-out),
-    transform 550ms var(--ease-out);
+    opacity 420ms var(--ease-out),
+    transform 500ms var(--ease-out),
+    color 200ms ease;
 }
 
 .site-menu.is-open .menu-link {
@@ -723,35 +726,35 @@ a {
 }
 
 .site-menu.is-open .menu-link:nth-child(1) {
-  transition-delay: 60ms;
+  transition-delay: 50ms;
 }
 
 .site-menu.is-open .menu-link:nth-child(2) {
-  transition-delay: 90ms;
+  transition-delay: 80ms;
 }
 
 .site-menu.is-open .menu-link:nth-child(3) {
-  transition-delay: 120ms;
+  transition-delay: 110ms;
 }
 
 .site-menu.is-open .menu-link:nth-child(4) {
-  transition-delay: 150ms;
+  transition-delay: 140ms;
 }
 
 .site-menu.is-open .menu-link:nth-child(5) {
-  transition-delay: 180ms;
+  transition-delay: 170ms;
 }
 
 .site-menu.is-open .menu-link:nth-child(6) {
-  transition-delay: 210ms;
+  transition-delay: 200ms;
 }
 
 .site-menu.is-open .menu-link:nth-child(7) {
-  transition-delay: 240ms;
+  transition-delay: 230ms;
 }
 
 .site-menu.is-open .menu-link:nth-child(8) {
-  transition-delay: 270ms;
+  transition-delay: 260ms;
 }
 
 .menu-link:hover {
@@ -760,7 +763,7 @@ a {
 
 
 /* =========================================================
-   MAIN
+   STORY
    ========================================================= */
 
 main {
@@ -780,8 +783,9 @@ main {
   overflow: hidden;
 
   --title-alpha: 1;
-  --content-alpha: 0.2;
-  --content-y: 30px;
+  --title-y: 0px;
+  --content-alpha: .18;
+  --content-y: 32px;
 }
 
 .section-dark {
@@ -818,40 +822,48 @@ main {
   margin: 0;
 
   font-size: var(--display-xl);
-  line-height: 0.82;
-  letter-spacing: -0.065em;
+  line-height: .82;
+  letter-spacing: -.065em;
 }
 
 
 /* =========================================================
-   STORY GRID
+   GRID
+   Important:
+   the first column can NEVER be allowed to overlap
+   the content column.
    ========================================================= */
 
 .story-grid {
   width: min(var(--content-max), 100%);
+
   min-height: calc(100svh - 220px);
 
-  margin: 0 auto;
+  margin-inline: auto;
 
   display: grid;
-  grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1.15fr);
-  column-gap: clamp(40px, 9vw, 160px);
+
+  grid-template-columns:
+    minmax(0, .78fr)
+    minmax(0, 1.22fr);
+
+  column-gap: clamp(48px, 8vw, 150px);
+
   align-items: start;
 }
 
 .story-heading {
   min-width: 0;
+  max-width: 100%;
 
   padding-top: clamp(8px, 5vh, 65px);
 
   opacity: var(--title-alpha);
-  transform: translateY(
-    calc((1 - var(--title-alpha)) * -28px)
-  );
+  transform: translateY(var(--title-y));
 
   transition:
-    opacity 120ms linear,
-    transform 120ms linear;
+    opacity 100ms linear,
+    transform 100ms linear;
 }
 
 .story-kicker {
@@ -859,23 +871,24 @@ main {
 
   font-size: var(--micro);
   font-weight: 600;
-  letter-spacing: 0.18em;
+  letter-spacing: .18em;
   line-height: 1;
 
-  opacity: 0.5;
+  opacity: .5;
 }
 
 .story-title {
-  margin: 0;
+  display: block;
 
-  max-width: 8ch;
+  max-width: 100%;
+  margin: 0;
 
   font-size: var(--display-l);
   font-weight: 600;
-  line-height: 0.88;
-  letter-spacing: -0.055em;
+  line-height: .88;
+  letter-spacing: -.055em;
 
-  overflow-wrap: normal;
+  overflow-wrap: anywhere;
   word-break: normal;
 }
 
@@ -887,22 +900,24 @@ main {
   padding-bottom: 40px;
 
   opacity: var(--content-alpha);
-
   transform: translateY(var(--content-y));
 
   transition:
-    opacity 120ms linear,
-    transform 120ms linear;
+    opacity 100ms linear,
+    transform 100ms linear;
 }
 
 .story-content p {
   max-width: 700px;
 
-  margin: 0 0 1.25em;
+  margin:
+    0
+    0
+    1.25em;
 
   font-size: var(--narrative);
   line-height: 1.55;
-  letter-spacing: -0.015em;
+  letter-spacing: -.015em;
 }
 
 .story-content p:last-child {
@@ -914,15 +929,15 @@ main {
 
   font-size: var(--body-large);
   line-height: 1.3;
-  letter-spacing: -0.025em;
+  letter-spacing: -.025em;
 }
 
 .section-dark .story-content p {
-  color: rgba(241, 239, 232, 0.88);
+  color: rgba(241, 239, 232, .88);
 }
 
 .section-light .story-content p {
-  color: rgba(11, 11, 10, 0.82);
+  color: rgba(11, 11, 10, .82);
 }
 
 .story-divider {
@@ -930,37 +945,44 @@ main {
   max-width: 560px;
   height: 1px;
 
-  margin: clamp(38px, 7vh, 80px) 0;
+  margin:
+    clamp(38px, 7vh, 80px)
+    0;
 
   background: currentColor;
-  opacity: 0.18;
+  opacity: .18;
 }
 
 
 /* =========================================================
    COLLEGARE
-   Explicitly isolated to prevent overlaps.
    ========================================================= */
 
-.story-connecting {
+#collegare {
+  overflow: visible;
+}
+
+#collegare .story-grid {
   min-height: 105svh;
 }
 
-.story-connecting .story-heading {
-  padding-right: 20px;
+#collegare .story-heading {
+  min-width: 0;
 }
 
-.story-connecting .story-title {
+#collegare .story-heading .story-title {
+  /*
+   * Deliberately NOT nowrap.
+   * This is what prevents COLLEGARE / long headings
+   * from entering the text column.
+   */
   max-width: 100%;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
-.story-list-content {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-
-  padding-top: clamp(30px, 8vh, 110px);
+#collegare .story-content {
+  padding-top: clamp(28px, 8vh, 105px);
 }
 
 .connection-list {
@@ -969,23 +991,21 @@ main {
 
   display: flex;
   flex-direction: column;
-  gap: clamp(8px, 1.2vh, 15px);
+
+  gap: clamp(9px, 1.2vh, 15px);
 }
 
 .connection-list span {
   display: block;
 
-  font-size: clamp(1.7rem, 3vw, 3.4rem);
+  max-width: 100%;
+
+  font-size: clamp(1.7rem, 3vw, 3.3rem);
   font-weight: 500;
   line-height: 1.08;
-  letter-spacing: -0.035em;
+  letter-spacing: -.035em;
 
-  overflow-wrap: break-word;
-}
-
-.story-connecting .story-divider {
-  margin-top: clamp(44px, 8vh, 90px);
-  margin-bottom: clamp(36px, 7vh, 75px);
+  overflow-wrap: anywhere;
 }
 
 
@@ -1003,8 +1023,8 @@ main {
 
   overflow: hidden;
 
-  border: 1px solid rgba(241, 239, 232, 0.12);
   background: var(--surface);
+  border: 1px solid rgba(241, 239, 232, .12);
 }
 
 .map-wrap iframe {
@@ -1019,10 +1039,6 @@ main {
    PROFILE
    ========================================================= */
 
-.profile-grid {
-  align-items: start;
-}
-
 .portrait-wrap {
   width: min(100%, 560px);
 
@@ -1036,6 +1052,7 @@ main {
   height: auto;
 
   aspect-ratio: 753 / 941;
+
   object-fit: cover;
 }
 
@@ -1053,14 +1070,14 @@ main {
 
 .contact-inner {
   width: min(var(--content-max), 100%);
-  margin: 0 auto;
+  margin-inline: auto;
 }
 
 .story-contact .story-title {
-  max-width: none;
+  max-width: 100%;
 
   font-size: var(--display-xl);
-  line-height: 0.82;
+  line-height: .82;
 }
 
 .contact-copy {
@@ -1072,8 +1089,8 @@ main {
   transform: translateY(var(--content-y));
 
   transition:
-    opacity 120ms linear,
-    transform 120ms linear;
+    opacity 100ms linear,
+    transform 100ms linear;
 }
 
 .contact-copy p {
@@ -1098,9 +1115,9 @@ main {
 
   border-bottom: 1px solid currentColor;
 
-  font-size: 0.8rem;
+  font-size: .8rem;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: .18em;
   line-height: 1;
 
   text-decoration: none;
@@ -1112,7 +1129,7 @@ main {
 
 .contact-link:hover {
   gap: 24px;
-  opacity: 0.65;
+  opacity: .65;
 }
 
 
@@ -1129,24 +1146,25 @@ main {
     var(--gutter)
     55px;
 
-  border-top: 1px solid rgba(241, 239, 232, 0.1);
+  border-top: 1px solid rgba(241, 239, 232, .1);
 }
 
 .footer-inner {
   width: min(var(--content-max), 100%);
-  margin: 0 auto;
+  margin-inline: auto;
 
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
+
   gap: 30px;
 }
 
 .footer-mark {
-  display: block;
-
   width: 54px;
   height: 54px;
+
+  display: block;
 }
 
 .footer-mark img {
@@ -1160,13 +1178,13 @@ main {
 }
 
 .footer-mark:hover img {
-  transform: scale(1.06);
+  transform: scale(1.05);
 }
 
 .footer-signature {
-  font-size: 0.7rem;
+  font-size: .7rem;
   font-weight: 600;
-  letter-spacing: 0.22em;
+  letter-spacing: .22em;
   line-height: 1;
 
   text-transform: uppercase;
@@ -1174,7 +1192,7 @@ main {
 
 
 /* =========================================================
-   MOBILE
+   TABLET / MOBILE
    ========================================================= */
 
 @media (max-width: 900px) {
@@ -1184,10 +1202,6 @@ main {
     --wow-h: 54px;
   }
 
-  .header-main {
-    grid-template-columns: 1fr auto 1fr;
-  }
-
   .brand,
   .brand-mark {
     width: 38px;
@@ -1195,11 +1209,10 @@ main {
   }
 
   .active-chapter {
-    font-size: 0.62rem;
-    letter-spacing: 0.15em;
-    max-width: 42vw;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    max-width: 40vw;
+
+    font-size: .62rem;
+    letter-spacing: .14em;
   }
 
   .menu-toggle {
@@ -1208,7 +1221,7 @@ main {
 
   .wow-bar {
     grid-template-columns: 48px minmax(0, 1fr) 48px;
-    gap: 9px;
+    gap: 10px;
   }
 
   .wow-arrow {
@@ -1229,8 +1242,10 @@ main {
   .story-section {
     min-height: auto;
 
-    padding-top: 110px;
-    padding-bottom: 120px;
+    padding-top: 100px;
+    padding-bottom: 115px;
+
+    overflow: visible;
   }
 
   .story-opening {
@@ -1238,36 +1253,46 @@ main {
 
     padding-top: 0;
     padding-bottom: 0;
+
+    overflow: hidden;
   }
 
   .story-grid {
-    min-height: auto;
-
     display: block;
+
+    min-height: auto;
   }
 
   .story-heading {
+    max-width: 100%;
+
     padding-top: 0;
-    padding-right: 0;
   }
 
   .story-title {
     max-width: 100%;
 
     font-size: var(--display-l);
+    line-height: .9;
   }
 
   .story-content {
-    padding-top: 90px;
+    max-width: 100%;
+
+    padding-top: 76px;
     padding-bottom: 0;
   }
 
-  .story-content p {
-    max-width: 100%;
+  #collegare {
+    overflow: visible;
   }
 
-  .story-connecting .story-title {
-    white-space: normal;
+  #collegare .story-grid {
+    min-height: auto;
+  }
+
+  #collegare .story-content {
+    padding-top: 76px;
   }
 
   .connection-list span {
@@ -1287,15 +1312,13 @@ main {
   }
 
   .menu-navigation {
-    gap: 15px;
+    gap: 14px;
+
+    padding-inline: 5px;
   }
 
   .menu-link {
-    font-size: clamp(1.35rem, 7vw, 2.6rem);
-  }
-
-  .footer-inner {
-    align-items: center;
+    font-size: clamp(1.3rem, 6.5vw, 2.7rem);
   }
 }
 
@@ -1306,57 +1329,59 @@ main {
     --gutter: 20px;
   }
 
-  .header-main {
-    padding-left: 20px;
-    padding-right: 20px;
-  }
-
+  .header-main,
   .wow-bar {
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-inline: 20px;
   }
 
   .active-chapter {
-    max-width: 36vw;
+    max-width: 34vw;
+
+    font-size: .58rem;
+    letter-spacing: .11em;
+  }
+
+  .menu-toggle {
+    min-width: 78px;
+    gap: 10px;
   }
 
   .menu-label {
     min-width: 42px;
-    font-size: 0.64rem;
+    font-size: .62rem;
   }
 
-  .menu-icon {
-    width: 21px;
-  }
-
+  .menu-icon,
   .menu-icon span {
     width: 21px;
   }
 
   .site-menu {
-    padding-left: 20px;
-    padding-right: 20px;
+    padding:
+      28px
+      20px
+      42px;
   }
 
   .menu-link {
-    font-size: clamp(1.35rem, 8vw, 2.15rem);
+    font-size: clamp(1.25rem, 7.8vw, 2.2rem);
   }
 
   .story-section {
-    padding-top: 92px;
-    padding-bottom: 105px;
+    padding-top: 84px;
+    padding-bottom: 100px;
   }
 
   .story-content {
-    padding-top: 68px;
+    padding-top: 62px;
   }
 
   .story-opening .story-title {
-    font-size: clamp(4.3rem, 19vw, 7rem);
+    font-size: clamp(4.2rem, 18vw, 7rem);
   }
 
   .story-contact .story-title {
-    font-size: clamp(4rem, 17vw, 7rem);
+    font-size: clamp(3.8rem, 17vw, 6.8rem);
   }
 
   .connection-list {
@@ -1364,7 +1389,11 @@ main {
   }
 
   .connection-list span {
-    font-size: clamp(1.55rem, 8vw, 2.4rem);
+    font-size: clamp(1.5rem, 8vw, 2.35rem);
+  }
+
+  .desktop-break {
+    display: none;
   }
 
   .footer-inner {
@@ -1372,8 +1401,8 @@ main {
   }
 
   .footer-signature {
-    font-size: 0.6rem;
-    letter-spacing: 0.16em;
+    font-size: .58rem;
+    letter-spacing: .14em;
     text-align: right;
   }
 }
@@ -1412,7 +1441,7 @@ main {
 
 
 /* =========================================================
-   NO-JS SAFETY
+   NO JS SAFETY
    ========================================================= */
 
 html:not(.js) .story-heading,
