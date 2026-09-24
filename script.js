@@ -6,559 +6,213 @@
     loaderMax: 1200,
     scrollOffset: 12,
     activeLineRatio: 0.32,
-    activeLineMax: 260,
-    progressEpsilon: 0.001
+    activeLineMax: 260
   };
+
+  const doc = document;
+  const root = doc.documentElement;
+  const body = doc.body;
+
+  const loader = doc.getElementById("site-loader");
+  const standby = doc.getElementById("standby");
+
+  const header = doc.getElementById("site-header");
+  const menu = doc.getElementById("menu");
+  const menuToggle = doc.getElementById("menu-toggle");
+  const menuLinks = [...doc.querySelectorAll(".menu-list a")];
+
+  const main = doc.getElementById("main-content");
+  const footer = doc.querySelector(".site-footer");
+
+  const storyNav = doc.getElementById("story-nav");
+  const activeStoryTitle = doc.getElementById("active-story-title");
+  const storyProgress = doc.getElementById("story-progress");
+  const storyProgressFill = doc.querySelector(".story-progress-fill");
+  const storyProgressOrb = doc.querySelector(".story-progress-orb");
+  const storyPrev = doc.getElementById("story-prev");
+  const storyNext = doc.getElementById("story-next");
+
+  const stories = [...doc.querySelectorAll(".story")];
+  const year = doc.getElementById("year");
 
   const prefersReducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)"
   );
 
-  const html = document.documentElement;
-  const body = document.body;
+  let activeIndex = 0;
+  let scrollFrame = 0;
+  let standbyTimer = 0;
+  let menuOpen = false;
+  let lastFocusedElement = null;
+  let loaderHidden = false;
 
-  const header = document.getElementById("site-header");
-  const main = document.getElementById("main-content");
-  const footer = document.querySelector(".site-footer");
-
-  const loader = document.getElementById("site-loader");
-  const standby = document.getElementById("standby");
-
-  const menu = document.getElementById("menu");
-  const menuToggle = document.getElementById("menu-toggle");
-  const brand = document.querySelector(".brand");
-
-  const menuLinks = Array.from(
-    document.querySelectorAll("[data-menu-target]")
-  );
-
-  const storyNav = document.getElementById("story-nav");
-  const storyPrev = document.getElementById("story-prev");
-  const storyNext = document.getElementById("story-next");
-
-  const storyProgress = document.getElementById("story-progress");
-  const progressFill = document.querySelector(".story-progress-fill");
-  const progressOrb = document.querySelector(".story-progress-orb");
-
-  const activeStoryTitle = document.getElementById("active-story-title");
-
-  const sections = Array.from(
-    document.querySelectorAll(".story")
-  );
-
-  const year = document.getElementById("current-year");
+  /* --------------------------------------------------
+     BASIC STATE
+  -------------------------------------------------- */
 
   if (year) {
-    year.textContent = String(new Date().getFullYear());
+    year.textContent = new Date().getFullYear();
   }
 
-  if (!sections.length) {
-    return;
+  function setThemeColor(value) {
+    let meta = doc.querySelector('meta[name="theme-color"]');
+
+    if (!meta) {
+      meta = doc.createElement("meta");
+      meta.name = "theme-color";
+      doc.head.appendChild(meta);
+    }
+
+    meta.content = value;
   }
 
-  let activeIndex = 0;
-  let ticking = false;
-  let standbyTimer = null;
-  let standbyPointerTimer = null;
-  let isMenuOpen = false;
-  let previousFocus = null;
-
-  /*
-   * -------------------------------------------------------
-   * UTILITIES
-   * -------------------------------------------------------
-   */
-
-  const clamp = (value, min, max) =>
-    Math.min(Math.max(value, min), max);
-
-  const getHeaderHeight = () =>
-    header ? header.getBoundingClientRect().height : 0;
-
-  const getReadingLine = () => {
-    const viewportHeight = window.innerHeight || 0;
-
-    return (
-      getHeaderHeight() +
-      Math.min(
-        viewportHeight * CONFIG.activeLineRatio,
-        CONFIG.activeLineMax
-      )
-    );
-  };
-
-  const getFocusable = (container) => {
-    if (!container) return [];
-
-    return Array.from(
-      container.querySelectorAll(
-        [
-          "a[href]",
-          "button:not([disabled])",
-          "input:not([disabled])",
-          "select:not([disabled])",
-          "textarea:not([disabled])",
-          "[tabindex]:not([tabindex='-1'])"
-        ].join(",")
-      )
-    ).filter((element) => {
-      const style = window.getComputedStyle(element);
-
-      return (
-        style.display !== "none" &&
-        style.visibility !== "hidden"
-      );
-    });
-  };
-
-  const getSectionIndex = (id) =>
-    sections.findIndex((section) => section.id === id);
-
-  const getSectionById = (id) =>
-    sections.find((section) => section.id === id);
-
-  const getCurrentHash = () =>
-    window.location.hash.replace(/^#/, "");
-
-  /*
-   * -------------------------------------------------------
-   * HEADER
-   * -------------------------------------------------------
-   *
-   * The upper header is intentionally ALWAYS dark.
-   * The active section never changes its visual theme.
-   */
-
-  const updateHeaderChrome = () => {
-    if (!header) return;
-
-    header.dataset.theme = "dark";
-
-    const themeMeta = document.querySelector(
-      'meta[name="theme-color"]'
-    );
-
-    if (themeMeta) {
-      themeMeta.setAttribute("content", "#0B0B0A");
-    }
-  };
-
-  /*
-   * -------------------------------------------------------
-   * PROGRESS
-   * -------------------------------------------------------
-   */
-
-  const calculateSectionProgress = (section) => {
-    const rect = section.getBoundingClientRect();
-    const viewportHeight = window.innerHeight || 1;
-
-    /*
-     * Progress is based on the actual reading position
-     * inside the current section rather than on global
-     * document scroll.
-     */
-    const start =
-      viewportHeight -
-      getHeaderHeight();
-
-    const distance =
-      Math.max(
-        section.offsetHeight - start,
-        viewportHeight * 0.5
-      );
-
-    const traveled =
-      viewportHeight - rect.top;
-
-    return clamp(traveled / distance, 0, 1);
-  };
-
-  const updateProgress = (progress) => {
-    const value = clamp(progress, 0, 1);
-    const percent = value * 100;
-
-    if (progressFill) {
-      progressFill.style.width = `${percent}%`;
-    }
-
-    if (progressOrb) {
-      progressOrb.style.left = `${percent}%`;
-    }
-
-    if (storyProgress) {
-      storyProgress.setAttribute(
-        "aria-valuenow",
-        String(Math.round(percent))
-      );
-    }
-  };
-
-  /*
-   * -------------------------------------------------------
-   * ACTIVE SECTION
-   * -------------------------------------------------------
-   */
-
-  const findActiveSection = () => {
-    const line = getReadingLine();
-
-    let bestIndex = 0;
-    let bestDistance = Number.POSITIVE_INFINITY;
-
-    sections.forEach((section, index) => {
-      const rect = section.getBoundingClientRect();
-
-      /*
-       * Prefer the section containing the reading line.
-       */
-      if (
-        rect.top <= line &&
-        rect.bottom > line
-      ) {
-        bestIndex = index;
-        bestDistance = 0;
-        return;
-      }
-
-      const distance =
-        rect.top > line
-          ? rect.top - line
-          : line - rect.bottom;
-
-      if (distance < bestDistance) {
-        bestDistance = distance;
-        bestIndex = index;
-      }
-    });
-
-    return bestIndex;
-  };
-
-  const updateNavigationState = (index) => {
-    const section = sections[index];
-
-    if (!section) return;
-
-    activeIndex = index;
-
-    const title =
-      section.dataset.title ||
-      section.querySelector("h1,h2")?.textContent?.trim() ||
-      "";
-
-    if (activeStoryTitle && title) {
-      activeStoryTitle.textContent = title;
-    }
-
-    if (storyPrev) {
-      storyPrev.disabled = index <= 0;
-      storyPrev.setAttribute(
-        "aria-label",
-        index <= 0
-          ? "Nessuna sezione precedente"
-          : `Sezione precedente: ${sections[index - 1].dataset.title || ""}`
-      );
-    }
-
-    if (storyNext) {
-      storyNext.disabled = index >= sections.length - 1;
-      storyNext.setAttribute(
-        "aria-label",
-        index >= sections.length - 1
-          ? "Nessuna sezione successiva"
-          : `Sezione successiva: ${sections[index + 1].dataset.title || ""}`
-      );
-    }
-
-    sections.forEach((item, itemIndex) => {
-      item.toggleAttribute(
-        "data-active",
-        itemIndex === index
-      );
-    });
-
-    menuLinks.forEach((link) => {
-      const isCurrent =
-        link.dataset.menuTarget === section.id;
-
-      if (isCurrent) {
-        link.setAttribute("aria-current", "page");
-      } else {
-        link.removeAttribute("aria-current");
-      }
-    });
-
-    updateHeaderChrome();
-  };
-
-  const updateActiveState = () => {
-    const nextIndex = findActiveSection();
-
-    if (nextIndex !== activeIndex) {
-      updateNavigationState(nextIndex);
-    }
-
-    const activeSection = sections[activeIndex];
-
-    if (activeSection) {
-      updateProgress(
-        calculateSectionProgress(activeSection)
-      );
-    }
-  };
-
-  const requestUpdate = () => {
-    if (ticking) return;
-
-    ticking = true;
-
-    window.requestAnimationFrame(() => {
-      updateActiveState();
-      ticking = false;
-    });
-  };
-
-  /*
-   * -------------------------------------------------------
-   * SCROLLING / HASH
-   * -------------------------------------------------------
-   */
-
-  const scrollToSection = (
-    section,
-    {
-      updateHash = true,
-      behavior = null
-    } = {}
-  ) => {
-    if (!section) return;
-
-    const headerHeight = getHeaderHeight();
-
-    const top =
-      window.scrollY +
-      section.getBoundingClientRect().top -
-      headerHeight -
-      CONFIG.scrollOffset;
-
-    const scrollBehavior =
-      behavior ||
-      (prefersReducedMotion.matches
-        ? "auto"
-        : "smooth");
-
-    window.scrollTo({
-      top: Math.max(0, top),
-      behavior: scrollBehavior
-    });
-
-    if (updateHash && section.id) {
-      const nextUrl =
-        `${window.location.pathname}` +
-        `${window.location.search}` +
-        `#${section.id}`;
-
-      window.history.replaceState(
-        {
-          section: section.id
-        },
-        "",
-        nextUrl
-      );
-    }
-  };
-
-  const goToSectionIndex = (index) => {
-    const target = sections[index];
-
-    if (!target) return;
-
-    scrollToSection(target);
-  };
-
-  const handleHash = ({
-    behavior = null
-  } = {}) => {
-    const hash = getCurrentHash();
-
-    if (!hash) {
-      requestUpdate();
+  function updateHeaderChrome() {
+    header?.setAttribute("data-theme", "dark");
+    setThemeColor("#0b0b0a");
+  }
+
+  updateHeaderChrome();
+
+  /* --------------------------------------------------
+     LOADER
+  -------------------------------------------------- */
+
+  function hideLoader() {
+    if (loaderHidden || !loader) {
       return;
     }
 
-    const section = getSectionById(hash);
+    loaderHidden = true;
+    loader.classList.add("is-hidden");
+    window.setTimeout(() => {
+      loader.hidden = true;
+    }, 700);
+  }
 
-    if (!section) return;
+  if (doc.readyState === "complete") {
+    window.setTimeout(hideLoader, 80);
+  } else {
+    window.addEventListener("load", () => {
+      window.setTimeout(hideLoader, 80);
+    }, { once: true });
+  }
 
-    const index = getSectionIndex(hash);
+  window.setTimeout(hideLoader, CONFIG.loaderMax);
 
-    if (index >= 0) {
-      updateNavigationState(index);
-    }
+  /* --------------------------------------------------
+     MENU / FOCUS MANAGEMENT
+  -------------------------------------------------- */
 
-    window.requestAnimationFrame(() => {
-      scrollToSection(section, {
-        updateHash: false,
-        behavior
-      });
+  const focusableSelector = [
+    "a[href]",
+    "button:not([disabled])",
+    "input:not([disabled])",
+    "select:not([disabled])",
+    "textarea:not([disabled])",
+    "[tabindex]:not([tabindex='-1'])"
+  ].join(",");
 
-      window.setTimeout(requestUpdate, 60);
+  function setMenuFocusable(enabled) {
+    menuLinks.forEach((link) => {
+      if (enabled) {
+        link.removeAttribute("tabindex");
+      } else {
+        link.setAttribute("tabindex", "-1");
+      }
     });
-  };
+  }
 
-  /*
-   * -------------------------------------------------------
-   * MENU / FOCUS MANAGEMENT
-   * -------------------------------------------------------
-   */
+  function setBackgroundInert(isInert) {
+    [main, footer, storyNav].forEach((element) => {
+      if (!element) {
+        return;
+      }
 
-  const setBackgroundInert = (state) => {
-    [
-      main,
-      footer,
-      storyNav
-    ].forEach((element) => {
-      if (!element) return;
+      element.inert = isInert;
 
-      element.inert = state;
-
-      if (state) {
+      if (isInert) {
         element.setAttribute("aria-hidden", "true");
       } else {
         element.removeAttribute("aria-hidden");
       }
     });
+  }
 
-    /*
-     * The brand lives inside the header, outside storyNav,
-     * so it must be handled separately.
-     */
-    if (brand) {
-      if (state) {
-        brand.setAttribute("tabindex", "-1");
-        brand.setAttribute("aria-hidden", "true");
-      } else {
-        brand.removeAttribute("tabindex");
-        brand.removeAttribute("aria-hidden");
-      }
-    }
-  };
-
-  const setMenuTabState = (disabled) => {
-    menuLinks.forEach((link) => {
-      if (disabled) {
-        link.setAttribute("tabindex", "-1");
-      } else {
-        link.removeAttribute("tabindex");
-      }
-    });
-  };
-
-  const focusMenuStart = () => {
-    const focusables = getFocusable(menu);
-
-    if (focusables.length) {
-      focusables[0].focus();
-    }
-  };
-
-  const closeMenu = ({
-    restoreFocus = true
-  } = {}) => {
-    if (!menu || !menuToggle) return;
-
-    isMenuOpen = false;
-
-    body.classList.remove("menu-open");
-
-    menu.classList.remove("is-open");
-
-    menu.setAttribute("inert", "");
-    menu.inert = true;
-
-    menuToggle.setAttribute(
-      "aria-expanded",
-      "false"
-    );
-
-    menuToggle.setAttribute(
+  function updateMenuAria(open) {
+    menuToggle?.setAttribute("aria-expanded", String(open));
+    menuToggle?.setAttribute(
       "aria-label",
-      "Apri menu"
+      open ? "Chiudi menu" : "Apri menu"
     );
 
-    setMenuTabState(true);
-    setBackgroundInert(false);
+    menu?.setAttribute("aria-hidden", String(!open));
+  }
 
-    if (
-      restoreFocus &&
-      previousFocus &&
-      typeof previousFocus.focus === "function"
-    ) {
-      previousFocus.focus();
-    }
-
-    previousFocus = null;
-  };
-
-  const openMenu = () => {
-    if (!menu || !menuToggle || isMenuOpen) {
+  function openMenu() {
+    if (!menu || menuOpen) {
       return;
     }
 
-    previousFocus =
-      document.activeElement instanceof HTMLElement
-        ? document.activeElement
-        : menuToggle;
+    lastFocusedElement = doc.activeElement;
+    menuOpen = true;
 
-    isMenuOpen = true;
-
-    body.classList.add("menu-open");
-
+    setMenuFocusable(true);
     setBackgroundInert(true);
 
     menu.removeAttribute("inert");
     menu.inert = false;
 
-    setMenuTabState(false);
-
     menu.classList.add("is-open");
+    menuToggle?.setAttribute("aria-expanded", "true");
+    menuToggle?.setAttribute("aria-label", "Chiudi menu");
 
-    menuToggle.setAttribute(
-      "aria-expanded",
-      "true"
-    );
-
-    menuToggle.setAttribute(
-      "aria-label",
-      "Chiudi menu"
-    );
+    body.classList.add("menu-open");
 
     window.requestAnimationFrame(() => {
-      focusMenuStart();
+      menuLinks[0]?.focus({ preventScroll: true });
     });
-  };
+  }
 
-  const toggleMenu = () => {
-    if (isMenuOpen) {
-      closeMenu();
-    } else {
-      openMenu();
-    }
-  };
-
-  const handleMenuKeydown = (event) => {
-    if (!isMenuOpen) return;
-
-    if (event.key === "Escape") {
-      event.preventDefault();
-      closeMenu();
+  function closeMenu(restoreFocus = true) {
+    if (!menu) {
       return;
     }
 
-    if (event.key !== "Tab") return;
+    menuOpen = false;
 
-    const focusables = getFocusable(menu);
+    menu.classList.remove("is-open");
+    menu.setAttribute("aria-hidden", "true");
+    menu.setAttribute("inert", "");
+    menu.inert = true;
+
+    setMenuFocusable(false);
+    setBackgroundInert(false);
+
+    body.classList.remove("menu-open");
+
+    menuToggle?.setAttribute("aria-expanded", "false");
+    menuToggle?.setAttribute("aria-label", "Apri menu");
+
+    if (
+      restoreFocus &&
+      lastFocusedElement &&
+      typeof lastFocusedElement.focus === "function"
+    ) {
+      window.requestAnimationFrame(() => {
+        lastFocusedElement.focus({ preventScroll: true });
+      });
+    }
+
+    lastFocusedElement = null;
+  }
+
+  function trapMenuFocus(event) {
+    if (!menuOpen || event.key !== "Tab") {
+      return;
+    }
+
+    const focusables = [...menu.querySelectorAll(focusableSelector)]
+      .filter((element) => !element.hasAttribute("disabled"));
 
     if (!focusables.length) {
       event.preventDefault();
@@ -568,437 +222,502 @@
     const first = focusables[0];
     const last = focusables[focusables.length - 1];
 
-    if (
-      event.shiftKey &&
-      document.activeElement === first
-    ) {
+    if (event.shiftKey && doc.activeElement === first) {
       event.preventDefault();
       last.focus();
-      return;
-    }
-
-    if (
-      !event.shiftKey &&
-      document.activeElement === last
-    ) {
+    } else if (!event.shiftKey && doc.activeElement === last) {
       event.preventDefault();
       first.focus();
     }
-  };
+  }
 
-  /*
-   * -------------------------------------------------------
-   * STANDBY
-   * -------------------------------------------------------
-   */
+  menuToggle?.addEventListener("click", () => {
+    if (menuOpen) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  });
 
-  const hideStandby = () => {
-    if (!standby) return;
+  menuLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      closeMenu(false);
+    });
+  });
 
-    standby.classList.remove("is-visible");
-  };
+  doc.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && menuOpen) {
+      event.preventDefault();
+      closeMenu();
+      return;
+    }
 
-  const showStandby = () => {
-    if (!standby || isMenuOpen) return;
+    trapMenuFocus(event);
+  });
 
-    standby.classList.add("is-visible");
-  };
+  setMenuFocusable(false);
+  if (menu) {
+    menu.setAttribute("inert", "");
+    menu.inert = true;
+    menu.setAttribute("aria-hidden", "true");
+  }
 
-  const resetStandby = () => {
+  /* --------------------------------------------------
+     STORY NAVIGATION
+  -------------------------------------------------- */
+
+  function getStoryId(index) {
+    return stories[index]?.id || "";
+  }
+
+  function getStoryTitle(index) {
+    return stories[index]?.dataset.title || "";
+  }
+
+  function getReadingLine() {
+    const headerHeight = header?.offsetHeight || 0;
+    return headerHeight + Math.min(
+      window.innerHeight * CONFIG.activeLineRatio,
+      CONFIG.activeLineMax
+    );
+  }
+
+  function calculateActiveIndex() {
+    if (!stories.length) {
+      return 0;
+    }
+
+    const readingLine = getReadingLine();
+    let candidate = 0;
+
+    for (let index = 0; index < stories.length; index += 1) {
+      const rect = stories[index].getBoundingClientRect();
+
+      if (rect.top <= readingLine) {
+        candidate = index;
+      } else {
+        break;
+      }
+    }
+
+    return Math.max(0, Math.min(candidate, stories.length - 1));
+  }
+
+  function updateMenuCurrentState(index) {
+    const currentId = getStoryId(index);
+
+    menuLinks.forEach((link) => {
+      const matches = link.hash === `#${currentId}`;
+
+      if (matches) {
+        link.setAttribute("aria-current", "page");
+      } else {
+        link.removeAttribute("aria-current");
+      }
+    });
+  }
+
+  function updateNavigationState(index) {
+    if (!stories[index]) {
+      return;
+    }
+
+    activeIndex = index;
+
+    const title = getStoryTitle(index);
+
+    if (activeStoryTitle && activeStoryTitle.textContent !== title) {
+      activeStoryTitle.textContent = title;
+    }
+
+    if (storyPrev) {
+      storyPrev.disabled = index <= 0;
+      storyPrev.setAttribute(
+        "aria-label",
+        index <= 0
+          ? "Sezione precedente non disponibile"
+          : `Sezione precedente: ${getStoryTitle(index - 1)}`
+      );
+    }
+
+    if (storyNext) {
+      storyNext.disabled = index >= stories.length - 1;
+      storyNext.setAttribute(
+        "aria-label",
+        index >= stories.length - 1
+          ? "Sezione successiva non disponibile"
+          : `Sezione successiva: ${getStoryTitle(index + 1)}`
+      );
+    }
+
+    updateMenuCurrentState(index);
+  }
+
+  function getSectionProgress(section) {
+    if (!section) {
+      return 0;
+    }
+
+    const rect = section.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const sectionHeight = Math.max(section.offsetHeight, viewportHeight);
+
+    const start = viewportHeight;
+    const end = -sectionHeight;
+    const current = rect.top;
+
+    const progress = (start - current) / (start - end);
+
+    return Math.max(0, Math.min(1, progress));
+  }
+
+  function updateProgress() {
+    const section = stories[activeIndex];
+
+    if (!section || !storyProgress) {
+      return;
+    }
+
+    const progress = getSectionProgress(section);
+    const percentage = progress * 100;
+
+    if (storyProgressFill) {
+      storyProgressFill.style.width = `${percentage}%`;
+    }
+
+    if (storyProgressOrb) {
+      storyProgressOrb.style.left = `${percentage}%`;
+    }
+
+    storyProgress.setAttribute(
+      "aria-valuenow",
+      String(Math.round(percentage))
+    );
+  }
+
+  function updateScrollState() {
+    const nextIndex = calculateActiveIndex();
+
+    if (nextIndex !== activeIndex) {
+      updateNavigationState(nextIndex);
+    }
+
+    updateProgress();
+
+    scrollFrame = 0;
+  }
+
+  function requestScrollStateUpdate() {
+    if (scrollFrame) {
+      return;
+    }
+
+    scrollFrame = window.requestAnimationFrame(updateScrollState);
+  }
+
+  function scrollToStory(index, updateHash = true) {
+    if (!stories[index]) {
+      return;
+    }
+
+    const target = stories[index];
+    const offset = header?.offsetHeight || 0;
+    const targetTop =
+      window.scrollY +
+      target.getBoundingClientRect().top -
+      offset -
+      CONFIG.scrollOffset;
+
+    if (updateHash) {
+      const nextHash = `#${target.id}`;
+
+      if (window.location.hash !== nextHash) {
+        history.pushState(
+          { story: target.id },
+          "",
+          nextHash
+        );
+      }
+    }
+
+    window.scrollTo({
+      top: Math.max(0, targetTop),
+      behavior: prefersReducedMotion.matches ? "auto" : "smooth"
+    });
+
+    updateNavigationState(index);
+  }
+
+  storyPrev?.addEventListener("click", () => {
+    if (activeIndex > 0) {
+      scrollToStory(activeIndex - 1);
+    }
+  });
+
+  storyNext?.addEventListener("click", () => {
+    if (activeIndex < stories.length - 1) {
+      scrollToStory(activeIndex + 1);
+    }
+  });
+
+  window.addEventListener("scroll", requestScrollStateUpdate, {
+    passive: true
+  });
+
+  window.addEventListener("resize", requestScrollStateUpdate, {
+    passive: true
+  });
+
+  window.addEventListener("orientationchange", requestScrollStateUpdate, {
+    passive: true
+  });
+
+  /* --------------------------------------------------
+     HASH / HISTORY
+  -------------------------------------------------- */
+
+  function indexFromHash() {
+    const hash = window.location.hash.replace(/^#/, "");
+
+    if (!hash) {
+      return -1;
+    }
+
+    return stories.findIndex((story) => story.id === hash);
+  }
+
+  function handleHash(initial = false) {
+    const index = indexFromHash();
+
+    if (index < 0) {
+      if (initial) {
+        updateNavigationState(calculateActiveIndex());
+        updateProgress();
+      }
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        scrollToStory(index, false);
+      });
+    });
+  }
+
+  window.addEventListener("hashchange", () => {
+    handleHash(false);
+  });
+
+  window.addEventListener("popstate", () => {
+    handleHash(false);
+  });
+
+  /* --------------------------------------------------
+     KEYBOARD STORY CONTROL
+  -------------------------------------------------- */
+
+  function isTypingContext(element) {
+    if (!element) {
+      return false;
+    }
+
+    const tag = element.tagName;
+
+    return (
+      tag === "INPUT" ||
+      tag === "TEXTAREA" ||
+      tag === "SELECT" ||
+      element.isContentEditable
+    );
+  }
+
+  doc.addEventListener("keydown", (event) => {
+    if (menuOpen || isTypingContext(doc.activeElement)) {
+      return;
+    }
+
+    const target = doc.activeElement;
+
+    if (
+      target &&
+      target !== doc.body &&
+      target !== doc.documentElement
+    ) {
+      const isInteractive =
+        target.matches("a, button, input, textarea, select, [contenteditable]");
+
+      if (isInteractive) {
+        return;
+      }
+    }
+
+    if (event.key === "ArrowDown" || event.key === "PageDown") {
+      event.preventDefault();
+
+      if (activeIndex < stories.length - 1) {
+        scrollToStory(activeIndex + 1);
+      }
+    }
+
+    if (event.key === "ArrowUp" || event.key === "PageUp") {
+      event.preventDefault();
+
+      if (activeIndex > 0) {
+        scrollToStory(activeIndex - 1);
+      }
+    }
+  });
+
+  /* --------------------------------------------------
+     STANDBY
+  -------------------------------------------------- */
+
+  function hideStandby() {
+    standby?.classList.remove("is-visible");
+  }
+
+  function resetStandbyTimer() {
     hideStandby();
 
     window.clearTimeout(standbyTimer);
 
-    standbyTimer = window.setTimeout(
-      showStandby,
-      CONFIG.standbyDelay
-    );
-  };
+    standbyTimer = window.setTimeout(() => {
+      if (!menuOpen && document.visibilityState === "visible") {
+        standby?.classList.add("is-visible");
+      }
+    }, CONFIG.standbyDelay);
+  }
 
-  const handlePointerMove = () => {
-    if (standbyPointerTimer) return;
+  [
+    "scroll",
+    "wheel",
+    "touchstart",
+    "pointerdown",
+    "keydown",
+    "click"
+  ].forEach((eventName) => {
+    window.addEventListener(eventName, resetStandbyTimer, {
+      passive: eventName !== "keydown"
+    });
+  });
 
-    standbyPointerTimer = window.setTimeout(() => {
-      standbyPointerTimer = null;
-      resetStandby();
-    }, 700);
-  };
+  resetStandbyTimer();
 
-  /*
-   * -------------------------------------------------------
-   * GSAP MOTION
-   * -------------------------------------------------------
-   */
+  /* --------------------------------------------------
+     GSAP / SCROLLTRIGGER
+  -------------------------------------------------- */
 
-  const initAnimations = () => {
+  function initAnimations() {
     if (
       prefersReducedMotion.matches ||
-      !window.gsap ||
-      !window.ScrollTrigger
+      typeof window.gsap === "undefined"
     ) {
       return;
     }
 
-    window.gsap.registerPlugin(
-      window.ScrollTrigger
-    );
+    if (typeof window.ScrollTrigger === "undefined") {
+      return;
+    }
 
-    sections.forEach((section, index) => {
-      const kicker =
-        section.querySelector(".story-kicker");
+    window.gsap.registerPlugin(window.ScrollTrigger);
 
-      const heading =
-        section.querySelector("h1, h2");
+    stories.forEach((section, index) => {
+      const heading = section.querySelector(".story-heading");
+      const copy = section.querySelector(".story-copy");
+      const indexLabel = section.querySelector(".story-index");
+      const image = section.querySelector(".person-image");
+      const map = section.querySelector(".map-frame");
 
-      const lead =
-        section.querySelector(".story-lead");
-
-      const copy =
-        section.querySelector(".story-copy");
-
-      const image =
-        section.querySelector(".person-image");
-
-      const targets = [
-        kicker,
+      const elements = [
+        indexLabel,
         heading,
-        lead,
         copy,
-        image
+        image,
+        map
       ].filter(Boolean);
 
-      if (!targets.length) return;
+      if (!elements.length) {
+        return;
+      }
 
-      window.gsap.set(targets, {
-        opacity: 0,
-        y: 24
+      window.gsap.set(elements, {
+        y: 22,
+        opacity: 0
       });
 
-      window.gsap.to(targets, {
-        opacity: 1,
+      window.gsap.to(elements, {
         y: 0,
-        duration: 0.9,
-        stagger: 0.07,
+        opacity: 1,
+        duration: .85,
+        stagger: .07,
         ease: "power3.out",
-
+        overwrite: "auto",
         scrollTrigger: {
           id: `story-${index}`,
           trigger: section,
-          start: "top 72%",
+          start: "top 76%",
           once: true
         }
       });
     });
-  };
 
-  /*
-   * -------------------------------------------------------
-   * REFRESH / LIFECYCLE
-   * -------------------------------------------------------
-   */
-
-  const refresh = () => {
-    requestUpdate();
-
-    if (
-      window.ScrollTrigger &&
-      typeof window.ScrollTrigger.refresh === "function"
-    ) {
-      window.ScrollTrigger.refresh();
-    }
-  };
-
-  const killAnimations = () => {
-    if (!window.ScrollTrigger) return;
-
-    window.ScrollTrigger.getAll()
-      .filter((trigger) =>
-        String(trigger.vars?.id || "").startsWith("story-")
-      )
-      .forEach((trigger) => trigger.kill());
-  };
-
-  /*
-   * -------------------------------------------------------
-   * LOADER
-   * -------------------------------------------------------
-   */
-
-  const hideLoader = () => {
-    if (!loader) return;
-
-    loader.classList.add("is-hidden");
-
-    window.setTimeout(() => {
-      loader.remove();
-    }, 700);
-  };
-
-  const initLoader = () => {
-    if (!loader) return;
-
-    let finished = false;
-
-    const finish = () => {
-      if (finished) return;
-
-      finished = true;
-
-      window.setTimeout(
-        hideLoader,
-        prefersReducedMotion.matches ? 0 : 140
-      );
-    };
-
-    if (document.readyState === "complete") {
-      finish();
-    } else {
-      window.addEventListener(
-        "load",
-        finish,
-        {
-          once: true
-        }
-      );
-    }
-
-    window.setTimeout(
-      finish,
-      CONFIG.loaderMax
-    );
-  };
-
-  /*
-   * -------------------------------------------------------
-   * EVENTS
-   * -------------------------------------------------------
-   */
-
-  menuToggle?.addEventListener(
-    "click",
-    toggleMenu
-  );
-
-  menu?.addEventListener(
-    "keydown",
-    handleMenuKeydown
-  );
-
-  menuLinks.forEach((link) => {
-    link.addEventListener("click", () => {
-      closeMenu({
-        restoreFocus: false
-      });
-    });
-  });
-
-  storyPrev?.addEventListener(
-    "click",
-    () => {
-      if (activeIndex > 0) {
-        goToSectionIndex(activeIndex - 1);
-      }
-    }
-  );
-
-  storyNext?.addEventListener(
-    "click",
-    () => {
-      if (activeIndex < sections.length - 1) {
-        goToSectionIndex(activeIndex + 1);
-      }
-    }
-  );
-
-  window.addEventListener(
-    "scroll",
-    () => {
-      requestUpdate();
-      resetStandby();
-    },
-    {
-      passive: true
-    }
-  );
-
-  window.addEventListener(
-    "wheel",
-    resetStandby,
-    {
-      passive: true
-    }
-  );
-
-  window.addEventListener(
-    "touchstart",
-    resetStandby,
-    {
-      passive: true
-    }
-  );
-
-  window.addEventListener(
-    "pointermove",
-    handlePointerMove,
-    {
-      passive: true
-    }
-  );
-
-  window.addEventListener(
-    "click",
-    resetStandby,
-    {
-      passive: true
-    }
-  );
-
-  window.addEventListener(
-    "keydown",
-    (event) => {
-      resetStandby();
-
-      if (event.key === "Escape") {
-        hideStandby();
-
-        if (isMenuOpen) {
-          closeMenu();
-        }
-
-        return;
-      }
-
-      if (
-        isMenuOpen ||
-        event.defaultPrevented ||
-        event.metaKey ||
-        event.ctrlKey ||
-        event.altKey
-      ) {
-        return;
-      }
-
-      const activeElement =
-        document.activeElement;
-
-      const isTyping =
-        activeElement &&
-        (
-          activeElement.matches?.(
-            "input, textarea, select"
-          ) ||
-          activeElement.isContentEditable
-        );
-
-      if (isTyping) return;
-
-      if (
-        event.key === "ArrowDown" &&
-        activeIndex < sections.length - 1
-      ) {
-        event.preventDefault();
-        goToSectionIndex(activeIndex + 1);
-      }
-
-      if (
-        event.key === "ArrowUp" &&
-        activeIndex > 0
-      ) {
-        event.preventDefault();
-        goToSectionIndex(activeIndex - 1);
-      }
-    }
-  );
-
-  window.addEventListener(
-    "hashchange",
-    () => {
-      handleHash();
-    }
-  );
-
-  window.addEventListener(
-    "popstate",
-    () => {
-      handleHash();
-    }
-  );
-
-  window.addEventListener(
-    "resize",
-    () => {
-      requestUpdate();
-    },
-    {
-      passive: true
-    }
-  );
-
-  window.addEventListener(
-    "pageshow",
-    () => {
-      refresh();
-    }
-  );
-
-  document.addEventListener(
-    "visibilitychange",
-    () => {
-      if (!document.hidden) {
-        refresh();
-      }
-    }
-  );
-
-  prefersReducedMotion.addEventListener?.(
-    "change",
-    () => {
-      killAnimations();
-
-      if (!prefersReducedMotion.matches) {
-        initAnimations();
-      }
-
-      refresh();
-    }
-  );
-
-  /*
-   * -------------------------------------------------------
-   * INITIALIZATION
-   * -------------------------------------------------------
-   */
-
-  menu?.setAttribute("inert", "");
-  menu.inert = true;
-
-  setMenuTabState(true);
-  setBackgroundInert(false);
-
-  updateHeaderChrome();
-
-  const initialIndex = findActiveSection();
-
-  updateNavigationState(initialIndex);
-  updateProgress(
-    calculateSectionProgress(
-      sections[initialIndex]
-    )
-  );
-
-  initLoader();
-  initAnimations();
-  resetStandby();
-
-  if (getCurrentHash()) {
-    handleHash({
-      behavior: "auto"
-    });
+    window.ScrollTrigger.refresh();
   }
 
-  window.setTimeout(
-    refresh,
-    80
-  );
+  /* --------------------------------------------------
+     REDUCED MOTION CHANGES
+  -------------------------------------------------- */
 
+  function handleMotionPreference() {
+    if (prefersReducedMotion.matches) {
+      if (window.ScrollTrigger) {
+        window.ScrollTrigger.getAll().forEach((trigger) => {
+          if (trigger.vars?.id?.startsWith("story-")) {
+            trigger.kill();
+          }
+        });
+      }
+    } else {
+      initAnimations();
+    }
+  }
+
+  if (typeof prefersReducedMotion.addEventListener === "function") {
+    prefersReducedMotion.addEventListener("change", handleMotionPreference);
+  }
+
+  /* --------------------------------------------------
+     VISIBILITY / BF CACHE
+  -------------------------------------------------- */
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      requestScrollStateUpdate();
+      resetStandbyTimer();
+    } else {
+      hideStandby();
+    }
+  });
+
+  window.addEventListener("pageshow", () => {
+    requestScrollStateUpdate();
+
+    if (window.ScrollTrigger) {
+      window.ScrollTrigger.refresh();
+    }
+  });
+
+  /* --------------------------------------------------
+     INITIALISE
+  -------------------------------------------------- */
+
+  updateHeaderChrome();
+  updateNavigationState(calculateActiveIndex());
+  updateProgress();
+  initAnimations();
+  handleHash(true);
+
+  window.requestAnimationFrame(() => {
+    requestScrollStateUpdate();
+  });
 })();
