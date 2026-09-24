@@ -12,7 +12,7 @@
 
   <meta
     name="description"
-    content="Cesare Paratore: un percorso tra sport, scienze motorie, educazione, management e digitale. Un modo di osservare, capire, collegare e costruire."
+    content="Cesare Paratore: sport, scienze motorie, educazione, management e digitale. Un percorso costruito attraverso osservazione, studio, esperienza e progettazione."
   >
 
   <meta name="author" content="Cesare Paratore">
@@ -21,41 +21,49 @@
   <meta name="color-scheme" content="dark light">
 
   <link rel="canonical" href="https://cesareparatore.github.io/">
-
   <link rel="icon" type="image/svg+xml" href="/assets/images/cp-mark.svg">
 
-  <link
-    rel="preload"
-    href="/assets/images/cp-mark.svg"
-    as="image"
-    type="image/svg+xml"
+  <meta
+    property="og:type"
+    content="website"
   >
-
-  <!-- Open Graph -->
-  <meta property="og:type" content="website">
-  <meta property="og:locale" content="it_IT">
+  <meta
+    property="og:locale"
+    content="it_IT"
+  >
   <meta
     property="og:title"
     content="Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale"
   >
   <meta
     property="og:description"
-    content="Un percorso tra sport, scienze motorie, educazione, management e digitale. Un modo di osservare, capire, collegare e costruire."
+    content="Un percorso tra sport, scienze motorie, educazione, management e digitale. Osservare, capire, collegare, progettare."
   >
-  <meta property="og:url" content="https://cesareparatore.github.io/">
-  <meta property="og:site_name" content="Cesare Paratore">
+  <meta
+    property="og:url"
+    content="https://cesareparatore.github.io/"
+  >
+  <meta
+    property="og:site_name"
+    content="Cesare Paratore"
+  >
   <meta
     property="og:image"
     content="https://cesareparatore.github.io/assets/images/cp.jpg"
   >
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
+  <meta
+    property="og:image:width"
+    content="1200"
+  >
+  <meta
+    property="og:image:height"
+    content="630"
+  >
   <meta
     property="og:image:alt"
     content="Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale"
   >
 
-  <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image">
   <meta
     name="twitter:title"
@@ -74,7 +82,6 @@
     content="Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale"
   >
 
-  <!-- Performance: scripts non bloccano il rendering -->
   <script
     src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"
     defer
@@ -87,41 +94,50 @@
 
   <link rel="stylesheet" href="/css/style.css">
 
-  <!-- Entity / structured data -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "WebSite",
-    "@id": "https://cesareparatore.github.io/#website",
-    "url": "https://cesareparatore.github.io/",
-    "name": "Cesare Paratore",
-    "description": "Sport, Scienze Motorie, Educazione e Digitale",
-    "inLanguage": "it-IT",
-    "publisher": {
-      "@id": "https://cesareparatore.github.io/#person"
-    }
-  }
-  </script>
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    "@id": "https://cesareparatore.github.io/#person",
-    "name": "Cesare Paratore",
-    "url": "https://cesareparatore.github.io/",
-    "image": "https://cesareparatore.github.io/assets/images/cp-foto.webp",
-    "jobTitle": [
-      "Atleta",
-      "Tecnico",
-      "Educatore"
-    ],
-    "knowsAbout": [
-      "Sport",
-      "Scienze motorie",
-      "Educazione",
-      "Management",
-      "Digitale"
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://cesareparatore.github.io/#website",
+        "url": "https://cesareparatore.github.io/",
+        "name": "Cesare Paratore",
+        "description": "Sport, Scienze Motorie, Educazione e Digitale",
+        "inLanguage": "it-IT",
+        "publisher": {
+          "@id": "https://cesareparatore.github.io/#person"
+        }
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://cesareparatore.github.io/#webpage",
+        "url": "https://cesareparatore.github.io/",
+        "name": "Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale",
+        "description": "Un percorso tra sport, scienze motorie, educazione, management e digitale.",
+        "isPartOf": {
+          "@id": "https://cesareparatore.github.io/#website"
+        },
+        "about": {
+          "@id": "https://cesareparatore.github.io/#person"
+        },
+        "inLanguage": "it-IT"
+      },
+      {
+        "@type": "Person",
+        "@id": "https://cesareparatore.github.io/#person",
+        "name": "Cesare Paratore",
+        "url": "https://cesareparatore.github.io/",
+        "image": "https://cesareparatore.github.io/assets/images/cp-foto.webp",
+        "jobTitle": "Atleta, tecnico ed educatore",
+        "knowsAbout": [
+          "Sport",
+          "Scienze motorie",
+          "Educazione",
+          "Management",
+          "Digitale"
+        ]
+      }
     ]
   }
   </script>
@@ -129,12 +145,12 @@
 
 <body>
 
-  <!-- Fallback per utenti senza JavaScript -->
   <noscript>
     <style>
       #site-loader,
       #standby,
-      .menu-toggle {
+      .menu-toggle,
+      .section-nav {
         display: none !important;
       }
 
@@ -144,20 +160,23 @@
         visibility: visible !important;
         pointer-events: auto !important;
         transform: none !important;
+        clip-path: none !important;
       }
 
-      #menu[aria-hidden="true"] {
+      #menu[inert] {
         display: block !important;
       }
 
-      .section-nav {
-        position: static !important;
-        margin: 2rem 5vw !important;
+      .menu-inner {
+        min-height: auto !important;
       }
     </style>
   </noscript>
 
-  <!-- Loader -->
+  <a class="skip-link" href="#main-content">
+    Vai al contenuto principale
+  </a>
+
   <div
     id="site-loader"
     class="site-loader"
@@ -167,14 +186,14 @@
       <img
         src="/assets/images/cp-mark.svg"
         alt=""
-        width="512"
-        height="512"
+        width="96"
+        height="96"
+        fetchpriority="high"
       >
       <span>CESARE PARATORE</span>
     </div>
   </div>
 
-  <!-- Standby -->
   <div
     id="standby"
     class="standby"
@@ -183,8 +202,10 @@
     <span>GUARDA.</span>
   </div>
 
-  <!-- Header -->
-  <header class="site-header">
+  <header
+    class="site-header"
+    data-header-theme="dark"
+  >
     <a
       class="brand"
       href="/"
@@ -193,8 +214,8 @@
       <img
         src="/assets/images/cp-mark.svg"
         alt=""
-        width="512"
-        height="512"
+        width="40"
+        height="40"
       >
       <span>CESARE PARATORE</span>
     </a>
@@ -214,13 +235,11 @@
     </button>
   </header>
 
-  <!-- Overlay menu -->
   <aside
     id="menu"
     class="menu-overlay"
     aria-hidden="true"
     inert
-    aria-label="Menu principale"
   >
     <div class="menu-inner">
 
@@ -249,7 +268,6 @@
 
   <main id="main-content" tabindex="-1">
 
-    <!-- 01 -->
     <section
       id="guarda"
       class="story story-dark story-opening"
@@ -276,11 +294,11 @@
           alt=""
           width="512"
           height="512"
+          decoding="async"
         >
       </div>
     </section>
 
-    <!-- 02 -->
     <section
       id="come"
       class="story story-light story-movement"
@@ -305,7 +323,6 @@
       </div>
     </section>
 
-    <!-- 03 -->
     <section
       id="movimento"
       class="story story-dark story-movement-detail"
@@ -320,7 +337,10 @@
         <h2 id="movimento-title">MOVIMENTO.</h2>
 
         <div class="split-copy">
-          <p class="statement">Prima atleta.<br>Poi tecnico.</p>
+          <p class="statement">
+            Prima atleta.<br>
+            Poi tecnico.
+          </p>
 
           <div class="narrative-copy">
             <p>
@@ -334,7 +354,6 @@
       </div>
     </section>
 
-    <!-- 04 -->
     <section
       id="capire"
       class="story story-light story-understand"
@@ -367,7 +386,6 @@
       </div>
     </section>
 
-    <!-- 05 -->
     <section
       id="trasmettere"
       class="story story-dark"
@@ -391,7 +409,6 @@
       </div>
     </section>
 
-    <!-- 06 -->
     <section
       id="costruire"
       class="story story-light story-build"
@@ -421,7 +438,6 @@
       </div>
     </section>
 
-    <!-- 07 -->
     <section
       id="ritorna"
       class="story story-dark story-return"
@@ -443,7 +459,7 @@
             ma come strumento per costruire.
           </p>
 
-          <div class="return-list" aria-label="Ambiti digitali">
+          <div class="return-list">
             <span>Pagine.</span>
             <span>Sistemi.</span>
             <span>Esperienze digitali.</span>
@@ -452,7 +468,6 @@
       </div>
     </section>
 
-    <!-- 08 -->
     <section
       id="collegare"
       class="story story-light story-connect"
@@ -467,7 +482,7 @@
         <h2 id="collegare-title">COLLEGARE.</h2>
 
         <div class="connect-grid">
-          <div class="connect-words" aria-label="Aree di competenza">
+          <div class="connect-words">
             <span>Sport.</span>
             <span>Scienze motorie.</span>
             <span>Educazione.</span>
@@ -485,7 +500,6 @@
       </div>
     </section>
 
-    <!-- 09 -->
     <section
       id="oggi"
       class="story story-dark story-today"
@@ -513,7 +527,6 @@
       </div>
     </section>
 
-    <!-- 10 -->
     <section
       id="obiettivo"
       class="story story-light story-objective"
@@ -542,7 +555,6 @@
       </div>
     </section>
 
-    <!-- 11 -->
     <section
       id="qui"
       class="story story-dark story-place"
@@ -560,9 +572,7 @@
 
             <div class="narrative-copy">
               <p>Ogni percorso parte da un luogo.</p>
-              <p>
-                Un territorio, una comunità, un contesto.
-              </p>
+              <p>Un territorio, una comunità, un contesto.</p>
               <p>
                 È da qui che si osserva ciò che accade
                 e si decide dove andare.
@@ -583,7 +593,6 @@
       </div>
     </section>
 
-    <!-- 12 -->
     <section
       id="da-qui"
       class="story story-light story-from-here"
@@ -615,7 +624,6 @@
       </div>
     </section>
 
-    <!-- 13 -->
     <section
       id="eccomi"
       class="story story-dark story-person"
@@ -658,7 +666,6 @@
       </div>
     </section>
 
-    <!-- 14 -->
     <section
       id="scrivimi"
       class="story story-light story-contact"
@@ -673,22 +680,20 @@
         <h2 id="scrivimi-title">SCRIVIMI.</h2>
 
         <p class="contact-lead">
-          Parlami del tuo obiettivo.
+          Hai un progetto, un'idea o una domanda?
         </p>
 
         <div class="narrative-copy">
           <p>
-            Un progetto, un'idea, una domanda
-            o semplicemente un punto da cui partire.
+            Raccontami il punto da cui vuoi partire.
           </p>
         </div>
 
         <a
           class="contact-link"
           href="/contatti/"
-          aria-label="Vai alla pagina Contatti"
         >
-          PARLIAMONE
+          <span>PARLIAMONE</span>
           <span aria-hidden="true">→</span>
         </a>
       </div>
@@ -696,7 +701,6 @@
 
   </main>
 
-  <!-- Persistent section navigation -->
   <nav
     class="section-nav"
     aria-label="Navigazione narrativa"
@@ -704,14 +708,18 @@
     <button
       type="button"
       class="section-nav-button section-nav-prev"
-      aria-label="Sezione precedente"
+      aria-label="Sezione precedente non disponibile"
       disabled
     >
       <span aria-hidden="true">←</span>
       <span class="section-nav-text">PRECEDENTE</span>
     </button>
 
-    <div class="section-nav-current">
+    <div
+      class="section-nav-current"
+      aria-live="polite"
+      aria-atomic="true"
+    >
       <span class="section-nav-number">01</span>
       <span class="section-nav-title">GUARDA.</span>
     </div>
@@ -719,7 +727,7 @@
     <button
       type="button"
       class="section-nav-button section-nav-next"
-      aria-label="Sezione successiva"
+      aria-label="Vai alla sezione successiva"
     >
       <span class="section-nav-text">SUCCESSIVA</span>
       <span aria-hidden="true">→</span>
@@ -727,12 +735,14 @@
   </nav>
 
   <footer class="site-footer">
-    <div class="footer-mark">
+    <div class="footer-mark" aria-hidden="true">
       <img
         src="/assets/images/cp-mark.svg"
         alt=""
-        width="512"
-        height="512"
+        width="64"
+        height="64"
+        loading="lazy"
+        decoding="async"
       >
     </div>
 
@@ -744,7 +754,9 @@
     </div>
 
     <div class="footer-meta">
-      <span>© <span id="current-year">2026</span></span>
+      <span>
+        © <span id="current-year">2026</span>
+      </span>
       <span>PALERMO · SICILIA · ITALIA</span>
     </div>
   </footer>
