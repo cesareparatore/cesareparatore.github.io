@@ -276,7 +276,7 @@ a {
 .site-brand img {
   width: 28px;
   height: 28px;
-  filter: none;
+  filter: invert(1);
 }
 
 .menu-toggle {
@@ -1368,7 +1368,7 @@ main:focus {
   display: block;
   width: 42px;
   height: 42px;
-  filter: none;
+  filter: invert(1);
 }
 
 .footer-name {
