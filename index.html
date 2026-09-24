@@ -184,67 +184,34 @@
   </div>
 
   <!-- Header -->
-  <header class="site-header">
-    <a
-      class="brand"
-      href="/"
-      aria-label="Cesare Paratore — Home"
-    >
-      <img
-        src="/assets/images/cp-mark.svg"
-        alt=""
-        width="512"
-        height="512"
-      >
-      <span>CESARE PARATORE</span>
-    </a>
+<header class="site-header" id="site-header">
+  <a class="site-brand" href="/" aria-label="Cesare Paratore — Home">
+    <img src="/assets/images/cp-mark.svg" alt="CP">
+  </a>
 
-    <button
-      class="menu-toggle"
-      type="button"
-      aria-controls="menu"
-      aria-expanded="false"
-      aria-label="Apri menu"
-    >
-      <span class="menu-label">MENU</span>
-      <span class="menu-icon" aria-hidden="true">
-        <span></span>
-        <span></span>
-      </span>
-    </button>
+  <button
+    class="menu-toggle"
+    id="menu-toggle"
+    type="button"
+    aria-expanded="false"
+    aria-controls="menu"
+  >
+    <span class="menu-toggle-label">MENU</span>
+  </button>
   </header>
 
   <!-- Overlay menu -->
   <aside
-    id="menu"
-    class="menu-overlay"
-    aria-hidden="true"
-    inert
-    aria-label="Menu principale"
-  >
-    <div class="menu-inner">
-
-      <div class="menu-meta">
-        <span>NAVIGAZIONE</span>
-        <span>CESARE PARATORE</span>
-      </div>
-
-      <nav aria-label="Pagine principali">
-        <a href="/chi-sono/">Chi sono</a>
-        <a href="/sport/">Sport</a>
-        <a href="/scienze-motorie/">Scienze motorie</a>
-        <a href="/educazione/">Educazione</a>
-        <a href="/management/">Management</a>
-        <a href="/digitale/">Digitale</a>
-        <a href="/territorio/">Territorio</a>
-        <a href="/contatti/">Contatti</a>
-      </nav>
-
-      <div class="menu-footer">
-        <span>OSSERVARE · CAPIRE · COLLEGARE · COSTRUIRE</span>
-      </div>
-
-    </div>
+ <nav class="menu-nav" aria-label="Menu principale">
+    <a href="/chi-sono/">CHI SONO</a>
+    <a href="/sport/">SPORT</a>
+    <a href="/scienze-motorie/">SCIENZE MOTORIE</a>
+    <a href="/educazione/">EDUCAZIONE</a>
+    <a href="/management/">MANAGEMENT</a>
+    <a href="/digitale/">DIGITALE</a>
+    <a href="/territorio/">TERRITORIO</a>
+    <a href="/contatti/">CONTATTI</a>
+  </nav>
   </aside>
 
   <main id="main-content" tabindex="-1">
