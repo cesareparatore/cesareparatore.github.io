@@ -1,273 +1,140 @@
 (() => {
   "use strict";
 
-  /* =======================================================
-     01. CONFIG
-     ======================================================= */
-
   const CONFIG = {
     standbyDelay: 40000,
     loaderMax: 1200,
     scrollOffset: 12,
     activeLineRatio: 0.32,
-    activeLineMax: 260
+    activeLineMax: 260,
+    progressEpsilon: 0.001
   };
 
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  );
 
-  /* =======================================================
-     02. DOM
-     ======================================================= */
+  const dom = {
+    body: document.body,
+    header: document.getElementById("site-header"),
+    loader: document.getElementById("page-loader"),
+    standby: document.getElementById("standby"),
+    menu: document.getElementById("menu"),
+    menuToggle: document.getElementById("menu-toggle"),
+    menuLinks: [...document.querySelectorAll(".menu-list a")],
+    activeTitle: document.getElementById("active-story-title"),
+    previous: document.getElementById("story-prev"),
+    next: document.getElementById("story-next"),
+    progress: document.getElementById("story-progress"),
+    progressFill: document.querySelector(".story-progress-fill"),
+    progressOrb: document.querySelector(".story-progress-orb"),
+    currentYear: document.getElementById("current-year"),
+    sections: [...document.querySelectorAll(".story[data-story-title]")]
+  };
 
-  const body = document.body;
-  const html = document.documentElement;
-
-  const loader = document.getElementById("loader");
-  const standby = document.getElementById("standby");
-
-  const header = document.getElementById("site-header");
-  const storyNav = document.getElementById("story-nav");
-
-  const menu = document.getElementById("menu");
-  const menuToggle = document.getElementById("menu-toggle");
-  const menuLinks = [...document.querySelectorAll(".site-menu-link")];
-
-  const activeStoryTitle =
-    document.getElementById("active-story-title");
-
-  const prevButton =
-    document.getElementById("story-prev");
-
-  const nextButton =
-    document.getElementById("story-next");
-
-  const progress =
-    document.getElementById("story-progress");
-
-  const progressFill =
-    document.querySelector(".story-progress-fill");
-
-  const progressOrb =
-    document.querySelector(".story-progress-orb");
-
-  const sections =
-    [...document.querySelectorAll(".story-section[data-story-title]")];
-
-
-  /* =======================================================
-     03. STATE
-     ======================================================= */
+  if (!dom.header || !dom.sections.length) return;
 
   let activeIndex = 0;
-  let menuOpen = false;
-
   let ticking = false;
-  let resizeTimer = 0;
-  let standbyTimer = 0;
-
+  let standbyTimer = null;
+  let menuOpen = false;
   let previousFocus = null;
+  let lastHash = "";
 
-  let suppressHashScroll = false;
-
-  let lastScrollY = window.scrollY;
-
-  const reduceMotion =
-    window.matchMedia("(prefers-reduced-motion: reduce)");
-
-
-  /* =======================================================
-     04. HELPERS
-     ======================================================= */
-
-  const clamp = (value, min, max) =>
-    Math.min(Math.max(value, min), max);
-
+  const clamp = (value, min = 0, max = 1) =>
+    Math.min(max, Math.max(min, value));
 
   const getHeaderHeight = () =>
-    header?.getBoundingClientRect().height || 0;
+    dom.header ? dom.header.getBoundingClientRect().height : 0;
 
-
-  const getReadingLine = () =>
+  const getActiveLine = () =>
     getHeaderHeight() +
     Math.min(
       window.innerHeight * CONFIG.activeLineRatio,
       CONFIG.activeLineMax
     );
 
+  function updateMenuAria(isOpen) {
+    dom.menu.setAttribute("aria-hidden", String(!isOpen));
+    dom.menu.toggleAttribute("inert", !isOpen);
+  }
 
-  const getSectionData = (section) => ({
-    title: section.dataset.storyTitle || "",
-    meta: section.dataset.storyMeta || ""
-  });
+  function updateMenuLinks() {
+    dom.menuLinks.forEach((link) => {
+      const isCurrent = link.dataset.section === dom.sections[activeIndex].id;
 
-
-  const getSectionId = (index) =>
-    sections[index]?.id || "";
-
-
-  const getIndexFromHash = () => {
-    const hash = window.location.hash.slice(1);
-
-    if (!hash) {
-      return -1;
-    }
-
-    return sections.findIndex(
-      (section) => section.id === hash
-    );
-  };
-
-
-  /* =======================================================
-     05. HEADER THEME
-     ======================================================= */
-
-  const updateHeaderChrome = () => {
-    if (!header) {
-      return;
-    }
-
-    header.style.background = "#0b0b0a";
-    header.style.color = "#f1efe8";
-
-    document
-      .querySelector('meta[name="theme-color"]')
-      ?.setAttribute("content", "#0b0b0a");
-  };
-
-
-  /* =======================================================
-     06. MENU ARIA
-     ======================================================= */
-
-  const updateMenuAria = (open) => {
-    if (!menu || !menuToggle) {
-      return;
-    }
-
-    menu.setAttribute("aria-hidden", String(!open));
-
-    menuToggle.setAttribute(
-      "aria-expanded",
-      String(open)
-    );
-
-    menuToggle.setAttribute(
-      "aria-label",
-      open ? "Chiudi menu" : "Apri menu"
-    );
-
-    if (open) {
-      menu.removeAttribute("inert");
-      menu.inert = false;
-    } else {
-      menu.setAttribute("inert", "");
-      menu.inert = true;
-    }
-  };
-
-
-  /* =======================================================
-     07. BACKGROUND INERT
-     ======================================================= */
-
-  const setBackgroundInert = (inert) => {
-    const main = document.getElementById("main-content");
-
-    if (main) {
-      main.inert = inert;
-    }
-
-    if (storyNav) {
-      storyNav.inert = inert;
-      storyNav.setAttribute(
-        "aria-hidden",
-        String(inert)
-      );
-    }
-  };
-
-
-  /* =======================================================
-     08. MENU
-     ======================================================= */
-
-  const openMenu = () => {
-    if (menuOpen || !menu || !menuToggle) {
-      return;
-    }
-
-    previousFocus = document.activeElement;
-    menuOpen = true;
-
-    body.classList.add("menu-open");
-    menu.classList.add("is-open");
-
-    setBackgroundInert(true);
-    updateMenuAria(true);
-
-    requestAnimationFrame(() => {
-      const firstLink = menuLinks[0];
-
-      if (firstLink) {
-        firstLink.focus();
+      if (isCurrent) {
+        link.setAttribute("aria-current", "location");
+      } else {
+        link.removeAttribute("aria-current");
       }
     });
-  };
+  }
 
+  function setMenuState(isOpen, { restoreFocus = true } = {}) {
+    menuOpen = isOpen;
 
-  const closeMenu = ({
-    restoreFocus = true
-  } = {}) => {
-    if (!menuOpen || !menu || !menuToggle) {
-      return;
-    }
+    if (isOpen) {
+      previousFocus = document.activeElement;
+      dom.body.classList.add("menu-open");
+      dom.menuToggle.setAttribute("aria-expanded", "true");
+      dom.menuToggle.setAttribute("aria-label", "Chiudi menu");
+      dom.menu.classList.add("is-open");
+      updateMenuAria(true);
 
-    menuOpen = false;
+      requestAnimationFrame(() => {
+        const currentLink = dom.menuLinks.find(
+          (link) => link.dataset.section === dom.sections[activeIndex].id
+        );
 
-    body.classList.remove("menu-open");
-    menu.classList.remove("is-open");
-
-    setBackgroundInert(false);
-    updateMenuAria(false);
-
-    if (
-      restoreFocus &&
-      previousFocus &&
-      typeof previousFocus.focus === "function"
-    ) {
-      previousFocus.focus();
-    }
-
-    previousFocus = null;
-  };
-
-
-  const toggleMenu = () => {
-    if (menuOpen) {
-      closeMenu();
+        (currentLink || dom.menuLinks[0])?.focus();
+      });
     } else {
-      openMenu();
+      dom.body.classList.remove("menu-open");
+      dom.menuToggle.setAttribute("aria-expanded", "false");
+      dom.menuToggle.setAttribute("aria-label", "Apri menu");
+      dom.menu.classList.remove("is-open");
+      updateMenuAria(false);
+
+      if (restoreFocus && previousFocus instanceof HTMLElement) {
+        previousFocus.focus({ preventScroll: true });
+      }
+
+      previousFocus = null;
     }
-  };
+  }
 
+  function openMenu() {
+    if (!menuOpen) setMenuState(true);
+  }
 
-  /* =======================================================
-     09. FOCUS TRAP
-     ======================================================= */
+  function closeMenu(options) {
+    if (menuOpen) setMenuState(false, options);
+  }
 
-  const trapMenuFocus = (event) => {
-    if (!menuOpen || event.key !== "Tab") {
-      return;
-    }
+  function toggleMenu() {
+    setMenuState(!menuOpen);
+  }
 
-    const focusable = menuLinks.filter(
-      (element) =>
+  function focusTrap(event) {
+    if (!menuOpen || event.key !== "Tab") return;
+
+    const focusable = [
+      ...dom.menu.querySelectorAll(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )
+    ].filter((element) => {
+      const style = window.getComputedStyle(element);
+      return (
         !element.hasAttribute("disabled") &&
-        element.getAttribute("aria-hidden") !== "true"
-    );
+        style.display !== "none" &&
+        style.visibility !== "hidden"
+      );
+    });
 
     if (!focusable.length) {
       event.preventDefault();
+      dom.menuToggle.focus();
       return;
     }
 
@@ -277,704 +144,425 @@
     if (event.shiftKey && document.activeElement === first) {
       event.preventDefault();
       last.focus();
-      return;
-    }
-
-    if (!event.shiftKey && document.activeElement === last) {
+    } else if (!event.shiftKey && document.activeElement === last) {
       event.preventDefault();
       first.focus();
     }
-  };
+  }
 
+  function getSectionProgress(section) {
+    const top = section.offsetTop;
+    const height = section.offsetHeight;
+    const travel = Math.max(height - window.innerHeight, 1);
 
-  /* =======================================================
-     10. ACTIVE SECTION
-     ======================================================= */
-
-  const calculateActiveIndex = () => {
-    if (!sections.length) {
-      return 0;
+    if (height <= window.innerHeight) {
+      return clamp(
+        (window.scrollY - top + window.innerHeight * 0.15) /
+          Math.max(height, 1)
+      );
     }
 
-    const readingLine = getReadingLine();
+    return clamp((window.scrollY - top) / travel);
+  }
 
-    let index = 0;
+  function findActiveSection() {
+    const readingLine = getActiveLine();
+    let bestIndex = 0;
+    let bestDistance = Number.POSITIVE_INFINITY;
 
-    sections.forEach((section, currentIndex) => {
+    dom.sections.forEach((section, index) => {
       const rect = section.getBoundingClientRect();
+      const top = rect.top;
+      const bottom = rect.bottom;
 
-      if (rect.top <= readingLine) {
-        index = currentIndex;
+      if (top <= readingLine && bottom > readingLine) {
+        bestIndex = index;
+        bestDistance = 0;
+        return;
+      }
+
+      if (bestDistance !== 0) {
+        const distance =
+          readingLine < top
+            ? top - readingLine
+            : readingLine - bottom;
+
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          bestIndex = index;
+        }
       }
     });
 
-    return clamp(
-      index,
-      0,
-      sections.length - 1
-    );
-  };
+    return bestIndex;
+  }
 
+  function updateProgress() {
+    const section = dom.sections[activeIndex];
+    if (!section) return;
 
-  const setActiveSection = (index) => {
-    if (!sections.length) {
-      return;
+    const progress = getSectionProgress(section);
+    const percentage = Math.round(progress * 100);
+
+    dom.progressFill.style.transform = `scaleX(${progress})`;
+    dom.progressOrb.style.left = `${progress * 100}%`;
+
+    dom.progress.setAttribute("aria-valuenow", String(percentage));
+  }
+
+  function updateHeaderChrome(force = false) {
+    if (!force && !dom.header) return;
+
+    dom.header.style.backgroundColor = "var(--bg)";
+    dom.header.style.color = "var(--light)";
+
+    const themeMeta = document.querySelector('meta[name="theme-color"]');
+    if (themeMeta) {
+      themeMeta.setAttribute("content", "#0b0b0a");
+    }
+  }
+
+  function updateActiveSection({ force = false } = {}) {
+    const nextIndex = findActiveSection();
+
+    if (force || nextIndex !== activeIndex) {
+      activeIndex = nextIndex;
+
+      const title = dom.sections[activeIndex].dataset.storyTitle || "";
+      dom.activeTitle.textContent = title;
+
+      dom.previous.disabled = activeIndex === 0;
+      dom.next.disabled = activeIndex === dom.sections.length - 1;
+
+      updateMenuLinks();
+      updateHeaderChrome();
     }
 
-    const nextIndex = clamp(
-      index,
-      0,
-      sections.length - 1
-    );
-
-    const changed = nextIndex !== activeIndex;
-
-    activeIndex = nextIndex;
-
-    const section = sections[activeIndex];
-    const data = getSectionData(section);
-
-    if (activeStoryTitle) {
-      activeStoryTitle.textContent = data.title;
-    }
-
-    menuLinks.forEach((link) => {
-      const href = link.getAttribute("href");
-      const isCurrent =
-        href === `#${section.id}`;
-
-      if (isCurrent) {
-        link.setAttribute(
-          "aria-current",
-          "location"
-        );
-      } else {
-        link.removeAttribute("aria-current");
-      }
-    });
-
-    if (prevButton) {
-      prevButton.disabled =
-        activeIndex === 0;
-    }
-
-    if (nextButton) {
-      nextButton.disabled =
-        activeIndex === sections.length - 1;
-    }
-
-    if (changed) {
-      updateProgress();
-    }
-  };
-
-
-  /* =======================================================
-     11. SECTION PROGRESS
-     ======================================================= */
-
-  const calculateSectionProgress = (section) => {
-    const rect = section.getBoundingClientRect();
-
-    const viewportHeight =
-      window.innerHeight;
-
-    const sectionTop =
-      window.scrollY + rect.top;
-
-    const sectionHeight =
-      Math.max(section.offsetHeight, 1);
-
-    const start =
-      sectionTop - viewportHeight;
-
-    const end =
-      sectionTop + sectionHeight;
-
-    const progressValue =
-      (window.scrollY - start) /
-      Math.max(end - start, 1);
-
-    return clamp(
-      progressValue,
-      0,
-      1
-    );
-  };
-
-
-  const updateProgress = () => {
-    if (
-      !sections.length ||
-      !progress ||
-      !progressFill ||
-      !progressOrb
-    ) {
-      return;
-    }
-
-    const section =
-      sections[activeIndex];
-
-    if (!section) {
-      return;
-    }
-
-    const value =
-      calculateSectionProgress(section);
-
-    const percentage =
-      Math.round(value * 100);
-
-    progress.setAttribute(
-      "aria-valuenow",
-      String(percentage)
-    );
-
-    progressFill.style.width =
-      `${percentage}%`;
-
-    progressOrb.style.left =
-      `${percentage}%`;
-  };
-
-
-  /* =======================================================
-     12. SCROLL UPDATE
-     ======================================================= */
-
-  const updateScrollState = () => {
-    ticking = false;
-
-    const nextIndex =
-      calculateActiveIndex();
-
-    setActiveSection(nextIndex);
     updateProgress();
+  }
 
-    lastScrollY = window.scrollY;
-  };
-
-
-  const requestScrollUpdate = () => {
-    if (ticking) {
-      return;
-    }
-
-    ticking = true;
-
-    window.requestAnimationFrame(
-      updateScrollState
-    );
-  };
-
-
-  /* =======================================================
-     13. NAVIGATION
-     ======================================================= */
-
-  const scrollToStory = (
-    index,
-    {
-      updateHash = true,
-      smooth = true
-    } = {}
-  ) => {
-    if (!sections.length) {
-      return;
-    }
-
+  function scrollToSection(index, updateHistory = true) {
     const targetIndex = clamp(
       index,
       0,
-      sections.length - 1
+      dom.sections.length - 1
     );
 
-    const target =
-      sections[targetIndex];
+    const target = dom.sections[targetIndex];
+    if (!target) return;
 
-    if (!target) {
-      return;
-    }
+    closeMenu({ restoreFocus: false });
 
-    if (menuOpen) {
-      closeMenu({
-        restoreFocus: false
-      });
-    }
-
-    const targetTop =
-      window.scrollY +
-      target.getBoundingClientRect().top -
+    const top =
+      target.getBoundingClientRect().top +
+      window.scrollY -
       getHeaderHeight() -
       CONFIG.scrollOffset;
 
-    const behavior =
-      !reduceMotion.matches &&
-      smooth
-        ? "smooth"
-        : "auto";
-
-    if (updateHash) {
-      const hash =
-        `#${target.id}`;
-
-      if (window.location.hash !== hash) {
-        suppressHashScroll = true;
-
-        history.pushState(
-          {
-            storyIndex: targetIndex
-          },
-          "",
-          hash
-        );
-      }
-    }
+    const behavior = prefersReducedMotion.matches ? "auto" : "smooth";
 
     window.scrollTo({
-      top: Math.max(targetTop, 0),
+      top: Math.max(0, top),
       behavior
     });
 
-    setActiveSection(targetIndex);
+    if (updateHistory) {
+      const newHash = `#${target.id}`;
 
-    window.setTimeout(() => {
-      suppressHashScroll = false;
-      requestScrollUpdate();
-    }, smooth ? 700 : 0);
-  };
+      if (window.location.hash !== newHash) {
+        history.pushState(
+          { section: target.id },
+          "",
+          newHash
+        );
+      }
+    }
 
+    lastHash = target.id;
+    activeIndex = targetIndex;
+    dom.activeTitle.textContent = target.dataset.storyTitle || "";
+    dom.previous.disabled = targetIndex === 0;
+    dom.next.disabled = targetIndex === dom.sections.length - 1;
+    updateMenuLinks();
+    updateProgress();
+  }
 
-  const navigateRelative = (direction) => {
-    scrollToStory(
-      activeIndex + direction
+  function handleHash({ initial = false } = {}) {
+    const hash = window.location.hash.replace(/^#/, "");
+
+    if (!hash) {
+      if (initial) {
+        updateActiveSection({ force: true });
+      }
+      return;
+    }
+
+    const index = dom.sections.findIndex(
+      (section) => section.id === hash
     );
-  };
 
+    if (index === -1) return;
 
-  /* =======================================================
-     14. HASH / HISTORY
-     ======================================================= */
+    lastHash = hash;
 
-  const handleHash = ({
-    smooth = true
-  } = {}) => {
-    if (suppressHashScroll) {
-      return;
-    }
+    const target = dom.sections[index];
+    const top =
+      target.getBoundingClientRect().top +
+      window.scrollY -
+      getHeaderHeight() -
+      CONFIG.scrollOffset;
 
-    const index =
-      getIndexFromHash();
+    activeIndex = index;
+    dom.activeTitle.textContent = target.dataset.storyTitle || "";
+    dom.previous.disabled = index === 0;
+    dom.next.disabled = index === dom.sections.length - 1;
+    updateMenuLinks();
+    updateProgress();
 
-    if (index < 0) {
-      return;
-    }
-
-    window.requestAnimationFrame(() => {
-      scrollToStory(
-        index,
-        {
-          updateHash: false,
-          smooth
-        }
-      );
+    window.scrollTo({
+      top: Math.max(0, top),
+      behavior: initial || prefersReducedMotion.matches ? "auto" : "smooth"
     });
-  };
+  }
 
+  function handleScroll() {
+    if (ticking) return;
 
-  /* =======================================================
-     15. STANDBY
-     ======================================================= */
+    ticking = true;
 
-  const hideStandby = () => {
-    if (!standby) {
-      return;
-    }
+    requestAnimationFrame(() => {
+      updateActiveSection();
+      ticking = false;
+    });
+  }
 
-    standby.classList.remove("is-visible");
-    standby.setAttribute("aria-hidden", "true");
-  };
+  function handleKeydown(event) {
+    focusTrap(event);
 
-
-  const showStandby = () => {
-    if (!standby || menuOpen) {
-      return;
-    }
-
-    standby.classList.add("is-visible");
-    standby.setAttribute("aria-hidden", "false");
-  };
-
-
-  const resetStandbyTimer = () => {
-    hideStandby();
-
-    window.clearTimeout(
-      standbyTimer
-    );
-
-    standbyTimer =
-      window.setTimeout(
-        showStandby,
-        CONFIG.standbyDelay
-      );
-  };
-
-
-  /* =======================================================
-     16. LOADER
-     ======================================================= */
-
-  let loaderHidden = false;
-
-  const hideLoader = () => {
-    if (loaderHidden || !loader) {
-      return;
-    }
-
-    loaderHidden = true;
-
-    loader.classList.add("is-hidden");
-
-    loader.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-  };
-
-
-  /* =======================================================
-     17. KEYBOARD NAVIGATION
-     ======================================================= */
-
-  const handleKeyboard = (event) => {
-    if (menuOpen) {
-      trapMenuFocus(event);
-
-      if (event.key === "Escape") {
+    if (event.key === "Escape") {
+      if (menuOpen) {
         event.preventDefault();
         closeMenu();
       }
-
       return;
     }
 
-    const tagName =
-      event.target?.tagName;
+    if (menuOpen) return;
 
-    const isFormElement =
-      tagName === "INPUT" ||
-      tagName === "TEXTAREA" ||
-      tagName === "SELECT" ||
-      tagName === "BUTTON" ||
-      event.target?.isContentEditable;
-
-    if (isFormElement) {
-      return;
-    }
-
-    switch (event.key) {
-      case "ArrowDown":
-      case "PageDown":
-        event.preventDefault();
-        navigateRelative(1);
-        break;
-
-      case "ArrowUp":
-      case "PageUp":
-        event.preventDefault();
-        navigateRelative(-1);
-        break;
-
-      case "Home":
-        event.preventDefault();
-        scrollToStory(0);
-        break;
-
-      case "End":
-        event.preventDefault();
-        scrollToStory(
-          sections.length - 1
-        );
-        break;
-
-      default:
-        break;
-    }
-  };
-
-
-  /* =======================================================
-     18. GSAP / OPTIONAL MOTION
-     ======================================================= */
-
-  const initMotion = () => {
     if (
-      reduceMotion.matches ||
-      typeof window.gsap === "undefined"
+      event.key === "ArrowDown" ||
+      event.key === "PageDown"
     ) {
-      return;
+      if (
+        event.target instanceof HTMLInputElement ||
+        event.target instanceof HTMLTextAreaElement ||
+        event.target instanceof HTMLSelectElement
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      scrollToSection(activeIndex + 1);
     }
 
+    if (event.key === "ArrowUp" || event.key === "PageUp") {
+      if (
+        event.target instanceof HTMLInputElement ||
+        event.target instanceof HTMLTextAreaElement ||
+        event.target instanceof HTMLSelectElement
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      scrollToSection(activeIndex - 1);
+    }
+  }
+
+  function resetStandby() {
+    window.clearTimeout(standbyTimer);
+    dom.standby.classList.remove("is-visible");
+
+    standbyTimer = window.setTimeout(() => {
+      if (!document.hidden && !menuOpen) {
+        dom.standby.classList.add("is-visible");
+      }
+    }, CONFIG.standbyDelay);
+  }
+
+  function hideStandby() {
+    window.clearTimeout(standbyTimer);
+    dom.standby.classList.remove("is-visible");
+  }
+
+  function initMotion() {
     if (
+      prefersReducedMotion.matches ||
+      typeof window.gsap === "undefined" ||
       typeof window.ScrollTrigger === "undefined"
     ) {
       return;
     }
 
-    window.gsap.registerPlugin(
-      window.ScrollTrigger
+    window.gsap.registerPlugin(window.ScrollTrigger);
+
+    const animatedSections = dom.sections.filter(
+      (section) =>
+        !section.classList.contains("story--opening")
     );
 
-    const motionSections =
-      document.querySelectorAll(
-        ".story-section-content"
+    animatedSections.forEach((section) => {
+      const targets = section.querySelectorAll(
+        ".story-kicker, .story-title, .story-copy, .story-aside, .system-words span, .map-frame, .portrait-frame, .contact-link"
       );
 
-    motionSections.forEach((content) => {
+      if (!targets.length) return;
+
       window.gsap.fromTo(
-        content,
+        targets,
         {
-          y: 28,
+          y: 22,
           opacity: 0
         },
         {
           y: 0,
           opacity: 1,
-          duration: 0.9,
+          duration: 0.8,
           ease: "power3.out",
+          stagger: 0.035,
+          clearProps: "transform",
           scrollTrigger: {
-            trigger: content,
-            start: "top 84%",
+            trigger: section,
+            start: "top 72%",
             once: true
           }
         }
       );
     });
-  };
+  }
 
+  function updateYear() {
+    if (dom.currentYear) {
+      dom.currentYear.textContent = String(new Date().getFullYear());
+    }
+  }
 
-  /* =======================================================
-     19. EVENTS
-     ======================================================= */
+  function bindEvents() {
+    dom.menuToggle.addEventListener("click", toggleMenu);
 
-  menuToggle?.addEventListener(
-    "click",
-    toggleMenu
-  );
+    dom.previous.addEventListener("click", () => {
+      scrollToSection(activeIndex - 1);
+    });
 
-  prevButton?.addEventListener(
-    "click",
-    () => navigateRelative(-1)
-  );
+    dom.next.addEventListener("click", () => {
+      scrollToSection(activeIndex + 1);
+    });
 
-  nextButton?.addEventListener(
-    "click",
-    () => navigateRelative(1)
-  );
-
-  menuLinks.forEach((link) => {
-    link.addEventListener("click", (event) => {
-      const href =
-        link.getAttribute("href");
-
-      if (!href?.startsWith("#")) {
-        return;
-      }
-
-      const index =
-        sections.findIndex(
-          (section) =>
-            `#${section.id}` === href
+    dom.menuLinks.forEach((link) => {
+      link.addEventListener("click", (event) => {
+        const sectionId = link.dataset.section;
+        const index = dom.sections.findIndex(
+          (section) => section.id === sectionId
         );
 
-      if (index < 0) {
-        return;
-      }
+        if (index === -1) return;
 
-      event.preventDefault();
-
-      scrollToStory(index);
+        event.preventDefault();
+        scrollToSection(index);
+      });
     });
-  });
 
-  window.addEventListener(
-    "scroll",
-    requestScrollUpdate,
-    {
+    window.addEventListener("scroll", handleScroll, {
       passive: true
-    }
-  );
+    });
 
-  window.addEventListener(
-    "resize",
-    () => {
-      window.clearTimeout(
-        resizeTimer
-      );
-
-      resizeTimer =
-        window.setTimeout(() => {
-          requestScrollUpdate();
-
-          if (
-            typeof window.ScrollTrigger !==
-            "undefined"
-          ) {
-            window.ScrollTrigger.refresh();
-          }
-        }, 120);
-    },
-    {
+    window.addEventListener("resize", handleScroll, {
       passive: true
-    }
-  );
+    });
 
-  window.addEventListener(
-    "orientationchange",
-    () => {
-      window.setTimeout(
-        requestScrollUpdate,
-        180
-      );
-    },
-    {
+    window.addEventListener("orientationchange", handleScroll, {
       passive: true
-    }
-  );
+    });
 
-  window.addEventListener(
-    "keydown",
-    handleKeyboard
-  );
+    window.addEventListener("keydown", handleKeydown);
 
-  window.addEventListener(
-    "hashchange",
-    () => handleHash({
-      smooth: true
-    })
-  );
+    window.addEventListener("hashchange", () => {
+      handleHash();
+    });
 
-  window.addEventListener(
-    "popstate",
-    () => handleHash({
-      smooth: false
-    })
-  );
+    window.addEventListener("popstate", () => {
+      handleHash();
+    });
 
-  window.addEventListener(
-    "pointerdown",
-    resetStandbyTimer,
-    {
+    window.addEventListener("pointerdown", () => {
+      hideStandby();
+      resetStandby();
+    }, { passive: true });
+
+    window.addEventListener("mousemove", resetStandby, {
       passive: true
-    }
-  );
+    });
 
-  window.addEventListener(
-    "touchstart",
-    resetStandbyTimer,
-    {
-      passive: true
-    }
-  );
+    window.addEventListener("keydown", resetStandby);
 
-  window.addEventListener(
-    "keydown",
-    resetStandbyTimer
-  );
-
-  window.addEventListener(
-    "mousemove",
-    resetStandbyTimer,
-    {
-      passive: true
-    }
-  );
-
-  document.addEventListener(
-    "visibilitychange",
-    () => {
-      if (document.visibilityState === "visible") {
-        requestScrollUpdate();
-        resetStandbyTimer();
-      } else {
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
         hideStandby();
+      } else {
+        resetStandby();
+        updateActiveSection({ force: true });
       }
-    }
-  );
+    });
 
-  window.addEventListener(
-    "pageshow",
-    () => {
-      updateHeaderChrome();
-      requestScrollUpdate();
-    }
-  );
+    window.addEventListener("pageshow", () => {
+      updateActiveSection({ force: true });
 
-
-  /* =======================================================
-     20. INITIALIZATION
-     ======================================================= */
-
-  updateHeaderChrome();
-  updateMenuAria(false);
-  setBackgroundInert(false);
-
-  setActiveSection(
-    calculateActiveIndex()
-  );
-
-  requestScrollUpdate();
-
-  /*
-   * Il loader è volutamente breve.
-   * Non blocca la lettura in attesa di immagini,
-   * iframe o risorse esterne.
-   */
-  window.setTimeout(
-    hideLoader,
-    CONFIG.loaderMax
-  );
-
-  if (document.readyState === "complete") {
-    hideLoader();
-  } else {
-    window.addEventListener(
-      "load",
-      hideLoader,
-      {
-        once: true
+      if (window.location.hash) {
+        handleHash({ initial: false });
       }
-    );
+
+      resetStandby();
+    });
+
+    prefersReducedMotion.addEventListener?.("change", () => {
+      if (prefersReducedMotion.matches && window.gsap) {
+        window.gsap.globalTimeline?.clear();
+      }
+    });
   }
 
-  window.addEventListener(
-    "load",
-    () => {
-      initMotion();
-      requestScrollUpdate();
-    },
-    {
-      once: true
-    }
-  );
+  function hideLoader() {
+    if (!dom.loader) return;
 
-  const initialHash =
-    getIndexFromHash();
+    dom.loader.classList.add("is-hidden");
 
-  if (initialHash >= 0) {
     window.setTimeout(() => {
-      scrollToStory(
-        initialHash,
-        {
-          updateHash: false,
-          smooth: false
-        }
-      );
-    }, 0);
+      dom.loader.setAttribute("hidden", "");
+    }, 550);
   }
 
-  resetStandbyTimer();
+  function init() {
+    updateYear();
+    updateMenuAria(false);
+    updateHeaderChrome(true);
+    updateActiveSection({ force: true });
+    bindEvents();
+    resetStandby();
 
+    if (window.location.hash) {
+      handleHash({ initial: true });
+    }
+
+    window.setTimeout(hideLoader, CONFIG.loaderMax);
+
+    window.setTimeout(initMotion, 0);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init, {
+      once: true
+    });
+  } else {
+    init();
+  }
 })();
