@@ -5,7 +5,7 @@
    * ========================================================
    * CESARE PARATORE
    * Navigation / loader / narrative progression
-   * V3
+   * V4
    * ========================================================
    */
 
@@ -57,6 +57,9 @@
   const wowDot =
     document.getElementById("wow-dot-active");
 
+  const wowTrack =
+    document.querySelector(".wow-track");
+
   const brand =
     document.querySelector(".brand");
 
@@ -65,6 +68,9 @@
 
   const footer =
     document.querySelector(".site-footer");
+
+  const skipLink =
+    document.querySelector(".skip-link");
 
   const sections =
     Array.from(
@@ -112,11 +118,6 @@
 
   let lastFocusedElement = null;
 
-  /*
-   * Durante una navigazione programmata non permettiamo
-   * al rilevamento automatico dello scroll di sovrascrivere
-   * immediatamente la sezione scelta dall'utente.
-   */
   let navigationLock = null;
   let navigationFrame = null;
   let navigationTimer = null;
@@ -152,8 +153,7 @@
 
 
   const smoothStep = (value) => {
-    const t =
-      clamp(value, 0, 1);
+    const t = clamp(value, 0, 1);
 
     return t * t * (3 - 2 * t);
   };
@@ -169,66 +169,13 @@
   };
 
 
-  /*
-   * Calcola la posizione documentale reale della sezione,
-   * tenendo conto dell'header fisso e del limite inferiore
-   * della pagina.
-   */
-  const getScrollTarget = (section) => {
-
-    if (!section) {
-      return 0;
-    }
-
-    const headerHeight =
-      getHeaderHeight();
-
-    const rect =
-      section.getBoundingClientRect();
-
-    const documentTop =
-      window.scrollY +
-      rect.top;
-
-    const maxScroll =
-      Math.max(
-        0,
-        document.documentElement.scrollHeight -
-        window.innerHeight
-      );
-
-    return clamp(
-      documentTop - headerHeight,
-      0,
-      maxScroll
-    );
-  };
-
-
-  const scrollToSection = (
-    section,
-    behavior = "smooth"
-  ) => {
-
-    if (!section) {
-      return 0;
-    }
-
-    const targetTop =
-      getScrollTarget(section);
-
-    window.scrollTo({
-      top: targetTop,
-      behavior
-    });
-
-    return targetTop;
+  const isElement = (target) => {
+    return target instanceof Element;
   };
 
 
   const isEditableTarget = (target) => {
-
-    if (!(target instanceof Element)) {
+    if (!isElement(target)) {
       return false;
     }
 
@@ -240,14 +187,25 @@
   };
 
 
-  const getFocusableMenuElements = () => {
+  const isInteractiveTarget = (target) => {
+    if (!isElement(target)) {
+      return false;
+    }
 
+    return Boolean(
+      target.closest(
+        "a, button, input, textarea, select, summary, [contenteditable='true']"
+      )
+    );
+  };
+
+
+  const getFocusableMenuElements = () => {
     return Array.from(
       menu.querySelectorAll(
         "a[href], button:not([disabled]), [tabindex]:not([tabindex='-1'])"
       )
     ).filter((element) => {
-
       return (
         !element.hasAttribute("disabled") &&
         element.getAttribute("aria-hidden") !== "true"
@@ -257,19 +215,18 @@
 
 
   const setPageInert = (locked) => {
-
     [main, footer].forEach((element) => {
-
       if (!element) {
         return;
       }
 
-      if (locked) {
-        element.setAttribute("inert", "");
-      } else {
-        element.removeAttribute("inert");
-      }
+      element.inert = Boolean(locked);
     });
+  };
+
+
+  const setMenuInert = (locked) => {
+    menu.inert = Boolean(locked);
   };
 
 
@@ -278,7 +235,6 @@
      ======================================================== */
 
   const finishLoader = () => {
-
     if (!loader || loaderFinished) {
       return;
     }
@@ -286,24 +242,16 @@
     loaderFinished = true;
 
     if (loaderMinTimer !== null) {
-      window.clearTimeout(
-        loaderMinTimer
-      );
-
+      window.clearTimeout(loaderMinTimer);
       loaderMinTimer = null;
     }
 
     if (loaderFallbackTimer !== null) {
-      window.clearTimeout(
-        loaderFallbackTimer
-      );
-
+      window.clearTimeout(loaderFallbackTimer);
       loaderFallbackTimer = null;
     }
 
-    loader.classList.add(
-      "is-exiting"
-    );
+    loader.classList.add("is-exiting");
 
     const exitDuration =
       reducedMotion.matches
@@ -312,14 +260,8 @@
 
     loaderExitTimer =
       window.setTimeout(() => {
-
-        loader.classList.remove(
-          "is-active"
-        );
-
-        loader.classList.remove(
-          "is-exiting"
-        );
+        loader.classList.remove("is-active");
+        loader.classList.remove("is-exiting");
 
         loader.setAttribute(
           "aria-hidden",
@@ -327,13 +269,11 @@
         );
 
         loaderExitTimer = null;
-
       }, exitDuration);
   };
 
 
   const tryFinishLoader = () => {
-
     if (!loader || loaderFinished) {
       return;
     }
@@ -358,6 +298,10 @@
       return;
     }
 
+    if (loaderMinTimer !== null) {
+      window.clearTimeout(loaderMinTimer);
+    }
+
     loaderMinTimer =
       window.setTimeout(
         finishLoader,
@@ -367,8 +311,11 @@
 
 
   const startLoader = () => {
-
     if (!loader) {
+      return;
+    }
+
+    if (loader.classList.contains("is-active")) {
       return;
     }
 
@@ -377,17 +324,13 @@
 
     loaderFinished = false;
 
-    loader.classList.add(
-      "is-active"
-    );
+    loader.classList.add("is-active");
 
     if (
-      document.readyState ===
-      "complete"
+      document.readyState === "complete"
     ) {
       tryFinishLoader();
     } else {
-
       window.addEventListener(
         "load",
         tryFinishLoader,
@@ -411,16 +354,35 @@
      MENU
      ======================================================== */
 
-  const setMenuState = (open) => {
+  const updateMenuCurrentState = () => {
+    menuLinks.forEach((link) => {
+      const href =
+        link.getAttribute("href");
 
-    const nextState =
-      Boolean(open);
+      const isCurrent =
+        href ===
+        `#${sections[activeIndex]?.id || ""}`;
+
+      if (isCurrent) {
+        link.setAttribute(
+          "aria-current",
+          "page"
+        );
+      } else {
+        link.removeAttribute(
+          "aria-current"
+        );
+      }
+    });
+  };
+
+
+  const setMenuState = (open) => {
+    const nextState = Boolean(open);
 
     if (
       nextState === menuOpen &&
-      menu.classList.contains(
-        "is-open"
-      )
+      menu.classList.contains("is-open")
     ) {
       return;
     }
@@ -434,18 +396,15 @@
 
       menuOpen = true;
 
-      header.classList.add(
-        "menu-open"
-      );
-
-      menu.classList.add(
-        "is-open"
-      );
+      header.classList.add("menu-open");
+      menu.classList.add("is-open");
 
       menu.setAttribute(
         "aria-hidden",
         "false"
       );
+
+      setMenuInert(false);
 
       menuToggle.setAttribute(
         "aria-expanded",
@@ -464,7 +423,6 @@
       setPageInert(true);
 
       window.requestAnimationFrame(() => {
-
         const focusable =
           getFocusableMenuElements();
 
@@ -473,7 +431,6 @@
             preventScroll: true
           });
         }
-
       });
 
       return;
@@ -482,18 +439,15 @@
 
     menuOpen = false;
 
-    header.classList.remove(
-      "menu-open"
-    );
-
-    menu.classList.remove(
-      "is-open"
-    );
+    header.classList.remove("menu-open");
+    menu.classList.remove("is-open");
 
     menu.setAttribute(
       "aria-hidden",
       "true"
     );
+
+    setMenuInert(true);
 
     menuToggle.setAttribute(
       "aria-expanded",
@@ -545,10 +499,6 @@
     updateHash = false
   ) => {
 
-    if (!sections.length) {
-      return;
-    }
-
     const safeIndex =
       clamp(
         Number.isFinite(Number(index))
@@ -558,8 +508,7 @@
         sections.length - 1
       );
 
-    activeIndex =
-      safeIndex;
+    activeIndex = safeIndex;
 
     const section =
       sections[safeIndex];
@@ -568,8 +517,11 @@
       return;
     }
 
-    activeChapter.textContent =
+    const chapter =
       section.dataset.chapter || "";
+
+    activeChapter.textContent =
+      chapter;
 
 
     /* ------------------------------------
@@ -598,8 +550,7 @@
        ------------------------------------ */
 
     const last =
-      safeIndex ===
-      sections.length - 1;
+      safeIndex === sections.length - 1;
 
     nextButton.classList.toggle(
       "is-return",
@@ -652,21 +603,35 @@
     const percentageValue =
       `${percentage}%`;
 
-    if (
-      wowProgress.style.width !==
-      percentageValue
-    ) {
-      wowProgress.style.width =
-        percentageValue;
+    wowProgress.style.width =
+      percentageValue;
+
+    wowDot.style.left =
+      percentageValue;
+
+
+    if (wowTrack) {
+      wowTrack.setAttribute(
+        "aria-valuenow",
+        String(safeIndex + 1)
+      );
+
+      wowTrack.setAttribute(
+        "aria-valuetext",
+        `Sezione ${
+          safeIndex + 1
+        } di ${
+          sections.length
+        }: ${chapter}`
+      );
     }
 
-    if (
-      wowDot.style.left !==
-      percentageValue
-    ) {
-      wowDot.style.left =
-        percentageValue;
-    }
+
+    /* ------------------------------------
+       MENU CURRENT
+       ------------------------------------ */
+
+    updateMenuCurrentState();
 
 
     /* ------------------------------------
@@ -677,12 +642,69 @@
       updateHash &&
       section.id
     ) {
-      window.history.replaceState(
-        null,
-        "",
-        `#${section.id}`
-      );
+      const newHash =
+        `#${section.id}`;
+
+      if (
+        window.location.hash !==
+        newHash
+      ) {
+        window.history.replaceState(
+          null,
+          "",
+          newHash
+        );
+      }
     }
+  };
+
+
+  /* ========================================================
+     SCROLL TARGET
+     ======================================================== */
+
+  const getScrollTarget = (section) => {
+    if (!section) {
+      return 0;
+    }
+
+    const rect =
+      section.getBoundingClientRect();
+
+    const documentTop =
+      window.scrollY +
+      rect.top;
+
+    const maxScroll =
+      Math.max(
+        0,
+        document.documentElement.scrollHeight -
+        window.innerHeight
+      );
+
+    return clamp(
+      documentTop -
+      getHeaderHeight(),
+      0,
+      maxScroll
+    );
+  };
+
+
+  const scrollToSection = (
+    section,
+    behavior = "smooth"
+  ) => {
+
+    const targetTop =
+      getScrollTarget(section);
+
+    window.scrollTo({
+      top: targetTop,
+      behavior
+    });
+
+    return targetTop;
   };
 
 
@@ -726,7 +748,7 @@
     stopNavigationMonitor();
 
     if (syncToViewport) {
-      updateNarrative();
+      requestNarrativeUpdate();
     } else {
       setActiveSection(
         lockedIndex,
@@ -811,11 +833,8 @@
       );
 
     if (behavior === "auto") {
-
       navigationLock = null;
-
       requestNarrativeUpdate();
-
       return;
     }
 
@@ -862,14 +881,14 @@
           return;
         }
 
-        event.preventDefault();
-
         const index =
           getSectionIndex(target);
 
         if (index < 0) {
           return;
         }
+
+        event.preventDefault();
 
         setMenuState(false);
 
@@ -883,7 +902,7 @@
 
 
   /* ========================================================
-     NARRATIVE STYLE CACHE
+     NARRATIVE CACHE
      ======================================================== */
 
   const updateSectionVariable = (
@@ -915,18 +934,9 @@
 
 
   /* ========================================================
-     FIND ACTIVE SECTION
+     ACTIVE SECTION DETECTION
      ======================================================== */
 
-  /*
-   * La sezione attiva è quella che contiene realmente
-   * il punto di lettura sotto l'header.
-   *
-   * Questo sostituisce il precedente confronto tra
-   * "narrativePoint" e distanza dall'anchor, che poteva
-   * scegliere una sezione non coerente con la posizione
-   * effettiva del viewport.
-   */
   const getViewportActiveIndex = () => {
 
     const viewportHeight =
@@ -998,13 +1008,13 @@
   };
 
 
+  /* ========================================================
+     NARRATIVE PROGRESSION
+     ======================================================== */
+
   const updateNarrative = () => {
 
     scrollFrame = null;
-
-    if (!sections.length) {
-      return;
-    }
 
     const viewportHeight =
       window.innerHeight;
@@ -1095,10 +1105,6 @@
           ).toFixed(1)}px`;
 
 
-        /* --------------------------------
-           WRITE ONLY WHEN CHANGED
-           -------------------------------- */
-
         updateSectionVariable(
           section,
           index,
@@ -1130,10 +1136,6 @@
     );
 
 
-    /*
-     * Se siamo dentro una navigazione programmata,
-     * manteniamo la destinazione richiesta dall'utente.
-     */
     if (navigationLock) {
       return;
     }
@@ -1186,13 +1188,11 @@
   );
 
 
-  /*
-   * Browser che supportano scrollend:
-   * sincronizzazione immediata alla fine dello scroll.
-   */
-  if (
-    "onscrollend" in window
-  ) {
+  /* ========================================================
+     SCROLL END ENHANCEMENT
+     ======================================================== */
+
+  if ("onscrollend" in window) {
 
     window.addEventListener(
       "scrollend",
@@ -1241,7 +1241,6 @@
         sections.length - 1;
 
       if (last) {
-
         navigateToSection(
           0,
           true
@@ -1265,6 +1264,32 @@
   if (brand) {
 
     brand.addEventListener(
+      "click",
+      (event) => {
+
+        event.preventDefault();
+
+        setMenuState(false);
+
+        navigateToSection(
+          0,
+          true
+        );
+      }
+    );
+  }
+
+
+  /* ========================================================
+     FOOTER MARK
+     ======================================================== */
+
+  const footerMark =
+    document.querySelector(".footer-mark");
+
+  if (footerMark) {
+
+    footerMark.addEventListener(
       "click",
       (event) => {
 
@@ -1351,20 +1376,29 @@
           event.preventDefault();
 
           first.focus();
-
-          return;
         }
+
+        return;
       }
 
 
       /* --------------------------------
-         EDITABLE ELEMENTS
+         EDITABLE / INTERACTIVE
          -------------------------------- */
 
       if (
-        isEditableTarget(
-          event.target
-        )
+        isEditableTarget(event.target) ||
+        isInteractiveTarget(event.target)
+      ) {
+        return;
+      }
+
+
+      if (
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.shiftKey
       ) {
         return;
       }
@@ -1404,13 +1438,13 @@
      HASH
      ======================================================== */
 
-  const handleHash = () => {
+  const getHashTarget = () => {
 
     const hash =
       window.location.hash;
 
     if (!hash) {
-      return;
+      return null;
     }
 
     let id = "";
@@ -1421,15 +1455,21 @@
           hash.slice(1)
         );
     } catch {
-      return;
+      return null;
     }
 
     if (!id) {
-      return;
+      return null;
     }
 
+    return document.getElementById(id);
+  };
+
+
+  const handleHash = () => {
+
     const target =
-      document.getElementById(id);
+      getHashTarget();
 
     if (!target) {
       return;
@@ -1442,9 +1482,6 @@
       return;
     }
 
-    /*
-     * Aspettiamo il primo layout completo.
-     */
     window.setTimeout(
       () => {
 
@@ -1514,29 +1551,85 @@
   );
 
 
+  /* ========================================================
+     INITIAL MENU STATE
+     ======================================================== */
+
+  setMenuInert(true);
+
+  menu.setAttribute(
+    "aria-hidden",
+    "true"
+  );
+
+  setPageInert(false);
+
+
+  /* ========================================================
+     INITIAL ACTIVE SECTION
+     ======================================================== */
+
   setActiveSection(
     0,
     false
   );
 
-
   requestNarrativeUpdate();
 
 
   /* ========================================================
-     LOADER START
+     LOADER
      ======================================================== */
 
   startLoader();
 
 
   /* ========================================================
-     RESTORE HASH
+     HASH RESTORE
      ======================================================== */
 
   if (window.location.hash) {
     handleHash();
   }
+
+
+  /* ========================================================
+     BFCache / PAGE SHOW
+     ======================================================== */
+
+  window.addEventListener(
+    "pageshow",
+    (event) => {
+
+      if (event.persisted) {
+
+        menuOpen = false;
+
+        header.classList.remove(
+          "menu-open"
+        );
+
+        menu.classList.remove(
+          "is-open"
+        );
+
+        menu.setAttribute(
+          "aria-hidden",
+          "true"
+        );
+
+        setMenuInert(true);
+
+        body.classList.remove(
+          "menu-is-open"
+        );
+
+        setPageInert(false);
+
+        requestNarrativeUpdate();
+      }
+    }
+  );
 
 
   /* ========================================================
