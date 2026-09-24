@@ -2,26 +2,27 @@
   'use strict';
 
   /*
-   * Cesare Paratore — main interaction layer
+   * Cesare Paratore — interaction layer
    * Progressive enhancement:
-   * - il sito funziona anche senza GSAP
+   * - il sito funziona senza GSAP
    * - il loader non può bloccare permanentemente la pagina
-   * - animazioni e interazioni sono aggiunte dopo il rendering iniziale
+   * - animazioni e interazioni sono opzionali
    */
 
   const CONFIG = {
     standbyDelay: 40000,
-    loaderMax: 1200,
+    loaderMax: 1500,
     scrollOffset: 12,
     activeLineRatio: 0.32,
-    activeLineMax: 260,
-    progressEpsilon: 0.001
+    activeLineMax: 260
   };
 
   const doc = document;
   const win = window;
 
-  const $ = (selector, parent = doc) => parent.querySelector(selector);
+  const $ = (selector, parent = doc) =>
+    parent.querySelector(selector);
+
   const $$ = (selector, parent = doc) =>
     Array.from(parent.querySelectorAll(selector));
 
@@ -31,128 +32,127 @@
   const prefersReducedMotion = () =>
     win.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  let UI = null;
   let sections = [];
   let activeIndex = 0;
-  let scrollTicking = false;
-  let standbyTimer = null;
+
   let menuOpen = false;
   let lastFocusedElement = null;
+
+  let scrollTicking = false;
+  let resizeTimer = null;
+  let standbyTimer = null;
+
   let loaderHidden = false;
 
-  /* -------------------------------------------------------
-     LOADER — fail safe
-     ------------------------------------------------------- */
+  /* =========================================================
+     LOADER
+     ========================================================= */
 
   function hideLoader() {
     if (loaderHidden) return;
 
     loaderHidden = true;
 
-    const loader = $('#loader');
-    if (!loader) {
-      doc.documentElement.classList.remove('is-loading');
-      doc.body.classList.remove('is-loading');
-      return;
-    }
+    /*
+     * IMPORTANTE:
+     * l'HTML usa #page-loader.
+     */
+    const loader = doc.getElementById('page-loader');
 
-    loader.classList.add('is-hidden');
+    /*
+     * Rimuoviamo immediatamente eventuali stati
+     * di caricamento dalla pagina.
+     */
     doc.documentElement.classList.remove('is-loading');
     doc.body.classList.remove('is-loading');
 
-    // Rimuove completamente il loader dopo la transizione.
+    if (!loader) return;
+
+    loader.classList.add('is-hidden');
+
+    /*
+     * Fallback ulteriore:
+     * anche se la transizione CSS non esiste,
+     * il loader viene comunque rimosso.
+     */
     win.setTimeout(() => {
       try {
         loader.remove();
       } catch (_) {
-        // Safe fallback.
         loader.style.display = 'none';
+        loader.style.visibility = 'hidden';
+        loader.style.pointerEvents = 'none';
       }
     }, 700);
   }
 
-  function emergencyLoaderFallback() {
-    // Il loader deve SEMPRE sparire, anche in caso di errore JS.
-    win.setTimeout(hideLoader, CONFIG.loaderMax);
-  }
-
   /*
-   * Avviato immediatamente, prima di qualsiasi inizializzazione.
-   * Se qualcosa sotto fallisce, il timer rimane comunque attivo.
+   * Sicurezza assoluta:
+   * anche se l'inizializzazione JS fallisce,
+   * il loader viene rimosso.
    */
-  emergencyLoaderFallback();
+  win.setTimeout(hideLoader, CONFIG.loaderMax);
 
-  /* -------------------------------------------------------
-     DOM READY
-     ------------------------------------------------------- */
+  /* =========================================================
+     DOM REFERENCES
+     ========================================================= */
 
-  function onReady(callback) {
-    if (doc.readyState === 'loading') {
-      doc.addEventListener('DOMContentLoaded', callback, {
-        once: true
-      });
-    } else {
-      callback();
-    }
-  }
-
-  /* -------------------------------------------------------
-     REFERENCES
-     ------------------------------------------------------- */
-
-  function getElements() {
-    return {
+  function collectUI() {
+    UI = {
       header: $('#site-header'),
+
       menuToggle: $('#menu-toggle'),
       menu: $('#menu'),
       menuLinks: $$('#menu a'),
+
       storyTitle: $('#active-story-title'),
+
       storyPrev: $('#story-prev'),
       storyNext: $('#story-next'),
+
       storyProgress: $('#story-progress'),
       storyProgressFill: $('.story-progress-fill'),
       storyProgressOrb: $('.story-progress-orb'),
+
       sections: $$('main .story'),
-      year: $('#current-year'),
-      standby: $('#standby')
+
+      standby: $('#standby'),
+
+      year: $('#current-year')
     };
   }
 
-  let UI = null;
-
-  /* -------------------------------------------------------
+  /* =========================================================
      SECTIONS
-     ------------------------------------------------------- */
+     ========================================================= */
 
-  function getSectionData() {
-    if (!UI) return [];
+  function collectSections() {
+    if (!UI?.sections?.length) {
+      sections = [];
+      return;
+    }
 
-    return UI.sections
-      .map((section) => {
-        const title =
-          section.dataset.title ||
-          $('.story-title', section)?.textContent?.trim() ||
-          $('.story-kicker', section)?.textContent?.trim() ||
-          section.id;
-
-        return {
-          element: section,
-          id: section.id,
-          title
-        };
-      })
+    sections = UI.sections
+      .map((element) => ({
+        element,
+        id: element.id,
+        title:
+          element.dataset.storyTitle ||
+          $('.story-title', element)?.textContent?.trim() ||
+          element.id
+      }))
       .filter((item) => item.element);
   }
 
-  function updateSectionMeasurements() {
-    sections = getSectionData();
-  }
-
-  /* -------------------------------------------------------
+  /* =========================================================
      ACTIVE SECTION
-     ------------------------------------------------------- */
+     ========================================================= */
 
   function getReadingLine() {
-    const viewportHeight = win.innerHeight || doc.documentElement.clientHeight;
+    const viewportHeight =
+      win.innerHeight ||
+      doc.documentElement.clientHeight;
 
     return Math.min(
       viewportHeight * CONFIG.activeLineRatio,
@@ -160,50 +160,53 @@
     );
   }
 
-  function getActiveSectionIndex() {
+  function findActiveSection() {
     if (!sections.length) return 0;
 
     const readingLine = getReadingLine();
-    let closestIndex = 0;
+
+    let candidate = 0;
     let closestDistance = Infinity;
 
-    sections.forEach((item, index) => {
-      const rect = item.element.getBoundingClientRect();
-
-      const distance = Math.abs(rect.top - readingLine);
+    sections.forEach((section, index) => {
+      const rect =
+        section.element.getBoundingClientRect();
 
       /*
-       * Sezione già attraversata:
-       * la consideriamo attiva quando la sua parte iniziale
-       * ha superato la reading line.
+       * Una sezione diventa attiva quando il suo inizio
+       * raggiunge la reading line.
        */
-      if (rect.top <= readingLine + 1) {
-        closestIndex = index;
+      if (rect.top <= readingLine) {
+        candidate = index;
       }
 
-      if (distance < closestDistance) {
-        closestDistance = distance;
+      const distance = Math.abs(
+        rect.top - readingLine
+      );
 
-        if (rect.top <= readingLine) {
-          closestIndex = index;
-        }
+      if (
+        distance < closestDistance &&
+        rect.top <= readingLine
+      ) {
+        closestDistance = distance;
+        candidate = index;
       }
     });
 
     return clamp(
-      closestIndex,
+      candidate,
       0,
-      Math.max(0, sections.length - 1)
+      sections.length - 1
     );
   }
 
   function updateActiveSection(force = false) {
     if (!sections.length) return;
 
-    const nextIndex = getActiveSectionIndex();
+    const nextIndex = findActiveSection();
 
     if (!force && nextIndex === activeIndex) {
-      updateSectionProgress();
+      updateProgress();
       return;
     }
 
@@ -212,104 +215,161 @@
     const current = sections[activeIndex];
 
     if (UI.storyTitle) {
-      UI.storyTitle.textContent = current.title;
+      UI.storyTitle.textContent =
+        current.title;
     }
 
-    sections.forEach((item, index) => {
-      const isActive = index === activeIndex;
+    sections.forEach((section, index) => {
+      const isActive =
+        index === activeIndex;
 
-      item.element.classList.toggle('is-active', isActive);
-
-      const menuLink = UI.menuLinks.find(
-        (link) => link.getAttribute('href') === `#${item.id}`
+      section.element.classList.toggle(
+        'is-active',
+        isActive
       );
 
-      if (menuLink) {
-        if (isActive) {
-          menuLink.setAttribute('aria-current', 'location');
-        } else {
-          menuLink.removeAttribute('aria-current');
-        }
+      const link = UI.menuLinks.find(
+        (item) =>
+          item.getAttribute('href') ===
+          `#${section.id}`
+      );
+
+      if (!link) return;
+
+      if (isActive) {
+        link.setAttribute(
+          'aria-current',
+          'location'
+        );
+      } else {
+        link.removeAttribute(
+          'aria-current'
+        );
       }
     });
 
     updateArrowState();
-    updateSectionProgress();
+    updateProgress();
   }
 
-  /* -------------------------------------------------------
-     SECTION PROGRESS
-     ------------------------------------------------------- */
+  /* =========================================================
+     PROGRESS
+     ========================================================= */
 
-  function getSectionProgress(section) {
+  function getProgress(section) {
     if (!section) return 0;
 
     const element = section.element;
-    const rect = element.getBoundingClientRect();
+    const rect =
+      element.getBoundingClientRect();
 
-    const scrollY = win.scrollY || win.pageYOffset || 0;
+    const scrollY =
+      win.scrollY ||
+      win.pageYOffset ||
+      0;
+
     const viewportHeight =
-      win.innerHeight || doc.documentElement.clientHeight;
+      win.innerHeight ||
+      doc.documentElement.clientHeight;
 
-    const sectionTop = scrollY + rect.top;
-    const sectionHeight = element.offsetHeight;
+    const sectionTop =
+      scrollY + rect.top;
 
+    const sectionHeight =
+      element.offsetHeight;
+
+    if (!sectionHeight) return 0;
+
+    /*
+     * Sezione più corta della viewport:
+     * progress basato sull'attraversamento.
+     */
     if (sectionHeight <= viewportHeight) {
-      const total =
-        Math.max(1, sectionHeight - viewportHeight * 0.35);
+      const travel = Math.max(
+        1,
+        sectionHeight -
+          viewportHeight * 0.35
+      );
 
       return clamp(
-        (scrollY - sectionTop + viewportHeight * 0.35) / total
+        (
+          scrollY -
+          sectionTop +
+          viewportHeight * 0.35
+        ) / travel
       );
     }
 
-    const total = Math.max(
+    /*
+     * Sezione lunga:
+     * 0% all'inizio,
+     * 100% quando il fondo raggiunge la viewport.
+     */
+    const travel = Math.max(
       1,
       sectionHeight - viewportHeight
     );
 
     return clamp(
-      (scrollY - sectionTop) / total
+      (scrollY - sectionTop) / travel
     );
   }
 
-  function updateSectionProgress() {
-    if (!sections.length || !UI.storyProgressFill) return;
+  function updateProgress() {
+    if (
+      !sections.length ||
+      !UI.storyProgressFill
+    ) {
+      return;
+    }
 
-    const current = sections[activeIndex];
-    const progress = getSectionProgress(current);
+    const progress =
+      getProgress(
+        sections[activeIndex]
+      );
 
-    const percentage = `${progress * 100}%`;
+    const percentage =
+      `${progress * 100}%`;
 
-    UI.storyProgressFill.style.width = percentage;
+    UI.storyProgressFill.style.width =
+      percentage;
 
     if (UI.storyProgressOrb) {
-      UI.storyProgressOrb.style.left = percentage;
+      UI.storyProgressOrb.style.left =
+        percentage;
     }
 
     if (UI.storyProgress) {
-      const value = Math.round(progress * 100);
-
       UI.storyProgress.setAttribute(
         'aria-valuenow',
-        String(value)
+        String(Math.round(progress * 100))
       );
     }
   }
 
-  /* -------------------------------------------------------
+  /* =========================================================
      ARROWS
-     ------------------------------------------------------- */
+     ========================================================= */
 
   function updateArrowState() {
-    if (!UI.storyPrev || !UI.storyNext) return;
+    if (
+      !UI.storyPrev ||
+      !UI.storyNext
+    ) {
+      return;
+    }
 
-    UI.storyPrev.disabled = activeIndex <= 0;
+    UI.storyPrev.disabled =
+      activeIndex <= 0;
+
     UI.storyNext.disabled =
       activeIndex >= sections.length - 1;
   }
 
-  function scrollToSection(index, updateHistory = true) {
+  function scrollToSection(
+    index,
+    updateHistory = true
+  ) {
     if (!sections.length) return;
 
     const safeIndex = clamp(
@@ -318,7 +378,8 @@
       sections.length - 1
     );
 
-    const target = sections[safeIndex]?.element;
+    const target =
+      sections[safeIndex]?.element;
 
     if (!target) return;
 
@@ -327,20 +388,29 @@
 
     const top =
       target.getBoundingClientRect().top +
-      (win.scrollY || win.pageYOffset || 0) -
+      (
+        win.scrollY ||
+        win.pageYOffset ||
+        0
+      ) -
       headerHeight +
       CONFIG.scrollOffset;
 
-    const behavior = prefersReducedMotion()
-      ? 'auto'
-      : 'smooth';
-
     win.scrollTo({
       top: Math.max(0, top),
-      behavior
+      behavior: prefersReducedMotion()
+        ? 'auto'
+        : 'smooth'
     });
 
-    if (updateHistory && target.id) {
+    activeIndex = safeIndex;
+
+    updateActiveSection(true);
+
+    if (
+      updateHistory &&
+      target.id
+    ) {
       try {
         history.pushState(
           null,
@@ -348,32 +418,44 @@
           `#${target.id}`
         );
       } catch (_) {
-        // Hash navigation still works without history API.
+        /*
+         * Fallback:
+         * nessuna azione necessaria.
+         */
       }
     }
-
-    activeIndex = safeIndex;
-    updateActiveSection(true);
   }
 
   function goPrevious() {
     if (activeIndex > 0) {
-      scrollToSection(activeIndex - 1);
+      scrollToSection(
+        activeIndex - 1
+      );
     }
   }
 
   function goNext() {
-    if (activeIndex < sections.length - 1) {
-      scrollToSection(activeIndex + 1);
+    if (
+      activeIndex <
+      sections.length - 1
+    ) {
+      scrollToSection(
+        activeIndex + 1
+      );
     }
   }
 
-  /* -------------------------------------------------------
+  /* =========================================================
      MENU
-     ------------------------------------------------------- */
+     ========================================================= */
 
-  function updateMenuAria() {
-    if (!UI.menu || !UI.menuToggle) return;
+  function updateMenuState() {
+    if (
+      !UI.menu ||
+      !UI.menuToggle
+    ) {
+      return;
+    }
 
     UI.menuToggle.setAttribute(
       'aria-expanded',
@@ -382,7 +464,9 @@
 
     UI.menuToggle.setAttribute(
       'aria-label',
-      menuOpen ? 'Chiudi menu' : 'Apri menu'
+      menuOpen
+        ? 'Chiudi menu'
+        : 'Apri menu'
     );
 
     UI.menu.setAttribute(
@@ -390,30 +474,43 @@
       String(!menuOpen)
     );
 
-    /*
-     * inert evita che il contenuto del menu chiuso
-     * venga raggiunto accidentalmente dalla tastiera.
-     */
     if (menuOpen) {
-      UI.menu.removeAttribute('inert');
+      UI.menu.removeAttribute(
+        'inert'
+      );
     } else {
-      UI.menu.setAttribute('inert', '');
+      UI.menu.setAttribute(
+        'inert',
+        ''
+      );
     }
   }
 
   function openMenu() {
-    if (!UI.menu || !UI.menuToggle) return;
+    if (
+      !UI.menu ||
+      !UI.menuToggle
+    ) {
+      return;
+    }
 
-    lastFocusedElement = doc.activeElement;
+    lastFocusedElement =
+      doc.activeElement;
 
     menuOpen = true;
 
-    UI.menu.classList.add('is-open');
-    UI.header?.classList.add('menu-is-open');
+    UI.menu.classList.add(
+      'is-open'
+    );
 
-    updateMenuAria();
+    UI.header?.classList.add(
+      'menu-is-open'
+    );
 
-    const firstLink = UI.menuLinks[0];
+    updateMenuState();
+
+    const firstLink =
+      UI.menuLinks[0];
 
     if (firstLink) {
       win.requestAnimationFrame(() => {
@@ -422,20 +519,33 @@
     }
   }
 
-  function closeMenu(restoreFocus = true) {
-    if (!UI.menu || !UI.menuToggle) return;
+  function closeMenu(
+    restoreFocus = true
+  ) {
+    if (
+      !UI.menu ||
+      !UI.menuToggle
+    ) {
+      return;
+    }
 
     menuOpen = false;
 
-    UI.menu.classList.remove('is-open');
-    UI.header?.classList.remove('menu-is-open');
+    UI.menu.classList.remove(
+      'is-open'
+    );
 
-    updateMenuAria();
+    UI.header?.classList.remove(
+      'menu-is-open'
+    );
+
+    updateMenuState();
 
     if (
       restoreFocus &&
       lastFocusedElement &&
-      typeof lastFocusedElement.focus === 'function'
+      typeof lastFocusedElement.focus ===
+        'function'
     ) {
       win.requestAnimationFrame(() => {
         try {
@@ -455,58 +565,90 @@
     }
   }
 
-  function handleMenuLinkClick(event) {
-    const link = event.currentTarget;
-    const href = link.getAttribute('href');
+  function handleMenuClick(event) {
+    const link =
+      event.currentTarget;
 
-    if (!href || !href.startsWith('#')) return;
+    const href =
+      link.getAttribute('href');
 
-    const id = href.slice(1);
+    if (
+      !href ||
+      !href.startsWith('#')
+    ) {
+      return;
+    }
 
-    const index = sections.findIndex(
-      (item) => item.id === id
-    );
+    const id =
+      href.slice(1);
+
+    const index =
+      sections.findIndex(
+        (section) =>
+          section.id === id
+      );
 
     if (index === -1) return;
 
     event.preventDefault();
 
     closeMenu(false);
+
     scrollToSection(index);
   }
 
-  /* -------------------------------------------------------
+  /* =========================================================
      KEYBOARD
-     ------------------------------------------------------- */
+     ========================================================= */
 
   function trapMenuFocus(event) {
-    if (!menuOpen || event.key !== 'Tab') return;
+    if (
+      !menuOpen ||
+      event.key !== 'Tab'
+    ) {
+      return;
+    }
 
-    const focusable = UI.menuLinks.filter(
-      (element) =>
-        !element.hasAttribute('disabled') &&
-        element.offsetParent !== null
-    );
+    const focusable =
+      UI.menuLinks.filter(
+        (element) =>
+          !element.disabled &&
+          element.offsetParent !== null
+      );
 
     if (!focusable.length) return;
 
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
+    const first =
+      focusable[0];
 
-    if (event.shiftKey && doc.activeElement === first) {
+    const last =
+      focusable[
+        focusable.length - 1
+      ];
+
+    if (
+      event.shiftKey &&
+      doc.activeElement === first
+    ) {
       event.preventDefault();
       last.focus();
       return;
     }
 
-    if (!event.shiftKey && doc.activeElement === last) {
+    if (
+      !event.shiftKey &&
+      doc.activeElement === last
+    ) {
       event.preventDefault();
       first.focus();
     }
   }
 
-  function handleGlobalKeydown(event) {
-    if (event.key === 'Escape' && menuOpen) {
+  function handleKeydown(event) {
+    if (
+      event.key === 'Escape' &&
+      menuOpen
+    ) {
       event.preventDefault();
       closeMenu();
       return;
@@ -516,47 +658,62 @@
 
     if (menuOpen) return;
 
-    /*
-     * Evitiamo di intercettare i tasti quando l'utente
-     * sta scrivendo in un campo.
-     */
-    const target = event.target;
+    const target =
+      event.target;
 
     if (
-      target instanceof HTMLInputElement ||
-      target instanceof HTMLTextAreaElement ||
-      target instanceof HTMLSelectElement ||
+      target instanceof
+        HTMLInputElement ||
+      target instanceof
+        HTMLTextAreaElement ||
+      target instanceof
+        HTMLSelectElement ||
       target?.isContentEditable
     ) {
       return;
     }
 
-    if (event.key === 'ArrowDown' || event.key === 'PageDown') {
+    if (
+      event.key === 'ArrowDown' ||
+      event.key === 'PageDown'
+    ) {
       event.preventDefault();
       goNext();
     }
 
-    if (event.key === 'ArrowUp' || event.key === 'PageUp') {
+    if (
+      event.key === 'ArrowUp' ||
+      event.key === 'PageUp'
+    ) {
       event.preventDefault();
       goPrevious();
     }
 
-    if (event.key === 'Home' && event.ctrlKey) {
+    if (
+      event.key === 'Home' &&
+      event.ctrlKey
+    ) {
       event.preventDefault();
       scrollToSection(0);
     }
 
-    if (event.key === 'End' && event.ctrlKey) {
+    if (
+      event.key === 'End' &&
+      event.ctrlKey
+    ) {
       event.preventDefault();
-      scrollToSection(sections.length - 1);
+
+      scrollToSection(
+        sections.length - 1
+      );
     }
   }
 
-  /* -------------------------------------------------------
+  /* =========================================================
      SCROLL
-     ------------------------------------------------------- */
+     ========================================================= */
 
-  function requestScrollUpdate() {
+  function handleScroll() {
     if (scrollTicking) return;
 
     scrollTicking = true;
@@ -567,73 +724,77 @@
     });
   }
 
-  /* -------------------------------------------------------
-     HASH / HISTORY
-     ------------------------------------------------------- */
+  /* =========================================================
+     HASH
+     ========================================================= */
 
-  function goToCurrentHash() {
-    const hash = win.location.hash;
+  function handleHash() {
+    const hash =
+      win.location.hash;
 
-    if (!hash || hash === '#') {
+    if (
+      !hash ||
+      hash === '#'
+    ) {
       updateActiveSection(true);
       return;
     }
 
-    const id = decodeURIComponent(
-      hash.slice(1)
-    );
+    const id =
+      decodeURIComponent(
+        hash.slice(1)
+      );
 
-    const index = sections.findIndex(
-      (item) => item.id === id
-    );
+    const index =
+      sections.findIndex(
+        (section) =>
+          section.id === id
+      );
 
     if (index === -1) {
       updateActiveSection(true);
       return;
     }
 
-    /*
-     * Al primo caricamento lasciamo che il browser
-     * completi il layout prima di spostarsi.
-     */
     win.setTimeout(() => {
-      scrollToSection(index, false);
-    }, 30);
+      scrollToSection(
+        index,
+        false
+      );
+    }, 50);
   }
 
-  function handleHashChange() {
-    goToCurrentHash();
-  }
-
-  /* -------------------------------------------------------
-     STANDBY / INACTIVITY
-     ------------------------------------------------------- */
+  /* =========================================================
+     STANDBY
+     ========================================================= */
 
   function resetStandby() {
     if (!UI.standby) return;
 
-    UI.standby.classList.remove('is-visible');
+    UI.standby.classList.remove(
+      'is-visible'
+    );
 
     if (standbyTimer) {
-      win.clearTimeout(standbyTimer);
+      win.clearTimeout(
+        standbyTimer
+      );
     }
 
     standbyTimer = win.setTimeout(() => {
-      /*
-       * Standby volutamente discreto.
-       * Non blocca mai l'interazione.
-       */
       if (
         !doc.hidden &&
         !menuOpen &&
         UI.standby
       ) {
-        UI.standby.classList.add('is-visible');
+        UI.standby.classList.add(
+          'is-visible'
+        );
       }
     }, CONFIG.standbyDelay);
   }
 
-  function setupStandby() {
+  function initStandby() {
     [
       'pointerdown',
       'pointermove',
@@ -644,22 +805,20 @@
       doc.addEventListener(
         eventName,
         resetStandby,
-        { passive: true }
+        {
+          passive: true
+        }
       );
     });
 
     resetStandby();
   }
 
-  /* -------------------------------------------------------
-     GSAP — OPTIONAL ENHANCEMENT
-     ------------------------------------------------------- */
+  /* =========================================================
+     GSAP — OPTIONAL
+     ========================================================= */
 
   function initGSAP() {
-    /*
-     * GSAP non è necessario per il funzionamento del sito.
-     * Se non è disponibile, semplicemente usciamo.
-     */
     if (
       prefersReducedMotion() ||
       typeof win.gsap === 'undefined'
@@ -669,48 +828,50 @@
 
     try {
       if (
-        typeof win.ScrollTrigger !== 'undefined'
+        typeof win.ScrollTrigger !==
+        'undefined'
       ) {
         win.gsap.registerPlugin(
           win.ScrollTrigger
         );
       }
 
-      const animatedElements = $$('.story .reveal');
+      const elements =
+        $$('.story .reveal');
 
-      if (!animatedElements.length) return;
+      if (!elements.length) {
+        return;
+      }
 
-      /*
-       * Se ScrollTrigger è disponibile, lo usiamo.
-       * Altrimenti fallback a una semplice animazione
-       * eseguita al caricamento.
-       */
       if (
-        typeof win.ScrollTrigger !== 'undefined'
+        typeof win.ScrollTrigger !==
+        'undefined'
       ) {
-        animatedElements.forEach((element) => {
-          win.gsap.fromTo(
-            element,
-            {
-              opacity: 0,
-              y: 28
-            },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.8,
-              ease: 'power3.out',
-              scrollTrigger: {
-                trigger: element,
-                start: 'top 86%',
-                once: true
+        elements.forEach(
+          (element) => {
+            win.gsap.fromTo(
+              element,
+              {
+                opacity: 0,
+                y: 28
+              },
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                ease: 'power3.out',
+                scrollTrigger: {
+                  trigger: element,
+                  start: 'top 86%',
+                  once: true
+                }
               }
-            }
-          );
-        });
+            );
+          }
+        );
       } else {
         win.gsap.to(
-          animatedElements,
+          elements,
           {
             opacity: 1,
             y: 0,
@@ -722,9 +883,8 @@
       }
     } catch (error) {
       /*
-       * GSAP è enhancement:
-       * un suo errore NON deve mai impedire
-       * il funzionamento del sito.
+       * GSAP è opzionale.
+       * Un suo errore non deve mai rompere il sito.
        */
       console.warn(
         'GSAP enhancement skipped:',
@@ -733,101 +893,95 @@
     }
   }
 
-  /* -------------------------------------------------------
-     MENU FALLBACK
-     ------------------------------------------------------- */
-
-  function ensureMenuFallback() {
-    if (!UI.menu) return;
-
-    /*
-     * Il CSS/no-JS può comunque rendere il menu leggibile.
-     * Qui impostiamo solo lo stato iniziale.
-     */
-    updateMenuAria();
-  }
-
-  /* -------------------------------------------------------
+  /* =========================================================
      YEAR
-     ------------------------------------------------------- */
+     ========================================================= */
 
   function updateYear() {
     if (!UI.year) return;
 
-    UI.year.textContent = String(
-      new Date().getFullYear()
-    );
+    UI.year.textContent =
+      String(
+        new Date().getFullYear()
+      );
   }
 
-  /* -------------------------------------------------------
+  /* =========================================================
      RESIZE
-     ------------------------------------------------------- */
-
-  let resizeTimer = null;
+     ========================================================= */
 
   function handleResize() {
     if (resizeTimer) {
-      win.clearTimeout(resizeTimer);
+      win.clearTimeout(
+        resizeTimer
+      );
     }
 
-    resizeTimer = win.setTimeout(() => {
-      updateSectionMeasurements();
-      updateActiveSection(true);
+    resizeTimer = win.setTimeout(
+      () => {
+        collectSections();
+        updateActiveSection(true);
 
-      if (
-        typeof win.ScrollTrigger !== 'undefined'
-      ) {
-        try {
-          win.ScrollTrigger.refresh();
-        } catch (_) {
-          // Enhancement only.
+        if (
+          typeof win.ScrollTrigger !==
+          'undefined'
+        ) {
+          try {
+            win.ScrollTrigger.refresh();
+          } catch (_) {
+            // Optional enhancement.
+          }
         }
-      }
-    }, 100);
+      },
+      100
+    );
   }
 
-  /* -------------------------------------------------------
-     PAGE VISIBILITY / BFCACHE
-     ------------------------------------------------------- */
+  /* =========================================================
+     VISIBILITY / BFCACHE
+     ========================================================= */
 
-  function handleVisibilityChange() {
+  function handleVisibility() {
     if (doc.hidden) {
       if (standbyTimer) {
-        win.clearTimeout(standbyTimer);
+        win.clearTimeout(
+          standbyTimer
+        );
       }
+
       return;
     }
 
     resetStandby();
-    updateSectionMeasurements();
+    collectSections();
     updateActiveSection(true);
   }
 
   function handlePageShow() {
-    updateSectionMeasurements();
-    updateActiveSection(true);
-    resetStandby();
-
     /*
-     * Se la pagina viene ripristinata dal BFCache,
-     * ci assicuriamo che il loader non torni visibile.
+     * Anche dopo BFCache il loader non deve ricomparire.
      */
     hideLoader();
 
+    collectSections();
+    updateActiveSection(true);
+    resetStandby();
+
     if (
-      typeof win.ScrollTrigger !== 'undefined'
+      typeof win.ScrollTrigger !==
+      'undefined'
     ) {
       try {
         win.ScrollTrigger.refresh();
       } catch (_) {
-        // Enhancement only.
+        // Optional enhancement.
       }
     }
   }
 
-  /* -------------------------------------------------------
+  /* =========================================================
      EVENTS
-     ------------------------------------------------------- */
+     ========================================================= */
 
   function bindEvents() {
     UI.menuToggle?.addEventListener(
@@ -835,12 +989,14 @@
       toggleMenu
     );
 
-    UI.menuLinks.forEach((link) => {
-      link.addEventListener(
-        'click',
-        handleMenuLinkClick
-      );
-    });
+    UI.menuLinks.forEach(
+      (link) => {
+        link.addEventListener(
+          'click',
+          handleMenuClick
+        );
+      }
+    );
 
     UI.storyPrev?.addEventListener(
       'click',
@@ -854,24 +1010,28 @@
 
     win.addEventListener(
       'scroll',
-      requestScrollUpdate,
-      { passive: true }
+      handleScroll,
+      {
+        passive: true
+      }
     );
 
     win.addEventListener(
       'resize',
       handleResize,
-      { passive: true }
+      {
+        passive: true
+      }
     );
 
     win.addEventListener(
       'hashchange',
-      handleHashChange
+      handleHash
     );
 
     win.addEventListener(
       'popstate',
-      handleHashChange
+      handleHash
     );
 
     win.addEventListener(
@@ -881,129 +1041,111 @@
 
     doc.addEventListener(
       'keydown',
-      handleGlobalKeydown
+      handleKeydown
     );
 
     doc.addEventListener(
       'visibilitychange',
-      handleVisibilityChange
+      handleVisibility
     );
   }
 
-  /* -------------------------------------------------------
+  /* =========================================================
      INITIALIZATION
-     ------------------------------------------------------- */
+     ========================================================= */
 
   function init() {
     try {
-      UI = getElements();
-
-      if (!UI) {
-        hideLoader();
-        return;
-      }
+      collectUI();
+      collectSections();
 
       updateYear();
-
-      updateSectionMeasurements();
-
-      ensureMenuFallback();
+      updateMenuState();
 
       bindEvents();
 
-      /*
-       * Primo stato della navigazione.
-       */
       updateActiveSection(true);
 
       /*
-       * Gestione eventuale deep-link #sezione.
+       * Se esiste un hash, lo gestiamo dopo
+       * che il layout è stato calcolato.
        */
-      goToCurrentHash();
+      handleHash();
 
-      setupStandby();
+      initStandby();
 
       /*
-       * GSAP viene inizializzato DOPO che la UI
-       * è già funzionante.
-       */
-      win.setTimeout(() => {
-        try {
-          initGSAP();
-        } catch (error) {
-          console.warn(
-            'Optional animation layer skipped:',
-            error
-          );
-        }
-      }, 0);
-
-      /*
-       * Il loader non aspetta GSAP.
-       * Scompare appena la struttura base è pronta.
+       * Il loader viene chiuso SUBITO.
+       * Non aspettiamo GSAP, immagini, iframe o altro.
        */
       win.requestAnimationFrame(() => {
         hideLoader();
       });
 
-    } catch (error) {
       /*
-       * ULTIMO LIVELLO DI SICUREZZA.
-       * Qualunque errore di inizializzazione non può
-       * lasciare il sito coperto dal loader.
+       * GSAP viene caricato/inizializzato
+       * come enhancement separato.
        */
+      win.setTimeout(() => {
+        initGSAP();
+      }, 0);
+
+    } catch (error) {
       console.error(
         'Site initialization error:',
         error
       );
 
+      /*
+       * Fallback definitivo:
+       * la pagina deve comunque diventare visibile.
+       */
       hideLoader();
 
-      /*
-       * Tentiamo comunque di rendere la pagina
-       * immediatamente utilizzabile.
-       */
-      try {
-        doc.documentElement.classList.remove(
-          'is-loading'
-        );
+      doc.documentElement.classList.remove(
+        'is-loading'
+      );
 
-        doc.body.classList.remove(
-          'is-loading'
-        );
-      } catch (_) {
-        // Nothing else to do.
-      }
+      doc.body.classList.remove(
+        'is-loading'
+      );
     }
   }
 
-  /* -------------------------------------------------------
+  /* =========================================================
      GLOBAL ERROR SAFETY
-     ------------------------------------------------------- */
+     ========================================================= */
 
-  /*
-   * Se un errore non gestito arriva da uno script esterno
-   * (es. GSAP/CDN), il loader viene comunque rimosso.
-   */
   win.addEventListener(
     'error',
     () => {
       hideLoader();
-    },
-    { once: false }
+    }
   );
 
   win.addEventListener(
     'unhandledrejection',
     () => {
       hideLoader();
-    },
-    { once: false }
+    }
   );
 
-  /*
-   * Avvio.
-   */
-  onReady(init);
+  /* =========================================================
+     START
+     ========================================================= */
+
+  if (
+    doc.readyState === 'loading'
+  ) {
+    doc.addEventListener(
+      'DOMContentLoaded',
+      init,
+      {
+        once: true
+      }
+    );
+  } else {
+    init();
+  }
 
 })();
