@@ -1365,10 +1365,10 @@ main:focus {
 }
 
 .footer-mark img {
+  display: block;
   width: 42px;
   height: 42px;
-
-  filter: invert(1);
+  filter: none;
 }
 
 .footer-name {
