@@ -1,1148 +1,965 @@
-(() => {
-  'use strict';
+/* =========================================================
+   CESARE PARATORE — HOME
+   STANDARD OPERATIVO — MAXIMUM QUALITY
+   ========================================================= */
 
-  /*
-   * Cesare Paratore — interaction layer
-   * Progressive enhancement:
-   * - il sito funziona senza GSAP
-   * - il loader non può bloccare permanentemente la pagina
-   * - animazioni e interazioni sono opzionali
-   */
+(() => {
+  "use strict";
+
+  /* =======================================================
+     CONFIG
+     ======================================================= */
 
   const CONFIG = {
     standbyDelay: 40000,
-    loaderMax: 1500,
-    scrollOffset: 12,
+    loaderFailsafe: 3500,
     activeLineRatio: 0.32,
-    activeLineMax: 260
+    activeLineMax: 260,
+    scrollOffset: 12,
+    pointerThrottle: 700
   };
 
+  /* =======================================================
+     DOM
+     ======================================================= */
+
   const doc = document;
-  const win = window;
+  const html = doc.documentElement;
+  const body = doc.body;
 
-  const $ = (selector, parent = doc) =>
-    parent.querySelector(selector);
+  const loader = doc.getElementById("site-loader");
+  const standby = doc.getElementById("standby");
 
-  const $$ = (selector, parent = doc) =>
-    Array.from(parent.querySelectorAll(selector));
+  const menuToggle = doc.querySelector(".menu-toggle");
+  const menu = doc.getElementById("menu");
 
-  const clamp = (value, min = 0, max = 1) =>
-    Math.min(max, Math.max(min, value));
+  const main = doc.getElementById("main-content");
+  const footer = doc.querySelector(".site-footer");
 
-  const prefersReducedMotion = () =>
-    win.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const sections = Array.from(
+    doc.querySelectorAll(".story")
+  );
 
-  let UI = null;
-  let sections = [];
-  let activeIndex = 0;
+  const sectionNav = doc.querySelector(".section-nav");
+  const sectionPrev = doc.querySelector(".section-nav-prev");
+  const sectionNext = doc.querySelector(".section-nav-next");
+  const sectionNumber = doc.querySelector(".section-nav-number");
+  const sectionTitle = doc.querySelector(".section-nav-title");
 
+  const currentYear = doc.getElementById("current-year");
+
+  /* =======================================================
+     STATE
+     ======================================================= */
+
+  let currentIndex = 0;
   let menuOpen = false;
-  let lastFocusedElement = null;
-
-  let scrollTicking = false;
-  let resizeTimer = null;
   let standbyTimer = null;
-
   let loaderHidden = false;
+  let lastPointerActivity = 0;
 
-  /* =========================================================
-     LOADER
-     ========================================================= */
+  let menuFocusables = [];
+  let restoreFocusElement = null;
 
-  function hideLoader() {
-    if (loaderHidden) return;
+  const reduceMotionQuery = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  );
 
-    loaderHidden = true;
+  /* =======================================================
+     HELPERS
+     ======================================================= */
 
-    /*
-     * IMPORTANTE:
-     * l'HTML usa #page-loader.
-     */
-    const loader = doc.getElementById('page-loader');
+  const clamp = (value, min, max) =>
+    Math.min(Math.max(value, min), max);
 
-    /*
-     * Rimuoviamo immediatamente eventuali stati
-     * di caricamento dalla pagina.
-     */
-    doc.documentElement.classList.remove('is-loading');
-    doc.body.classList.remove('is-loading');
+  const isVisible = (element) => {
+    if (!element) return false;
 
-    if (!loader) return;
+    const style = window.getComputedStyle(element);
 
-    loader.classList.add('is-hidden');
-
-    /*
-     * Fallback ulteriore:
-     * anche se la transizione CSS non esiste,
-     * il loader viene comunque rimosso.
-     */
-    win.setTimeout(() => {
-      try {
-        loader.remove();
-      } catch (_) {
-        loader.style.display = 'none';
-        loader.style.visibility = 'hidden';
-        loader.style.pointerEvents = 'none';
-      }
-    }, 700);
-  }
-
-  /*
-   * Sicurezza assoluta:
-   * anche se l'inizializzazione JS fallisce,
-   * il loader viene rimosso.
-   */
-  win.setTimeout(hideLoader, CONFIG.loaderMax);
-
-  /* =========================================================
-     DOM REFERENCES
-     ========================================================= */
-
-  function collectUI() {
-    UI = {
-      header: $('#site-header'),
-
-      menuToggle: $('#menu-toggle'),
-      menu: $('#menu'),
-      menuLinks: $$('#menu a'),
-
-      storyTitle: $('#active-story-title'),
-
-      storyPrev: $('#story-prev'),
-      storyNext: $('#story-next'),
-
-      storyProgress: $('#story-progress'),
-      storyProgressFill: $('.story-progress-fill'),
-      storyProgressOrb: $('.story-progress-orb'),
-
-      sections: $$('main .story'),
-
-      standby: $('#standby'),
-
-      year: $('#current-year')
-    };
-  }
-
-  /* =========================================================
-     SECTIONS
-     ========================================================= */
-
-  function collectSections() {
-    if (!UI?.sections?.length) {
-      sections = [];
-      return;
-    }
-
-    sections = UI.sections
-      .map((element) => ({
-        element,
-        id: element.id,
-        title:
-          element.dataset.storyTitle ||
-          $('.story-title', element)?.textContent?.trim() ||
-          element.id
-      }))
-      .filter((item) => item.element);
-  }
-
-  /* =========================================================
-     ACTIVE SECTION
-     ========================================================= */
-
-  function getReadingLine() {
-    const viewportHeight =
-      win.innerHeight ||
-      doc.documentElement.clientHeight;
-
-    return Math.min(
-      viewportHeight * CONFIG.activeLineRatio,
-      CONFIG.activeLineMax
+    return (
+      style.display !== "none" &&
+      style.visibility !== "hidden" &&
+      style.opacity !== "0"
     );
+  };
+
+  const getFocusableElements = (container) => {
+    if (!container) return [];
+
+    return Array.from(
+      container.querySelectorAll(
+        [
+          "a[href]",
+          "button:not([disabled])",
+          "input:not([disabled])",
+          "select:not([disabled])",
+          "textarea:not([disabled])",
+          "[tabindex]:not([tabindex='-1'])"
+        ].join(",")
+      )
+    ).filter(isVisible);
+  };
+
+  /* =======================================================
+     CURRENT YEAR
+     ======================================================= */
+
+  if (currentYear) {
+    currentYear.textContent = String(new Date().getFullYear());
   }
 
-  function findActiveSection() {
-    if (!sections.length) return 0;
+  /* =======================================================
+     ACCESSIBILITY / MENU
+     ======================================================= */
 
-    const readingLine = getReadingLine();
+  function setMenuTabState(disabled) {
+    if (!menu) return;
 
-    let candidate = 0;
-    let closestDistance = Infinity;
+    const focusables = getFocusableElements(menu);
 
-    sections.forEach((section, index) => {
-      const rect =
-        section.element.getBoundingClientRect();
-
-      /*
-       * Una sezione diventa attiva quando il suo inizio
-       * raggiunge la reading line.
-       */
-      if (rect.top <= readingLine) {
-        candidate = index;
-      }
-
-      const distance = Math.abs(
-        rect.top - readingLine
-      );
-
-      if (
-        distance < closestDistance &&
-        rect.top <= readingLine
-      ) {
-        closestDistance = distance;
-        candidate = index;
-      }
-    });
-
-    return clamp(
-      candidate,
-      0,
-      sections.length - 1
-    );
-  }
-
-  function updateActiveSection(force = false) {
-    if (!sections.length) return;
-
-    const nextIndex = findActiveSection();
-
-    if (!force && nextIndex === activeIndex) {
-      updateProgress();
-      return;
-    }
-
-    activeIndex = nextIndex;
-
-    const current = sections[activeIndex];
-
-    if (UI.storyTitle) {
-      UI.storyTitle.textContent =
-        current.title;
-    }
-
-    sections.forEach((section, index) => {
-      const isActive =
-        index === activeIndex;
-
-      section.element.classList.toggle(
-        'is-active',
-        isActive
-      );
-
-      const link = UI.menuLinks.find(
-        (item) =>
-          item.getAttribute('href') ===
-          `#${section.id}`
-      );
-
-      if (!link) return;
-
-      if (isActive) {
-        link.setAttribute(
-          'aria-current',
-          'location'
-        );
+    focusables.forEach((element) => {
+      if (disabled) {
+        element.dataset.menuTabindex = element.getAttribute("tabindex") ?? "";
+        element.setAttribute("tabindex", "-1");
       } else {
-        link.removeAttribute(
-          'aria-current'
-        );
+        const previous = element.dataset.menuTabindex;
+
+        if (previous === "") {
+          element.removeAttribute("tabindex");
+        } else if (previous !== undefined) {
+          element.setAttribute("tabindex", previous);
+        }
+
+        delete element.dataset.menuTabindex;
       }
     });
-
-    updateArrowState();
-    updateProgress();
   }
 
-  /* =========================================================
-     PROGRESS
-     ========================================================= */
-
-  function getProgress(section) {
-    if (!section) return 0;
-
-    const element = section.element;
-    const rect =
-      element.getBoundingClientRect();
-
-    const scrollY =
-      win.scrollY ||
-      win.pageYOffset ||
-      0;
-
-    const viewportHeight =
-      win.innerHeight ||
-      doc.documentElement.clientHeight;
-
-    const sectionTop =
-      scrollY + rect.top;
-
-    const sectionHeight =
-      element.offsetHeight;
-
-    if (!sectionHeight) return 0;
-
-    /*
-     * Sezione più corta della viewport:
-     * progress basato sull'attraversamento.
-     */
-    if (sectionHeight <= viewportHeight) {
-      const travel = Math.max(
-        1,
-        sectionHeight -
-          viewportHeight * 0.35
-      );
-
-      return clamp(
-        (
-          scrollY -
-          sectionTop +
-          viewportHeight * 0.35
-        ) / travel
-      );
+  function setBackgroundInteractionDisabled(disabled) {
+    if (main) {
+      main.inert = disabled;
+      main.setAttribute("aria-hidden", disabled ? "true" : "false");
     }
 
-    /*
-     * Sezione lunga:
-     * 0% all'inizio,
-     * 100% quando il fondo raggiunge la viewport.
-     */
-    const travel = Math.max(
-      1,
-      sectionHeight - viewportHeight
-    );
-
-    return clamp(
-      (scrollY - sectionTop) / travel
-    );
-  }
-
-  function updateProgress() {
-    if (
-      !sections.length ||
-      !UI.storyProgressFill
-    ) {
-      return;
-    }
-
-    const progress =
-      getProgress(
-        sections[activeIndex]
-      );
-
-    const percentage =
-      `${progress * 100}%`;
-
-    UI.storyProgressFill.style.width =
-      percentage;
-
-    if (UI.storyProgressOrb) {
-      UI.storyProgressOrb.style.left =
-        percentage;
-    }
-
-    if (UI.storyProgress) {
-      UI.storyProgress.setAttribute(
-        'aria-valuenow',
-        String(Math.round(progress * 100))
-      );
+    if (footer) {
+      footer.inert = disabled;
+      footer.setAttribute("aria-hidden", disabled ? "true" : "false");
     }
   }
 
-  /* =========================================================
-     ARROWS
-     ========================================================= */
+  function updateMenuLabel() {
+    if (!menuToggle) return;
 
-  function updateArrowState() {
-    if (
-      !UI.storyPrev ||
-      !UI.storyNext
-    ) {
-      return;
-    }
+    const label = menuToggle.querySelector(".menu-label");
 
-    UI.storyPrev.disabled =
-      activeIndex <= 0;
-
-    UI.storyNext.disabled =
-      activeIndex >= sections.length - 1;
-  }
-
-  function scrollToSection(
-    index,
-    updateHistory = true
-  ) {
-    if (!sections.length) return;
-
-    const safeIndex = clamp(
-      index,
-      0,
-      sections.length - 1
-    );
-
-    const target =
-      sections[safeIndex]?.element;
-
-    if (!target) return;
-
-    const headerHeight =
-      UI.header?.offsetHeight || 0;
-
-    const top =
-      target.getBoundingClientRect().top +
-      (
-        win.scrollY ||
-        win.pageYOffset ||
-        0
-      ) -
-      headerHeight +
-      CONFIG.scrollOffset;
-
-    win.scrollTo({
-      top: Math.max(0, top),
-      behavior: prefersReducedMotion()
-        ? 'auto'
-        : 'smooth'
-    });
-
-    activeIndex = safeIndex;
-
-    updateActiveSection(true);
-
-    if (
-      updateHistory &&
-      target.id
-    ) {
-      try {
-        history.pushState(
-          null,
-          '',
-          `#${target.id}`
-        );
-      } catch (_) {
-        /*
-         * Fallback:
-         * nessuna azione necessaria.
-         */
-      }
-    }
-  }
-
-  function goPrevious() {
-    if (activeIndex > 0) {
-      scrollToSection(
-        activeIndex - 1
-      );
-    }
-  }
-
-  function goNext() {
-    if (
-      activeIndex <
-      sections.length - 1
-    ) {
-      scrollToSection(
-        activeIndex + 1
-      );
-    }
-  }
-
-  /* =========================================================
-     MENU
-     ========================================================= */
-
-  function updateMenuState() {
-    if (
-      !UI.menu ||
-      !UI.menuToggle
-    ) {
-      return;
-    }
-
-    UI.menuToggle.setAttribute(
-      'aria-expanded',
+    menuToggle.setAttribute(
+      "aria-expanded",
       String(menuOpen)
     );
 
-    UI.menuToggle.setAttribute(
-      'aria-label',
-      menuOpen
-        ? 'Chiudi menu'
-        : 'Apri menu'
+    menuToggle.setAttribute(
+      "aria-label",
+      menuOpen ? "Chiudi menu" : "Apri menu"
     );
 
-    UI.menu.setAttribute(
-      'aria-hidden',
+    if (label) {
+      label.textContent = menuOpen ? "CHIUDI" : "MENU";
+    }
+  }
+
+  function updateMenuState(forceOpen = null) {
+    if (!menu || !menuToggle) return;
+
+    const shouldOpen =
+      forceOpen === null ? !menuOpen : Boolean(forceOpen);
+
+    menuOpen = shouldOpen;
+
+    menu.classList.toggle("is-open", menuOpen);
+    menu.setAttribute(
+      "aria-hidden",
       String(!menuOpen)
     );
 
+    setBackgroundInteractionDisabled(menuOpen);
+    setMenuTabState(!menuOpen);
+    updateMenuLabel();
+
+    html.classList.toggle("menu-is-open", menuOpen);
+    body.classList.toggle("menu-is-open", menuOpen);
+
     if (menuOpen) {
-      UI.menu.removeAttribute(
-        'inert'
-      );
-    } else {
-      UI.menu.setAttribute(
-        'inert',
-        ''
-      );
-    }
-  }
+      restoreFocusElement = doc.activeElement;
 
-  function openMenu() {
-    if (
-      !UI.menu ||
-      !UI.menuToggle
-    ) {
-      return;
-    }
+      requestAnimationFrame(() => {
+        menuFocusables = getFocusableElements(menu);
 
-    lastFocusedElement =
-      doc.activeElement;
-
-    menuOpen = true;
-
-    UI.menu.classList.add(
-      'is-open'
-    );
-
-    UI.header?.classList.add(
-      'menu-is-open'
-    );
-
-    updateMenuState();
-
-    const firstLink =
-      UI.menuLinks[0];
-
-    if (firstLink) {
-      win.requestAnimationFrame(() => {
-        firstLink.focus();
-      });
-    }
-  }
-
-  function closeMenu(
-    restoreFocus = true
-  ) {
-    if (
-      !UI.menu ||
-      !UI.menuToggle
-    ) {
-      return;
-    }
-
-    menuOpen = false;
-
-    UI.menu.classList.remove(
-      'is-open'
-    );
-
-    UI.header?.classList.remove(
-      'menu-is-open'
-    );
-
-    updateMenuState();
-
-    if (
-      restoreFocus &&
-      lastFocusedElement &&
-      typeof lastFocusedElement.focus ===
-        'function'
-    ) {
-      win.requestAnimationFrame(() => {
-        try {
-          lastFocusedElement.focus();
-        } catch (_) {
-          UI.menuToggle.focus();
+        if (menuFocusables.length) {
+          menuFocusables[0].focus();
         }
       });
-    }
-  }
-
-  function toggleMenu() {
-    if (menuOpen) {
-      closeMenu();
     } else {
-      openMenu();
+      const target =
+        restoreFocusElement &&
+        typeof restoreFocusElement.focus === "function"
+          ? restoreFocusElement
+          : menuToggle;
+
+      requestAnimationFrame(() => {
+        target.focus?.();
+      });
+
+      restoreFocusElement = null;
     }
   }
-
-  function handleMenuClick(event) {
-    const link =
-      event.currentTarget;
-
-    const href =
-      link.getAttribute('href');
-
-    if (
-      !href ||
-      !href.startsWith('#')
-    ) {
-      return;
-    }
-
-    const id =
-      href.slice(1);
-
-    const index =
-      sections.findIndex(
-        (section) =>
-          section.id === id
-      );
-
-    if (index === -1) return;
-
-    event.preventDefault();
-
-    closeMenu(false);
-
-    scrollToSection(index);
-  }
-
-  /* =========================================================
-     KEYBOARD
-     ========================================================= */
 
   function trapMenuFocus(event) {
-    if (
-      !menuOpen ||
-      event.key !== 'Tab'
-    ) {
+    if (!menuOpen || event.key !== "Tab") return;
+
+    menuFocusables = getFocusableElements(menu);
+
+    if (!menuFocusables.length) {
+      event.preventDefault();
       return;
     }
 
-    const focusable =
-      UI.menuLinks.filter(
-        (element) =>
-          !element.disabled &&
-          element.offsetParent !== null
-      );
+    const first = menuFocusables[0];
+    const last = menuFocusables[menuFocusables.length - 1];
 
-    if (!focusable.length) return;
-
-    const first =
-      focusable[0];
-
-    const last =
-      focusable[
-        focusable.length - 1
-      ];
-
-    if (
-      event.shiftKey &&
-      doc.activeElement === first
-    ) {
+    if (event.shiftKey && doc.activeElement === first) {
       event.preventDefault();
       last.focus();
       return;
     }
 
-    if (
-      !event.shiftKey &&
-      doc.activeElement === last
-    ) {
+    if (!event.shiftKey && doc.activeElement === last) {
       event.preventDefault();
       first.focus();
     }
   }
 
-  function handleKeydown(event) {
-    if (
-      event.key === 'Escape' &&
-      menuOpen
-    ) {
+  menuToggle?.addEventListener("click", () => {
+    updateMenuState();
+  });
+
+  menu?.addEventListener("click", (event) => {
+    const link = event.target.closest("a");
+
+    if (!link) return;
+
+    updateMenuState(false);
+  });
+
+  doc.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && menuOpen) {
       event.preventDefault();
-      closeMenu();
+      updateMenuState(false);
       return;
     }
 
     trapMenuFocus(event);
+  });
 
-    if (menuOpen) return;
+  /* =======================================================
+     STANDBY
+     ======================================================= */
 
-    const target =
-      event.target;
+  function hideStandby() {
+    if (!standby) return;
+
+    standby.classList.remove("is-visible");
+    standby.setAttribute("aria-hidden", "true");
+  }
+
+  function showStandby() {
+    if (!standby) return;
+    if (menuOpen || doc.hidden) return;
+
+    standby.classList.add("is-visible");
+    standby.setAttribute("aria-hidden", "false");
+  }
+
+  function resetStandbyTimer() {
+    if (standbyTimer) {
+      window.clearTimeout(standbyTimer);
+    }
+
+    hideStandby();
+
+    standbyTimer = window.setTimeout(
+      showStandby,
+      CONFIG.standbyDelay
+    );
+  }
+
+  function handleActivity() {
+    hideStandby();
+    resetStandbyTimer();
+  }
+
+  ["scroll", "wheel", "touchstart", "keydown", "click"].forEach((eventName) => {
+    window.addEventListener(eventName, handleActivity, {
+      passive: true
+    });
+  });
+
+  window.addEventListener("pointermove", () => {
+    const now = Date.now();
 
     if (
-      target instanceof
-        HTMLInputElement ||
-      target instanceof
-        HTMLTextAreaElement ||
-      target instanceof
-        HTMLSelectElement ||
-      target?.isContentEditable
+      now - lastPointerActivity <
+      CONFIG.pointerThrottle
+    ) {
+      return;
+    }
+
+    lastPointerActivity = now;
+    handleActivity();
+  }, {
+    passive: true
+  });
+
+  /* =======================================================
+     LOADER
+     ======================================================= */
+
+  function hideLoader() {
+    if (loaderHidden || !loader) return;
+
+    loaderHidden = true;
+
+    const finish = () => {
+      loader.setAttribute("aria-hidden", "true");
+      loader.style.display = "none";
+    };
+
+    if (
+      reduceMotionQuery.matches ||
+      !window.gsap
+    ) {
+      finish();
+      return;
+    }
+
+    window.gsap.to(loader, {
+      opacity: 0,
+      duration: 0.65,
+      ease: "power2.out",
+      onComplete: finish
+    });
+  }
+
+  function initLoader() {
+    window.setTimeout(
+      hideLoader,
+      CONFIG.loaderFailsafe
+    );
+
+    if (document.readyState === "complete") {
+      window.setTimeout(hideLoader, 120);
+      return;
+    }
+
+    window.addEventListener("load", () => {
+      window.setTimeout(hideLoader, 120);
+    }, {
+      once: true
+    });
+  }
+
+  /* =======================================================
+     SECTION STATE
+     ======================================================= */
+
+  function getReadingLine() {
+    const headerHeight =
+      document.querySelector(".site-header")?.offsetHeight || 0;
+
+    return (
+      headerHeight +
+      Math.min(
+        window.innerHeight * CONFIG.activeLineRatio,
+        CONFIG.activeLineMax
+      )
+    );
+  }
+
+  function getActiveSectionIndex() {
+    if (!sections.length) return 0;
+
+    const readingLine = getReadingLine();
+
+    let bestIndex = 0;
+    let bestDistance = Number.POSITIVE_INFINITY;
+
+    sections.forEach((section, index) => {
+      const rect = section.getBoundingClientRect();
+
+      if (
+        rect.top <= readingLine &&
+        rect.bottom >= readingLine
+      ) {
+        bestIndex = index;
+        bestDistance = 0;
+        return;
+      }
+
+      const center = rect.top + rect.height / 2;
+      const distance = Math.abs(center - readingLine);
+
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestIndex = index;
+      }
+    });
+
+    return bestIndex;
+  }
+
+  function updateSectionNavigation(index = getActiveSectionIndex()) {
+    if (!sections.length || !sectionNav) return;
+
+    index = clamp(
+      index,
+      0,
+      sections.length - 1
+    );
+
+    currentIndex = index;
+
+    const section = sections[index];
+
+    const title =
+      section.dataset.title ||
+      section.querySelector("h1, h2")?.textContent?.trim() ||
+      "";
+
+    if (sectionNumber) {
+      sectionNumber.textContent =
+        String(index + 1).padStart(2, "0");
+    }
+
+    if (sectionTitle) {
+      sectionTitle.textContent = title;
+    }
+
+    if (sectionPrev) {
+      sectionPrev.disabled = index === 0;
+      sectionPrev.setAttribute(
+        "aria-label",
+        index === 0
+          ? "Sezione precedente non disponibile"
+          : `Vai a ${sections[index - 1].dataset.title || "sezione precedente"}`
+      );
+    }
+
+    if (sectionNext) {
+      sectionNext.disabled =
+        index === sections.length - 1;
+
+      sectionNext.setAttribute(
+        "aria-label",
+        index === sections.length - 1
+          ? "Sezione successiva non disponibile"
+          : `Vai a ${sections[index + 1].dataset.title || "sezione successiva"}`
+      );
+    }
+
+    const isLight =
+      section.classList.contains("story-light");
+
+    sectionNav.dataset.theme =
+      isLight ? "light" : "dark";
+
+    html.dataset.activeSection =
+      section.id || "";
+
+    sections.forEach((item, itemIndex) => {
+      item.setAttribute(
+        "aria-current",
+        itemIndex === index ? "true" : "false"
+      );
+    });
+  }
+
+  function scrollToSection(index) {
+    if (!sections[index]) return;
+
+    const section = sections[index];
+
+    const top =
+      window.scrollY +
+      section.getBoundingClientRect().top -
+      CONFIG.scrollOffset;
+
+    if (
+      reduceMotionQuery.matches
+    ) {
+      window.scrollTo({
+        top,
+        behavior: "auto"
+      });
+      return;
+    }
+
+    window.scrollTo({
+      top,
+      behavior: "smooth"
+    });
+  }
+
+  sectionPrev?.addEventListener("click", () => {
+    if (currentIndex > 0) {
+      scrollToSection(currentIndex - 1);
+    }
+  });
+
+  sectionNext?.addEventListener("click", () => {
+    if (currentIndex < sections.length - 1) {
+      scrollToSection(currentIndex + 1);
+    }
+  });
+
+  /* =======================================================
+     KEYBOARD SECTION NAVIGATION
+     ======================================================= */
+
+  doc.addEventListener("keydown", (event) => {
+    if (
+      menuOpen ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.shiftKey
     ) {
       return;
     }
 
     if (
-      event.key === 'ArrowDown' ||
-      event.key === 'PageDown'
+      event.key === "ArrowDown" &&
+      doc.activeElement === body
     ) {
       event.preventDefault();
-      goNext();
+
+      if (currentIndex < sections.length - 1) {
+        scrollToSection(currentIndex + 1);
+      }
     }
 
     if (
-      event.key === 'ArrowUp' ||
-      event.key === 'PageUp'
-    ) {
-      event.preventDefault();
-      goPrevious();
-    }
-
-    if (
-      event.key === 'Home' &&
-      event.ctrlKey
-    ) {
-      event.preventDefault();
-      scrollToSection(0);
-    }
-
-    if (
-      event.key === 'End' &&
-      event.ctrlKey
+      event.key === "ArrowUp" &&
+      doc.activeElement === body
     ) {
       event.preventDefault();
 
-      scrollToSection(
-        sections.length - 1
-      );
+      if (currentIndex > 0) {
+        scrollToSection(currentIndex - 1);
+      }
     }
-  }
+  });
 
-  /* =========================================================
-     SCROLL
-     ========================================================= */
+  /* =======================================================
+     SCROLL / ACTIVE SECTION
+     ======================================================= */
 
-  function handleScroll() {
+  let scrollTicking = false;
+
+  function requestSectionUpdate() {
     if (scrollTicking) return;
 
     scrollTicking = true;
 
-    win.requestAnimationFrame(() => {
-      updateActiveSection();
+    window.requestAnimationFrame(() => {
+      updateSectionNavigation();
       scrollTicking = false;
     });
   }
 
-  /* =========================================================
-     HASH
-     ========================================================= */
+  window.addEventListener(
+    "scroll",
+    requestSectionUpdate,
+    { passive: true }
+  );
 
-  function handleHash() {
-    const hash =
-      win.location.hash;
+  window.addEventListener(
+    "resize",
+    requestSectionUpdate,
+    { passive: true }
+  );
 
-    if (
-      !hash ||
-      hash === '#'
-    ) {
-      updateActiveSection(true);
-      return;
-    }
+  /* =======================================================
+     GSAP / SCROLLTRIGGER
+     ======================================================= */
 
-    const id =
-      decodeURIComponent(
-        hash.slice(1)
-      );
-
-    const index =
-      sections.findIndex(
-        (section) =>
-          section.id === id
-      );
-
-    if (index === -1) {
-      updateActiveSection(true);
-      return;
-    }
-
-    win.setTimeout(() => {
-      scrollToSection(
-        index,
-        false
-      );
-    }, 50);
+  function gsapAvailable() {
+    return (
+      !reduceMotionQuery.matches &&
+      window.gsap &&
+      window.ScrollTrigger
+    );
   }
 
-  /* =========================================================
-     STANDBY
-     ========================================================= */
+  function killStoryAnimations() {
+    if (!window.ScrollTrigger) return;
 
-  function resetStandby() {
-    if (!UI.standby) return;
+    window.ScrollTrigger.getAll()
+      .filter((trigger) =>
+        trigger.vars &&
+        trigger.vars.id &&
+        String(trigger.vars.id).startsWith("story-")
+      )
+      .forEach((trigger) => trigger.kill());
+  }
 
-    UI.standby.classList.remove(
-      'is-visible'
+  function initStoryAnimations() {
+    if (!gsapAvailable()) {
+      sections.forEach((section) => {
+        section
+          .querySelectorAll(
+            ".eyebrow, h1, h2, p, .return-list span, .connect-words span, .person-frame, .map-frame"
+          )
+          .forEach((element) => {
+            element.style.opacity = "1";
+            element.style.transform = "none";
+          });
+      });
+
+      return;
+    }
+
+    window.gsap.registerPlugin(
+      window.ScrollTrigger
     );
 
-    if (standbyTimer) {
-      win.clearTimeout(
-        standbyTimer
-      );
-    }
+    killStoryAnimations();
 
-    standbyTimer = win.setTimeout(() => {
-      if (
-        !doc.hidden &&
-        !menuOpen &&
-        UI.standby
-      ) {
-        UI.standby.classList.add(
-          'is-visible'
+    sections.forEach((section, index) => {
+      const eyebrow =
+        section.querySelector(".eyebrow");
+
+      const heading =
+        section.querySelector("h1, h2");
+
+      const paragraphs =
+        section.querySelectorAll(
+          ".narrative-copy p, .opening-copy p, .today-lead, .contact-lead"
         );
-      }
-    }, CONFIG.standbyDelay);
-  }
 
-  function initStandby() {
-    [
-      'pointerdown',
-      'pointermove',
-      'keydown',
-      'touchstart',
-      'wheel'
-    ].forEach((eventName) => {
-      doc.addEventListener(
-        eventName,
-        resetStandby,
-        {
-          passive: true
-        }
-      );
-    });
-
-    resetStandby();
-  }
-
-  /* =========================================================
-     GSAP — OPTIONAL
-     ========================================================= */
-
-  function initGSAP() {
-    if (
-      prefersReducedMotion() ||
-      typeof win.gsap === 'undefined'
-    ) {
-      return;
-    }
-
-    try {
-      if (
-        typeof win.ScrollTrigger !==
-        'undefined'
-      ) {
-        win.gsap.registerPlugin(
-          win.ScrollTrigger
+      const frame =
+        section.querySelector(
+          ".person-frame, .map-frame"
         );
-      }
 
-      const elements =
-        $$('.story .reveal');
+      /* Opening */
+      if (
+        section.classList.contains("story-opening")
+      ) {
+        const tl = window.gsap.timeline({
+          scrollTrigger: {
+            id: `story-${index}-opening`,
+            trigger: section,
+            start: "top 70%",
+            once: true
+          }
+        });
 
-      if (!elements.length) {
+        tl.from(eyebrow, {
+          opacity: 0,
+          y: 18,
+          duration: 0.6,
+          ease: "power3.out"
+        })
+        .from(heading, {
+          opacity: 0,
+          y: 40,
+          duration: 0.9,
+          ease: "power4.out"
+        }, "-=0.35")
+        .from(paragraphs, {
+          opacity: 0,
+          y: 20,
+          duration: 0.65,
+          stagger: 0.12,
+          ease: "power3.out"
+        }, "-=0.35");
+
         return;
       }
 
+      /* Understand */
       if (
-        typeof win.ScrollTrigger !==
-        'undefined'
+        section.classList.contains("story-understand")
       ) {
-        elements.forEach(
-          (element) => {
-            win.gsap.fromTo(
-              element,
-              {
-                opacity: 0,
-                y: 28
-              },
-              {
-                opacity: 1,
-                y: 0,
-                duration: 0.8,
-                ease: 'power3.out',
-                scrollTrigger: {
-                  trigger: element,
-                  start: 'top 86%',
-                  once: true
-                }
-              }
-            );
+        const items = section.querySelectorAll(
+          ".understand-lead, .narrative-copy"
+        );
+
+        window.gsap.from(items, {
+          opacity: 0,
+          y: 45,
+          duration: 0.85,
+          stagger: 0.14,
+          ease: "power3.out",
+          scrollTrigger: {
+            id: `story-${index}-understand`,
+            trigger: section,
+            start: "top 68%",
+            once: true
           }
+        });
+
+        return;
+      }
+
+      /* Return */
+      if (
+        section.classList.contains("story-return")
+      ) {
+        const items = section.querySelectorAll(
+          ".return-copy > p, .return-list span"
         );
-      } else {
-        win.gsap.to(
-          elements,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            stagger: 0.04,
-            ease: 'power3.out'
+
+        window.gsap.from(items, {
+          opacity: 0,
+          y: 35,
+          duration: 0.75,
+          stagger: 0.12,
+          ease: "power3.out",
+          scrollTrigger: {
+            id: `story-${index}-return`,
+            trigger: section,
+            start: "top 68%",
+            once: true
           }
-        );
+        });
+
+        return;
       }
-    } catch (error) {
-      /*
-       * GSAP è opzionale.
-       * Un suo errore non deve mai rompere il sito.
-       */
-      console.warn(
-        'GSAP enhancement skipped:',
-        error
-      );
-    }
-  }
 
-  /* =========================================================
-     YEAR
-     ========================================================= */
+      /* Connect */
+      if (
+        section.classList.contains("story-connect")
+      ) {
+        const words =
+          section.querySelectorAll(
+            ".connect-words span"
+          );
 
-  function updateYear() {
-    if (!UI.year) return;
-
-    UI.year.textContent =
-      String(
-        new Date().getFullYear()
-      );
-  }
-
-  /* =========================================================
-     RESIZE
-     ========================================================= */
-
-  function handleResize() {
-    if (resizeTimer) {
-      win.clearTimeout(
-        resizeTimer
-      );
-    }
-
-    resizeTimer = win.setTimeout(
-      () => {
-        collectSections();
-        updateActiveSection(true);
-
-        if (
-          typeof win.ScrollTrigger !==
-          'undefined'
-        ) {
-          try {
-            win.ScrollTrigger.refresh();
-          } catch (_) {
-            // Optional enhancement.
+        window.gsap.from(words, {
+          opacity: 0,
+          x: -35,
+          duration: 0.65,
+          stagger: 0.1,
+          ease: "power3.out",
+          scrollTrigger: {
+            id: `story-${index}-connect`,
+            trigger: section,
+            start: "top 68%",
+            once: true
           }
-        }
-      },
-      100
-    );
-  }
+        });
 
-  /* =========================================================
-     VISIBILITY / BFCACHE
-     ========================================================= */
-
-  function handleVisibility() {
-    if (doc.hidden) {
-      if (standbyTimer) {
-        win.clearTimeout(
-          standbyTimer
-        );
+        return;
       }
 
-      return;
-    }
+      /* Today */
+      if (
+        section.classList.contains("story-today")
+      ) {
+        const tl = window.gsap.timeline({
+          scrollTrigger: {
+            id: `story-${index}-today`,
+            trigger: section,
+            start: "top 68%",
+            once: true
+          }
+        });
 
-    resetStandby();
-    collectSections();
-    updateActiveSection(true);
+        tl.from(heading, {
+          opacity: 0,
+          y: 35,
+          duration: 0.8,
+          ease: "power4.out"
+        })
+        .from(section.querySelector(".today-lead"), {
+          opacity: 0,
+          y: 40,
+          duration: 0.8,
+          ease: "power4.out"
+        }, "-=0.35")
+        .from(section.querySelector(".narrative-copy"), {
+          opacity: 0,
+          y: 30,
+          duration: 0.7,
+          ease: "power3.out"
+        }, "-=0.35");
+
+        return;
+      }
+
+      /* Person / Map */
+      if (frame) {
+        window.gsap.from(frame, {
+          opacity: 0,
+          y: 45,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            id: `story-${index}-frame`,
+            trigger: section,
+            start: "top 70%",
+            once: true
+          }
+        });
+      }
+
+      /* Generic — deliberately restrained */
+      const contentItems = [
+        eyebrow,
+        heading,
+        ...Array.from(paragraphs)
+      ].filter(Boolean);
+
+      if (contentItems.length) {
+        window.gsap.from(contentItems, {
+          opacity: 0,
+          y: 30,
+          duration: 0.75,
+          stagger: 0.1,
+          ease: "power3.out",
+          scrollTrigger: {
+            id: `story-${index}-generic`,
+            trigger: section,
+            start: "top 72%",
+            once: true
+          }
+        });
+      }
+    });
+
+    window.ScrollTrigger.refresh();
   }
 
-  function handlePageShow() {
-    /*
-     * Anche dopo BFCache il loader non deve ricomparire.
-     */
-    hideLoader();
+  /* =======================================================
+     REDUCED MOTION DYNAMIC CHANGE
+     ======================================================= */
 
-    collectSections();
-    updateActiveSection(true);
-    resetStandby();
+  function handleMotionPreferenceChange() {
+    initStoryAnimations();
 
-    if (
-      typeof win.ScrollTrigger !==
-      'undefined'
-    ) {
-      try {
-        win.ScrollTrigger.refresh();
-      } catch (_) {
-        // Optional enhancement.
-      }
+    if (window.ScrollTrigger) {
+      window.ScrollTrigger.refresh();
     }
   }
-
-  /* =========================================================
-     EVENTS
-     ========================================================= */
-
-  function bindEvents() {
-    UI.menuToggle?.addEventListener(
-      'click',
-      toggleMenu
-    );
-
-    UI.menuLinks.forEach(
-      (link) => {
-        link.addEventListener(
-          'click',
-          handleMenuClick
-        );
-      }
-    );
-
-    UI.storyPrev?.addEventListener(
-      'click',
-      goPrevious
-    );
-
-    UI.storyNext?.addEventListener(
-      'click',
-      goNext
-    );
-
-    win.addEventListener(
-      'scroll',
-      handleScroll,
-      {
-        passive: true
-      }
-    );
-
-    win.addEventListener(
-      'resize',
-      handleResize,
-      {
-        passive: true
-      }
-    );
-
-    win.addEventListener(
-      'hashchange',
-      handleHash
-    );
-
-    win.addEventListener(
-      'popstate',
-      handleHash
-    );
-
-    win.addEventListener(
-      'pageshow',
-      handlePageShow
-    );
-
-    doc.addEventListener(
-      'keydown',
-      handleKeydown
-    );
-
-    doc.addEventListener(
-      'visibilitychange',
-      handleVisibility
-    );
-  }
-
-  /* =========================================================
-     INITIALIZATION
-     ========================================================= */
-
-  function init() {
-    try {
-      collectUI();
-      collectSections();
-
-      updateYear();
-      updateMenuState();
-
-      bindEvents();
-
-      updateActiveSection(true);
-
-      /*
-       * Se esiste un hash, lo gestiamo dopo
-       * che il layout è stato calcolato.
-       */
-      handleHash();
-
-      initStandby();
-
-      /*
-       * Il loader viene chiuso SUBITO.
-       * Non aspettiamo GSAP, immagini, iframe o altro.
-       */
-      win.requestAnimationFrame(() => {
-        hideLoader();
-      });
-
-      /*
-       * GSAP viene caricato/inizializzato
-       * come enhancement separato.
-       */
-      win.setTimeout(() => {
-        initGSAP();
-      }, 0);
-
-    } catch (error) {
-      console.error(
-        'Site initialization error:',
-        error
-      );
-
-      /*
-       * Fallback definitivo:
-       * la pagina deve comunque diventare visibile.
-       */
-      hideLoader();
-
-      doc.documentElement.classList.remove(
-        'is-loading'
-      );
-
-      doc.body.classList.remove(
-        'is-loading'
-      );
-    }
-  }
-
-  /* =========================================================
-     GLOBAL ERROR SAFETY
-     ========================================================= */
-
-  win.addEventListener(
-    'error',
-    () => {
-      hideLoader();
-    }
-  );
-
-  win.addEventListener(
-    'unhandledrejection',
-    () => {
-      hideLoader();
-    }
-  );
-
-  /* =========================================================
-     START
-     ========================================================= */
 
   if (
-    doc.readyState === 'loading'
+    typeof reduceMotionQuery.addEventListener ===
+    "function"
   ) {
-    doc.addEventListener(
-      'DOMContentLoaded',
-      init,
-      {
-        once: true
+    reduceMotionQuery.addEventListener(
+      "change",
+      handleMotionPreferenceChange
+    );
+  } else if (
+    typeof reduceMotionQuery.addListener ===
+    "function"
+  ) {
+    reduceMotionQuery.addListener(
+      handleMotionPreferenceChange
+    );
+  }
+
+  /* =======================================================
+     HASH NAVIGATION
+     ======================================================= */
+
+  function handleInitialHash() {
+    const hash = window.location.hash;
+
+    if (!hash) return;
+
+    const target = doc.getElementById(
+      decodeURIComponent(hash.slice(1))
+    );
+
+    if (!target) return;
+
+    window.setTimeout(() => {
+      target.scrollIntoView({
+        behavior: reduceMotionQuery.matches
+          ? "auto"
+          : "smooth",
+        block: "start"
+      });
+    }, 250);
+  }
+
+  /* =======================================================
+     PAGE VISIBILITY / BFCACHE
+     ======================================================= */
+
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+      if (document.hidden) {
+        hideStandby();
+      } else {
+        resetStandbyTimer();
+
+        if (window.ScrollTrigger) {
+          window.ScrollTrigger.refresh();
+        }
       }
+    }
+  );
+
+  window.addEventListener(
+    "pageshow",
+    () => {
+      resetStandbyTimer();
+
+      if (window.ScrollTrigger) {
+        window.ScrollTrigger.refresh();
+      }
+
+      requestSectionUpdate();
+    }
+  );
+
+  /* =======================================================
+     INITIALIZATION
+     ======================================================= */
+
+  function init() {
+    setMenuTabState(true);
+    updateMenuState(false);
+
+    updateSectionNavigation(0);
+
+    initLoader();
+    initStoryAnimations();
+
+    handleInitialHash();
+
+    window.setTimeout(() => {
+      updateSectionNavigation();
+    }, 50);
+
+    resetStandbyTimer();
+
+    if (window.ScrollTrigger) {
+      window.setTimeout(() => {
+        window.ScrollTrigger.refresh();
+      }, 150);
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      init,
+      { once: true }
     );
   } else {
     init();
