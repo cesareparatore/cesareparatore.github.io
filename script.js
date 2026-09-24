@@ -1,415 +1,148 @@
+/* =========================================================
+   CESARE PARATORE
+   Main interaction layer
+   No external libraries.
+   No dependency on GSAP.
+   No dependency for page visibility.
+========================================================= */
+
 (() => {
   "use strict";
 
-  /*
-   * ========================================================
-   * CESARE PARATORE
-   * Navigation / loader / narrative progression
-   * V2
-   * ========================================================
-   */
 
-  const html = document.documentElement;
-  const body = document.body;
+  /* =======================================================
+     DOM READY
+  ======================================================= */
 
-  html.classList.add("js");
+  const init = () => {
+
+    document.documentElement.classList.add("js");
 
 
-  /* ========================================================
-     DOM
-     ======================================================== */
+    /* =====================================================
+       ELEMENTS
+    ===================================================== */
 
-  const loader =
-    document.getElementById("site-loader");
+    const body = document.body;
 
-  const header =
-    document.getElementById("site-header");
+    const loader = document.getElementById("site-loader");
 
-  const menuToggle =
-    document.getElementById("menu-toggle");
+    const menuToggle = document.getElementById("menu-toggle");
+    const menu = document.getElementById("site-menu");
 
-  const menu =
-    document.getElementById("site-menu");
+    const activeChapter =
+      document.getElementById("active-chapter");
 
-  const menuLinks =
-    Array.from(
-      document.querySelectorAll(".menu-link")
-    );
+    const previousButton =
+      document.getElementById("prev-section");
 
-  const activeChapter =
-    document.getElementById("active-chapter");
+    const nextButton =
+      document.getElementById("next-section");
 
-  const previousButton =
-    document.getElementById("prev-section");
+    const progress =
+      document.getElementById("wow-progress");
 
-  const nextButton =
-    document.getElementById("next-section");
+    const activeDot =
+      document.getElementById("wow-dot-active");
 
-  const nextArrowSymbol =
-    document.getElementById("next-arrow-symbol");
+    const brand =
+      document.querySelector(".brand");
 
-  const nextArrowLabel =
-    document.getElementById("next-arrow-label");
+    const menuLinks =
+      document.querySelectorAll(".menu-links a");
 
-  const wowProgress =
-    document.getElementById("wow-progress");
-
-  const wowDot =
-    document.getElementById("wow-dot-active");
-
-  const brand =
-    document.querySelector(".brand");
-
-  const main =
-    document.getElementById("main-content");
-
-  const footer =
-    document.querySelector(".site-footer");
-
-  const sections =
-    Array.from(
-      document.querySelectorAll(".story-section")
-    );
+    const sections =
+      Array.from(document.querySelectorAll(".story"));
 
 
-  /* ========================================================
-     BASIC SAFETY
-     ======================================================== */
-
-  if (
-    !header ||
-    !menuToggle ||
-    !menu ||
-    !activeChapter ||
-    !previousButton ||
-    !nextButton ||
-    !nextArrowSymbol ||
-    !nextArrowLabel ||
-    !wowProgress ||
-    !wowDot ||
-    !sections.length
-  ) {
-    return;
-  }
+    if (!sections.length) {
+      return;
+    }
 
 
-  /* ========================================================
-     STATE
-     ======================================================== */
+    /* =====================================================
+       SECTION DATA
+    ===================================================== */
 
-  let activeIndex = 0;
-  let menuOpen = false;
-
-  let scrollFrame = null;
-
-  let loaderMinTimer = null;
-  let loaderFallbackTimer = null;
-  let loaderExitTimer = null;
-
-  let loaderStartedAt = 0;
-  let loaderFinished = false;
-
-  let lastFocusedElement = null;
-
-  const reducedMotion =
-    window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    );
-
-  /*
-   * Cache dell'ultimo stato applicato.
-   *
-   * Evita di riscrivere continuamente le stesse
-   * custom properties durante lo scroll.
-   */
-  const narrativeCache =
-    sections.map(() => ({
-      titleAlpha: null,
-      titleY: null,
-      contentAlpha: null,
-      contentY: null
+    const sectionData = sections.map((section, index) => ({
+      element: section,
+      index,
+      title: section.dataset.title || "",
+      id: section.id
     }));
 
 
-  /* ========================================================
-     HELPERS
-     ======================================================== */
-
-  const clamp = (
-    value,
-    min,
-    max
-  ) => {
-    return Math.min(
-      Math.max(value, min),
-      max
-    );
-  };
+    let activeIndex = 0;
+    let ticking = false;
+    let menuOpen = false;
 
 
-  const smoothStep = (value) => {
-    const t =
-      clamp(value, 0, 1);
+    /* =====================================================
+       LOADER
+       Progressive enhancement only.
 
-    return t * t * (3 - 2 * t);
-  };
+       CSS hides loader by default.
+       Therefore a JS failure can never create
+       a permanent black screen.
+    ===================================================== */
 
+    const runLoader = () => {
 
-  const getHeaderHeight = () => {
-    return header.getBoundingClientRect().height;
-  };
-
-
-  const getSectionIndex = (section) => {
-    return sections.indexOf(section);
-  };
-
-
-  const scrollToSection = (
-    section,
-    behavior = "smooth"
-  ) => {
-
-    if (!section) {
-      return;
-    }
-
-    const headerHeight =
-      getHeaderHeight();
-
-    const rect =
-      section.getBoundingClientRect();
-
-    const targetTop =
-      window.scrollY +
-      rect.top -
-      headerHeight;
-
-    window.scrollTo({
-      top: Math.max(0, targetTop),
-      behavior
-    });
-  };
-
-
-  const isEditableTarget = (target) => {
-    if (!(target instanceof Element)) {
-      return false;
-    }
-
-    return Boolean(
-      target.closest(
-        "input, textarea, select, [contenteditable='true']"
-      )
-    );
-  };
-
-
-  const getFocusableMenuElements = () => {
-    return Array.from(
-      menu.querySelectorAll(
-        "a[href], button:not([disabled]), [tabindex]:not([tabindex='-1'])"
-      )
-    ).filter((element) => {
-      return (
-        !element.hasAttribute("disabled") &&
-        element.getAttribute("aria-hidden") !== "true"
-      );
-    });
-  };
-
-
-  const setPageInert = (locked) => {
-    [main, footer].forEach((element) => {
-      if (!element) {
+      if (!loader) {
         return;
       }
 
-      if (locked) {
-        element.setAttribute("inert", "");
-      } else {
-        element.removeAttribute("inert");
+      const reducedMotion =
+        window.matchMedia(
+          "(prefers-reduced-motion: reduce)"
+        ).matches;
+
+      if (reducedMotion) {
+        loader.remove();
+        return;
       }
-    });
-  };
 
+      /*
+       * The loader is activated only after the page exists.
+       * This guarantees that the underlying page is already
+       * available if anything interrupts the sequence.
+       */
 
-  /* ========================================================
-     LOADER
-     ======================================================== */
+      loader.setAttribute("aria-hidden", "false");
+      loader.classList.add("is-active");
 
-  const finishLoader = () => {
-
-    if (!loader || loaderFinished) {
-      return;
-    }
-
-    loaderFinished = true;
-
-    if (loaderMinTimer !== null) {
-      window.clearTimeout(
-        loaderMinTimer
-      );
-
-      loaderMinTimer = null;
-    }
-
-    if (loaderFallbackTimer !== null) {
-      window.clearTimeout(
-        loaderFallbackTimer
-      );
-
-      loaderFallbackTimer = null;
-    }
-
-    loader.classList.add(
-      "is-exiting"
-    );
-
-    const exitDuration =
-      reducedMotion.matches
-        ? 20
-        : 1150;
-
-    loaderExitTimer =
       window.setTimeout(() => {
 
-        loader.classList.remove(
-          "is-active"
-        );
+        loader.classList.add("is-exiting");
 
-        loader.classList.remove(
-          "is-exiting"
-        );
+        window.setTimeout(() => {
 
-        loader.setAttribute(
-          "aria-hidden",
-          "true"
-        );
+          loader.classList.remove("is-active");
+          loader.remove();
 
-        loaderExitTimer = null;
+        }, 900);
 
-      }, exitDuration);
-  };
+      }, 2100);
+    };
 
 
-  const tryFinishLoader = () => {
+    /* =====================================================
+       MENU
+    ===================================================== */
 
-    if (!loader || loaderFinished) {
-      return;
-    }
+    const openMenu = () => {
 
-    const minimumDuration =
-      reducedMotion.matches
-        ? 0
-        : 900;
-
-    const elapsed =
-      performance.now() -
-      loaderStartedAt;
-
-    const remaining =
-      Math.max(
-        0,
-        minimumDuration - elapsed
-      );
-
-    if (remaining === 0) {
-      finishLoader();
-      return;
-    }
-
-    loaderMinTimer =
-      window.setTimeout(
-        finishLoader,
-        remaining
-      );
-  };
-
-
-  const startLoader = () => {
-
-    if (!loader) {
-      return;
-    }
-
-    loaderStartedAt =
-      performance.now();
-
-    loaderFinished = false;
-
-    loader.classList.add(
-      "is-active"
-    );
-
-    /*
-     * Se la pagina è già caricata, non aspettiamo
-     * inutilmente l'evento load.
-     */
-    if (
-      document.readyState ===
-      "complete"
-    ) {
-      tryFinishLoader();
-    } else {
-
-      window.addEventListener(
-        "load",
-        tryFinishLoader,
-        {
-          once: true
-        }
-      );
-    }
-
-    /*
-     * Fallback di sicurezza:
-     * il loader non può rimanere bloccato
-     * indefinitamente in caso di risorsa lenta.
-     */
-    loaderFallbackTimer =
-      window.setTimeout(
-        finishLoader,
-        reducedMotion.matches
-          ? 1000
-          : 4500
-      );
-  };
-
-
-  /* ========================================================
-     MENU
-     * ======================================================== */
-
-  const setMenuState = (open) => {
-
-    const nextState =
-      Boolean(open);
-
-    if (
-      nextState === menuOpen &&
-      menu.classList.contains(
-        "is-open"
-      )
-    ) {
-      return;
-    }
-
-    if (nextState) {
-
-      lastFocusedElement =
-        document.activeElement instanceof HTMLElement
-          ? document.activeElement
-          : menuToggle;
+      if (menuOpen) {
+        return;
+      }
 
       menuOpen = true;
 
-      header.classList.add(
-        "menu-open"
-      );
+      body.classList.add("menu-open");
 
-      menu.classList.add(
-        "is-open"
+      menuToggle.setAttribute(
+        "aria-expanded",
+        "true"
       );
 
       menu.setAttribute(
@@ -417,1007 +150,430 @@
         "false"
       );
 
+      /*
+       * Focus first navigation item after the opening
+       * animation starts.
+       */
+
+      window.setTimeout(() => {
+
+        if (menuLinks[0]) {
+          menuLinks[0].focus();
+        }
+
+      }, 120);
+    };
+
+
+    const closeMenu = (restoreFocus = true) => {
+
+      if (!menuOpen) {
+        return;
+      }
+
+      menuOpen = false;
+
+      body.classList.remove("menu-open");
+
       menuToggle.setAttribute(
         "aria-expanded",
+        "false"
+      );
+
+      menu.setAttribute(
+        "aria-hidden",
         "true"
       );
 
-      menuToggle.setAttribute(
-        "aria-label",
-        "Chiudi menu"
-      );
-
-      body.classList.add(
-        "menu-is-open"
-      );
-
-      setPageInert(true);
-
-      window.requestAnimationFrame(() => {
-
-        const focusable =
-          getFocusableMenuElements();
-
-        if (focusable.length) {
-          focusable[0].focus({
-            preventScroll: true
-          });
-        }
-
-      });
-
-      return;
-    }
+      if (restoreFocus) {
+        menuToggle.focus();
+      }
+    };
 
 
-    /*
-     * CHIUSURA
-     */
+    menuToggle.addEventListener("click", () => {
 
-    menuOpen = false;
+      if (menuOpen) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
 
-    header.classList.remove(
-      "menu-open"
-    );
-
-    menu.classList.remove(
-      "is-open"
-    );
-
-    menu.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-
-    menuToggle.setAttribute(
-      "aria-expanded",
-      "false"
-    );
-
-    menuToggle.setAttribute(
-      "aria-label",
-      "Apri menu"
-    );
-
-    body.classList.remove(
-      "menu-is-open"
-    );
-
-    setPageInert(false);
-
-    /*
-     * Restituisce il focus a chi aveva aperto il menu.
-     */
-    const focusTarget =
-      lastFocusedElement &&
-      document.contains(lastFocusedElement) &&
-      !lastFocusedElement.hasAttribute("disabled")
-        ? lastFocusedElement
-        : menuToggle;
-
-    window.requestAnimationFrame(() => {
-      focusTarget.focus({
-        preventScroll: true
-      });
     });
 
-    lastFocusedElement = null;
-  };
+
+    menuLinks.forEach((link) => {
+
+      link.addEventListener("click", () => {
+        closeMenu(false);
+      });
+
+    });
 
 
-  menuToggle.addEventListener(
-    "click",
-    () => {
-      setMenuState(!menuOpen);
-    }
-  );
+    /* =====================================================
+       ESC KEY
+    ===================================================== */
 
+    document.addEventListener("keydown", (event) => {
 
-  menuLinks.forEach((link) => {
-
-    link.addEventListener(
-      "click",
-      (event) => {
-
-        const href =
-          link.getAttribute("href");
-
-        if (
-          !href ||
-          !href.startsWith("#")
-        ) {
-          return;
-        }
-
-        const target =
-          document.getElementById(
-            href.slice(1)
-          );
-
-        if (!target) {
-          return;
-        }
-
-        event.preventDefault();
-
-        const index =
-          getSectionIndex(target);
-
-        setMenuState(false);
-
-        if (index >= 0) {
-          setActiveSection(
-            index,
-            false
-          );
-        }
-
-        scrollToSection(
-          target,
-          reducedMotion.matches
-            ? "auto"
-            : "smooth"
-        );
-
-        window.history.replaceState(
-          null,
-          "",
-          href
-        );
+      if (event.key === "Escape" && menuOpen) {
+        closeMenu();
       }
-    );
-  });
+
+    });
 
 
-  /* ========================================================
-     ACTIVE SECTION UI
-     ======================================================== */
+    /* =====================================================
+       ACTIVE SECTION
+    ===================================================== */
 
-  const setActiveSection = (
-    index,
-    updateHash = false
-  ) => {
+    const setActiveSection = (index) => {
 
-    if (!sections.length) {
-      return;
-    }
-
-    const safeIndex =
-      clamp(
-        Number.isFinite(Number(index))
-          ? Number(index)
-          : 0,
-        0,
-        sections.length - 1
-      );
-
-    activeIndex =
-      safeIndex;
-
-    const section =
-      sections[safeIndex];
-
-    if (!section) {
-      return;
-    }
-
-    const chapter =
-      section.dataset.chapter || "";
-
-    activeChapter.textContent =
-      chapter;
-
-
-    /* ------------------------------------
-       PREVIOUS
-       ------------------------------------ */
-
-    const first =
-      safeIndex === 0;
-
-    previousButton.disabled =
-      first;
-
-    previousButton.setAttribute(
-      "aria-label",
-      first
-        ? "Sei all'inizio"
-        : `Vai alla sezione precedente: ${
-            sections[safeIndex - 1]
-              ?.dataset.chapter || ""
-          }`
-    );
-
-
-    /* ------------------------------------
-       NEXT / RETURN
-       ------------------------------------ */
-
-    const last =
-      safeIndex ===
-      sections.length - 1;
-
-    nextButton.classList.toggle(
-      "is-return",
-      last
-    );
-
-    if (last) {
-
-      nextArrowSymbol.textContent =
-        "↶";
-
-      nextArrowLabel.textContent =
-        "INIZIO";
-
-      nextButton.setAttribute(
-        "aria-label",
-        "Torna all'inizio"
-      );
-
-    } else {
-
-      nextArrowSymbol.textContent =
-        "→";
-
-      nextArrowLabel.textContent =
-        "AVANTI";
-
-      nextButton.setAttribute(
-        "aria-label",
-        `Vai alla sezione successiva: ${
-          sections[safeIndex + 1]
-            ?.dataset.chapter || ""
-        }`
-      );
-    }
-
-
-    /* ------------------------------------
-       PROGRESS
-       ------------------------------------ */
-
-    const percentage =
-      sections.length > 1
-        ? (
-            safeIndex /
-            (sections.length - 1)
-          ) * 100
-        : 0;
-
-    const percentageValue =
-      `${percentage}%`;
-
-    if (
-      wowProgress.style.width !==
-      percentageValue
-    ) {
-      wowProgress.style.width =
-        percentageValue;
-    }
-
-    if (
-      wowDot.style.left !==
-      percentageValue
-    ) {
-      wowDot.style.left =
-        percentageValue;
-    }
-
-
-    /* ------------------------------------
-       HASH
-       ------------------------------------ */
-
-    if (updateHash) {
-
-      const id =
-        section.id;
-
-      if (id) {
-        window.history.replaceState(
-          null,
-          "",
-          `#${id}`
+      const safeIndex =
+        Math.max(
+          0,
+          Math.min(index, sectionData.length - 1)
         );
+
+      activeIndex = safeIndex;
+
+      const data = sectionData[safeIndex];
+
+      sections.forEach((section, sectionIndex) => {
+
+        section.classList.toggle(
+          "is-active",
+          sectionIndex === safeIndex
+        );
+
+      });
+
+      if (activeChapter) {
+        activeChapter.textContent = data.title;
       }
-    }
-  };
+
+      if (previousButton) {
+        previousButton.disabled =
+          safeIndex === 0;
+      }
+
+      if (nextButton) {
+        nextButton.disabled =
+          safeIndex === sectionData.length - 1;
+      }
+
+      /*
+       * Narrative progress:
+       * first chapter = 0%
+       * last chapter = 100%
+       */
+
+      const percentage =
+        sectionData.length <= 1
+          ? 0
+          : (safeIndex / (sectionData.length - 1)) * 100;
+
+      if (progress) {
+        progress.style.width = `${percentage}%`;
+      }
+
+      if (activeDot) {
+        activeDot.style.left = `${percentage}%`;
+      }
+    };
 
 
-  /* ========================================================
-     NARRATIVE STYLE CACHE
-     ======================================================== */
+    /* =====================================================
+       FIND ACTIVE SECTION FROM SCROLL POSITION
+    ===================================================== */
 
-  const updateSectionVariable = (
-    section,
-    index,
-    key,
-    value
-  ) => {
+    const updateActiveFromScroll = () => {
 
-    if (
-      narrativeCache[index][key] ===
-      value
-    ) {
-      return;
-    }
+      const viewportCenter =
+        window.innerHeight * 0.5;
 
-    narrativeCache[index][key] =
-      value;
+      let closestIndex = 0;
+      let closestDistance = Infinity;
 
-    section.style.setProperty(
-      `--${key.replace(
-        /[A-Z]/g,
-        (match) =>
-          `-${match.toLowerCase()}`
-      )}`,
-      value
-    );
-  };
-
-
-  /* ========================================================
-     FIND ACTIVE SECTION
-     ======================================================== */
-
-  const updateNarrative = () => {
-
-    scrollFrame = null;
-
-    if (!sections.length) {
-      return;
-    }
-
-    const viewportHeight =
-      window.innerHeight;
-
-    const headerHeight =
-      getHeaderHeight();
-
-    /*
-     * Anchor narrativo.
-     *
-     * Rimane sotto l'header e impedisce
-     * alla sezione successiva di prendere
-     * il controllo troppo presto.
-     */
-    const anchor =
-      headerHeight +
-      (
-        viewportHeight -
-        headerHeight
-      ) * .38;
-
-    let bestIndex =
-      activeIndex;
-
-    let bestDistance =
-      Infinity;
-
-
-    sections.forEach(
-      (section, index) => {
+      sections.forEach((section, index) => {
 
         const rect =
           section.getBoundingClientRect();
 
-        const height =
-          Math.max(
-            rect.height,
-            1
-          );
-
-
-        /* --------------------------------
-           SECTION PROGRESS
-           -------------------------------- */
-
-        const raw =
-          (
-            anchor -
-            rect.top
-          ) / height;
-
-        const progress =
-          clamp(
-            raw,
-            0,
-            1
-          );
-
-
-        /* --------------------------------
-           TITLE
-           -------------------------------- */
-
-        const titleFade =
-          smoothStep(
-            (progress - .05) / .42
-          );
-
-        const titleAlpha =
-          (
-            1 -
-            titleFade
-          ).toFixed(3);
-
-        const titleY =
-          `${(
-            -22 *
-            titleFade
-          ).toFixed(1)}px`;
-
-
-        /* --------------------------------
-           CONTENT
-           -------------------------------- */
-
-        const contentReveal =
-          smoothStep(
-            (progress - .14) / .42
-          );
-
-        const contentAlpha =
-          (
-            .18 +
-            (.82 * contentReveal)
-          ).toFixed(3);
-
-        const contentY =
-          `${(
-            32 *
-            (1 - contentReveal)
-          ).toFixed(1)}px`;
-
-
-        /* --------------------------------
-           WRITE ONLY WHEN CHANGED
-           -------------------------------- */
-
-        updateSectionVariable(
-          section,
-          index,
-          "titleAlpha",
-          titleAlpha
-        );
-
-        updateSectionVariable(
-          section,
-          index,
-          "titleY",
-          titleY
-        );
-
-        updateSectionVariable(
-          section,
-          index,
-          "contentAlpha",
-          contentAlpha
-        );
-
-        updateSectionVariable(
-          section,
-          index,
-          "contentY",
-          contentY
-        );
-
-
-        /* --------------------------------
-           ACTIVE CHAPTER
-           -------------------------------- */
-
-        const narrativePoint =
-          rect.top +
-          Math.min(
-            height * .35,
-            viewportHeight * .42
-          );
+        const sectionCenter =
+          rect.top + rect.height / 2;
 
         const distance =
           Math.abs(
-            narrativePoint -
-            anchor
+            viewportCenter - sectionCenter
           );
 
-        const visible =
-          rect.bottom > headerHeight &&
-          rect.top < viewportHeight;
-
-        if (
-          visible &&
-          distance < bestDistance
-        ) {
-          bestDistance =
-            distance;
-
-          bestIndex =
-            index;
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = index;
         }
+
+      });
+
+      setActiveSection(closestIndex);
+
+      ticking = false;
+    };
+
+
+    const requestScrollUpdate = () => {
+
+      if (ticking) {
+        return;
       }
-    );
 
+      ticking = true;
 
-    if (
-      bestIndex !==
-      activeIndex
-    ) {
-      setActiveSection(
-        bestIndex,
-        false
-      );
-    }
-  };
-
-
-  const requestNarrativeUpdate = () => {
-
-    if (
-      scrollFrame !== null
-    ) {
-      return;
-    }
-
-    scrollFrame =
       window.requestAnimationFrame(
-        updateNarrative
+        updateActiveFromScroll
       );
-  };
+    };
 
 
-  window.addEventListener(
-    "scroll",
-    requestNarrativeUpdate,
-    {
-      passive: true
-    }
-  );
+    window.addEventListener(
+      "scroll",
+      requestScrollUpdate,
+      { passive: true }
+    );
+
+    window.addEventListener(
+      "resize",
+      requestScrollUpdate
+    );
 
 
-  window.addEventListener(
-    "resize",
-    requestNarrativeUpdate,
-    {
-      passive: true
-    }
-  );
+    /* =====================================================
+       SECTION SCROLL
+    ===================================================== */
 
+    const goToSection = (index) => {
 
-  /* ========================================================
-     PREVIOUS
-     ======================================================== */
-
-  previousButton.addEventListener(
-    "click",
-    () => {
-
-      if (activeIndex <= 0) {
-        return;
-      }
-
-      const targetIndex =
-        activeIndex - 1;
-
-      const target =
-        sections[targetIndex];
-
-      if (!target) {
-        return;
-      }
-
-      setActiveSection(
-        targetIndex,
-        true
-      );
-
-      scrollToSection(
-        target,
-        reducedMotion.matches
-          ? "auto"
-          : "smooth"
-      );
-    }
-  );
-
-
-  /* ========================================================
-     NEXT / RETURN
-     ======================================================== */
-
-  nextButton.addEventListener(
-    "click",
-    () => {
-
-      const last =
-        activeIndex ===
-        sections.length - 1;
-
-
-      if (last) {
-
-        const firstSection =
-          sections[0];
-
-        setActiveSection(
+      const safeIndex =
+        Math.max(
           0,
-          true
+          Math.min(index, sectionData.length - 1)
         );
-
-        scrollToSection(
-          firstSection,
-          reducedMotion.matches
-            ? "auto"
-            : "smooth"
-        );
-
-        return;
-      }
-
-
-      const targetIndex =
-        activeIndex + 1;
 
       const target =
-        sections[targetIndex];
+        sectionData[safeIndex].element;
 
       if (!target) {
         return;
       }
 
-      setActiveSection(
-        targetIndex,
-        true
-      );
-
-      scrollToSection(
-        target,
-        reducedMotion.matches
-          ? "auto"
-          : "smooth"
-      );
-    }
-  );
+      target.scrollIntoView({
+        behavior:
+          window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+          ).matches
+            ? "auto"
+            : "smooth",
+        block: "start"
+      });
+    };
 
 
-  /* ========================================================
-     BRAND
-     ======================================================== */
-
-  if (brand) {
-
-    brand.addEventListener(
+    previousButton.addEventListener(
       "click",
-      (event) => {
-
-        event.preventDefault();
-
-        setMenuState(false);
-
-        setActiveSection(
-          0,
-          true
-        );
-
-        scrollToSection(
-          sections[0],
-          reducedMotion.matches
-            ? "auto"
-            : "smooth"
-        );
+      () => {
+        goToSection(activeIndex - 1);
       }
     );
-  }
 
 
-  /* ========================================================
-     KEYBOARD
-     ======================================================== */
-
-  document.addEventListener(
-    "keydown",
-    (event) => {
-
-      /* --------------------------------
-         ESCAPE
-         -------------------------------- */
-
-      if (
-        event.key === "Escape" &&
-        menuOpen
-      ) {
-        event.preventDefault();
-
-        setMenuState(false);
-
-        return;
+    nextButton.addEventListener(
+      "click",
+      () => {
+        goToSection(activeIndex + 1);
       }
-
-
-      /* --------------------------------
-         FOCUS TRAP
-         -------------------------------- */
-
-      if (
-        event.key === "Tab" &&
-        menuOpen
-      ) {
-
-        const focusable =
-          getFocusableMenuElements();
-
-        if (!focusable.length) {
-          event.preventDefault();
-          return;
-        }
-
-        const first =
-          focusable[0];
-
-        const last =
-          focusable[
-            focusable.length - 1
-          ];
-
-        if (
-          event.shiftKey &&
-          document.activeElement === first
-        ) {
-          event.preventDefault();
-
-          last.focus();
-
-          return;
-        }
-
-        if (
-          !event.shiftKey &&
-          document.activeElement === last
-        ) {
-          event.preventDefault();
-
-          first.focus();
-
-          return;
-        }
-      }
-
-
-      /* --------------------------------
-         EDITABLE ELEMENTS
-         -------------------------------- */
-
-      if (
-        isEditableTarget(
-          event.target
-        )
-      ) {
-        return;
-      }
-
-
-      /* --------------------------------
-         ARROW NAVIGATION
-         -------------------------------- */
-
-      if (
-        event.key === "ArrowLeft" &&
-        !menuOpen
-      ) {
-
-        event.preventDefault();
-
-        previousButton.click();
-
-        return;
-      }
-
-
-      if (
-        event.key === "ArrowRight" &&
-        !menuOpen
-      ) {
-
-        event.preventDefault();
-
-        nextButton.click();
-
-        return;
-      }
-    }
-  );
-
-
-  /* ========================================================
-     HASH
-     ======================================================== */
-
-  const handleHash = () => {
-
-    const hash =
-      window.location.hash;
-
-    if (!hash) {
-      return;
-    }
-
-    let id = "";
-
-    try {
-      id =
-        decodeURIComponent(
-          hash.slice(1)
-        );
-    } catch {
-      return;
-    }
-
-    if (!id) {
-      return;
-    }
-
-    const target =
-      document.getElementById(id);
-
-    if (!target) {
-      return;
-    }
-
-    const index =
-      getSectionIndex(target);
-
-    if (index < 0) {
-      return;
-    }
-
-    setActiveSection(
-      index,
-      false
     );
+
+
+    /* =====================================================
+       KEYBOARD ARROW NAVIGATION
+    ===================================================== */
+
+    document.addEventListener("keydown", (event) => {
+
+      /*
+       * Don't hijack keyboard arrows when user is typing.
+       */
+
+      const tag =
+        document.activeElement?.tagName;
+
+      const isTyping =
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT";
+
+      if (isTyping || menuOpen) {
+        return;
+      }
+
+      if (event.key === "ArrowDown") {
+
+        event.preventDefault();
+
+        goToSection(activeIndex + 1);
+      }
+
+      if (event.key === "ArrowUp") {
+
+        event.preventDefault();
+
+        goToSection(activeIndex - 1);
+      }
+
+    });
+
+
+    /* =====================================================
+       BRAND → TOP
+    ===================================================== */
+
+    if (brand) {
+
+      brand.addEventListener("click", () => {
+
+        if (menuOpen) {
+          closeMenu(false);
+        }
+
+      });
+
+    }
+
+
+    /* =====================================================
+       URL HASH
+    ===================================================== */
+
+    const initialHash =
+      window.location.hash.replace("#", "");
+
+    if (initialHash) {
+
+      const initialIndex =
+        sectionData.findIndex(
+          item => item.id === initialHash
+        );
+
+      if (initialIndex >= 0) {
+
+        window.setTimeout(() => {
+
+          sectionData[
+            initialIndex
+          ].element.scrollIntoView({
+            behavior: "auto",
+            block: "start"
+          });
+
+          setActiveSection(initialIndex);
+
+        }, 0);
+
+      }
+
+    }
+
+
+    /* =====================================================
+       INTERSECTION OBSERVER
+       Used only for narrative reveal states.
+       If unsupported, the page remains fully visible.
+    ===================================================== */
+
+    if ("IntersectionObserver" in window) {
+
+      const observer =
+        new IntersectionObserver(
+          (entries) => {
+
+            entries.forEach((entry) => {
+
+              if (entry.isIntersecting) {
+
+                entry.target.classList.add(
+                  "is-active"
+                );
+
+              }
+
+            });
+
+          },
+          {
+            root: null,
+            threshold: 0.22
+          }
+        );
+
+      sections.forEach((section) => {
+
+        observer.observe(section);
+
+      });
+
+    } else {
+
+      sections.forEach((section) => {
+
+        section.classList.add("is-active");
+
+      });
+
+    }
+
+
+    /* =====================================================
+       INITIAL STATE
+    ===================================================== */
+
+    setActiveSection(0);
 
     /*
-     * Aspettiamo il primo layout completo.
+     * Opening section is intentionally pure:
+     * GUARDA. only.
      */
-    window.setTimeout(
-      () => {
 
-        scrollToSection(
-          target,
-          reducedMotion.matches
-            ? "auto"
-            : "smooth"
-        );
+    sections[0].classList.add("is-active");
 
-      },
-      80
-    );
+
+    /* =====================================================
+       START CINEMATIC INTRO
+    ===================================================== */
+
+    runLoader();
+
   };
 
 
-  window.addEventListener(
-    "hashchange",
-    handleHash
-  );
+  /* =======================================================
+     START SAFELY
+  ======================================================= */
 
+  if (
+    document.readyState === "loading"
+  ) {
 
-  /* ========================================================
-     INITIAL STATE
-     ======================================================== */
+    document.addEventListener(
+      "DOMContentLoaded",
+      init,
+      { once: true }
+    );
 
-  sections.forEach(
-    (section, index) => {
+  } else {
 
-      const initialState =
-        index === 0
-          ? {
-              titleAlpha: "1",
-              titleY: "0px",
-              contentAlpha: "1",
-              contentY: "0px"
-            }
-          : {
-              titleAlpha: "0.15",
-              titleY: "-10px",
-              contentAlpha: "0.18",
-              contentY: "32px"
-            };
+    init();
 
-
-      narrativeCache[index] = {
-        ...initialState
-      };
-
-
-      section.style.setProperty(
-        "--title-alpha",
-        initialState.titleAlpha
-      );
-
-      section.style.setProperty(
-        "--title-y",
-        initialState.titleY
-      );
-
-      section.style.setProperty(
-        "--content-alpha",
-        initialState.contentAlpha
-      );
-
-      section.style.setProperty(
-        "--content-y",
-        initialState.contentY
-      );
-    }
-  );
-
-
-  setActiveSection(
-    0,
-    false
-  );
-
-
-  requestNarrativeUpdate();
-
-
-  /* ========================================================
-     LOADER START
-     ======================================================== */
-
-  startLoader();
-
-
-  /* ========================================================
-     RESTORE HASH
-     ======================================================== */
-
-  if (window.location.hash) {
-    handleHash();
   }
-
-
-  /* ========================================================
-     CLEANUP
-     ======================================================== */
-
-  window.addEventListener(
-    "pagehide",
-    () => {
-
-      if (
-        loaderMinTimer !== null
-      ) {
-        window.clearTimeout(
-          loaderMinTimer
-        );
-      }
-
-      if (
-        loaderFallbackTimer !== null
-      ) {
-        window.clearTimeout(
-          loaderFallbackTimer
-        );
-      }
-
-      if (
-        loaderExitTimer !== null
-      ) {
-        window.clearTimeout(
-          loaderExitTimer
-        );
-      }
-
-      if (
-        scrollFrame !== null
-      ) {
-        window.cancelAnimationFrame(
-          scrollFrame
-        );
-
-        scrollFrame = null;
-      }
-    }
-  );
 
 })();
