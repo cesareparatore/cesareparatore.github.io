@@ -5,7 +5,7 @@
    * ========================================================
    * CESARE PARATORE
    * Navigation / loader / narrative progression
-   * V5
+   * V2
    * ========================================================
    */
 
@@ -57,14 +57,8 @@
   const wowDot =
     document.getElementById("wow-dot-active");
 
-  const wowTrack =
-    document.querySelector(".wow-track");
-
   const brand =
     document.querySelector(".brand");
-
-  const footerMark =
-    document.querySelector(".footer-mark");
 
   const main =
     document.getElementById("main-content");
@@ -79,10 +73,22 @@
 
 
   /* ========================================================
-     CORE SAFETY
+     BASIC SAFETY
      ======================================================== */
 
-  if (!sections.length) {
+  if (
+    !header ||
+    !menuToggle ||
+    !menu ||
+    !activeChapter ||
+    !previousButton ||
+    !nextButton ||
+    !nextArrowSymbol ||
+    !nextArrowLabel ||
+    !wowProgress ||
+    !wowDot ||
+    !sections.length
+  ) {
     return;
   }
 
@@ -96,12 +102,12 @@
 
   let scrollFrame = null;
 
-  let loaderStartedAt = 0;
-  let loaderFinished = false;
-
   let loaderMinTimer = null;
   let loaderFallbackTimer = null;
   let loaderExitTimer = null;
+
+  let loaderStartedAt = 0;
+  let loaderFinished = false;
 
   let lastFocusedElement = null;
 
@@ -110,11 +116,12 @@
       "(prefers-reduced-motion: reduce)"
     );
 
-
-  /* ========================================================
-     NARRATIVE CACHE
-     ======================================================== */
-
+  /*
+   * Cache dell'ultimo stato applicato.
+   *
+   * Evita di riscrivere continuamente le stesse
+   * custom properties durante lo scroll.
+   */
   const narrativeCache =
     sections.map(() => ({
       titleAlpha: null,
@@ -141,43 +148,52 @@
 
 
   const smoothStep = (value) => {
-    const t = clamp(
-      value,
-      0,
-      1
-    );
+    const t =
+      clamp(value, 0, 1);
 
     return t * t * (3 - 2 * t);
   };
 
 
   const getHeaderHeight = () => {
-    if (!header) {
-      return 0;
-    }
-
     return header.getBoundingClientRect().height;
   };
 
 
-  const getSectionIndex = (
-    section
-  ) => {
+  const getSectionIndex = (section) => {
     return sections.indexOf(section);
   };
 
 
-  const isElement = (
-    target
+  const scrollToSection = (
+    section,
+    behavior = "smooth"
   ) => {
-    return target instanceof Element;
+
+    if (!section) {
+      return;
+    }
+
+    const headerHeight =
+      getHeaderHeight();
+
+    const rect =
+      section.getBoundingClientRect();
+
+    const targetTop =
+      window.scrollY +
+      rect.top -
+      headerHeight;
+
+    window.scrollTo({
+      top: Math.max(0, targetTop),
+      behavior
+    });
   };
 
 
-  const isEditableTarget = (
-    target
-  ) => {
-    if (!isElement(target)) {
+  const isEditableTarget = (target) => {
+    if (!(target instanceof Element)) {
       return false;
     }
 
@@ -189,180 +205,268 @@
   };
 
 
-  const isInteractiveTarget = (
-    target
-  ) => {
-    if (!isElement(target)) {
-      return false;
-    }
-
-    return Boolean(
-      target.closest(
-        "a, button, input, textarea, select, summary, [role='button'], [contenteditable='true']"
-      )
-    );
-  };
-
-
   const getFocusableMenuElements = () => {
-    if (!menu) {
-      return [];
-    }
-
     return Array.from(
       menu.querySelectorAll(
-        [
-          "a[href]",
-          "button:not([disabled])",
-          "input:not([disabled])",
-          "select:not([disabled])",
-          "textarea:not([disabled])",
-          "[tabindex]:not([tabindex='-1'])"
-        ].join(", ")
+        "a[href], button:not([disabled]), [tabindex]:not([tabindex='-1'])"
       )
     ).filter((element) => {
       return (
         !element.hasAttribute("disabled") &&
-        element.getAttribute(
-          "aria-hidden"
-        ) !== "true"
+        element.getAttribute("aria-hidden") !== "true"
       );
     });
   };
 
 
-  const setInert = (
-    element,
-    locked
-  ) => {
-    if (!element) {
-      return;
-    }
+  const setPageInert = (locked) => {
+    [main, footer].forEach((element) => {
+      if (!element) {
+        return;
+      }
 
-    element.inert =
-      Boolean(locked);
+      if (locked) {
+        element.setAttribute("inert", "");
+      } else {
+        element.removeAttribute("inert");
+      }
+    });
   };
 
 
-  const setPageInert = (
-    locked
-  ) => {
-    setInert(
-      main,
-      locked
+  /* ========================================================
+     LOADER
+     ======================================================== */
+
+  const finishLoader = () => {
+
+    if (!loader || loaderFinished) {
+      return;
+    }
+
+    loaderFinished = true;
+
+    if (loaderMinTimer !== null) {
+      window.clearTimeout(
+        loaderMinTimer
+      );
+
+      loaderMinTimer = null;
+    }
+
+    if (loaderFallbackTimer !== null) {
+      window.clearTimeout(
+        loaderFallbackTimer
+      );
+
+      loaderFallbackTimer = null;
+    }
+
+    loader.classList.add(
+      "is-exiting"
     );
 
-    setInert(
-      footer,
-      locked
+    const exitDuration =
+      reducedMotion.matches
+        ? 20
+        : 1150;
+
+    loaderExitTimer =
+      window.setTimeout(() => {
+
+        loader.classList.remove(
+          "is-active"
+        );
+
+        loader.classList.remove(
+          "is-exiting"
+        );
+
+        loader.setAttribute(
+          "aria-hidden",
+          "true"
+        );
+
+        loaderExitTimer = null;
+
+      }, exitDuration);
+  };
+
+
+  const tryFinishLoader = () => {
+
+    if (!loader || loaderFinished) {
+      return;
+    }
+
+    const minimumDuration =
+      reducedMotion.matches
+        ? 0
+        : 900;
+
+    const elapsed =
+      performance.now() -
+      loaderStartedAt;
+
+    const remaining =
+      Math.max(
+        0,
+        minimumDuration - elapsed
+      );
+
+    if (remaining === 0) {
+      finishLoader();
+      return;
+    }
+
+    loaderMinTimer =
+      window.setTimeout(
+        finishLoader,
+        remaining
+      );
+  };
+
+
+  const startLoader = () => {
+
+    if (!loader) {
+      return;
+    }
+
+    loaderStartedAt =
+      performance.now();
+
+    loaderFinished = false;
+
+    loader.classList.add(
+      "is-active"
     );
+
+    /*
+     * Se la pagina è già caricata, non aspettiamo
+     * inutilmente l'evento load.
+     */
+    if (
+      document.readyState ===
+      "complete"
+    ) {
+      tryFinishLoader();
+    } else {
+
+      window.addEventListener(
+        "load",
+        tryFinishLoader,
+        {
+          once: true
+        }
+      );
+    }
+
+    /*
+     * Fallback di sicurezza:
+     * il loader non può rimanere bloccato
+     * indefinitamente in caso di risorsa lenta.
+     */
+    loaderFallbackTimer =
+      window.setTimeout(
+        finishLoader,
+        reducedMotion.matches
+          ? 1000
+          : 4500
+      );
   };
 
 
   /* ========================================================
      MENU
-     ======================================================== */
+     * ======================================================== */
 
-  const initializeMenu = () => {
+  const setMenuState = (open) => {
+
+    const nextState =
+      Boolean(open);
+
     if (
-      !menu ||
-      !menuToggle
+      nextState === menuOpen &&
+      menu.classList.contains(
+        "is-open"
+      )
     ) {
       return;
     }
 
-    menuToggle.setAttribute(
-      "aria-expanded",
-      "false"
-    );
+    if (nextState) {
 
-    menuToggle.setAttribute(
-      "aria-controls",
-      menu.id || "site-menu"
-    );
+      lastFocusedElement =
+        document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : menuToggle;
 
-    menuToggle.setAttribute(
-      "aria-label",
-      "Apri menu"
-    );
+      menuOpen = true;
 
-    menu.setAttribute(
-      "aria-hidden",
-      "true"
-    );
+      header.classList.add(
+        "menu-open"
+      );
 
-    setInert(
-      menu,
-      true
-    );
-  };
+      menu.classList.add(
+        "is-open"
+      );
 
+      menu.setAttribute(
+        "aria-hidden",
+        "false"
+      );
 
-  const updateMenuCurrentState = () => {
-    if (!menuLinks.length) {
-      return;
-    }
+      menuToggle.setAttribute(
+        "aria-expanded",
+        "true"
+      );
 
-    const currentId =
-      sections[activeIndex]?.id || "";
+      menuToggle.setAttribute(
+        "aria-label",
+        "Chiudi menu"
+      );
 
-    menuLinks.forEach(
-      (link) => {
-        const href =
-          link.getAttribute(
-            "href"
-          ) || "";
+      body.classList.add(
+        "menu-is-open"
+      );
 
-        const current =
-          href === `#${currentId}`;
+      setPageInert(true);
 
-        if (current) {
-          link.setAttribute(
-            "aria-current",
-            "location"
-          );
-        } else {
-          link.removeAttribute(
-            "aria-current"
-          );
+      window.requestAnimationFrame(() => {
+
+        const focusable =
+          getFocusableMenuElements();
+
+        if (focusable.length) {
+          focusable[0].focus({
+            preventScroll: true
+          });
         }
-      }
-    );
-  };
 
+      });
 
-  const closeMenu = () => {
-    if (
-      !menu ||
-      !menuToggle
-    ) {
       return;
     }
 
-    if (!menuOpen) {
-      return;
-    }
+
+    /*
+     * CHIUSURA
+     */
 
     menuOpen = false;
+
+    header.classList.remove(
+      "menu-open"
+    );
 
     menu.classList.remove(
       "is-open"
     );
 
-    if (header) {
-      header.classList.remove(
-        "menu-open"
-      );
-    }
-
     menu.setAttribute(
       "aria-hidden",
       "true"
-    );
-
-    setInert(
-      menu,
-      true
     );
 
     menuToggle.setAttribute(
@@ -381,284 +485,92 @@
 
     setPageInert(false);
 
+    /*
+     * Restituisce il focus a chi aveva aperto il menu.
+     */
     const focusTarget =
       lastFocusedElement &&
-      document.contains(
-        lastFocusedElement
-      ) &&
-      !lastFocusedElement.hasAttribute(
-        "disabled"
-      )
+      document.contains(lastFocusedElement) &&
+      !lastFocusedElement.hasAttribute("disabled")
         ? lastFocusedElement
         : menuToggle;
 
+    window.requestAnimationFrame(() => {
+      focusTarget.focus({
+        preventScroll: true
+      });
+    });
+
     lastFocusedElement = null;
-
-    requestAnimationFrame(
-      () => {
-        focusTarget.focus({
-          preventScroll: true
-        });
-      }
-    );
   };
 
 
-  const openMenu = () => {
-    if (
-      !menu ||
-      !menuToggle
-    ) {
-      return;
+  menuToggle.addEventListener(
+    "click",
+    () => {
+      setMenuState(!menuOpen);
     }
-
-    if (menuOpen) {
-      return;
-    }
-
-    lastFocusedElement =
-      document.activeElement instanceof HTMLElement
-        ? document.activeElement
-        : menuToggle;
-
-    menuOpen = true;
-
-    if (header) {
-      header.classList.add(
-        "menu-open"
-      );
-    }
-
-    menu.classList.add(
-      "is-open"
-    );
-
-    menu.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-    setInert(
-      menu,
-      false
-    );
-
-    menuToggle.setAttribute(
-      "aria-expanded",
-      "true"
-    );
-
-    menuToggle.setAttribute(
-      "aria-label",
-      "Chiudi menu"
-    );
-
-    body.classList.add(
-      "menu-is-open"
-    );
-
-    setPageInert(true);
-
-    requestAnimationFrame(
-      () => {
-        const focusable =
-          getFocusableMenuElements();
-
-        if (focusable.length) {
-          focusable[0].focus({
-            preventScroll: true
-          });
-        }
-      }
-    );
-  };
+  );
 
 
-  const toggleMenu = () => {
-    if (menuOpen) {
-      closeMenu();
-    } else {
-      openMenu();
-    }
-  };
+  menuLinks.forEach((link) => {
 
-
-  initializeMenu();
-
-
-  if (
-    menuToggle &&
-    menu
-  ) {
-    menuToggle.addEventListener(
+    link.addEventListener(
       "click",
-      toggleMenu
-    );
-  }
+      (event) => {
 
+        const href =
+          link.getAttribute("href");
 
-  /* ========================================================
-     LOADER
-     ======================================================== */
-
-  const finishLoader = () => {
-    if (
-      !loader ||
-      loaderFinished
-    ) {
-      return;
-    }
-
-    loaderFinished = true;
-
-    if (
-      loaderMinTimer !== null
-    ) {
-      clearTimeout(
-        loaderMinTimer
-      );
-
-      loaderMinTimer = null;
-    }
-
-    if (
-      loaderFallbackTimer !== null
-    ) {
-      clearTimeout(
-        loaderFallbackTimer
-      );
-
-      loaderFallbackTimer = null;
-    }
-
-    loader.classList.add(
-      "is-exiting"
-    );
-
-    const exitDuration =
-      reducedMotion.matches
-        ? 20
-        : 1150;
-
-    loaderExitTimer =
-      setTimeout(
-        () => {
-          loader.classList.remove(
-            "is-active"
-          );
-
-          loader.classList.remove(
-            "is-exiting"
-          );
-
-          loader.setAttribute(
-            "aria-hidden",
-            "true"
-          );
-
-          loaderExitTimer = null;
-        },
-        exitDuration
-      );
-  };
-
-
-  const tryFinishLoader = () => {
-    if (
-      !loader ||
-      loaderFinished
-    ) {
-      return;
-    }
-
-    const minimumDuration =
-      reducedMotion.matches
-        ? 0
-        : 900;
-
-    const elapsed =
-      performance.now() -
-      loaderStartedAt;
-
-    const remaining =
-      Math.max(
-        0,
-        minimumDuration -
-        elapsed
-      );
-
-    if (
-      remaining === 0
-    ) {
-      finishLoader();
-      return;
-    }
-
-    if (
-      loaderMinTimer !== null
-    ) {
-      clearTimeout(
-        loaderMinTimer
-      );
-    }
-
-    loaderMinTimer =
-      setTimeout(
-        finishLoader,
-        remaining
-      );
-  };
-
-
-  const startLoader = () => {
-    if (!loader) {
-      return;
-    }
-
-    if (
-      loader.classList.contains(
-        "is-active"
-      )
-    ) {
-      return;
-    }
-
-    loaderStartedAt =
-      performance.now();
-
-    loaderFinished = false;
-
-    loader.classList.add(
-      "is-active"
-    );
-
-    if (
-      document.readyState ===
-      "complete"
-    ) {
-      tryFinishLoader();
-    } else {
-      window.addEventListener(
-        "load",
-        tryFinishLoader,
-        {
-          once: true
+        if (
+          !href ||
+          !href.startsWith("#")
+        ) {
+          return;
         }
-      );
-    }
 
-    loaderFallbackTimer =
-      setTimeout(
-        finishLoader,
-        reducedMotion.matches
-          ? 1000
-          : 4500
-      );
-  };
+        const target =
+          document.getElementById(
+            href.slice(1)
+          );
+
+        if (!target) {
+          return;
+        }
+
+        event.preventDefault();
+
+        const index =
+          getSectionIndex(target);
+
+        setMenuState(false);
+
+        if (index >= 0) {
+          setActiveSection(
+            index,
+            false
+          );
+        }
+
+        scrollToSection(
+          target,
+          reducedMotion.matches
+            ? "auto"
+            : "smooth"
+        );
+
+        window.history.replaceState(
+          null,
+          "",
+          href
+        );
+      }
+    );
+  });
 
 
   /* ========================================================
-     ACTIVE SECTION
+     ACTIVE SECTION UI
      ======================================================== */
 
   const setActiveSection = (
@@ -666,11 +578,13 @@
     updateHash = false
   ) => {
 
+    if (!sections.length) {
+      return;
+    }
+
     const safeIndex =
       clamp(
-        Number.isFinite(
-          Number(index)
-        )
+        Number.isFinite(Number(index))
           ? Number(index)
           : 0,
         0,
@@ -687,91 +601,81 @@
       return;
     }
 
-    sections.forEach(
-      (
-        currentSection,
-        currentIndex
-      ) => {
-        currentSection.classList.toggle(
-          "is-active",
-          currentIndex ===
-            safeIndex
-        );
-      }
+    const chapter =
+      section.dataset.chapter || "";
+
+    activeChapter.textContent =
+      chapter;
+
+
+    /* ------------------------------------
+       PREVIOUS
+       ------------------------------------ */
+
+    const first =
+      safeIndex === 0;
+
+    previousButton.disabled =
+      first;
+
+    previousButton.setAttribute(
+      "aria-label",
+      first
+        ? "Sei all'inizio"
+        : `Vai alla sezione precedente: ${
+            sections[safeIndex - 1]
+              ?.dataset.chapter || ""
+          }`
     );
 
-    const chapter =
-      section.dataset.chapter ||
-      "";
 
-    if (activeChapter) {
-      activeChapter.textContent =
-        chapter;
-    }
+    /* ------------------------------------
+       NEXT / RETURN
+       ------------------------------------ */
 
+    const last =
+      safeIndex ===
+      sections.length - 1;
 
-    /* PREVIOUS */
+    nextButton.classList.toggle(
+      "is-return",
+      last
+    );
 
-    if (previousButton) {
-      const first =
-        safeIndex === 0;
+    if (last) {
 
-      previousButton.disabled =
-        first;
+      nextArrowSymbol.textContent =
+        "↶";
 
-      previousButton.setAttribute(
-        "aria-label",
-        first
-          ? "Sei all'inizio"
-          : `Vai alla sezione precedente: ${
-              sections[
-                safeIndex - 1
-              ]?.dataset.chapter || ""
-            }`
-      );
-    }
-
-
-    /* NEXT */
-
-    if (nextButton) {
-      const last =
-        safeIndex ===
-        sections.length - 1;
-
-      nextButton.classList.toggle(
-        "is-return",
-        last
-      );
-
-      if (nextArrowSymbol) {
-        nextArrowSymbol.textContent =
-          last
-            ? "↶"
-            : "→";
-      }
-
-      if (nextArrowLabel) {
-        nextArrowLabel.textContent =
-          last
-            ? "INIZIO"
-            : "AVANTI";
-      }
+      nextArrowLabel.textContent =
+        "INIZIO";
 
       nextButton.setAttribute(
         "aria-label",
-        last
-          ? "Torna all'inizio"
-          : `Vai alla sezione successiva: ${
-              sections[
-                safeIndex + 1
-              ]?.dataset.chapter || ""
-            }`
+        "Torna all'inizio"
+      );
+
+    } else {
+
+      nextArrowSymbol.textContent =
+        "→";
+
+      nextArrowLabel.textContent =
+        "AVANTI";
+
+      nextButton.setAttribute(
+        "aria-label",
+        `Vai alla sezione successiva: ${
+          sections[safeIndex + 1]
+            ?.dataset.chapter || ""
+        }`
       );
     }
 
 
-    /* PROGRESS */
+    /* ------------------------------------
+       PROGRESS
+       ------------------------------------ */
 
     const percentage =
       sections.length > 1
@@ -781,57 +685,40 @@
           ) * 100
         : 0;
 
-    if (wowProgress) {
-      wowProgress.style.width =
-        `${percentage}%`;
-    }
-
-    if (wowDot) {
-      wowDot.style.left =
-        `${percentage}%`;
-    }
-
-    if (wowTrack) {
-      wowTrack.setAttribute(
-        "aria-valuenow",
-        String(
-          safeIndex + 1
-        )
-      );
-
-      wowTrack.setAttribute(
-        "aria-valuetext",
-        `Sezione ${
-          safeIndex + 1
-        } di ${
-          sections.length
-        }: ${chapter}`
-      );
-    }
-
-
-    /* MENU */
-
-    updateMenuCurrentState();
-
-
-    /* HASH */
+    const percentageValue =
+      `${percentage}%`;
 
     if (
-      updateHash &&
-      section.id
+      wowProgress.style.width !==
+      percentageValue
     ) {
-      const newHash =
-        `#${section.id}`;
+      wowProgress.style.width =
+        percentageValue;
+    }
 
-      if (
-        window.location.hash !==
-        newHash
-      ) {
+    if (
+      wowDot.style.left !==
+      percentageValue
+    ) {
+      wowDot.style.left =
+        percentageValue;
+    }
+
+
+    /* ------------------------------------
+       HASH
+       ------------------------------------ */
+
+    if (updateHash) {
+
+      const id =
+        section.id;
+
+      if (id) {
         window.history.replaceState(
           null,
           "",
-          newHash
+          `#${id}`
         );
       }
     }
@@ -839,133 +726,7 @@
 
 
   /* ========================================================
-     SCROLL
-     ======================================================== */
-
-  const getScrollTarget = (
-    section
-  ) => {
-    if (!section) {
-      return 0;
-    }
-
-    const rect =
-      section.getBoundingClientRect();
-
-    return Math.max(
-      0,
-      window.scrollY +
-        rect.top -
-        getHeaderHeight()
-    );
-  };
-
-
-  const navigateToSection = (
-    index,
-    updateHash = true
-  ) => {
-
-    const safeIndex =
-      clamp(
-        Number.isFinite(
-          Number(index)
-        )
-          ? Number(index)
-          : 0,
-        0,
-        sections.length - 1
-      );
-
-    const target =
-      sections[safeIndex];
-
-    if (!target) {
-      return;
-    }
-
-    setActiveSection(
-      safeIndex,
-      updateHash
-    );
-
-    const targetTop =
-      getScrollTarget(
-        target
-      );
-
-    window.scrollTo({
-      top: targetTop,
-      behavior:
-        reducedMotion.matches
-          ? "auto"
-          : "smooth"
-    });
-
-    requestNarrativeUpdate();
-  };
-
-
-  /* ========================================================
-     MENU LINKS
-     ======================================================== */
-
-  menuLinks.forEach(
-    (link) => {
-
-      link.addEventListener(
-        "click",
-        (event) => {
-
-          const href =
-            link.getAttribute(
-              "href"
-            );
-
-          if (
-            !href ||
-            !href.startsWith("#")
-          ) {
-            return;
-          }
-
-          const id =
-            href.slice(1);
-
-          const target =
-            document.getElementById(
-              id
-            );
-
-          if (!target) {
-            return;
-          }
-
-          const index =
-            getSectionIndex(
-              target
-            );
-
-          if (index < 0) {
-            return;
-          }
-
-          event.preventDefault();
-
-          closeMenu();
-
-          navigateToSection(
-            index,
-            true
-          );
-        }
-      );
-    }
-  );
-
-
-  /* ========================================================
-     NARRATIVE VARIABLES
+     NARRATIVE STYLE CACHE
      ======================================================== */
 
   const updateSectionVariable = (
@@ -997,113 +758,46 @@
 
 
   /* ========================================================
-     ACTIVE SECTION DETECTION
-     ======================================================== */
-
-  const getViewportActiveIndex = () => {
-
-    const viewportHeight =
-      window.innerHeight;
-
-    const headerHeight =
-      getHeaderHeight();
-
-    const anchor =
-      headerHeight +
-      (
-        viewportHeight -
-        headerHeight
-      ) * 0.38;
-
-    let containingIndex = -1;
-
-    sections.forEach(
-      (
-        section,
-        index
-      ) => {
-
-        const rect =
-          section.getBoundingClientRect();
-
-        if (
-          rect.top <= anchor &&
-          rect.bottom > anchor
-        ) {
-          containingIndex =
-            index;
-        }
-      }
-    );
-
-    if (
-      containingIndex >= 0
-    ) {
-      return containingIndex;
-    }
-
-    let nearestIndex = 0;
-    let nearestDistance =
-      Infinity;
-
-    sections.forEach(
-      (
-        section,
-        index
-      ) => {
-
-        const rect =
-          section.getBoundingClientRect();
-
-        const distance =
-          Math.abs(
-            rect.top -
-            anchor
-          );
-
-        if (
-          distance <
-          nearestDistance
-        ) {
-          nearestDistance =
-            distance;
-
-          nearestIndex =
-            index;
-        }
-      }
-    );
-
-    return nearestIndex;
-  };
-
-
-  /* ========================================================
-     NARRATIVE PROGRESSION
+     FIND ACTIVE SECTION
      ======================================================== */
 
   const updateNarrative = () => {
 
     scrollFrame = null;
 
+    if (!sections.length) {
+      return;
+    }
+
     const viewportHeight =
       window.innerHeight;
 
     const headerHeight =
       getHeaderHeight();
 
+    /*
+     * Anchor narrativo.
+     *
+     * Rimane sotto l'header e impedisce
+     * alla sezione successiva di prendere
+     * il controllo troppo presto.
+     */
     const anchor =
       headerHeight +
       (
         viewportHeight -
         headerHeight
-      ) * 0.38;
+      ) * .38;
+
+    let bestIndex =
+      activeIndex;
+
+    let bestDistance =
+      Infinity;
+
 
     sections.forEach(
-      (
-        section,
-        index
-      ) => {
+      (section, index) => {
 
         const rect =
           section.getBoundingClientRect();
@@ -1113,6 +807,11 @@
             rect.height,
             1
           );
+
+
+        /* --------------------------------
+           SECTION PROGRESS
+           -------------------------------- */
 
         const raw =
           (
@@ -1128,14 +827,13 @@
           );
 
 
-        /* TITLE */
+        /* --------------------------------
+           TITLE
+           -------------------------------- */
 
         const titleFade =
           smoothStep(
-            (
-              progress -
-              0.05
-            ) / 0.42
+            (progress - .05) / .42
           );
 
         const titleAlpha =
@@ -1151,32 +849,31 @@
           ).toFixed(1)}px`;
 
 
-        /* CONTENT */
+        /* --------------------------------
+           CONTENT
+           -------------------------------- */
 
         const contentReveal =
           smoothStep(
-            (
-              progress -
-              0.14
-            ) / 0.42
+            (progress - .14) / .42
           );
 
         const contentAlpha =
           (
-            0.18 +
-            0.82 *
-              contentReveal
+            .18 +
+            (.82 * contentReveal)
           ).toFixed(3);
 
         const contentY =
           `${(
             32 *
-            (
-              1 -
-              contentReveal
-            )
+            (1 - contentReveal)
           ).toFixed(1)}px`;
 
+
+        /* --------------------------------
+           WRITE ONLY WHEN CHANGED
+           -------------------------------- */
 
         updateSectionVariable(
           section,
@@ -1205,19 +902,49 @@
           "contentY",
           contentY
         );
+
+
+        /* --------------------------------
+           ACTIVE CHAPTER
+           -------------------------------- */
+
+        const narrativePoint =
+          rect.top +
+          Math.min(
+            height * .35,
+            viewportHeight * .42
+          );
+
+        const distance =
+          Math.abs(
+            narrativePoint -
+            anchor
+          );
+
+        const visible =
+          rect.bottom > headerHeight &&
+          rect.top < viewportHeight;
+
+        if (
+          visible &&
+          distance < bestDistance
+        ) {
+          bestDistance =
+            distance;
+
+          bestIndex =
+            index;
+        }
       }
     );
 
 
-    const viewportIndex =
-      getViewportActiveIndex();
-
     if (
-      viewportIndex !==
+      bestIndex !==
       activeIndex
     ) {
       setActiveSection(
-        viewportIndex,
+        bestIndex,
         false
       );
     }
@@ -1233,7 +960,7 @@
     }
 
     scrollFrame =
-      requestAnimationFrame(
+      window.requestAnimationFrame(
         updateNarrative
       );
   };
@@ -1246,6 +973,7 @@
       passive: true
     }
   );
+
 
   window.addEventListener(
     "resize",
@@ -1260,81 +988,124 @@
      PREVIOUS
      ======================================================== */
 
-  if (previousButton) {
-    previousButton.addEventListener(
-      "click",
-      () => {
+  previousButton.addEventListener(
+    "click",
+    () => {
 
-        if (
-          activeIndex <= 0
-        ) {
-          return;
-        }
-
-        navigateToSection(
-          activeIndex - 1,
-          true
-        );
+      if (activeIndex <= 0) {
+        return;
       }
-    );
-  }
+
+      const targetIndex =
+        activeIndex - 1;
+
+      const target =
+        sections[targetIndex];
+
+      if (!target) {
+        return;
+      }
+
+      setActiveSection(
+        targetIndex,
+        true
+      );
+
+      scrollToSection(
+        target,
+        reducedMotion.matches
+          ? "auto"
+          : "smooth"
+      );
+    }
+  );
 
 
   /* ========================================================
-     NEXT
+     NEXT / RETURN
      ======================================================== */
 
-  if (nextButton) {
-    nextButton.addEventListener(
-      "click",
-      () => {
+  nextButton.addEventListener(
+    "click",
+    () => {
 
-        const last =
-          activeIndex ===
-          sections.length - 1;
+      const last =
+        activeIndex ===
+        sections.length - 1;
 
-        navigateToSection(
-          last
-            ? 0
-            : activeIndex + 1,
+
+      if (last) {
+
+        const firstSection =
+          sections[0];
+
+        setActiveSection(
+          0,
           true
         );
+
+        scrollToSection(
+          firstSection,
+          reducedMotion.matches
+            ? "auto"
+            : "smooth"
+        );
+
+        return;
       }
-    );
-  }
+
+
+      const targetIndex =
+        activeIndex + 1;
+
+      const target =
+        sections[targetIndex];
+
+      if (!target) {
+        return;
+      }
+
+      setActiveSection(
+        targetIndex,
+        true
+      );
+
+      scrollToSection(
+        target,
+        reducedMotion.matches
+          ? "auto"
+          : "smooth"
+      );
+    }
+  );
 
 
   /* ========================================================
-     BRAND / FOOTER
+     BRAND
      ======================================================== */
-
-  const goHome = (
-    event
-  ) => {
-
-    event.preventDefault();
-
-    closeMenu();
-
-    navigateToSection(
-      0,
-      true
-    );
-  };
-
 
   if (brand) {
+
     brand.addEventListener(
       "click",
-      goHome
-    );
-  }
+      (event) => {
 
+        event.preventDefault();
 
-  if (footerMark) {
-    footerMark.addEventListener(
-      "click",
-      goHome
+        setMenuState(false);
+
+        setActiveSection(
+          0,
+          true
+        );
+
+        scrollToSection(
+          sections[0],
+          reducedMotion.matches
+            ? "auto"
+            : "smooth"
+        );
+      }
     );
   }
 
@@ -1347,22 +1118,25 @@
     "keydown",
     (event) => {
 
-      /* ESC */
+      /* --------------------------------
+         ESCAPE
+         -------------------------------- */
 
       if (
-        event.key ===
-          "Escape" &&
+        event.key === "Escape" &&
         menuOpen
       ) {
         event.preventDefault();
 
-        closeMenu();
+        setMenuState(false);
 
         return;
       }
 
 
-      /* MENU FOCUS TRAP */
+      /* --------------------------------
+         FOCUS TRAP
+         -------------------------------- */
 
       if (
         event.key === "Tab" &&
@@ -1387,8 +1161,7 @@
 
         if (
           event.shiftKey &&
-          document.activeElement ===
-            first
+          document.activeElement === first
         ) {
           event.preventDefault();
 
@@ -1399,25 +1172,23 @@
 
         if (
           !event.shiftKey &&
-          document.activeElement ===
-            last
+          document.activeElement === last
         ) {
           event.preventDefault();
 
           first.focus();
-        }
 
-        return;
+          return;
+        }
       }
 
 
-      /* INTERACTIVE ELEMENTS */
+      /* --------------------------------
+         EDITABLE ELEMENTS
+         -------------------------------- */
 
       if (
         isEditableTarget(
-          event.target
-        ) ||
-        isInteractiveTarget(
           event.target
         )
       ) {
@@ -1425,43 +1196,33 @@
       }
 
 
-      if (
-        event.altKey ||
-        event.ctrlKey ||
-        event.metaKey ||
-        event.shiftKey
-      ) {
-        return;
-      }
-
-
-      /* LEFT */
+      /* --------------------------------
+         ARROW NAVIGATION
+         -------------------------------- */
 
       if (
-        event.key ===
-          "ArrowLeft" &&
+        event.key === "ArrowLeft" &&
         !menuOpen
       ) {
 
         event.preventDefault();
 
-        previousButton?.click();
+        previousButton.click();
 
         return;
       }
 
 
-      /* RIGHT */
-
       if (
-        event.key ===
-          "ArrowRight" &&
+        event.key === "ArrowRight" &&
         !menuOpen
       ) {
 
         event.preventDefault();
 
-        nextButton?.click();
+        nextButton.click();
+
+        return;
       }
     }
   );
@@ -1471,13 +1232,13 @@
      HASH
      ======================================================== */
 
-  const getHashTarget = () => {
+  const handleHash = () => {
 
     const hash =
       window.location.hash;
 
     if (!hash) {
-      return null;
+      return;
     }
 
     let id = "";
@@ -1488,44 +1249,47 @@
           hash.slice(1)
         );
     } catch {
-      return null;
+      return;
     }
 
     if (!id) {
-      return null;
+      return;
     }
 
-    return document.getElementById(
-      id
-    );
-  };
-
-
-  const handleHash = () => {
-
     const target =
-      getHashTarget();
+      document.getElementById(id);
 
     if (!target) {
       return;
     }
 
     const index =
-      getSectionIndex(
-        target
-      );
+      getSectionIndex(target);
 
     if (index < 0) {
       return;
     }
 
-    requestAnimationFrame(
+    setActiveSection(
+      index,
+      false
+    );
+
+    /*
+     * Aspettiamo il primo layout completo.
+     */
+    window.setTimeout(
       () => {
-        navigateToSection(
-          index,
-          false
+
+        scrollToSection(
+          target,
+          reducedMotion.matches
+            ? "auto"
+            : "smooth"
         );
-      }
+
+      },
+      80
     );
   };
 
@@ -1537,14 +1301,11 @@
 
 
   /* ========================================================
-     INITIAL NARRATIVE STATE
+     INITIAL STATE
      ======================================================== */
 
   sections.forEach(
-    (
-      section,
-      index
-    ) => {
+    (section, index) => {
 
       const initialState =
         index === 0
@@ -1561,10 +1322,11 @@
               contentY: "32px"
             };
 
-      narrativeCache[index] =
-        {
-          ...initialState
-        };
+
+      narrativeCache[index] = {
+        ...initialState
+      };
+
 
       section.style.setProperty(
         "--title-alpha",
@@ -1589,85 +1351,29 @@
   );
 
 
-  /* ========================================================
-     INITIAL PAGE STATE
-     ======================================================== */
-
-  setPageInert(false);
-
   setActiveSection(
     0,
     false
   );
 
+
   requestNarrativeUpdate();
 
 
   /* ========================================================
-     LOADER
+     LOADER START
      ======================================================== */
 
   startLoader();
 
 
   /* ========================================================
-     HASH RESTORE
+     RESTORE HASH
      ======================================================== */
 
-  if (
-    window.location.hash
-  ) {
+  if (window.location.hash) {
     handleHash();
   }
-
-
-  /* ========================================================
-     BF CACHE
-     ======================================================== */
-
-  window.addEventListener(
-    "pageshow",
-    (event) => {
-
-      if (
-        !event.persisted
-      ) {
-        return;
-      }
-
-      menuOpen = false;
-
-      if (header) {
-        header.classList.remove(
-          "menu-open"
-        );
-      }
-
-      if (menu) {
-        menu.classList.remove(
-          "is-open"
-        );
-
-        menu.setAttribute(
-          "aria-hidden",
-          "true"
-        );
-
-        setInert(
-          menu,
-          true
-        );
-      }
-
-      body.classList.remove(
-        "menu-is-open"
-      );
-
-      setPageInert(false);
-
-      requestNarrativeUpdate();
-    }
-  );
 
 
   /* ========================================================
@@ -1681,7 +1387,7 @@
       if (
         loaderMinTimer !== null
       ) {
-        clearTimeout(
+        window.clearTimeout(
           loaderMinTimer
         );
       }
@@ -1689,7 +1395,7 @@
       if (
         loaderFallbackTimer !== null
       ) {
-        clearTimeout(
+        window.clearTimeout(
           loaderFallbackTimer
         );
       }
@@ -1697,7 +1403,7 @@
       if (
         loaderExitTimer !== null
       ) {
-        clearTimeout(
+        window.clearTimeout(
           loaderExitTimer
         );
       }
@@ -1705,7 +1411,7 @@
       if (
         scrollFrame !== null
       ) {
-        cancelAnimationFrame(
+        window.cancelAnimationFrame(
           scrollFrame
         );
 
