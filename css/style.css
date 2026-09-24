@@ -1,18 +1,18 @@
 /* =========================================================
    CESARE PARATORE — HOME
-   STANDARD OPERATIVO — MAXIMUM QUALITY
    ========================================================= */
 
 :root {
-  --bg: #0B0B0A;
+  --bg: #0b0b0a;
   --surface: #151513;
-  --surface-2: #1C1C19;
+  --surface-2: #1c1c19;
 
-  --light: #F1EFE8;
-  --secondary: #A7A49C;
-  --muted: #66645F;
+  --light: #f1efe8;
+  --secondary: #a7a49c;
+  --muted: #66645f;
 
-  --ink: #11110F;
+  --ink: #11110f;
+
   --line-dark: rgba(241, 239, 232, 0.16);
   --line-light: rgba(11, 11, 10, 0.16);
 
@@ -53,27 +53,24 @@ html {
   min-height: 100%;
   scroll-behavior: auto;
   scrollbar-gutter: stable;
-  scroll-padding-top: calc(
-    var(--header-h) + env(safe-area-inset-top) + 24px
-  );
+  scroll-padding-top:
+    calc(var(--header-h) + env(safe-area-inset-top) + 24px);
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100%;
+
   overflow-x: clip;
 
   background: var(--bg);
   color: var(--light);
 
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
-
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
   line-height: 1.5;
+
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -150,7 +147,6 @@ a {
 .site-loader {
   position: fixed;
   z-index: 900;
-
   inset: 0;
 
   display: grid;
@@ -173,7 +169,6 @@ a {
 
 .loader-inner img {
   width: clamp(52px, 8vw, 88px);
-  height: auto;
   filter: invert(1);
 }
 
@@ -225,7 +220,6 @@ a {
 .site-header {
   position: fixed;
   z-index: 500;
-
   top: 0;
   left: 0;
   right: 0;
@@ -242,8 +236,9 @@ a {
   justify-content: space-between;
 
   color: var(--light);
-
   pointer-events: none;
+
+  transition: color 350ms var(--ease-out);
 }
 
 .brand,
@@ -266,7 +261,8 @@ a {
   filter: invert(1);
 }
 
-.brand span {
+.brand span,
+.menu-label {
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -285,12 +281,6 @@ a {
   cursor: pointer;
 }
 
-.menu-label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-}
-
 .menu-icon {
   display: grid;
   gap: 5px;
@@ -301,6 +291,7 @@ a {
   display: block;
   width: 100%;
   height: 1px;
+
   background: currentColor;
 
   transition:
@@ -308,11 +299,13 @@ a {
     opacity var(--duration-fast) ease;
 }
 
-.menu-toggle[aria-expanded="true"] .menu-icon span:first-child {
+.menu-toggle[aria-expanded="true"]
+.menu-icon span:first-child {
   transform: translateY(3px) rotate(45deg);
 }
 
-.menu-toggle[aria-expanded="true"] .menu-icon span:last-child {
+.menu-toggle[aria-expanded="true"]
+.menu-icon span:last-child {
   transform: translateY(-3px) rotate(-45deg);
 }
 
@@ -323,7 +316,6 @@ a {
 .menu-overlay {
   position: fixed;
   z-index: 450;
-
   inset: 0;
 
   min-height: 100svh;
@@ -360,7 +352,6 @@ a {
 .menu-inner {
   width: min(100%, var(--content-max));
   min-height: 100%;
-
   margin-inline: auto;
 
   display: flex;
@@ -383,8 +374,6 @@ a {
 .menu-inner nav {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-
-  gap: 0;
 
   margin-block: clamp(3rem, 8vh, 7rem);
 }
@@ -447,7 +436,7 @@ main:focus {
 }
 
 /* =========================================================
-   STORY BASE
+   STORY
    ========================================================= */
 
 .story {
@@ -464,6 +453,8 @@ main:focus {
   align-items: center;
 
   overflow: clip;
+
+  isolation: isolate;
 }
 
 .story-content {
@@ -487,7 +478,7 @@ main:focus {
 .story-light {
   --story-bg: var(--light);
   --story-fg: var(--ink);
-  --story-secondary: #5D5A54;
+  --story-secondary: #5d5a54;
   --story-line: var(--line-light);
 
   background: var(--story-bg);
@@ -496,31 +487,19 @@ main:focus {
 
 .story-index {
   position: absolute;
-
-  top: calc(
-    var(--header-h) +
-    env(safe-area-inset-top) +
-    1.5rem
-  );
-
+  top:
+    calc(
+      var(--header-h) +
+      env(safe-area-inset-top) +
+      1.5rem
+    );
   left: var(--gutter);
 
   font-size: var(--micro);
   font-weight: 700;
   letter-spacing: 0.12em;
 
-  opacity: 0.6;
-}
-
-.eyebrow {
-  margin: 0 0 1.5rem;
-
-  color: var(--story-secondary);
-
-  font-size: var(--micro);
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  opacity: 0.55;
 }
 
 .story h1,
@@ -558,106 +537,55 @@ main:focus {
   margin-top: 1.35em;
 }
 
-.narrative-wide {
-  max-width: 900px;
-}
-
-.narrative-medium {
-  max-width: 760px;
-}
-
 /* =========================================================
-   OPENING
+   OPENING — 01
    ========================================================= */
 
 .story-opening {
-  isolation: isolate;
+  min-height: 100svh;
 }
 
-.opening-content {
-  padding-right: 20vw;
+.story-opening .story-content {
+  width: min(100%, var(--content-max));
 }
 
-.opening-copy {
-  width: min(100%, 650px);
-
-  margin-top: clamp(2rem, 5vw, 4rem);
-
-  font-size: var(--body-large);
-  line-height: 1.35;
+.story-opening .opening-content {
+  padding: 0;
 }
 
-.opening-copy p {
-  margin: 0;
-}
-
-.opening-copy p + p {
-  margin-top: 0.65em;
-}
-
-.opening-mark {
-  position: absolute;
-
-  right: 4vw;
-  bottom: 10vh;
-
-  width: clamp(160px, 26vw, 420px);
-
-  opacity: 0.08;
-
-  pointer-events: none;
-}
-
-.opening-mark img {
-  width: 100%;
-  filter: invert(1);
+.story-opening h1 {
+  max-width: 100%;
 }
 
 /* =========================================================
-   MOVEMENT
+   02 — COME?
    ========================================================= */
 
 .story-movement .story-content {
   max-width: 1100px;
 }
 
+/* =========================================================
+   03 — SPORT
+   ========================================================= */
+
 .story-movement-detail .story-content {
   max-width: 1200px;
 }
 
-.split-copy {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.8fr);
-  gap: clamp(3rem, 10vw, 12rem);
-
-  margin-top: clamp(3rem, 7vw, 7rem);
-
-  align-items: end;
-}
-
-.statement {
-  margin: 0;
-
-  font-size: clamp(2rem, 4.5vw, 5.5rem);
-  line-height: 0.95;
-  font-weight: 700;
-  letter-spacing: -0.055em;
-}
-
-.split-copy .narrative-copy {
-  margin-top: 0;
+.story-movement-detail .narrative-copy {
+  max-width: 760px;
 }
 
 /* =========================================================
-   UNDERSTAND
+   04 — SCIENZE MOTORIE
    ========================================================= */
 
-.understand-grid,
-.build-grid,
-.from-here-grid,
-.objective-grid {
+.understand-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+  grid-template-columns:
+    minmax(0, 1.1fr)
+    minmax(280px, 0.9fr);
 
   gap: clamp(3rem, 9vw, 10rem);
 
@@ -666,10 +594,7 @@ main:focus {
   align-items: end;
 }
 
-.understand-lead,
-.build-lead,
-.from-here-lead,
-.objective-question {
+.understand-lead {
   max-width: 800px;
 
   font-size: clamp(2rem, 4vw, 4.5rem);
@@ -678,26 +603,87 @@ main:focus {
   letter-spacing: -0.055em;
 }
 
-.understand-lead p,
-.build-lead p,
-.from-here-lead p,
-.objective-question p {
+.understand-lead p {
   margin: 0;
 }
 
-.build-lead p + p {
-  margin-top: 0.25em;
-}
-
-.understand-grid .narrative-copy,
-.build-grid .narrative-copy,
-.from-here-grid .narrative-copy {
+.understand-grid .narrative-copy {
   margin-top: 0;
 }
 
 /* =========================================================
-   RETURN
+   05 — EDUCAZIONE
    ========================================================= */
+
+.story-build .story-content {
+  max-width: 1100px;
+}
+
+.build-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.1fr)
+    minmax(280px, 0.9fr);
+
+  gap: clamp(3rem, 9vw, 10rem);
+
+  margin-top: clamp(3rem, 7vw, 7rem);
+
+  align-items: end;
+}
+
+.build-lead {
+  max-width: 800px;
+
+  font-size: clamp(2rem, 4vw, 4.5rem);
+  line-height: 0.98;
+  font-weight: 700;
+  letter-spacing: -0.055em;
+}
+
+.build-lead p {
+  margin: 0;
+}
+
+.build-grid .narrative-copy {
+  margin-top: 0;
+}
+
+/* =========================================================
+   06 — MANAGEMENT
+   ========================================================= */
+
+.management-system {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+
+  margin-top: clamp(3rem, 7vw, 7rem);
+
+  border-top: 1px solid var(--story-line);
+  border-bottom: 1px solid var(--story-line);
+}
+
+.management-system > * {
+  padding: 1.25rem 0.75rem;
+
+  font-size: var(--micro);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.management-system + .narrative-copy {
+  margin-top: 2.5rem;
+}
+
+/* =========================================================
+   07 — DIGITALE
+   ========================================================= */
+
+.story-return .story-content {
+  max-width: 1200px;
+}
 
 .return-copy {
   width: min(100%, 1000px);
@@ -710,11 +696,6 @@ main:focus {
 .return-copy > p {
   margin: 0;
   max-width: 800px;
-}
-
-.return-copy > p + p {
-  margin-top: 1em;
-  max-width: 720px;
 }
 
 .return-list {
@@ -730,17 +711,15 @@ main:focus {
   letter-spacing: -0.055em;
 }
 
-.return-list span {
-  display: block;
-}
-
 /* =========================================================
-   CONNECT
+   08 — COLLEGARE
    ========================================================= */
 
 .connect-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  grid-template-columns:
+    minmax(0, 1.1fr)
+    minmax(280px, 0.9fr);
 
   gap: clamp(3rem, 9vw, 10rem);
 
@@ -751,7 +730,7 @@ main:focus {
 
 .connect-words {
   display: grid;
-  gap: 0.1em;
+  gap: 0.08em;
 
   font-size: clamp(2.25rem, 5vw, 6rem);
   line-height: 0.94;
@@ -764,7 +743,7 @@ main:focus {
 }
 
 /* =========================================================
-   TODAY
+   09 — OGGI
    ========================================================= */
 
 .story-today .story-content {
@@ -784,50 +763,87 @@ main:focus {
 
 .closing-line {
   margin-top: 2.5em !important;
-
   font-weight: 700;
 }
 
 /* =========================================================
-   OBJECTIVE
+   10 — OBIETTIVO
    ========================================================= */
 
-.objective-list {
+.objective-grid {
   display: grid;
-  gap: 0;
+  grid-template-columns:
+    minmax(0, 0.85fr)
+    minmax(0, 1.15fr);
 
-  font-size: clamp(1.5rem, 2.5vw, 2.5rem);
-  line-height: 1.15;
+  gap: clamp(3rem, 8vw, 9rem);
+
+  margin-top: clamp(3rem, 7vw, 7rem);
+
+  align-items: start;
+}
+
+.objective-question {
+  max-width: 800px;
+
+  font-size: clamp(2rem, 4vw, 4.5rem);
+  line-height: 0.98;
   font-weight: 700;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.055em;
 }
 
-.objective-list p {
+.objective-question p {
   margin: 0;
-  padding-block: 0.55em;
-
-  border-bottom: 1px solid var(--story-line);
 }
 
-.objective-list p:first-child {
-  border-top: 1px solid var(--story-line);
+.objective-questions {
+  max-width: 800px;
+
+  font-size: var(--body-large);
+  line-height: 1.35;
 }
 
-.objective-list .objective-final {
-  margin-top: 1rem;
+.objective-questions p {
+  margin: 0;
+}
 
-  border: 0;
+.objective-flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem 0.8rem;
 
-  font-size: 1.05em;
+  margin-top: clamp(3rem, 6vw, 6rem);
+
+  font-size: clamp(1.35rem, 2.5vw, 2.5rem);
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.objective-flow span {
+  display: inline-block;
+}
+
+.objective-flow .arrow {
+  opacity: 0.35;
+}
+
+.objective-final {
+  margin-top: 2rem !important;
+
+  font-weight: 700;
 }
 
 /* =========================================================
-   PLACE / MAP
+   11 — TERRITORIO
    ========================================================= */
 
 .place-grid {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
+  grid-template-columns:
+    minmax(0, 0.9fr)
+    minmax(320px, 1.1fr);
 
   gap: clamp(2.5rem, 7vw, 8rem);
 
@@ -852,19 +868,70 @@ main:focus {
 .map-frame iframe {
   width: 100%;
   height: 100%;
-
   border: 0;
 
   filter: grayscale(1) contrast(0.9);
 }
 
 /* =========================================================
-   PERSON
+   12 — DA QUI
+   ========================================================= */
+
+.from-here-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(280px, 0.8fr);
+
+  gap: clamp(3rem, 9vw, 10rem);
+
+  margin-top: clamp(3rem, 7vw, 7rem);
+
+  align-items: end;
+}
+
+.from-here-lead {
+  max-width: 800px;
+
+  font-size: clamp(2rem, 4vw, 4.5rem);
+  line-height: 0.98;
+  font-weight: 700;
+  letter-spacing: -0.055em;
+}
+
+.from-here-lead p {
+  margin: 0;
+}
+
+.from-here-grid .narrative-copy {
+  margin-top: 0;
+}
+
+.presence-online {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  margin-top: clamp(3rem, 7vw, 7rem);
+
+  font-size: clamp(1.5rem, 3vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.presence-online .arrow {
+  opacity: 0.35;
+}
+
+/* =========================================================
+   13 — CHI SONO
    ========================================================= */
 
 .person-grid {
   display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(300px, 0.7fr);
+  grid-template-columns:
+    minmax(0, 0.95fr)
+    minmax(300px, 0.7fr);
 
   gap: clamp(3rem, 8vw, 9rem);
 
@@ -877,13 +944,11 @@ main:focus {
 
 .person-tags {
   margin-top: 3rem !important;
-
   font-weight: 700;
 }
 
 .person-frame {
   width: min(100%, 520px);
-
   margin: 0 0 0 auto;
 
   aspect-ratio: 753 / 941;
@@ -898,12 +963,11 @@ main:focus {
   height: 100%;
 
   object-fit: cover;
-
   filter: grayscale(1);
 }
 
 /* =========================================================
-   CONTACT
+   14 — CONTATTI
    ========================================================= */
 
 .contact-content {
@@ -919,10 +983,6 @@ main:focus {
   line-height: 0.94;
   font-weight: 700;
   letter-spacing: -0.065em;
-}
-
-.contact-content .narrative-copy {
-  max-width: 650px;
 }
 
 .contact-link {
@@ -954,7 +1014,7 @@ main:focus {
 }
 
 /* =========================================================
-   SECTION NAVIGATION
+   SECTION NAV
    ========================================================= */
 
 .section-nav {
@@ -978,7 +1038,7 @@ main:focus {
 
   color: var(--light);
 
-  transition: color 250ms ease;
+  transition: color 350ms var(--ease-out);
 }
 
 .section-nav[data-theme="light"] {
@@ -1029,11 +1089,10 @@ main:focus {
 .section-nav-current {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.75rem;
 
   min-width: 150px;
-
-  justify-content: center;
 
   font-size: var(--micro);
   font-weight: 700;
@@ -1068,7 +1127,6 @@ main:focus {
   grid-template-columns: auto 1fr auto;
 
   gap: 2rem;
-
   align-items: end;
 
   background: var(--bg);
@@ -1078,12 +1136,7 @@ main:focus {
 .footer-mark img {
   width: 42px;
   height: 42px;
-
   filter: invert(1);
-}
-
-.footer-main {
-  align-self: end;
 }
 
 .footer-name {
@@ -1116,7 +1169,7 @@ main:focus {
 }
 
 /* =========================================================
-   RESPONSIVE — TABLET
+   TABLET
    ========================================================= */
 
 @media (max-width: 1000px) {
@@ -1139,7 +1192,9 @@ main:focus {
   }
 
   .person-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.75fr);
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(280px, 0.75fr);
   }
 
   .person-frame {
@@ -1158,7 +1213,7 @@ main:focus {
 }
 
 /* =========================================================
-   RESPONSIVE — MOBILE
+   MOBILE
    ========================================================= */
 
 @media (max-width: 720px) {
@@ -1198,6 +1253,8 @@ main:focus {
   }
 
   .story {
+    min-height: 100svh;
+
     padding-top:
       calc(var(--header-h) + env(safe-area-inset-top) + 4rem);
 
@@ -1224,28 +1281,21 @@ main:focus {
     font-size: clamp(3.25rem, 16vw, 6rem);
   }
 
-  .opening-content {
-    padding-right: 0;
+  .story-opening {
+    align-items: center;
   }
 
-  .opening-mark {
-    width: 55vw;
-    right: -12vw;
-    bottom: 16vh;
-  }
-
-  .split-copy,
   .understand-grid,
   .build-grid,
   .connect-grid,
   .objective-grid,
   .place-grid,
-  .from-here-grid {
+  .from-here-grid,
+  .person-grid {
     grid-template-columns: 1fr;
     gap: 2.5rem;
   }
 
-  .split-copy .narrative-copy,
   .understand-grid .narrative-copy,
   .build-grid .narrative-copy,
   .connect-grid .narrative-copy,
@@ -1253,7 +1303,6 @@ main:focus {
     margin-top: 0;
   }
 
-  .statement,
   .understand-lead,
   .build-lead,
   .from-here-lead,
@@ -1275,20 +1324,22 @@ main:focus {
     font-size: clamp(2rem, 10vw, 4rem);
   }
 
+  .management-system {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .presence-online {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .person-grid {
-    grid-template-columns: 1fr;
     align-items: start;
   }
 
   .person-frame {
     width: min(100%, 500px);
     margin: 0;
-    justify-self: start;
-  }
-
-  .section-nav {
-    left: var(--gutter);
-    right: var(--gutter);
   }
 
   .section-nav-current {
@@ -1314,7 +1365,6 @@ main:focus {
 
   .footer-meta {
     grid-column: auto;
-
     grid-template-columns: 1fr;
   }
 }
@@ -1356,11 +1406,16 @@ main:focus {
 @media (max-height: 600px) and (orientation: landscape) {
   .story {
     min-height: auto;
+
     padding-top:
       calc(var(--header-h) + env(safe-area-inset-top) + 4rem);
 
     padding-bottom:
       calc(var(--nav-h) + env(safe-area-inset-bottom) + 4rem);
+  }
+
+  .story-opening {
+    min-height: 100svh;
   }
 
   .story h1 {
@@ -1369,10 +1424,6 @@ main:focus {
 
   .story h2 {
     font-size: clamp(3rem, 10vw, 5rem);
-  }
-
-  .opening-mark {
-    width: 28vw;
   }
 }
 
@@ -1423,8 +1474,10 @@ main:focus {
   .story-light {
     min-height: auto;
     padding: 2rem 0;
+
     color: #000;
     background: #fff;
+
     break-inside: avoid;
   }
 
