@@ -6,15 +6,13 @@
 (() => {
   "use strict";
 
-  const CONFIG = Object.freeze({
+  const CONFIG = {
     standbyDelay: 40000,
-    loaderFailsafe: 3500,
+    loaderMaxDelay: 1100,
     activeLineRatio: 0.32,
     activeLineMax: 260,
-    scrollOffset: 8,
-    activityThrottle: 500,
-    resizeDebounce: 120
-  });
+    scrollOffset: 16
+  };
 
   const doc = document;
   const html = doc.documentElement;
@@ -24,23 +22,23 @@
   const standby = doc.getElementById("standby");
 
   const header = doc.querySelector(".site-header");
+  const brand = doc.querySelector(".brand");
   const menuToggle = doc.querySelector(".menu-toggle");
   const menu = doc.getElementById("menu");
 
   const main = doc.getElementById("main-content");
   const footer = doc.querySelector(".site-footer");
-
-  const sections = Array.from(
-    doc.querySelectorAll(".story")
-  );
-
   const sectionNav = doc.querySelector(".section-nav");
+
+  const sections = Array.from(doc.querySelectorAll(".story"));
+
   const sectionPrev = doc.querySelector(".section-nav-prev");
   const sectionNext = doc.querySelector(".section-nav-next");
   const sectionNumber = doc.querySelector(".section-nav-number");
   const sectionTitle = doc.querySelector(".section-nav-title");
 
   const currentYear = doc.getElementById("current-year");
+  const themeColorMeta = doc.querySelector('meta[name="theme-color"]');
 
   const reduceMotionQuery = window.matchMedia(
     "(prefers-reduced-motion: reduce)"
@@ -48,21 +46,27 @@
 
   let currentIndex = 0;
   let menuOpen = false;
-  let standbyTimer = null;
-  let loaderHidden = false;
-  let lastActivity = 0;
-  let scrollFrame = 0;
-  let resizeTimer = 0;
   let restoreFocusElement = null;
-
-  /* =======================================================
-     UTILITIES
-     ======================================================= */
+  let standbyTimer = null;
+  let scrollTicking = false;
+  let animationsReady = false;
+  let lastTheme = null;
 
   const clamp = (value, min, max) =>
     Math.min(Math.max(value, min), max);
 
-  const isElementVisible = (element) => {
+  const motionReduced = () => reduceMotionQuery.matches;
+
+  const focusableSelector = [
+    "a[href]",
+    "button:not([disabled])",
+    "input:not([disabled])",
+    "select:not([disabled])",
+    "textarea:not([disabled])",
+    "[tabindex]:not([tabindex='-1'])"
+  ].join(",");
+
+  const isVisible = (element) => {
     if (!element) return false;
 
     const style = window.getComputedStyle(element);
@@ -70,125 +74,62 @@
     return (
       style.display !== "none" &&
       style.visibility !== "hidden" &&
-      parseFloat(style.opacity || "1") > 0
+      style.visibility !== "collapse"
     );
   };
 
-  const getFocusableElements = (container) => {
+  const getFocusable = (container) => {
     if (!container) return [];
 
     return Array.from(
-      container.querySelectorAll(
-        [
-          "a[href]",
-          "button:not([disabled])",
-          "input:not([disabled])",
-          "select:not([disabled])",
-          "textarea:not([disabled])",
-          "summary",
-          "[tabindex]:not([tabindex='-1'])"
-        ].join(",")
-      )
-    ).filter(isElementVisible);
+      container.querySelectorAll(focusableSelector)
+    ).filter(isVisible);
   };
 
-  const getGsap = () =>
-    window.gsap && window.ScrollTrigger
-      ? window.gsap
-      : null;
-
-  const prefersReducedMotion = () =>
-    reduceMotionQuery.matches;
-
-  /* =======================================================
-     YEAR
-     ======================================================= */
-
-  if (currentYear) {
-    currentYear.textContent = String(
-      new Date().getFullYear()
-    );
-  }
-
-  /* =======================================================
-     STANDBY
-     ======================================================= */
-
-  function hideStandby() {
-    if (!standby) return;
-
-    standby.classList.remove("is-visible");
-    standby.setAttribute("aria-hidden", "true");
-  }
-
-  function showStandby() {
-    if (!standby || menuOpen || doc.hidden) return;
-
-    standby.classList.add("is-visible");
-    standby.setAttribute("aria-hidden", "false");
-  }
-
-  function resetStandbyTimer() {
-    if (standbyTimer) {
-      window.clearTimeout(standbyTimer);
-    }
-
-    hideStandby();
-
-    standbyTimer = window.setTimeout(
-      showStandby,
-      CONFIG.standbyDelay
-    );
-  }
-
-  function registerActivity() {
-    const now = Date.now();
+  const getMenuFocusable = () => {
+    const elements = getFocusable(menu);
 
     if (
-      now - lastActivity <
-      CONFIG.activityThrottle
+      menuToggle &&
+      !menuToggle.disabled &&
+      isVisible(menuToggle)
     ) {
-      return;
+      elements.push(menuToggle);
     }
 
-    lastActivity = now;
-    resetStandbyTimer();
-  }
+    return elements;
+  };
 
-  [
-    "scroll",
-    "wheel",
-    "touchstart",
-    "keydown",
-    "click",
-    "pointerdown"
-  ].forEach((eventName) => {
-    window.addEventListener(
-      eventName,
-      registerActivity,
-      {
-        passive: true
-      }
-    );
-  });
+  const setInert = (element, value) => {
+    if (!element) return;
 
-  window.addEventListener(
-    "pointermove",
-    registerActivity,
-    {
-      passive: true
+    element.inert = value;
+
+    if (value) {
+      element.setAttribute("aria-hidden", "true");
+    } else {
+      element.removeAttribute("aria-hidden");
     }
-  );
+  };
 
-  /* =======================================================
-     MENU
-     ======================================================= */
+  const updateYear = () => {
+    if (currentYear) {
+      currentYear.textContent = String(
+        new Date().getFullYear()
+      );
+    }
+  };
 
-  function updateMenuVisualState() {
+  const setMenuBackgroundState = (disabled) => {
+    [main, footer, sectionNav, brand].forEach((element) => {
+      setInert(element, disabled);
+    });
+  };
+
+  const updateMenuLabel = () => {
     if (!menuToggle) return;
 
-    const label =
-      menuToggle.querySelector(".menu-label");
+    const label = menuToggle.querySelector(".menu-label");
 
     menuToggle.setAttribute(
       "aria-expanded",
@@ -197,73 +138,44 @@
 
     menuToggle.setAttribute(
       "aria-label",
-      menuOpen
-        ? "Chiudi menu"
-        : "Apri menu"
+      menuOpen ? "Chiudi menu" : "Apri menu"
     );
 
     if (label) {
-      label.textContent =
-        menuOpen
-          ? "CHIUDI"
-          : "MENU";
+      label.textContent = menuOpen ? "CHIUDI" : "MENU";
     }
+  };
 
-    if (header) {
-      header.classList.toggle(
-        "menu-active",
-        menuOpen
-      );
-    }
-  }
-
-  function setBackgroundInert(isInert) {
-    [main, footer].forEach((element) => {
-      if (!element) return;
-
-      element.inert = isInert;
-
-      if (isInert) {
-        element.setAttribute(
-          "aria-hidden",
-          "true"
-        );
-      } else {
-        element.removeAttribute("aria-hidden");
-      }
-    });
-  }
-
-  function updateMenuState(forceState = null) {
+  const setMenuState = (open, { restoreFocus = true } = {}) => {
     if (!menu || !menuToggle) return;
 
-    const nextState =
-      forceState === null
-        ? !menuOpen
-        : Boolean(forceState);
+    if (open === menuOpen) return;
 
-    if (nextState === menuOpen) return;
-
-    if (nextState) {
+    if (open) {
       restoreFocusElement = doc.activeElement;
+
       menuOpen = true;
 
-      menu.classList.add("is-open");
-      menu.setAttribute("aria-hidden", "false");
       menu.inert = false;
+      menu.removeAttribute("aria-hidden");
+      menu.classList.add("is-open");
 
-      setBackgroundInert(true);
+      setMenuBackgroundState(true);
 
       html.classList.add("menu-is-open");
       body.classList.add("menu-is-open");
 
-      updateMenuVisualState();
+      updateMenuLabel();
 
-      requestAnimationFrame(() => {
-        const focusables =
-          getFocusableElements(menu);
+      window.requestAnimationFrame(() => {
+        const links = getFocusable(menu);
 
-        focusables[0]?.focus();
+        if (links.length) {
+          links[0].focus();
+        } else {
+          menu.setAttribute("tabindex", "-1");
+          menu.focus();
+        }
       });
 
       return;
@@ -275,469 +187,562 @@
     menu.setAttribute("aria-hidden", "true");
     menu.inert = true;
 
-    setBackgroundInert(false);
+    setMenuBackgroundState(false);
 
     html.classList.remove("menu-is-open");
     body.classList.remove("menu-is-open");
 
-    updateMenuVisualState();
+    updateMenuLabel();
+
+    if (!restoreFocus) {
+      restoreFocusElement = null;
+      return;
+    }
 
     const target =
       restoreFocusElement &&
+      restoreFocusElement.isConnected &&
       typeof restoreFocusElement.focus === "function"
         ? restoreFocusElement
         : menuToggle;
 
     restoreFocusElement = null;
 
-    requestAnimationFrame(() => {
-      target?.focus?.();
+    window.requestAnimationFrame(() => {
+      target.focus();
     });
-  }
+  };
 
-  menuToggle?.addEventListener(
-    "click",
-    () => {
-      updateMenuState();
+  const trapMenuFocus = (event) => {
+    if (!menuOpen || event.key !== "Tab") return;
+
+    const focusables = getMenuFocusable();
+
+    if (!focusables.length) {
+      event.preventDefault();
+      return;
     }
-  );
 
-  menu?.addEventListener(
-    "click",
-    (event) => {
-      const link =
-        event.target.closest("a");
-
-      if (!link) return;
-
-      updateMenuState(false);
-    }
-  );
-
-  doc.addEventListener(
-    "keydown",
-    (event) => {
-      if (event.key === "Escape" && menuOpen) {
-        event.preventDefault();
-        updateMenuState(false);
-        return;
-      }
-
-      if (
-        !menuOpen ||
-        event.key !== "Tab"
-      ) {
-        return;
-      }
-
-      const focusables =
-        getFocusableElements(menu);
-
-      if (!focusables.length) {
-        event.preventDefault();
-        return;
-      }
-
-      const first = focusables[0];
-      const last =
-        focusables[focusables.length - 1];
-
-      if (
-        event.shiftKey &&
-        doc.activeElement === first
-      ) {
-        event.preventDefault();
-        last.focus();
-      } else if (
-        !event.shiftKey &&
-        doc.activeElement === last
-      ) {
-        event.preventDefault();
-        first.focus();
-      }
-    }
-  );
-
-  /* =======================================================
-     LOADER
-     ======================================================= */
-
-  function hideLoader() {
-    if (loaderHidden || !loader) return;
-
-    loaderHidden = true;
-
-    const finish = () => {
-      loader.setAttribute(
-        "aria-hidden",
-        "true"
-      );
-
-      loader.style.display = "none";
-    };
-
-    const gsap = getGsap();
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
 
     if (
-      prefersReducedMotion() ||
-      !gsap
+      event.shiftKey &&
+      doc.activeElement === first
     ) {
-      finish();
+      event.preventDefault();
+      last.focus();
       return;
     }
 
-    gsap.to(loader, {
-      opacity: 0,
-      duration: 0.55,
-      ease: "power2.out",
-      onComplete: finish
-    });
-  }
+    if (
+      !event.shiftKey &&
+      doc.activeElement === last
+    ) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
 
-  function initLoader() {
+  const keepFocusInsideMenu = (event) => {
+    if (!menuOpen) return;
+
+    if (
+      menu.contains(event.target) ||
+      event.target === menuToggle
+    ) {
+      return;
+    }
+
+    const first = getFocusable(menu)[0];
+
+    if (first) {
+      first.focus();
+    }
+  };
+
+  menuToggle?.addEventListener("click", () => {
+    setMenuState(!menuOpen);
+  });
+
+  menu?.addEventListener("click", (event) => {
+    const link = event.target.closest("a[href]");
+
+    if (!link) return;
+
+    setMenuState(false, { restoreFocus: false });
+  });
+
+  menu?.addEventListener("click", (event) => {
+    if (event.target === menu) {
+      setMenuState(false);
+    }
+  });
+
+  doc.addEventListener("focusin", keepFocusInsideMenu);
+
+  doc.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && menuOpen) {
+      event.preventDefault();
+      setMenuState(false);
+      return;
+    }
+
+    trapMenuFocus(event);
+  });
+
+  /* -------------------------------------------------------
+     STANDBY
+     ------------------------------------------------------- */
+
+  const hideStandby = () => {
+    if (!standby) return;
+
+    standby.classList.remove("is-visible");
+    standby.setAttribute("aria-hidden", "true");
+  };
+
+  const clearStandbyTimer = () => {
+    if (!standbyTimer) return;
+
+    window.clearTimeout(standbyTimer);
+    standbyTimer = null;
+  };
+
+  const scheduleStandby = () => {
+    if (!standby) return;
+
+    clearStandbyTimer();
+
+    if (doc.hidden || menuOpen) return;
+
+    standbyTimer = window.setTimeout(() => {
+      if (doc.hidden || menuOpen) return;
+
+      standby.classList.add("is-visible");
+      standby.setAttribute("aria-hidden", "false");
+      standbyTimer = null;
+    }, CONFIG.standbyDelay);
+  };
+
+  const registerActivity = () => {
+    hideStandby();
+
+    if (!standbyTimer && !doc.hidden && !menuOpen) {
+      scheduleStandby();
+    }
+  };
+
+  [
+    "pointerdown",
+    "wheel",
+    "touchstart",
+    "keydown",
+    "scroll"
+  ].forEach((eventName) => {
+    window.addEventListener(
+      eventName,
+      registerActivity,
+      { passive: true }
+    );
+  });
+
+  /* -------------------------------------------------------
+     LOADER
+     ------------------------------------------------------- */
+
+  const hideLoader = () => {
+    if (!loader || loader.classList.contains("is-hidden")) {
+      return;
+    }
+
+    loader.classList.add("is-hidden");
+  };
+
+  const initLoader = () => {
     window.setTimeout(
       hideLoader,
-      CONFIG.loaderFailsafe
+      motionReduced()
+        ? 0
+        : CONFIG.loaderMaxDelay
     );
+  };
 
-    if (doc.readyState === "complete") {
-      window.setTimeout(
-        hideLoader,
-        100
-      );
-      return;
-    }
-
-    window.addEventListener(
-      "load",
-      () => {
-        window.setTimeout(
-          hideLoader,
-          100
-        );
-      },
-      { once: true }
-    );
-  }
-
-  /* =======================================================
+  /* -------------------------------------------------------
      SECTION STATE
-     ======================================================= */
+     ------------------------------------------------------- */
 
-  function getReadingLine() {
+  const getReadingLine = () => {
     const headerHeight =
       header?.offsetHeight || 0;
 
     return (
       headerHeight +
       Math.min(
-        window.innerHeight *
-          CONFIG.activeLineRatio,
+        window.innerHeight * CONFIG.activeLineRatio,
         CONFIG.activeLineMax
       )
     );
-  }
+  };
 
-  function getActiveSectionIndex() {
+  const getActiveSectionIndex = () => {
     if (!sections.length) return 0;
 
-    const readingLine =
-      getReadingLine();
+    const readingLine = getReadingLine();
 
-    let bestIndex = 0;
-    let bestDistance =
-      Number.POSITIVE_INFINITY;
+    let bestIndex = currentIndex;
+    let bestDistance = Number.POSITIVE_INFINITY;
 
-    sections.forEach(
-      (section, index) => {
-        const rect =
-          section.getBoundingClientRect();
+    sections.forEach((section, index) => {
+      const rect = section.getBoundingClientRect();
 
-        if (
-          rect.top <= readingLine &&
-          rect.bottom >= readingLine
-        ) {
-          bestIndex = index;
-          bestDistance = 0;
-          return;
-        }
-
-        const center =
-          rect.top +
-          rect.height / 2;
-
-        const distance =
-          Math.abs(
-            center - readingLine
-          );
-
-        if (
-          distance <
-          bestDistance
-        ) {
-          bestDistance = distance;
-          bestIndex = index;
-        }
+      if (
+        rect.top <= readingLine &&
+        rect.bottom >= readingLine
+      ) {
+        bestIndex = index;
+        bestDistance = 0;
+        return;
       }
-    );
 
-    return bestIndex;
-  }
+      const center =
+        rect.top + rect.height / 2;
 
-  function updateHeaderTheme(section) {
-    if (!header || !section) return;
-
-    const isLight =
-      section.classList.contains(
-        "story-light"
+      const distance = Math.abs(
+        center - readingLine
       );
 
-    header.dataset.headerTheme =
-      isLight
-        ? "light"
-        : "dark";
-  }
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestIndex = index;
+      }
+    });
 
-  function updateSectionNavigation(
+    return bestIndex;
+  };
+
+  const getSectionTitle = (section) =>
+    section?.dataset.title ||
+    section?.querySelector("h1, h2")?.textContent?.trim() ||
+    "";
+
+  const updateTheme = (section) => {
+    if (!section) return;
+
+    const light = section.classList.contains(
+      "story-light"
+    );
+
+    const theme = light ? "light" : "dark";
+
+    if (theme === lastTheme) return;
+
+    lastTheme = theme;
+
+    if (header) {
+      header.dataset.theme = theme;
+    }
+
+    if (sectionNav) {
+      sectionNav.dataset.theme = theme;
+    }
+
+    if (themeColorMeta) {
+      themeColorMeta.setAttribute(
+        "content",
+        light ? "#F1EFE8" : "#0B0B0A"
+      );
+    }
+  };
+
+  const updateSectionNavigation = (
     index = getActiveSectionIndex()
-  ) {
+  ) => {
     if (!sections.length) return;
 
-    index = clamp(
+    const nextIndex = clamp(
       index,
       0,
       sections.length - 1
     );
 
-    currentIndex = index;
+    const changed = nextIndex !== currentIndex;
 
-    const section =
-      sections[index];
+    currentIndex = nextIndex;
 
-    const title =
-      section.dataset.title ||
-      section.querySelector(
-        "h1, h2"
-      )?.textContent?.trim() ||
-      "";
+    const section = sections[currentIndex];
+    const title = getSectionTitle(section);
 
     if (sectionNumber) {
-      sectionNumber.textContent =
-        String(index + 1)
-          .padStart(2, "0");
+      sectionNumber.textContent = String(
+        currentIndex + 1
+      ).padStart(2, "0");
     }
 
     if (sectionTitle) {
-      sectionTitle.textContent =
-        title;
+      sectionTitle.textContent = title;
     }
 
     if (sectionPrev) {
-      const disabled =
-        index === 0;
+      const disabled = currentIndex === 0;
 
-      sectionPrev.disabled =
-        disabled;
-
+      sectionPrev.disabled = disabled;
       sectionPrev.setAttribute(
         "aria-label",
         disabled
           ? "Sezione precedente non disponibile"
-          : `Vai a ${
-              sections[index - 1]
-                .dataset.title ||
-              "sezione precedente"
-            }`
+          : `Vai a ${getSectionTitle(
+              sections[currentIndex - 1]
+            )}`
       );
+
+      if (!disabled) {
+        sectionPrev.setAttribute(
+          "aria-controls",
+          sections[currentIndex - 1].id
+        );
+      } else {
+        sectionPrev.removeAttribute("aria-controls");
+      }
     }
 
     if (sectionNext) {
       const disabled =
-        index ===
-        sections.length - 1;
+        currentIndex === sections.length - 1;
 
-      sectionNext.disabled =
-        disabled;
+      sectionNext.disabled = disabled;
 
       sectionNext.setAttribute(
         "aria-label",
         disabled
           ? "Sezione successiva non disponibile"
-          : `Vai a ${
-              sections[index + 1]
-                .dataset.title ||
-              "sezione successiva"
-            }`
+          : `Vai a ${getSectionTitle(
+              sections[currentIndex + 1]
+            )}`
       );
+
+      if (!disabled) {
+        sectionNext.setAttribute(
+          "aria-controls",
+          sections[currentIndex + 1].id
+        );
+      } else {
+        sectionNext.removeAttribute("aria-controls");
+      }
     }
 
-    if (sectionNav) {
-      sectionNav.dataset.theme =
-        section.classList.contains(
-          "story-light"
-        )
-          ? "light"
-          : "dark";
-    }
+    sections.forEach((item, itemIndex) => {
+      item.toggleAttribute(
+        "data-active",
+        itemIndex === currentIndex
+      );
+    });
 
-    updateHeaderTheme(section);
+    updateTheme(section);
 
-    html.dataset.activeSection =
-      section.id || "";
-  }
+    return changed;
+  };
 
-  function updateUrl(section) {
-    if (
-      !section?.id ||
-      !window.history?.replaceState
-    ) {
+  const getSectionTop = (section) => {
+    const headerHeight =
+      header?.offsetHeight || 0;
+
+    return Math.max(
+      0,
+      window.scrollY +
+        section.getBoundingClientRect().top -
+        headerHeight -
+        CONFIG.scrollOffset
+    );
+  };
+
+  const updateHash = (section) => {
+    if (!section?.id) return;
+
+    const url = `${window.location.pathname}#${section.id}`;
+
+    if (window.location.hash === `#${section.id}`) {
       return;
     }
 
-    const url =
-      `${window.location.pathname}` +
-      `${window.location.search}` +
-      `#${encodeURIComponent(section.id)}`;
-
     window.history.replaceState(
-      null,
+      { section: section.id },
       "",
       url
     );
-  }
+  };
 
-  function scrollToSection(
+  const scrollToSection = (
     index,
-    updateHash = true
-  ) {
-    const section =
-      sections[index];
+    {
+      updateUrl = true,
+      focusHeading = false
+    } = {}
+  ) => {
+    const section = sections[index];
 
     if (!section) return;
 
-    const top =
-      window.scrollY +
-      section.getBoundingClientRect()
-        .top -
-      CONFIG.scrollOffset;
-
-    if (updateHash) {
-      updateUrl(section);
-    }
+    const top = getSectionTop(section);
 
     window.scrollTo({
       top,
-      behavior:
-        prefersReducedMotion()
-          ? "auto"
-          : "smooth"
+      behavior: motionReduced()
+        ? "auto"
+        : "smooth"
     });
-  }
 
-  sectionPrev?.addEventListener(
-    "click",
-    () => {
-      if (currentIndex > 0) {
-        scrollToSection(
-          currentIndex - 1
-        );
-      }
+    if (updateUrl) {
+      updateHash(section);
     }
-  );
 
-  sectionNext?.addEventListener(
-    "click",
-    () => {
-      if (
-        currentIndex <
-        sections.length - 1
-      ) {
-        scrollToSection(
-          currentIndex + 1
-        );
-      }
-    }
-  );
+    if (focusHeading) {
+      const heading =
+        section.querySelector("h1, h2");
 
-  /* =======================================================
-     KEYBOARD SECTION NAVIGATION
-     ======================================================= */
+      if (heading) {
+        const hadTabIndex =
+          heading.getAttribute("tabindex");
 
-  doc.addEventListener(
-    "keydown",
-    (event) => {
-      if (
-        menuOpen ||
-        event.altKey ||
-        event.ctrlKey ||
-        event.metaKey ||
-        event.shiftKey
-      ) {
-        return;
-      }
-
-      const target =
-        event.target;
-
-      const isFormControl =
-        target instanceof
-          HTMLInputElement ||
-        target instanceof
-          HTMLTextAreaElement ||
-        target instanceof
-          HTMLSelectElement ||
-        target instanceof
-          HTMLButtonElement ||
-        target?.isContentEditable;
-
-      if (isFormControl) {
-        return;
-      }
-
-      if (
-        event.key === "ArrowDown"
-      ) {
-        event.preventDefault();
-
-        if (
-          currentIndex <
-          sections.length - 1
-        ) {
-          scrollToSection(
-            currentIndex + 1
+        if (hadTabIndex === null) {
+          heading.setAttribute(
+            "tabindex",
+            "-1"
           );
+        }
+
+        window.setTimeout(() => {
+          heading.focus({
+            preventScroll: true
+          });
+
+          if (hadTabIndex === null) {
+            heading.removeAttribute("tabindex");
+          }
+        }, motionReduced() ? 0 : 500);
+      }
+    }
+  };
+
+  sectionPrev?.addEventListener("click", () => {
+    if (currentIndex > 0) {
+      scrollToSection(currentIndex - 1, {
+        updateUrl: true,
+        focusHeading: true
+      });
+    }
+  });
+
+  sectionNext?.addEventListener("click", () => {
+    if (currentIndex < sections.length - 1) {
+      scrollToSection(currentIndex + 1, {
+        updateUrl: true,
+        focusHeading: true
+      });
+    }
+  });
+
+  /* -------------------------------------------------------
+     HASH / HISTORY
+     ------------------------------------------------------- */
+
+  const getHashTarget = () => {
+    const rawHash = window.location.hash.slice(1);
+
+    if (!rawHash) return null;
+
+    let id = rawHash;
+
+    try {
+      id = decodeURIComponent(rawHash);
+    } catch {
+      return null;
+    }
+
+    return doc.getElementById(id);
+  };
+
+  const navigateToHash = ({
+    behavior = "auto",
+    focus = false
+  } = {}) => {
+    const target = getHashTarget();
+
+    if (!target) return;
+
+    const index = sections.indexOf(target);
+
+    if (index >= 0) {
+      const top = getSectionTop(target);
+
+      window.scrollTo({
+        top,
+        behavior:
+          motionReduced()
+            ? "auto"
+            : behavior
+      });
+
+      updateSectionNavigation(index);
+
+      if (focus) {
+        const heading =
+          target.querySelector("h1, h2");
+
+        if (heading) {
+          heading.setAttribute(
+            "tabindex",
+            "-1"
+          );
+
+          window.setTimeout(() => {
+            heading.focus({
+              preventScroll: true
+            });
+          }, motionReduced() ? 0 : 350);
         }
       }
 
-      if (
-        event.key === "ArrowUp"
-      ) {
-        event.preventDefault();
-
-        if (currentIndex > 0) {
-          scrollToSection(
-            currentIndex - 1
-          );
-        }
-      }
+      return;
     }
-  );
 
-  /* =======================================================
+    target.scrollIntoView({
+      behavior:
+        motionReduced()
+          ? "auto"
+          : behavior,
+      block: "start"
+    });
+  };
+
+  window.addEventListener("hashchange", () => {
+    navigateToHash({
+      behavior: "smooth",
+      focus: true
+    });
+  });
+
+  window.addEventListener("popstate", () => {
+    navigateToHash({
+      behavior: "smooth",
+      focus: true
+    });
+  });
+
+  /* -------------------------------------------------------
      SCROLL / RESIZE
-     ======================================================= */
+     ------------------------------------------------------- */
 
-  function requestSectionUpdate() {
-    if (scrollFrame) return;
+  const requestSectionUpdate = () => {
+    if (scrollTicking) return;
 
-    scrollFrame =
-      window.requestAnimationFrame(
-        () => {
-          updateSectionNavigation();
-          scrollFrame = 0;
-        }
-      );
-  }
+    scrollTicking = true;
+
+    window.requestAnimationFrame(() => {
+      updateSectionNavigation();
+      scrollTicking = false;
+    });
+  };
 
   window.addEventListener(
     "scroll",
@@ -747,404 +752,281 @@
 
   window.addEventListener(
     "resize",
-    () => {
-      window.clearTimeout(
-        resizeTimer
-      );
-
-      resizeTimer =
-        window.setTimeout(
-          () => {
-            requestSectionUpdate();
-
-            if (window.ScrollTrigger) {
-              window.ScrollTrigger.refresh();
-            }
-          },
-          CONFIG.resizeDebounce
-        );
-    },
+    requestSectionUpdate,
     { passive: true }
   );
 
-  /* =======================================================
-     GSAP
-     ======================================================= */
+  /* -------------------------------------------------------
+     GSAP MOTION
+     ------------------------------------------------------- */
 
-  function revealWithoutAnimation() {
-    sections.forEach(
-      (section) => {
-        section
-          .querySelectorAll(
-            [
-              ".eyebrow",
-              "h1",
-              "h2",
-              "p",
-              ".return-list span",
-              ".connect-words span",
-              ".person-frame",
-              ".map-frame",
-              ".understand-lead",
-              ".build-lead",
-              ".from-here-lead",
-              ".objective-list"
-            ].join(",")
-          )
-          .forEach(
-            (element) => {
-              element.style.opacity = "1";
-              element.style.transform =
-                "none";
-            }
-          );
+  const gsapAvailable = () =>
+    !motionReduced() &&
+    window.gsap &&
+    window.ScrollTrigger;
+
+  const resetAnimatedElements = () => {
+    sections.forEach((section) => {
+      section
+        .querySelectorAll(
+          [
+            ".eyebrow",
+            "h1",
+            "h2",
+            ".narrative-copy > p",
+            ".today-lead",
+            ".contact-lead",
+            ".statement",
+            ".understand-lead",
+            ".build-lead",
+            ".return-list li",
+            ".connect-words li",
+            ".objective-list p",
+            ".person-frame",
+            ".map-frame"
+          ].join(",")
+        )
+        .forEach((element) => {
+          element.style.removeProperty("opacity");
+          element.style.removeProperty("transform");
+          element.style.removeProperty("visibility");
+        });
+    });
+  };
+
+  const createReveal = (
+    targets,
+    {
+      trigger,
+      start = "top 74%",
+      y = 30,
+      x = 0,
+      duration = 0.75,
+      stagger = 0.08,
+      id
+    } = {}
+  ) => {
+    const elements = Array.from(
+      targets || []
+    ).filter(Boolean);
+
+    if (!elements.length) return;
+
+    window.gsap.from(elements, {
+      opacity: 0,
+      y,
+      x,
+      duration,
+      stagger,
+      ease: "power3.out",
+      clearProps: "opacity,transform",
+      scrollTrigger: {
+        id,
+        trigger,
+        start,
+        once: true
       }
-    );
-  }
+    });
+  };
 
-  function killStoryAnimations() {
-    if (!window.ScrollTrigger) {
+  const initStoryAnimations = () => {
+    resetAnimatedElements();
+
+    if (!gsapAvailable()) {
+      animationsReady = false;
       return;
     }
 
-    window.ScrollTrigger
-      .getAll()
-      .filter(
-        (trigger) =>
-          String(
-            trigger.vars?.id || ""
-          ).startsWith("story-")
-      )
-      .forEach(
-        (trigger) => trigger.kill()
-      );
-  }
+    const {
+      gsap,
+      ScrollTrigger
+    } = window;
 
-  function initStoryAnimations() {
-    const gsap = getGsap();
+    gsap.registerPlugin(ScrollTrigger);
 
-    killStoryAnimations();
-
-    if (
-      !gsap ||
-      prefersReducedMotion()
-    ) {
-      revealWithoutAnimation();
-      return;
+    if (gsap.__cesareHomeContext) {
+      gsap.__cesareHomeContext.revert();
     }
 
-    gsap.registerPlugin(
-      window.ScrollTrigger
-    );
+    const context = gsap.context(() => {
+      const opening = sections[0];
 
-    sections.forEach(
-      (section, index) => {
+      if (opening) {
         const eyebrow =
-          section.querySelector(
-            ".eyebrow"
-          );
+          opening.querySelector(".eyebrow");
 
         const heading =
-          section.querySelector(
-            "h1, h2"
-          );
+          opening.querySelector("h1");
 
         const paragraphs =
-          Array.from(
-            section.querySelectorAll(
-              ".narrative-copy p, " +
-              ".opening-copy p, " +
-              ".today-lead, " +
-              ".contact-lead"
-            )
+          opening.querySelectorAll(
+            ".opening-copy > p"
           );
 
-        const animate = (
-          targets,
-          options = {}
-        ) => {
-          const validTargets =
-            Array.from(
-              targets || []
-            ).filter(Boolean);
+        const timeline = gsap.timeline();
 
-          if (!validTargets.length) {
-            return;
-          }
+        if (eyebrow) {
+          timeline.from(eyebrow, {
+            opacity: 0,
+            y: 14,
+            duration: 0.55,
+            ease: "power3.out"
+          });
+        }
 
-          gsap.from(
-            validTargets,
+        if (heading) {
+          timeline.from(
+            heading,
             {
               opacity: 0,
-              y: 30,
-              duration: 0.75,
-              stagger: 0.08,
-              ease: "power3.out",
-              ...options,
-              scrollTrigger: {
-                id:
-                  `story-${index}-${options.name || "content"}`,
-                trigger: section,
-                start:
-                  options.start ||
-                  "top 72%",
-                once: true
-              }
-            }
-          );
-        };
-
-        if (
-          section.classList.contains(
-            "story-opening"
-          )
-        ) {
-          const timeline =
-            gsap.timeline({
-              scrollTrigger: {
-                id:
-                  `story-${index}-opening`,
-                trigger: section,
-                start: "top 70%",
-                once: true
-              }
-            });
-
-          if (eyebrow) {
-            timeline.from(
-              eyebrow,
-              {
-                opacity: 0,
-                y: 18,
-                duration: 0.55,
-                ease: "power3.out"
-              }
-            );
-          }
-
-          if (heading) {
-            timeline.from(
-              heading,
-              {
-                opacity: 0,
-                y: 40,
-                duration: 0.85,
-                ease: "power4.out"
-              },
-              "-=0.3"
-            );
-          }
-
-          if (paragraphs.length) {
-            timeline.from(
-              paragraphs,
-              {
-                opacity: 0,
-                y: 20,
-                duration: 0.6,
-                stagger: 0.1,
-                ease: "power3.out"
-              },
-              "-=0.25"
-            );
-          }
-
-          return;
-        }
-
-        if (
-          section.classList.contains(
-            "story-understand"
-          )
-        ) {
-          animate(
-            section.querySelectorAll(
-              ".understand-lead, .narrative-copy"
-            ),
-            {
-              name: "understand",
-              y: 38,
+              y: 34,
               duration: 0.8,
-              stagger: 0.12,
-              start: "top 68%"
-            }
+              ease: "power4.out"
+            },
+            "-=0.25"
           );
-
-          return;
         }
 
-        if (
-          section.classList.contains(
-            "story-return"
-          )
-        ) {
-          animate(
-            section.querySelectorAll(
-              ".return-copy > p, .return-list span"
-            ),
+        if (paragraphs.length) {
+          timeline.from(
+            paragraphs,
             {
-              name: "return",
-              y: 28,
-              duration: 0.7,
+              opacity: 0,
+              y: 18,
+              duration: 0.6,
               stagger: 0.1,
-              start: "top 68%"
-            }
+              ease: "power3.out"
+            },
+            "-=0.3"
           );
-
-          return;
         }
+      }
 
-        if (
-          section.classList.contains(
-            "story-connect"
-          )
-        ) {
-          animate(
+      sections.slice(1).forEach(
+        (section, index) => {
+          const number = index + 1;
+
+          const eyebrow =
+            section.querySelector(".eyebrow");
+
+          const heading =
+            section.querySelector("h1, h2");
+
+          const paragraphs =
             section.querySelectorAll(
-              ".connect-words span"
-            ),
-            {
-              name: "connect",
-              x: -28,
-              y: 0,
-              duration: 0.62,
-              stagger: 0.09,
-              start: "top 68%"
-            }
-          );
-
-          animate(
-            [
-              section.querySelector(
-                ".narrative-copy"
-              )
-            ],
-            {
-              name: "connect-copy",
-              y: 28,
-              duration: 0.7,
-              start: "top 68%"
-            }
-          );
-
-          return;
-        }
-
-        if (
-          section.classList.contains(
-            "story-today"
-          )
-        ) {
-          const timeline =
-            gsap.timeline({
-              scrollTrigger: {
-                id:
-                  `story-${index}-today`,
-                trigger: section,
-                start: "top 68%",
-                once: true
-              }
-            });
-
-          if (heading) {
-            timeline.from(
-              heading,
-              {
-                opacity: 0,
-                y: 35,
-                duration: 0.75,
-                ease: "power4.out"
-              }
+              ".narrative-copy > p"
             );
-          }
 
-          const todayLead =
+          const frame =
             section.querySelector(
-              ".today-lead"
+              ".person-frame, .map-frame"
             );
 
-          if (todayLead) {
-            timeline.from(
-              todayLead,
-              {
-                opacity: 0,
-                y: 35,
-                duration: 0.75,
-                ease: "power4.out"
-              },
-              "-=0.3"
-            );
-          }
-
-          const copy =
-            section.querySelector(
-              ".narrative-copy"
-            );
-
-          if (copy) {
-            timeline.from(
-              copy,
-              {
-                opacity: 0,
-                y: 25,
-                duration: 0.65,
-                ease: "power3.out"
-              },
-              "-=0.3"
-            );
-          }
-
-          return;
-        }
-
-        const frame =
-          section.querySelector(
-            ".person-frame, .map-frame"
-          );
-
-        if (frame) {
-          animate(
-            [frame],
-            {
-              name: "frame",
-              y: 35,
-              duration: 0.9,
-              start: "top 70%"
-            }
-          );
-        }
-
-        animate(
-          [
+          const selector = [
             eyebrow,
             heading,
-            ...paragraphs
-          ],
-          {
-            name: "generic",
+            ...Array.from(paragraphs),
+            frame
+          ].filter(Boolean);
+
+          if (!selector.length) return;
+
+          createReveal(selector, {
+            trigger: section,
+            start: "top 76%",
             y: 28,
             duration: 0.72,
-            stagger: 0.08,
-            start: "top 72%"
+            stagger: 0.07,
+            id: `story-${number}`
+          });
+
+          if (
+            section.classList.contains(
+              "story-connect"
+            )
+          ) {
+            createReveal(
+              section.querySelectorAll(
+                ".connect-words li"
+              ),
+              {
+                trigger: section,
+                start: "top 72%",
+                x: -22,
+                y: 0,
+                duration: 0.62,
+                stagger: 0.07,
+                id: `story-${number}-words`
+              }
+            );
           }
-        );
-      }
-    );
 
-    window.ScrollTrigger.refresh();
-  }
+          if (
+            section.classList.contains(
+              "story-return"
+            )
+          ) {
+            createReveal(
+              section.querySelectorAll(
+                ".return-list li"
+              ),
+              {
+                trigger: section,
+                start: "top 72%",
+                y: 22,
+                duration: 0.62,
+                stagger: 0.08,
+                id: `story-${number}-list`
+              }
+            );
+          }
 
-  /* =======================================================
-     MOTION PREFERENCE
-     ======================================================= */
+          if (
+            section.classList.contains(
+              "story-objective"
+            )
+          ) {
+            createReveal(
+              section.querySelectorAll(
+                ".objective-list p"
+              ),
+              {
+                trigger: section,
+                start: "top 72%",
+                x: 22,
+                y: 0,
+                duration: 0.62,
+                stagger: 0.08,
+                id: `story-${number}-method`
+              }
+            );
+          }
+        }
+      );
+    });
 
-  function handleMotionPreferenceChange() {
+    gsap.__cesareHomeContext = context;
+    animationsReady = true;
+
+    window.requestAnimationFrame(() => {
+      ScrollTrigger.refresh();
+    });
+  };
+
+  const handleMotionPreferenceChange = () => {
+    if (window.gsap?.__cesareHomeContext) {
+      window.gsap.__cesareHomeContext.revert();
+      window.gsap.__cesareHomeContext = null;
+    }
+
     initStoryAnimations();
+
+    requestSectionUpdate();
 
     if (window.ScrollTrigger) {
       window.ScrollTrigger.refresh();
     }
-  }
+  };
 
   if (
     typeof reduceMotionQuery.addEventListener ===
@@ -1159,86 +1041,39 @@
     "function"
   ) {
     reduceMotionQuery.addListener(
+      "change",
       handleMotionPreferenceChange
     );
   }
 
-  /* =======================================================
-     HASH NAVIGATION
-     ======================================================= */
+  /* -------------------------------------------------------
+     MEDIA FALLBACKS
+     ------------------------------------------------------- */
 
-  function getHashTarget() {
-    const rawHash =
-      window.location.hash;
-
-    if (!rawHash) return null;
-
-    const id =
-      decodeURIComponent(
-        rawHash.slice(1)
-      );
-
-    return doc.getElementById(id);
-  }
-
-  function handleInitialHash() {
-    const target =
-      getHashTarget();
-
-    if (!target) return;
-
-    const index =
-      sections.indexOf(target);
-
-    if (index === -1) return;
-
-    window.setTimeout(
+  doc.querySelectorAll("img").forEach((image) => {
+    image.addEventListener(
+      "error",
       () => {
-        scrollToSection(
-          index,
-          false
-        );
-        updateSectionNavigation(
-          index
-        );
+        image.classList.add("is-broken");
       },
-      80
+      { once: true }
     );
-  }
+  });
 
-  window.addEventListener(
-    "hashchange",
-    () => {
-      const target =
-        getHashTarget();
-
-      if (!target) return;
-
-      const index =
-        sections.indexOf(target);
-
-      if (index === -1) return;
-
-      scrollToSection(
-        index,
-        false
-      );
-    }
-  );
-
-  /* =======================================================
-     VISIBILITY / BF CACHE
-     ======================================================= */
+  /* -------------------------------------------------------
+     PAGE LIFECYCLE
+     ------------------------------------------------------- */
 
   document.addEventListener(
     "visibilitychange",
     () => {
-      if (doc.hidden) {
+      if (document.hidden) {
         hideStandby();
+        clearStandbyTimer();
         return;
       }
 
-      resetStandbyTimer();
+      scheduleStandby();
 
       if (window.ScrollTrigger) {
         window.ScrollTrigger.refresh();
@@ -1247,27 +1082,35 @@
       requestSectionUpdate();
     }
   );
+
+  window.addEventListener("pageshow", () => {
+    scheduleStandby();
+
+    if (window.ScrollTrigger) {
+      window.ScrollTrigger.refresh();
+    }
+
+    requestSectionUpdate();
+  });
 
   window.addEventListener(
-    "pageshow",
+    "pagehide",
     () => {
-      resetStandbyTimer();
-
-      if (window.ScrollTrigger) {
-        window.ScrollTrigger.refresh();
-      }
-
-      requestSectionUpdate();
-    }
+      clearStandbyTimer();
+    },
+    { passive: true }
   );
 
-  /* =======================================================
+  /* -------------------------------------------------------
      INITIALIZATION
-     ======================================================= */
+     ------------------------------------------------------- */
 
-  function init() {
+  const init = () => {
+    updateYear();
+
+    menuOpen = false;
+
     if (menu) {
-      menuOpen = false;
       menu.inert = true;
       menu.setAttribute(
         "aria-hidden",
@@ -1275,35 +1118,36 @@
       );
     }
 
-    updateMenuVisualState();
+    setMenuBackgroundState(false);
+    updateMenuLabel();
 
-    updateSectionNavigation(0);
+    updateSectionNavigation(
+      getActiveSectionIndex()
+    );
 
     initLoader();
     initStoryAnimations();
-    handleInitialHash();
-    resetStandbyTimer();
+    scheduleStandby();
 
-    window.setTimeout(
-      () => {
-        updateSectionNavigation();
-      },
-      50
-    );
-
-    if (window.ScrollTrigger) {
-      window.setTimeout(
-        () => {
-          window.ScrollTrigger.refresh();
-        },
-        150
-      );
+    if (window.location.hash) {
+      window.setTimeout(() => {
+        navigateToHash({
+          behavior: "auto",
+          focus: true
+        });
+      }, 80);
     }
-  }
 
-  if (
-    doc.readyState === "loading"
-  ) {
+    window.requestAnimationFrame(() => {
+      updateSectionNavigation();
+
+      if (window.ScrollTrigger) {
+        window.ScrollTrigger.refresh();
+      }
+    });
+  };
+
+  if (doc.readyState === "loading") {
     doc.addEventListener(
       "DOMContentLoaded",
       init,
