@@ -1,1435 +1,766 @@
-/* =========================================================
-   CESARE PARATORE — HOME
-   STANDARD OPERATIVO — MAXIMUM QUALITY
-   ========================================================= */
-
-:root {
-  --bg: #0B0B0A;
-  --surface: #151513;
-  --surface-2: #1C1C19;
-
-  --light: #F1EFE8;
-  --secondary: #A7A49C;
-  --muted: #66645F;
-
-  --ink: #11110F;
-  --line-dark: rgba(241, 239, 232, 0.16);
-  --line-light: rgba(11, 11, 10, 0.16);
-
-  --content-max: 1500px;
-  --text-max: 700px;
-
-  --display-xl: clamp(4.5rem, 10vw, 11rem);
-  --display-l: clamp(3rem, 7vw, 8rem);
-  --display-m: clamp(2.25rem, 5vw, 5rem);
-
-  --body-large: clamp(1.25rem, 2vw, 2rem);
-  --narrative: clamp(1.15rem, 1.35vw, 1.5rem);
-  --micro: clamp(0.72rem, 0.8vw, 0.85rem);
-
-  --gutter: 5vw;
-  --header-h: 76px;
-  --nav-h: 96px;
-
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-
-  --duration-fast: 220ms;
-  --duration: 600ms;
-  --duration-slow: 1000ms;
-}
-
-/* =========================================================
-   RESET
-   ========================================================= */
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-html {
-  min-height: 100%;
-  scroll-behavior: auto;
-  scrollbar-gutter: stable;
-  scroll-padding-top: calc(
-    var(--header-h) + env(safe-area-inset-top) + 24px
-  );
-}
-
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100%;
-  overflow-x: clip;
-
-  background: var(--bg);
-  color: var(--light);
-
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
-
-  font-size: 16px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-img,
-svg,
-iframe {
-  display: block;
-  max-width: 100%;
-}
-
-img {
-  height: auto;
-}
-
-button,
-a {
-  font: inherit;
-}
-
-button {
-  border: 0;
-}
-
-a {
-  color: inherit;
-}
-
-::selection {
-  background: var(--light);
-  color: var(--bg);
-}
-
-/* =========================================================
-   ACCESSIBILITY
-   ========================================================= */
-
-:focus {
-  outline: none;
-}
-
-:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 5px;
-}
-
-.skip-link {
-  position: fixed;
-  z-index: 1000;
-  top: 12px;
-  left: 12px;
-
-  padding: 0.75rem 1rem;
-
-  background: var(--light);
-  color: var(--bg);
-
-  font-size: 0.85rem;
-  font-weight: 700;
-  text-decoration: none;
-
-  transform: translateY(-160%);
-  transition: transform var(--duration-fast) var(--ease-out);
-}
-
-.skip-link:focus {
-  transform: translateY(0);
-}
-
-/* =========================================================
-   LOADER
-   ========================================================= */
-
-.site-loader {
-  position: fixed;
-  z-index: 900;
-
-  inset: 0;
-
-  display: grid;
-  place-items: center;
-
-  background: var(--bg);
-  color: var(--light);
-
-  pointer-events: none;
-}
-
-.loader-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-
-  text-align: center;
-}
-
-.loader-inner img {
-  width: clamp(52px, 8vw, 88px);
-  height: auto;
-  filter: invert(1);
-}
-
-.loader-inner span {
-  font-size: var(--micro);
-  letter-spacing: 0.18em;
-  font-weight: 700;
-}
-
-/* =========================================================
-   STANDBY
-   ========================================================= */
-
-.standby {
-  position: fixed;
-  z-index: 700;
-  inset: 0;
-
-  display: grid;
-  place-items: center;
-
-  background: var(--bg);
-  color: var(--light);
-
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-
-  transition:
-    opacity 700ms var(--ease-out),
-    visibility 700ms var(--ease-out);
-}
-
-.standby.is-visible {
-  opacity: 1;
-  visibility: visible;
-}
-
-.standby span {
-  font-size: clamp(2rem, 5vw, 5rem);
-  font-weight: 700;
-  letter-spacing: -0.04em;
-}
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
-.site-header {
-  position: fixed;
-  z-index: 500;
-
-  top: 0;
-  left: 0;
-  right: 0;
-
-  height: calc(var(--header-h) + env(safe-area-inset-top));
-
-  padding:
-    env(safe-area-inset-top)
-    var(--gutter)
-    0;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  color: var(--light);
-
-  pointer-events: none;
-}
-
-.brand,
-.menu-toggle {
-  pointer-events: auto;
-}
-
-.brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.7rem;
-
-  color: inherit;
-  text-decoration: none;
-}
-
-.brand img {
-  width: 28px;
-  height: 28px;
-  filter: invert(1);
-}
-
-.brand span {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-}
-
-.menu-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-
-  padding: 0.7rem 0;
-
-  background: transparent;
-  color: inherit;
-
-  cursor: pointer;
-}
-
-.menu-label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-}
-
-.menu-icon {
-  display: grid;
-  gap: 5px;
-  width: 24px;
-}
-
-.menu-icon span {
-  display: block;
-  width: 100%;
-  height: 1px;
-  background: currentColor;
-
-  transition:
-    transform var(--duration-fast) var(--ease-out),
-    opacity var(--duration-fast) ease;
-}
-
-.menu-toggle[aria-expanded="true"] .menu-icon span:first-child {
-  transform: translateY(3px) rotate(45deg);
-}
-
-.menu-toggle[aria-expanded="true"] .menu-icon span:last-child {
-  transform: translateY(-3px) rotate(-45deg);
-}
-
-/* =========================================================
-   MENU
-   ========================================================= */
-
-.menu-overlay {
-  position: fixed;
-  z-index: 450;
-
-  inset: 0;
-
-  min-height: 100svh;
-
-  padding:
-    calc(var(--header-h) + env(safe-area-inset-top) + 40px)
-    var(--gutter)
-    calc(var(--nav-h) + env(safe-area-inset-bottom) + 40px);
-
-  background: var(--light);
-  color: var(--bg);
-
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-
-  transform: translateY(-1.5rem);
-
-  transition:
-    opacity 450ms var(--ease-out),
-    visibility 450ms var(--ease-out),
-    transform 650ms var(--ease-out);
-
-  overflow-y: auto;
-}
-
-.menu-overlay.is-open {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-  transform: translateY(0);
-}
-
-.menu-inner {
-  width: min(100%, var(--content-max));
-  min-height: 100%;
-
-  margin-inline: auto;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.menu-meta,
-.menu-footer {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-
-  font-size: var(--micro);
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.menu-inner nav {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-
-  gap: 0;
-
-  margin-block: clamp(3rem, 8vh, 7rem);
-}
-
-.menu-inner nav a {
-  position: relative;
-
-  padding-block: 0.55rem;
-
-  color: inherit;
-  text-decoration: none;
-
-  font-size: clamp(2rem, 5vw, 5.5rem);
-  font-weight: 700;
-  line-height: 0.98;
-  letter-spacing: -0.05em;
-
-  transition:
-    opacity var(--duration-fast) ease,
-    transform var(--duration-fast) var(--ease-out);
-}
-
-.menu-inner nav a::after {
-  content: "";
-
-  position: absolute;
-  left: 0;
-  bottom: 0.25rem;
-
-  width: 0;
-  height: 2px;
-
-  background: currentColor;
-
-  transition: width 400ms var(--ease-out);
-}
-
-.menu-inner nav a:hover,
-.menu-inner nav a:focus-visible {
-  opacity: 0.65;
-  transform: translateX(0.25rem);
-}
-
-.menu-inner nav a:hover::after,
-.menu-inner nav a:focus-visible::after {
-  width: min(80px, 20%);
-}
-
-/* =========================================================
-   MAIN
-   ========================================================= */
-
-main {
-  position: relative;
-  padding-top: env(safe-area-inset-top);
-}
-
-main:focus {
-  outline: none;
-}
-
-/* =========================================================
-   STORY BASE
-   ========================================================= */
-
-.story {
-  position: relative;
-
-  min-height: 100svh;
-
-  padding:
-    calc(var(--header-h) + env(safe-area-inset-top) + 6vh)
-    var(--gutter)
-    calc(var(--nav-h) + env(safe-area-inset-bottom) + 8vh);
-
-  display: flex;
-  align-items: center;
-
-  overflow: clip;
-}
-
-.story-content {
-  position: relative;
-  z-index: 2;
-
-  width: min(100%, var(--content-max));
-  margin-inline: auto;
-}
-
-.story-dark {
-  --story-bg: var(--bg);
-  --story-fg: var(--light);
-  --story-secondary: var(--secondary);
-  --story-line: var(--line-dark);
-
-  background: var(--story-bg);
-  color: var(--story-fg);
-}
-
-.story-light {
-  --story-bg: var(--light);
-  --story-fg: var(--ink);
-  --story-secondary: #5D5A54;
-  --story-line: var(--line-light);
-
-  background: var(--story-bg);
-  color: var(--story-fg);
-}
-
-.story-index {
-  position: absolute;
-
-  top: calc(
-    var(--header-h) +
-    env(safe-area-inset-top) +
-    1.5rem
-  );
-
-  left: var(--gutter);
-
-  font-size: var(--micro);
-  font-weight: 700;
-  letter-spacing: 0.12em;
-
-  opacity: 0.6;
-}
-
-.eyebrow {
-  margin: 0 0 1.5rem;
-
-  color: var(--story-secondary);
-
-  font-size: var(--micro);
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
-.story h1,
-.story h2 {
-  margin: 0;
-
-  font-weight: 700;
-  line-height: 0.88;
-  letter-spacing: -0.065em;
-}
-
-.story h1 {
-  font-size: var(--display-xl);
-}
-
-.story h2 {
-  font-size: var(--display-l);
-}
-
-.narrative-copy {
-  width: min(100%, var(--text-max));
-
-  margin-top: clamp(2rem, 5vw, 5rem);
-
-  font-size: var(--narrative);
-  line-height: 1.42;
-  letter-spacing: -0.018em;
-}
-
-.narrative-copy p {
-  margin: 0;
-}
-
-.narrative-copy p + p {
-  margin-top: 1.35em;
-}
-
-.narrative-wide {
-  max-width: 900px;
-}
-
-.narrative-medium {
-  max-width: 760px;
-}
-
-/* =========================================================
-   OPENING
-   ========================================================= */
-
-.story-opening {
-  isolation: isolate;
-}
-
-.opening-content {
-  padding-right: 20vw;
-}
-
-.opening-copy {
-  width: min(100%, 650px);
-
-  margin-top: clamp(2rem, 5vw, 4rem);
-
-  font-size: var(--body-large);
-  line-height: 1.35;
-}
-
-.opening-copy p {
-  margin: 0;
-}
-
-.opening-copy p + p {
-  margin-top: 0.65em;
-}
-
-.opening-mark {
-  position: absolute;
-
-  right: 4vw;
-  bottom: 10vh;
-
-  width: clamp(160px, 26vw, 420px);
-
-  opacity: 0.08;
-
-  pointer-events: none;
-}
-
-.opening-mark img {
-  width: 100%;
-  filter: invert(1);
-}
-
-/* =========================================================
-   MOVEMENT
-   ========================================================= */
-
-.story-movement .story-content {
-  max-width: 1100px;
-}
-
-.story-movement-detail .story-content {
-  max-width: 1200px;
-}
-
-.split-copy {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.8fr);
-  gap: clamp(3rem, 10vw, 12rem);
-
-  margin-top: clamp(3rem, 7vw, 7rem);
-
-  align-items: end;
-}
-
-.statement {
-  margin: 0;
-
-  font-size: clamp(2rem, 4.5vw, 5.5rem);
-  line-height: 0.95;
-  font-weight: 700;
-  letter-spacing: -0.055em;
-}
-
-.split-copy .narrative-copy {
-  margin-top: 0;
-}
-
-/* =========================================================
-   UNDERSTAND
-   ========================================================= */
-
-.understand-grid,
-.build-grid,
-.from-here-grid,
-.objective-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
-
-  gap: clamp(3rem, 9vw, 10rem);
-
-  margin-top: clamp(3rem, 7vw, 7rem);
-
-  align-items: end;
-}
-
-.understand-lead,
-.build-lead,
-.from-here-lead,
-.objective-question {
-  max-width: 800px;
-
-  font-size: clamp(2rem, 4vw, 4.5rem);
-  line-height: 0.98;
-  font-weight: 700;
-  letter-spacing: -0.055em;
-}
-
-.understand-lead p,
-.build-lead p,
-.from-here-lead p,
-.objective-question p {
-  margin: 0;
-}
-
-.build-lead p + p {
-  margin-top: 0.25em;
-}
-
-.understand-grid .narrative-copy,
-.build-grid .narrative-copy,
-.from-here-grid .narrative-copy {
-  margin-top: 0;
-}
-
-/* =========================================================
-   RETURN
-   ========================================================= */
-
-.return-copy {
-  width: min(100%, 1000px);
-  margin-top: clamp(3rem, 7vw, 7rem);
-
-  font-size: var(--body-large);
-  line-height: 1.35;
-}
-
-.return-copy > p {
-  margin: 0;
-  max-width: 800px;
-}
-
-.return-copy > p + p {
-  margin-top: 1em;
-  max-width: 720px;
-}
-
-.return-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem 1.5rem;
-
-  margin-top: clamp(3rem, 8vw, 8rem);
-
-  font-size: clamp(2rem, 4vw, 4rem);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.055em;
-}
-
-.return-list span {
-  display: block;
-}
-
-/* =========================================================
-   CONNECT
-   ========================================================= */
-
-.connect-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
-
-  gap: clamp(3rem, 9vw, 10rem);
-
-  margin-top: clamp(3rem, 7vw, 7rem);
-
-  align-items: end;
-}
-
-.connect-words {
-  display: grid;
-  gap: 0.1em;
-
-  font-size: clamp(2.25rem, 5vw, 6rem);
-  line-height: 0.94;
-  font-weight: 700;
-  letter-spacing: -0.06em;
-}
-
-.connect-grid .narrative-copy {
-  margin-top: 0;
-}
-
-/* =========================================================
-   TODAY
-   ========================================================= */
-
-.story-today .story-content {
-  max-width: 1250px;
-}
-
-.today-lead {
-  max-width: 1100px;
-
-  margin: clamp(3rem, 8vw, 8rem) 0 0;
-
-  font-size: clamp(2.5rem, 6vw, 7rem);
-  line-height: 0.94;
-  font-weight: 700;
-  letter-spacing: -0.065em;
-}
-
-.closing-line {
-  margin-top: 2.5em !important;
-
-  font-weight: 700;
-}
-
-/* =========================================================
-   OBJECTIVE
-   ========================================================= */
-
-.objective-list {
-  display: grid;
-  gap: 0;
-
-  font-size: clamp(1.5rem, 2.5vw, 2.5rem);
-  line-height: 1.15;
-  font-weight: 700;
-  letter-spacing: -0.035em;
-}
-
-.objective-list p {
-  margin: 0;
-  padding-block: 0.55em;
-
-  border-bottom: 1px solid var(--story-line);
-}
-
-.objective-list p:first-child {
-  border-top: 1px solid var(--story-line);
-}
-
-.objective-list .objective-final {
-  margin-top: 1rem;
-
-  border: 0;
-
-  font-size: 1.05em;
-}
-
-/* =========================================================
-   PLACE / MAP
-   ========================================================= */
-
-.place-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
-
-  gap: clamp(2.5rem, 7vw, 8rem);
-
-  align-items: center;
-}
-
-.place-copy .narrative-copy {
-  margin-top: clamp(2rem, 4vw, 4rem);
-}
-
-.map-frame {
-  position: relative;
-
-  width: 100%;
-  aspect-ratio: 16 / 10;
-
-  overflow: hidden;
-
-  background: var(--surface);
-}
-
-.map-frame iframe {
-  width: 100%;
-  height: 100%;
-
-  border: 0;
-
-  filter: grayscale(1) contrast(0.9);
-}
-
-/* =========================================================
-   PERSON
-   ========================================================= */
-
-.person-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(300px, 0.7fr);
-
-  gap: clamp(3rem, 8vw, 9rem);
-
-  align-items: center;
-}
-
-.person-copy .narrative-copy {
-  margin-top: clamp(2rem, 4vw, 4rem);
-}
-
-.person-tags {
-  margin-top: 3rem !important;
-
-  font-weight: 700;
-}
-
-.person-frame {
-  width: min(100%, 520px);
-
-  margin: 0 0 0 auto;
-
-  aspect-ratio: 753 / 941;
-
-  overflow: hidden;
-
-  background: var(--surface-2);
-}
-
-.person-frame img {
-  width: 100%;
-  height: 100%;
-
-  object-fit: cover;
-
-  filter: grayscale(1);
-}
-
-/* =========================================================
-   CONTACT
-   ========================================================= */
-
-.contact-content {
-  max-width: 1100px;
-}
-
-.contact-lead {
-  margin: clamp(3rem, 8vw, 8rem) 0 0;
-
-  max-width: 1000px;
-
-  font-size: clamp(2.5rem, 6vw, 7rem);
-  line-height: 0.94;
-  font-weight: 700;
-  letter-spacing: -0.065em;
-}
-
-.contact-content .narrative-copy {
-  max-width: 650px;
-}
-
-.contact-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 1rem;
-
-  margin-top: clamp(3rem, 7vw, 6rem);
-
-  padding-bottom: 0.5rem;
-
-  border-bottom: 2px solid currentColor;
-
-  color: inherit;
-  text-decoration: none;
-
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-
-  transition:
-    gap var(--duration-fast) var(--ease-out),
-    opacity var(--duration-fast) ease;
-}
-
-.contact-link:hover {
-  gap: 1.5rem;
-  opacity: 0.65;
-}
-
-/* =========================================================
-   SECTION NAVIGATION
-   ========================================================= */
-
-.section-nav {
-  position: fixed;
-  z-index: 300;
-
-  left: var(--gutter);
-  right: var(--gutter);
-  bottom: 0;
-
-  height: calc(var(--nav-h) + env(safe-area-inset-bottom));
-
-  padding-bottom: env(safe-area-inset-bottom);
-
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 1rem;
-
-  pointer-events: none;
-
-  color: var(--light);
-
-  transition: color 250ms ease;
-}
-
-.section-nav[data-theme="light"] {
-  color: var(--ink);
-}
-
-.section-nav-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.65rem;
-
-  padding: 0.6rem 0;
-
-  background: transparent;
-  color: inherit;
-
-  font-size: var(--micro);
-  font-weight: 700;
-  letter-spacing: 0.12em;
-
-  cursor: pointer;
-  pointer-events: auto;
-
-  opacity: 0.75;
-
-  transition:
-    opacity var(--duration-fast) ease,
-    transform var(--duration-fast) var(--ease-out);
-}
-
-.section-nav-button:hover:not(:disabled) {
-  opacity: 1;
-}
-
-.section-nav-button:disabled {
-  opacity: 0.2;
-  cursor: default;
-}
-
-.section-nav-prev {
-  justify-self: start;
-}
-
-.section-nav-next {
-  justify-self: end;
-}
-
-.section-nav-current {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-
-  min-width: 150px;
-
-  justify-content: center;
-
-  font-size: var(--micro);
-  font-weight: 700;
-  letter-spacing: 0.12em;
-
-  text-align: center;
-}
-
-.section-nav-number {
-  opacity: 0.5;
-}
-
-/* =========================================================
-   FOOTER
-   ========================================================= */
-
-.site-footer {
-  position: relative;
-
-  min-height: 42vh;
-
-  padding:
-    8rem
-    var(--gutter)
-    calc(
-      var(--nav-h) +
-      env(safe-area-inset-bottom) +
-      4rem
-    );
-
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-
-  gap: 2rem;
-
-  align-items: end;
-
-  background: var(--bg);
-  color: var(--light);
-}
-
-.footer-mark img {
-  width: 42px;
-  height: 42px;
-
-  filter: invert(1);
-}
-
-.footer-main {
-  align-self: end;
-}
-
-.footer-name {
-  margin: 0;
-
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-}
-
-.footer-description {
-  margin: 0.7rem 0 0;
-
-  color: var(--secondary);
-
-  font-size: var(--micro);
-  letter-spacing: 0.08em;
-}
-
-.footer-meta {
-  display: grid;
-  gap: 0.5rem;
-
-  color: var(--secondary);
-
-  font-size: var(--micro);
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-align: right;
-}
-
-/* =========================================================
-   RESPONSIVE — TABLET
-   ========================================================= */
-
-@media (max-width: 1000px) {
-  :root {
-    --gutter: 4vw;
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <title>Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale</title>
+
+  <meta
+    name="description"
+    content="Cesare Paratore: sport, scienze motorie, educazione, management e digitale. Un percorso costruito attraverso osservazione, studio, esperienza e progettazione."
+  >
+
+  <meta name="author" content="Cesare Paratore">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="theme-color" content="#0B0B0A">
+  <meta name="color-scheme" content="dark light">
+
+  <link rel="canonical" href="https://cesareparatore.github.io/">
+  <link rel="icon" type="image/svg+xml" href="/assets/images/cp-mark.svg">
+
+  <meta
+    property="og:type"
+    content="website"
+  >
+  <meta
+    property="og:locale"
+    content="it_IT"
+  >
+  <meta
+    property="og:title"
+    content="Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale"
+  >
+  <meta
+    property="og:description"
+    content="Un percorso tra sport, scienze motorie, educazione, management e digitale. Osservare, capire, collegare, progettare."
+  >
+  <meta
+    property="og:url"
+    content="https://cesareparatore.github.io/"
+  >
+  <meta
+    property="og:site_name"
+    content="Cesare Paratore"
+  >
+  <meta
+    property="og:image"
+    content="https://cesareparatore.github.io/assets/images/cp.jpg"
+  >
+  <meta
+    property="og:image:width"
+    content="1200"
+  >
+  <meta
+    property="og:image:height"
+    content="630"
+  >
+  <meta
+    property="og:image:alt"
+    content="Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale"
+  >
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta
+    name="twitter:title"
+    content="Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale"
+  >
+  <meta
+    name="twitter:description"
+    content="Un percorso tra sport, scienze motorie, educazione, management e digitale."
+  >
+  <meta
+    name="twitter:image"
+    content="https://cesareparatore.github.io/assets/images/cp.jpg"
+  >
+  <meta
+    name="twitter:image:alt"
+    content="Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale"
+  >
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"
+    defer
+  ></script>
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"
+    defer
+  ></script>
+
+  <link rel="stylesheet" href="/css/style.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://cesareparatore.github.io/#website",
+        "url": "https://cesareparatore.github.io/",
+        "name": "Cesare Paratore",
+        "description": "Sport, Scienze Motorie, Educazione e Digitale",
+        "inLanguage": "it-IT",
+        "publisher": {
+          "@id": "https://cesareparatore.github.io/#person"
+        }
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://cesareparatore.github.io/#webpage",
+        "url": "https://cesareparatore.github.io/",
+        "name": "Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale",
+        "description": "Un percorso tra sport, scienze motorie, educazione, management e digitale.",
+        "isPartOf": {
+          "@id": "https://cesareparatore.github.io/#website"
+        },
+        "about": {
+          "@id": "https://cesareparatore.github.io/#person"
+        },
+        "inLanguage": "it-IT"
+      },
+      {
+        "@type": "Person",
+        "@id": "https://cesareparatore.github.io/#person",
+        "name": "Cesare Paratore",
+        "url": "https://cesareparatore.github.io/",
+        "image": "https://cesareparatore.github.io/assets/images/cp-foto.webp",
+        "jobTitle": "Atleta, tecnico ed educatore",
+        "knowsAbout": [
+          "Sport",
+          "Scienze motorie",
+          "Educazione",
+          "Management",
+          "Digitale"
+        ]
+      }
+    ]
   }
+  </script>
+</head>
 
-  .menu-inner nav a {
-    font-size: clamp(1.8rem, 5.5vw, 4rem);
-  }
+<body>
 
-  .person-grid,
-  .place-grid,
-  .connect-grid,
-  .understand-grid,
-  .build-grid,
-  .from-here-grid,
-  .objective-grid {
-    gap: clamp(2.5rem, 6vw, 5rem);
-  }
+  <noscript>
+    <style>
+      #site-loader,
+      #standby,
+      .menu-toggle,
+      .section-nav {
+        display: none !important;
+      }
 
-  .person-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.75fr);
-  }
+      #menu {
+        position: static !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        transform: none !important;
+        clip-path: none !important;
+      }
 
-  .person-frame {
-    width: 100%;
-  }
+      #menu[inert] {
+        display: block !important;
+      }
 
-  .site-footer {
-    grid-template-columns: auto 1fr;
-  }
+      .menu-inner {
+        min-height: auto !important;
+      }
+    </style>
+  </noscript>
 
-  .footer-meta {
-    grid-column: 1 / -1;
-    grid-template-columns: 1fr auto;
-    text-align: left;
-  }
-}
+  <a class="skip-link" href="#main-content">
+    Vai al contenuto principale
+  </a>
 
-/* =========================================================
-   RESPONSIVE — MOBILE
-   ========================================================= */
+  <div
+    id="site-loader"
+    class="site-loader"
+    aria-hidden="true"
+  >
+    <div class="loader-inner">
+      <img
+        src="/assets/images/cp-mark.svg"
+        alt=""
+        width="96"
+        height="96"
+        fetchpriority="high"
+      >
+      <span>CESARE PARATORE</span>
+    </div>
+  </div>
 
-@media (max-width: 720px) {
-  :root {
-    --header-h: 68px;
-    --nav-h: 78px;
-    --gutter: 6vw;
-  }
+  <div
+    id="standby"
+    class="standby"
+    aria-hidden="true"
+  >
+    <span>GUARDA.</span>
+  </div>
 
-  .brand span {
-    display: none;
-  }
+  <header
+    class="site-header"
+    data-header-theme="dark"
+  >
+    <a
+      class="brand"
+      href="/"
+      aria-label="Cesare Paratore — Home"
+    >
+      <img
+        src="/assets/images/cp-mark.svg"
+        alt=""
+        width="40"
+        height="40"
+      >
+      <span>CESARE PARATORE</span>
+    </a>
 
-  .brand img {
-    width: 26px;
-    height: 26px;
-  }
+    <button
+      class="menu-toggle"
+      type="button"
+      aria-controls="menu"
+      aria-expanded="false"
+      aria-label="Apri menu"
+    >
+      <span class="menu-label">MENU</span>
+      <span class="menu-icon" aria-hidden="true">
+        <span></span>
+        <span></span>
+      </span>
+    </button>
+  </header>
 
-  .menu-overlay {
-    padding-top:
-      calc(var(--header-h) + env(safe-area-inset-top) + 32px);
-  }
+  <aside
+    id="menu"
+    class="menu-overlay"
+    aria-hidden="true"
+    inert
+  >
+    <div class="menu-inner">
 
-  .menu-inner nav {
-    grid-template-columns: 1fr;
-    margin-block: 3rem;
-  }
+      <div class="menu-meta">
+        <span>NAVIGAZIONE</span>
+        <span>CESARE PARATORE</span>
+      </div>
 
-  .menu-inner nav a {
-    font-size: clamp(2rem, 10vw, 4rem);
-    padding-block: 0.4rem;
-  }
+      <nav aria-label="Pagine principali">
+        <a href="/chi-sono/">Chi sono</a>
+        <a href="/sport/">Sport</a>
+        <a href="/scienze-motorie/">Scienze motorie</a>
+        <a href="/educazione/">Educazione</a>
+        <a href="/management/">Management</a>
+        <a href="/digitale/">Digitale</a>
+        <a href="/territorio/">Territorio</a>
+        <a href="/contatti/">Contatti</a>
+      </nav>
 
-  .menu-footer {
-    display: block;
-    line-height: 1.5;
-  }
+      <div class="menu-footer">
+        <span>OSSERVARE · CAPIRE · COLLEGARE · COSTRUIRE</span>
+      </div>
 
-  .story {
-    padding-top:
-      calc(var(--header-h) + env(safe-area-inset-top) + 4rem);
+    </div>
+  </aside>
 
-    padding-bottom:
-      calc(var(--nav-h) + env(safe-area-inset-bottom) + 5rem);
+  <main id="main-content" tabindex="-1">
 
-    align-items: flex-start;
-  }
+    <section
+      id="guarda"
+      class="story story-dark story-opening"
+      data-title="GUARDA."
+      aria-labelledby="guarda-title"
+    >
+      <div class="story-index">01</div>
 
-  .story-index {
-    top:
-      calc(
-        var(--header-h) +
-        env(safe-area-inset-top) +
-        1.1rem
-      );
-  }
+      <div class="story-content opening-content">
+        <p class="eyebrow">INIZIO</p>
 
-  .story h1 {
-    font-size: clamp(4rem, 19vw, 7rem);
-  }
+        <h1 id="guarda-title">GUARDA.</h1>
 
-  .story h2 {
-    font-size: clamp(3.25rem, 16vw, 6rem);
-  }
+        <div class="opening-copy">
+          <p>Prima di fare qualcosa, guardo.</p>
+          <p>Da piccolo ho incontrato un computer.</p>
+          <p>Non sapevo ancora cosa fosse. Volevo capire.</p>
+        </div>
+      </div>
 
-  .opening-content {
-    padding-right: 0;
-  }
+      <div class="opening-mark" aria-hidden="true">
+        <img
+          src="/assets/images/cp-mark.svg"
+          alt=""
+          width="512"
+          height="512"
+          decoding="async"
+        >
+      </div>
+    </section>
 
-  .opening-mark {
-    width: 55vw;
-    right: -12vw;
-    bottom: 16vh;
-  }
+    <section
+      id="come"
+      class="story story-light story-movement"
+      data-title="COME?"
+      aria-labelledby="come-title"
+    >
+      <div class="story-index">02</div>
 
-  .split-copy,
-  .understand-grid,
-  .build-grid,
-  .connect-grid,
-  .objective-grid,
-  .place-grid,
-  .from-here-grid {
-    grid-template-columns: 1fr;
-    gap: 2.5rem;
-  }
+      <div class="story-content">
+        <p class="eyebrow">MOVIMENTO</p>
 
-  .split-copy .narrative-copy,
-  .understand-grid .narrative-copy,
-  .build-grid .narrative-copy,
-  .connect-grid .narrative-copy,
-  .from-here-grid .narrative-copy {
-    margin-top: 0;
-  }
+        <h2 id="come-title">COME?</h2>
 
-  .statement,
-  .understand-lead,
-  .build-lead,
-  .from-here-lead,
-  .objective-question {
-    font-size: clamp(2rem, 10vw, 3.5rem);
-  }
+        <div class="narrative-copy">
+          <p>Poi ho iniziato a muovermi.</p>
+          <p>A correre, giocare, provare.</p>
+          <p>
+            Lo sport è diventato un modo per conoscere me stesso
+            e ciò che mi circondava.
+          </p>
+        </div>
+      </div>
+    </section>
 
-  .connect-words {
-    font-size: clamp(2rem, 10vw, 4rem);
-  }
+    <section
+      id="movimento"
+      class="story story-dark story-movement-detail"
+      data-title="MOVIMENTO."
+      aria-labelledby="movimento-title"
+    >
+      <div class="story-index">03</div>
 
-  .today-lead,
-  .contact-lead {
-    font-size: clamp(2.4rem, 11vw, 4.5rem);
-  }
+      <div class="story-content">
+        <p class="eyebrow">ESPERIENZA</p>
 
-  .return-list {
-    display: grid;
-    font-size: clamp(2rem, 10vw, 4rem);
-  }
+        <h2 id="movimento-title">MOVIMENTO.</h2>
 
-  .person-grid {
-    grid-template-columns: 1fr;
-    align-items: start;
-  }
+        <div class="split-copy">
+          <p class="statement">
+            Prima atleta.<br>
+            Poi tecnico.
+          </p>
 
-  .person-frame {
-    width: min(100%, 500px);
-    margin: 0;
-    justify-self: start;
-  }
+          <div class="narrative-copy">
+            <p>
+              Il movimento non è rimasto soltanto qualcosa da praticare.
+            </p>
+            <p>
+              È diventato qualcosa da osservare, studiare e comprendere.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  .section-nav {
-    left: var(--gutter);
-    right: var(--gutter);
-  }
+    <section
+      id="capire"
+      class="story story-light story-understand"
+      data-title="CAPIRE."
+      aria-labelledby="capire-title"
+    >
+      <div class="story-index">04</div>
 
-  .section-nav-current {
-    min-width: 100px;
-  }
+      <div class="story-content">
+        <p class="eyebrow">STUDIO</p>
 
-  .section-nav-text {
-    display: none;
-  }
+        <h2 id="capire-title">CAPIRE.</h2>
 
-  .section-nav-button {
-    font-size: 1.1rem;
-  }
+        <div class="understand-grid">
+          <div class="understand-lead">
+            <p>
+              Studiare il movimento ha cambiato il modo di guardarlo.
+            </p>
+          </div>
 
-  .site-footer {
-    min-height: 50vh;
+          <div class="narrative-copy">
+            <p>
+              L'esperienza e lo studio hanno iniziato a parlarsi.
+            </p>
+            <p>
+              La pratica poneva domande. La teoria aiutava a cercare risposte.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    padding-top: 6rem;
+    <section
+      id="trasmettere"
+      class="story story-dark"
+      data-title="TRASMETTERE."
+      aria-labelledby="trasmettere-title"
+    >
+      <div class="story-index">05</div>
 
-    grid-template-columns: 1fr;
-    align-items: start;
-  }
+      <div class="story-content">
+        <p class="eyebrow">EDUCAZIONE</p>
 
-  .footer-meta {
-    grid-column: auto;
+        <h2 id="trasmettere-title">TRASMETTERE.</h2>
 
-    grid-template-columns: 1fr;
-  }
-}
+        <div class="narrative-copy narrative-wide">
+          <p>Ciò che si comprende può essere condiviso.</p>
+          <p>
+            Insegnare significa trasformare esperienza, conoscenza e metodo
+            in qualcosa che possa diventare utile ad altri.
+          </p>
+        </div>
+      </div>
+    </section>
 
-/* =========================================================
-   VERY SMALL MOBILE
-   ========================================================= */
+    <section
+      id="costruire"
+      class="story story-light story-build"
+      data-title="COSTRUIRE."
+      aria-labelledby="costruire-title"
+    >
+      <div class="story-index">06</div>
 
-@media (max-width: 390px) {
-  :root {
-    --gutter: 5.5vw;
-  }
+      <div class="story-content">
+        <p class="eyebrow">PROGETTO</p>
 
-  .menu-inner nav a {
-    font-size: 1.85rem;
-  }
+        <h2 id="costruire-title">COSTRUIRE.</h2>
 
-  .story h1 {
-    font-size: clamp(3.7rem, 18vw, 5rem);
-  }
+        <div class="build-grid">
+          <div class="build-lead">
+            <p>A un certo punto non basta più capire.</p>
+            <p>Bisogna progettare.</p>
+          </div>
 
-  .story h2 {
-    font-size: clamp(3rem, 15vw, 4.5rem);
-  }
+          <div class="narrative-copy">
+            <p>
+              Organizzare persone, strumenti, risorse e processi
+              per trasformare un'idea in qualcosa di concreto.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  .narrative-copy {
-    font-size: 1.08rem;
-  }
+    <section
+      id="ritorna"
+      class="story story-dark story-return"
+      data-title="RITORNA."
+      aria-labelledby="ritorna-title"
+    >
+      <div class="story-index">07</div>
 
-  .section-nav-current {
-    min-width: 80px;
-  }
-}
+      <div class="story-content">
+        <p class="eyebrow">DIGITALE</p>
 
-/* =========================================================
-   LANDSCAPE MOBILE
-   ========================================================= */
+        <h2 id="ritorna-title">RITORNA.</h2>
 
-@media (max-height: 600px) and (orientation: landscape) {
-  .story {
-    min-height: auto;
-    padding-top:
-      calc(var(--header-h) + env(safe-area-inset-top) + 4rem);
+        <div class="return-copy">
+          <p>Quel computer dell'inizio ritorna.</p>
 
-    padding-bottom:
-      calc(var(--nav-h) + env(safe-area-inset-bottom) + 4rem);
-  }
+          <p>
+            Non più soltanto come oggetto da osservare,
+            ma come strumento per costruire.
+          </p>
 
-  .story h1 {
-    font-size: clamp(3.5rem, 13vw, 6rem);
-  }
+          <div class="return-list">
+            <span>Pagine.</span>
+            <span>Sistemi.</span>
+            <span>Esperienze digitali.</span>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  .story h2 {
-    font-size: clamp(3rem, 10vw, 5rem);
-  }
+    <section
+      id="collegare"
+      class="story story-light story-connect"
+      data-title="COLLEGARE."
+      aria-labelledby="collegare-title"
+    >
+      <div class="story-index">08</div>
 
-  .opening-mark {
-    width: 28vw;
-  }
-}
+      <div class="story-content">
+        <p class="eyebrow">SISTEMA</p>
 
-/* =========================================================
-   REDUCED MOTION
-   ========================================================= */
+        <h2 id="collegare-title">COLLEGARE.</h2>
 
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
+        <div class="connect-grid">
+          <div class="connect-words">
+            <span>Sport.</span>
+            <span>Scienze motorie.</span>
+            <span>Educazione.</span>
+            <span>Management.</span>
+            <span>Digitale.</span>
+          </div>
 
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
-  }
+          <div class="narrative-copy">
+            <p>
+              Non sono percorsi separati.
+              Sono punti di uno stesso sistema.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  .standby,
-  .menu-overlay {
-    transition: none;
-  }
-}
+    <section
+      id="oggi"
+      class="story story-dark story-today"
+      data-title="OGGI."
+      aria-labelledby="oggi-title"
+    >
+      <div class="story-index">09</div>
 
-/* =========================================================
-   PRINT
-   ========================================================= */
+      <div class="story-content">
+        <p class="eyebrow">APPROCCIO</p>
 
-@media print {
-  .site-header,
-  .menu-overlay,
-  .section-nav,
-  .site-loader,
-  .standby {
-    display: none !important;
-  }
+        <h2 id="oggi-title">OGGI.</h2>
 
-  body {
-    background: #fff;
-    color: #000;
-  }
+        <p class="today-lead">
+          Osservare. Studiare. Collegare. Progettare. Sviluppare.
+        </p>
 
-  .story,
-  .story-dark,
-  .story-light {
-    min-height: auto;
-    padding: 2rem 0;
-    color: #000;
-    background: #fff;
-    break-inside: avoid;
-  }
+        <div class="narrative-copy narrative-medium">
+          <p>
+            Un approccio trasversale per affrontare problemi
+            e costruire soluzioni.
+          </p>
+          <p class="closing-line">Capire prima di intervenire.</p>
+        </div>
+      </div>
+    </section>
 
-  .site-footer {
-    color: #000;
-    background: #fff;
-  }
-}
+    <section
+      id="obiettivo"
+      class="story story-light story-objective"
+      data-title="OBIETTIVO."
+      aria-labelledby="obiettivo-title"
+    >
+      <div class="story-index">10</div>
+
+      <div class="story-content">
+        <p class="eyebrow">METODO</p>
+
+        <h2 id="obiettivo-title">OBIETTIVO.</h2>
+
+        <div class="objective-grid">
+          <div class="objective-question">
+            <p>Ogni progetto parte da una domanda.</p>
+          </div>
+
+          <div class="objective-list">
+            <p>Qual è l'obiettivo?</p>
+            <p>Qual è il contesto?</p>
+            <p>Cosa serve davvero?</p>
+            <p class="objective-final">Da qui nasce il lavoro.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="qui"
+      class="story story-dark story-place"
+      data-title="QUI."
+      aria-labelledby="qui-title"
+    >
+      <div class="story-index">11</div>
+
+      <div class="story-content">
+        <p class="eyebrow">TERRITORIO</p>
+
+        <div class="place-grid">
+          <div class="place-copy">
+            <h2 id="qui-title">QUI.</h2>
+
+            <div class="narrative-copy">
+              <p>Ogni percorso parte da un luogo.</p>
+              <p>Un territorio, una comunità, un contesto.</p>
+              <p>
+                È da qui che si osserva ciò che accade
+                e si decide dove andare.
+              </p>
+            </div>
+          </div>
+
+          <div class="map-frame">
+            <iframe
+              title="Stadio Comunale Giuseppe La Franca, Partinico"
+              src="https://www.google.com/maps?q=Stadio+Comunale+Giuseppe+La+Franca,+Partinico&output=embed"
+              loading="lazy"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen
+            ></iframe>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="da-qui"
+      class="story story-light story-from-here"
+      data-title="DA QUI."
+      aria-labelledby="da-qui-title"
+    >
+      <div class="story-index">12</div>
+
+      <div class="story-content">
+        <p class="eyebrow">PRESENZA</p>
+
+        <h2 id="da-qui-title">DA QUI.</h2>
+
+        <div class="from-here-grid">
+          <div class="from-here-lead">
+            <p>Una base in presenza e online.</p>
+          </div>
+
+          <div class="narrative-copy">
+            <p>
+              Il luogo è il punto di partenza.
+            </p>
+            <p>
+              Il digitale permette di estendere il percorso,
+              collegare persone e costruire possibilità.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section
+      id="eccomi"
+      class="story story-dark story-person"
+      data-title="ECCOMI."
+      aria-labelledby="eccomi-title"
+    >
+      <div class="story-index">13</div>
+
+      <div class="story-content person-grid">
+        <div class="person-copy">
+          <p class="eyebrow">IDENTITÀ</p>
+
+          <h2 id="eccomi-title">ECCOMI.</h2>
+
+          <div class="narrative-copy">
+            <p>
+              Questo percorso non è una somma di ruoli.
+            </p>
+            <p>
+              È il risultato di esperienze diverse che nel tempo
+              hanno iniziato a dialogare.
+            </p>
+
+            <p class="person-tags">
+              Sport. Studio. Educazione. Progetto. Digitale.
+            </p>
+          </div>
+        </div>
+
+        <figure class="person-frame">
+          <img
+            src="/assets/images/cp-foto.webp"
+            alt="Cesare Paratore"
+            width="753"
+            height="941"
+            loading="lazy"
+            decoding="async"
+          >
+        </figure>
+      </div>
+    </section>
+
+    <section
+      id="scrivimi"
+      class="story story-light story-contact"
+      data-title="SCRIVIMI."
+      aria-labelledby="scrivimi-title"
+    >
+      <div class="story-index">14</div>
+
+      <div class="story-content contact-content">
+        <p class="eyebrow">CONTATTO</p>
+
+        <h2 id="scrivimi-title">SCRIVIMI.</h2>
+
+        <p class="contact-lead">
+          Hai un progetto, un'idea o una domanda?
+        </p>
+
+        <div class="narrative-copy">
+          <p>
+            Raccontami il punto da cui vuoi partire.
+          </p>
+        </div>
+
+        <a
+          class="contact-link"
+          href="/contatti/"
+        >
+          <span>PARLIAMONE</span>
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <nav
+    class="section-nav"
+    aria-label="Navigazione narrativa"
+  >
+    <button
+      type="button"
+      class="section-nav-button section-nav-prev"
+      aria-label="Sezione precedente non disponibile"
+      disabled
+    >
+      <span aria-hidden="true">←</span>
+      <span class="section-nav-text">PRECEDENTE</span>
+    </button>
+
+    <div
+      class="section-nav-current"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+      <span class="section-nav-number">01</span>
+      <span class="section-nav-title">GUARDA.</span>
+    </div>
+
+    <button
+      type="button"
+      class="section-nav-button section-nav-next"
+      aria-label="Vai alla sezione successiva"
+    >
+      <span class="section-nav-text">SUCCESSIVA</span>
+      <span aria-hidden="true">→</span>
+    </button>
+  </nav>
+
+  <footer class="site-footer">
+    <div class="footer-mark" aria-hidden="true">
+      <img
+        src="/assets/images/cp-mark.svg"
+        alt=""
+        width="64"
+        height="64"
+        loading="lazy"
+        decoding="async"
+      >
+    </div>
+
+    <div class="footer-main">
+      <p class="footer-name">CESARE PARATORE</p>
+      <p class="footer-description">
+        Sport · Scienze Motorie · Educazione · Management · Digitale
+      </p>
+    </div>
+
+    <div class="footer-meta">
+      <span>
+        © <span id="current-year">2026</span>
+      </span>
+      <span>PALERMO · SICILIA · ITALIA</span>
+    </div>
+  </footer>
+
+  <script src="/script.js" defer></script>
+</body>
+</html>
