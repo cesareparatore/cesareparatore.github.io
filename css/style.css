@@ -274,6 +274,7 @@ a {
 }
 
 .site-brand img {
+  display: block;
   width: 28px;
   height: 28px;
   filter: invert(1);
@@ -296,6 +297,7 @@ a {
   font-weight: 700;
   letter-spacing: 0.14em;
 }
+
 
 /* =========================================================
    MENU
@@ -1341,24 +1343,20 @@ main:focus {
 
 .site-footer {
   position: relative;
-
-  min-height: 42vh;
+  min-height: 32vh;
 
   padding:
-    8rem
+    6rem
     var(--gutter)
     calc(
       var(--nav-h) +
       env(safe-area-inset-bottom) +
-      4rem
+      3rem
     );
 
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-
-  gap: 2rem;
-
-  align-items: end;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
 
   background: var(--bg);
   color: var(--light);
@@ -1377,26 +1375,6 @@ main:focus {
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-}
-
-.footer-description {
-  margin: 0.7rem 0 0;
-
-  color: var(--secondary);
-
-  font-size: var(--micro);
-  letter-spacing: 0.08em;
-}
-
-.footer-meta {
-  display: grid;
-  gap: 0.5rem;
-
-  color: var(--secondary);
-
-  font-size: var(--micro);
-  font-weight: 700;
-  letter-spacing: 0.1em;
 
   text-align: right;
 }
