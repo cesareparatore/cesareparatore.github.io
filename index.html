@@ -1,606 +1,449 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0b0a">
+  <meta name="description" content="Cesare Paratore — sport, scienze motorie, educazione, management e digitale.">
+  <meta name="author" content="Cesare Paratore">
+  <meta name="robots" content="index,follow">
 
   <title>Cesare Paratore</title>
 
-  <meta
-    name="description"
-    content="Cesare Paratore — Sport, scienze motorie, educazione, management e digitale."
-  >
+  <link rel="icon" href="assets/images/cp-mark.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/images/cp-foto.webp" as="image" fetchpriority="high">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/style.css">
 
-  <!-- GSAP -->
-  <script
-    src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"
-    defer
-  ></script>
-
-  <script
-    src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"
-    defer
-  ></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js" defer></script>
   <script src="script.js" defer></script>
 </head>
 
 <body>
+  <a class="skip-link" href="#main-content">Vai al contenuto</a>
 
-  <a class="skip-link" href="#main-content">
-    Vai al contenuto
-  </a>
-
-  <!-- =====================================================
-       LOADER
-       ===================================================== -->
-
-  <div
-    id="site-loader"
-    class="site-loader"
-    aria-hidden="false"
-  >
+  <div class="loader" id="loader" aria-hidden="true">
     <div class="loader-inner">
-      <img
-        src="assets/images/cp-logo.webp"
-        alt=""
-      >
-      <span>CESARE PARATORE</span>
+      <img src="assets/images/cp-mark.svg" alt="">
+      <span>CP</span>
     </div>
   </div>
 
-  <!-- =====================================================
-       STANDBY
-       ===================================================== -->
-
-  <div
-    id="standby"
-    class="standby"
-    aria-hidden="true"
-  >
-    <span>OSSERVA.</span>
+  <div class="standby" id="standby" aria-hidden="true">
+    <span>RIPRENDI</span>
   </div>
 
-  <!-- =====================================================
-       HEADER
-       ===================================================== -->
-
-  <header class="site-header">
-
-    <a
-      class="site-brand"
-      href="#guarda"
-      aria-label="Cesare Paratore — Home"
-    >
-      <img
-        src="assets/images/cp-mark.svg"
-        alt="CP"
-      >
+  <header class="site-header" id="site-header">
+    <a class="brand" href="#guarda" aria-label="Cesare Paratore — inizio">
+      <img src="assets/images/cp-mark.svg" alt="CP">
     </a>
 
     <button
-      id="menu-toggle"
       class="menu-toggle"
+      id="menu-toggle"
       type="button"
+      aria-controls="site-menu"
       aria-expanded="false"
-      aria-controls="menu"
-      aria-label="Apri menu"
-    >
+      aria-label="Apri menu">
       <span class="menu-toggle-label">MENU</span>
     </button>
-
   </header>
 
-  <!-- =====================================================
-       MENU
-       ===================================================== -->
-
-  <nav
-    id="menu"
-    class="site-menu"
-    aria-label="Menu principale"
+  <div
+    class="menu-overlay"
+    id="site-menu"
     aria-hidden="true"
-    inert
-  >
-    <div class="menu-nav">
+    inert>
+    <nav class="menu-nav" aria-label="Navigazione principale">
+      <a href="#eccomi">CHI SONO</a>
+      <a href="#movimento">SPORT</a>
+      <a href="#capire">SCIENZE MOTORIE</a>
+      <a href="#trasmettere">EDUCAZIONE</a>
+      <a href="#costruire">MANAGEMENT</a>
+      <a href="#ritorna">DIGITALE</a>
+      <a href="#qui">TERRITORIO</a>
+      <a href="#scrivimi">CONTATTI</a>
+    </nav>
+  </div>
 
-      <a href="#eccomi">
-        CHI SONO
-      </a>
+  <main id="main-content">
 
-      <a href="#movimento">
-        SPORT
-      </a>
-
-      <a href="#capire">
-        SCIENZE MOTORIE
-      </a>
-
-      <a href="#trasmettere">
-        EDUCAZIONE
-      </a>
-
-      <a href="#costruire">
-        MANAGEMENT
-      </a>
-
-      <a href="#ritorna">
-        DIGITALE
-      </a>
-
-      <a href="#qui">
-        TERRITORIO
-      </a>
-
-      <a href="#scrivimi">
-        CONTATTI
-      </a>
-
-    </div>
-  </nav>
-
-  <!-- =====================================================
-       MAIN
-       ===================================================== -->
-
-  <main id="main-content" tabindex="-1">
-
-    <!-- ===================================================
-         01 — GUARDA
-         =================================================== -->
-
+    <!-- 01 -->
     <section
+      class="story story-dark hero-story"
       id="guarda"
-      class="story story-dark story-opening"
       data-title="GUARDA"
-      aria-current="true"
-    >
-
-      <div class="story-content opening-content">
-
-        <h1>GUARDA.</h1>
-
+      aria-labelledby="title-guarda">
+      <div class="story-content hero-content">
+        <h1 id="title-guarda" class="hero-title">GUARDA<span>.</span></h1>
       </div>
-
-      <div
-        class="opening-mark"
-        aria-hidden="true"
-      >
-        <img
-          src="assets/images/cp-logo.webp"
-          alt=""
-        >
-      </div>
-
     </section>
 
-    <!-- ===================================================
-         02 — COME?
-         =================================================== -->
-
+    <!-- 02 -->
     <section
+      class="story story-light story-computer"
       id="come"
-      class="story story-light"
       data-title="COME?"
-      aria-current="false"
-    >
-
-      <div class="story-content">
-
-        <p class="eyebrow">
-          02
-        </p>
-
-        <h2>
-          COME?
-        </h2>
-
-        <div class="narrative-copy narrative-medium">
-          <p>
-            Prima di fare qualcosa, guardo.
-            Da piccolo, davanti al primo computer,
-            mi sono fermato a guardare.
-            Poi ho iniziato a usarlo.
-            Volevo capire come funzionava.
-            Usarlo meglio.
-            Migliorarlo.
-          </p>
-        </div>
-
-        <div
-          class="visual-computer"
-          aria-hidden="true"
-        >
-          <div class="computer-screen">
-            <span>HELLO</span>
+      aria-labelledby="title-come">
+      <div class="story-content split-content">
+        <div class="story-copy">
+          <p class="eyebrow">02 / COME?</p>
+          <h2 id="title-come">COME?</h2>
+          <div class="narrative-copy">
+            <p>Prima di fare qualcosa, guardo.</p>
+            <p>Da piccolo, davanti al primo computer, mi sono fermato a guardare.</p>
+            <p>Poi ho iniziato a usarlo.</p>
+            <p>Volevo capire come funzionava.</p>
+            <p>Usarlo meglio.</p>
+            <p>Migliorarlo.</p>
           </div>
-
-          <div class="computer-base"></div>
         </div>
 
+        <div class="visual visual-crt" aria-hidden="true">
+          <div class="crt-shadow"></div>
+          <div class="crt-monitor">
+            <div class="crt-shell">
+              <div class="crt-bezel">
+                <div class="crt-screen">
+                  <div class="crt-scanlines"></div>
+                  <span class="crt-cursor"></span>
+                  <span class="crt-glow-text">READY_</span>
+                </div>
+                <div class="crt-controls">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            </div>
+            <div class="crt-vent"></div>
+            <div class="crt-foot crt-foot-left"></div>
+            <div class="crt-foot crt-foot-right"></div>
+          </div>
+        </div>
       </div>
-
     </section>
 
-    <!-- ===================================================
-         03 — SPORT
-         =================================================== -->
-
+    <!-- 03 -->
     <section
+      class="story story-dark story-sport"
       id="movimento"
-      class="story story-dark story-movement"
       data-title="SPORT"
-      aria-current="false"
-    >
+      aria-labelledby="title-sport">
+      <div class="story-content split-content split-reverse">
+        <div class="visual visual-runner" aria-hidden="true">
+          <svg class="runner-svg" viewBox="0 0 760 620" role="presentation">
+            <defs>
+              <filter id="runner-glow">
+                <feGaussianBlur stdDeviation="2.5" result="blur"/>
+                <feMerge>
+                  <feMergeNode in="blur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
 
-      <div class="story-content">
+            <g class="runner-motion">
+              <path class="runner-body" d="M378 139 C351 164 340 198 350 234 C361 275 391 302 414 329 C433 351 439 378 432 408" />
+              <circle class="runner-joint" cx="373" cy="120" r="17"/>
+              <path class="runner-bone" d="M366 137 L354 218 L391 292 L432 408"/>
+              <path class="runner-bone" d="M354 218 L299 285 L246 337"/>
+              <path class="runner-bone" d="M391 292 L474 316 L548 296"/>
+              <path class="runner-bone" d="M432 408 L507 466 L596 450"/>
+              <path class="runner-bone" d="M432 408 L386 486 L317 530"/>
+              <path class="runner-bone" d="M299 285 L253 257 L207 271"/>
+              <path class="runner-bone" d="M474 316 L527 353 L584 343"/>
 
-        <p class="eyebrow">
-          03
-        </p>
+              <circle class="runner-joint" cx="354" cy="218" r="6"/>
+              <circle class="runner-joint" cx="391" cy="292" r="6"/>
+              <circle class="runner-joint" cx="432" cy="408" r="6"/>
+              <circle class="runner-joint" cx="299" cy="285" r="6"/>
+              <circle class="runner-joint" cx="474" cy="316" r="6"/>
+              <circle class="runner-joint" cx="507" cy="466" r="6"/>
+              <circle class="runner-joint" cx="386" cy="486" r="6"/>
 
-        <h2>
-          SPORT
-        </h2>
-
-        <div class="sport-layout">
-
-          <div class="sport-visual" aria-hidden="true">
-            <div class="sport-line sport-line-1"></div>
-            <div class="sport-line sport-line-2"></div>
-            <div class="sport-line sport-line-3"></div>
-
-            <div class="sport-runner">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-          </div>
-
-          <div class="narrative-copy">
-            <p>
-              Poi ho iniziato a muovermi.
-              Lo sport è diventato parte del mio percorso.
-              Prima da atleta e poi da tecnico è iniziata
-              la mia esperienza nella corsa.
-              Come con il computer, anche nella corsa
-              ho cercato di capire meglio ciò che facevo,
-              per migliorare.
-            </p>
-          </div>
-
+              <path class="runner-axis" d="M180 500 C300 460 420 460 610 500"/>
+              <path class="runner-axis" d="M170 516 C310 476 470 480 626 512"/>
+            </g>
+          </svg>
         </div>
 
+        <div class="story-copy">
+          <p class="eyebrow">03 / SPORT</p>
+          <h2 id="title-sport">SPORT</h2>
+          <div class="narrative-copy">
+            <p>Poi ho iniziato a muovermi.</p>
+            <p>Lo sport è diventato parte del mio percorso.</p>
+            <p>Prima da atleta e poi da tecnico è iniziata la mia esperienza nella corsa.</p>
+            <p>Come con il computer, anche nella corsa ho cercato di capire meglio ciò che facevo, per migliorare.</p>
+          </div>
+        </div>
       </div>
-
     </section>
 
-    <!-- ===================================================
-         04 — SCIENZE MOTORIE
-         =================================================== -->
-
+    <!-- 04 -->
     <section
+      class="story story-light story-science"
       id="capire"
-      class="story story-light story-understand"
       data-title="SCIENZE MOTORIE"
-      aria-current="false"
-    >
-
+      aria-labelledby="title-scienze">
       <div class="story-content">
-
-        <p class="eyebrow">
-          04
-        </p>
-
-        <h2>
-          SCIENZE<br>
-          MOTORIE
-        </h2>
-
-        <div class="understand-grid">
-
-          <div class="practice-theory" aria-hidden="true">
-            <span>PRATICA</span>
-
-            <div class="practice-arrow">
-              ↔
-            </div>
-
-            <span>TEORIA</span>
-          </div>
-
-          <div class="narrative-copy">
-            <p>
-              Studiare ha cambiato il modo di guardare
-              il movimento e lo sport.
-              L’esperienza e lo studio hanno iniziato
-              a parlarsi.
-              La pratica poneva domande.
-              La teoria aiutava a trovare risposte.
-            </p>
-          </div>
-
+        <div class="section-heading">
+          <p class="eyebrow">04 / SCIENZE MOTORIE</p>
+          <h2 id="title-scienze">SCIENZE MOTORIE</h2>
         </div>
 
-      </div>
+        <div class="science-layout">
+          <div class="science-copy narrative-copy">
+            <p>Studiare ha cambiato il modo di guardare il movimento e lo sport.</p>
+            <p>L’esperienza e lo studio hanno iniziato a parlarsi.</p>
+            <p>La pratica poneva domande.</p>
+            <p>La teoria aiutava a trovare risposte.</p>
+          </div>
 
+          <div class="visual visual-science" aria-hidden="true">
+            <svg viewBox="0 0 700 700" role="presentation">
+              <defs>
+                <linearGradient id="scienceFade" x1="0" x2="1">
+                  <stop offset="0" stop-color="currentColor" stop-opacity=".12"/>
+                  <stop offset=".5" stop-color="currentColor" stop-opacity=".55"/>
+                  <stop offset="1" stop-color="currentColor" stop-opacity=".08"/>
+                </linearGradient>
+              </defs>
+
+              <circle class="orbit orbit-a" cx="350" cy="350" r="250"/>
+              <circle class="orbit orbit-b" cx="350" cy="350" r="190"/>
+              <ellipse class="orbit orbit-c" cx="350" cy="350" rx="260" ry="145"/>
+              <ellipse class="orbit orbit-d" cx="350" cy="350" rx="150" ry="255"/>
+
+              <path class="profile" d="M340 198 C314 215 304 241 309 270 C312 292 328 303 330 324 C332 343 316 353 313 371 C310 394 328 414 349 427 C367 438 376 456 372 480 L365 516 L454 516 C430 497 416 472 418 446 C420 420 441 404 446 376 C450 350 437 330 421 312 C407 297 402 280 407 258 C412 236 398 213 377 201 C366 195 351 193 340 198 Z"/>
+              <path class="profile-detail" d="M407 258 C424 261 438 271 445 282"/>
+              <path class="profile-detail" d="M313 371 C337 366 361 368 382 380"/>
+
+              <circle class="measure-point p1" cx="185" cy="240" r="5"/>
+              <circle class="measure-point p2" cx="508" cy="206" r="5"/>
+              <circle class="measure-point p3" cx="563" cy="421" r="5"/>
+              <circle class="measure-point p4" cx="208" cy="475" r="5"/>
+              <circle class="measure-point p5" cx="350" cy="100" r="5"/>
+
+              <path class="measure-line" d="M185 240 L309 270"/>
+              <path class="measure-line" d="M508 206 L407 258"/>
+              <path class="measure-line" d="M563 421 L418 446"/>
+              <path class="measure-line" d="M208 475 L365 480"/>
+              <path class="measure-line" d="M350 100 L350 198"/>
+
+              <text x="160" y="224">AXIS 01</text>
+              <text x="516" y="190">LOAD</text>
+              <text x="570" y="438">VECTOR</text>
+              <text x="153" y="494">RANGE</text>
+            </svg>
+          </div>
+        </div>
+
+        <div class="practice-theory" aria-label="Pratica e teoria">
+          <span>PRATICA</span>
+          <i></i>
+          <span>TEORIA</span>
+        </div>
+      </div>
     </section>
 
-    <!-- ===================================================
-         05 — EDUCAZIONE
-         =================================================== -->
-
+    <!-- 05 -->
     <section
+      class="story story-dark story-education"
       id="trasmettere"
-      class="story story-dark"
       data-title="EDUCAZIONE"
-      aria-current="false"
-    >
-
+      aria-labelledby="title-educazione">
       <div class="story-content">
-
-        <p class="eyebrow">
-          05
-        </p>
-
-        <h2>
-          EDUCAZIONE
-        </h2>
-
-        <div class="education-visual" aria-hidden="true">
-
-          <div class="education-node">
-            ESPERIENZA
-          </div>
-
-          <div class="education-arrow">
-            →
-          </div>
-
-          <div class="education-node">
-            CONOSCENZA
-          </div>
-
-          <div class="education-arrow">
-            →
-          </div>
-
-          <div class="education-node">
-            METODO
-          </div>
-
+        <div class="section-heading">
+          <p class="eyebrow">05 / EDUCAZIONE</p>
+          <h2 id="title-educazione">EDUCAZIONE</h2>
         </div>
 
-        <div class="narrative-copy">
-          <p>
-            Ciò che si comprende può essere trasmesso.
-            Insegnare significa condividere esperienza,
-            conoscenza e metodo con gli altri.
-          </p>
-        </div>
+        <div class="education-layout">
+          <div class="education-copy narrative-copy">
+            <p>Ciò che si comprende può essere trasmesso.</p>
+            <p>Insegnare significa condividere esperienza, conoscenza e metodo con gli altri.</p>
+          </div>
 
+          <div class="visual visual-education" aria-hidden="true">
+            <svg viewBox="0 0 900 360" role="presentation">
+              <defs>
+                <marker id="eduArrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                  <path d="M0 0 L8 4 L0 8 Z" fill="currentColor"/>
+                </marker>
+              </defs>
+
+              <path class="edu-path" d="M105 180 C230 180 250 100 370 100 C485 100 480 260 590 260 C695 260 700 180 810 180" marker-end="url(#eduArrow)"/>
+              <path class="edu-path secondary" d="M105 180 C230 180 270 260 370 260 C485 260 500 100 590 100 C690 100 720 180 810 180"/>
+
+              <circle class="edu-node origin" cx="105" cy="180" r="20"/>
+              <circle class="edu-node" cx="370" cy="100" r="12"/>
+              <circle class="edu-node" cx="370" cy="260" r="12"/>
+              <circle class="edu-node" cx="590" cy="100" r="12"/>
+              <circle class="edu-node" cx="590" cy="260" r="12"/>
+              <circle class="edu-node destination" cx="810" cy="180" r="20"/>
+
+              <text x="74" y="232">ESPERIENZA</text>
+              <text x="334" y="70">CONOSCENZA</text>
+              <text x="557" y="305">METODO</text>
+              <text x="744" y="232">TRASMISSIONE</text>
+            </svg>
+          </div>
+        </div>
       </div>
-
     </section>
 
-    <!-- ===================================================
-         06 — MANAGEMENT
-         =================================================== -->
-
+    <!-- 06 -->
     <section
+      class="story story-light story-management"
       id="costruire"
-      class="story story-light story-build"
       data-title="MANAGEMENT"
-      aria-current="false"
-    >
-
+      aria-labelledby="title-management">
       <div class="story-content">
-
-        <p class="eyebrow">
-          06
-        </p>
-
-        <h2>
-          MANAGEMENT
-        </h2>
-
-        <div class="management-system" aria-hidden="true">
-
-          <div class="management-inputs">
-
-            <span>
-              PERSONE
-            </span>
-
-            <span>
-              STRUMENTI
-            </span>
-
-            <span>
-              RISORSE
-            </span>
-
-            <span>
-              PROCESSI
-            </span>
-
-          </div>
-
-          <div class="management-arrow">
-            ↓
-          </div>
-
-          <div class="management-idea">
-            IDEA
-          </div>
-
-          <div class="management-arrow">
-            ↓
-          </div>
-
-          <div class="management-result">
-            REALIZZAZIONE
-          </div>
-
+        <div class="section-heading">
+          <p class="eyebrow">06 / MANAGEMENT</p>
+          <h2 id="title-management">MANAGEMENT</h2>
         </div>
 
-        <div class="narrative-copy">
-          <p>
-            Capire non basta.
-            Bisogna anche progettare.
-            Organizzare persone, strumenti, risorse e processi
-            per trasformare un’idea in qualcosa di concreto.
-          </p>
-        </div>
+        <div class="management-layout">
+          <div class="management-copy narrative-copy">
+            <p>Capire non basta.</p>
+            <p>Bisogna anche progettare.</p>
+            <p>Organizzare persone, strumenti, risorse e processi per trasformare un’idea in qualcosa di concreto.</p>
+          </div>
 
+          <div class="visual management-system" aria-label="Persone, strumenti, risorse e processi convergono verso un'idea che diventa realizzazione">
+            <svg viewBox="0 0 960 520" role="img">
+              <path class="management-line" d="M90 100 H330 L465 260"/>
+              <path class="management-line" d="M90 205 H330 L465 260"/>
+              <path class="management-line" d="M90 315 H330 L465 260"/>
+              <path class="management-line" d="M90 420 H330 L465 260"/>
+              <path class="management-line output" d="M465 260 H790"/>
+              <circle class="management-core" cx="465" cy="260" r="34"/>
+              <circle class="management-dot" cx="90" cy="100" r="5"/>
+              <circle class="management-dot" cx="90" cy="205" r="5"/>
+              <circle class="management-dot" cx="90" cy="315" r="5"/>
+              <circle class="management-dot" cx="90" cy="420" r="5"/>
+              <circle class="management-end" cx="790" cy="260" r="9"/>
+
+              <text x="115" y="91">PERSONE</text>
+              <text x="115" y="196">STRUMENTI</text>
+              <text x="115" y="306">RISORSE</text>
+              <text x="115" y="411">PROCESSI</text>
+              <text class="management-label-core" x="432" y="265">IDEA</text>
+              <text x="812" y="265">REALIZZAZIONE</text>
+            </svg>
+          </div>
+        </div>
       </div>
-
     </section>
 
-    <!-- ===================================================
-         07 — DIGITALE
-         =================================================== -->
-
+    <!-- 07 -->
     <section
-      id="ritorna"
       class="story story-dark story-digital"
+      id="ritorna"
       data-title="DIGITALE"
-      aria-current="false"
-    >
+      aria-labelledby="title-digitale">
+      <div class="story-content split-content">
+        <div class="story-copy">
+          <p class="eyebrow">07 / DIGITALE</p>
+          <h2 id="title-digitale">DIGITALE</h2>
+          <div class="narrative-copy">
+            <p>Quel computer dell’inizio ritorna.</p>
+            <p>Non più soltanto per essere usato, ma per costruire.</p>
+            <p>Pagine.</p>
+            <p>Sistemi.</p>
+            <p>Esperienze digitali.</p>
+          </div>
+        </div>
 
-      <div class="story-content">
-
-        <p class="eyebrow">
-          07
-        </p>
-
-        <h2>
-          DIGITALE
-        </h2>
-
-        <div class="digital-visual" aria-hidden="true">
-
+        <div class="visual digital-visual" aria-hidden="true">
           <div class="digital-device">
-            <div class="digital-screen">
-
-              <span class="digital-window"></span>
-              <span class="digital-window"></span>
-              <span class="digital-window"></span>
-
+            <div class="digital-monitor">
+              <div class="digital-screen">
+                <div class="digital-grid"></div>
+                <div class="digital-ui">
+                  <span class="ui-bar"></span>
+                  <span class="ui-bar short"></span>
+                  <span class="ui-box"></span>
+                  <span class="ui-box small"></span>
+                  <span class="ui-line"></span>
+                </div>
+              </div>
+              <div class="digital-controls"></div>
             </div>
+            <div class="digital-foot left"></div>
+            <div class="digital-foot right"></div>
           </div>
 
-          <div class="digital-pages">
-            <span>PAGINE.</span>
-            <span>SISTEMI.</span>
-            <span>ESPERIENZE DIGITALI.</span>
+          <div class="digital-emergence">
+            <span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span>
           </div>
-
         </div>
-
-        <div class="narrative-copy narrative-wide">
-          <p>
-            Quel computer dell’inizio ritorna.
-            Non più soltanto per essere usato,
-            ma per costruire.
-            Pagine.
-            Sistemi.
-            Esperienze digitali.
-          </p>
-        </div>
-
       </div>
-
     </section>
 
-    <!-- ===================================================
-         08 — COLLEGARE
-         =================================================== -->
-
+    <!-- 08 -->
     <section
-      id="collegare"
       class="story story-light story-connect"
+      id="collegare"
       data-title="COLLEGARE"
-      aria-current="false"
-    >
-
+      aria-labelledby="title-collegare">
       <div class="story-content">
-
-        <p class="eyebrow">
-          08
-        </p>
-
-        <h2>
-          COLLEGARE
-        </h2>
-
-        <div class="connect-system">
-
-          <div class="connect-words">
-
-            <span>Sport.</span>
-            <span>Scienze motorie.</span>
-            <span>Educazione.</span>
-            <span>Management.</span>
-            <span>Digitale.</span>
-
-          </div>
-
-          <div
-            class="connect-network"
-            aria-hidden="true"
-          >
-            <span class="network-node node-1"></span>
-            <span class="network-node node-2"></span>
-            <span class="network-node node-3"></span>
-            <span class="network-node node-4"></span>
-            <span class="network-node node-5"></span>
-
-            <i class="network-line line-1"></i>
-            <i class="network-line line-2"></i>
-            <i class="network-line line-3"></i>
-            <i class="network-line line-4"></i>
-            <i class="network-line line-5"></i>
-            <i class="network-line line-6"></i>
-          </div>
-
+        <div class="section-heading">
+          <p class="eyebrow">08 / COLLEGARE</p>
+          <h2 id="title-collegare">COLLEGARE</h2>
         </div>
 
-        <div class="narrative-copy">
-          <p>
-            Non sono percorsi separati.
-            Sono punti di uno stesso sistema.
-          </p>
+        <div class="connect-intro narrative-copy">
+          <p>Sport.<br>Scienze motorie.<br>Educazione.<br>Management.<br>Digitale.</p>
+          <p>Non sono percorsi separati.<br>Sono punti di uno stesso sistema.</p>
         </div>
 
+        <div class="visual connect-network" aria-label="Rete composta da sport, scienze motorie, educazione, management e digitale">
+          <svg viewBox="0 0 1000 640" role="img">
+            <path class="network-link" d="M500 110 L770 230 L700 500 L300 500 L230 230 Z"/>
+            <path class="network-link" d="M500 110 L700 500"/>
+            <path class="network-link" d="M770 230 L300 500"/>
+            <path class="network-link" d="M230 230 L700 500"/>
+            <path class="network-link" d="M770 230 L300 500"/>
+
+            <circle class="network-node node-sport" cx="500" cy="110" r="28"/>
+            <circle class="network-node" cx="770" cy="230" r="28"/>
+            <circle class="network-node" cx="700" cy="500" r="28"/>
+            <circle class="network-node" cx="300" cy="500" r="28"/>
+            <circle class="network-node" cx="230" cy="230" r="28"/>
+
+            <text x="500" y="64" text-anchor="middle">SPORT</text>
+            <text x="810" y="236">SCIENZE MOTORIE</text>
+            <text x="700" y="554" text-anchor="middle">EDUCAZIONE</text>
+            <text x="300" y="554" text-anchor="middle">MANAGEMENT</text>
+            <text x="180" y="236" text-anchor="end">DIGITALE</text>
+          </svg>
+        </div>
       </div>
-
     </section>
 
-    <!-- ===================================================
-         09 — OGGI
-         =================================================== -->
-
+    <!-- 09 -->
     <section
-      id="oggi"
       class="story story-dark story-today"
+      id="oggi"
       data-title="OGGI"
-      aria-current="false"
-    >
+      aria-labelledby="title-oggi">
+      <div class="story-content today-content">
+        <div class="section-heading">
+          <p class="eyebrow">09 / OGGI</p>
+          <h2 id="title-oggi">OGGI</h2>
+        </div>
 
-      <div class="story-content">
-
-        <p class="eyebrow">
-          09
-        </p>
-
-        <h2>
-          OGGI
-        </h2>
-
-        <div class="today-method">
+        <div class="today-method" aria-label="Metodo">
           <span>OSSERVARE.</span>
           <span>STUDIARE.</span>
           <span>COLLEGARE.</span>
@@ -608,348 +451,208 @@
           <span>SVILUPPARE.</span>
         </div>
 
-        <div class="narrative-copy">
-          <p>
-            Partire dalla comprensione per arrivare
-            alla soluzione.
-            Prima capire, poi intervenire.
-          </p>
+        <div class="today-copy narrative-copy">
+          <p>Partire dalla comprensione per arrivare alla soluzione.</p>
+          <p>Prima capire, poi intervenire.</p>
         </div>
-
       </div>
-
     </section>
 
-    <!-- ===================================================
-         10 — OBIETTIVO
-         =================================================== -->
-
+    <!-- 10 -->
     <section
+      class="story story-light story-objective"
       id="obiettivo"
-      class="story story-light"
       data-title="OBIETTIVO"
-      aria-current="false"
-    >
-
+      aria-labelledby="title-obiettivo">
       <div class="story-content">
-
-        <p class="eyebrow">
-          10
-        </p>
-
-        <h2>
-          OBIETTIVO
-        </h2>
-
-        <div class="objective-intro">
-          <p>
-            Ogni progetto parte da una domanda.
-            Qual è l’obiettivo?
-            Qual è il contesto?
-            Cosa serve davvero?
-          </p>
+        <div class="section-heading">
+          <p class="eyebrow">10 / OBIETTIVO</p>
+          <h2 id="title-obiettivo">OBIETTIVO</h2>
         </div>
 
-        <div
-          class="objective-flow"
-          aria-label="Obiettivo, contesto, necessità"
-        >
-
-          <span>
-            OBIETTIVO
-          </span>
-
-          <b>→</b>
-
-          <span>
-            CONTESTO
-          </span>
-
-          <b>→</b>
-
-          <span>
-            NECESSITÀ
-          </span>
-
+        <div class="objective-copy narrative-copy">
+          <p>Ogni progetto parte da una domanda.</p>
+          <p>Qual è l’obiettivo?</p>
+          <p>Qual è il contesto?</p>
+          <p>Cosa serve davvero?</p>
         </div>
 
-        <div class="objective-final">
-          Da qui nasce il lavoro.
+        <div class="visual objective-visual" aria-label="Domanda, contesto, necessità, lavoro e obiettivo">
+          <svg viewBox="0 0 1200 300" role="img">
+            <line class="objective-base" x1="90" y1="150" x2="1090" y2="150"/>
+            <line class="objective-progress" x1="90" y1="150" x2="90" y2="150"/>
+
+            <circle class="objective-point" cx="90" cy="150" r="9"/>
+            <circle class="objective-point" cx="340" cy="150" r="9"/>
+            <circle class="objective-point" cx="590" cy="150" r="9"/>
+            <circle class="objective-point" cx="840" cy="150" r="9"/>
+            <circle class="objective-target" cx="1090" cy="150" r="26"/>
+            <circle class="objective-target-inner" cx="1090" cy="150" r="7"/>
+
+            <text x="90" y="108" text-anchor="middle">DOMANDA</text>
+            <text x="340" y="108" text-anchor="middle">CONTESTO</text>
+            <text x="590" y="108" text-anchor="middle">NECESSITÀ</text>
+            <text x="840" y="108" text-anchor="middle">LAVORO</text>
+            <text x="1090" y="215" text-anchor="middle">◎</text>
+          </svg>
         </div>
 
+        <p class="objective-final">Da qui nasce il lavoro.</p>
       </div>
-
     </section>
 
-    <!-- ===================================================
-         11 — TERRITORIO
-         =================================================== -->
-
+    <!-- 11 -->
     <section
+      class="story story-dark story-territory"
       id="qui"
-      class="story story-dark story-place"
       data-title="TERRITORIO"
-      aria-current="false"
-    >
-
+      aria-labelledby="title-territorio">
       <div class="story-content">
-
-        <p class="eyebrow">
-          11
-        </p>
-
-        <h2>
-          TERRITORIO
-        </h2>
-
-        <div class="place-grid">
-
+        <div class="territory-grid">
           <div class="place-copy">
-
+            <p class="eyebrow">11 / TERRITORIO</p>
+            <h2 id="title-territorio">TERRITORIO</h2>
             <div class="narrative-copy">
-              <p>
-                Ogni percorso parte da un luogo.
-                Un territorio, una comunità, un contesto.
-                È qui che prende forma il lavoro.
-              </p>
+              <p>Ogni percorso parte da un luogo.</p>
+              <p>Un territorio, una comunità, un contesto.</p>
+              <p>È qui che prende forma il lavoro.</p>
             </div>
 
+            <div class="place-meta">
+              <span>PARTINICO</span>
+              <span>SICILIA</span>
+            </div>
           </div>
 
           <div class="map-frame">
-
             <iframe
               title="Stadio Comunale Giuseppe La Franca, Partinico"
-              src="https://www.google.com/maps?q=Stadio+Comunale+Giuseppe+La+Franca,+Partinico&output=embed"
               loading="lazy"
               referrerpolicy="no-referrer-when-downgrade"
-            ></iframe>
-
+              src="https://www.google.com/maps?q=Stadio%20Comunale%20Giuseppe%20La%20Franca%2C%20Partinico&output=embed">
+            </iframe>
+            <div class="map-label">STADIO COMUNALE GIUSEPPE LA FRANCA</div>
           </div>
-
         </div>
-
       </div>
-
     </section>
 
-    <!-- ===================================================
-         12 — DA QUI
-         =================================================== -->
-
+    <!-- 12 -->
     <section
-      id="da-qui"
       class="story story-light story-from-here"
+      id="da-qui"
       data-title="DA QUI"
-      aria-current="false"
-    >
-
+      aria-labelledby="title-da-qui">
       <div class="story-content">
-
-        <p class="eyebrow">
-          12
-        </p>
-
-        <h2>
-          DA QUI
-        </h2>
-
-        <div class="presence-online" aria-hidden="true">
-
-          <span>
-            PRESENZA
-          </span>
-
-          <b>
-            ↔
-          </b>
-
-          <span>
-            ONLINE
-          </span>
-
+        <div class="section-heading">
+          <p class="eyebrow">12 / DA QUI</p>
+          <h2 id="title-da-qui">DA QUI</h2>
         </div>
 
-        <div class="narrative-copy">
-          <p>
-            Una base in presenza e online.
-            Il luogo è il punto di partenza.
-            Il digitale permette di estendere il percorso,
-            collegare persone e lavorare anche a distanza.
-          </p>
+        <div class="from-here-copy narrative-copy">
+          <p>Una base in presenza e online.</p>
+          <p>Il luogo è il punto di partenza.</p>
+          <p>Il digitale permette di estendere il percorso, collegare persone e lavorare anche a distanza.</p>
         </div>
 
+        <div class="visual presence-online" aria-label="Presenza e online">
+          <svg viewBox="0 0 1000 420" role="img">
+            <defs>
+              <marker id="onlineArrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+                <path d="M0 0 L9 4.5 L0 9 Z" fill="currentColor"/>
+              </marker>
+            </defs>
+
+            <circle class="presence-origin" cx="120" cy="210" r="24"/>
+            <path class="presence-main" d="M145 210 C300 210 300 110 470 110 C640 110 650 210 870 210" marker-end="url(#onlineArrow)"/>
+            <path class="presence-branch" d="M145 210 C300 210 340 310 500 310 C650 310 700 210 870 210"/>
+
+            <circle class="presence-node" cx="470" cy="110" r="9"/>
+            <circle class="presence-node" cx="500" cy="310" r="9"/>
+            <circle class="presence-end" cx="870" cy="210" r="17"/>
+
+            <text x="120" y="275" text-anchor="middle">PRESENZA</text>
+            <text x="870" y="275" text-anchor="middle">ONLINE</text>
+            <text x="470" y="78" text-anchor="middle">COLLEGARE</text>
+            <text x="500" y="350" text-anchor="middle">ESTENDERE</text>
+          </svg>
+        </div>
       </div>
-
     </section>
 
-    <!-- ===================================================
-         13 — CHI SONO
-         =================================================== -->
-
+    <!-- 13 -->
     <section
-      id="eccomi"
       class="story story-dark story-person"
+      id="eccomi"
       data-title="CHI SONO"
-      aria-current="false"
-    >
-
-      <div class="story-content">
-
-        <p class="eyebrow">
-          13
-        </p>
-
-        <h2>
-          CHI SONO
-        </h2>
-
-        <div class="person-grid">
-
-          <div class="person-copy">
-
-            <div class="narrative-copy">
-              <p>
-                Questo percorso non è una somma di ruoli.
-                È il risultato di esperienze diverse
-                che nel tempo hanno iniziato a dialogare.
-              </p>
-
-              <p class="person-tags">
-                Sport.
-                Scienze motorie.
-                Educazione.
-                Management.
-                Digitale.
-              </p>
-            </div>
-
+      aria-labelledby="title-chi-sono">
+      <div class="story-content person-grid">
+        <div class="person-copy">
+          <p class="eyebrow">13 / CHI SONO</p>
+          <h2 id="title-chi-sono">CHI SONO</h2>
+          <div class="narrative-copy">
+            <p>Questo percorso non è una somma di ruoli.</p>
+            <p>È il risultato di esperienze diverse che nel tempo hanno iniziato a dialogare.</p>
+            <p>Sport.<br>Scienze motorie.<br>Educazione.<br>Management.<br>Digitale.</p>
           </div>
-
-          <figure class="person-frame">
-            <img
-              src="/assets/images/cp-foto.webp"
-              alt="Cesare Paratore"
-              loading="lazy"
-            >
-          </figure>
-
         </div>
 
+        <figure class="person-frame">
+          <img
+            src="assets/images/cp-foto.webp"
+            alt="Cesare Paratore"
+            width="1200"
+            height="1500"
+            loading="lazy">
+        </figure>
       </div>
-
     </section>
 
-    <!-- ===================================================
-         14 — CONTATTI
-         =================================================== -->
-
+    <!-- 14 -->
     <section
-      id="scrivimi"
       class="story story-light story-contact"
+      id="scrivimi"
       data-title="CONTATTI"
-      aria-current="false"
-    >
-
+      aria-labelledby="title-contatti">
       <div class="story-content contact-content">
-
-        <p class="eyebrow">
-          14
-        </p>
-
-        <h2>
-          CONTATTI
-        </h2>
-
-        <div class="contact-lead">
-          Parlami del tuo obiettivo.
+        <div>
+          <p class="eyebrow">14 / CONTATTI</p>
+          <h2 id="title-contatti">CONTATTI</h2>
         </div>
 
-        <div class="narrative-copy">
-          <p>
-            Un progetto, un’idea, una domanda
-            o semplicemente un punto da cui partire.
+        <div class="contact-main">
+          <p class="contact-lead">Parlami del tuo obiettivo.</p>
+
+          <p class="narrative-copy">
+            Un progetto, un’idea, una domanda o semplicemente un punto da cui partire.
           </p>
+
+          <a class="contact-link" href="mailto:ciao@cesareparatore.it">
+            <span class="contact-point" aria-hidden="true"></span>
+            <span>SCRIVIMI</span>
+            <span aria-hidden="true">↗</span>
+          </a>
         </div>
-
-        <a
-          class="contact-link"
-          href="mailto:"
-        >
-          SCRIVIMI
-          <span aria-hidden="true">→</span>
-        </a>
-
       </div>
-
     </section>
 
   </main>
 
-  <!-- =====================================================
-       SECTION NAVIGATION
-       ===================================================== -->
-
-  <nav
-    class="section-nav"
-    aria-label="Navigazione sezioni"
-  >
-
-    <button
-      class="section-nav-button section-nav-prev"
-      type="button"
-      aria-label="Sezione precedente"
-    >
-      <span aria-hidden="true">←</span>
-      <span class="section-nav-text">
-        PRECEDENTE
-      </span>
-    </button>
-
-    <div
-      class="section-nav-current"
-      aria-live="polite"
-    >
-      <span class="section-nav-number">
-        01
-      </span>
-
-      <span class="section-nav-title">
-        GUARDA
-      </span>
-    </div>
-
-    <button
-      class="section-nav-button section-nav-next"
-      type="button"
-      aria-label="Sezione successiva"
-    >
-      <span class="section-nav-text">
-        SUCCESSIVA
-      </span>
-      <span aria-hidden="true">→</span>
-    </button>
-
+  <nav class="section-nav" aria-label="Navigazione sezioni">
+    <button type="button" class="section-nav-button" data-direction="prev" aria-label="Sezione precedente">↑</button>
+    <span class="section-counter">
+      <span id="section-current">01</span>
+      <span>/</span>
+      <span>14</span>
+    </span>
+    <button type="button" class="section-nav-button" data-direction="next" aria-label="Sezione successiva">↓</button>
   </nav>
 
-  <!-- =====================================================
-       FOOTER
-       ===================================================== -->
-
   <footer class="site-footer">
-
     <div class="footer-mark">
-      <img
-        src="assets/images/cp-mark.svg"
-        alt="CP"
-      >
+      <img src="assets/images/cp-mark.svg" alt="CP">
     </div>
-
-    <p class="footer-name">
-      CESARE PARATORE
-    </p>
-
+    <p class="footer-name">CESARE PARATORE</p>
   </footer>
-
 </body>
 </html>
