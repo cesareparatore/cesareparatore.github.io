@@ -274,8 +274,11 @@ a {
 }
 
 .site-brand img {
+  display: block;
+
   width: 28px;
   height: 28px;
+
   filter: invert(1);
 }
 
@@ -394,14 +397,37 @@ a {
   transform: translateY(0);
 }
 
-.site-menu.is-open .menu-nav a:nth-child(1) { transition-delay: 50ms; }
-.site-menu.is-open .menu-nav a:nth-child(2) { transition-delay: 90ms; }
-.site-menu.is-open .menu-nav a:nth-child(3) { transition-delay: 130ms; }
-.site-menu.is-open .menu-nav a:nth-child(4) { transition-delay: 170ms; }
-.site-menu.is-open .menu-nav a:nth-child(5) { transition-delay: 210ms; }
-.site-menu.is-open .menu-nav a:nth-child(6) { transition-delay: 250ms; }
-.site-menu.is-open .menu-nav a:nth-child(7) { transition-delay: 290ms; }
-.site-menu.is-open .menu-nav a:nth-child(8) { transition-delay: 330ms; }
+.site-menu.is-open .menu-nav a:nth-child(1) {
+  transition-delay: 50ms;
+}
+
+.site-menu.is-open .menu-nav a:nth-child(2) {
+  transition-delay: 90ms;
+}
+
+.site-menu.is-open .menu-nav a:nth-child(3) {
+  transition-delay: 130ms;
+}
+
+.site-menu.is-open .menu-nav a:nth-child(4) {
+  transition-delay: 170ms;
+}
+
+.site-menu.is-open .menu-nav a:nth-child(5) {
+  transition-delay: 210ms;
+}
+
+.site-menu.is-open .menu-nav a:nth-child(6) {
+  transition-delay: 250ms;
+}
+
+.site-menu.is-open .menu-nav a:nth-child(7) {
+  transition-delay: 290ms;
+}
+
+.site-menu.is-open .menu-nav a:nth-child(8) {
+  transition-delay: 330ms;
+}
 
 .menu-nav a::after {
   content: "";
@@ -638,9 +664,17 @@ main:focus {
   opacity: 0.25;
 }
 
-.sport-line-1 { top: 30%; }
-.sport-line-2 { top: 50%; }
-.sport-line-3 { top: 70%; }
+.sport-line-1 {
+  top: 30%;
+}
+
+.sport-line-2 {
+  top: 50%;
+}
+
+.sport-line-3 {
+  top: 70%;
+}
 
 .sport-runner {
   position: absolute;
@@ -929,11 +963,30 @@ main:focus {
   background: currentColor;
 }
 
-.node-1 { top: 12%; left: 48%; }
-.node-2 { top: 38%; left: 16%; }
-.node-3 { top: 43%; right: 12%; }
-.node-4 { bottom: 16%; left: 30%; }
-.node-5 { bottom: 10%; right: 30%; }
+.node-1 {
+  top: 12%;
+  left: 48%;
+}
+
+.node-2 {
+  top: 38%;
+  left: 16%;
+}
+
+.node-3 {
+  top: 43%;
+  right: 12%;
+}
+
+.node-4 {
+  bottom: 16%;
+  left: 30%;
+}
+
+.node-5 {
+  bottom: 10%;
+  right: 30%;
+}
 
 .network-line {
   position: absolute;
@@ -1342,29 +1395,32 @@ main:focus {
 .site-footer {
   position: relative;
 
-  min-height: 42vh;
+  min-height: 32vh;
 
   padding:
-    8rem
+    6rem
     var(--gutter)
     calc(
       var(--nav-h) +
       env(safe-area-inset-bottom) +
-      4rem
+      3rem
     );
 
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-
-  gap: 2rem;
-
-  align-items: end;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
 
   background: var(--bg);
   color: var(--light);
 }
 
+.footer-mark {
+  flex: 0 0 auto;
+}
+
 .footer-mark img {
+  display: block;
+
   width: 42px;
   height: 42px;
 
@@ -1374,29 +1430,11 @@ main:focus {
 .footer-name {
   margin: 0;
 
+  color: var(--light);
+
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-}
-
-.footer-description {
-  margin: 0.7rem 0 0;
-
-  color: var(--secondary);
-
-  font-size: var(--micro);
-  letter-spacing: 0.08em;
-}
-
-.footer-meta {
-  display: grid;
-  gap: 0.5rem;
-
-  color: var(--secondary);
-
-  font-size: var(--micro);
-  font-weight: 700;
-  letter-spacing: 0.1em;
 
   text-align: right;
 }
@@ -1432,18 +1470,6 @@ main:focus {
 
   .person-frame {
     width: 100%;
-  }
-
-  .site-footer {
-    grid-template-columns: auto 1fr;
-  }
-
-  .footer-meta {
-    grid-column: 1 / -1;
-
-    grid-template-columns: 1fr auto;
-
-    text-align: left;
   }
 
 }
@@ -1583,19 +1609,26 @@ main:focus {
   }
 
   .site-footer {
-    min-height: 50vh;
+    min-height: 38vh;
 
-    padding-top: 6rem;
+    padding-top: 5rem;
+    padding-bottom: calc(
+      var(--nav-h) +
+      env(safe-area-inset-bottom) +
+      2.5rem
+    );
 
-    grid-template-columns: 1fr;
-
-    align-items: start;
+    align-items: flex-end;
   }
 
-  .footer-meta {
-    grid-column: auto;
+  .footer-mark img {
+    width: 36px;
+    height: 36px;
+  }
 
-    grid-template-columns: 1fr;
+  .footer-name {
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
   }
 
 }
