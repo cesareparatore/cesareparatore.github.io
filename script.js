@@ -1,61 +1,51 @@
-/* =========================================================
-   CESARE PARATORE — HOME
-   MAXIMUM QUALITY
-   ========================================================= */
-
 (() => {
   "use strict";
 
   const CONFIG = {
     standbyDelay: 40000,
-    loaderMaxDelay: 1100,
+    loaderMax: 1200,
+    scrollOffset: 12,
     activeLineRatio: 0.32,
-    activeLineMax: 260,
-    scrollOffset: 16
+    activeLineMax: 260
   };
 
-  const doc = document;
-  const html = doc.documentElement;
-  const body = doc.body;
+  const root = document.documentElement;
+  const body = document.body;
 
-  const loader = doc.getElementById("site-loader");
-  const standby = doc.getElementById("standby");
+  const header = document.querySelector(".site-header");
+  const loader = document.querySelector("#site-loader");
+  const standby = document.querySelector("#standby");
 
-  const header = doc.querySelector(".site-header");
-  const brand = doc.querySelector(".brand");
-  const menuToggle = doc.querySelector(".menu-toggle");
-  const menu = doc.getElementById("menu");
+  const menu = document.querySelector("#menu");
+  const menuToggle = document.querySelector("#menu-toggle");
+  const menuLinks = [...document.querySelectorAll("#menu a")];
 
-  const main = doc.getElementById("main-content");
-  const footer = doc.querySelector(".site-footer");
-  const sectionNav = doc.querySelector(".section-nav");
+  const main = document.querySelector("#main-content");
+  const footer = document.querySelector(".site-footer");
 
-  const sections = Array.from(doc.querySelectorAll(".story"));
+  const sections = [...document.querySelectorAll(".story")];
 
-  const sectionPrev = doc.querySelector(".section-nav-prev");
-  const sectionNext = doc.querySelector(".section-nav-next");
-  const sectionNumber = doc.querySelector(".section-nav-number");
-  const sectionTitle = doc.querySelector(".section-nav-title");
+  const activeTitle = document.querySelector("#active-story-title");
+  const storyNav = document.querySelector("#story-nav");
+  const progress = document.querySelector(".story-progress");
+  const progressFill = document.querySelector(".story-progress-fill");
+  const progressOrb = document.querySelector(".story-progress-orb");
 
-  const currentYear = doc.getElementById("current-year");
-  const themeColorMeta = doc.querySelector('meta[name="theme-color"]');
+  const previousButton = document.querySelector("#story-prev");
+  const nextButton = document.querySelector("#story-next");
 
-  const reduceMotionQuery = window.matchMedia(
+  const currentYear = document.querySelector("#current-year");
+
+  let activeIndex = 0;
+  let ticking = false;
+  let standbyTimer = 0;
+  let menuOpen = false;
+  let lastFocusedElement = null;
+  let menuAnimation = null;
+
+  const prefersReducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)"
   );
-
-  let currentIndex = 0;
-  let menuOpen = false;
-  let restoreFocusElement = null;
-  let standbyTimer = null;
-  let scrollTicking = false;
-  let animationsReady = false;
-  let lastTheme = null;
-
-  const clamp = (value, min, max) =>
-    Math.min(Math.max(value, min), max);
-
-  const motionReduced = () => reduceMotionQuery.matches;
 
   const focusableSelector = [
     "a[href]",
@@ -66,39 +56,32 @@
     "[tabindex]:not([tabindex='-1'])"
   ].join(",");
 
-  const isVisible = (element) => {
-    if (!element) return false;
+  /* ---------------------------------------------
+     UTILITIES
+  --------------------------------------------- */
 
-    const style = window.getComputedStyle(element);
+  const clamp = (value, min, max) =>
+    Math.min(Math.max(value, min), max);
 
-    return (
-      style.display !== "none" &&
-      style.visibility !== "hidden" &&
-      style.visibility !== "collapse"
+  const getHeaderHeight = () =>
+    header?.getBoundingClientRect().height || 0;
+
+  const getSectionLine = () =>
+    getHeaderHeight() +
+    Math.min(
+      window.innerHeight * CONFIG.activeLineRatio,
+      CONFIG.activeLineMax
     );
-  };
 
-  const getFocusable = (container) => {
-    if (!container) return [];
-
-    return Array.from(
-      container.querySelectorAll(focusableSelector)
-    ).filter(isVisible);
-  };
-
-  const getMenuFocusable = () => {
-    const elements = getFocusable(menu);
-
-    if (
-      menuToggle &&
-      !menuToggle.disabled &&
-      isVisible(menuToggle)
-    ) {
-      elements.push(menuToggle);
-    }
-
-    return elements;
-  };
+  const getFocusable = (container) =>
+    [...container.querySelectorAll(focusableSelector)]
+      .filter((element) => {
+        const style = window.getComputedStyle(element);
+        return (
+          style.display !== "none" &&
+          style.visibility !== "hidden"
+        );
+      });
 
   const setInert = (element, value) => {
     if (!element) return;
@@ -112,152 +95,80 @@
     }
   };
 
-  const updateYear = () => {
-    if (currentYear) {
-      currentYear.textContent = String(
-        new Date().getFullYear()
-      );
-    }
-  };
+  /* ---------------------------------------------
+     YEAR
+  --------------------------------------------- */
 
-  const setMenuBackgroundState = (disabled) => {
-    [main, footer, sectionNav, brand].forEach((element) => {
-      setInert(element, disabled);
-    });
-  };
+  if (currentYear) {
+    currentYear.textContent = String(new Date().getFullYear());
+  }
 
-  const updateMenuLabel = () => {
-    if (!menuToggle) return;
+  /* ---------------------------------------------
+     MENU
+  --------------------------------------------- */
 
-    const label = menuToggle.querySelector(".menu-label");
-
-    menuToggle.setAttribute(
-      "aria-expanded",
-      String(menuOpen)
-    );
-
-    menuToggle.setAttribute(
-      "aria-label",
-      menuOpen ? "Chiudi menu" : "Apri menu"
-    );
-
-    if (label) {
-      label.textContent = menuOpen ? "CHIUDI" : "MENU";
-    }
-  };
+  const getMenuFocusable = () => getFocusable(menu);
 
   const setMenuState = (open, { restoreFocus = true } = {}) => {
     if (!menu || !menuToggle) return;
 
-    if (open === menuOpen) return;
+    menuOpen = open;
 
     if (open) {
-      restoreFocusElement = doc.activeElement;
+      lastFocusedElement = document.activeElement;
 
-      menuOpen = true;
+      body.classList.add("menu-is-open");
 
       menu.inert = false;
       menu.removeAttribute("aria-hidden");
-      menu.classList.add("is-open");
 
-      setMenuBackgroundState(true);
+      menuToggle.setAttribute("aria-expanded", "true");
+      menuToggle.setAttribute("aria-label", "Chiudi menu");
 
-      html.classList.add("menu-is-open");
-      body.classList.add("menu-is-open");
+      if (main) setInert(main, true);
+      if (footer) setInert(footer, true);
+      if (storyNav) setInert(storyNav, true);
 
-      updateMenuLabel();
+      /*
+       * Il brand non deve diventare un punto di fuga
+       * durante il focus trap del menu.
+       */
+      const brand = document.querySelector(".brand");
+      if (brand) brand.setAttribute("tabindex", "-1");
 
-      window.requestAnimationFrame(() => {
-        const links = getFocusable(menu);
-
-        if (links.length) {
-          links[0].focus();
-        } else {
-          menu.setAttribute("tabindex", "-1");
-          menu.focus();
-        }
+      requestAnimationFrame(() => {
+        const focusables = getMenuFocusable();
+        (focusables[0] || menuToggle).focus();
       });
+    } else {
+      body.classList.remove("menu-is-open");
 
-      return;
-    }
+      menu.inert = true;
+      menu.setAttribute("aria-hidden", "true");
 
-    menuOpen = false;
+      menuToggle.setAttribute("aria-expanded", "false");
+      menuToggle.setAttribute("aria-label", "Apri menu");
 
-    menu.classList.remove("is-open");
-    menu.setAttribute("aria-hidden", "true");
-    menu.inert = true;
+      if (main) setInert(main, false);
+      if (footer) setInert(footer, false);
+      if (storyNav) setInert(storyNav, false);
 
-    setMenuBackgroundState(false);
+      const brand = document.querySelector(".brand");
+      if (brand) brand.removeAttribute("tabindex");
 
-    html.classList.remove("menu-is-open");
-    body.classList.remove("menu-is-open");
-
-    updateMenuLabel();
-
-    if (!restoreFocus) {
-      restoreFocusElement = null;
-      return;
-    }
-
-    const target =
-      restoreFocusElement &&
-      restoreFocusElement.isConnected &&
-      typeof restoreFocusElement.focus === "function"
-        ? restoreFocusElement
-        : menuToggle;
-
-    restoreFocusElement = null;
-
-    window.requestAnimationFrame(() => {
-      target.focus();
-    });
-  };
-
-  const trapMenuFocus = (event) => {
-    if (!menuOpen || event.key !== "Tab") return;
-
-    const focusables = getMenuFocusable();
-
-    if (!focusables.length) {
-      event.preventDefault();
-      return;
-    }
-
-    const first = focusables[0];
-    const last = focusables[focusables.length - 1];
-
-    if (
-      event.shiftKey &&
-      doc.activeElement === first
-    ) {
-      event.preventDefault();
-      last.focus();
-      return;
-    }
-
-    if (
-      !event.shiftKey &&
-      doc.activeElement === last
-    ) {
-      event.preventDefault();
-      first.focus();
+      if (
+        restoreFocus &&
+        lastFocusedElement &&
+        typeof lastFocusedElement.focus === "function"
+      ) {
+        lastFocusedElement.focus();
+      }
     }
   };
 
-  const keepFocusInsideMenu = (event) => {
-    if (!menuOpen) return;
-
-    if (
-      menu.contains(event.target) ||
-      event.target === menuToggle
-    ) {
-      return;
-    }
-
-    const first = getFocusable(menu)[0];
-
-    if (first) {
-      first.focus();
+  const closeMenu = () => {
+    if (menuOpen) {
+      setMenuState(false);
     }
   };
 
@@ -266,151 +177,165 @@
   });
 
   menu?.addEventListener("click", (event) => {
-    const link = event.target.closest("a[href]");
-
-    if (!link) return;
-
-    setMenuState(false, { restoreFocus: false });
+    const link = event.target.closest("a");
+    if (link) closeMenu();
   });
 
-  menu?.addEventListener("click", (event) => {
-    if (event.target === menu) {
-      setMenuState(false);
-    }
-  });
+  document.addEventListener("keydown", (event) => {
+    if (!menuOpen) return;
 
-  doc.addEventListener("focusin", keepFocusInsideMenu);
-
-  doc.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && menuOpen) {
+    if (event.key === "Escape") {
       event.preventDefault();
       setMenuState(false);
       return;
     }
 
-    trapMenuFocus(event);
+    if (event.key !== "Tab") return;
+
+    const focusables = [
+      menuToggle,
+      ...getMenuFocusable()
+    ].filter(Boolean);
+
+    if (!focusables.length) return;
+
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
   });
 
-  /* -------------------------------------------------------
-     STANDBY
-     ------------------------------------------------------- */
+  /* ---------------------------------------------
+     STORY NAVIGATION
+  --------------------------------------------- */
 
-  const hideStandby = () => {
-    if (!standby) return;
+  const updateTheme = (section) => {
+    if (!header || !section) return;
 
-    standby.classList.remove("is-visible");
-    standby.setAttribute("aria-hidden", "true");
-  };
+    const isLight =
+      section.classList.contains("story-light") ||
+      section.classList.contains("story-place") ||
+      section.classList.contains("story-person") ||
+      section.classList.contains("story-contact");
 
-  const clearStandbyTimer = () => {
-    if (!standbyTimer) return;
+    header.dataset.theme = isLight ? "light" : "dark";
 
-    window.clearTimeout(standbyTimer);
-    standbyTimer = null;
-  };
+    const themeColor = isLight ? "#F1EFE8" : "#0B0B0A";
+    const themeMeta = document.querySelector('meta[name="theme-color"]');
 
-  const scheduleStandby = () => {
-    if (!standby) return;
-
-    clearStandbyTimer();
-
-    if (doc.hidden || menuOpen) return;
-
-    standbyTimer = window.setTimeout(() => {
-      if (doc.hidden || menuOpen) return;
-
-      standby.classList.add("is-visible");
-      standby.setAttribute("aria-hidden", "false");
-      standbyTimer = null;
-    }, CONFIG.standbyDelay);
-  };
-
-  const registerActivity = () => {
-    hideStandby();
-
-    if (!standbyTimer && !doc.hidden && !menuOpen) {
-      scheduleStandby();
+    if (themeMeta) {
+      themeMeta.setAttribute("content", themeColor);
     }
   };
 
-  [
-    "pointerdown",
-    "wheel",
-    "touchstart",
-    "keydown",
-    "scroll"
-  ].forEach((eventName) => {
-    window.addEventListener(
-      eventName,
-      registerActivity,
-      { passive: true }
-    );
-  });
+  const setActiveSection = (index, force = false) => {
+    if (!sections.length) return;
 
-  /* -------------------------------------------------------
-     LOADER
-     ------------------------------------------------------- */
+    const nextIndex = clamp(index, 0, sections.length - 1);
 
-  const hideLoader = () => {
-    if (!loader || loader.classList.contains("is-hidden")) {
+    if (!force && nextIndex === activeIndex) {
+      updateProgress();
       return;
     }
 
-    loader.classList.add("is-hidden");
+    activeIndex = nextIndex;
+
+    const section = sections[activeIndex];
+    const title = section.dataset.title || "";
+
+    sections.forEach((item, itemIndex) => {
+      item.dataset.active = itemIndex === activeIndex
+        ? "true"
+        : "false";
+    });
+
+    if (activeTitle) {
+      activeTitle.textContent = title;
+    }
+
+    previousButton.disabled = activeIndex === 0;
+    nextButton.disabled = activeIndex === sections.length - 1;
+
+    previousButton.setAttribute(
+      "aria-label",
+      activeIndex > 0
+        ? `Vai a ${sections[activeIndex - 1].dataset.title || "sezione precedente"}`
+        : "Sezione precedente"
+    );
+
+    nextButton.setAttribute(
+      "aria-label",
+      activeIndex < sections.length - 1
+        ? `Vai a ${sections[activeIndex + 1].dataset.title || "sezione successiva"}`
+        : "Sezione successiva"
+    );
+
+    updateTheme(section);
+    updateProgress();
   };
 
-  const initLoader = () => {
-    window.setTimeout(
-      hideLoader,
-      motionReduced()
-        ? 0
-        : CONFIG.loaderMaxDelay
+  const updateProgress = () => {
+    if (!sections.length || !progress || !progressFill || !progressOrb) {
+      return;
+    }
+
+    const section = sections[activeIndex];
+
+    if (!section) return;
+
+    const rect = section.getBoundingClientRect();
+    const height = Math.max(section.offsetHeight, 1);
+
+    const line = getSectionLine();
+
+    /*
+     * Progressione continua dentro la sezione:
+     * 0% quando la linea entra nella sezione,
+     * 100% quando la linea raggiunge la fine.
+     */
+    const localProgress = clamp(
+      (line - rect.top) / height,
+      0,
+      1
+    );
+
+    const globalProgress =
+      (activeIndex + localProgress) /
+      Math.max(sections.length - 1, 1);
+
+    const percent = clamp(globalProgress * 100, 0, 100);
+
+    progressFill.style.width = `${percent}%`;
+    progressOrb.style.left = `${percent}%`;
+
+    progress.setAttribute(
+      "aria-valuenow",
+      String(Math.round(percent))
     );
   };
 
-  /* -------------------------------------------------------
-     SECTION STATE
-     ------------------------------------------------------- */
+  const getActiveIndexFromViewport = () => {
+    const line = getSectionLine();
 
-  const getReadingLine = () => {
-    const headerHeight =
-      header?.offsetHeight || 0;
-
-    return (
-      headerHeight +
-      Math.min(
-        window.innerHeight * CONFIG.activeLineRatio,
-        CONFIG.activeLineMax
-      )
-    );
-  };
-
-  const getActiveSectionIndex = () => {
-    if (!sections.length) return 0;
-
-    const readingLine = getReadingLine();
-
-    let bestIndex = currentIndex;
-    let bestDistance = Number.POSITIVE_INFINITY;
+    let bestIndex = 0;
+    let bestDistance = Infinity;
 
     sections.forEach((section, index) => {
       const rect = section.getBoundingClientRect();
 
-      if (
-        rect.top <= readingLine &&
-        rect.bottom >= readingLine
-      ) {
-        bestIndex = index;
-        bestDistance = 0;
-        return;
-      }
-
-      const center =
-        rect.top + rect.height / 2;
-
-      const distance = Math.abs(
-        center - readingLine
-      );
+      const distance =
+        rect.top <= line && rect.bottom >= line
+          ? 0
+          : Math.min(
+              Math.abs(rect.top - line),
+              Math.abs(rect.bottom - line)
+            );
 
       if (distance < bestDistance) {
         bestDistance = distance;
@@ -421,636 +346,271 @@
     return bestIndex;
   };
 
-  const getSectionTitle = (section) =>
-    section?.dataset.title ||
-    section?.querySelector("h1, h2")?.textContent?.trim() ||
-    "";
+  const updateScrollState = () => {
+    ticking = false;
 
-  const updateTheme = (section) => {
-    if (!section) return;
+    const nextIndex = getActiveIndexFromViewport();
 
-    const light = section.classList.contains(
-      "story-light"
-    );
-
-    const theme = light ? "light" : "dark";
-
-    if (theme === lastTheme) return;
-
-    lastTheme = theme;
-
-    if (header) {
-      header.dataset.theme = theme;
-    }
-
-    if (sectionNav) {
-      sectionNav.dataset.theme = theme;
-    }
-
-    if (themeColorMeta) {
-      themeColorMeta.setAttribute(
-        "content",
-        light ? "#F1EFE8" : "#0B0B0A"
-      );
+    if (nextIndex !== activeIndex) {
+      setActiveSection(nextIndex);
+    } else {
+      updateProgress();
     }
   };
 
-  const updateSectionNavigation = (
-    index = getActiveSectionIndex()
-  ) => {
-    if (!sections.length) return;
+  const requestScrollUpdate = () => {
+    if (ticking) return;
 
-    const nextIndex = clamp(
-      index,
-      0,
-      sections.length - 1
-    );
-
-    const changed = nextIndex !== currentIndex;
-
-    currentIndex = nextIndex;
-
-    const section = sections[currentIndex];
-    const title = getSectionTitle(section);
-
-    if (sectionNumber) {
-      sectionNumber.textContent = String(
-        currentIndex + 1
-      ).padStart(2, "0");
-    }
-
-    if (sectionTitle) {
-      sectionTitle.textContent = title;
-    }
-
-    if (sectionPrev) {
-      const disabled = currentIndex === 0;
-
-      sectionPrev.disabled = disabled;
-      sectionPrev.setAttribute(
-        "aria-label",
-        disabled
-          ? "Sezione precedente non disponibile"
-          : `Vai a ${getSectionTitle(
-              sections[currentIndex - 1]
-            )}`
-      );
-
-      if (!disabled) {
-        sectionPrev.setAttribute(
-          "aria-controls",
-          sections[currentIndex - 1].id
-        );
-      } else {
-        sectionPrev.removeAttribute("aria-controls");
-      }
-    }
-
-    if (sectionNext) {
-      const disabled =
-        currentIndex === sections.length - 1;
-
-      sectionNext.disabled = disabled;
-
-      sectionNext.setAttribute(
-        "aria-label",
-        disabled
-          ? "Sezione successiva non disponibile"
-          : `Vai a ${getSectionTitle(
-              sections[currentIndex + 1]
-            )}`
-      );
-
-      if (!disabled) {
-        sectionNext.setAttribute(
-          "aria-controls",
-          sections[currentIndex + 1].id
-        );
-      } else {
-        sectionNext.removeAttribute("aria-controls");
-      }
-    }
-
-    sections.forEach((item, itemIndex) => {
-      item.toggleAttribute(
-        "data-active",
-        itemIndex === currentIndex
-      );
-    });
-
-    updateTheme(section);
-
-    return changed;
-  };
-
-  const getSectionTop = (section) => {
-    const headerHeight =
-      header?.offsetHeight || 0;
-
-    return Math.max(
-      0,
-      window.scrollY +
-        section.getBoundingClientRect().top -
-        headerHeight -
-        CONFIG.scrollOffset
-    );
-  };
-
-  const updateHash = (section) => {
-    if (!section?.id) return;
-
-    const url = `${window.location.pathname}#${section.id}`;
-
-    if (window.location.hash === `#${section.id}`) {
-      return;
-    }
-
-    window.history.replaceState(
-      { section: section.id },
-      "",
-      url
-    );
-  };
-
-  const scrollToSection = (
-    index,
-    {
-      updateUrl = true,
-      focusHeading = false
-    } = {}
-  ) => {
-    const section = sections[index];
-
-    if (!section) return;
-
-    const top = getSectionTop(section);
-
-    window.scrollTo({
-      top,
-      behavior: motionReduced()
-        ? "auto"
-        : "smooth"
-    });
-
-    if (updateUrl) {
-      updateHash(section);
-    }
-
-    if (focusHeading) {
-      const heading =
-        section.querySelector("h1, h2");
-
-      if (heading) {
-        const hadTabIndex =
-          heading.getAttribute("tabindex");
-
-        if (hadTabIndex === null) {
-          heading.setAttribute(
-            "tabindex",
-            "-1"
-          );
-        }
-
-        window.setTimeout(() => {
-          heading.focus({
-            preventScroll: true
-          });
-
-          if (hadTabIndex === null) {
-            heading.removeAttribute("tabindex");
-          }
-        }, motionReduced() ? 0 : 500);
-      }
-    }
-  };
-
-  sectionPrev?.addEventListener("click", () => {
-    if (currentIndex > 0) {
-      scrollToSection(currentIndex - 1, {
-        updateUrl: true,
-        focusHeading: true
-      });
-    }
-  });
-
-  sectionNext?.addEventListener("click", () => {
-    if (currentIndex < sections.length - 1) {
-      scrollToSection(currentIndex + 1, {
-        updateUrl: true,
-        focusHeading: true
-      });
-    }
-  });
-
-  /* -------------------------------------------------------
-     HASH / HISTORY
-     ------------------------------------------------------- */
-
-  const getHashTarget = () => {
-    const rawHash = window.location.hash.slice(1);
-
-    if (!rawHash) return null;
-
-    let id = rawHash;
-
-    try {
-      id = decodeURIComponent(rawHash);
-    } catch {
-      return null;
-    }
-
-    return doc.getElementById(id);
-  };
-
-  const navigateToHash = ({
-    behavior = "auto",
-    focus = false
-  } = {}) => {
-    const target = getHashTarget();
-
-    if (!target) return;
-
-    const index = sections.indexOf(target);
-
-    if (index >= 0) {
-      const top = getSectionTop(target);
-
-      window.scrollTo({
-        top,
-        behavior:
-          motionReduced()
-            ? "auto"
-            : behavior
-      });
-
-      updateSectionNavigation(index);
-
-      if (focus) {
-        const heading =
-          target.querySelector("h1, h2");
-
-        if (heading) {
-          heading.setAttribute(
-            "tabindex",
-            "-1"
-          );
-
-          window.setTimeout(() => {
-            heading.focus({
-              preventScroll: true
-            });
-          }, motionReduced() ? 0 : 350);
-        }
-      }
-
-      return;
-    }
-
-    target.scrollIntoView({
-      behavior:
-        motionReduced()
-          ? "auto"
-          : behavior,
-      block: "start"
-    });
-  };
-
-  window.addEventListener("hashchange", () => {
-    navigateToHash({
-      behavior: "smooth",
-      focus: true
-    });
-  });
-
-  window.addEventListener("popstate", () => {
-    navigateToHash({
-      behavior: "smooth",
-      focus: true
-    });
-  });
-
-  /* -------------------------------------------------------
-     SCROLL / RESIZE
-     ------------------------------------------------------- */
-
-  const requestSectionUpdate = () => {
-    if (scrollTicking) return;
-
-    scrollTicking = true;
-
-    window.requestAnimationFrame(() => {
-      updateSectionNavigation();
-      scrollTicking = false;
-    });
+    ticking = true;
+    requestAnimationFrame(updateScrollState);
   };
 
   window.addEventListener(
     "scroll",
-    requestSectionUpdate,
+    requestScrollUpdate,
     { passive: true }
   );
 
   window.addEventListener(
     "resize",
-    requestSectionUpdate,
+    requestScrollUpdate,
     { passive: true }
   );
 
-  /* -------------------------------------------------------
-     GSAP MOTION
-     ------------------------------------------------------- */
+  const scrollToSection = (index, { updateHash = true } = {}) => {
+    const section = sections[clamp(index, 0, sections.length - 1)];
 
-  const gsapAvailable = () =>
-    !motionReduced() &&
-    window.gsap &&
-    window.ScrollTrigger;
+    if (!section) return;
 
-  const resetAnimatedElements = () => {
-    sections.forEach((section) => {
-      section
-        .querySelectorAll(
-          [
-            ".eyebrow",
-            "h1",
-            "h2",
-            ".narrative-copy > p",
-            ".today-lead",
-            ".contact-lead",
-            ".statement",
-            ".understand-lead",
-            ".build-lead",
-            ".return-list li",
-            ".connect-words li",
-            ".objective-list p",
-            ".person-frame",
-            ".map-frame"
-          ].join(",")
-        )
-        .forEach((element) => {
-          element.style.removeProperty("opacity");
-          element.style.removeProperty("transform");
-          element.style.removeProperty("visibility");
-        });
+    closeMenu();
+
+    const top =
+      window.scrollY +
+      section.getBoundingClientRect().top -
+      getHeaderHeight() -
+      CONFIG.scrollOffset;
+
+    const behavior = prefersReducedMotion.matches
+      ? "auto"
+      : "smooth";
+
+    if (updateHash) {
+      history.replaceState(
+        null,
+        "",
+        `#${section.id}`
+      );
+    }
+
+    window.scrollTo({
+      top: Math.max(0, top),
+      behavior
     });
+
+    setActiveSection(
+      sections.indexOf(section),
+      true
+    );
   };
 
-  const createReveal = (
-    targets,
-    {
-      trigger,
-      start = "top 74%",
-      y = 30,
-      x = 0,
-      duration = 0.75,
-      stagger = 0.08,
-      id
-    } = {}
-  ) => {
-    const elements = Array.from(
-      targets || []
-    ).filter(Boolean);
+  previousButton?.addEventListener("click", () => {
+    if (activeIndex > 0) {
+      scrollToSection(activeIndex - 1);
+    }
+  });
 
-    if (!elements.length) return;
+  nextButton?.addEventListener("click", () => {
+    if (activeIndex < sections.length - 1) {
+      scrollToSection(activeIndex + 1);
+    }
+  });
 
-    window.gsap.from(elements, {
-      opacity: 0,
-      y,
-      x,
-      duration,
-      stagger,
-      ease: "power3.out",
-      clearProps: "opacity,transform",
-      scrollTrigger: {
-        id,
-        trigger,
-        start,
-        once: true
-      }
-    });
-  };
+  /* ---------------------------------------------
+     HASH / DEEP LINKS
+  --------------------------------------------- */
 
-  const initStoryAnimations = () => {
-    resetAnimatedElements();
+  const handleHash = () => {
+    const hash = window.location.hash.slice(1);
 
-    if (!gsapAvailable()) {
-      animationsReady = false;
+    if (!hash) {
+      setActiveSection(
+        getActiveIndexFromViewport(),
+        true
+      );
       return;
     }
 
-    const {
-      gsap,
-      ScrollTrigger
-    } = window;
+    const target = document.getElementById(hash);
 
-    gsap.registerPlugin(ScrollTrigger);
-
-    if (gsap.__cesareHomeContext) {
-      gsap.__cesareHomeContext.revert();
+    if (!target || !target.classList.contains("story")) {
+      return;
     }
 
-    const context = gsap.context(() => {
-      const opening = sections[0];
+    const index = sections.indexOf(target);
 
-      if (opening) {
-        const eyebrow =
-          opening.querySelector(".eyebrow");
+    if (index < 0) return;
 
-        const heading =
-          opening.querySelector("h1");
+    requestAnimationFrame(() => {
+      setActiveSection(index, true);
 
-        const paragraphs =
-          opening.querySelectorAll(
-            ".opening-copy > p"
-          );
+      const top =
+        window.scrollY +
+        target.getBoundingClientRect().top -
+        getHeaderHeight() -
+        CONFIG.scrollOffset;
 
-        const timeline = gsap.timeline();
+      window.scrollTo({
+        top: Math.max(0, top),
+        behavior: prefersReducedMotion.matches
+          ? "auto"
+          : "smooth"
+      });
+    });
+  };
 
-        if (eyebrow) {
-          timeline.from(eyebrow, {
-            opacity: 0,
-            y: 14,
-            duration: 0.55,
-            ease: "power3.out"
-          });
-        }
+  window.addEventListener("hashchange", handleHash);
+  window.addEventListener("popstate", handleHash);
 
-        if (heading) {
-          timeline.from(
-            heading,
-            {
-              opacity: 0,
-              y: 34,
-              duration: 0.8,
-              ease: "power4.out"
-            },
-            "-=0.25"
-          );
-        }
+  /* ---------------------------------------------
+     STANDBY
+  --------------------------------------------- */
 
-        if (paragraphs.length) {
-          timeline.from(
-            paragraphs,
-            {
-              opacity: 0,
-              y: 18,
-              duration: 0.6,
-              stagger: 0.1,
-              ease: "power3.out"
-            },
-            "-=0.3"
-          );
-        }
+  const resetStandby = () => {
+    if (!standby) return;
+
+    standby.classList.remove("is-visible");
+
+    window.clearTimeout(standbyTimer);
+
+    standbyTimer = window.setTimeout(() => {
+      if (!menuOpen) {
+        standby.classList.add("is-visible");
       }
+    }, CONFIG.standbyDelay);
+  };
 
-      sections.slice(1).forEach(
-        (section, index) => {
-          const number = index + 1;
+  [
+    "scroll",
+    "wheel",
+    "touchstart",
+    "keydown",
+    "click"
+  ].forEach((eventName) => {
+    window.addEventListener(eventName, resetStandby, {
+      passive: eventName !== "keydown"
+    });
+  });
 
-          const eyebrow =
-            section.querySelector(".eyebrow");
+  /* ---------------------------------------------
+     MOTION
+  --------------------------------------------- */
 
-          const heading =
-            section.querySelector("h1, h2");
+  let gsapContext = null;
 
-          const paragraphs =
-            section.querySelectorAll(
-              ".narrative-copy > p"
-            );
+  const killMotion = () => {
+    if (gsapContext) {
+      gsapContext.revert();
+      gsapContext = null;
+    }
+  };
 
-          const frame =
-            section.querySelector(
-              ".person-frame, .map-frame"
-            );
+  const initMotion = () => {
+    killMotion();
 
-          const selector = [
-            eyebrow,
-            heading,
-            ...Array.from(paragraphs),
-            frame
-          ].filter(Boolean);
+    if (
+      prefersReducedMotion.matches ||
+      !window.gsap ||
+      !window.ScrollTrigger
+    ) {
+      return;
+    }
 
-          if (!selector.length) return;
+    window.gsap.registerPlugin(window.ScrollTrigger);
 
-          createReveal(selector, {
-            trigger: section,
-            start: "top 76%",
+    gsapContext = window.gsap.context(() => {
+      sections.forEach((section) => {
+        const eyebrow = section.querySelector(".eyebrow");
+        const heading = section.querySelector("h1, h2");
+        const copy = section.querySelector(
+          ".story-lead, .story-copy"
+        );
+
+        if (!heading) return;
+
+        window.gsap.fromTo(
+          [eyebrow, heading, copy].filter(Boolean),
+          {
             y: 28,
-            duration: 0.72,
-            stagger: 0.07,
-            id: `story-${number}`
-          });
-
-          if (
-            section.classList.contains(
-              "story-connect"
-            )
-          ) {
-            createReveal(
-              section.querySelectorAll(
-                ".connect-words li"
-              ),
-              {
-                trigger: section,
-                start: "top 72%",
-                x: -22,
-                y: 0,
-                duration: 0.62,
-                stagger: 0.07,
-                id: `story-${number}-words`
-              }
-            );
+            opacity: 0
+          },
+          {
+            y: 0,
+            opacity: 1,
+            duration: .9,
+            stagger: .08,
+            ease: "power3.out",
+            scrollTrigger: {
+              id: `story-${section.id}`,
+              trigger: section,
+              start: "top 72%",
+              once: true
+            }
           }
+        );
+      });
 
-          if (
-            section.classList.contains(
-              "story-return"
-            )
-          ) {
-            createReveal(
-              section.querySelectorAll(
-                ".return-list li"
-              ),
-              {
-                trigger: section,
-                start: "top 72%",
-                y: 22,
-                duration: 0.62,
-                stagger: 0.08,
-                id: `story-${number}-list`
-              }
-            );
-          }
-
-          if (
-            section.classList.contains(
-              "story-objective"
-            )
-          ) {
-            createReveal(
-              section.querySelectorAll(
-                ".objective-list p"
-              ),
-              {
-                trigger: section,
-                start: "top 72%",
-                x: 22,
-                y: 0,
-                duration: 0.62,
-                stagger: 0.08,
-                id: `story-${number}-method`
-              }
-            );
+      window.gsap.fromTo(
+        ".person-image",
+        {
+          y: 30,
+          opacity: 0
+        },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            id: "story-person-image",
+            trigger: "#eccomi",
+            start: "top 72%",
+            once: true
           }
         }
       );
-    });
 
-    gsap.__cesareHomeContext = context;
-    animationsReady = true;
-
-    window.requestAnimationFrame(() => {
-      ScrollTrigger.refresh();
-    });
+      window.gsap.fromTo(
+        ".map-frame",
+        {
+          y: 30,
+          opacity: 0
+        },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            id: "story-map",
+            trigger: "#qui",
+            start: "top 72%",
+            once: true
+          }
+        }
+      );
+    }, document);
   };
 
-  const handleMotionPreferenceChange = () => {
-    if (window.gsap?.__cesareHomeContext) {
-      window.gsap.__cesareHomeContext.revert();
-      window.gsap.__cesareHomeContext = null;
-    }
+  prefersReducedMotion.addEventListener?.(
+    "change",
+    initMotion
+  );
 
-    initStoryAnimations();
+  /* ---------------------------------------------
+     IMAGE FALLBACK
+  --------------------------------------------- */
 
-    requestSectionUpdate();
-
-    if (window.ScrollTrigger) {
-      window.ScrollTrigger.refresh();
-    }
-  };
-
-  if (
-    typeof reduceMotionQuery.addEventListener ===
-    "function"
-  ) {
-    reduceMotionQuery.addEventListener(
-      "change",
-      handleMotionPreferenceChange
-    );
-  } else if (
-    typeof reduceMotionQuery.addListener ===
-    "function"
-  ) {
-    reduceMotionQuery.addListener(
-      "change",
-      handleMotionPreferenceChange
-    );
-  }
-
-  /* -------------------------------------------------------
-     MEDIA FALLBACKS
-     ------------------------------------------------------- */
-
-  doc.querySelectorAll("img").forEach((image) => {
+  document.querySelectorAll("img").forEach((image) => {
     image.addEventListener(
       "error",
       () => {
@@ -1060,100 +620,89 @@
     );
   });
 
-  /* -------------------------------------------------------
-     PAGE LIFECYCLE
-     ------------------------------------------------------- */
-
-  document.addEventListener(
-    "visibilitychange",
-    () => {
-      if (document.hidden) {
-        hideStandby();
-        clearStandbyTimer();
-        return;
-      }
-
-      scheduleStandby();
-
-      if (window.ScrollTrigger) {
-        window.ScrollTrigger.refresh();
-      }
-
-      requestSectionUpdate();
-    }
-  );
+  /* ---------------------------------------------
+     PAGE VISIBILITY / BFCache
+  --------------------------------------------- */
 
   window.addEventListener("pageshow", () => {
-    scheduleStandby();
+    requestScrollUpdate();
 
     if (window.ScrollTrigger) {
       window.ScrollTrigger.refresh();
     }
-
-    requestSectionUpdate();
   });
 
-  window.addEventListener(
-    "pagehide",
-    () => {
-      clearStandbyTimer();
-    },
-    { passive: true }
-  );
-
-  /* -------------------------------------------------------
-     INITIALIZATION
-     ------------------------------------------------------- */
-
-  const init = () => {
-    updateYear();
-
-    menuOpen = false;
-
-    if (menu) {
-      menu.inert = true;
-      menu.setAttribute(
-        "aria-hidden",
-        "true"
-      );
-    }
-
-    setMenuBackgroundState(false);
-    updateMenuLabel();
-
-    updateSectionNavigation(
-      getActiveSectionIndex()
-    );
-
-    initLoader();
-    initStoryAnimations();
-    scheduleStandby();
-
-    if (window.location.hash) {
-      window.setTimeout(() => {
-        navigateToHash({
-          behavior: "auto",
-          focus: true
-        });
-      }, 80);
-    }
-
-    window.requestAnimationFrame(() => {
-      updateSectionNavigation();
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) {
+      requestScrollUpdate();
 
       if (window.ScrollTrigger) {
         window.ScrollTrigger.refresh();
       }
-    });
+    }
+  });
+
+  /* ---------------------------------------------
+     LOADER
+  --------------------------------------------- */
+
+  const hideLoader = () => {
+    if (!loader) return;
+
+    loader.classList.add("is-hidden");
+
+    window.setTimeout(() => {
+      loader.remove();
+    }, 650);
   };
 
-  if (doc.readyState === "loading") {
-    doc.addEventListener(
-      "DOMContentLoaded",
-      init,
+  const startLoader = () => {
+    if (!loader) return;
+
+    const maxTimer = window.setTimeout(
+      hideLoader,
+      CONFIG.loaderMax
+    );
+
+    window.addEventListener(
+      "load",
+      () => {
+        window.clearTimeout(maxTimer);
+
+        window.setTimeout(
+          hideLoader,
+          prefersReducedMotion.matches ? 0 : 120
+        );
+      },
       { once: true }
     );
-  } else {
-    init();
+  };
+
+  /* ---------------------------------------------
+     INIT
+  --------------------------------------------- */
+
+  menu?.setAttribute("inert", "");
+  menu?.setAttribute("aria-hidden", "true");
+
+  setActiveSection(
+    getActiveIndexFromViewport(),
+    true
+  );
+
+  initMotion();
+  startLoader();
+  resetStandby();
+
+  if (window.location.hash) {
+    handleHash();
   }
+
+  requestAnimationFrame(() => {
+    updateProgress();
+
+    if (window.ScrollTrigger) {
+      window.ScrollTrigger.refresh();
+    }
+  });
 })();
