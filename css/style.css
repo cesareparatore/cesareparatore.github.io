@@ -276,7 +276,7 @@ a {
 .site-brand img {
   width: 28px;
   height: 28px;
-  filter: invert(1);
+  filter: none;
 }
 
 .menu-toggle {
