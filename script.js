@@ -1,6 +1,5 @@
 /* =========================================================
    CESARE PARATORE — HOME
-   STANDARD OPERATIVO — MAXIMUM QUALITY
    ========================================================= */
 
 (() => {
@@ -54,12 +53,16 @@
 
   let currentIndex = 0;
   let menuOpen = false;
+
   let standbyTimer = null;
   let loaderHidden = false;
+
   let lastPointerActivity = 0;
 
   let menuFocusables = [];
   let restoreFocusElement = null;
+
+  let scrollTicking = false;
 
   const reduceMotionQuery = window.matchMedia(
     "(prefers-reduced-motion: reduce)"
@@ -102,38 +105,56 @@
   };
 
   /* =======================================================
-     CURRENT YEAR
+     YEAR
      ======================================================= */
 
   if (currentYear) {
-    currentYear.textContent = String(new Date().getFullYear());
+    currentYear.textContent =
+      String(new Date().getFullYear());
   }
 
   /* =======================================================
-     ACCESSIBILITY / MENU
+     MENU
      ======================================================= */
 
   function setMenuTabState(disabled) {
     if (!menu) return;
 
-    const focusables = getFocusableElements(menu);
+    const focusables =
+      getFocusableElements(menu);
 
     focusables.forEach((element) => {
+
       if (disabled) {
+
         if (!element.dataset.menuTabindexStored) {
+
           element.dataset.menuTabindex =
             element.getAttribute("tabindex") ?? "";
-          element.dataset.menuTabindexStored = "true";
+
+          element.dataset.menuTabindexStored =
+            "true";
         }
 
-        element.setAttribute("tabindex", "-1");
+        element.setAttribute(
+          "tabindex",
+          "-1"
+        );
+
       } else {
-        const previous = element.dataset.menuTabindex;
+
+        const previous =
+          element.dataset.menuTabindex;
 
         if (previous === "") {
           element.removeAttribute("tabindex");
-        } else if (previous !== undefined) {
-          element.setAttribute("tabindex", previous);
+        } else if (
+          previous !== undefined
+        ) {
+          element.setAttribute(
+            "tabindex",
+            previous
+          );
         }
 
         delete element.dataset.menuTabindex;
@@ -142,9 +163,13 @@
     });
   }
 
-  function setBackgroundInteractionDisabled(disabled) {
+  function setBackgroundInteractionDisabled(
+    disabled
+  ) {
+
     if (main) {
       main.inert = disabled;
+
       main.setAttribute(
         "aria-hidden",
         disabled ? "true" : "false"
@@ -153,6 +178,7 @@
 
     if (footer) {
       footer.inert = disabled;
+
       footer.setAttribute(
         "aria-hidden",
         disabled ? "true" : "false"
@@ -161,10 +187,13 @@
   }
 
   function updateMenuLabel() {
+
     if (!menuToggle) return;
 
     const label =
-      menuToggle.querySelector(".menu-toggle-label");
+      menuToggle.querySelector(
+        ".menu-toggle-label"
+      );
 
     menuToggle.setAttribute(
       "aria-expanded",
@@ -173,16 +202,23 @@
 
     menuToggle.setAttribute(
       "aria-label",
-      menuOpen ? "Chiudi menu" : "Apri menu"
+      menuOpen
+        ? "Chiudi menu"
+        : "Apri menu"
     );
 
     if (label) {
       label.textContent =
-        menuOpen ? "CHIUDI" : "MENU";
+        menuOpen
+          ? "CHIUDI"
+          : "MENU";
     }
   }
 
-  function updateMenuState(forceOpen = null) {
+  function updateMenuState(
+    forceOpen = null
+  ) {
+
     if (!menu || !menuToggle) return;
 
     const shouldOpen =
@@ -196,27 +232,46 @@
     }
 
     if (shouldOpen) {
-      restoreFocusElement = doc.activeElement;
+
+      restoreFocusElement =
+        doc.activeElement;
 
       menuOpen = true;
 
       menu.inert = false;
-      menu.classList.add("is-open");
-      menu.setAttribute("aria-hidden", "false");
 
-      setBackgroundInteractionDisabled(true);
+      menu.classList.add("is-open");
+
+      menu.setAttribute(
+        "aria-hidden",
+        "false"
+      );
+
+      setBackgroundInteractionDisabled(
+        true
+      );
+
       setMenuTabState(false);
+
       updateMenuLabel();
 
-      html.classList.add("menu-is-open");
-      body.classList.add("menu-is-open");
+      html.classList.add(
+        "menu-is-open"
+      );
+
+      body.classList.add(
+        "menu-is-open"
+      );
 
       requestAnimationFrame(() => {
-        menuFocusables = getFocusableElements(menu);
+
+        menuFocusables =
+          getFocusableElements(menu);
 
         if (menuFocusables.length) {
           menuFocusables[0].focus();
         }
+
       });
 
       return;
@@ -224,22 +279,37 @@
 
     menuOpen = false;
 
-    menu.classList.remove("is-open");
-    menu.setAttribute("aria-hidden", "true");
+    menu.classList.remove(
+      "is-open"
+    );
+
+    menu.setAttribute(
+      "aria-hidden",
+      "true"
+    );
 
     setMenuTabState(true);
 
     menu.inert = true;
 
-    setBackgroundInteractionDisabled(false);
+    setBackgroundInteractionDisabled(
+      false
+    );
+
     updateMenuLabel();
 
-    html.classList.remove("menu-is-open");
-    body.classList.remove("menu-is-open");
+    html.classList.remove(
+      "menu-is-open"
+    );
+
+    body.classList.remove(
+      "menu-is-open"
+    );
 
     const target =
       restoreFocusElement &&
-      typeof restoreFocusElement.focus === "function"
+      typeof restoreFocusElement.focus ===
+        "function"
         ? restoreFocusElement
         : menuToggle;
 
@@ -251,19 +321,29 @@
   }
 
   function trapMenuFocus(event) {
-    if (!menuOpen || event.key !== "Tab") return;
 
-    menuFocusables = getFocusableElements(menu);
+    if (
+      !menuOpen ||
+      event.key !== "Tab"
+    ) {
+      return;
+    }
+
+    menuFocusables =
+      getFocusableElements(menu);
 
     if (!menuFocusables.length) {
       event.preventDefault();
       return;
     }
 
-    const first = menuFocusables[0];
-    const last = menuFocusables[
-      menuFocusables.length - 1
-    ];
+    const first =
+      menuFocusables[0];
+
+    const last =
+      menuFocusables[
+        menuFocusables.length - 1
+      ];
 
     if (
       event.shiftKey &&
@@ -293,7 +373,9 @@
   menu?.addEventListener(
     "click",
     (event) => {
-      const link = event.target.closest("a");
+
+      const link =
+        event.target.closest("a");
 
       if (!link) return;
 
@@ -304,12 +386,15 @@
   doc.addEventListener(
     "keydown",
     (event) => {
+
       if (
         event.key === "Escape" &&
         menuOpen
       ) {
         event.preventDefault();
+
         updateMenuState(false);
+
         return;
       }
 
@@ -322,31 +407,55 @@
      ======================================================= */
 
   function hideStandby() {
+
     if (!standby) return;
 
-    standby.classList.remove("is-visible");
-    standby.setAttribute("aria-hidden", "true");
+    standby.classList.remove(
+      "is-visible"
+    );
+
+    standby.setAttribute(
+      "aria-hidden",
+      "true"
+    );
   }
 
   function showStandby() {
-    if (!standby) return;
-    if (menuOpen || doc.hidden) return;
 
-    standby.classList.add("is-visible");
-    standby.setAttribute("aria-hidden", "false");
+    if (!standby) return;
+
+    if (
+      menuOpen ||
+      doc.hidden
+    ) {
+      return;
+    }
+
+    standby.classList.add(
+      "is-visible"
+    );
+
+    standby.setAttribute(
+      "aria-hidden",
+      "false"
+    );
   }
 
   function resetStandbyTimer() {
+
     if (standbyTimer) {
-      window.clearTimeout(standbyTimer);
+      window.clearTimeout(
+        standbyTimer
+      );
     }
 
     hideStandby();
 
-    standbyTimer = window.setTimeout(
-      showStandby,
-      CONFIG.standbyDelay
-    );
+    standbyTimer =
+      window.setTimeout(
+        showStandby,
+        CONFIG.standbyDelay
+      );
   }
 
   function handleActivity() {
@@ -361,6 +470,7 @@
     "keydown",
     "click"
   ].forEach((eventName) => {
+
     window.addEventListener(
       eventName,
       handleActivity,
@@ -368,11 +478,13 @@
         passive: true
       }
     );
+
   });
 
   window.addEventListener(
     "pointermove",
     () => {
+
       const now = Date.now();
 
       if (
@@ -383,6 +495,7 @@
       }
 
       lastPointerActivity = now;
+
       handleActivity();
     },
     {
@@ -395,17 +508,25 @@
      ======================================================= */
 
   function hideLoader() {
-    if (loaderHidden || !loader) return;
+
+    if (
+      loaderHidden ||
+      !loader
+    ) {
+      return;
+    }
 
     loaderHidden = true;
 
     const finish = () => {
+
       loader.setAttribute(
         "aria-hidden",
         "true"
       );
 
-      loader.style.display = "none";
+      loader.style.display =
+        "none";
     };
 
     if (
@@ -416,37 +537,46 @@
       return;
     }
 
-    window.gsap.to(loader, {
-      opacity: 0,
-      duration: 0.65,
-      ease: "power2.out",
-      onComplete: finish
-    });
+    window.gsap.to(
+      loader,
+      {
+        opacity: 0,
+        duration: 0.65,
+        ease: "power2.out",
+        onComplete: finish
+      }
+    );
   }
 
   function initLoader() {
+
     window.setTimeout(
       hideLoader,
       CONFIG.loaderFailsafe
     );
 
     if (
-      document.readyState === "complete"
+      document.readyState ===
+      "complete"
     ) {
+
       window.setTimeout(
         hideLoader,
         120
       );
+
       return;
     }
 
     window.addEventListener(
       "load",
       () => {
+
         window.setTimeout(
           hideLoader,
           120
         );
+
       },
       {
         once: true
@@ -455,10 +585,11 @@
   }
 
   /* =======================================================
-     SECTION STATE
+     ACTIVE SECTION
      ======================================================= */
 
   function getReadingLine() {
+
     const headerHeight =
       document.querySelector(
         ".site-header"
@@ -475,17 +606,22 @@
   }
 
   function getActiveSectionIndex() {
-    if (!sections.length) return 0;
+
+    if (!sections.length) {
+      return 0;
+    }
 
     const readingLine =
       getReadingLine();
 
     let bestIndex = 0;
+
     let bestDistance =
       Number.POSITIVE_INFINITY;
 
     sections.forEach(
       (section, index) => {
+
         const rect =
           section.getBoundingClientRect();
 
@@ -499,19 +635,23 @@
         }
 
         const center =
-          rect.top + rect.height / 2;
+          rect.top +
+          rect.height / 2;
 
         const distance =
           Math.abs(
-            center - readingLine
+            center -
+            readingLine
           );
 
         if (
-          distance < bestDistance
+          distance <
+          bestDistance
         ) {
           bestDistance = distance;
           bestIndex = index;
         }
+
       }
     );
 
@@ -521,6 +661,7 @@
   function updateSectionNavigation(
     index = getActiveSectionIndex()
   ) {
+
     if (
       !sections.length ||
       !sectionNav
@@ -548,10 +689,8 @@
 
     if (sectionNumber) {
       sectionNumber.textContent =
-        String(index + 1).padStart(
-          2,
-          "0"
-        );
+        String(index + 1)
+          .padStart(2, "0");
     }
 
     if (sectionTitle) {
@@ -560,6 +699,7 @@
     }
 
     if (sectionPrev) {
+
       sectionPrev.disabled =
         index === 0;
 
@@ -576,6 +716,7 @@
     }
 
     if (sectionNext) {
+
       sectionNext.disabled =
         index ===
         sections.length - 1;
@@ -593,13 +734,10 @@
       );
     }
 
-    const isLight =
+    sectionNav.dataset.theme =
       section.classList.contains(
         "story-light"
-      );
-
-    sectionNav.dataset.theme =
-      isLight
+      )
         ? "light"
         : "dark";
 
@@ -608,18 +746,23 @@
 
     sections.forEach(
       (item, itemIndex) => {
+
         item.setAttribute(
           "aria-current",
           itemIndex === index
             ? "true"
             : "false"
         );
+
       }
     );
   }
 
   function scrollToSection(index) {
-    if (!sections[index]) return;
+
+    if (!sections[index]) {
+      return;
+    }
 
     const section =
       sections[index];
@@ -630,37 +773,32 @@
         .top -
       CONFIG.scrollOffset;
 
-    if (
-      reduceMotionQuery.matches
-    ) {
-      window.scrollTo({
-        top,
-        behavior: "auto"
-      });
-
-      return;
-    }
-
     window.scrollTo({
       top,
-      behavior: "smooth"
+      behavior:
+        reduceMotionQuery.matches
+          ? "auto"
+          : "smooth"
     });
   }
 
   sectionPrev?.addEventListener(
     "click",
     () => {
+
       if (currentIndex > 0) {
         scrollToSection(
           currentIndex - 1
         );
       }
+
     }
   );
 
   sectionNext?.addEventListener(
     "click",
     () => {
+
       if (
         currentIndex <
         sections.length - 1
@@ -669,16 +807,18 @@
           currentIndex + 1
         );
       }
+
     }
   );
 
   /* =======================================================
-     KEYBOARD SECTION NAVIGATION
+     KEYBOARD NAVIGATION
      ======================================================= */
 
   doc.addEventListener(
     "keydown",
     (event) => {
+
       if (
         menuOpen ||
         event.altKey ||
@@ -693,6 +833,7 @@
         event.key === "ArrowDown" &&
         doc.activeElement === body
       ) {
+
         event.preventDefault();
 
         if (
@@ -709,6 +850,7 @@
         event.key === "ArrowUp" &&
         doc.activeElement === body
       ) {
+
         event.preventDefault();
 
         if (currentIndex > 0) {
@@ -717,23 +859,25 @@
           );
         }
       }
+
     }
   );
 
   /* =======================================================
-     SCROLL / ACTIVE SECTION
+     SCROLL / RESIZE
      ======================================================= */
 
-  let scrollTicking = false;
-
   function requestSectionUpdate() {
+
     if (scrollTicking) return;
 
     scrollTicking = true;
 
     window.requestAnimationFrame(
       () => {
+
         updateSectionNavigation();
+
         scrollTicking = false;
       }
     );
@@ -756,10 +900,11 @@
   );
 
   /* =======================================================
-     GSAP / SCROLLTRIGGER
+     GSAP
      ======================================================= */
 
   function gsapAvailable() {
+
     return (
       !reduceMotionQuery.matches &&
       window.gsap &&
@@ -768,7 +913,10 @@
   }
 
   function killStoryAnimations() {
-    if (!window.ScrollTrigger) return;
+
+    if (!window.ScrollTrigger) {
+      return;
+    }
 
     window.ScrollTrigger
       .getAll()
@@ -781,21 +929,37 @@
           ).startsWith("story-")
       )
       .forEach(
-        (trigger) =>
-          trigger.kill()
+        (trigger) => {
+          trigger.kill();
+        }
       );
   }
 
   function initStoryAnimations() {
+
     if (!gsapAvailable()) {
+
       sections.forEach(
         (section) => {
+
           section
             .querySelectorAll(
-              ".eyebrow, h1, h2, p, .return-list span, .connect-words span, .person-frame, .map-frame"
+              [
+                ".eyebrow",
+                "h1",
+                "h2",
+                "p",
+                ".today-method span",
+                ".connect-words span",
+                ".person-frame",
+                ".map-frame",
+                ".objective-flow span",
+                ".objective-flow b"
+              ].join(",")
             )
             .forEach(
               (element) => {
+
                 element.style.opacity =
                   "1";
 
@@ -817,259 +981,56 @@
 
     sections.forEach(
       (section, index) => {
-        const eyebrow =
-          section.querySelector(
-            ".eyebrow"
-          );
 
-        const heading =
-          section.querySelector(
-            "h1, h2"
-          );
-
-        const paragraphs =
+        const animated =
           section.querySelectorAll(
-            ".narrative-copy p, .opening-copy p, .today-lead, .contact-lead"
+            [
+              ".eyebrow",
+              "h1",
+              "h2",
+              ".narrative-copy",
+              ".today-method span",
+              ".connect-words span",
+              ".objective-flow span",
+              ".objective-flow b",
+              ".person-frame",
+              ".map-frame",
+              ".visual-computer",
+              ".sport-visual",
+              ".practice-theory",
+              ".education-visual",
+              ".management-system",
+              ".digital-visual",
+              ".connect-network",
+              ".presence-online"
+            ].join(",")
           );
 
-        const frame =
-          section.querySelector(
-            ".person-frame, .map-frame"
-          );
-
-        if (
-          section.classList.contains(
-            "story-opening"
-          )
-        ) {
-          const tl =
-            window.gsap.timeline({
-              scrollTrigger: {
-                id: `story-${index}-opening`,
-                trigger: section,
-                start: "top 70%",
-                once: true
-              }
-            });
-
-          tl.from(
-            eyebrow,
-            {
-              opacity: 0,
-              y: 18,
-              duration: 0.6,
-              ease: "power3.out"
-            }
-          )
-          .from(
-            heading,
-            {
-              opacity: 0,
-              y: 40,
-              duration: 0.9,
-              ease: "power4.out"
-            },
-            "-=0.35"
-          )
-          .from(
-            paragraphs,
-            {
-              opacity: 0,
-              y: 20,
-              duration: 0.65,
-              stagger: 0.12,
-              ease: "power3.out"
-            },
-            "-=0.35"
-          );
-
+        if (!animated.length) {
           return;
         }
 
-        if (
-          section.classList.contains(
-            "story-understand"
-          )
-        ) {
-          const items =
-            section.querySelectorAll(
-              ".understand-lead, .narrative-copy"
-            );
+        window.gsap.from(
+          animated,
+          {
+            opacity: 0,
+            y: 30,
+            duration: 0.8,
+            stagger: 0.08,
+            ease: "power3.out",
 
-          window.gsap.from(
-            items,
-            {
-              opacity: 0,
-              y: 45,
-              duration: 0.85,
-              stagger: 0.14,
-              ease: "power3.out",
-              scrollTrigger: {
-                id: `story-${index}-understand`,
-                trigger: section,
-                start: "top 68%",
-                once: true
-              }
+            scrollTrigger: {
+              id:
+                `story-${index}-animation`,
+
+              trigger: section,
+
+              start: "top 72%",
+
+              once: true
             }
-          );
-
-          return;
-        }
-
-        if (
-          section.classList.contains(
-            "story-return"
-          )
-        ) {
-          const items =
-            section.querySelectorAll(
-              ".return-copy > p, .return-list span"
-            );
-
-          window.gsap.from(
-            items,
-            {
-              opacity: 0,
-              y: 35,
-              duration: 0.75,
-              stagger: 0.12,
-              ease: "power3.out",
-              scrollTrigger: {
-                id: `story-${index}-return`,
-                trigger: section,
-                start: "top 68%",
-                once: true
-              }
-            }
-          );
-
-          return;
-        }
-
-        if (
-          section.classList.contains(
-            "story-connect"
-          )
-        ) {
-          const words =
-            section.querySelectorAll(
-              ".connect-words span"
-            );
-
-          window.gsap.from(
-            words,
-            {
-              opacity: 0,
-              x: -35,
-              duration: 0.65,
-              stagger: 0.1,
-              ease: "power3.out",
-              scrollTrigger: {
-                id: `story-${index}-connect`,
-                trigger: section,
-                start: "top 68%",
-                once: true
-              }
-            }
-          );
-
-          return;
-        }
-
-        if (
-          section.classList.contains(
-            "story-today"
-          )
-        ) {
-          const tl =
-            window.gsap.timeline({
-              scrollTrigger: {
-                id: `story-${index}-today`,
-                trigger: section,
-                start: "top 68%",
-                once: true
-              }
-            });
-
-          tl.from(
-            heading,
-            {
-              opacity: 0,
-              y: 35,
-              duration: 0.8,
-              ease: "power4.out"
-            }
-          )
-          .from(
-            section.querySelector(
-              ".today-lead"
-            ),
-            {
-              opacity: 0,
-              y: 40,
-              duration: 0.8,
-              ease: "power4.out"
-            },
-            "-=0.35"
-          )
-          .from(
-            section.querySelector(
-              ".narrative-copy"
-            ),
-            {
-              opacity: 0,
-              y: 30,
-              duration: 0.7,
-              ease: "power3.out"
-            },
-            "-=0.35"
-          );
-
-          return;
-        }
-
-        if (frame) {
-          window.gsap.from(
-            frame,
-            {
-              opacity: 0,
-              y: 45,
-              duration: 1,
-              ease: "power3.out",
-              scrollTrigger: {
-                id: `story-${index}-frame`,
-                trigger: section,
-                start: "top 70%",
-                once: true
-              }
-            }
-          );
-        }
-
-        const contentItems = [
-          eyebrow,
-          heading,
-          ...Array.from(paragraphs)
-        ].filter(Boolean);
-
-        if (contentItems.length) {
-          window.gsap.from(
-            contentItems,
-            {
-              opacity: 0,
-              y: 30,
-              duration: 0.75,
-              stagger: 0.1,
-              ease: "power3.out",
-              scrollTrigger: {
-                id: `story-${index}-generic`,
-                trigger: section,
-                start: "top 72%",
-                once: true
-              }
-            }
-          );
-        }
+          }
+        );
       }
     );
 
@@ -1077,10 +1038,11 @@
   }
 
   /* =======================================================
-     REDUCED MOTION DYNAMIC CHANGE
+     REDUCED MOTION CHANGE
      ======================================================= */
 
   function handleMotionPreferenceChange() {
+
     initStoryAnimations();
 
     if (window.ScrollTrigger) {
@@ -1092,24 +1054,28 @@
     typeof reduceMotionQuery.addEventListener ===
     "function"
   ) {
+
     reduceMotionQuery.addEventListener(
       "change",
       handleMotionPreferenceChange
     );
+
   } else if (
     typeof reduceMotionQuery.addListener ===
     "function"
   ) {
+
     reduceMotionQuery.addListener(
       handleMotionPreferenceChange
     );
   }
 
   /* =======================================================
-     HASH NAVIGATION
+     HASH
      ======================================================= */
 
   function handleInitialHash() {
+
     const hash =
       window.location.hash;
 
@@ -1126,40 +1092,50 @@
 
     window.setTimeout(
       () => {
+
         target.scrollIntoView({
           behavior:
             reduceMotionQuery.matches
               ? "auto"
               : "smooth",
+
           block: "start"
         });
+
       },
       250
     );
   }
 
   /* =======================================================
-     PAGE VISIBILITY / BFCACHE
+     VISIBILITY / BF CACHE
      ======================================================= */
 
   document.addEventListener(
     "visibilitychange",
     () => {
+
       if (document.hidden) {
+
         hideStandby();
+
       } else {
+
         resetStandbyTimer();
 
         if (window.ScrollTrigger) {
           window.ScrollTrigger.refresh();
         }
+
       }
+
     }
   );
 
   window.addEventListener(
     "pageshow",
     () => {
+
       resetStandbyTimer();
 
       if (window.ScrollTrigger) {
@@ -1171,15 +1147,21 @@
   );
 
   /* =======================================================
-     INITIALIZATION
+     INIT
      ======================================================= */
 
   function init() {
+
     menuOpen = false;
 
     if (menu) {
+
       menu.inert = true;
-      menu.classList.remove("is-open");
+
+      menu.classList.remove(
+        "is-open"
+      );
+
       menu.setAttribute(
         "aria-hidden",
         "true"
@@ -1187,12 +1169,17 @@
     }
 
     setMenuTabState(true);
-    setBackgroundInteractionDisabled(false);
+
+    setBackgroundInteractionDisabled(
+      false
+    );
+
     updateMenuLabel();
 
     updateSectionNavigation(0);
 
     initLoader();
+
     initStoryAnimations();
 
     handleInitialHash();
@@ -1207,6 +1194,7 @@
     resetStandbyTimer();
 
     if (window.ScrollTrigger) {
+
       window.setTimeout(
         () => {
           window.ScrollTrigger.refresh();
@@ -1220,6 +1208,7 @@
     document.readyState ===
     "loading"
   ) {
+
     document.addEventListener(
       "DOMContentLoaded",
       init,
@@ -1227,8 +1216,11 @@
         once: true
       }
     );
+
   } else {
+
     init();
+
   }
 
 })();
