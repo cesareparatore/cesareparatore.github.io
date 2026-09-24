@@ -1,805 +1,1004 @@
-<!doctype html>
-<html lang="it">
-<head>
-  <meta charset="utf-8">
+(() => {
+  "use strict";
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  >
+  const CONFIG = {
+    standbyDelay: 40000,
+    loaderMax: 1200,
+    scrollOffset: 12,
+    activeLineRatio: 0.32,
+    activeLineMax: 260,
+    progressEpsilon: 0.001
+  };
 
-  <title>Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale</title>
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  );
 
-  <meta
-    name="description"
-    content="Cesare Paratore: un percorso tra sport, scienze motorie, educazione, management e digitale. Un modo di osservare, capire, collegare e costruire."
-  >
+  const html = document.documentElement;
+  const body = document.body;
 
-  <meta name="theme-color" content="#0B0B0A">
-  <meta name="color-scheme" content="dark light">
+  const header = document.getElementById("site-header");
+  const main = document.getElementById("main-content");
+  const footer = document.querySelector(".site-footer");
 
-  <link rel="canonical" href="https://cesareparatore.github.io/">
+  const loader = document.getElementById("site-loader");
+  const standby = document.getElementById("standby");
 
-  <meta property="og:type" content="website">
-  <meta property="og:locale" content="it_IT">
-  <meta property="og:title" content="Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale">
-  <meta
-    property="og:description"
-    content="Un percorso tra sport, scienze motorie, educazione, management e digitale."
-  >
-  <meta property="og:url" content="https://cesareparatore.github.io/">
-  <meta
-    property="og:image"
-    content="https://cesareparatore.github.io/assets/images/cp.jpg"
-  >
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
+  const menu = document.getElementById("menu");
+  const menuToggle = document.getElementById("menu-toggle");
+  const brand = document.querySelector(".brand");
 
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale">
-  <meta
-    name="twitter:description"
-    content="Un percorso tra sport, scienze motorie, educazione, management e digitale."
-  >
-  <meta
-    name="twitter:image"
-    content="https://cesareparatore.github.io/assets/images/cp.jpg"
-  >
+  const menuLinks = Array.from(
+    document.querySelectorAll("[data-menu-target]")
+  );
 
-  <link rel="icon" href="/assets/images/cp-mark.svg" type="image/svg+xml">
+  const storyNav = document.getElementById("story-nav");
+  const storyPrev = document.getElementById("story-prev");
+  const storyNext = document.getElementById("story-next");
 
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  const storyProgress = document.getElementById("story-progress");
+  const progressFill = document.querySelector(".story-progress-fill");
+  const progressOrb = document.querySelector(".story-progress-orb");
 
-  <script
-    defer
-    src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"
-  ></script>
+  const activeStoryTitle = document.getElementById("active-story-title");
 
-  <script
-    defer
-    src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"
-  ></script>
+  const sections = Array.from(
+    document.querySelectorAll(".story")
+  );
 
-  <link rel="stylesheet" href="/css/style.css">
+  const year = document.getElementById("current-year");
 
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "WebSite",
-        "@id": "https://cesareparatore.github.io/#website",
-        "url": "https://cesareparatore.github.io/",
-        "name": "Cesare Paratore",
-        "inLanguage": "it-IT"
-      },
-      {
-        "@type": "WebPage",
-        "@id": "https://cesareparatore.github.io/#webpage",
-        "url": "https://cesareparatore.github.io/",
-        "name": "Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale",
-        "isPartOf": {
-          "@id": "https://cesareparatore.github.io/#website"
-        },
-        "about": {
-          "@id": "https://cesareparatore.github.io/#person"
-        },
-        "inLanguage": "it-IT"
-      },
-      {
-        "@type": "Person",
-        "@id": "https://cesareparatore.github.io/#person",
-        "name": "Cesare Paratore",
-        "url": "https://cesareparatore.github.io/",
-        "image": "https://cesareparatore.github.io/assets/images/cp-foto.webp",
-        "jobTitle": "Atleta, tecnico ed educatore",
-        "knowsAbout": [
-          "Sport",
-          "Scienze motorie",
-          "Educazione",
-          "Management",
-          "Digitale"
-        ]
-      }
-    ]
+  if (year) {
+    year.textContent = String(new Date().getFullYear());
   }
-  </script>
-</head>
-
-<body>
-
-  <a class="skip-link" href="#main-content">
-    Vai al contenuto principale
-  </a>
-
-  <div
-    class="site-loader"
-    id="site-loader"
-    aria-hidden="true"
-  >
-    <span class="site-loader-line"></span>
-  </div>
-
-  <div
-    class="standby"
-    id="standby"
-    aria-hidden="true"
-  >
-    GUARDA.
-  </div>
-
-  <header class="site-header" id="site-header">
-
-    <div class="header-primary">
-
-      <a
-        class="brand"
-        href="/"
-        aria-label="Cesare Paratore — Home"
-      >
-        <img
-          src="/assets/images/cp-mark.svg"
-          width="40"
-          height="40"
-          alt=""
-          decoding="async"
-        >
-      </a>
-
-      <div
-        class="active-story"
-        aria-live="polite"
-        aria-atomic="true"
-      >
-        <span id="active-story-title">GUARDA.</span>
-      </div>
-
-      <button
-        class="menu-toggle"
-        id="menu-toggle"
-        type="button"
-        aria-expanded="false"
-        aria-controls="menu"
-        aria-label="Apri menu"
-      >
-        <span class="menu-toggle-label">MENU</span>
-
-        <span
-          class="menu-toggle-icon"
-          aria-hidden="true"
-        >
-          <i></i>
-          <i></i>
-        </span>
-      </button>
-
-    </div>
-
-    <nav
-      class="story-nav"
-      id="story-nav"
-      aria-label="Navigazione narrativa"
-    >
-      <div class="story-nav-inner">
-
-        <button
-          class="story-arrow"
-          id="story-prev"
-          type="button"
-          aria-label="Sezione precedente"
-          disabled
-        >
-          <span aria-hidden="true">←</span>
-        </button>
-
-        <div
-          class="story-progress"
-          id="story-progress"
-          role="progressbar"
-          aria-label="Avanzamento nella pagina"
-          aria-valuemin="0"
-          aria-valuemax="100"
-          aria-valuenow="0"
-        >
-          <span class="story-progress-track"></span>
-          <span class="story-progress-fill"></span>
-          <span class="story-progress-orb"></span>
-        </div>
-
-        <button
-          class="story-arrow"
-          id="story-next"
-          type="button"
-          aria-label="Sezione successiva"
-        >
-          <span aria-hidden="true">→</span>
-        </button>
-
-      </div>
-    </nav>
-
-  </header>
-
-  <nav
-    class="site-menu"
-    id="menu"
-    aria-label="Navigazione principale"
-    inert
-  >
-    <div class="site-menu-inner">
-
-      <div class="site-menu-heading">
-        <span>INDICE</span>
-      </div>
-
-      <ul class="site-menu-list">
-
-        <li>
-          <a href="#guarda" data-menu-target="guarda">
-            <span>01</span>
-            <strong>Guarda.</strong>
-          </a>
-        </li>
-
-        <li>
-          <a href="#movimento" data-menu-target="movimento">
-            <span>02</span>
-            <strong>Movimento.</strong>
-          </a>
-        </li>
-
-        <li>
-          <a href="#capire" data-menu-target="capire">
-            <span>03</span>
-            <strong>Capire.</strong>
-          </a>
-        </li>
-
-        <li>
-          <a href="#trasmettere" data-menu-target="trasmettere">
-            <span>04</span>
-            <strong>Trasmettere.</strong>
-          </a>
-        </li>
-
-        <li>
-          <a href="#costruire" data-menu-target="costruire">
-            <span>05</span>
-            <strong>Costruire.</strong>
-          </a>
-        </li>
-
-        <li>
-          <a href="#ritorna" data-menu-target="ritorna">
-            <span>06</span>
-            <strong>Ritorna.</strong>
-          </a>
-        </li>
-
-        <li>
-          <a href="#collegare" data-menu-target="collegare">
-            <span>07</span>
-            <strong>Collegare.</strong>
-          </a>
-        </li>
-
-        <li>
-          <a href="#oggi" data-menu-target="oggi">
-            <span>08</span>
-            <strong>Oggi.</strong>
-          </a>
-        </li>
-
-        <li>
-          <a href="#obiettivo" data-menu-target="obiettivo">
-            <span>09</span>
-            <strong>Obiettivo.</strong>
-          </a>
-        </li>
-
-        <li>
-          <a href="#qui" data-menu-target="qui">
-            <span>10</span>
-            <strong>Qui.</strong>
-          </a>
-        </li>
-
-        <li>
-          <a href="#da-qui" data-menu-target="da-qui">
-            <span>11</span>
-            <strong>Da qui.</strong>
-          </a>
-        </li>
-
-        <li>
-          <a href="#eccomi" data-menu-target="eccomi">
-            <span>12</span>
-            <strong>Eccomi.</strong>
-          </a>
-        </li>
-
-        <li>
-          <a href="#scrivimi" data-menu-target="scrivimi">
-            <span>13</span>
-            <strong>Scrivimi.</strong>
-          </a>
-        </li>
-
-      </ul>
-
-    </div>
-  </nav>
-
-  <main id="main-content">
-
-    <section
-      class="story story-opening"
-      id="guarda"
-      data-title="GUARDA."
-      data-kicker="INIZIO"
-      aria-labelledby="guarda-title"
-    >
-      <div class="story-inner">
-
-        <p class="story-kicker">INIZIO</p>
-
-        <h1 id="guarda-title">
-          GUARDA.
-        </h1>
-
-        <p class="story-lead">
-          Prima di costruire, osservare.
-          Prima di decidere, capire.
-        </p>
-
-        <div class="story-meta">
-          <span>01</span>
-          <span>OSSERVARE</span>
-        </div>
-
-      </div>
-    </section>
-
-    <section
-      class="story story-dark"
-      id="come"
-      data-title="COME?"
-      data-kicker="MOVIMENTO"
-      aria-labelledby="come-title"
-    >
-      <div class="story-inner story-inner-split">
-
-        <div>
-          <p class="story-kicker">MOVIMENTO</p>
-
-          <h2 id="come-title">
-            COME?
-          </h2>
-        </div>
-
-        <div class="story-copy">
-          <p>
-            Ogni esperienza parte da una domanda.
-            Il movimento è uno dei primi modi attraverso cui
-            quella domanda prende forma.
-          </p>
-        </div>
-
-      </div>
-    </section>
-
-    <section
-      class="story story-light"
-      id="movimento"
-      data-title="MOVIMENTO."
-      data-kicker="ESPERIENZA"
-      aria-labelledby="movimento-title"
-    >
-      <div class="story-inner">
-
-        <p class="story-kicker">ESPERIENZA</p>
-
-        <h2 id="movimento-title">
-          MOVIMENTO.
-        </h2>
-
-        <p class="story-lead">
-          Lo sport come esperienza concreta:
-          corpo, disciplina, relazione, presenza.
-        </p>
-
-        <div class="story-line">
-          <span></span>
-        </div>
-
-      </div>
-    </section>
-
-    <section
-      class="story story-dark"
-      id="capire"
-      data-title="CAPIRE."
-      data-kicker="STUDIO"
-      aria-labelledby="capire-title"
-    >
-      <div class="story-inner story-inner-split">
-
-        <div>
-          <p class="story-kicker">STUDIO</p>
-
-          <h2 id="capire-title">
-            CAPIRE.
-          </h2>
-        </div>
-
-        <div class="story-copy">
-          <p>
-            L'esperienza diventa conoscenza.
-            Le scienze motorie aggiungono metodo,
-            osservazione e consapevolezza.
-          </p>
-        </div>
-
-      </div>
-    </section>
-
-    <section
-      class="story story-light"
-      id="trasmettere"
-      data-title="TRASMETTERE."
-      data-kicker="EDUCAZIONE"
-      aria-labelledby="trasmettere-title"
-    >
-      <div class="story-inner">
-
-        <p class="story-kicker">EDUCAZIONE</p>
-
-        <h2 id="trasmettere-title">
-          TRASMETTERE.
-        </h2>
-
-        <p class="story-lead">
-          Condividere ciò che si è compreso
-          significa trasformarlo in esperienza per altri.
-        </p>
-
-      </div>
-    </section>
-
-    <section
-      class="story story-dark"
-      id="costruire"
-      data-title="COSTRUIRE."
-      data-kicker="PROGETTO"
-      aria-labelledby="costruire-title"
-    >
-      <div class="story-inner story-inner-split">
-
-        <div>
-          <p class="story-kicker">PROGETTO</p>
-
-          <h2 id="costruire-title">
-            COSTRUIRE.
-          </h2>
-        </div>
-
-        <div class="story-copy">
-          <p>
-            Idee, persone e strumenti prendono forma
-            quando vengono organizzati intorno a un obiettivo.
-          </p>
-        </div>
-
-      </div>
-    </section>
-
-    <section
-      class="story story-light"
-      id="ritorna"
-      data-title="RITORNA."
-      data-kicker="DIGITALE"
-      aria-labelledby="ritorna-title"
-    >
-      <div class="story-inner">
-
-        <p class="story-kicker">DIGITALE</p>
-
-        <h2 id="ritorna-title">
-          RITORNA.
-        </h2>
-
-        <p class="story-lead">
-          Il digitale diventa uno strumento:
-          per organizzare, comunicare, connettere.
-        </p>
-
-      </div>
-    </section>
-
-    <section
-      class="story story-dark"
-      id="collegare"
-      data-title="COLLEGARE."
-      data-kicker="SISTEMA"
-      aria-labelledby="collegare-title"
-    >
-      <div class="story-inner story-inner-split">
-
-        <div>
-          <p class="story-kicker">SISTEMA</p>
-
-          <h2 id="collegare-title">
-            COLLEGARE.
-          </h2>
-        </div>
-
-        <div class="story-copy">
-          <p>
-            Sport, scienze motorie, educazione,
-            management e digitale non sono mondi separati.
-            Possono diventare parti dello stesso sistema.
-          </p>
-        </div>
-
-      </div>
-    </section>
-
-    <section
-      class="story story-light"
-      id="oggi"
-      data-title="OGGI."
-      data-kicker="APPROCCIO"
-      aria-labelledby="oggi-title"
-    >
-      <div class="story-inner">
-
-        <p class="story-kicker">APPROCCIO</p>
-
-        <h2 id="oggi-title">
-          OGGI.
-        </h2>
-
-        <p class="story-lead">
-          Osservare ciò che accade,
-          leggere il contesto,
-          trovare connessioni utili.
-        </p>
-
-      </div>
-    </section>
-
-    <section
-      class="story story-dark"
-      id="obiettivo"
-      data-title="OBIETTIVO."
-      data-kicker="METODO"
-      aria-labelledby="obiettivo-title"
-    >
-      <div class="story-inner story-inner-split">
-
-        <div>
-          <p class="story-kicker">METODO</p>
-
-          <h2 id="obiettivo-title">
-            OBIETTIVO.
-          </h2>
-        </div>
-
-        <div class="story-copy">
-          <p>
-            Ogni progetto richiede una direzione,
-            ma anche la capacità di adattarsi
-            mentre si procede.
-          </p>
-        </div>
-
-      </div>
-    </section>
-
-    <section
-      class="story story-place story-light"
-      id="qui"
-      data-title="QUI."
-      data-kicker="TERRITORIO"
-      aria-labelledby="qui-title"
-    >
-      <div class="story-inner">
-
-        <div class="place-header">
-
-          <div>
-            <p class="story-kicker">TERRITORIO</p>
-
-            <h2 id="qui-title">
-              QUI.
-            </h2>
-          </div>
-
-          <p class="place-note">
-            Sicilia · Italia
-          </p>
-
-        </div>
-
-        <div class="map-frame">
-          <iframe
-            title="Mappa dello Stadio Comunale Giuseppe La Franca, Partinico"
-            src="https://www.google.com/maps?q=Stadio+Comunale+Giuseppe+La+Franca,+Partinico&output=embed"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-          ></iframe>
-        </div>
-
-        <p class="map-fallback">
-          <a
-            href="https://www.google.com/maps/search/?api=1&query=Stadio+Comunale+Giuseppe+La+Franca,+Partinico"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Apri la posizione sulla mappa
-          </a>
-        </p>
-
-      </div>
-    </section>
-
-    <section
-      class="story story-dark"
-      id="da-qui"
-      data-title="DA QUI."
-      data-kicker="PRESENZA"
-      aria-labelledby="da-qui-title"
-    >
-      <div class="story-inner story-inner-split">
-
-        <div>
-          <p class="story-kicker">PRESENZA</p>
-
-          <h2 id="da-qui-title">
-            DA QUI.
-          </h2>
-        </div>
-
-        <div class="story-copy">
-          <p>
-            Un punto di partenza concreto,
-            da cui osservare il territorio
-            e costruire nuove connessioni.
-          </p>
-        </div>
-
-      </div>
-    </section>
-
-    <section
-      class="story story-person story-light"
-      id="eccomi"
-      data-title="ECCOMI."
-      data-kicker="IDENTITÀ"
-      aria-labelledby="eccomi-title"
-    >
-      <div class="story-inner person-layout">
-
-        <div class="person-image">
-          <img
-            src="/assets/images/cp-foto.webp"
-            width="900"
-            height="1200"
-            alt="Cesare Paratore"
-            loading="lazy"
-            decoding="async"
-          >
-        </div>
-
-        <div class="person-copy">
-
-          <p class="story-kicker">IDENTITÀ</p>
-
-          <h2 id="eccomi-title">
-            ECCOMI.
-          </h2>
-
-          <p class="story-lead">
-            Atleta, tecnico ed educatore.
-            Un percorso costruito attraverso esperienze
-            che continuano a dialogare tra loro.
-          </p>
-
-        </div>
-
-      </div>
-    </section>
-
-    <section
-      class="story story-contact story-dark"
-      id="scrivimi"
-      data-title="SCRIVIMI."
-      data-kicker="CONTATTO"
-      aria-labelledby="scrivimi-title"
-    >
-      <div class="story-inner contact-inner">
-
-        <p class="story-kicker">CONTATTO</p>
-
-        <h2 id="scrivimi-title">
-          SCRIVIMI.
-        </h2>
-
-        <p class="story-lead">
-          Se vuoi approfondire il percorso,
-          le idee o un possibile progetto,
-          possiamo iniziare da una conversazione.
-        </p>
-
-        <a
-          class="contact-link"
-          href="/contatti/"
-        >
-          <span>Vai ai contatti</span>
-          <span aria-hidden="true">↗</span>
-        </a>
-
-      </div>
-    </section>
-
-  </main>
-
-  <footer class="site-footer">
-
-    <div class="footer-main">
-
-      <div class="footer-name">
-        Cesare Paratore
-      </div>
-
-      <div class="footer-fields">
-        Sport · Scienze Motorie · Educazione · Management · Digitale
-      </div>
-
-    </div>
-
-    <div class="footer-bottom">
-
-      <span>
-        © <span id="current-year"></span> Cesare Paratore
-      </span>
-
-      <span>
-        PALERMO · SICILIA · ITALIA
-      </span>
-
-    </div>
-
-  </footer>
-
-  <noscript>
-    <style>
-      .site-loader,
-      .standby {
-        display: none !important;
+
+  if (!sections.length) {
+    return;
+  }
+
+  let activeIndex = 0;
+  let ticking = false;
+  let standbyTimer = null;
+  let standbyPointerTimer = null;
+  let isMenuOpen = false;
+  let previousFocus = null;
+
+  /*
+   * -------------------------------------------------------
+   * UTILITIES
+   * -------------------------------------------------------
+   */
+
+  const clamp = (value, min, max) =>
+    Math.min(Math.max(value, min), max);
+
+  const getHeaderHeight = () =>
+    header ? header.getBoundingClientRect().height : 0;
+
+  const getReadingLine = () => {
+    const viewportHeight = window.innerHeight || 0;
+
+    return (
+      getHeaderHeight() +
+      Math.min(
+        viewportHeight * CONFIG.activeLineRatio,
+        CONFIG.activeLineMax
+      )
+    );
+  };
+
+  const getFocusable = (container) => {
+    if (!container) return [];
+
+    return Array.from(
+      container.querySelectorAll(
+        [
+          "a[href]",
+          "button:not([disabled])",
+          "input:not([disabled])",
+          "select:not([disabled])",
+          "textarea:not([disabled])",
+          "[tabindex]:not([tabindex='-1'])"
+        ].join(",")
+      )
+    ).filter((element) => {
+      const style = window.getComputedStyle(element);
+
+      return (
+        style.display !== "none" &&
+        style.visibility !== "hidden"
+      );
+    });
+  };
+
+  const getSectionIndex = (id) =>
+    sections.findIndex((section) => section.id === id);
+
+  const getSectionById = (id) =>
+    sections.find((section) => section.id === id);
+
+  const getCurrentHash = () =>
+    window.location.hash.replace(/^#/, "");
+
+  /*
+   * -------------------------------------------------------
+   * HEADER
+   * -------------------------------------------------------
+   *
+   * The upper header is intentionally ALWAYS dark.
+   * The active section never changes its visual theme.
+   */
+
+  const updateHeaderChrome = () => {
+    if (!header) return;
+
+    header.dataset.theme = "dark";
+
+    const themeMeta = document.querySelector(
+      'meta[name="theme-color"]'
+    );
+
+    if (themeMeta) {
+      themeMeta.setAttribute("content", "#0B0B0A");
+    }
+  };
+
+  /*
+   * -------------------------------------------------------
+   * PROGRESS
+   * -------------------------------------------------------
+   */
+
+  const calculateSectionProgress = (section) => {
+    const rect = section.getBoundingClientRect();
+    const viewportHeight = window.innerHeight || 1;
+
+    /*
+     * Progress is based on the actual reading position
+     * inside the current section rather than on global
+     * document scroll.
+     */
+    const start =
+      viewportHeight -
+      getHeaderHeight();
+
+    const distance =
+      Math.max(
+        section.offsetHeight - start,
+        viewportHeight * 0.5
+      );
+
+    const traveled =
+      viewportHeight - rect.top;
+
+    return clamp(traveled / distance, 0, 1);
+  };
+
+  const updateProgress = (progress) => {
+    const value = clamp(progress, 0, 1);
+    const percent = value * 100;
+
+    if (progressFill) {
+      progressFill.style.width = `${percent}%`;
+    }
+
+    if (progressOrb) {
+      progressOrb.style.left = `${percent}%`;
+    }
+
+    if (storyProgress) {
+      storyProgress.setAttribute(
+        "aria-valuenow",
+        String(Math.round(percent))
+      );
+    }
+  };
+
+  /*
+   * -------------------------------------------------------
+   * ACTIVE SECTION
+   * -------------------------------------------------------
+   */
+
+  const findActiveSection = () => {
+    const line = getReadingLine();
+
+    let bestIndex = 0;
+    let bestDistance = Number.POSITIVE_INFINITY;
+
+    sections.forEach((section, index) => {
+      const rect = section.getBoundingClientRect();
+
+      /*
+       * Prefer the section containing the reading line.
+       */
+      if (
+        rect.top <= line &&
+        rect.bottom > line
+      ) {
+        bestIndex = index;
+        bestDistance = 0;
+        return;
       }
 
-      .site-menu {
-        position: relative !important;
-        inset: auto !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-        transform: none !important;
-        pointer-events: auto !important;
+      const distance =
+        rect.top > line
+          ? rect.top - line
+          : line - rect.bottom;
+
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestIndex = index;
+      }
+    });
+
+    return bestIndex;
+  };
+
+  const updateNavigationState = (index) => {
+    const section = sections[index];
+
+    if (!section) return;
+
+    activeIndex = index;
+
+    const title =
+      section.dataset.title ||
+      section.querySelector("h1,h2")?.textContent?.trim() ||
+      "";
+
+    if (activeStoryTitle && title) {
+      activeStoryTitle.textContent = title;
+    }
+
+    if (storyPrev) {
+      storyPrev.disabled = index <= 0;
+      storyPrev.setAttribute(
+        "aria-label",
+        index <= 0
+          ? "Nessuna sezione precedente"
+          : `Sezione precedente: ${sections[index - 1].dataset.title || ""}`
+      );
+    }
+
+    if (storyNext) {
+      storyNext.disabled = index >= sections.length - 1;
+      storyNext.setAttribute(
+        "aria-label",
+        index >= sections.length - 1
+          ? "Nessuna sezione successiva"
+          : `Sezione successiva: ${sections[index + 1].dataset.title || ""}`
+      );
+    }
+
+    sections.forEach((item, itemIndex) => {
+      item.toggleAttribute(
+        "data-active",
+        itemIndex === index
+      );
+    });
+
+    menuLinks.forEach((link) => {
+      const isCurrent =
+        link.dataset.menuTarget === section.id;
+
+      if (isCurrent) {
+        link.setAttribute("aria-current", "page");
+      } else {
+        link.removeAttribute("aria-current");
+      }
+    });
+
+    updateHeaderChrome();
+  };
+
+  const updateActiveState = () => {
+    const nextIndex = findActiveSection();
+
+    if (nextIndex !== activeIndex) {
+      updateNavigationState(nextIndex);
+    }
+
+    const activeSection = sections[activeIndex];
+
+    if (activeSection) {
+      updateProgress(
+        calculateSectionProgress(activeSection)
+      );
+    }
+  };
+
+  const requestUpdate = () => {
+    if (ticking) return;
+
+    ticking = true;
+
+    window.requestAnimationFrame(() => {
+      updateActiveState();
+      ticking = false;
+    });
+  };
+
+  /*
+   * -------------------------------------------------------
+   * SCROLLING / HASH
+   * -------------------------------------------------------
+   */
+
+  const scrollToSection = (
+    section,
+    {
+      updateHash = true,
+      behavior = null
+    } = {}
+  ) => {
+    if (!section) return;
+
+    const headerHeight = getHeaderHeight();
+
+    const top =
+      window.scrollY +
+      section.getBoundingClientRect().top -
+      headerHeight -
+      CONFIG.scrollOffset;
+
+    const scrollBehavior =
+      behavior ||
+      (prefersReducedMotion.matches
+        ? "auto"
+        : "smooth");
+
+    window.scrollTo({
+      top: Math.max(0, top),
+      behavior: scrollBehavior
+    });
+
+    if (updateHash && section.id) {
+      const nextUrl =
+        `${window.location.pathname}` +
+        `${window.location.search}` +
+        `#${section.id}`;
+
+      window.history.replaceState(
+        {
+          section: section.id
+        },
+        "",
+        nextUrl
+      );
+    }
+  };
+
+  const goToSectionIndex = (index) => {
+    const target = sections[index];
+
+    if (!target) return;
+
+    scrollToSection(target);
+  };
+
+  const handleHash = ({
+    behavior = null
+  } = {}) => {
+    const hash = getCurrentHash();
+
+    if (!hash) {
+      requestUpdate();
+      return;
+    }
+
+    const section = getSectionById(hash);
+
+    if (!section) return;
+
+    const index = getSectionIndex(hash);
+
+    if (index >= 0) {
+      updateNavigationState(index);
+    }
+
+    window.requestAnimationFrame(() => {
+      scrollToSection(section, {
+        updateHash: false,
+        behavior
+      });
+
+      window.setTimeout(requestUpdate, 60);
+    });
+  };
+
+  /*
+   * -------------------------------------------------------
+   * MENU / FOCUS MANAGEMENT
+   * -------------------------------------------------------
+   */
+
+  const setBackgroundInert = (state) => {
+    [
+      main,
+      footer,
+      storyNav
+    ].forEach((element) => {
+      if (!element) return;
+
+      element.inert = state;
+
+      if (state) {
+        element.setAttribute("aria-hidden", "true");
+      } else {
+        element.removeAttribute("aria-hidden");
+      }
+    });
+
+    /*
+     * The brand lives inside the header, outside storyNav,
+     * so it must be handled separately.
+     */
+    if (brand) {
+      if (state) {
+        brand.setAttribute("tabindex", "-1");
+        brand.setAttribute("aria-hidden", "true");
+      } else {
+        brand.removeAttribute("tabindex");
+        brand.removeAttribute("aria-hidden");
+      }
+    }
+  };
+
+  const setMenuTabState = (disabled) => {
+    menuLinks.forEach((link) => {
+      if (disabled) {
+        link.setAttribute("tabindex", "-1");
+      } else {
+        link.removeAttribute("tabindex");
+      }
+    });
+  };
+
+  const focusMenuStart = () => {
+    const focusables = getFocusable(menu);
+
+    if (focusables.length) {
+      focusables[0].focus();
+    }
+  };
+
+  const closeMenu = ({
+    restoreFocus = true
+  } = {}) => {
+    if (!menu || !menuToggle) return;
+
+    isMenuOpen = false;
+
+    body.classList.remove("menu-open");
+
+    menu.classList.remove("is-open");
+
+    menu.setAttribute("inert", "");
+    menu.inert = true;
+
+    menuToggle.setAttribute(
+      "aria-expanded",
+      "false"
+    );
+
+    menuToggle.setAttribute(
+      "aria-label",
+      "Apri menu"
+    );
+
+    setMenuTabState(true);
+    setBackgroundInert(false);
+
+    if (
+      restoreFocus &&
+      previousFocus &&
+      typeof previousFocus.focus === "function"
+    ) {
+      previousFocus.focus();
+    }
+
+    previousFocus = null;
+  };
+
+  const openMenu = () => {
+    if (!menu || !menuToggle || isMenuOpen) {
+      return;
+    }
+
+    previousFocus =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : menuToggle;
+
+    isMenuOpen = true;
+
+    body.classList.add("menu-open");
+
+    setBackgroundInert(true);
+
+    menu.removeAttribute("inert");
+    menu.inert = false;
+
+    setMenuTabState(false);
+
+    menu.classList.add("is-open");
+
+    menuToggle.setAttribute(
+      "aria-expanded",
+      "true"
+    );
+
+    menuToggle.setAttribute(
+      "aria-label",
+      "Chiudi menu"
+    );
+
+    window.requestAnimationFrame(() => {
+      focusMenuStart();
+    });
+  };
+
+  const toggleMenu = () => {
+    if (isMenuOpen) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  };
+
+  const handleMenuKeydown = (event) => {
+    if (!isMenuOpen) return;
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeMenu();
+      return;
+    }
+
+    if (event.key !== "Tab") return;
+
+    const focusables = getFocusable(menu);
+
+    if (!focusables.length) {
+      event.preventDefault();
+      return;
+    }
+
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+
+    if (
+      event.shiftKey &&
+      document.activeElement === first
+    ) {
+      event.preventDefault();
+      last.focus();
+      return;
+    }
+
+    if (
+      !event.shiftKey &&
+      document.activeElement === last
+    ) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
+
+  /*
+   * -------------------------------------------------------
+   * STANDBY
+   * -------------------------------------------------------
+   */
+
+  const hideStandby = () => {
+    if (!standby) return;
+
+    standby.classList.remove("is-visible");
+  };
+
+  const showStandby = () => {
+    if (!standby || isMenuOpen) return;
+
+    standby.classList.add("is-visible");
+  };
+
+  const resetStandby = () => {
+    hideStandby();
+
+    window.clearTimeout(standbyTimer);
+
+    standbyTimer = window.setTimeout(
+      showStandby,
+      CONFIG.standbyDelay
+    );
+  };
+
+  const handlePointerMove = () => {
+    if (standbyPointerTimer) return;
+
+    standbyPointerTimer = window.setTimeout(() => {
+      standbyPointerTimer = null;
+      resetStandby();
+    }, 700);
+  };
+
+  /*
+   * -------------------------------------------------------
+   * GSAP MOTION
+   * -------------------------------------------------------
+   */
+
+  const initAnimations = () => {
+    if (
+      prefersReducedMotion.matches ||
+      !window.gsap ||
+      !window.ScrollTrigger
+    ) {
+      return;
+    }
+
+    window.gsap.registerPlugin(
+      window.ScrollTrigger
+    );
+
+    sections.forEach((section, index) => {
+      const kicker =
+        section.querySelector(".story-kicker");
+
+      const heading =
+        section.querySelector("h1, h2");
+
+      const lead =
+        section.querySelector(".story-lead");
+
+      const copy =
+        section.querySelector(".story-copy");
+
+      const image =
+        section.querySelector(".person-image");
+
+      const targets = [
+        kicker,
+        heading,
+        lead,
+        copy,
+        image
+      ].filter(Boolean);
+
+      if (!targets.length) return;
+
+      window.gsap.set(targets, {
+        opacity: 0,
+        y: 24
+      });
+
+      window.gsap.to(targets, {
+        opacity: 1,
+        y: 0,
+        duration: 0.9,
+        stagger: 0.07,
+        ease: "power3.out",
+
+        scrollTrigger: {
+          id: `story-${index}`,
+          trigger: section,
+          start: "top 72%",
+          once: true
+        }
+      });
+    });
+  };
+
+  /*
+   * -------------------------------------------------------
+   * REFRESH / LIFECYCLE
+   * -------------------------------------------------------
+   */
+
+  const refresh = () => {
+    requestUpdate();
+
+    if (
+      window.ScrollTrigger &&
+      typeof window.ScrollTrigger.refresh === "function"
+    ) {
+      window.ScrollTrigger.refresh();
+    }
+  };
+
+  const killAnimations = () => {
+    if (!window.ScrollTrigger) return;
+
+    window.ScrollTrigger.getAll()
+      .filter((trigger) =>
+        String(trigger.vars?.id || "").startsWith("story-")
+      )
+      .forEach((trigger) => trigger.kill());
+  };
+
+  /*
+   * -------------------------------------------------------
+   * LOADER
+   * -------------------------------------------------------
+   */
+
+  const hideLoader = () => {
+    if (!loader) return;
+
+    loader.classList.add("is-hidden");
+
+    window.setTimeout(() => {
+      loader.remove();
+    }, 700);
+  };
+
+  const initLoader = () => {
+    if (!loader) return;
+
+    let finished = false;
+
+    const finish = () => {
+      if (finished) return;
+
+      finished = true;
+
+      window.setTimeout(
+        hideLoader,
+        prefersReducedMotion.matches ? 0 : 140
+      );
+    };
+
+    if (document.readyState === "complete") {
+      finish();
+    } else {
+      window.addEventListener(
+        "load",
+        finish,
+        {
+          once: true
+        }
+      );
+    }
+
+    window.setTimeout(
+      finish,
+      CONFIG.loaderMax
+    );
+  };
+
+  /*
+   * -------------------------------------------------------
+   * EVENTS
+   * -------------------------------------------------------
+   */
+
+  menuToggle?.addEventListener(
+    "click",
+    toggleMenu
+  );
+
+  menu?.addEventListener(
+    "keydown",
+    handleMenuKeydown
+  );
+
+  menuLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      closeMenu({
+        restoreFocus: false
+      });
+    });
+  });
+
+  storyPrev?.addEventListener(
+    "click",
+    () => {
+      if (activeIndex > 0) {
+        goToSectionIndex(activeIndex - 1);
+      }
+    }
+  );
+
+  storyNext?.addEventListener(
+    "click",
+    () => {
+      if (activeIndex < sections.length - 1) {
+        goToSectionIndex(activeIndex + 1);
+      }
+    }
+  );
+
+  window.addEventListener(
+    "scroll",
+    () => {
+      requestUpdate();
+      resetStandby();
+    },
+    {
+      passive: true
+    }
+  );
+
+  window.addEventListener(
+    "wheel",
+    resetStandby,
+    {
+      passive: true
+    }
+  );
+
+  window.addEventListener(
+    "touchstart",
+    resetStandby,
+    {
+      passive: true
+    }
+  );
+
+  window.addEventListener(
+    "pointermove",
+    handlePointerMove,
+    {
+      passive: true
+    }
+  );
+
+  window.addEventListener(
+    "click",
+    resetStandby,
+    {
+      passive: true
+    }
+  );
+
+  window.addEventListener(
+    "keydown",
+    (event) => {
+      resetStandby();
+
+      if (event.key === "Escape") {
+        hideStandby();
+
+        if (isMenuOpen) {
+          closeMenu();
+        }
+
+        return;
       }
 
-      .site-menu-list a {
-        opacity: 1 !important;
-        transform: none !important;
+      if (
+        isMenuOpen ||
+        event.defaultPrevented ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.altKey
+      ) {
+        return;
       }
 
-      .menu-toggle {
-        display: none !important;
+      const activeElement =
+        document.activeElement;
+
+      const isTyping =
+        activeElement &&
+        (
+          activeElement.matches?.(
+            "input, textarea, select"
+          ) ||
+          activeElement.isContentEditable
+        );
+
+      if (isTyping) return;
+
+      if (
+        event.key === "ArrowDown" &&
+        activeIndex < sections.length - 1
+      ) {
+        event.preventDefault();
+        goToSectionIndex(activeIndex + 1);
       }
-    </style>
-  </noscript>
 
-  <script defer src="/script.js"></script>
+      if (
+        event.key === "ArrowUp" &&
+        activeIndex > 0
+      ) {
+        event.preventDefault();
+        goToSectionIndex(activeIndex - 1);
+      }
+    }
+  );
 
-</body>
-</html>
+  window.addEventListener(
+    "hashchange",
+    () => {
+      handleHash();
+    }
+  );
+
+  window.addEventListener(
+    "popstate",
+    () => {
+      handleHash();
+    }
+  );
+
+  window.addEventListener(
+    "resize",
+    () => {
+      requestUpdate();
+    },
+    {
+      passive: true
+    }
+  );
+
+  window.addEventListener(
+    "pageshow",
+    () => {
+      refresh();
+    }
+  );
+
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+      if (!document.hidden) {
+        refresh();
+      }
+    }
+  );
+
+  prefersReducedMotion.addEventListener?.(
+    "change",
+    () => {
+      killAnimations();
+
+      if (!prefersReducedMotion.matches) {
+        initAnimations();
+      }
+
+      refresh();
+    }
+  );
+
+  /*
+   * -------------------------------------------------------
+   * INITIALIZATION
+   * -------------------------------------------------------
+   */
+
+  menu?.setAttribute("inert", "");
+  menu.inert = true;
+
+  setMenuTabState(true);
+  setBackgroundInert(false);
+
+  updateHeaderChrome();
+
+  const initialIndex = findActiveSection();
+
+  updateNavigationState(initialIndex);
+  updateProgress(
+    calculateSectionProgress(
+      sections[initialIndex]
+    )
+  );
+
+  initLoader();
+  initAnimations();
+  resetStandby();
+
+  if (getCurrentHash()) {
+    handleHash({
+      behavior: "auto"
+    });
+  }
+
+  window.setTimeout(
+    refresh,
+    80
+  );
+
+})();
