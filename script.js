@@ -5,7 +5,7 @@
    * ========================================================
    * CESARE PARATORE
    * Navigation / loader / narrative progression
-   * V4
+   * V5
    * ========================================================
    */
 
@@ -63,14 +63,14 @@
   const brand =
     document.querySelector(".brand");
 
+  const footerMark =
+    document.querySelector(".footer-mark");
+
   const main =
     document.getElementById("main-content");
 
   const footer =
     document.querySelector(".site-footer");
-
-  const skipLink =
-    document.querySelector(".skip-link");
 
   const sections =
     Array.from(
@@ -79,23 +79,10 @@
 
 
   /* ========================================================
-     BASIC SAFETY
+     CORE SAFETY
      ======================================================== */
 
-  if (
-    !header ||
-    !menuToggle ||
-    !menu ||
-    !activeChapter ||
-    !previousButton ||
-    !nextButton ||
-    !nextArrowSymbol ||
-    !nextArrowLabel ||
-    !wowProgress ||
-    !wowDot ||
-    !main ||
-    !sections.length
-  ) {
+  if (!sections.length) {
     return;
   }
 
@@ -109,23 +96,24 @@
 
   let scrollFrame = null;
 
+  let loaderStartedAt = 0;
+  let loaderFinished = false;
+
   let loaderMinTimer = null;
   let loaderFallbackTimer = null;
   let loaderExitTimer = null;
 
-  let loaderStartedAt = 0;
-  let loaderFinished = false;
-
   let lastFocusedElement = null;
-
-  let navigationLock = null;
-  let navigationFrame = null;
-  let navigationTimer = null;
 
   const reducedMotion =
     window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     );
+
+
+  /* ========================================================
+     NARRATIVE CACHE
+     ======================================================== */
 
   const narrativeCache =
     sections.map(() => ({
@@ -153,28 +141,42 @@
 
 
   const smoothStep = (value) => {
-    const t = clamp(value, 0, 1);
+    const t = clamp(
+      value,
+      0,
+      1
+    );
 
     return t * t * (3 - 2 * t);
   };
 
 
   const getHeaderHeight = () => {
+    if (!header) {
+      return 0;
+    }
+
     return header.getBoundingClientRect().height;
   };
 
 
-  const getSectionIndex = (section) => {
+  const getSectionIndex = (
+    section
+  ) => {
     return sections.indexOf(section);
   };
 
 
-  const isElement = (target) => {
+  const isElement = (
+    target
+  ) => {
     return target instanceof Element;
   };
 
 
-  const isEditableTarget = (target) => {
+  const isEditableTarget = (
+    target
+  ) => {
     if (!isElement(target)) {
       return false;
     }
@@ -187,166 +189,73 @@
   };
 
 
-  const isInteractiveTarget = (target) => {
+  const isInteractiveTarget = (
+    target
+  ) => {
     if (!isElement(target)) {
       return false;
     }
 
     return Boolean(
       target.closest(
-        "a, button, input, textarea, select, summary, [contenteditable='true']"
+        "a, button, input, textarea, select, summary, [role='button'], [contenteditable='true']"
       )
     );
   };
 
 
   const getFocusableMenuElements = () => {
+    if (!menu) {
+      return [];
+    }
+
     return Array.from(
       menu.querySelectorAll(
-        "a[href], button:not([disabled]), [tabindex]:not([tabindex='-1'])"
+        [
+          "a[href]",
+          "button:not([disabled])",
+          "input:not([disabled])",
+          "select:not([disabled])",
+          "textarea:not([disabled])",
+          "[tabindex]:not([tabindex='-1'])"
+        ].join(", ")
       )
     ).filter((element) => {
       return (
         !element.hasAttribute("disabled") &&
-        element.getAttribute("aria-hidden") !== "true"
+        element.getAttribute(
+          "aria-hidden"
+        ) !== "true"
       );
     });
   };
 
 
-  const setPageInert = (locked) => {
-    [main, footer].forEach((element) => {
-      if (!element) {
-        return;
-      }
+  const setInert = (
+    element,
+    locked
+  ) => {
+    if (!element) {
+      return;
+    }
 
-      element.inert = Boolean(locked);
-    });
+    element.inert =
+      Boolean(locked);
   };
 
 
-  const setMenuInert = (locked) => {
-    menu.inert = Boolean(locked);
-  };
+  const setPageInert = (
+    locked
+  ) => {
+    setInert(
+      main,
+      locked
+    );
 
-
-  /* ========================================================
-     LOADER
-     ======================================================== */
-
-  const finishLoader = () => {
-    if (!loader || loaderFinished) {
-      return;
-    }
-
-    loaderFinished = true;
-
-    if (loaderMinTimer !== null) {
-      window.clearTimeout(loaderMinTimer);
-      loaderMinTimer = null;
-    }
-
-    if (loaderFallbackTimer !== null) {
-      window.clearTimeout(loaderFallbackTimer);
-      loaderFallbackTimer = null;
-    }
-
-    loader.classList.add("is-exiting");
-
-    const exitDuration =
-      reducedMotion.matches
-        ? 20
-        : 1150;
-
-    loaderExitTimer =
-      window.setTimeout(() => {
-        loader.classList.remove("is-active");
-        loader.classList.remove("is-exiting");
-
-        loader.setAttribute(
-          "aria-hidden",
-          "true"
-        );
-
-        loaderExitTimer = null;
-      }, exitDuration);
-  };
-
-
-  const tryFinishLoader = () => {
-    if (!loader || loaderFinished) {
-      return;
-    }
-
-    const minimumDuration =
-      reducedMotion.matches
-        ? 0
-        : 900;
-
-    const elapsed =
-      performance.now() -
-      loaderStartedAt;
-
-    const remaining =
-      Math.max(
-        0,
-        minimumDuration - elapsed
-      );
-
-    if (remaining === 0) {
-      finishLoader();
-      return;
-    }
-
-    if (loaderMinTimer !== null) {
-      window.clearTimeout(loaderMinTimer);
-    }
-
-    loaderMinTimer =
-      window.setTimeout(
-        finishLoader,
-        remaining
-      );
-  };
-
-
-  const startLoader = () => {
-    if (!loader) {
-      return;
-    }
-
-    if (loader.classList.contains("is-active")) {
-      return;
-    }
-
-    loaderStartedAt =
-      performance.now();
-
-    loaderFinished = false;
-
-    loader.classList.add("is-active");
-
-    if (
-      document.readyState === "complete"
-    ) {
-      tryFinishLoader();
-    } else {
-      window.addEventListener(
-        "load",
-        tryFinishLoader,
-        {
-          once: true
-        }
-      );
-    }
-
-    loaderFallbackTimer =
-      window.setTimeout(
-        finishLoader,
-        reducedMotion.matches
-          ? 1000
-          : 4500
-      );
+    setInert(
+      footer,
+      locked
+    );
   };
 
 
@@ -354,100 +263,107 @@
      MENU
      ======================================================== */
 
-  const updateMenuCurrentState = () => {
-    menuLinks.forEach((link) => {
-      const href =
-        link.getAttribute("href");
-
-      const isCurrent =
-        href ===
-        `#${sections[activeIndex]?.id || ""}`;
-
-      if (isCurrent) {
-        link.setAttribute(
-          "aria-current",
-          "page"
-        );
-      } else {
-        link.removeAttribute(
-          "aria-current"
-        );
-      }
-    });
-  };
-
-
-  const setMenuState = (open) => {
-    const nextState = Boolean(open);
-
+  const initializeMenu = () => {
     if (
-      nextState === menuOpen &&
-      menu.classList.contains("is-open")
+      !menu ||
+      !menuToggle
     ) {
       return;
     }
 
-    if (nextState) {
+    menuToggle.setAttribute(
+      "aria-expanded",
+      "false"
+    );
 
-      lastFocusedElement =
-        document.activeElement instanceof HTMLElement
-          ? document.activeElement
-          : menuToggle;
+    menuToggle.setAttribute(
+      "aria-controls",
+      menu.id || "site-menu"
+    );
 
-      menuOpen = true;
-
-      header.classList.add("menu-open");
-      menu.classList.add("is-open");
-
-      menu.setAttribute(
-        "aria-hidden",
-        "false"
-      );
-
-      setMenuInert(false);
-
-      menuToggle.setAttribute(
-        "aria-expanded",
-        "true"
-      );
-
-      menuToggle.setAttribute(
-        "aria-label",
-        "Chiudi menu"
-      );
-
-      body.classList.add(
-        "menu-is-open"
-      );
-
-      setPageInert(true);
-
-      window.requestAnimationFrame(() => {
-        const focusable =
-          getFocusableMenuElements();
-
-        if (focusable.length) {
-          focusable[0].focus({
-            preventScroll: true
-          });
-        }
-      });
-
-      return;
-    }
-
-
-    menuOpen = false;
-
-    header.classList.remove("menu-open");
-    menu.classList.remove("is-open");
+    menuToggle.setAttribute(
+      "aria-label",
+      "Apri menu"
+    );
 
     menu.setAttribute(
       "aria-hidden",
       "true"
     );
 
-    setMenuInert(true);
+    setInert(
+      menu,
+      true
+    );
+  };
+
+
+  const updateMenuCurrentState = () => {
+    if (!menuLinks.length) {
+      return;
+    }
+
+    const currentId =
+      sections[activeIndex]?.id || "";
+
+    menuLinks.forEach(
+      (link) => {
+        const href =
+          link.getAttribute(
+            "href"
+          ) || "";
+
+        const current =
+          href === `#${currentId}`;
+
+        if (current) {
+          link.setAttribute(
+            "aria-current",
+            "location"
+          );
+        } else {
+          link.removeAttribute(
+            "aria-current"
+          );
+        }
+      }
+    );
+  };
+
+
+  const closeMenu = () => {
+    if (
+      !menu ||
+      !menuToggle
+    ) {
+      return;
+    }
+
+    if (!menuOpen) {
+      return;
+    }
+
+    menuOpen = false;
+
+    menu.classList.remove(
+      "is-open"
+    );
+
+    if (header) {
+      header.classList.remove(
+        "menu-open"
+      );
+    }
+
+    menu.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    setInert(
+      menu,
+      true
+    );
 
     menuToggle.setAttribute(
       "aria-expanded",
@@ -467,31 +383,282 @@
 
     const focusTarget =
       lastFocusedElement &&
-      document.contains(lastFocusedElement) &&
-      !lastFocusedElement.hasAttribute("disabled")
+      document.contains(
+        lastFocusedElement
+      ) &&
+      !lastFocusedElement.hasAttribute(
+        "disabled"
+      )
         ? lastFocusedElement
         : menuToggle;
 
-    window.requestAnimationFrame(() => {
-      focusTarget.focus({
-        preventScroll: true
-      });
-    });
-
     lastFocusedElement = null;
+
+    requestAnimationFrame(
+      () => {
+        focusTarget.focus({
+          preventScroll: true
+        });
+      }
+    );
   };
 
 
-  menuToggle.addEventListener(
-    "click",
-    () => {
-      setMenuState(!menuOpen);
+  const openMenu = () => {
+    if (
+      !menu ||
+      !menuToggle
+    ) {
+      return;
     }
-  );
+
+    if (menuOpen) {
+      return;
+    }
+
+    lastFocusedElement =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : menuToggle;
+
+    menuOpen = true;
+
+    if (header) {
+      header.classList.add(
+        "menu-open"
+      );
+    }
+
+    menu.classList.add(
+      "is-open"
+    );
+
+    menu.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
+    setInert(
+      menu,
+      false
+    );
+
+    menuToggle.setAttribute(
+      "aria-expanded",
+      "true"
+    );
+
+    menuToggle.setAttribute(
+      "aria-label",
+      "Chiudi menu"
+    );
+
+    body.classList.add(
+      "menu-is-open"
+    );
+
+    setPageInert(true);
+
+    requestAnimationFrame(
+      () => {
+        const focusable =
+          getFocusableMenuElements();
+
+        if (focusable.length) {
+          focusable[0].focus({
+            preventScroll: true
+          });
+        }
+      }
+    );
+  };
+
+
+  const toggleMenu = () => {
+    if (menuOpen) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  };
+
+
+  initializeMenu();
+
+
+  if (
+    menuToggle &&
+    menu
+  ) {
+    menuToggle.addEventListener(
+      "click",
+      toggleMenu
+    );
+  }
 
 
   /* ========================================================
-     ACTIVE SECTION UI
+     LOADER
+     ======================================================== */
+
+  const finishLoader = () => {
+    if (
+      !loader ||
+      loaderFinished
+    ) {
+      return;
+    }
+
+    loaderFinished = true;
+
+    if (
+      loaderMinTimer !== null
+    ) {
+      clearTimeout(
+        loaderMinTimer
+      );
+
+      loaderMinTimer = null;
+    }
+
+    if (
+      loaderFallbackTimer !== null
+    ) {
+      clearTimeout(
+        loaderFallbackTimer
+      );
+
+      loaderFallbackTimer = null;
+    }
+
+    loader.classList.add(
+      "is-exiting"
+    );
+
+    const exitDuration =
+      reducedMotion.matches
+        ? 20
+        : 1150;
+
+    loaderExitTimer =
+      setTimeout(
+        () => {
+          loader.classList.remove(
+            "is-active"
+          );
+
+          loader.classList.remove(
+            "is-exiting"
+          );
+
+          loader.setAttribute(
+            "aria-hidden",
+            "true"
+          );
+
+          loaderExitTimer = null;
+        },
+        exitDuration
+      );
+  };
+
+
+  const tryFinishLoader = () => {
+    if (
+      !loader ||
+      loaderFinished
+    ) {
+      return;
+    }
+
+    const minimumDuration =
+      reducedMotion.matches
+        ? 0
+        : 900;
+
+    const elapsed =
+      performance.now() -
+      loaderStartedAt;
+
+    const remaining =
+      Math.max(
+        0,
+        minimumDuration -
+        elapsed
+      );
+
+    if (
+      remaining === 0
+    ) {
+      finishLoader();
+      return;
+    }
+
+    if (
+      loaderMinTimer !== null
+    ) {
+      clearTimeout(
+        loaderMinTimer
+      );
+    }
+
+    loaderMinTimer =
+      setTimeout(
+        finishLoader,
+        remaining
+      );
+  };
+
+
+  const startLoader = () => {
+    if (!loader) {
+      return;
+    }
+
+    if (
+      loader.classList.contains(
+        "is-active"
+      )
+    ) {
+      return;
+    }
+
+    loaderStartedAt =
+      performance.now();
+
+    loaderFinished = false;
+
+    loader.classList.add(
+      "is-active"
+    );
+
+    if (
+      document.readyState ===
+      "complete"
+    ) {
+      tryFinishLoader();
+    } else {
+      window.addEventListener(
+        "load",
+        tryFinishLoader,
+        {
+          once: true
+        }
+      );
+    }
+
+    loaderFallbackTimer =
+      setTimeout(
+        finishLoader,
+        reducedMotion.matches
+          ? 1000
+          : 4500
+      );
+  };
+
+
+  /* ========================================================
+     ACTIVE SECTION
      ======================================================== */
 
   const setActiveSection = (
@@ -501,14 +668,17 @@
 
     const safeIndex =
       clamp(
-        Number.isFinite(Number(index))
+        Number.isFinite(
+          Number(index)
+        )
           ? Number(index)
           : 0,
         0,
         sections.length - 1
       );
 
-    activeIndex = safeIndex;
+    activeIndex =
+      safeIndex;
 
     const section =
       sections[safeIndex];
@@ -517,80 +687,91 @@
       return;
     }
 
+    sections.forEach(
+      (
+        currentSection,
+        currentIndex
+      ) => {
+        currentSection.classList.toggle(
+          "is-active",
+          currentIndex ===
+            safeIndex
+        );
+      }
+    );
+
     const chapter =
-      section.dataset.chapter || "";
+      section.dataset.chapter ||
+      "";
 
-    activeChapter.textContent =
-      chapter;
-
-
-    /* ------------------------------------
-       PREVIOUS
-       ------------------------------------ */
-
-    const first =
-      safeIndex === 0;
-
-    previousButton.disabled =
-      first;
-
-    previousButton.setAttribute(
-      "aria-label",
-      first
-        ? "Sei all'inizio"
-        : `Vai alla sezione precedente: ${
-            sections[safeIndex - 1]
-              ?.dataset.chapter || ""
-          }`
-    );
+    if (activeChapter) {
+      activeChapter.textContent =
+        chapter;
+    }
 
 
-    /* ------------------------------------
-       NEXT / RETURN
-       ------------------------------------ */
+    /* PREVIOUS */
 
-    const last =
-      safeIndex === sections.length - 1;
+    if (previousButton) {
+      const first =
+        safeIndex === 0;
 
-    nextButton.classList.toggle(
-      "is-return",
-      last
-    );
+      previousButton.disabled =
+        first;
 
-    if (last) {
-
-      nextArrowSymbol.textContent =
-        "↶";
-
-      nextArrowLabel.textContent =
-        "INIZIO";
-
-      nextButton.setAttribute(
+      previousButton.setAttribute(
         "aria-label",
-        "Torna all'inizio"
-      );
-
-    } else {
-
-      nextArrowSymbol.textContent =
-        "→";
-
-      nextArrowLabel.textContent =
-        "AVANTI";
-
-      nextButton.setAttribute(
-        "aria-label",
-        `Vai alla sezione successiva: ${
-          sections[safeIndex + 1]
-            ?.dataset.chapter || ""
-        }`
+        first
+          ? "Sei all'inizio"
+          : `Vai alla sezione precedente: ${
+              sections[
+                safeIndex - 1
+              ]?.dataset.chapter || ""
+            }`
       );
     }
 
 
-    /* ------------------------------------
-       PROGRESS
-       ------------------------------------ */
+    /* NEXT */
+
+    if (nextButton) {
+      const last =
+        safeIndex ===
+        sections.length - 1;
+
+      nextButton.classList.toggle(
+        "is-return",
+        last
+      );
+
+      if (nextArrowSymbol) {
+        nextArrowSymbol.textContent =
+          last
+            ? "↶"
+            : "→";
+      }
+
+      if (nextArrowLabel) {
+        nextArrowLabel.textContent =
+          last
+            ? "INIZIO"
+            : "AVANTI";
+      }
+
+      nextButton.setAttribute(
+        "aria-label",
+        last
+          ? "Torna all'inizio"
+          : `Vai alla sezione successiva: ${
+              sections[
+                safeIndex + 1
+              ]?.dataset.chapter || ""
+            }`
+      );
+    }
+
+
+    /* PROGRESS */
 
     const percentage =
       sections.length > 1
@@ -600,20 +781,22 @@
           ) * 100
         : 0;
 
-    const percentageValue =
-      `${percentage}%`;
+    if (wowProgress) {
+      wowProgress.style.width =
+        `${percentage}%`;
+    }
 
-    wowProgress.style.width =
-      percentageValue;
-
-    wowDot.style.left =
-      percentageValue;
-
+    if (wowDot) {
+      wowDot.style.left =
+        `${percentage}%`;
+    }
 
     if (wowTrack) {
       wowTrack.setAttribute(
         "aria-valuenow",
-        String(safeIndex + 1)
+        String(
+          safeIndex + 1
+        )
       );
 
       wowTrack.setAttribute(
@@ -627,16 +810,12 @@
     }
 
 
-    /* ------------------------------------
-       MENU CURRENT
-       ------------------------------------ */
+    /* MENU */
 
     updateMenuCurrentState();
 
 
-    /* ------------------------------------
-       HASH
-       ------------------------------------ */
+    /* HASH */
 
     if (
       updateHash &&
@@ -660,10 +839,12 @@
 
 
   /* ========================================================
-     SCROLL TARGET
+     SCROLL
      ======================================================== */
 
-  const getScrollTarget = (section) => {
+  const getScrollTarget = (
+    section
+  ) => {
     if (!section) {
       return 0;
     }
@@ -671,125 +852,12 @@
     const rect =
       section.getBoundingClientRect();
 
-    const documentTop =
-      window.scrollY +
-      rect.top;
-
-    const maxScroll =
-      Math.max(
-        0,
-        document.documentElement.scrollHeight -
-        window.innerHeight
-      );
-
-    return clamp(
-      documentTop -
-      getHeaderHeight(),
+    return Math.max(
       0,
-      maxScroll
+      window.scrollY +
+        rect.top -
+        getHeaderHeight()
     );
-  };
-
-
-  const scrollToSection = (
-    section,
-    behavior = "smooth"
-  ) => {
-
-    const targetTop =
-      getScrollTarget(section);
-
-    window.scrollTo({
-      top: targetTop,
-      behavior
-    });
-
-    return targetTop;
-  };
-
-
-  /* ========================================================
-     NAVIGATION LOCK
-     ======================================================== */
-
-  const stopNavigationMonitor = () => {
-
-    if (navigationFrame !== null) {
-      window.cancelAnimationFrame(
-        navigationFrame
-      );
-
-      navigationFrame = null;
-    }
-
-    if (navigationTimer !== null) {
-      window.clearTimeout(
-        navigationTimer
-      );
-
-      navigationTimer = null;
-    }
-  };
-
-
-  const releaseNavigationLock = (
-    syncToViewport = true
-  ) => {
-
-    if (!navigationLock) {
-      return;
-    }
-
-    const lockedIndex =
-      navigationLock.index;
-
-    navigationLock = null;
-
-    stopNavigationMonitor();
-
-    if (syncToViewport) {
-      requestNarrativeUpdate();
-    } else {
-      setActiveSection(
-        lockedIndex,
-        false
-      );
-    }
-  };
-
-
-  const monitorNavigation = () => {
-
-    if (!navigationLock) {
-      return;
-    }
-
-    const distance =
-      Math.abs(
-        window.scrollY -
-        navigationLock.targetTop
-      );
-
-    if (
-      reducedMotion.matches ||
-      distance <= 3
-    ) {
-      releaseNavigationLock(false);
-      return;
-    }
-
-    if (
-      performance.now() >=
-      navigationLock.deadline
-    ) {
-      releaseNavigationLock(true);
-      return;
-    }
-
-    navigationFrame =
-      window.requestAnimationFrame(
-        monitorNavigation
-      );
   };
 
 
@@ -800,7 +868,9 @@
 
     const safeIndex =
       clamp(
-        Number.isFinite(Number(index))
+        Number.isFinite(
+          Number(index)
+        )
           ? Number(index)
           : 0,
         0,
@@ -814,41 +884,25 @@
       return;
     }
 
-    stopNavigationMonitor();
-
     setActiveSection(
       safeIndex,
       updateHash
     );
 
-    const behavior =
-      reducedMotion.matches
-        ? "auto"
-        : "smooth";
-
     const targetTop =
-      scrollToSection(
-        target,
-        behavior
+      getScrollTarget(
+        target
       );
 
-    if (behavior === "auto") {
-      navigationLock = null;
-      requestNarrativeUpdate();
-      return;
-    }
+    window.scrollTo({
+      top: targetTop,
+      behavior:
+        reducedMotion.matches
+          ? "auto"
+          : "smooth"
+    });
 
-    navigationLock = {
-      index: safeIndex,
-      targetTop,
-      deadline:
-        performance.now() + 2200
-    };
-
-    navigationFrame =
-      window.requestAnimationFrame(
-        monitorNavigation
-      );
+    requestNarrativeUpdate();
   };
 
 
@@ -856,53 +910,62 @@
      MENU LINKS
      ======================================================== */
 
-  menuLinks.forEach((link) => {
+  menuLinks.forEach(
+    (link) => {
 
-    link.addEventListener(
-      "click",
-      (event) => {
+      link.addEventListener(
+        "click",
+        (event) => {
 
-        const href =
-          link.getAttribute("href");
+          const href =
+            link.getAttribute(
+              "href"
+            );
 
-        if (
-          !href ||
-          !href.startsWith("#")
-        ) {
-          return;
-        }
+          if (
+            !href ||
+            !href.startsWith("#")
+          ) {
+            return;
+          }
 
-        const target =
-          document.getElementById(
-            href.slice(1)
+          const id =
+            href.slice(1);
+
+          const target =
+            document.getElementById(
+              id
+            );
+
+          if (!target) {
+            return;
+          }
+
+          const index =
+            getSectionIndex(
+              target
+            );
+
+          if (index < 0) {
+            return;
+          }
+
+          event.preventDefault();
+
+          closeMenu();
+
+          navigateToSection(
+            index,
+            true
           );
-
-        if (!target) {
-          return;
         }
-
-        const index =
-          getSectionIndex(target);
-
-        if (index < 0) {
-          return;
-        }
-
-        event.preventDefault();
-
-        setMenuState(false);
-
-        navigateToSection(
-          index,
-          true
-        );
-      }
-    );
-  });
+      );
+    }
+  );
 
 
   /* ========================================================
-     NARRATIVE CACHE
+     NARRATIVE VARIABLES
      ======================================================== */
 
   const updateSectionVariable = (
@@ -950,12 +1013,15 @@
       (
         viewportHeight -
         headerHeight
-      ) * .38;
+      ) * 0.38;
 
     let containingIndex = -1;
 
     sections.forEach(
-      (section, index) => {
+      (
+        section,
+        index
+      ) => {
 
         const rect =
           section.getBoundingClientRect();
@@ -977,10 +1043,14 @@
     }
 
     let nearestIndex = 0;
-    let nearestDistance = Infinity;
+    let nearestDistance =
+      Infinity;
 
     sections.forEach(
-      (section, index) => {
+      (
+        section,
+        index
+      ) => {
 
         const rect =
           section.getBoundingClientRect();
@@ -1027,11 +1097,13 @@
       (
         viewportHeight -
         headerHeight
-      ) * .38;
-
+      ) * 0.38;
 
     sections.forEach(
-      (section, index) => {
+      (
+        section,
+        index
+      ) => {
 
         const rect =
           section.getBoundingClientRect();
@@ -1041,11 +1113,6 @@
             rect.height,
             1
           );
-
-
-        /* --------------------------------
-           SECTION PROGRESS
-           -------------------------------- */
 
         const raw =
           (
@@ -1061,13 +1128,14 @@
           );
 
 
-        /* --------------------------------
-           TITLE
-           -------------------------------- */
+        /* TITLE */
 
         const titleFade =
           smoothStep(
-            (progress - .05) / .42
+            (
+              progress -
+              0.05
+            ) / 0.42
           );
 
         const titleAlpha =
@@ -1083,25 +1151,30 @@
           ).toFixed(1)}px`;
 
 
-        /* --------------------------------
-           CONTENT
-           -------------------------------- */
+        /* CONTENT */
 
         const contentReveal =
           smoothStep(
-            (progress - .14) / .42
+            (
+              progress -
+              0.14
+            ) / 0.42
           );
 
         const contentAlpha =
           (
-            .18 +
-            (.82 * contentReveal)
+            0.18 +
+            0.82 *
+              contentReveal
           ).toFixed(3);
 
         const contentY =
           `${(
             32 *
-            (1 - contentReveal)
+            (
+              1 -
+              contentReveal
+            )
           ).toFixed(1)}px`;
 
 
@@ -1136,10 +1209,6 @@
     );
 
 
-    if (navigationLock) {
-      return;
-    }
-
     const viewportIndex =
       getViewportActiveIndex();
 
@@ -1164,7 +1233,7 @@
     }
 
     scrollFrame =
-      window.requestAnimationFrame(
+      requestAnimationFrame(
         updateNarrative
       );
   };
@@ -1178,7 +1247,6 @@
     }
   );
 
-
   window.addEventListener(
     "resize",
     requestNarrativeUpdate,
@@ -1189,90 +1257,22 @@
 
 
   /* ========================================================
-     SCROLL END ENHANCEMENT
-     ======================================================== */
-
-  if ("onscrollend" in window) {
-
-    window.addEventListener(
-      "scrollend",
-      () => {
-
-        if (navigationLock) {
-          releaseNavigationLock(true);
-        } else {
-          requestNarrativeUpdate();
-        }
-      }
-    );
-  }
-
-
-  /* ========================================================
      PREVIOUS
      ======================================================== */
 
-  previousButton.addEventListener(
-    "click",
-    () => {
-
-      if (activeIndex <= 0) {
-        return;
-      }
-
-      navigateToSection(
-        activeIndex - 1,
-        true
-      );
-    }
-  );
-
-
-  /* ========================================================
-     NEXT / RETURN
-     ======================================================== */
-
-  nextButton.addEventListener(
-    "click",
-    () => {
-
-      const last =
-        activeIndex ===
-        sections.length - 1;
-
-      if (last) {
-        navigateToSection(
-          0,
-          true
-        );
-
-        return;
-      }
-
-      navigateToSection(
-        activeIndex + 1,
-        true
-      );
-    }
-  );
-
-
-  /* ========================================================
-     BRAND
-     ======================================================== */
-
-  if (brand) {
-
-    brand.addEventListener(
+  if (previousButton) {
+    previousButton.addEventListener(
       "click",
-      (event) => {
+      () => {
 
-        event.preventDefault();
-
-        setMenuState(false);
+        if (
+          activeIndex <= 0
+        ) {
+          return;
+        }
 
         navigateToSection(
-          0,
+          activeIndex - 1,
           true
         );
       }
@@ -1281,27 +1281,60 @@
 
 
   /* ========================================================
-     FOOTER MARK
+     NEXT
      ======================================================== */
 
-  const footerMark =
-    document.querySelector(".footer-mark");
-
-  if (footerMark) {
-
-    footerMark.addEventListener(
+  if (nextButton) {
+    nextButton.addEventListener(
       "click",
-      (event) => {
+      () => {
 
-        event.preventDefault();
-
-        setMenuState(false);
+        const last =
+          activeIndex ===
+          sections.length - 1;
 
         navigateToSection(
-          0,
+          last
+            ? 0
+            : activeIndex + 1,
           true
         );
       }
+    );
+  }
+
+
+  /* ========================================================
+     BRAND / FOOTER
+     ======================================================== */
+
+  const goHome = (
+    event
+  ) => {
+
+    event.preventDefault();
+
+    closeMenu();
+
+    navigateToSection(
+      0,
+      true
+    );
+  };
+
+
+  if (brand) {
+    brand.addEventListener(
+      "click",
+      goHome
+    );
+  }
+
+
+  if (footerMark) {
+    footerMark.addEventListener(
+      "click",
+      goHome
     );
   }
 
@@ -1314,26 +1347,22 @@
     "keydown",
     (event) => {
 
-      /* --------------------------------
-         ESCAPE
-         -------------------------------- */
+      /* ESC */
 
       if (
-        event.key === "Escape" &&
+        event.key ===
+          "Escape" &&
         menuOpen
       ) {
-
         event.preventDefault();
 
-        setMenuState(false);
+        closeMenu();
 
         return;
       }
 
 
-      /* --------------------------------
-         FOCUS TRAP
-         -------------------------------- */
+      /* MENU FOCUS TRAP */
 
       if (
         event.key === "Tab" &&
@@ -1358,9 +1387,9 @@
 
         if (
           event.shiftKey &&
-          document.activeElement === first
+          document.activeElement ===
+            first
         ) {
-
           event.preventDefault();
 
           last.focus();
@@ -1370,9 +1399,9 @@
 
         if (
           !event.shiftKey &&
-          document.activeElement === last
+          document.activeElement ===
+            last
         ) {
-
           event.preventDefault();
 
           first.focus();
@@ -1382,13 +1411,15 @@
       }
 
 
-      /* --------------------------------
-         EDITABLE / INTERACTIVE
-         -------------------------------- */
+      /* INTERACTIVE ELEMENTS */
 
       if (
-        isEditableTarget(event.target) ||
-        isInteractiveTarget(event.target)
+        isEditableTarget(
+          event.target
+        ) ||
+        isInteractiveTarget(
+          event.target
+        )
       ) {
         return;
       }
@@ -1404,31 +1435,33 @@
       }
 
 
-      /* --------------------------------
-         ARROW NAVIGATION
-         -------------------------------- */
+      /* LEFT */
 
       if (
-        event.key === "ArrowLeft" &&
+        event.key ===
+          "ArrowLeft" &&
         !menuOpen
       ) {
 
         event.preventDefault();
 
-        previousButton.click();
+        previousButton?.click();
 
         return;
       }
 
 
+      /* RIGHT */
+
       if (
-        event.key === "ArrowRight" &&
+        event.key ===
+          "ArrowRight" &&
         !menuOpen
       ) {
 
         event.preventDefault();
 
-        nextButton.click();
+        nextButton?.click();
       }
     }
   );
@@ -1462,7 +1495,9 @@
       return null;
     }
 
-    return document.getElementById(id);
+    return document.getElementById(
+      id
+    );
   };
 
 
@@ -1476,22 +1511,21 @@
     }
 
     const index =
-      getSectionIndex(target);
+      getSectionIndex(
+        target
+      );
 
     if (index < 0) {
       return;
     }
 
-    window.setTimeout(
+    requestAnimationFrame(
       () => {
-
         navigateToSection(
           index,
           false
         );
-
-      },
-      80
+      }
     );
   };
 
@@ -1503,11 +1537,14 @@
 
 
   /* ========================================================
-     INITIAL STATE
+     INITIAL NARRATIVE STATE
      ======================================================== */
 
   sections.forEach(
-    (section, index) => {
+    (
+      section,
+      index
+    ) => {
 
       const initialState =
         index === 0
@@ -1524,9 +1561,10 @@
               contentY: "32px"
             };
 
-      narrativeCache[index] = {
-        ...initialState
-      };
+      narrativeCache[index] =
+        {
+          ...initialState
+        };
 
       section.style.setProperty(
         "--title-alpha",
@@ -1552,22 +1590,10 @@
 
 
   /* ========================================================
-     INITIAL MENU STATE
+     INITIAL PAGE STATE
      ======================================================== */
-
-  setMenuInert(true);
-
-  menu.setAttribute(
-    "aria-hidden",
-    "true"
-  );
 
   setPageInert(false);
-
-
-  /* ========================================================
-     INITIAL ACTIVE SECTION
-     ======================================================== */
 
   setActiveSection(
     0,
@@ -1588,27 +1614,36 @@
      HASH RESTORE
      ======================================================== */
 
-  if (window.location.hash) {
+  if (
+    window.location.hash
+  ) {
     handleHash();
   }
 
 
   /* ========================================================
-     BFCache / PAGE SHOW
+     BF CACHE
      ======================================================== */
 
   window.addEventListener(
     "pageshow",
     (event) => {
 
-      if (event.persisted) {
+      if (
+        !event.persisted
+      ) {
+        return;
+      }
 
-        menuOpen = false;
+      menuOpen = false;
 
+      if (header) {
         header.classList.remove(
           "menu-open"
         );
+      }
 
+      if (menu) {
         menu.classList.remove(
           "is-open"
         );
@@ -1618,16 +1653,19 @@
           "true"
         );
 
-        setMenuInert(true);
-
-        body.classList.remove(
-          "menu-is-open"
+        setInert(
+          menu,
+          true
         );
-
-        setPageInert(false);
-
-        requestNarrativeUpdate();
       }
+
+      body.classList.remove(
+        "menu-is-open"
+      );
+
+      setPageInert(false);
+
+      requestNarrativeUpdate();
     }
   );
 
@@ -1643,7 +1681,7 @@
       if (
         loaderMinTimer !== null
       ) {
-        window.clearTimeout(
+        clearTimeout(
           loaderMinTimer
         );
       }
@@ -1651,7 +1689,7 @@
       if (
         loaderFallbackTimer !== null
       ) {
-        window.clearTimeout(
+        clearTimeout(
           loaderFallbackTimer
         );
       }
@@ -1659,17 +1697,15 @@
       if (
         loaderExitTimer !== null
       ) {
-        window.clearTimeout(
+        clearTimeout(
           loaderExitTimer
         );
       }
 
-      stopNavigationMonitor();
-
       if (
         scrollFrame !== null
       ) {
-        window.cancelAnimationFrame(
+        cancelAnimationFrame(
           scrollFrame
         );
 
