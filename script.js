@@ -1,6 +1,10 @@
 (() => {
   "use strict";
 
+  /* =======================================================
+     01. CONFIG
+     ======================================================= */
+
   const CONFIG = {
     standbyDelay: 40000,
     loaderMax: 1200,
@@ -9,715 +13,968 @@
     activeLineMax: 260
   };
 
-  const doc = document;
-  const root = doc.documentElement;
-  const body = doc.body;
 
-  const loader = doc.getElementById("site-loader");
-  const standby = doc.getElementById("standby");
+  /* =======================================================
+     02. DOM
+     ======================================================= */
 
-  const header = doc.getElementById("site-header");
-  const menu = doc.getElementById("menu");
-  const menuToggle = doc.getElementById("menu-toggle");
-  const menuLinks = [...doc.querySelectorAll(".menu-list a")];
+  const body = document.body;
+  const html = document.documentElement;
 
-  const main = doc.getElementById("main-content");
-  const footer = doc.querySelector(".site-footer");
+  const loader = document.getElementById("loader");
+  const standby = document.getElementById("standby");
 
-  const storyNav = doc.getElementById("story-nav");
-  const activeStoryTitle = doc.getElementById("active-story-title");
-  const storyProgress = doc.getElementById("story-progress");
-  const storyProgressFill = doc.querySelector(".story-progress-fill");
-  const storyProgressOrb = doc.querySelector(".story-progress-orb");
-  const storyPrev = doc.getElementById("story-prev");
-  const storyNext = doc.getElementById("story-next");
+  const header = document.getElementById("site-header");
+  const storyNav = document.getElementById("story-nav");
 
-  const stories = [...doc.querySelectorAll(".story")];
-  const year = doc.getElementById("year");
+  const menu = document.getElementById("menu");
+  const menuToggle = document.getElementById("menu-toggle");
+  const menuLinks = [...document.querySelectorAll(".site-menu-link")];
 
-  const prefersReducedMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)"
-  );
+  const activeStoryTitle =
+    document.getElementById("active-story-title");
+
+  const prevButton =
+    document.getElementById("story-prev");
+
+  const nextButton =
+    document.getElementById("story-next");
+
+  const progress =
+    document.getElementById("story-progress");
+
+  const progressFill =
+    document.querySelector(".story-progress-fill");
+
+  const progressOrb =
+    document.querySelector(".story-progress-orb");
+
+  const sections =
+    [...document.querySelectorAll(".story-section[data-story-title]")];
+
+
+  /* =======================================================
+     03. STATE
+     ======================================================= */
 
   let activeIndex = 0;
-  let scrollFrame = 0;
-  let standbyTimer = 0;
   let menuOpen = false;
-  let lastFocusedElement = null;
-  let loaderHidden = false;
 
-  /* --------------------------------------------------
-     BASIC STATE
-  -------------------------------------------------- */
+  let ticking = false;
+  let resizeTimer = 0;
+  let standbyTimer = 0;
 
-  if (year) {
-    year.textContent = new Date().getFullYear();
-  }
+  let previousFocus = null;
 
-  function setThemeColor(value) {
-    let meta = doc.querySelector('meta[name="theme-color"]');
+  let suppressHashScroll = false;
 
-    if (!meta) {
-      meta = doc.createElement("meta");
-      meta.name = "theme-color";
-      doc.head.appendChild(meta);
-    }
+  let lastScrollY = window.scrollY;
 
-    meta.content = value;
-  }
+  const reduceMotion =
+    window.matchMedia("(prefers-reduced-motion: reduce)");
 
-  function updateHeaderChrome() {
-    header?.setAttribute("data-theme", "dark");
-    setThemeColor("#0b0b0a");
-  }
 
-  updateHeaderChrome();
+  /* =======================================================
+     04. HELPERS
+     ======================================================= */
 
-  /* --------------------------------------------------
-     LOADER
-  -------------------------------------------------- */
+  const clamp = (value, min, max) =>
+    Math.min(Math.max(value, min), max);
 
-  function hideLoader() {
-    if (loaderHidden || !loader) {
-      return;
-    }
 
-    loaderHidden = true;
-    loader.classList.add("is-hidden");
-    window.setTimeout(() => {
-      loader.hidden = true;
-    }, 700);
-  }
+  const getHeaderHeight = () =>
+    header?.getBoundingClientRect().height || 0;
 
-  if (doc.readyState === "complete") {
-    window.setTimeout(hideLoader, 80);
-  } else {
-    window.addEventListener("load", () => {
-      window.setTimeout(hideLoader, 80);
-    }, { once: true });
-  }
 
-  window.setTimeout(hideLoader, CONFIG.loaderMax);
-
-  /* --------------------------------------------------
-     MENU / FOCUS MANAGEMENT
-  -------------------------------------------------- */
-
-  const focusableSelector = [
-    "a[href]",
-    "button:not([disabled])",
-    "input:not([disabled])",
-    "select:not([disabled])",
-    "textarea:not([disabled])",
-    "[tabindex]:not([tabindex='-1'])"
-  ].join(",");
-
-  function setMenuFocusable(enabled) {
-    menuLinks.forEach((link) => {
-      if (enabled) {
-        link.removeAttribute("tabindex");
-      } else {
-        link.setAttribute("tabindex", "-1");
-      }
-    });
-  }
-
-  function setBackgroundInert(isInert) {
-    [main, footer, storyNav].forEach((element) => {
-      if (!element) {
-        return;
-      }
-
-      element.inert = isInert;
-
-      if (isInert) {
-        element.setAttribute("aria-hidden", "true");
-      } else {
-        element.removeAttribute("aria-hidden");
-      }
-    });
-  }
-
-  function updateMenuAria(open) {
-    menuToggle?.setAttribute("aria-expanded", String(open));
-    menuToggle?.setAttribute(
-      "aria-label",
-      open ? "Chiudi menu" : "Apri menu"
-    );
-
-    menu?.setAttribute("aria-hidden", String(!open));
-  }
-
-  function openMenu() {
-    if (!menu || menuOpen) {
-      return;
-    }
-
-    lastFocusedElement = doc.activeElement;
-    menuOpen = true;
-
-    setMenuFocusable(true);
-    setBackgroundInert(true);
-
-    menu.removeAttribute("inert");
-    menu.inert = false;
-
-    menu.classList.add("is-open");
-    menuToggle?.setAttribute("aria-expanded", "true");
-    menuToggle?.setAttribute("aria-label", "Chiudi menu");
-
-    body.classList.add("menu-open");
-
-    window.requestAnimationFrame(() => {
-      menuLinks[0]?.focus({ preventScroll: true });
-    });
-  }
-
-  function closeMenu(restoreFocus = true) {
-    if (!menu) {
-      return;
-    }
-
-    menuOpen = false;
-
-    menu.classList.remove("is-open");
-    menu.setAttribute("aria-hidden", "true");
-    menu.setAttribute("inert", "");
-    menu.inert = true;
-
-    setMenuFocusable(false);
-    setBackgroundInert(false);
-
-    body.classList.remove("menu-open");
-
-    menuToggle?.setAttribute("aria-expanded", "false");
-    menuToggle?.setAttribute("aria-label", "Apri menu");
-
-    if (
-      restoreFocus &&
-      lastFocusedElement &&
-      typeof lastFocusedElement.focus === "function"
-    ) {
-      window.requestAnimationFrame(() => {
-        lastFocusedElement.focus({ preventScroll: true });
-      });
-    }
-
-    lastFocusedElement = null;
-  }
-
-  function trapMenuFocus(event) {
-    if (!menuOpen || event.key !== "Tab") {
-      return;
-    }
-
-    const focusables = [...menu.querySelectorAll(focusableSelector)]
-      .filter((element) => !element.hasAttribute("disabled"));
-
-    if (!focusables.length) {
-      event.preventDefault();
-      return;
-    }
-
-    const first = focusables[0];
-    const last = focusables[focusables.length - 1];
-
-    if (event.shiftKey && doc.activeElement === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && doc.activeElement === last) {
-      event.preventDefault();
-      first.focus();
-    }
-  }
-
-  menuToggle?.addEventListener("click", () => {
-    if (menuOpen) {
-      closeMenu();
-    } else {
-      openMenu();
-    }
-  });
-
-  menuLinks.forEach((link) => {
-    link.addEventListener("click", () => {
-      closeMenu(false);
-    });
-  });
-
-  doc.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && menuOpen) {
-      event.preventDefault();
-      closeMenu();
-      return;
-    }
-
-    trapMenuFocus(event);
-  });
-
-  setMenuFocusable(false);
-  if (menu) {
-    menu.setAttribute("inert", "");
-    menu.inert = true;
-    menu.setAttribute("aria-hidden", "true");
-  }
-
-  /* --------------------------------------------------
-     STORY NAVIGATION
-  -------------------------------------------------- */
-
-  function getStoryId(index) {
-    return stories[index]?.id || "";
-  }
-
-  function getStoryTitle(index) {
-    return stories[index]?.dataset.title || "";
-  }
-
-  function getReadingLine() {
-    const headerHeight = header?.offsetHeight || 0;
-    return headerHeight + Math.min(
+  const getReadingLine = () =>
+    getHeaderHeight() +
+    Math.min(
       window.innerHeight * CONFIG.activeLineRatio,
       CONFIG.activeLineMax
     );
-  }
 
-  function calculateActiveIndex() {
-    if (!stories.length) {
-      return 0;
-    }
 
-    const readingLine = getReadingLine();
-    let candidate = 0;
-
-    for (let index = 0; index < stories.length; index += 1) {
-      const rect = stories[index].getBoundingClientRect();
-
-      if (rect.top <= readingLine) {
-        candidate = index;
-      } else {
-        break;
-      }
-    }
-
-    return Math.max(0, Math.min(candidate, stories.length - 1));
-  }
-
-  function updateMenuCurrentState(index) {
-    const currentId = getStoryId(index);
-
-    menuLinks.forEach((link) => {
-      const matches = link.hash === `#${currentId}`;
-
-      if (matches) {
-        link.setAttribute("aria-current", "page");
-      } else {
-        link.removeAttribute("aria-current");
-      }
-    });
-  }
-
-  function updateNavigationState(index) {
-    if (!stories[index]) {
-      return;
-    }
-
-    activeIndex = index;
-
-    const title = getStoryTitle(index);
-
-    if (activeStoryTitle && activeStoryTitle.textContent !== title) {
-      activeStoryTitle.textContent = title;
-    }
-
-    if (storyPrev) {
-      storyPrev.disabled = index <= 0;
-      storyPrev.setAttribute(
-        "aria-label",
-        index <= 0
-          ? "Sezione precedente non disponibile"
-          : `Sezione precedente: ${getStoryTitle(index - 1)}`
-      );
-    }
-
-    if (storyNext) {
-      storyNext.disabled = index >= stories.length - 1;
-      storyNext.setAttribute(
-        "aria-label",
-        index >= stories.length - 1
-          ? "Sezione successiva non disponibile"
-          : `Sezione successiva: ${getStoryTitle(index + 1)}`
-      );
-    }
-
-    updateMenuCurrentState(index);
-  }
-
-  function getSectionProgress(section) {
-    if (!section) {
-      return 0;
-    }
-
-    const rect = section.getBoundingClientRect();
-    const viewportHeight = window.innerHeight;
-    const sectionHeight = Math.max(section.offsetHeight, viewportHeight);
-
-    const start = viewportHeight;
-    const end = -sectionHeight;
-    const current = rect.top;
-
-    const progress = (start - current) / (start - end);
-
-    return Math.max(0, Math.min(1, progress));
-  }
-
-  function updateProgress() {
-    const section = stories[activeIndex];
-
-    if (!section || !storyProgress) {
-      return;
-    }
-
-    const progress = getSectionProgress(section);
-    const percentage = progress * 100;
-
-    if (storyProgressFill) {
-      storyProgressFill.style.width = `${percentage}%`;
-    }
-
-    if (storyProgressOrb) {
-      storyProgressOrb.style.left = `${percentage}%`;
-    }
-
-    storyProgress.setAttribute(
-      "aria-valuenow",
-      String(Math.round(percentage))
-    );
-  }
-
-  function updateScrollState() {
-    const nextIndex = calculateActiveIndex();
-
-    if (nextIndex !== activeIndex) {
-      updateNavigationState(nextIndex);
-    }
-
-    updateProgress();
-
-    scrollFrame = 0;
-  }
-
-  function requestScrollStateUpdate() {
-    if (scrollFrame) {
-      return;
-    }
-
-    scrollFrame = window.requestAnimationFrame(updateScrollState);
-  }
-
-  function scrollToStory(index, updateHash = true) {
-    if (!stories[index]) {
-      return;
-    }
-
-    const target = stories[index];
-    const offset = header?.offsetHeight || 0;
-    const targetTop =
-      window.scrollY +
-      target.getBoundingClientRect().top -
-      offset -
-      CONFIG.scrollOffset;
-
-    if (updateHash) {
-      const nextHash = `#${target.id}`;
-
-      if (window.location.hash !== nextHash) {
-        history.pushState(
-          { story: target.id },
-          "",
-          nextHash
-        );
-      }
-    }
-
-    window.scrollTo({
-      top: Math.max(0, targetTop),
-      behavior: prefersReducedMotion.matches ? "auto" : "smooth"
-    });
-
-    updateNavigationState(index);
-  }
-
-  storyPrev?.addEventListener("click", () => {
-    if (activeIndex > 0) {
-      scrollToStory(activeIndex - 1);
-    }
+  const getSectionData = (section) => ({
+    title: section.dataset.storyTitle || "",
+    meta: section.dataset.storyMeta || ""
   });
 
-  storyNext?.addEventListener("click", () => {
-    if (activeIndex < stories.length - 1) {
-      scrollToStory(activeIndex + 1);
-    }
-  });
 
-  window.addEventListener("scroll", requestScrollStateUpdate, {
-    passive: true
-  });
+  const getSectionId = (index) =>
+    sections[index]?.id || "";
 
-  window.addEventListener("resize", requestScrollStateUpdate, {
-    passive: true
-  });
 
-  window.addEventListener("orientationchange", requestScrollStateUpdate, {
-    passive: true
-  });
-
-  /* --------------------------------------------------
-     HASH / HISTORY
-  -------------------------------------------------- */
-
-  function indexFromHash() {
-    const hash = window.location.hash.replace(/^#/, "");
+  const getIndexFromHash = () => {
+    const hash = window.location.hash.slice(1);
 
     if (!hash) {
       return -1;
     }
 
-    return stories.findIndex((story) => story.id === hash);
-  }
+    return sections.findIndex(
+      (section) => section.id === hash
+    );
+  };
 
-  function handleHash(initial = false) {
-    const index = indexFromHash();
+
+  /* =======================================================
+     05. HEADER THEME
+     ======================================================= */
+
+  const updateHeaderChrome = () => {
+    if (!header) {
+      return;
+    }
+
+    header.style.background = "#0b0b0a";
+    header.style.color = "#f1efe8";
+
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", "#0b0b0a");
+  };
+
+
+  /* =======================================================
+     06. MENU ARIA
+     ======================================================= */
+
+  const updateMenuAria = (open) => {
+    if (!menu || !menuToggle) {
+      return;
+    }
+
+    menu.setAttribute("aria-hidden", String(!open));
+
+    menuToggle.setAttribute(
+      "aria-expanded",
+      String(open)
+    );
+
+    menuToggle.setAttribute(
+      "aria-label",
+      open ? "Chiudi menu" : "Apri menu"
+    );
+
+    if (open) {
+      menu.removeAttribute("inert");
+      menu.inert = false;
+    } else {
+      menu.setAttribute("inert", "");
+      menu.inert = true;
+    }
+  };
+
+
+  /* =======================================================
+     07. BACKGROUND INERT
+     ======================================================= */
+
+  const setBackgroundInert = (inert) => {
+    const main = document.getElementById("main-content");
+
+    if (main) {
+      main.inert = inert;
+    }
+
+    if (storyNav) {
+      storyNav.inert = inert;
+      storyNav.setAttribute(
+        "aria-hidden",
+        String(inert)
+      );
+    }
+  };
+
+
+  /* =======================================================
+     08. MENU
+     ======================================================= */
+
+  const openMenu = () => {
+    if (menuOpen || !menu || !menuToggle) {
+      return;
+    }
+
+    previousFocus = document.activeElement;
+    menuOpen = true;
+
+    body.classList.add("menu-open");
+    menu.classList.add("is-open");
+
+    setBackgroundInert(true);
+    updateMenuAria(true);
+
+    requestAnimationFrame(() => {
+      const firstLink = menuLinks[0];
+
+      if (firstLink) {
+        firstLink.focus();
+      }
+    });
+  };
+
+
+  const closeMenu = ({
+    restoreFocus = true
+  } = {}) => {
+    if (!menuOpen || !menu || !menuToggle) {
+      return;
+    }
+
+    menuOpen = false;
+
+    body.classList.remove("menu-open");
+    menu.classList.remove("is-open");
+
+    setBackgroundInert(false);
+    updateMenuAria(false);
+
+    if (
+      restoreFocus &&
+      previousFocus &&
+      typeof previousFocus.focus === "function"
+    ) {
+      previousFocus.focus();
+    }
+
+    previousFocus = null;
+  };
+
+
+  const toggleMenu = () => {
+    if (menuOpen) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  };
+
+
+  /* =======================================================
+     09. FOCUS TRAP
+     ======================================================= */
+
+  const trapMenuFocus = (event) => {
+    if (!menuOpen || event.key !== "Tab") {
+      return;
+    }
+
+    const focusable = menuLinks.filter(
+      (element) =>
+        !element.hasAttribute("disabled") &&
+        element.getAttribute("aria-hidden") !== "true"
+    );
+
+    if (!focusable.length) {
+      event.preventDefault();
+      return;
+    }
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+      return;
+    }
+
+    if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
+
+
+  /* =======================================================
+     10. ACTIVE SECTION
+     ======================================================= */
+
+  const calculateActiveIndex = () => {
+    if (!sections.length) {
+      return 0;
+    }
+
+    const readingLine = getReadingLine();
+
+    let index = 0;
+
+    sections.forEach((section, currentIndex) => {
+      const rect = section.getBoundingClientRect();
+
+      if (rect.top <= readingLine) {
+        index = currentIndex;
+      }
+    });
+
+    return clamp(
+      index,
+      0,
+      sections.length - 1
+    );
+  };
+
+
+  const setActiveSection = (index) => {
+    if (!sections.length) {
+      return;
+    }
+
+    const nextIndex = clamp(
+      index,
+      0,
+      sections.length - 1
+    );
+
+    const changed = nextIndex !== activeIndex;
+
+    activeIndex = nextIndex;
+
+    const section = sections[activeIndex];
+    const data = getSectionData(section);
+
+    if (activeStoryTitle) {
+      activeStoryTitle.textContent = data.title;
+    }
+
+    menuLinks.forEach((link) => {
+      const href = link.getAttribute("href");
+      const isCurrent =
+        href === `#${section.id}`;
+
+      if (isCurrent) {
+        link.setAttribute(
+          "aria-current",
+          "location"
+        );
+      } else {
+        link.removeAttribute("aria-current");
+      }
+    });
+
+    if (prevButton) {
+      prevButton.disabled =
+        activeIndex === 0;
+    }
+
+    if (nextButton) {
+      nextButton.disabled =
+        activeIndex === sections.length - 1;
+    }
+
+    if (changed) {
+      updateProgress();
+    }
+  };
+
+
+  /* =======================================================
+     11. SECTION PROGRESS
+     ======================================================= */
+
+  const calculateSectionProgress = (section) => {
+    const rect = section.getBoundingClientRect();
+
+    const viewportHeight =
+      window.innerHeight;
+
+    const sectionTop =
+      window.scrollY + rect.top;
+
+    const sectionHeight =
+      Math.max(section.offsetHeight, 1);
+
+    const start =
+      sectionTop - viewportHeight;
+
+    const end =
+      sectionTop + sectionHeight;
+
+    const progressValue =
+      (window.scrollY - start) /
+      Math.max(end - start, 1);
+
+    return clamp(
+      progressValue,
+      0,
+      1
+    );
+  };
+
+
+  const updateProgress = () => {
+    if (
+      !sections.length ||
+      !progress ||
+      !progressFill ||
+      !progressOrb
+    ) {
+      return;
+    }
+
+    const section =
+      sections[activeIndex];
+
+    if (!section) {
+      return;
+    }
+
+    const value =
+      calculateSectionProgress(section);
+
+    const percentage =
+      Math.round(value * 100);
+
+    progress.setAttribute(
+      "aria-valuenow",
+      String(percentage)
+    );
+
+    progressFill.style.width =
+      `${percentage}%`;
+
+    progressOrb.style.left =
+      `${percentage}%`;
+  };
+
+
+  /* =======================================================
+     12. SCROLL UPDATE
+     ======================================================= */
+
+  const updateScrollState = () => {
+    ticking = false;
+
+    const nextIndex =
+      calculateActiveIndex();
+
+    setActiveSection(nextIndex);
+    updateProgress();
+
+    lastScrollY = window.scrollY;
+  };
+
+
+  const requestScrollUpdate = () => {
+    if (ticking) {
+      return;
+    }
+
+    ticking = true;
+
+    window.requestAnimationFrame(
+      updateScrollState
+    );
+  };
+
+
+  /* =======================================================
+     13. NAVIGATION
+     ======================================================= */
+
+  const scrollToStory = (
+    index,
+    {
+      updateHash = true,
+      smooth = true
+    } = {}
+  ) => {
+    if (!sections.length) {
+      return;
+    }
+
+    const targetIndex = clamp(
+      index,
+      0,
+      sections.length - 1
+    );
+
+    const target =
+      sections[targetIndex];
+
+    if (!target) {
+      return;
+    }
+
+    if (menuOpen) {
+      closeMenu({
+        restoreFocus: false
+      });
+    }
+
+    const targetTop =
+      window.scrollY +
+      target.getBoundingClientRect().top -
+      getHeaderHeight() -
+      CONFIG.scrollOffset;
+
+    const behavior =
+      !reduceMotion.matches &&
+      smooth
+        ? "smooth"
+        : "auto";
+
+    if (updateHash) {
+      const hash =
+        `#${target.id}`;
+
+      if (window.location.hash !== hash) {
+        suppressHashScroll = true;
+
+        history.pushState(
+          {
+            storyIndex: targetIndex
+          },
+          "",
+          hash
+        );
+      }
+    }
+
+    window.scrollTo({
+      top: Math.max(targetTop, 0),
+      behavior
+    });
+
+    setActiveSection(targetIndex);
+
+    window.setTimeout(() => {
+      suppressHashScroll = false;
+      requestScrollUpdate();
+    }, smooth ? 700 : 0);
+  };
+
+
+  const navigateRelative = (direction) => {
+    scrollToStory(
+      activeIndex + direction
+    );
+  };
+
+
+  /* =======================================================
+     14. HASH / HISTORY
+     ======================================================= */
+
+  const handleHash = ({
+    smooth = true
+  } = {}) => {
+    if (suppressHashScroll) {
+      return;
+    }
+
+    const index =
+      getIndexFromHash();
 
     if (index < 0) {
-      if (initial) {
-        updateNavigationState(calculateActiveIndex());
-        updateProgress();
-      }
       return;
     }
 
     window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
-        scrollToStory(index, false);
-      });
+      scrollToStory(
+        index,
+        {
+          updateHash: false,
+          smooth
+        }
+      );
     });
-  }
+  };
 
-  window.addEventListener("hashchange", () => {
-    handleHash(false);
-  });
 
-  window.addEventListener("popstate", () => {
-    handleHash(false);
-  });
+  /* =======================================================
+     15. STANDBY
+     ======================================================= */
 
-  /* --------------------------------------------------
-     KEYBOARD STORY CONTROL
-  -------------------------------------------------- */
-
-  function isTypingContext(element) {
-    if (!element) {
-      return false;
-    }
-
-    const tag = element.tagName;
-
-    return (
-      tag === "INPUT" ||
-      tag === "TEXTAREA" ||
-      tag === "SELECT" ||
-      element.isContentEditable
-    );
-  }
-
-  doc.addEventListener("keydown", (event) => {
-    if (menuOpen || isTypingContext(doc.activeElement)) {
+  const hideStandby = () => {
+    if (!standby) {
       return;
     }
 
-    const target = doc.activeElement;
+    standby.classList.remove("is-visible");
+    standby.setAttribute("aria-hidden", "true");
+  };
 
-    if (
-      target &&
-      target !== doc.body &&
-      target !== doc.documentElement
-    ) {
-      const isInteractive =
-        target.matches("a, button, input, textarea, select, [contenteditable]");
 
-      if (isInteractive) {
-        return;
-      }
+  const showStandby = () => {
+    if (!standby || menuOpen) {
+      return;
     }
 
-    if (event.key === "ArrowDown" || event.key === "PageDown") {
-      event.preventDefault();
+    standby.classList.add("is-visible");
+    standby.setAttribute("aria-hidden", "false");
+  };
 
-      if (activeIndex < stories.length - 1) {
-        scrollToStory(activeIndex + 1);
-      }
-    }
 
-    if (event.key === "ArrowUp" || event.key === "PageUp") {
-      event.preventDefault();
-
-      if (activeIndex > 0) {
-        scrollToStory(activeIndex - 1);
-      }
-    }
-  });
-
-  /* --------------------------------------------------
-     STANDBY
-  -------------------------------------------------- */
-
-  function hideStandby() {
-    standby?.classList.remove("is-visible");
-  }
-
-  function resetStandbyTimer() {
+  const resetStandbyTimer = () => {
     hideStandby();
 
-    window.clearTimeout(standbyTimer);
+    window.clearTimeout(
+      standbyTimer
+    );
 
-    standbyTimer = window.setTimeout(() => {
-      if (!menuOpen && document.visibilityState === "visible") {
-        standby?.classList.add("is-visible");
+    standbyTimer =
+      window.setTimeout(
+        showStandby,
+        CONFIG.standbyDelay
+      );
+  };
+
+
+  /* =======================================================
+     16. LOADER
+     ======================================================= */
+
+  let loaderHidden = false;
+
+  const hideLoader = () => {
+    if (loaderHidden || !loader) {
+      return;
+    }
+
+    loaderHidden = true;
+
+    loader.classList.add("is-hidden");
+
+    loader.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+  };
+
+
+  /* =======================================================
+     17. KEYBOARD NAVIGATION
+     ======================================================= */
+
+  const handleKeyboard = (event) => {
+    if (menuOpen) {
+      trapMenuFocus(event);
+
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeMenu();
       }
-    }, CONFIG.standbyDelay);
-  }
 
-  [
-    "scroll",
-    "wheel",
-    "touchstart",
-    "pointerdown",
-    "keydown",
-    "click"
-  ].forEach((eventName) => {
-    window.addEventListener(eventName, resetStandbyTimer, {
-      passive: eventName !== "keydown"
-    });
-  });
+      return;
+    }
 
-  resetStandbyTimer();
+    const tagName =
+      event.target?.tagName;
 
-  /* --------------------------------------------------
-     GSAP / SCROLLTRIGGER
-  -------------------------------------------------- */
+    const isFormElement =
+      tagName === "INPUT" ||
+      tagName === "TEXTAREA" ||
+      tagName === "SELECT" ||
+      tagName === "BUTTON" ||
+      event.target?.isContentEditable;
 
-  function initAnimations() {
+    if (isFormElement) {
+      return;
+    }
+
+    switch (event.key) {
+      case "ArrowDown":
+      case "PageDown":
+        event.preventDefault();
+        navigateRelative(1);
+        break;
+
+      case "ArrowUp":
+      case "PageUp":
+        event.preventDefault();
+        navigateRelative(-1);
+        break;
+
+      case "Home":
+        event.preventDefault();
+        scrollToStory(0);
+        break;
+
+      case "End":
+        event.preventDefault();
+        scrollToStory(
+          sections.length - 1
+        );
+        break;
+
+      default:
+        break;
+    }
+  };
+
+
+  /* =======================================================
+     18. GSAP / OPTIONAL MOTION
+     ======================================================= */
+
+  const initMotion = () => {
     if (
-      prefersReducedMotion.matches ||
+      reduceMotion.matches ||
       typeof window.gsap === "undefined"
     ) {
       return;
     }
 
-    if (typeof window.ScrollTrigger === "undefined") {
+    if (
+      typeof window.ScrollTrigger === "undefined"
+    ) {
       return;
     }
 
-    window.gsap.registerPlugin(window.ScrollTrigger);
+    window.gsap.registerPlugin(
+      window.ScrollTrigger
+    );
 
-    stories.forEach((section, index) => {
-      const heading = section.querySelector(".story-heading");
-      const copy = section.querySelector(".story-copy");
-      const indexLabel = section.querySelector(".story-index");
-      const image = section.querySelector(".person-image");
-      const map = section.querySelector(".map-frame");
+    const motionSections =
+      document.querySelectorAll(
+        ".story-section-content"
+      );
 
-      const elements = [
-        indexLabel,
-        heading,
-        copy,
-        image,
-        map
-      ].filter(Boolean);
+    motionSections.forEach((content) => {
+      window.gsap.fromTo(
+        content,
+        {
+          y: 28,
+          opacity: 0
+        },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.9,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: content,
+            start: "top 84%",
+            once: true
+          }
+        }
+      );
+    });
+  };
 
-      if (!elements.length) {
+
+  /* =======================================================
+     19. EVENTS
+     ======================================================= */
+
+  menuToggle?.addEventListener(
+    "click",
+    toggleMenu
+  );
+
+  prevButton?.addEventListener(
+    "click",
+    () => navigateRelative(-1)
+  );
+
+  nextButton?.addEventListener(
+    "click",
+    () => navigateRelative(1)
+  );
+
+  menuLinks.forEach((link) => {
+    link.addEventListener("click", (event) => {
+      const href =
+        link.getAttribute("href");
+
+      if (!href?.startsWith("#")) {
         return;
       }
 
-      window.gsap.set(elements, {
-        y: 22,
-        opacity: 0
-      });
+      const index =
+        sections.findIndex(
+          (section) =>
+            `#${section.id}` === href
+        );
 
-      window.gsap.to(elements, {
-        y: 0,
-        opacity: 1,
-        duration: .85,
-        stagger: .07,
-        ease: "power3.out",
-        overwrite: "auto",
-        scrollTrigger: {
-          id: `story-${index}`,
-          trigger: section,
-          start: "top 76%",
-          once: true
-        }
-      });
-    });
-
-    window.ScrollTrigger.refresh();
-  }
-
-  /* --------------------------------------------------
-     REDUCED MOTION CHANGES
-  -------------------------------------------------- */
-
-  function handleMotionPreference() {
-    if (prefersReducedMotion.matches) {
-      if (window.ScrollTrigger) {
-        window.ScrollTrigger.getAll().forEach((trigger) => {
-          if (trigger.vars?.id?.startsWith("story-")) {
-            trigger.kill();
-          }
-        });
+      if (index < 0) {
+        return;
       }
-    } else {
-      initAnimations();
-    }
-  }
 
-  if (typeof prefersReducedMotion.addEventListener === "function") {
-    prefersReducedMotion.addEventListener("change", handleMotionPreference);
-  }
+      event.preventDefault();
 
-  /* --------------------------------------------------
-     VISIBILITY / BF CACHE
-  -------------------------------------------------- */
-
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible") {
-      requestScrollStateUpdate();
-      resetStandbyTimer();
-    } else {
-      hideStandby();
-    }
+      scrollToStory(index);
+    });
   });
 
-  window.addEventListener("pageshow", () => {
-    requestScrollStateUpdate();
-
-    if (window.ScrollTrigger) {
-      window.ScrollTrigger.refresh();
+  window.addEventListener(
+    "scroll",
+    requestScrollUpdate,
+    {
+      passive: true
     }
-  });
+  );
 
-  /* --------------------------------------------------
-     INITIALISE
-  -------------------------------------------------- */
+  window.addEventListener(
+    "resize",
+    () => {
+      window.clearTimeout(
+        resizeTimer
+      );
+
+      resizeTimer =
+        window.setTimeout(() => {
+          requestScrollUpdate();
+
+          if (
+            typeof window.ScrollTrigger !==
+            "undefined"
+          ) {
+            window.ScrollTrigger.refresh();
+          }
+        }, 120);
+    },
+    {
+      passive: true
+    }
+  );
+
+  window.addEventListener(
+    "orientationchange",
+    () => {
+      window.setTimeout(
+        requestScrollUpdate,
+        180
+      );
+    },
+    {
+      passive: true
+    }
+  );
+
+  window.addEventListener(
+    "keydown",
+    handleKeyboard
+  );
+
+  window.addEventListener(
+    "hashchange",
+    () => handleHash({
+      smooth: true
+    })
+  );
+
+  window.addEventListener(
+    "popstate",
+    () => handleHash({
+      smooth: false
+    })
+  );
+
+  window.addEventListener(
+    "pointerdown",
+    resetStandbyTimer,
+    {
+      passive: true
+    }
+  );
+
+  window.addEventListener(
+    "touchstart",
+    resetStandbyTimer,
+    {
+      passive: true
+    }
+  );
+
+  window.addEventListener(
+    "keydown",
+    resetStandbyTimer
+  );
+
+  window.addEventListener(
+    "mousemove",
+    resetStandbyTimer,
+    {
+      passive: true
+    }
+  );
+
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+      if (document.visibilityState === "visible") {
+        requestScrollUpdate();
+        resetStandbyTimer();
+      } else {
+        hideStandby();
+      }
+    }
+  );
+
+  window.addEventListener(
+    "pageshow",
+    () => {
+      updateHeaderChrome();
+      requestScrollUpdate();
+    }
+  );
+
+
+  /* =======================================================
+     20. INITIALIZATION
+     ======================================================= */
 
   updateHeaderChrome();
-  updateNavigationState(calculateActiveIndex());
-  updateProgress();
-  initAnimations();
-  handleHash(true);
+  updateMenuAria(false);
+  setBackgroundInert(false);
 
-  window.requestAnimationFrame(() => {
-    requestScrollStateUpdate();
-  });
+  setActiveSection(
+    calculateActiveIndex()
+  );
+
+  requestScrollUpdate();
+
+  /*
+   * Il loader è volutamente breve.
+   * Non blocca la lettura in attesa di immagini,
+   * iframe o risorse esterne.
+   */
+  window.setTimeout(
+    hideLoader,
+    CONFIG.loaderMax
+  );
+
+  if (document.readyState === "complete") {
+    hideLoader();
+  } else {
+    window.addEventListener(
+      "load",
+      hideLoader,
+      {
+        once: true
+      }
+    );
+  }
+
+  window.addEventListener(
+    "load",
+    () => {
+      initMotion();
+      requestScrollUpdate();
+    },
+    {
+      once: true
+    }
+  );
+
+  const initialHash =
+    getIndexFromHash();
+
+  if (initialHash >= 0) {
+    window.setTimeout(() => {
+      scrollToStory(
+        initialHash,
+        {
+          updateHash: false,
+          smooth: false
+        }
+      );
+    }, 0);
+  }
+
+  resetStandbyTimer();
+
 })();
