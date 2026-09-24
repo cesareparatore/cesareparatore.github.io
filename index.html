@@ -1,1004 +1,681 @@
-(() => {
-  "use strict";
-
-  const CONFIG = {
-    standbyDelay: 40000,
-    loaderMax: 1200,
-    scrollOffset: 12,
-    activeLineRatio: 0.32,
-    activeLineMax: 260,
-    progressEpsilon: 0.001
-  };
-
-  const prefersReducedMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)"
-  );
-
-  const html = document.documentElement;
-  const body = document.body;
-
-  const header = document.getElementById("site-header");
-  const main = document.getElementById("main-content");
-  const footer = document.querySelector(".site-footer");
-
-  const loader = document.getElementById("site-loader");
-  const standby = document.getElementById("standby");
-
-  const menu = document.getElementById("menu");
-  const menuToggle = document.getElementById("menu-toggle");
-  const brand = document.querySelector(".brand");
-
-  const menuLinks = Array.from(
-    document.querySelectorAll("[data-menu-target]")
-  );
-
-  const storyNav = document.getElementById("story-nav");
-  const storyPrev = document.getElementById("story-prev");
-  const storyNext = document.getElementById("story-next");
-
-  const storyProgress = document.getElementById("story-progress");
-  const progressFill = document.querySelector(".story-progress-fill");
-  const progressOrb = document.querySelector(".story-progress-orb");
-
-  const activeStoryTitle = document.getElementById("active-story-title");
-
-  const sections = Array.from(
-    document.querySelectorAll(".story")
-  );
-
-  const year = document.getElementById("current-year");
-
-  if (year) {
-    year.textContent = String(new Date().getFullYear());
-  }
-
-  if (!sections.length) {
-    return;
-  }
-
-  let activeIndex = 0;
-  let ticking = false;
-  let standbyTimer = null;
-  let standbyPointerTimer = null;
-  let isMenuOpen = false;
-  let previousFocus = null;
-
-  /*
-   * -------------------------------------------------------
-   * UTILITIES
-   * -------------------------------------------------------
-   */
-
-  const clamp = (value, min, max) =>
-    Math.min(Math.max(value, min), max);
-
-  const getHeaderHeight = () =>
-    header ? header.getBoundingClientRect().height : 0;
-
-  const getReadingLine = () => {
-    const viewportHeight = window.innerHeight || 0;
-
-    return (
-      getHeaderHeight() +
-      Math.min(
-        viewportHeight * CONFIG.activeLineRatio,
-        CONFIG.activeLineMax
-      )
-    );
-  };
-
-  const getFocusable = (container) => {
-    if (!container) return [];
-
-    return Array.from(
-      container.querySelectorAll(
-        [
-          "a[href]",
-          "button:not([disabled])",
-          "input:not([disabled])",
-          "select:not([disabled])",
-          "textarea:not([disabled])",
-          "[tabindex]:not([tabindex='-1'])"
-        ].join(",")
-      )
-    ).filter((element) => {
-      const style = window.getComputedStyle(element);
-
-      return (
-        style.display !== "none" &&
-        style.visibility !== "hidden"
-      );
-    });
-  };
-
-  const getSectionIndex = (id) =>
-    sections.findIndex((section) => section.id === id);
-
-  const getSectionById = (id) =>
-    sections.find((section) => section.id === id);
-
-  const getCurrentHash = () =>
-    window.location.hash.replace(/^#/, "");
-
-  /*
-   * -------------------------------------------------------
-   * HEADER
-   * -------------------------------------------------------
-   *
-   * The upper header is intentionally ALWAYS dark.
-   * The active section never changes its visual theme.
-   */
-
-  const updateHeaderChrome = () => {
-    if (!header) return;
-
-    header.dataset.theme = "dark";
-
-    const themeMeta = document.querySelector(
-      'meta[name="theme-color"]'
-    );
-
-    if (themeMeta) {
-      themeMeta.setAttribute("content", "#0B0B0A");
-    }
-  };
-
-  /*
-   * -------------------------------------------------------
-   * PROGRESS
-   * -------------------------------------------------------
-   */
-
-  const calculateSectionProgress = (section) => {
-    const rect = section.getBoundingClientRect();
-    const viewportHeight = window.innerHeight || 1;
-
-    /*
-     * Progress is based on the actual reading position
-     * inside the current section rather than on global
-     * document scroll.
-     */
-    const start =
-      viewportHeight -
-      getHeaderHeight();
-
-    const distance =
-      Math.max(
-        section.offsetHeight - start,
-        viewportHeight * 0.5
-      );
-
-    const traveled =
-      viewportHeight - rect.top;
-
-    return clamp(traveled / distance, 0, 1);
-  };
-
-  const updateProgress = (progress) => {
-    const value = clamp(progress, 0, 1);
-    const percent = value * 100;
-
-    if (progressFill) {
-      progressFill.style.width = `${percent}%`;
-    }
-
-    if (progressOrb) {
-      progressOrb.style.left = `${percent}%`;
-    }
-
-    if (storyProgress) {
-      storyProgress.setAttribute(
-        "aria-valuenow",
-        String(Math.round(percent))
-      );
-    }
-  };
-
-  /*
-   * -------------------------------------------------------
-   * ACTIVE SECTION
-   * -------------------------------------------------------
-   */
-
-  const findActiveSection = () => {
-    const line = getReadingLine();
-
-    let bestIndex = 0;
-    let bestDistance = Number.POSITIVE_INFINITY;
-
-    sections.forEach((section, index) => {
-      const rect = section.getBoundingClientRect();
-
-      /*
-       * Prefer the section containing the reading line.
-       */
-      if (
-        rect.top <= line &&
-        rect.bottom > line
-      ) {
-        bestIndex = index;
-        bestDistance = 0;
-        return;
-      }
-
-      const distance =
-        rect.top > line
-          ? rect.top - line
-          : line - rect.bottom;
-
-      if (distance < bestDistance) {
-        bestDistance = distance;
-        bestIndex = index;
-      }
-    });
-
-    return bestIndex;
-  };
-
-  const updateNavigationState = (index) => {
-    const section = sections[index];
-
-    if (!section) return;
-
-    activeIndex = index;
-
-    const title =
-      section.dataset.title ||
-      section.querySelector("h1,h2")?.textContent?.trim() ||
-      "";
-
-    if (activeStoryTitle && title) {
-      activeStoryTitle.textContent = title;
-    }
-
-    if (storyPrev) {
-      storyPrev.disabled = index <= 0;
-      storyPrev.setAttribute(
-        "aria-label",
-        index <= 0
-          ? "Nessuna sezione precedente"
-          : `Sezione precedente: ${sections[index - 1].dataset.title || ""}`
-      );
-    }
-
-    if (storyNext) {
-      storyNext.disabled = index >= sections.length - 1;
-      storyNext.setAttribute(
-        "aria-label",
-        index >= sections.length - 1
-          ? "Nessuna sezione successiva"
-          : `Sezione successiva: ${sections[index + 1].dataset.title || ""}`
-      );
-    }
-
-    sections.forEach((item, itemIndex) => {
-      item.toggleAttribute(
-        "data-active",
-        itemIndex === index
-      );
-    });
-
-    menuLinks.forEach((link) => {
-      const isCurrent =
-        link.dataset.menuTarget === section.id;
-
-      if (isCurrent) {
-        link.setAttribute("aria-current", "page");
-      } else {
-        link.removeAttribute("aria-current");
-      }
-    });
-
-    updateHeaderChrome();
-  };
-
-  const updateActiveState = () => {
-    const nextIndex = findActiveSection();
-
-    if (nextIndex !== activeIndex) {
-      updateNavigationState(nextIndex);
-    }
-
-    const activeSection = sections[activeIndex];
-
-    if (activeSection) {
-      updateProgress(
-        calculateSectionProgress(activeSection)
-      );
-    }
-  };
-
-  const requestUpdate = () => {
-    if (ticking) return;
-
-    ticking = true;
-
-    window.requestAnimationFrame(() => {
-      updateActiveState();
-      ticking = false;
-    });
-  };
-
-  /*
-   * -------------------------------------------------------
-   * SCROLLING / HASH
-   * -------------------------------------------------------
-   */
-
-  const scrollToSection = (
-    section,
-    {
-      updateHash = true,
-      behavior = null
-    } = {}
-  ) => {
-    if (!section) return;
-
-    const headerHeight = getHeaderHeight();
-
-    const top =
-      window.scrollY +
-      section.getBoundingClientRect().top -
-      headerHeight -
-      CONFIG.scrollOffset;
-
-    const scrollBehavior =
-      behavior ||
-      (prefersReducedMotion.matches
-        ? "auto"
-        : "smooth");
-
-    window.scrollTo({
-      top: Math.max(0, top),
-      behavior: scrollBehavior
-    });
-
-    if (updateHash && section.id) {
-      const nextUrl =
-        `${window.location.pathname}` +
-        `${window.location.search}` +
-        `#${section.id}`;
-
-      window.history.replaceState(
-        {
-          section: section.id
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <title>Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale</title>
+  <meta
+    name="description"
+    content="Cesare Paratore: un percorso tra sport, scienze motorie, educazione, management e digitale. Un modo di osservare, capire, collegare e costruire."
+  >
+
+  <link rel="canonical" href="https://cesareparatore.github.io/">
+  <meta name="robots" content="index,follow">
+
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale">
+  <meta
+    property="og:description"
+    content="Un percorso tra sport, scienze motorie, educazione, management e digitale."
+  >
+  <meta property="og:url" content="https://cesareparatore.github.io/">
+  <meta property="og:image" content="https://cesareparatore.github.io/assets/images/cp.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale">
+  <meta
+    name="twitter:description"
+    content="Un percorso tra sport, scienze motorie, educazione, management e digitale."
+  >
+  <meta name="twitter:image" content="https://cesareparatore.github.io/assets/images/cp.jpg">
+
+  <meta name="theme-color" content="#0b0b0a">
+
+  <link rel="icon" href="/assets/images/cp-mark.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+
+  <link rel="stylesheet" href="/style.css">
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"
+    defer
+  ></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"
+    defer
+  ></script>
+  <script src="/script.js" defer></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://cesareparatore.github.io/#website",
+        "url": "https://cesareparatore.github.io/",
+        "name": "Cesare Paratore",
+        "inLanguage": "it-IT"
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://cesareparatore.github.io/#webpage",
+        "url": "https://cesareparatore.github.io/",
+        "name": "Cesare Paratore — Sport, Scienze Motorie, Educazione e Digitale",
+        "isPartOf": {
+          "@id": "https://cesareparatore.github.io/#website"
         },
-        "",
-        nextUrl
-      );
-    }
-  };
-
-  const goToSectionIndex = (index) => {
-    const target = sections[index];
-
-    if (!target) return;
-
-    scrollToSection(target);
-  };
-
-  const handleHash = ({
-    behavior = null
-  } = {}) => {
-    const hash = getCurrentHash();
-
-    if (!hash) {
-      requestUpdate();
-      return;
-    }
-
-    const section = getSectionById(hash);
-
-    if (!section) return;
-
-    const index = getSectionIndex(hash);
-
-    if (index >= 0) {
-      updateNavigationState(index);
-    }
-
-    window.requestAnimationFrame(() => {
-      scrollToSection(section, {
-        updateHash: false,
-        behavior
-      });
-
-      window.setTimeout(requestUpdate, 60);
-    });
-  };
-
-  /*
-   * -------------------------------------------------------
-   * MENU / FOCUS MANAGEMENT
-   * -------------------------------------------------------
-   */
-
-  const setBackgroundInert = (state) => {
-    [
-      main,
-      footer,
-      storyNav
-    ].forEach((element) => {
-      if (!element) return;
-
-      element.inert = state;
-
-      if (state) {
-        element.setAttribute("aria-hidden", "true");
-      } else {
-        element.removeAttribute("aria-hidden");
+        "inLanguage": "it-IT"
+      },
+      {
+        "@type": "Person",
+        "@id": "https://cesareparatore.github.io/#person",
+        "name": "Cesare Paratore",
+        "url": "https://cesareparatore.github.io/",
+        "image": "https://cesareparatore.github.io/assets/images/cp-foto.webp",
+        "jobTitle": "Atleta, tecnico ed educatore",
+        "knowsAbout": [
+          "Sport",
+          "Scienze motorie",
+          "Educazione",
+          "Management",
+          "Digitale"
+        ]
       }
-    });
-
-    /*
-     * The brand lives inside the header, outside storyNav,
-     * so it must be handled separately.
-     */
-    if (brand) {
-      if (state) {
-        brand.setAttribute("tabindex", "-1");
-        brand.setAttribute("aria-hidden", "true");
-      } else {
-        brand.removeAttribute("tabindex");
-        brand.removeAttribute("aria-hidden");
-      }
-    }
-  };
-
-  const setMenuTabState = (disabled) => {
-    menuLinks.forEach((link) => {
-      if (disabled) {
-        link.setAttribute("tabindex", "-1");
-      } else {
-        link.removeAttribute("tabindex");
-      }
-    });
-  };
-
-  const focusMenuStart = () => {
-    const focusables = getFocusable(menu);
-
-    if (focusables.length) {
-      focusables[0].focus();
-    }
-  };
-
-  const closeMenu = ({
-    restoreFocus = true
-  } = {}) => {
-    if (!menu || !menuToggle) return;
-
-    isMenuOpen = false;
-
-    body.classList.remove("menu-open");
-
-    menu.classList.remove("is-open");
-
-    menu.setAttribute("inert", "");
-    menu.inert = true;
-
-    menuToggle.setAttribute(
-      "aria-expanded",
-      "false"
-    );
-
-    menuToggle.setAttribute(
-      "aria-label",
-      "Apri menu"
-    );
-
-    setMenuTabState(true);
-    setBackgroundInert(false);
-
-    if (
-      restoreFocus &&
-      previousFocus &&
-      typeof previousFocus.focus === "function"
-    ) {
-      previousFocus.focus();
-    }
-
-    previousFocus = null;
-  };
-
-  const openMenu = () => {
-    if (!menu || !menuToggle || isMenuOpen) {
-      return;
-    }
-
-    previousFocus =
-      document.activeElement instanceof HTMLElement
-        ? document.activeElement
-        : menuToggle;
-
-    isMenuOpen = true;
-
-    body.classList.add("menu-open");
-
-    setBackgroundInert(true);
-
-    menu.removeAttribute("inert");
-    menu.inert = false;
-
-    setMenuTabState(false);
-
-    menu.classList.add("is-open");
-
-    menuToggle.setAttribute(
-      "aria-expanded",
-      "true"
-    );
-
-    menuToggle.setAttribute(
-      "aria-label",
-      "Chiudi menu"
-    );
-
-    window.requestAnimationFrame(() => {
-      focusMenuStart();
-    });
-  };
-
-  const toggleMenu = () => {
-    if (isMenuOpen) {
-      closeMenu();
-    } else {
-      openMenu();
-    }
-  };
-
-  const handleMenuKeydown = (event) => {
-    if (!isMenuOpen) return;
-
-    if (event.key === "Escape") {
-      event.preventDefault();
-      closeMenu();
-      return;
-    }
-
-    if (event.key !== "Tab") return;
-
-    const focusables = getFocusable(menu);
-
-    if (!focusables.length) {
-      event.preventDefault();
-      return;
-    }
-
-    const first = focusables[0];
-    const last = focusables[focusables.length - 1];
-
-    if (
-      event.shiftKey &&
-      document.activeElement === first
-    ) {
-      event.preventDefault();
-      last.focus();
-      return;
-    }
-
-    if (
-      !event.shiftKey &&
-      document.activeElement === last
-    ) {
-      event.preventDefault();
-      first.focus();
-    }
-  };
-
-  /*
-   * -------------------------------------------------------
-   * STANDBY
-   * -------------------------------------------------------
-   */
-
-  const hideStandby = () => {
-    if (!standby) return;
-
-    standby.classList.remove("is-visible");
-  };
-
-  const showStandby = () => {
-    if (!standby || isMenuOpen) return;
-
-    standby.classList.add("is-visible");
-  };
-
-  const resetStandby = () => {
-    hideStandby();
-
-    window.clearTimeout(standbyTimer);
-
-    standbyTimer = window.setTimeout(
-      showStandby,
-      CONFIG.standbyDelay
-    );
-  };
-
-  const handlePointerMove = () => {
-    if (standbyPointerTimer) return;
-
-    standbyPointerTimer = window.setTimeout(() => {
-      standbyPointerTimer = null;
-      resetStandby();
-    }, 700);
-  };
-
-  /*
-   * -------------------------------------------------------
-   * GSAP MOTION
-   * -------------------------------------------------------
-   */
-
-  const initAnimations = () => {
-    if (
-      prefersReducedMotion.matches ||
-      !window.gsap ||
-      !window.ScrollTrigger
-    ) {
-      return;
-    }
-
-    window.gsap.registerPlugin(
-      window.ScrollTrigger
-    );
-
-    sections.forEach((section, index) => {
-      const kicker =
-        section.querySelector(".story-kicker");
-
-      const heading =
-        section.querySelector("h1, h2");
-
-      const lead =
-        section.querySelector(".story-lead");
-
-      const copy =
-        section.querySelector(".story-copy");
-
-      const image =
-        section.querySelector(".person-image");
-
-      const targets = [
-        kicker,
-        heading,
-        lead,
-        copy,
-        image
-      ].filter(Boolean);
-
-      if (!targets.length) return;
-
-      window.gsap.set(targets, {
-        opacity: 0,
-        y: 24
-      });
-
-      window.gsap.to(targets, {
-        opacity: 1,
-        y: 0,
-        duration: 0.9,
-        stagger: 0.07,
-        ease: "power3.out",
-
-        scrollTrigger: {
-          id: `story-${index}`,
-          trigger: section,
-          start: "top 72%",
-          once: true
-        }
-      });
-    });
-  };
-
-  /*
-   * -------------------------------------------------------
-   * REFRESH / LIFECYCLE
-   * -------------------------------------------------------
-   */
-
-  const refresh = () => {
-    requestUpdate();
-
-    if (
-      window.ScrollTrigger &&
-      typeof window.ScrollTrigger.refresh === "function"
-    ) {
-      window.ScrollTrigger.refresh();
-    }
-  };
-
-  const killAnimations = () => {
-    if (!window.ScrollTrigger) return;
-
-    window.ScrollTrigger.getAll()
-      .filter((trigger) =>
-        String(trigger.vars?.id || "").startsWith("story-")
-      )
-      .forEach((trigger) => trigger.kill());
-  };
-
-  /*
-   * -------------------------------------------------------
-   * LOADER
-   * -------------------------------------------------------
-   */
-
-  const hideLoader = () => {
-    if (!loader) return;
-
-    loader.classList.add("is-hidden");
-
-    window.setTimeout(() => {
-      loader.remove();
-    }, 700);
-  };
-
-  const initLoader = () => {
-    if (!loader) return;
-
-    let finished = false;
-
-    const finish = () => {
-      if (finished) return;
-
-      finished = true;
-
-      window.setTimeout(
-        hideLoader,
-        prefersReducedMotion.matches ? 0 : 140
-      );
-    };
-
-    if (document.readyState === "complete") {
-      finish();
-    } else {
-      window.addEventListener(
-        "load",
-        finish,
-        {
-          once: true
-        }
-      );
-    }
-
-    window.setTimeout(
-      finish,
-      CONFIG.loaderMax
-    );
-  };
-
-  /*
-   * -------------------------------------------------------
-   * EVENTS
-   * -------------------------------------------------------
-   */
-
-  menuToggle?.addEventListener(
-    "click",
-    toggleMenu
-  );
-
-  menu?.addEventListener(
-    "keydown",
-    handleMenuKeydown
-  );
-
-  menuLinks.forEach((link) => {
-    link.addEventListener("click", () => {
-      closeMenu({
-        restoreFocus: false
-      });
-    });
-  });
-
-  storyPrev?.addEventListener(
-    "click",
-    () => {
-      if (activeIndex > 0) {
-        goToSectionIndex(activeIndex - 1);
-      }
-    }
-  );
-
-  storyNext?.addEventListener(
-    "click",
-    () => {
-      if (activeIndex < sections.length - 1) {
-        goToSectionIndex(activeIndex + 1);
-      }
-    }
-  );
-
-  window.addEventListener(
-    "scroll",
-    () => {
-      requestUpdate();
-      resetStandby();
-    },
-    {
-      passive: true
-    }
-  );
-
-  window.addEventListener(
-    "wheel",
-    resetStandby,
-    {
-      passive: true
-    }
-  );
-
-  window.addEventListener(
-    "touchstart",
-    resetStandby,
-    {
-      passive: true
-    }
-  );
-
-  window.addEventListener(
-    "pointermove",
-    handlePointerMove,
-    {
-      passive: true
-    }
-  );
-
-  window.addEventListener(
-    "click",
-    resetStandby,
-    {
-      passive: true
-    }
-  );
-
-  window.addEventListener(
-    "keydown",
-    (event) => {
-      resetStandby();
-
-      if (event.key === "Escape") {
-        hideStandby();
-
-        if (isMenuOpen) {
-          closeMenu();
-        }
-
-        return;
-      }
-
-      if (
-        isMenuOpen ||
-        event.defaultPrevented ||
-        event.metaKey ||
-        event.ctrlKey ||
-        event.altKey
-      ) {
-        return;
-      }
-
-      const activeElement =
-        document.activeElement;
-
-      const isTyping =
-        activeElement &&
-        (
-          activeElement.matches?.(
-            "input, textarea, select"
-          ) ||
-          activeElement.isContentEditable
-        );
-
-      if (isTyping) return;
-
-      if (
-        event.key === "ArrowDown" &&
-        activeIndex < sections.length - 1
-      ) {
-        event.preventDefault();
-        goToSectionIndex(activeIndex + 1);
-      }
-
-      if (
-        event.key === "ArrowUp" &&
-        activeIndex > 0
-      ) {
-        event.preventDefault();
-        goToSectionIndex(activeIndex - 1);
-      }
-    }
-  );
-
-  window.addEventListener(
-    "hashchange",
-    () => {
-      handleHash();
-    }
-  );
-
-  window.addEventListener(
-    "popstate",
-    () => {
-      handleHash();
-    }
-  );
-
-  window.addEventListener(
-    "resize",
-    () => {
-      requestUpdate();
-    },
-    {
-      passive: true
-    }
-  );
-
-  window.addEventListener(
-    "pageshow",
-    () => {
-      refresh();
-    }
-  );
-
-  document.addEventListener(
-    "visibilitychange",
-    () => {
-      if (!document.hidden) {
-        refresh();
-      }
-    }
-  );
-
-  prefersReducedMotion.addEventListener?.(
-    "change",
-    () => {
-      killAnimations();
-
-      if (!prefersReducedMotion.matches) {
-        initAnimations();
-      }
-
-      refresh();
-    }
-  );
-
-  /*
-   * -------------------------------------------------------
-   * INITIALIZATION
-   * -------------------------------------------------------
-   */
-
-  menu?.setAttribute("inert", "");
-  menu.inert = true;
-
-  setMenuTabState(true);
-  setBackgroundInert(false);
-
-  updateHeaderChrome();
-
-  const initialIndex = findActiveSection();
-
-  updateNavigationState(initialIndex);
-  updateProgress(
-    calculateSectionProgress(
-      sections[initialIndex]
-    )
-  );
-
-  initLoader();
-  initAnimations();
-  resetStandby();
-
-  if (getCurrentHash()) {
-    handleHash({
-      behavior: "auto"
-    });
+    ]
   }
+  </script>
+</head>
 
-  window.setTimeout(
-    refresh,
-    80
-  );
+<body>
+  <a class="skip-link" href="#main-content">Vai al contenuto</a>
 
-})();
+  <div class="site-loader" id="site-loader" aria-hidden="true">
+    <span class="site-loader-mark">CP</span>
+  </div>
+
+  <div class="standby" id="standby" aria-hidden="true">
+    <span>GUARDA.</span>
+  </div>
+
+  <header class="site-header" id="site-header">
+    <div class="header-primary">
+      <a class="brand" href="/" aria-label="Cesare Paratore — Home">
+        <img
+          src="/assets/images/cp-mark.svg"
+          width="40"
+          height="40"
+          alt=""
+          decoding="async"
+        >
+      </a>
+
+      <div
+        class="active-story"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        <span id="active-story-title">GUARDA.</span>
+      </div>
+
+      <button
+        class="menu-toggle"
+        id="menu-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="menu"
+        aria-label="Apri menu"
+      >
+        <span class="menu-toggle-label">MENU</span>
+        <span class="menu-toggle-icon" aria-hidden="true">
+          <i></i>
+          <i></i>
+        </span>
+      </button>
+    </div>
+
+    <nav
+      class="story-nav"
+      id="story-nav"
+      aria-label="Navigazione narrativa"
+    >
+      <div class="story-nav-inner">
+        <button
+          class="story-arrow"
+          id="story-prev"
+          type="button"
+          aria-label="Sezione precedente"
+          disabled
+        >
+          <span aria-hidden="true">←</span>
+        </button>
+
+        <div
+          class="story-progress"
+          id="story-progress"
+          role="progressbar"
+          aria-label="Avanzamento nella pagina"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+        >
+          <span class="story-progress-track"></span>
+          <span class="story-progress-fill"></span>
+          <span class="story-progress-orb"></span>
+        </div>
+
+        <button
+          class="story-arrow"
+          id="story-next"
+          type="button"
+          aria-label="Sezione successiva"
+        >
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
+    </nav>
+
+    <nav
+      class="site-menu"
+      id="menu"
+      aria-label="Navigazione principale"
+      aria-hidden="true"
+      inert
+    >
+      <div class="menu-inner">
+        <p class="menu-kicker">INDICE</p>
+
+        <ol class="menu-list">
+          <li>
+            <a href="#guarda">01 <span>GUARDA.</span></a>
+          </li>
+          <li>
+            <a href="#come">02 <span>COME?</span></a>
+          </li>
+          <li>
+            <a href="#movimento">03 <span>MOVIMENTO.</span></a>
+          </li>
+          <li>
+            <a href="#capire">04 <span>CAPIRE.</span></a>
+          </li>
+          <li>
+            <a href="#trasmettere">05 <span>TRASMETTERE.</span></a>
+          </li>
+          <li>
+            <a href="#costruire">06 <span>COSTRUIRE.</span></a>
+          </li>
+          <li>
+            <a href="#ritorna">07 <span>RITORNA.</span></a>
+          </li>
+          <li>
+            <a href="#collegare">08 <span>COLLEGARE.</span></a>
+          </li>
+          <li>
+            <a href="#oggi">09 <span>OGGI.</span></a>
+          </li>
+          <li>
+            <a href="#obiettivo">10 <span>OBIETTIVO.</span></a>
+          </li>
+          <li>
+            <a href="#qui">11 <span>QUI.</span></a>
+          </li>
+          <li>
+            <a href="#da-qui">12 <span>DA QUI.</span></a>
+          </li>
+          <li>
+            <a href="#eccomi">13 <span>ECCOMI.</span></a>
+          </li>
+          <li>
+            <a href="#scrivimi">14 <span>SCRIVIMI.</span></a>
+          </li>
+        </ol>
+
+        <div class="menu-footer">
+          <span>CESARE PARATORE</span>
+          <span>PALERMO · SICILIA · ITALIA</span>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main-content">
+    <section
+      class="story story--dark"
+      id="guarda"
+      data-title="GUARDA."
+      data-theme="dark"
+      aria-labelledby="guarda-title"
+    >
+      <div class="story-inner story-inner--opening">
+        <p class="story-index">01 / 14</p>
+
+        <div class="story-heading">
+          <p class="eyebrow">INIZIO</p>
+          <h1 id="guarda-title">GUARDA.</h1>
+        </div>
+
+        <div class="story-copy">
+          <p class="story-lead">
+            Non tutto ciò che accade chiede una risposta immediata.
+            A volte chiede prima di essere osservato.
+          </p>
+        </div>
+
+        <p class="story-direction" aria-hidden="true">SCORRI</p>
+      </div>
+    </section>
+
+    <section
+      class="story story--light"
+      id="come"
+      data-title="COME?"
+      data-theme="light"
+      aria-labelledby="come-title"
+    >
+      <div class="story-inner">
+        <p class="story-index">02 / 14</p>
+
+        <div class="story-heading">
+          <p class="eyebrow">MOVIMENTO</p>
+          <h2 id="come-title">COME?</h2>
+        </div>
+
+        <div class="story-copy">
+          <p class="story-lead">
+            Partire dal movimento significa partire dalla realtà.
+            Dal corpo, dall'esperienza, da ciò che succede prima ancora
+            di diventare teoria.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="story story--dark story--movement"
+      id="movimento"
+      data-title="MOVIMENTO."
+      data-theme="dark"
+      aria-labelledby="movimento-title"
+    >
+      <div class="story-inner">
+        <p class="story-index">03 / 14</p>
+
+        <div class="story-heading">
+          <p class="eyebrow">ESPERIENZA</p>
+          <h2 id="movimento-title">MOVIMENTO.</h2>
+        </div>
+
+        <div class="story-copy">
+          <p class="story-lead">
+            Lo sport mette il movimento al centro.
+            Le scienze motorie offrono strumenti per comprenderlo.
+            L'esperienza permette di metterli in relazione.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="story story--light"
+      id="capire"
+      data-title="CAPIRE."
+      data-theme="light"
+      aria-labelledby="capire-title"
+    >
+      <div class="story-inner">
+        <p class="story-index">04 / 14</p>
+
+        <div class="story-heading">
+          <p class="eyebrow">STUDIO</p>
+          <h2 id="capire-title">CAPIRE.</h2>
+        </div>
+
+        <div class="story-copy">
+          <p class="story-lead">
+            Studiare non significa soltanto accumulare conoscenze.
+            Significa imparare a leggere meglio ciò che si ha davanti.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="story story--dark"
+      id="trasmettere"
+      data-title="TRASMETTERE."
+      data-theme="dark"
+      aria-labelledby="trasmettere-title"
+    >
+      <div class="story-inner">
+        <p class="story-index">05 / 14</p>
+
+        <div class="story-heading">
+          <p class="eyebrow">EDUCAZIONE</p>
+          <h2 id="trasmettere-title">TRASMETTERE.</h2>
+        </div>
+
+        <div class="story-copy">
+          <p class="story-lead">
+            Quello che si comprende acquista valore quando può diventare
+            esperienza condivisa.
+          </p>
+
+          <p>
+            Educare significa anche trasformare conoscenza in possibilità.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="story story--light"
+      id="costruire"
+      data-title="COSTRUIRE."
+      data-theme="light"
+      aria-labelledby="costruire-title"
+    >
+      <div class="story-inner">
+        <p class="story-index">06 / 14</p>
+
+        <div class="story-heading">
+          <p class="eyebrow">PROGETTO</p>
+          <h2 id="costruire-title">COSTRUIRE.</h2>
+        </div>
+
+        <div class="story-copy">
+          <p class="story-lead">
+            Un'idea diventa progetto quando incontra persone, metodo
+            e direzione.
+          </p>
+
+          <p>
+            È lì che pensare smette di essere soltanto pensiero.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="story story--dark story--return"
+      id="ritorna"
+      data-title="RITORNA."
+      data-theme="dark"
+      aria-labelledby="ritorna-title"
+    >
+      <div class="story-inner">
+        <p class="story-index">07 / 14</p>
+
+        <div class="story-heading">
+          <p class="eyebrow">DIGITALE</p>
+          <h2 id="ritorna-title">RITORNA.</h2>
+        </div>
+
+        <div class="story-copy">
+          <p class="story-lead">
+            Il digitale non è un mondo separato.
+            È uno strumento per rendere più semplici le connessioni,
+            più chiara la comunicazione, più concrete le idee.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="story story--light story--connect"
+      id="collegare"
+      data-title="COLLEGARE."
+      data-theme="light"
+      aria-labelledby="collegare-title"
+    >
+      <div class="story-inner">
+        <p class="story-index">08 / 14</p>
+
+        <div class="story-heading">
+          <p class="eyebrow">SISTEMA</p>
+          <h2 id="collegare-title">COLLEGARE.</h2>
+        </div>
+
+        <div class="story-copy">
+          <p class="story-lead">
+            Sport. Movimento. Educazione. Management. Digitale.
+          </p>
+
+          <p>
+            Ambiti diversi, ma una stessa domanda:
+            come possono dialogare per generare qualcosa di utile?
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="story story--dark"
+      id="oggi"
+      data-title="OGGI."
+      data-theme="dark"
+      aria-labelledby="oggi-title"
+    >
+      <div class="story-inner">
+        <p class="story-index">09 / 14</p>
+
+        <div class="story-heading">
+          <p class="eyebrow">APPROCCIO</p>
+          <h2 id="oggi-title">OGGI.</h2>
+        </div>
+
+        <div class="story-copy">
+          <p class="story-lead">
+            Guardare le cose cercando relazioni.
+            Tra ciò che accade e ciò che potrebbe accadere.
+          </p>
+
+          <p>
+            Tra un problema e una possibilità.
+            Tra una persona e il contesto in cui si muove.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="story story--light"
+      id="obiettivo"
+      data-title="OBIETTIVO."
+      data-theme="light"
+      aria-labelledby="obiettivo-title"
+    >
+      <div class="story-inner">
+        <p class="story-index">10 / 14</p>
+
+        <div class="story-heading">
+          <p class="eyebrow">METODO</p>
+          <h2 id="obiettivo-title">OBIETTIVO.</h2>
+        </div>
+
+        <div class="story-copy">
+          <p class="story-lead">
+            Avere una direzione non significa avere già tutte le risposte.
+          </p>
+
+          <p>
+            Significa sapere cosa cercare, osservare ciò che cambia
+            e correggere il percorso quando serve.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="story story--dark story--place"
+      id="qui"
+      data-title="QUI."
+      data-theme="dark"
+      aria-labelledby="qui-title"
+    >
+      <div class="story-inner story-inner--split">
+        <div class="story-main">
+          <p class="story-index">11 / 14</p>
+
+          <div class="story-heading">
+            <p class="eyebrow">TERRITORIO</p>
+            <h2 id="qui-title">QUI.</h2>
+          </div>
+
+          <div class="story-copy">
+            <p class="story-lead">
+              Ogni percorso parte da un luogo.
+              Qui il territorio diventa contesto, esperienza e punto di partenza.
+            </p>
+          </div>
+        </div>
+
+        <div class="map-frame">
+          <iframe
+            title="Stadio Comunale Giuseppe La Franca, Partinico"
+            src="https://www.google.com/maps?q=Stadio+Comunale+Giuseppe+La+Franca,+Partinico&output=embed"
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+          ></iframe>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="story story--light"
+      id="da-qui"
+      data-title="DA QUI."
+      data-theme="light"
+      aria-labelledby="da-qui-title"
+    >
+      <div class="story-inner">
+        <p class="story-index">12 / 14</p>
+
+        <div class="story-heading">
+          <p class="eyebrow">PRESENZA</p>
+          <h2 id="da-qui-title">DA QUI.</h2>
+        </div>
+
+        <div class="story-copy">
+          <p class="story-lead">
+            Il territorio non è soltanto un punto sulla mappa.
+            È il contesto da cui guardare il mondo e, allo stesso tempo,
+            il punto da cui provare a cambiarlo.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="story story--dark story--person"
+      id="eccomi"
+      data-title="ECCOMI."
+      data-theme="dark"
+      aria-labelledby="eccomi-title"
+    >
+      <div class="story-inner story-inner--person">
+        <div class="person-copy">
+          <p class="story-index">13 / 14</p>
+
+          <div class="story-heading">
+            <p class="eyebrow">IDENTITÀ</p>
+            <h2 id="eccomi-title">ECCOMI.</h2>
+          </div>
+
+          <div class="story-copy">
+            <p class="story-lead">
+              Atleta, tecnico, educatore.
+              Esperienze diverse, che nel tempo hanno iniziato
+              a parlare tra loro.
+            </p>
+          </div>
+        </div>
+
+        <figure class="person-image">
+          <img
+            src="/assets/images/cp-foto.webp"
+            alt="Cesare Paratore"
+            width="900"
+            height="1100"
+            loading="lazy"
+            decoding="async"
+          >
+        </figure>
+      </div>
+    </section>
+
+    <section
+      class="story story--light story--contact"
+      id="scrivimi"
+      data-title="SCRIVIMI."
+      data-theme="light"
+      aria-labelledby="scrivimi-title"
+    >
+      <div class="story-inner story-inner--contact">
+        <p class="story-index">14 / 14</p>
+
+        <div class="story-heading">
+          <p class="eyebrow">CONTATTO</p>
+          <h2 id="scrivimi-title">SCRIVIMI.</h2>
+        </div>
+
+        <div class="story-copy">
+          <p class="story-lead">
+            Se hai un'idea, un progetto o semplicemente una domanda,
+            possiamo partire da qui.
+          </p>
+
+          <a class="contact-link" href="/contatti/">
+            <span>CONTATTI</span>
+            <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-main">
+      <p class="footer-name">Cesare Paratore</p>
+      <p class="footer-fields">
+        Sport · Scienze Motorie · Educazione · Management · Digitale
+      </p>
+    </div>
+
+    <div class="footer-meta">
+      <span>© <span id="year"></span></span>
+      <span>PALERMO · SICILIA · ITALIA</span>
+    </div>
+  </footer>
+
+  <noscript>
+    <style>
+      .site-loader,
+      .standby,
+      .menu-toggle {
+        display: none !important;
+      }
+
+      .site-menu {
+        position: relative !important;
+        inset: auto !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        transform: none !important;
+        min-height: auto !important;
+        background: var(--bg) !important;
+      }
+
+      .site-menu .menu-inner {
+        padding-top: 2rem !important;
+      }
+    </style>
+  </noscript>
+</body>
+</html>
