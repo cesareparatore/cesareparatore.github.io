@@ -1,27 +1,20 @@
 /* =========================================================
    CESARE PARATORE — HOME
-   STANDARD OPERATIVO — MAXIMUM QUALITY
+   MAXIMUM QUALITY
    ========================================================= */
 
 (() => {
   "use strict";
 
-  /* =======================================================
-     CONFIG
-     ======================================================= */
-
-  const CONFIG = {
+  const CONFIG = Object.freeze({
     standbyDelay: 40000,
     loaderFailsafe: 3500,
     activeLineRatio: 0.32,
     activeLineMax: 260,
-    scrollOffset: 12,
-    pointerThrottle: 700
-  };
-
-  /* =======================================================
-     DOM
-     ======================================================= */
+    scrollOffset: 8,
+    activityThrottle: 500,
+    resizeDebounce: 120
+  });
 
   const doc = document;
   const html = doc.documentElement;
@@ -30,6 +23,7 @@
   const loader = doc.getElementById("site-loader");
   const standby = doc.getElementById("standby");
 
+  const header = doc.querySelector(".site-header");
   const menuToggle = doc.querySelector(".menu-toggle");
   const menu = doc.getElementById("menu");
 
@@ -48,31 +42,27 @@
 
   const currentYear = doc.getElementById("current-year");
 
-  /* =======================================================
-     STATE
-     ======================================================= */
+  const reduceMotionQuery = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  );
 
   let currentIndex = 0;
   let menuOpen = false;
   let standbyTimer = null;
   let loaderHidden = false;
-  let lastPointerActivity = 0;
-
-  let menuFocusables = [];
+  let lastActivity = 0;
+  let scrollFrame = 0;
+  let resizeTimer = 0;
   let restoreFocusElement = null;
 
-  const reduceMotionQuery = window.matchMedia(
-    "(prefers-reduced-motion: reduce)"
-  );
-
   /* =======================================================
-     HELPERS
+     UTILITIES
      ======================================================= */
 
   const clamp = (value, min, max) =>
     Math.min(Math.max(value, min), max);
 
-  const isVisible = (element) => {
+  const isElementVisible = (element) => {
     if (!element) return false;
 
     const style = window.getComputedStyle(element);
@@ -80,7 +70,7 @@
     return (
       style.display !== "none" &&
       style.visibility !== "hidden" &&
-      style.opacity !== "0"
+      parseFloat(style.opacity || "1") > 0
     );
   };
 
@@ -95,171 +85,30 @@
           "input:not([disabled])",
           "select:not([disabled])",
           "textarea:not([disabled])",
+          "summary",
           "[tabindex]:not([tabindex='-1'])"
         ].join(",")
       )
-    ).filter(isVisible);
+    ).filter(isElementVisible);
   };
 
+  const getGsap = () =>
+    window.gsap && window.ScrollTrigger
+      ? window.gsap
+      : null;
+
+  const prefersReducedMotion = () =>
+    reduceMotionQuery.matches;
+
   /* =======================================================
-     CURRENT YEAR
+     YEAR
      ======================================================= */
 
   if (currentYear) {
-    currentYear.textContent = String(new Date().getFullYear());
-  }
-
-  /* =======================================================
-     ACCESSIBILITY / MENU
-     ======================================================= */
-
-  function setMenuTabState(disabled) {
-    if (!menu) return;
-
-    const focusables = getFocusableElements(menu);
-
-    focusables.forEach((element) => {
-      if (disabled) {
-        element.dataset.menuTabindex = element.getAttribute("tabindex") ?? "";
-        element.setAttribute("tabindex", "-1");
-      } else {
-        const previous = element.dataset.menuTabindex;
-
-        if (previous === "") {
-          element.removeAttribute("tabindex");
-        } else if (previous !== undefined) {
-          element.setAttribute("tabindex", previous);
-        }
-
-        delete element.dataset.menuTabindex;
-      }
-    });
-  }
-
-  function setBackgroundInteractionDisabled(disabled) {
-    if (main) {
-      main.inert = disabled;
-      main.setAttribute("aria-hidden", disabled ? "true" : "false");
-    }
-
-    if (footer) {
-      footer.inert = disabled;
-      footer.setAttribute("aria-hidden", disabled ? "true" : "false");
-    }
-  }
-
-  function updateMenuLabel() {
-    if (!menuToggle) return;
-
-    const label = menuToggle.querySelector(".menu-label");
-
-    menuToggle.setAttribute(
-      "aria-expanded",
-      String(menuOpen)
+    currentYear.textContent = String(
+      new Date().getFullYear()
     );
-
-    menuToggle.setAttribute(
-      "aria-label",
-      menuOpen ? "Chiudi menu" : "Apri menu"
-    );
-
-    if (label) {
-      label.textContent = menuOpen ? "CHIUDI" : "MENU";
-    }
   }
-
-  function updateMenuState(forceOpen = null) {
-    if (!menu || !menuToggle) return;
-
-    const shouldOpen =
-      forceOpen === null ? !menuOpen : Boolean(forceOpen);
-
-    menuOpen = shouldOpen;
-
-    menu.classList.toggle("is-open", menuOpen);
-    menu.setAttribute(
-      "aria-hidden",
-      String(!menuOpen)
-    );
-
-    setBackgroundInteractionDisabled(menuOpen);
-    setMenuTabState(!menuOpen);
-    updateMenuLabel();
-
-    html.classList.toggle("menu-is-open", menuOpen);
-    body.classList.toggle("menu-is-open", menuOpen);
-
-    if (menuOpen) {
-      restoreFocusElement = doc.activeElement;
-
-      requestAnimationFrame(() => {
-        menuFocusables = getFocusableElements(menu);
-
-        if (menuFocusables.length) {
-          menuFocusables[0].focus();
-        }
-      });
-    } else {
-      const target =
-        restoreFocusElement &&
-        typeof restoreFocusElement.focus === "function"
-          ? restoreFocusElement
-          : menuToggle;
-
-      requestAnimationFrame(() => {
-        target.focus?.();
-      });
-
-      restoreFocusElement = null;
-    }
-  }
-
-  function trapMenuFocus(event) {
-    if (!menuOpen || event.key !== "Tab") return;
-
-    menuFocusables = getFocusableElements(menu);
-
-    if (!menuFocusables.length) {
-      event.preventDefault();
-      return;
-    }
-
-    const first = menuFocusables[0];
-    const last = menuFocusables[menuFocusables.length - 1];
-
-    if (event.shiftKey && doc.activeElement === first) {
-      event.preventDefault();
-      last.focus();
-      return;
-    }
-
-    if (!event.shiftKey && doc.activeElement === last) {
-      event.preventDefault();
-      first.focus();
-    }
-  }
-
-  menuToggle?.addEventListener("click", () => {
-    updateMenuState();
-  });
-
-  menu?.addEventListener("click", (event) => {
-    const link = event.target.closest("a");
-
-    if (!link) return;
-
-    updateMenuState(false);
-  });
-
-  doc.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && menuOpen) {
-      event.preventDefault();
-      updateMenuState(false);
-      return;
-    }
-
-    trapMenuFocus(event);
-  });
 
   /* =======================================================
      STANDBY
@@ -273,8 +122,7 @@
   }
 
   function showStandby() {
-    if (!standby) return;
-    if (menuOpen || doc.hidden) return;
+    if (!standby || menuOpen || doc.hidden) return;
 
     standby.classList.add("is-visible");
     standby.setAttribute("aria-hidden", "false");
@@ -293,32 +141,222 @@
     );
   }
 
-  function handleActivity() {
-    hideStandby();
-    resetStandbyTimer();
-  }
-
-  ["scroll", "wheel", "touchstart", "keydown", "click"].forEach((eventName) => {
-    window.addEventListener(eventName, handleActivity, {
-      passive: true
-    });
-  });
-
-  window.addEventListener("pointermove", () => {
+  function registerActivity() {
     const now = Date.now();
 
     if (
-      now - lastPointerActivity <
-      CONFIG.pointerThrottle
+      now - lastActivity <
+      CONFIG.activityThrottle
     ) {
       return;
     }
 
-    lastPointerActivity = now;
-    handleActivity();
-  }, {
-    passive: true
+    lastActivity = now;
+    resetStandbyTimer();
+  }
+
+  [
+    "scroll",
+    "wheel",
+    "touchstart",
+    "keydown",
+    "click",
+    "pointerdown"
+  ].forEach((eventName) => {
+    window.addEventListener(
+      eventName,
+      registerActivity,
+      {
+        passive: true
+      }
+    );
   });
+
+  window.addEventListener(
+    "pointermove",
+    registerActivity,
+    {
+      passive: true
+    }
+  );
+
+  /* =======================================================
+     MENU
+     ======================================================= */
+
+  function updateMenuVisualState() {
+    if (!menuToggle) return;
+
+    const label =
+      menuToggle.querySelector(".menu-label");
+
+    menuToggle.setAttribute(
+      "aria-expanded",
+      String(menuOpen)
+    );
+
+    menuToggle.setAttribute(
+      "aria-label",
+      menuOpen
+        ? "Chiudi menu"
+        : "Apri menu"
+    );
+
+    if (label) {
+      label.textContent =
+        menuOpen
+          ? "CHIUDI"
+          : "MENU";
+    }
+
+    if (header) {
+      header.classList.toggle(
+        "menu-active",
+        menuOpen
+      );
+    }
+  }
+
+  function setBackgroundInert(isInert) {
+    [main, footer].forEach((element) => {
+      if (!element) return;
+
+      element.inert = isInert;
+
+      if (isInert) {
+        element.setAttribute(
+          "aria-hidden",
+          "true"
+        );
+      } else {
+        element.removeAttribute("aria-hidden");
+      }
+    });
+  }
+
+  function updateMenuState(forceState = null) {
+    if (!menu || !menuToggle) return;
+
+    const nextState =
+      forceState === null
+        ? !menuOpen
+        : Boolean(forceState);
+
+    if (nextState === menuOpen) return;
+
+    if (nextState) {
+      restoreFocusElement = doc.activeElement;
+      menuOpen = true;
+
+      menu.classList.add("is-open");
+      menu.setAttribute("aria-hidden", "false");
+      menu.inert = false;
+
+      setBackgroundInert(true);
+
+      html.classList.add("menu-is-open");
+      body.classList.add("menu-is-open");
+
+      updateMenuVisualState();
+
+      requestAnimationFrame(() => {
+        const focusables =
+          getFocusableElements(menu);
+
+        focusables[0]?.focus();
+      });
+
+      return;
+    }
+
+    menuOpen = false;
+
+    menu.classList.remove("is-open");
+    menu.setAttribute("aria-hidden", "true");
+    menu.inert = true;
+
+    setBackgroundInert(false);
+
+    html.classList.remove("menu-is-open");
+    body.classList.remove("menu-is-open");
+
+    updateMenuVisualState();
+
+    const target =
+      restoreFocusElement &&
+      typeof restoreFocusElement.focus === "function"
+        ? restoreFocusElement
+        : menuToggle;
+
+    restoreFocusElement = null;
+
+    requestAnimationFrame(() => {
+      target?.focus?.();
+    });
+  }
+
+  menuToggle?.addEventListener(
+    "click",
+    () => {
+      updateMenuState();
+    }
+  );
+
+  menu?.addEventListener(
+    "click",
+    (event) => {
+      const link =
+        event.target.closest("a");
+
+      if (!link) return;
+
+      updateMenuState(false);
+    }
+  );
+
+  doc.addEventListener(
+    "keydown",
+    (event) => {
+      if (event.key === "Escape" && menuOpen) {
+        event.preventDefault();
+        updateMenuState(false);
+        return;
+      }
+
+      if (
+        !menuOpen ||
+        event.key !== "Tab"
+      ) {
+        return;
+      }
+
+      const focusables =
+        getFocusableElements(menu);
+
+      if (!focusables.length) {
+        event.preventDefault();
+        return;
+      }
+
+      const first = focusables[0];
+      const last =
+        focusables[focusables.length - 1];
+
+      if (
+        event.shiftKey &&
+        doc.activeElement === first
+      ) {
+        event.preventDefault();
+        last.focus();
+      } else if (
+        !event.shiftKey &&
+        doc.activeElement === last
+      ) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+  );
 
   /* =======================================================
      LOADER
@@ -330,21 +368,27 @@
     loaderHidden = true;
 
     const finish = () => {
-      loader.setAttribute("aria-hidden", "true");
+      loader.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+
       loader.style.display = "none";
     };
 
+    const gsap = getGsap();
+
     if (
-      reduceMotionQuery.matches ||
-      !window.gsap
+      prefersReducedMotion() ||
+      !gsap
     ) {
       finish();
       return;
     }
 
-    window.gsap.to(loader, {
+    gsap.to(loader, {
       opacity: 0,
-      duration: 0.65,
+      duration: 0.55,
       ease: "power2.out",
       onComplete: finish
     });
@@ -356,16 +400,24 @@
       CONFIG.loaderFailsafe
     );
 
-    if (document.readyState === "complete") {
-      window.setTimeout(hideLoader, 120);
+    if (doc.readyState === "complete") {
+      window.setTimeout(
+        hideLoader,
+        100
+      );
       return;
     }
 
-    window.addEventListener("load", () => {
-      window.setTimeout(hideLoader, 120);
-    }, {
-      once: true
-    });
+    window.addEventListener(
+      "load",
+      () => {
+        window.setTimeout(
+          hideLoader,
+          100
+        );
+      },
+      { once: true }
+    );
   }
 
   /* =======================================================
@@ -374,12 +426,13 @@
 
   function getReadingLine() {
     const headerHeight =
-      document.querySelector(".site-header")?.offsetHeight || 0;
+      header?.offsetHeight || 0;
 
     return (
       headerHeight +
       Math.min(
-        window.innerHeight * CONFIG.activeLineRatio,
+        window.innerHeight *
+          CONFIG.activeLineRatio,
         CONFIG.activeLineMax
       )
     );
@@ -388,37 +441,67 @@
   function getActiveSectionIndex() {
     if (!sections.length) return 0;
 
-    const readingLine = getReadingLine();
+    const readingLine =
+      getReadingLine();
 
     let bestIndex = 0;
-    let bestDistance = Number.POSITIVE_INFINITY;
+    let bestDistance =
+      Number.POSITIVE_INFINITY;
 
-    sections.forEach((section, index) => {
-      const rect = section.getBoundingClientRect();
+    sections.forEach(
+      (section, index) => {
+        const rect =
+          section.getBoundingClientRect();
 
-      if (
-        rect.top <= readingLine &&
-        rect.bottom >= readingLine
-      ) {
-        bestIndex = index;
-        bestDistance = 0;
-        return;
+        if (
+          rect.top <= readingLine &&
+          rect.bottom >= readingLine
+        ) {
+          bestIndex = index;
+          bestDistance = 0;
+          return;
+        }
+
+        const center =
+          rect.top +
+          rect.height / 2;
+
+        const distance =
+          Math.abs(
+            center - readingLine
+          );
+
+        if (
+          distance <
+          bestDistance
+        ) {
+          bestDistance = distance;
+          bestIndex = index;
+        }
       }
-
-      const center = rect.top + rect.height / 2;
-      const distance = Math.abs(center - readingLine);
-
-      if (distance < bestDistance) {
-        bestDistance = distance;
-        bestIndex = index;
-      }
-    });
+    );
 
     return bestIndex;
   }
 
-  function updateSectionNavigation(index = getActiveSectionIndex()) {
-    if (!sections.length || !sectionNav) return;
+  function updateHeaderTheme(section) {
+    if (!header || !section) return;
+
+    const isLight =
+      section.classList.contains(
+        "story-light"
+      );
+
+    header.dataset.headerTheme =
+      isLight
+        ? "light"
+        : "dark";
+  }
+
+  function updateSectionNavigation(
+    index = getActiveSectionIndex()
+  ) {
+    if (!sections.length) return;
 
     index = clamp(
       index,
@@ -428,152 +511,232 @@
 
     currentIndex = index;
 
-    const section = sections[index];
+    const section =
+      sections[index];
 
     const title =
       section.dataset.title ||
-      section.querySelector("h1, h2")?.textContent?.trim() ||
+      section.querySelector(
+        "h1, h2"
+      )?.textContent?.trim() ||
       "";
 
     if (sectionNumber) {
       sectionNumber.textContent =
-        String(index + 1).padStart(2, "0");
+        String(index + 1)
+          .padStart(2, "0");
     }
 
     if (sectionTitle) {
-      sectionTitle.textContent = title;
+      sectionTitle.textContent =
+        title;
     }
 
     if (sectionPrev) {
-      sectionPrev.disabled = index === 0;
+      const disabled =
+        index === 0;
+
+      sectionPrev.disabled =
+        disabled;
+
       sectionPrev.setAttribute(
         "aria-label",
-        index === 0
+        disabled
           ? "Sezione precedente non disponibile"
-          : `Vai a ${sections[index - 1].dataset.title || "sezione precedente"}`
+          : `Vai a ${
+              sections[index - 1]
+                .dataset.title ||
+              "sezione precedente"
+            }`
       );
     }
 
     if (sectionNext) {
+      const disabled =
+        index ===
+        sections.length - 1;
+
       sectionNext.disabled =
-        index === sections.length - 1;
+        disabled;
 
       sectionNext.setAttribute(
         "aria-label",
-        index === sections.length - 1
+        disabled
           ? "Sezione successiva non disponibile"
-          : `Vai a ${sections[index + 1].dataset.title || "sezione successiva"}`
+          : `Vai a ${
+              sections[index + 1]
+                .dataset.title ||
+              "sezione successiva"
+            }`
       );
     }
 
-    const isLight =
-      section.classList.contains("story-light");
+    if (sectionNav) {
+      sectionNav.dataset.theme =
+        section.classList.contains(
+          "story-light"
+        )
+          ? "light"
+          : "dark";
+    }
 
-    sectionNav.dataset.theme =
-      isLight ? "light" : "dark";
+    updateHeaderTheme(section);
 
     html.dataset.activeSection =
       section.id || "";
-
-    sections.forEach((item, itemIndex) => {
-      item.setAttribute(
-        "aria-current",
-        itemIndex === index ? "true" : "false"
-      );
-    });
   }
 
-  function scrollToSection(index) {
-    if (!sections[index]) return;
+  function updateUrl(section) {
+    if (
+      !section?.id ||
+      !window.history?.replaceState
+    ) {
+      return;
+    }
 
-    const section = sections[index];
+    const url =
+      `${window.location.pathname}` +
+      `${window.location.search}` +
+      `#${encodeURIComponent(section.id)}`;
+
+    window.history.replaceState(
+      null,
+      "",
+      url
+    );
+  }
+
+  function scrollToSection(
+    index,
+    updateHash = true
+  ) {
+    const section =
+      sections[index];
+
+    if (!section) return;
 
     const top =
       window.scrollY +
-      section.getBoundingClientRect().top -
+      section.getBoundingClientRect()
+        .top -
       CONFIG.scrollOffset;
 
-    if (
-      reduceMotionQuery.matches
-    ) {
-      window.scrollTo({
-        top,
-        behavior: "auto"
-      });
-      return;
+    if (updateHash) {
+      updateUrl(section);
     }
 
     window.scrollTo({
       top,
-      behavior: "smooth"
+      behavior:
+        prefersReducedMotion()
+          ? "auto"
+          : "smooth"
     });
   }
 
-  sectionPrev?.addEventListener("click", () => {
-    if (currentIndex > 0) {
-      scrollToSection(currentIndex - 1);
+  sectionPrev?.addEventListener(
+    "click",
+    () => {
+      if (currentIndex > 0) {
+        scrollToSection(
+          currentIndex - 1
+        );
+      }
     }
-  });
+  );
 
-  sectionNext?.addEventListener("click", () => {
-    if (currentIndex < sections.length - 1) {
-      scrollToSection(currentIndex + 1);
+  sectionNext?.addEventListener(
+    "click",
+    () => {
+      if (
+        currentIndex <
+        sections.length - 1
+      ) {
+        scrollToSection(
+          currentIndex + 1
+        );
+      }
     }
-  });
+  );
 
   /* =======================================================
      KEYBOARD SECTION NAVIGATION
      ======================================================= */
 
-  doc.addEventListener("keydown", (event) => {
-    if (
-      menuOpen ||
-      event.altKey ||
-      event.ctrlKey ||
-      event.metaKey ||
-      event.shiftKey
-    ) {
-      return;
-    }
+  doc.addEventListener(
+    "keydown",
+    (event) => {
+      if (
+        menuOpen ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.shiftKey
+      ) {
+        return;
+      }
 
-    if (
-      event.key === "ArrowDown" &&
-      doc.activeElement === body
-    ) {
-      event.preventDefault();
+      const target =
+        event.target;
 
-      if (currentIndex < sections.length - 1) {
-        scrollToSection(currentIndex + 1);
+      const isFormControl =
+        target instanceof
+          HTMLInputElement ||
+        target instanceof
+          HTMLTextAreaElement ||
+        target instanceof
+          HTMLSelectElement ||
+        target instanceof
+          HTMLButtonElement ||
+        target?.isContentEditable;
+
+      if (isFormControl) {
+        return;
+      }
+
+      if (
+        event.key === "ArrowDown"
+      ) {
+        event.preventDefault();
+
+        if (
+          currentIndex <
+          sections.length - 1
+        ) {
+          scrollToSection(
+            currentIndex + 1
+          );
+        }
+      }
+
+      if (
+        event.key === "ArrowUp"
+      ) {
+        event.preventDefault();
+
+        if (currentIndex > 0) {
+          scrollToSection(
+            currentIndex - 1
+          );
+        }
       }
     }
-
-    if (
-      event.key === "ArrowUp" &&
-      doc.activeElement === body
-    ) {
-      event.preventDefault();
-
-      if (currentIndex > 0) {
-        scrollToSection(currentIndex - 1);
-      }
-    }
-  });
+  );
 
   /* =======================================================
-     SCROLL / ACTIVE SECTION
+     SCROLL / RESIZE
      ======================================================= */
 
-  let scrollTicking = false;
-
   function requestSectionUpdate() {
-    if (scrollTicking) return;
+    if (scrollFrame) return;
 
-    scrollTicking = true;
-
-    window.requestAnimationFrame(() => {
-      updateSectionNavigation();
-      scrollTicking = false;
-    });
+    scrollFrame =
+      window.requestAnimationFrame(
+        () => {
+          updateSectionNavigation();
+          scrollFrame = 0;
+        }
+      );
   }
 
   window.addEventListener(
@@ -584,265 +747,395 @@
 
   window.addEventListener(
     "resize",
-    requestSectionUpdate,
+    () => {
+      window.clearTimeout(
+        resizeTimer
+      );
+
+      resizeTimer =
+        window.setTimeout(
+          () => {
+            requestSectionUpdate();
+
+            if (window.ScrollTrigger) {
+              window.ScrollTrigger.refresh();
+            }
+          },
+          CONFIG.resizeDebounce
+        );
+    },
     { passive: true }
   );
 
   /* =======================================================
-     GSAP / SCROLLTRIGGER
+     GSAP
      ======================================================= */
 
-  function gsapAvailable() {
-    return (
-      !reduceMotionQuery.matches &&
-      window.gsap &&
-      window.ScrollTrigger
+  function revealWithoutAnimation() {
+    sections.forEach(
+      (section) => {
+        section
+          .querySelectorAll(
+            [
+              ".eyebrow",
+              "h1",
+              "h2",
+              "p",
+              ".return-list span",
+              ".connect-words span",
+              ".person-frame",
+              ".map-frame",
+              ".understand-lead",
+              ".build-lead",
+              ".from-here-lead",
+              ".objective-list"
+            ].join(",")
+          )
+          .forEach(
+            (element) => {
+              element.style.opacity = "1";
+              element.style.transform =
+                "none";
+            }
+          );
+      }
     );
   }
 
   function killStoryAnimations() {
-    if (!window.ScrollTrigger) return;
-
-    window.ScrollTrigger.getAll()
-      .filter((trigger) =>
-        trigger.vars &&
-        trigger.vars.id &&
-        String(trigger.vars.id).startsWith("story-")
-      )
-      .forEach((trigger) => trigger.kill());
-  }
-
-  function initStoryAnimations() {
-    if (!gsapAvailable()) {
-      sections.forEach((section) => {
-        section
-          .querySelectorAll(
-            ".eyebrow, h1, h2, p, .return-list span, .connect-words span, .person-frame, .map-frame"
-          )
-          .forEach((element) => {
-            element.style.opacity = "1";
-            element.style.transform = "none";
-          });
-      });
-
+    if (!window.ScrollTrigger) {
       return;
     }
 
-    window.gsap.registerPlugin(
-      window.ScrollTrigger
-    );
+    window.ScrollTrigger
+      .getAll()
+      .filter(
+        (trigger) =>
+          String(
+            trigger.vars?.id || ""
+          ).startsWith("story-")
+      )
+      .forEach(
+        (trigger) => trigger.kill()
+      );
+  }
+
+  function initStoryAnimations() {
+    const gsap = getGsap();
 
     killStoryAnimations();
 
-    sections.forEach((section, index) => {
-      const eyebrow =
-        section.querySelector(".eyebrow");
+    if (
+      !gsap ||
+      prefersReducedMotion()
+    ) {
+      revealWithoutAnimation();
+      return;
+    }
 
-      const heading =
-        section.querySelector("h1, h2");
+    gsap.registerPlugin(
+      window.ScrollTrigger
+    );
 
-      const paragraphs =
-        section.querySelectorAll(
-          ".narrative-copy p, .opening-copy p, .today-lead, .contact-lead"
-        );
-
-      const frame =
-        section.querySelector(
-          ".person-frame, .map-frame"
-        );
-
-      /* Opening */
-      if (
-        section.classList.contains("story-opening")
-      ) {
-        const tl = window.gsap.timeline({
-          scrollTrigger: {
-            id: `story-${index}-opening`,
-            trigger: section,
-            start: "top 70%",
-            once: true
-          }
-        });
-
-        tl.from(eyebrow, {
-          opacity: 0,
-          y: 18,
-          duration: 0.6,
-          ease: "power3.out"
-        })
-        .from(heading, {
-          opacity: 0,
-          y: 40,
-          duration: 0.9,
-          ease: "power4.out"
-        }, "-=0.35")
-        .from(paragraphs, {
-          opacity: 0,
-          y: 20,
-          duration: 0.65,
-          stagger: 0.12,
-          ease: "power3.out"
-        }, "-=0.35");
-
-        return;
-      }
-
-      /* Understand */
-      if (
-        section.classList.contains("story-understand")
-      ) {
-        const items = section.querySelectorAll(
-          ".understand-lead, .narrative-copy"
-        );
-
-        window.gsap.from(items, {
-          opacity: 0,
-          y: 45,
-          duration: 0.85,
-          stagger: 0.14,
-          ease: "power3.out",
-          scrollTrigger: {
-            id: `story-${index}-understand`,
-            trigger: section,
-            start: "top 68%",
-            once: true
-          }
-        });
-
-        return;
-      }
-
-      /* Return */
-      if (
-        section.classList.contains("story-return")
-      ) {
-        const items = section.querySelectorAll(
-          ".return-copy > p, .return-list span"
-        );
-
-        window.gsap.from(items, {
-          opacity: 0,
-          y: 35,
-          duration: 0.75,
-          stagger: 0.12,
-          ease: "power3.out",
-          scrollTrigger: {
-            id: `story-${index}-return`,
-            trigger: section,
-            start: "top 68%",
-            once: true
-          }
-        });
-
-        return;
-      }
-
-      /* Connect */
-      if (
-        section.classList.contains("story-connect")
-      ) {
-        const words =
-          section.querySelectorAll(
-            ".connect-words span"
+    sections.forEach(
+      (section, index) => {
+        const eyebrow =
+          section.querySelector(
+            ".eyebrow"
           );
 
-        window.gsap.from(words, {
-          opacity: 0,
-          x: -35,
-          duration: 0.65,
-          stagger: 0.1,
-          ease: "power3.out",
-          scrollTrigger: {
-            id: `story-${index}-connect`,
-            trigger: section,
-            start: "top 68%",
-            once: true
+        const heading =
+          section.querySelector(
+            "h1, h2"
+          );
+
+        const paragraphs =
+          Array.from(
+            section.querySelectorAll(
+              ".narrative-copy p, " +
+              ".opening-copy p, " +
+              ".today-lead, " +
+              ".contact-lead"
+            )
+          );
+
+        const animate = (
+          targets,
+          options = {}
+        ) => {
+          const validTargets =
+            Array.from(
+              targets || []
+            ).filter(Boolean);
+
+          if (!validTargets.length) {
+            return;
           }
-        });
 
-        return;
-      }
+          gsap.from(
+            validTargets,
+            {
+              opacity: 0,
+              y: 30,
+              duration: 0.75,
+              stagger: 0.08,
+              ease: "power3.out",
+              ...options,
+              scrollTrigger: {
+                id:
+                  `story-${index}-${options.name || "content"}`,
+                trigger: section,
+                start:
+                  options.start ||
+                  "top 72%",
+                once: true
+              }
+            }
+          );
+        };
 
-      /* Today */
-      if (
-        section.classList.contains("story-today")
-      ) {
-        const tl = window.gsap.timeline({
-          scrollTrigger: {
-            id: `story-${index}-today`,
-            trigger: section,
-            start: "top 68%",
-            once: true
+        if (
+          section.classList.contains(
+            "story-opening"
+          )
+        ) {
+          const timeline =
+            gsap.timeline({
+              scrollTrigger: {
+                id:
+                  `story-${index}-opening`,
+                trigger: section,
+                start: "top 70%",
+                once: true
+              }
+            });
+
+          if (eyebrow) {
+            timeline.from(
+              eyebrow,
+              {
+                opacity: 0,
+                y: 18,
+                duration: 0.55,
+                ease: "power3.out"
+              }
+            );
           }
-        });
 
-        tl.from(heading, {
-          opacity: 0,
-          y: 35,
-          duration: 0.8,
-          ease: "power4.out"
-        })
-        .from(section.querySelector(".today-lead"), {
-          opacity: 0,
-          y: 40,
-          duration: 0.8,
-          ease: "power4.out"
-        }, "-=0.35")
-        .from(section.querySelector(".narrative-copy"), {
-          opacity: 0,
-          y: 30,
-          duration: 0.7,
-          ease: "power3.out"
-        }, "-=0.35");
-
-        return;
-      }
-
-      /* Person / Map */
-      if (frame) {
-        window.gsap.from(frame, {
-          opacity: 0,
-          y: 45,
-          duration: 1,
-          ease: "power3.out",
-          scrollTrigger: {
-            id: `story-${index}-frame`,
-            trigger: section,
-            start: "top 70%",
-            once: true
+          if (heading) {
+            timeline.from(
+              heading,
+              {
+                opacity: 0,
+                y: 40,
+                duration: 0.85,
+                ease: "power4.out"
+              },
+              "-=0.3"
+            );
           }
-        });
-      }
 
-      /* Generic — deliberately restrained */
-      const contentItems = [
-        eyebrow,
-        heading,
-        ...Array.from(paragraphs)
-      ].filter(Boolean);
-
-      if (contentItems.length) {
-        window.gsap.from(contentItems, {
-          opacity: 0,
-          y: 30,
-          duration: 0.75,
-          stagger: 0.1,
-          ease: "power3.out",
-          scrollTrigger: {
-            id: `story-${index}-generic`,
-            trigger: section,
-            start: "top 72%",
-            once: true
+          if (paragraphs.length) {
+            timeline.from(
+              paragraphs,
+              {
+                opacity: 0,
+                y: 20,
+                duration: 0.6,
+                stagger: 0.1,
+                ease: "power3.out"
+              },
+              "-=0.25"
+            );
           }
-        });
+
+          return;
+        }
+
+        if (
+          section.classList.contains(
+            "story-understand"
+          )
+        ) {
+          animate(
+            section.querySelectorAll(
+              ".understand-lead, .narrative-copy"
+            ),
+            {
+              name: "understand",
+              y: 38,
+              duration: 0.8,
+              stagger: 0.12,
+              start: "top 68%"
+            }
+          );
+
+          return;
+        }
+
+        if (
+          section.classList.contains(
+            "story-return"
+          )
+        ) {
+          animate(
+            section.querySelectorAll(
+              ".return-copy > p, .return-list span"
+            ),
+            {
+              name: "return",
+              y: 28,
+              duration: 0.7,
+              stagger: 0.1,
+              start: "top 68%"
+            }
+          );
+
+          return;
+        }
+
+        if (
+          section.classList.contains(
+            "story-connect"
+          )
+        ) {
+          animate(
+            section.querySelectorAll(
+              ".connect-words span"
+            ),
+            {
+              name: "connect",
+              x: -28,
+              y: 0,
+              duration: 0.62,
+              stagger: 0.09,
+              start: "top 68%"
+            }
+          );
+
+          animate(
+            [
+              section.querySelector(
+                ".narrative-copy"
+              )
+            ],
+            {
+              name: "connect-copy",
+              y: 28,
+              duration: 0.7,
+              start: "top 68%"
+            }
+          );
+
+          return;
+        }
+
+        if (
+          section.classList.contains(
+            "story-today"
+          )
+        ) {
+          const timeline =
+            gsap.timeline({
+              scrollTrigger: {
+                id:
+                  `story-${index}-today`,
+                trigger: section,
+                start: "top 68%",
+                once: true
+              }
+            });
+
+          if (heading) {
+            timeline.from(
+              heading,
+              {
+                opacity: 0,
+                y: 35,
+                duration: 0.75,
+                ease: "power4.out"
+              }
+            );
+          }
+
+          const todayLead =
+            section.querySelector(
+              ".today-lead"
+            );
+
+          if (todayLead) {
+            timeline.from(
+              todayLead,
+              {
+                opacity: 0,
+                y: 35,
+                duration: 0.75,
+                ease: "power4.out"
+              },
+              "-=0.3"
+            );
+          }
+
+          const copy =
+            section.querySelector(
+              ".narrative-copy"
+            );
+
+          if (copy) {
+            timeline.from(
+              copy,
+              {
+                opacity: 0,
+                y: 25,
+                duration: 0.65,
+                ease: "power3.out"
+              },
+              "-=0.3"
+            );
+          }
+
+          return;
+        }
+
+        const frame =
+          section.querySelector(
+            ".person-frame, .map-frame"
+          );
+
+        if (frame) {
+          animate(
+            [frame],
+            {
+              name: "frame",
+              y: 35,
+              duration: 0.9,
+              start: "top 70%"
+            }
+          );
+        }
+
+        animate(
+          [
+            eyebrow,
+            heading,
+            ...paragraphs
+          ],
+          {
+            name: "generic",
+            y: 28,
+            duration: 0.72,
+            stagger: 0.08,
+            start: "top 72%"
+          }
+        );
       }
-    });
+    );
 
     window.ScrollTrigger.refresh();
   }
 
   /* =======================================================
-     REDUCED MOTION DYNAMIC CHANGE
+     MOTION PREFERENCE
      ======================================================= */
 
   function handleMotionPreferenceChange() {
@@ -874,43 +1167,84 @@
      HASH NAVIGATION
      ======================================================= */
 
+  function getHashTarget() {
+    const rawHash =
+      window.location.hash;
+
+    if (!rawHash) return null;
+
+    const id =
+      decodeURIComponent(
+        rawHash.slice(1)
+      );
+
+    return doc.getElementById(id);
+  }
+
   function handleInitialHash() {
-    const hash = window.location.hash;
-
-    if (!hash) return;
-
-    const target = doc.getElementById(
-      decodeURIComponent(hash.slice(1))
-    );
+    const target =
+      getHashTarget();
 
     if (!target) return;
 
-    window.setTimeout(() => {
-      target.scrollIntoView({
-        behavior: reduceMotionQuery.matches
-          ? "auto"
-          : "smooth",
-        block: "start"
-      });
-    }, 250);
+    const index =
+      sections.indexOf(target);
+
+    if (index === -1) return;
+
+    window.setTimeout(
+      () => {
+        scrollToSection(
+          index,
+          false
+        );
+        updateSectionNavigation(
+          index
+        );
+      },
+      80
+    );
   }
 
+  window.addEventListener(
+    "hashchange",
+    () => {
+      const target =
+        getHashTarget();
+
+      if (!target) return;
+
+      const index =
+        sections.indexOf(target);
+
+      if (index === -1) return;
+
+      scrollToSection(
+        index,
+        false
+      );
+    }
+  );
+
   /* =======================================================
-     PAGE VISIBILITY / BFCACHE
+     VISIBILITY / BF CACHE
      ======================================================= */
 
   document.addEventListener(
     "visibilitychange",
     () => {
-      if (document.hidden) {
+      if (doc.hidden) {
         hideStandby();
-      } else {
-        resetStandbyTimer();
-
-        if (window.ScrollTrigger) {
-          window.ScrollTrigger.refresh();
-        }
+        return;
       }
+
+      resetStandbyTimer();
+
+      if (window.ScrollTrigger) {
+        window.ScrollTrigger.refresh();
+      }
+
+      requestSectionUpdate();
     }
   );
 
@@ -932,31 +1266,45 @@
      ======================================================= */
 
   function init() {
-    setMenuTabState(true);
-    updateMenuState(false);
+    if (menu) {
+      menuOpen = false;
+      menu.inert = true;
+      menu.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+    }
+
+    updateMenuVisualState();
 
     updateSectionNavigation(0);
 
     initLoader();
     initStoryAnimations();
-
     handleInitialHash();
-
-    window.setTimeout(() => {
-      updateSectionNavigation();
-    }, 50);
-
     resetStandbyTimer();
 
+    window.setTimeout(
+      () => {
+        updateSectionNavigation();
+      },
+      50
+    );
+
     if (window.ScrollTrigger) {
-      window.setTimeout(() => {
-        window.ScrollTrigger.refresh();
-      }, 150);
+      window.setTimeout(
+        () => {
+          window.ScrollTrigger.refresh();
+        },
+        150
+      );
     }
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener(
+  if (
+    doc.readyState === "loading"
+  ) {
+    doc.addEventListener(
       "DOMContentLoaded",
       init,
       { once: true }
@@ -964,5 +1312,4 @@
   } else {
     init();
   }
-
 })();
