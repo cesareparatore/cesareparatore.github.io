@@ -1,7 +1,7 @@
 /* =========================================================
    CESARE PARATORE
    Cinematic / editorial system
-   V2
+   V4
    ========================================================= */
 
 :root {
@@ -54,6 +54,8 @@
 html {
   background: var(--bg);
   scroll-behavior: smooth;
+  scroll-padding-top: var(--header-h);
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -134,6 +136,8 @@ a {
   color: var(--ink);
 
   font-size: .8rem;
+  font-weight: 600;
+
   text-decoration: none;
 
   transform: translateY(-150%);
@@ -793,6 +797,10 @@ a:focus-visible {
   color: var(--secondary);
 }
 
+.menu-link[aria-current="page"] {
+  color: var(--secondary);
+}
+
 
 /* =========================================================
    STORY
@@ -815,10 +823,12 @@ main {
 
   overflow: hidden;
 
+  scroll-margin-top: var(--header-h);
+
   --title-alpha: 1;
   --title-y: 0px;
-  --content-alpha: .18;
-  --content-y: 32px;
+  --content-alpha: 1;
+  --content-y: 0px;
 }
 
 .section-dark {
