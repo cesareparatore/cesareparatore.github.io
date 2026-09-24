@@ -3,6 +3,7 @@
    Editorial / Narrative / Responsive
    ========================================================= */
 
+
 /* =========================================================
    01. TOKENS
    ========================================================= */
@@ -58,17 +59,22 @@
 
 html {
   min-width: 320px;
-  scroll-behavior: smooth;
-  scroll-padding-top: var(--header-total);
+
   background: var(--bg);
   color: var(--light);
+
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--header-total);
+
   text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
 }
 
 body {
-  margin: 0;
   min-width: 320px;
+  margin: 0;
+
+  overflow-x: hidden;
 
   background: var(--bg);
   color: var(--light);
@@ -88,8 +94,6 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  overflow-x: hidden;
 }
 
 body.menu-open {
@@ -172,7 +176,9 @@ p:last-child {
   font-weight: 700;
 
   transform: translateY(-150%);
-  transition: transform var(--duration-fast) var(--ease);
+
+  transition:
+    transform var(--duration-fast) var(--ease);
 }
 
 .skip-link:focus {
@@ -247,6 +253,7 @@ p:last-child {
 
   opacity: 0;
   visibility: hidden;
+
   transform: translateY(8px);
 
   transition:
@@ -271,15 +278,15 @@ p:last-child {
   z-index: 8000;
   inset: 0 0 auto;
 
-  color: var(--light);
-  background: var(--bg);
-
   isolation: isolate;
+
+  background: var(--bg);
+  color: var(--light);
 }
 
 
 /* ---------------------------------------------------------
-   HEADER PRIMARY
+   PRIMARY HEADER
    --------------------------------------------------------- */
 
 .header-primary {
@@ -336,21 +343,14 @@ p:last-child {
    ACTIVE STORY TITLE
    --------------------------------------------------------- */
 
-/*
- * Il titolo NON è più position:absolute.
- *
- * È una vera colonna centrale della griglia dell'header.
- * In questo modo MENU e titolo non possono sovrapporsi.
- */
-
 .active-story {
   position: relative;
   z-index: 1;
 
   grid-column: 2;
 
-  min-width: 0;
   width: 100%;
+  min-width: 0;
 
   padding-inline: clamp(72px, 8vw, 140px);
 
@@ -403,7 +403,6 @@ p:last-child {
 
   border: 0;
   background: transparent;
-
   color: var(--light);
 
   font: inherit;
@@ -429,10 +428,10 @@ p:last-child {
   flex-direction: column;
   justify-content: center;
 
-  gap: 4px;
-
   width: 18px;
   height: 18px;
+
+  gap: 4px;
 
   flex-shrink: 0;
 }
@@ -462,7 +461,7 @@ p:last-child {
 
 
 /* =========================================================
-   07. STORY NAV / PROGRESS
+   07. STORY NAV
    ========================================================= */
 
 .story-nav {
@@ -480,12 +479,13 @@ p:last-child {
   display: grid;
   grid-template-columns: 44px minmax(0, 1fr) 44px;
   align-items: center;
-  gap: clamp(14px, 2vw, 28px);
 
   width: min(100%, 1100px);
   min-height: var(--header-secondary);
 
   margin-inline: auto;
+
+  gap: clamp(14px, 2vw, 28px);
 
   padding-inline:
     max(16px, env(safe-area-inset-left))
@@ -494,7 +494,7 @@ p:last-child {
 
 
 /* ---------------------------------------------------------
-   STORY ARROWS
+   ARROWS
    --------------------------------------------------------- */
 
 .story-arrow {
@@ -543,27 +543,23 @@ p:last-child {
 
 
 /* ---------------------------------------------------------
-   STORY PROGRESS
+   PROGRESS
    --------------------------------------------------------- */
 
 .story-progress {
   position: relative;
 
-  height: 20px;
-
   display: flex;
   align-items: center;
 
-  cursor: default;
+  height: 20px;
 }
 
 .story-progress-track,
 .story-progress-fill {
   position: absolute;
-  left: 0;
-  right: 0;
-
   top: 50%;
+  left: 0;
 
   height: 1px;
 
@@ -571,6 +567,7 @@ p:last-child {
 }
 
 .story-progress-track {
+  right: 0;
   background: rgba(17, 17, 15, 0.2);
 }
 
@@ -596,11 +593,9 @@ p:last-child {
 
   background: var(--ink);
 
-  transform:
-    translate(-50%, -50%);
+  transform: translate(-50%, -50%);
 
-  transition:
-    left 80ms linear;
+  transition: left 80ms linear;
 }
 
 
@@ -615,6 +610,7 @@ p:last-child {
   inset: var(--header-total) 0 0;
 
   overflow-y: auto;
+  overscroll-behavior: contain;
 
   padding:
     clamp(30px, 6vw, 80px)
@@ -680,8 +676,11 @@ p:last-child {
     padding-left var(--duration-fast) var(--ease);
 }
 
-.site-menu-link:hover,
-.site-menu-link[aria-current="page"] {
+.site-menu-link:hover {
+  opacity: 0.62;
+}
+
+.site-menu-link[aria-current="location"] {
   opacity: 0.62;
 }
 
@@ -714,17 +713,7 @@ p:last-child {
 
 
 /* =========================================================
-   09. MAIN
-   ========================================================= */
-
-main {
-  position: relative;
-  display: block;
-}
-
-
-/* =========================================================
-   10. STORY SECTIONS
+   09. STORY SECTIONS
    ========================================================= */
 
 .story-section {
@@ -799,7 +788,7 @@ main {
 
 
 /* =========================================================
-   11. SECTION VARIANTS
+   10. SECTION COLOURS
    ========================================================= */
 
 .section-dark {
@@ -821,9 +810,9 @@ main {
 }
 
 
-/* ---------------------------------------------------------
-   Intro
-   --------------------------------------------------------- */
+/* =========================================================
+   11. INTRO
+   ========================================================= */
 
 .section-intro {
   min-height: 100svh;
@@ -835,7 +824,6 @@ main {
 
 .section-intro h1 {
   max-width: 8ch;
-
   font-size: var(--display);
 }
 
@@ -845,36 +833,7 @@ main {
 
 
 /* =========================================================
-   12. EDITORIAL DETAILS
-   ========================================================= */
-
-.story-rule {
-  width: min(100%, 180px);
-  height: 1px;
-
-  margin-block: clamp(30px, 5vw, 60px);
-
-  background: currentColor;
-  opacity: 0.25;
-}
-
-.story-kicker {
-  margin-bottom: 18px;
-
-  font-size: 0.68rem;
-  font-weight: 700;
-
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.story-emphasis {
-  font-weight: 600;
-}
-
-
-/* =========================================================
-   13. MAP SECTION
+   12. MAP
    ========================================================= */
 
 .story-map {
@@ -883,10 +842,13 @@ main {
 
 .story-map .story-section-inner {
   display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(320px, 1.2fr);
-  gap: clamp(40px, 8vw, 120px);
+  grid-template-columns:
+    minmax(0, 0.8fr)
+    minmax(320px, 1.2fr);
 
   align-items: center;
+
+  gap: clamp(40px, 8vw, 120px);
 }
 
 .map-copy {
@@ -898,6 +860,8 @@ main {
 
   width: 100%;
   aspect-ratio: 16 / 10;
+
+  margin: 0;
 
   overflow: hidden;
 
@@ -915,7 +879,7 @@ main {
 
 
 /* =========================================================
-   14. PERSON / IMAGE
+   13. PERSON
    ========================================================= */
 
 .story-person {
@@ -924,11 +888,13 @@ main {
 
 .story-person .story-section-inner {
   display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(280px, 1.2fr);
-
-  gap: clamp(40px, 8vw, 120px);
+  grid-template-columns:
+    minmax(0, 0.8fr)
+    minmax(280px, 1.2fr);
 
   align-items: center;
+
+  gap: clamp(40px, 8vw, 120px);
 }
 
 .person-copy {
@@ -952,14 +918,11 @@ main {
 
 
 /* =========================================================
-   15. CONTACT
+   14. CONTACT
    ========================================================= */
 
 .story-contact {
   min-height: 80svh;
-
-  display: flex;
-  align-items: center;
 }
 
 .story-contact .story-section-content {
@@ -973,10 +936,10 @@ main {
 .contact-link {
   display: inline-flex;
   align-items: center;
+
   gap: 16px;
 
   margin-top: 18px;
-
   padding-bottom: 8px;
 
   border-bottom: 1px solid currentColor;
@@ -996,69 +959,137 @@ main {
 
 
 /* =========================================================
-   16. FOOTER
+   15. FOOTER / SIGNATURE
    ========================================================= */
 
 .site-footer {
+  --footer-bg: #070706;
+  --footer-ink: #f1efe8;
+
+  position: relative;
+
   padding:
-    clamp(50px, 8vw, 100px)
+    clamp(72px, 10vw, 140px)
     max(var(--gutter), env(safe-area-inset-right))
-    max(40px, env(safe-area-inset-bottom))
+    max(32px, env(safe-area-inset-bottom))
     max(var(--gutter), env(safe-area-inset-left));
 
-  background: var(--bg);
-  color: var(--light);
+  background: var(--footer-bg);
+  color: var(--footer-ink);
 
-  border-top: 1px solid var(--line-dark);
+  border-top: 1px solid rgba(241, 239, 232, 0.12);
 }
 
 .footer-inner {
-  display: grid;
-  grid-template-columns: 1fr auto;
-
-  gap: 40px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
 
   width: min(100%, var(--max-content));
 
   margin-inline: auto;
 }
 
-.footer-name {
-  margin-bottom: 12px;
+.footer-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-  font-size: clamp(1.5rem, 2.5vw, 2.4rem);
-  font-weight: 600;
-  line-height: 1;
+  width: 40px;
+  height: 40px;
 
-  letter-spacing: -0.04em;
+  flex-shrink: 0;
 }
 
-.footer-fields {
-  color: var(--secondary);
+.footer-mark img {
+  display: block;
 
-  font-size: 0.72rem;
-  font-weight: 600;
+  width: 40px;
+  height: 40px;
 
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  filter: brightness(0) invert(1);
+
+  opacity: 0.96;
+
+  transition:
+    opacity var(--duration-fast) var(--ease),
+    transform var(--duration-fast) var(--ease);
 }
 
-.footer-meta {
-  color: var(--secondary);
+.footer-mark:hover img {
+  opacity: 0.7;
+  transform: scale(0.96);
+}
 
-  font-size: 0.68rem;
-  font-weight: 600;
+.footer-signature {
+  position: relative;
 
-  line-height: 1.5;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
 
-  letter-spacing: 0.1em;
-  text-align: right;
-  text-transform: uppercase;
+  width: max-content;
+
+  color: var(--footer-ink);
+
+  text-decoration: none;
+
+  transition:
+    opacity var(--duration-fast) var(--ease);
+}
+
+.footer-signature-name {
+  display: block;
+
+  font-family:
+    "Baskerville",
+    "Iowan Old Style",
+    "Palatino Linotype",
+    Palatino,
+    "Times New Roman",
+    serif;
+
+  font-size: clamp(1.75rem, 3vw, 3rem);
+  font-weight: 400;
+  font-style: italic;
+
+  line-height: 0.95;
+
+  letter-spacing: -0.045em;
+
+  white-space: nowrap;
+
+  transform: skewX(-5deg);
+  transform-origin: right center;
+}
+
+.footer-signature-stroke {
+  display: block;
+
+  width: 76%;
+  height: 1px;
+
+  margin-top: 9px;
+  margin-right: 1px;
+
+  background: currentColor;
+
+  opacity: 0.55;
+
+  transform:
+    rotate(-1.5deg)
+    scaleX(0.92);
+
+  transform-origin: right center;
+}
+
+.footer-signature:hover {
+  opacity: 0.68;
 }
 
 
 /* =========================================================
-   17. RESPONSIVE — TABLET
+   16. TABLET
    ========================================================= */
 
 @media (max-width: 1100px) {
@@ -1079,7 +1110,7 @@ main {
 
 
 /* =========================================================
-   18. RESPONSIVE — HEADER TABLET
+   17. HEADER TABLET
    ========================================================= */
 
 @media (max-width: 900px) {
@@ -1106,7 +1137,7 @@ main {
 
 
 /* =========================================================
-   19. RESPONSIVE — MOBILE
+   18. MOBILE
    ========================================================= */
 
 @media (max-width: 640px) {
@@ -1124,9 +1155,7 @@ main {
   }
 
 
-  /* -------------------------------------------------------
-     HEADER MOBILE
-     ------------------------------------------------------- */
+  /* Header */
 
   .header-primary {
     grid-template-columns: 40px minmax(0, 1fr) auto;
@@ -1178,9 +1207,7 @@ main {
   }
 
 
-  /* -------------------------------------------------------
-     STORY NAV MOBILE
-     ------------------------------------------------------- */
+  /* Story navigation */
 
   .story-nav-inner {
     grid-template-columns: 42px minmax(0, 1fr) 42px;
@@ -1207,9 +1234,7 @@ main {
   }
 
 
-  /* -------------------------------------------------------
-     STORY CONTENT MOBILE
-     ------------------------------------------------------- */
+  /* Story sections */
 
   .story-section {
     min-height: 100svh;
@@ -1234,7 +1259,6 @@ main {
 
   .story-section p {
     max-width: 100%;
-
     line-height: 1.32;
   }
 
@@ -1243,9 +1267,7 @@ main {
   }
 
 
-  /* -------------------------------------------------------
-     MENU MOBILE
-     ------------------------------------------------------- */
+  /* Menu */
 
   .site-menu {
     inset: var(--header-total) 0 0;
@@ -1274,9 +1296,7 @@ main {
   }
 
 
-  /* -------------------------------------------------------
-     MAP MOBILE
-     ------------------------------------------------------- */
+  /* Map */
 
   .story-map .story-section-inner {
     display: block;
@@ -1291,14 +1311,11 @@ main {
   }
 
 
-  /* -------------------------------------------------------
-     PERSON MOBILE
-     ------------------------------------------------------- */
+  /* Person */
 
   .story-person .story-section-inner {
     display: flex;
     flex-direction: column;
-
     align-items: stretch;
 
     gap: 42px;
@@ -1313,33 +1330,46 @@ main {
   }
 
 
-  /* -------------------------------------------------------
-     CONTACT MOBILE
-     ------------------------------------------------------- */
+  /* Contact */
 
   .story-contact {
     min-height: 75svh;
   }
 
 
-  /* -------------------------------------------------------
-     FOOTER MOBILE
-     ------------------------------------------------------- */
+  /* Footer */
 
-  .footer-inner {
-    grid-template-columns: 1fr;
-
-    gap: 28px;
+  .site-footer {
+    padding:
+      64px
+      max(18px, env(safe-area-inset-right))
+      max(28px, env(safe-area-inset-bottom))
+      max(18px, env(safe-area-inset-left));
   }
 
-  .footer-meta {
-    text-align: left;
+  .footer-inner {
+    align-items: flex-end;
+  }
+
+  .footer-mark,
+  .footer-mark img {
+    width: 34px;
+    height: 34px;
+  }
+
+  .footer-signature-name {
+    font-size: clamp(1.45rem, 7vw, 2.1rem);
+  }
+
+  .footer-signature-stroke {
+    width: 72%;
+    margin-top: 7px;
   }
 }
 
 
 /* =========================================================
-   20. RESPONSIVE — VERY SMALL PHONES
+   19. VERY SMALL PHONES
    ========================================================= */
 
 @media (max-width: 380px) {
@@ -1365,7 +1395,6 @@ main {
 
   .menu-toggle {
     min-width: 42px;
-
     padding-left: 6px;
   }
 
@@ -1395,11 +1424,25 @@ main {
   .story-section h2 {
     font-size: clamp(3.2rem, 17vw, 4.8rem);
   }
+
+  .site-footer {
+    padding-top: 54px;
+  }
+
+  .footer-mark,
+  .footer-mark img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .footer-signature-name {
+    font-size: 1.35rem;
+  }
 }
 
 
 /* =========================================================
-   21. LANDSCAPE MOBILE
+   20. LANDSCAPE MOBILE
    ========================================================= */
 
 @media (max-height: 600px) and (orientation: landscape) {
@@ -1432,7 +1475,7 @@ main {
 
 
 /* =========================================================
-   22. REDUCED MOTION
+   21. REDUCED MOTION
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
@@ -1460,19 +1503,13 @@ main {
 
 
 /* =========================================================
-   23. FORCED COLORS
+   22. FORCED COLORS
    ========================================================= */
 
 @media (forced-colors: active) {
   .story-arrow,
   .menu-toggle {
     border-color: ButtonText;
-  }
-
-  .story-progress-track,
-  .story-progress-fill,
-  .story-progress-orb {
-    forced-color-adjust: auto;
   }
 
   :focus-visible {
@@ -1482,7 +1519,7 @@ main {
 
 
 /* =========================================================
-   24. PRINT
+   23. PRINT
    ========================================================= */
 
 @media print {
