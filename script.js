@@ -1,10 +1,14 @@
 /* =========================================================
-   CESARE PARATORE
-   Main JavaScript
+   CESARE PARATORE — HOME
+   STANDARD OPERATIVO — MAXIMUM QUALITY
    ========================================================= */
 
 (() => {
   "use strict";
+
+  /* =======================================================
+     CONFIG
+     ======================================================= */
 
   const CONFIG = {
     standbyDelay: 40000,
@@ -12,39 +16,54 @@
     activeLineRatio: 0.32,
     activeLineMax: 260,
     scrollOffset: 12,
-    pointerThrottle: 700,
-    menuTransition: 550
+    pointerThrottle: 700
   };
 
-  const dom = {
-    body: document.body,
-    loader: document.getElementById("loader"),
-    standby: document.getElementById("standby"),
-    menuToggle: document.getElementById("menu-toggle"),
-    menu: document.getElementById("menu"),
-    main: document.getElementById("main-content"),
-    footer: document.querySelector(".site-footer"),
+  /* =======================================================
+     DOM
+     ======================================================= */
 
-    stories: Array.from(document.querySelectorAll(".story")),
+  const doc = document;
+  const html = doc.documentElement;
+  const body = doc.body;
 
-    sectionNav: document.querySelector(".section-nav"),
-    sectionPrev: document.querySelector(".section-nav-prev"),
-    sectionNext: document.querySelector(".section-nav-next"),
-    sectionNumber: document.querySelector(".section-nav-number"),
-    sectionTitle: document.querySelector(".section-nav-title")
-  };
+  const loader = doc.getElementById("site-loader");
+  const standby = doc.getElementById("standby");
 
-  const state = {
-    currentIndex: 0,
-    menuOpen: false,
-    standbyTimer: null,
-    standbyVisible: false,
-    loaderHidden: false,
-    lastPointerActivity: 0,
-    menuFocusables: [],
-    restoreFocusElement: null,
-    scrollRaf: null
-  };
+  const menuToggle = doc.getElementById("menu-toggle");
+  const menu = doc.getElementById("menu");
+
+  const main = doc.getElementById("main-content");
+  const footer = doc.querySelector(".site-footer");
+
+  const sections = Array.from(
+    doc.querySelectorAll(".story")
+  );
+
+  const sectionNav = doc.querySelector(".section-nav");
+  const sectionPrev = doc.querySelector(".section-nav-prev");
+  const sectionNext = doc.querySelector(".section-nav-next");
+  const sectionNumber = doc.querySelector(".section-nav-number");
+  const sectionTitle = doc.querySelector(".section-nav-title");
+
+  const currentYear = doc.getElementById("current-year");
+
+  /* =======================================================
+     STATE
+     ======================================================= */
+
+  let currentIndex = 0;
+  let menuOpen = false;
+  let standbyTimer = null;
+  let loaderHidden = false;
+  let lastPointerActivity = 0;
+
+  let menuFocusables = [];
+  let restoreFocusElement = null;
+
+  const reduceMotionQuery = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  );
 
   /* =======================================================
      HELPERS
@@ -53,28 +72,6 @@
   const clamp = (value, min, max) =>
     Math.min(Math.max(value, min), max);
 
-  const gsapAvailable = () =>
-    typeof window.gsap !== "undefined";
-
-  const reducedMotion = () =>
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  const getFocusableElements = (container) => {
-    if (!container) return [];
-
-    return Array.from(
-      container.querySelectorAll(
-        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-      )
-    ).filter((element) => {
-      const style = window.getComputedStyle(element);
-      return (
-        style.display !== "none" &&
-        style.visibility !== "hidden"
-      );
-    });
-  };
-
   const isVisible = (element) => {
     if (!element) return false;
 
@@ -82,962 +79,1156 @@
 
     return (
       style.display !== "none" &&
-      style.visibility !== "hidden"
+      style.visibility !== "hidden" &&
+      style.opacity !== "0"
     );
   };
 
-  /* =======================================================
-     MENU
-     ======================================================= */
+  const getFocusableElements = (container) => {
+    if (!container) return [];
 
-  const setMenuTabState = (isOpen) => {
-    if (!dom.menu) return;
-
-    const links = dom.menu.querySelectorAll("a");
-
-    links.forEach((link) => {
-      link.tabIndex = isOpen ? 0 : -1;
-    });
-
-    state.menuFocusables = isOpen
-      ? getFocusableElements(dom.menu)
-      : [];
+    return Array.from(
+      container.querySelectorAll(
+        [
+          "a[href]",
+          "button:not([disabled])",
+          "input:not([disabled])",
+          "select:not([disabled])",
+          "textarea:not([disabled])",
+          "[tabindex]:not([tabindex='-1'])"
+        ].join(",")
+      )
+    ).filter(isVisible);
   };
 
-  const setBackgroundInteractionDisabled = (disabled) => {
-    if (dom.main) {
-      dom.main.inert = disabled;
-      dom.main.setAttribute("aria-hidden", disabled ? "true" : "false");
-    }
+  /* =======================================================
+     CURRENT YEAR
+     ======================================================= */
 
-    if (dom.footer) {
-      dom.footer.inert = disabled;
-      dom.footer.setAttribute(
+  if (currentYear) {
+    currentYear.textContent = String(new Date().getFullYear());
+  }
+
+  /* =======================================================
+     ACCESSIBILITY / MENU
+     ======================================================= */
+
+  function setMenuTabState(disabled) {
+    if (!menu) return;
+
+    const focusables = getFocusableElements(menu);
+
+    focusables.forEach((element) => {
+      if (disabled) {
+        if (!element.dataset.menuTabindexStored) {
+          element.dataset.menuTabindex =
+            element.getAttribute("tabindex") ?? "";
+          element.dataset.menuTabindexStored = "true";
+        }
+
+        element.setAttribute("tabindex", "-1");
+      } else {
+        const previous = element.dataset.menuTabindex;
+
+        if (previous === "") {
+          element.removeAttribute("tabindex");
+        } else if (previous !== undefined) {
+          element.setAttribute("tabindex", previous);
+        }
+
+        delete element.dataset.menuTabindex;
+        delete element.dataset.menuTabindexStored;
+      }
+    });
+  }
+
+  function setBackgroundInteractionDisabled(disabled) {
+    if (main) {
+      main.inert = disabled;
+      main.setAttribute(
         "aria-hidden",
         disabled ? "true" : "false"
       );
     }
-  };
 
-  const updateMenuLabel = (isOpen) => {
-    if (!dom.menuToggle) return;
+    if (footer) {
+      footer.inert = disabled;
+      footer.setAttribute(
+        "aria-hidden",
+        disabled ? "true" : "false"
+      );
+    }
+  }
 
-    const label = dom.menuToggle.querySelector(".menu-toggle-label");
+  function updateMenuLabel() {
+    if (!menuToggle) return;
+
+    const label =
+      menuToggle.querySelector(".menu-toggle-label");
+
+    menuToggle.setAttribute(
+      "aria-expanded",
+      String(menuOpen)
+    );
+
+    menuToggle.setAttribute(
+      "aria-label",
+      menuOpen ? "Chiudi menu" : "Apri menu"
+    );
 
     if (label) {
-      label.textContent = isOpen ? "CHIUDI" : "MENU";
+      label.textContent =
+        menuOpen ? "CHIUDI" : "MENU";
     }
+  }
 
-    dom.menuToggle.setAttribute(
-      "aria-label",
-      isOpen ? "Chiudi menu" : "Apri menu"
-    );
+  function updateMenuState(forceOpen = null) {
+    if (!menu || !menuToggle) return;
 
-    dom.menuToggle.setAttribute(
-      "aria-expanded",
-      String(isOpen)
-    );
-  };
+    const shouldOpen =
+      forceOpen === null
+        ? !menuOpen
+        : Boolean(forceOpen);
 
-  const updateMenuState = (open, { restoreFocus = true } = {}) => {
-    if (!dom.menu || !dom.menuToggle) return;
-
-    if (open === state.menuOpen) {
+    if (shouldOpen === menuOpen) {
+      updateMenuLabel();
       return;
     }
 
-    if (open) {
-      state.restoreFocusElement =
-        document.activeElement &&
-        document.activeElement !== document.body
-          ? document.activeElement
-          : dom.menuToggle;
+    if (shouldOpen) {
+      restoreFocusElement = doc.activeElement;
 
-      state.menuOpen = true;
+      menuOpen = true;
 
-      dom.body.classList.add("menu-open");
-      dom.menu.classList.add("is-open");
-
-      dom.menu.setAttribute("aria-hidden", "false");
-      dom.menu.inert = false;
+      menu.inert = false;
+      menu.classList.add("is-open");
+      menu.setAttribute("aria-hidden", "false");
 
       setBackgroundInteractionDisabled(true);
-      setMenuTabState(true);
-      updateMenuLabel(true);
+      setMenuTabState(false);
+      updateMenuLabel();
 
-      window.setTimeout(() => {
-        if (!state.menuOpen) return;
+      html.classList.add("menu-is-open");
+      body.classList.add("menu-is-open");
 
-        const firstFocusable = state.menuFocusables[0];
+      requestAnimationFrame(() => {
+        menuFocusables = getFocusableElements(menu);
 
-        if (firstFocusable) {
-          firstFocusable.focus();
+        if (menuFocusables.length) {
+          menuFocusables[0].focus();
         }
-      }, 60);
+      });
 
       return;
     }
 
-    state.menuOpen = false;
+    menuOpen = false;
 
-    dom.body.classList.remove("menu-open");
-    dom.menu.classList.remove("is-open");
+    menu.classList.remove("is-open");
+    menu.setAttribute("aria-hidden", "true");
 
-    dom.menu.setAttribute("aria-hidden", "true");
-    dom.menu.inert = true;
+    setMenuTabState(true);
 
-    setMenuTabState(false);
+    menu.inert = true;
+
     setBackgroundInteractionDisabled(false);
-    updateMenuLabel(false);
+    updateMenuLabel();
 
-    if (restoreFocus) {
-      window.setTimeout(() => {
-        if (state.restoreFocusElement instanceof HTMLElement) {
-          state.restoreFocusElement.focus();
-        } else {
-          dom.menuToggle.focus();
-        }
-      }, CONFIG.menuTransition);
-    }
-  };
+    html.classList.remove("menu-is-open");
+    body.classList.remove("menu-is-open");
 
-  const toggleMenu = () => {
-    updateMenuState(!state.menuOpen);
-  };
+    const target =
+      restoreFocusElement &&
+      typeof restoreFocusElement.focus === "function"
+        ? restoreFocusElement
+        : menuToggle;
 
-  const closeMenu = ({ restoreFocus = true } = {}) => {
-    if (state.menuOpen) {
-      updateMenuState(false, { restoreFocus });
-    }
-  };
+    restoreFocusElement = null;
 
-  const handleMenuKeydown = (event) => {
-    if (!state.menuOpen) return;
+    requestAnimationFrame(() => {
+      target.focus?.();
+    });
+  }
 
-    if (event.key === "Escape") {
-      event.preventDefault();
-      closeMenu();
-      return;
-    }
+  function trapMenuFocus(event) {
+    if (!menuOpen || event.key !== "Tab") return;
 
-    if (event.key !== "Tab") return;
+    menuFocusables = getFocusableElements(menu);
 
-    state.menuFocusables = getFocusableElements(dom.menu);
-
-    if (!state.menuFocusables.length) {
+    if (!menuFocusables.length) {
       event.preventDefault();
       return;
     }
 
-    const first = state.menuFocusables[0];
-    const last =
-      state.menuFocusables[state.menuFocusables.length - 1];
+    const first = menuFocusables[0];
+    const last = menuFocusables[
+      menuFocusables.length - 1
+    ];
 
-    if (event.shiftKey && document.activeElement === first) {
+    if (
+      event.shiftKey &&
+      doc.activeElement === first
+    ) {
       event.preventDefault();
       last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
+      return;
+    }
+
+    if (
+      !event.shiftKey &&
+      doc.activeElement === last
+    ) {
       event.preventDefault();
       first.focus();
     }
-  };
+  }
 
-  const handleMenuLinkClick = () => {
-    /*
-     * A menu destination should return focus to the menu button
-     * rather than to the link that is about to disappear.
-     */
-    state.restoreFocusElement = dom.menuToggle;
+  menuToggle?.addEventListener(
+    "click",
+    () => {
+      updateMenuState();
+    }
+  );
 
-    closeMenu({ restoreFocus: false });
-  };
+  menu?.addEventListener(
+    "click",
+    (event) => {
+      const link = event.target.closest("a");
+
+      if (!link) return;
+
+      updateMenuState(false);
+    }
+  );
+
+  doc.addEventListener(
+    "keydown",
+    (event) => {
+      if (
+        event.key === "Escape" &&
+        menuOpen
+      ) {
+        event.preventDefault();
+        updateMenuState(false);
+        return;
+      }
+
+      trapMenuFocus(event);
+    }
+  );
 
   /* =======================================================
      STANDBY
      ======================================================= */
 
-  const hideStandby = () => {
-    if (!dom.standby || !state.standbyVisible) return;
+  function hideStandby() {
+    if (!standby) return;
 
-    state.standbyVisible = false;
+    standby.classList.remove("is-visible");
+    standby.setAttribute("aria-hidden", "true");
+  }
 
-    if (gsapAvailable() && !reducedMotion()) {
-      gsap.to(dom.standby, {
-        autoAlpha: 0,
-        duration: 0.5,
-        ease: "power2.out",
-        onComplete: () => {
-          dom.standby.setAttribute("aria-hidden", "true");
-        }
-      });
-    } else {
-      dom.standby.style.opacity = "0";
-      dom.standby.style.visibility = "hidden";
-      dom.standby.setAttribute("aria-hidden", "true");
-    }
-  };
+  function showStandby() {
+    if (!standby) return;
+    if (menuOpen || doc.hidden) return;
 
-  const showStandby = () => {
-    if (!dom.standby || state.menuOpen || state.standbyVisible) {
-      return;
-    }
+    standby.classList.add("is-visible");
+    standby.setAttribute("aria-hidden", "false");
+  }
 
-    state.standbyVisible = true;
-
-    dom.standby.setAttribute("aria-hidden", "false");
-
-    if (gsapAvailable() && !reducedMotion()) {
-      gsap.to(dom.standby, {
-        autoAlpha: 1,
-        duration: 0.7,
-        ease: "power2.out"
-      });
-    } else {
-      dom.standby.style.opacity = "1";
-      dom.standby.style.visibility = "visible";
-    }
-  };
-
-  const resetStandbyTimer = () => {
-    if (state.standbyTimer) {
-      window.clearTimeout(state.standbyTimer);
+  function resetStandbyTimer() {
+    if (standbyTimer) {
+      window.clearTimeout(standbyTimer);
     }
 
     hideStandby();
 
-    state.standbyTimer = window.setTimeout(
+    standbyTimer = window.setTimeout(
       showStandby,
       CONFIG.standbyDelay
     );
-  };
+  }
 
-  const handleActivity = () => {
-    const now = performance.now();
-
-    if (
-      now - state.lastPointerActivity <
-      CONFIG.pointerThrottle
-    ) {
-      return;
-    }
-
-    state.lastPointerActivity = now;
+  function handleActivity() {
+    hideStandby();
     resetStandbyTimer();
-  };
+  }
+
+  [
+    "scroll",
+    "wheel",
+    "touchstart",
+    "keydown",
+    "click"
+  ].forEach((eventName) => {
+    window.addEventListener(
+      eventName,
+      handleActivity,
+      {
+        passive: true
+      }
+    );
+  });
+
+  window.addEventListener(
+    "pointermove",
+    () => {
+      const now = Date.now();
+
+      if (
+        now - lastPointerActivity <
+        CONFIG.pointerThrottle
+      ) {
+        return;
+      }
+
+      lastPointerActivity = now;
+      handleActivity();
+    },
+    {
+      passive: true
+    }
+  );
 
   /* =======================================================
      LOADER
      ======================================================= */
 
-  const hideLoader = () => {
-    if (!dom.loader || state.loaderHidden) return;
+  function hideLoader() {
+    if (loaderHidden || !loader) return;
 
-    state.loaderHidden = true;
+    loaderHidden = true;
 
-    const complete = () => {
-      dom.loader.setAttribute("aria-hidden", "true");
-      dom.loader.style.display = "none";
-    };
-
-    if (gsapAvailable() && !reducedMotion()) {
-      gsap.to(dom.loader, {
-        autoAlpha: 0,
-        duration: 0.6,
-        ease: "power2.out",
-        onComplete: complete
-      });
-    } else {
-      complete();
-    }
-  };
-
-  /* =======================================================
-     SECTION NAVIGATION
-     ======================================================= */
-
-  const getReadingLine = () => {
-    return clamp(
-      window.innerHeight * CONFIG.activeLineRatio,
-      140,
-      CONFIG.activeLineMax
-    );
-  };
-
-  const getActiveSectionIndex = () => {
-    if (!dom.stories.length) return 0;
-
-    const readingLine = getReadingLine();
-
-    let closestIndex = 0;
-    let closestDistance = Infinity;
-
-    dom.stories.forEach((section, index) => {
-      const rect = section.getBoundingClientRect();
-
-      const distance = Math.abs(
-        rect.top - readingLine
+    const finish = () => {
+      loader.setAttribute(
+        "aria-hidden",
+        "true"
       );
 
-      if (
-        rect.top <= readingLine &&
-        rect.bottom >= readingLine
-      ) {
-        closestIndex = index;
-        closestDistance = 0;
-        return;
-      }
+      loader.style.display = "none";
+    };
 
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestIndex = index;
-      }
-    });
-
-    return closestIndex;
-  };
-
-  const updateSectionNavigation = () => {
-    if (!dom.stories.length) return;
-
-    const index = getActiveSectionIndex();
-
-    if (index === state.currentIndex && dom.sectionTitle?.textContent) {
+    if (
+      reduceMotionQuery.matches ||
+      !window.gsap
+    ) {
+      finish();
       return;
     }
 
-    state.currentIndex = index;
+    window.gsap.to(loader, {
+      opacity: 0,
+      duration: 0.65,
+      ease: "power2.out",
+      onComplete: finish
+    });
+  }
 
-    const section = dom.stories[index];
+  function initLoader() {
+    window.setTimeout(
+      hideLoader,
+      CONFIG.loaderFailsafe
+    );
 
-    if (!section) return;
+    if (
+      document.readyState === "complete"
+    ) {
+      window.setTimeout(
+        hideLoader,
+        120
+      );
+      return;
+    }
 
-    const number =
-      section.querySelector(".story-index")?.textContent?.trim() ||
-      String(index + 1).padStart(2, "0");
+    window.addEventListener(
+      "load",
+      () => {
+        window.setTimeout(
+          hideLoader,
+          120
+        );
+      },
+      {
+        once: true
+      }
+    );
+  }
+
+  /* =======================================================
+     SECTION STATE
+     ======================================================= */
+
+  function getReadingLine() {
+    const headerHeight =
+      document.querySelector(
+        ".site-header"
+      )?.offsetHeight || 0;
+
+    return (
+      headerHeight +
+      Math.min(
+        window.innerHeight *
+          CONFIG.activeLineRatio,
+        CONFIG.activeLineMax
+      )
+    );
+  }
+
+  function getActiveSectionIndex() {
+    if (!sections.length) return 0;
+
+    const readingLine =
+      getReadingLine();
+
+    let bestIndex = 0;
+    let bestDistance =
+      Number.POSITIVE_INFINITY;
+
+    sections.forEach(
+      (section, index) => {
+        const rect =
+          section.getBoundingClientRect();
+
+        if (
+          rect.top <= readingLine &&
+          rect.bottom >= readingLine
+        ) {
+          bestIndex = index;
+          bestDistance = 0;
+          return;
+        }
+
+        const center =
+          rect.top + rect.height / 2;
+
+        const distance =
+          Math.abs(
+            center - readingLine
+          );
+
+        if (
+          distance < bestDistance
+        ) {
+          bestDistance = distance;
+          bestIndex = index;
+        }
+      }
+    );
+
+    return bestIndex;
+  }
+
+  function updateSectionNavigation(
+    index = getActiveSectionIndex()
+  ) {
+    if (
+      !sections.length ||
+      !sectionNav
+    ) {
+      return;
+    }
+
+    index = clamp(
+      index,
+      0,
+      sections.length - 1
+    );
+
+    currentIndex = index;
+
+    const section =
+      sections[index];
 
     const title =
       section.dataset.title ||
-      section.querySelector("h1, h2")?.textContent?.trim() ||
+      section.querySelector(
+        "h1, h2"
+      )?.textContent?.trim() ||
       "";
 
-    if (dom.sectionNumber) {
-      dom.sectionNumber.textContent = number;
+    if (sectionNumber) {
+      sectionNumber.textContent =
+        String(index + 1).padStart(
+          2,
+          "0"
+        );
     }
 
-    if (dom.sectionTitle) {
-      dom.sectionTitle.textContent = title;
+    if (sectionTitle) {
+      sectionTitle.textContent =
+        title;
     }
 
-    updateSectionTheme(section);
-    updateSectionButtons();
-  };
+    if (sectionPrev) {
+      sectionPrev.disabled =
+        index === 0;
 
-  const updateSectionTheme = (section) => {
-    if (!dom.sectionNav || !section) return;
-
-    dom.sectionNav.style.color =
-      section.classList.contains("story-dark")
-        ? "var(--light)"
-        : "var(--dark)";
-  };
-
-  const updateSectionButtons = () => {
-    if (!dom.sectionPrev || !dom.sectionNext) return;
-
-    dom.sectionPrev.disabled = state.currentIndex <= 0;
-    dom.sectionNext.disabled =
-      state.currentIndex >= dom.stories.length - 1;
-
-    dom.sectionPrev.style.opacity =
-      state.currentIndex <= 0 ? "0.25" : "1";
-
-    dom.sectionNext.style.opacity =
-      state.currentIndex >= dom.stories.length - 1
-        ? "0.25"
-        : "1";
-  };
-
-  const scrollToSection = (index) => {
-    if (
-      index < 0 ||
-      index >= dom.stories.length
-    ) {
-      return;
+      sectionPrev.setAttribute(
+        "aria-label",
+        index === 0
+          ? "Sezione precedente non disponibile"
+          : `Vai a ${
+              sections[index - 1]
+                .dataset.title ||
+              "sezione precedente"
+            }`
+      );
     }
 
-    const section = dom.stories[index];
+    if (sectionNext) {
+      sectionNext.disabled =
+        index ===
+        sections.length - 1;
 
-    if (!section) return;
+      sectionNext.setAttribute(
+        "aria-label",
+        index ===
+        sections.length - 1
+          ? "Sezione successiva non disponibile"
+          : `Vai a ${
+              sections[index + 1]
+                .dataset.title ||
+              "sezione successiva"
+            }`
+      );
+    }
 
-    closeMenu({ restoreFocus: false });
+    const isLight =
+      section.classList.contains(
+        "story-light"
+      );
 
-    const headerHeight =
-      document.getElementById("site-header")?.offsetHeight ||
-      0;
+    sectionNav.dataset.theme =
+      isLight
+        ? "light"
+        : "dark";
+
+    html.dataset.activeSection =
+      section.id || "";
+
+    sections.forEach(
+      (item, itemIndex) => {
+        item.setAttribute(
+          "aria-current",
+          itemIndex === index
+            ? "true"
+            : "false"
+        );
+      }
+    );
+  }
+
+  function scrollToSection(index) {
+    if (!sections[index]) return;
+
+    const section =
+      sections[index];
 
     const top =
       window.scrollY +
-      section.getBoundingClientRect().top -
-      headerHeight -
+      section.getBoundingClientRect()
+        .top -
       CONFIG.scrollOffset;
 
-    window.scrollTo({
-      top: Math.max(0, top),
-      behavior: reducedMotion() ? "auto" : "smooth"
-    });
-  };
-
-  const goPrevious = () => {
-    scrollToSection(state.currentIndex - 1);
-  };
-
-  const goNext = () => {
-    scrollToSection(state.currentIndex + 1);
-  };
-
-  const handleArrowNavigation = (event) => {
-    if (state.menuOpen) return;
-
     if (
-      document.activeElement !== document.body &&
-      document.activeElement !== document.documentElement
+      reduceMotionQuery.matches
     ) {
+      window.scrollTo({
+        top,
+        behavior: "auto"
+      });
+
       return;
     }
 
-    if (event.key === "ArrowDown") {
-      event.preventDefault();
-      goNext();
-    }
+    window.scrollTo({
+      top,
+      behavior: "smooth"
+    });
+  }
 
-    if (event.key === "ArrowUp") {
-      event.preventDefault();
-      goPrevious();
+  sectionPrev?.addEventListener(
+    "click",
+    () => {
+      if (currentIndex > 0) {
+        scrollToSection(
+          currentIndex - 1
+        );
+      }
     }
-  };
+  );
+
+  sectionNext?.addEventListener(
+    "click",
+    () => {
+      if (
+        currentIndex <
+        sections.length - 1
+      ) {
+        scrollToSection(
+          currentIndex + 1
+        );
+      }
+    }
+  );
 
   /* =======================================================
-     GSAP STORY ANIMATIONS
+     KEYBOARD SECTION NAVIGATION
      ======================================================= */
 
-  const killStoryAnimations = () => {
-    if (!gsapAvailable()) return;
-
-    if (window.ScrollTrigger) {
-      window.ScrollTrigger.getAll().forEach((trigger) => {
-        if (trigger.vars?.id?.startsWith("story-")) {
-          trigger.kill();
-        }
-      });
-    }
-
-    dom.stories.forEach((section) => {
-      gsap.killTweensOf(section.querySelectorAll("*"));
-    });
-  };
-
-  const setReducedMotionState = () => {
-    dom.stories.forEach((section) => {
-      const elements = section.querySelectorAll(
-        "h1, h2, p, .story-index, .connect-words span, .today-lead span, .objective-flow span, .person-frame, .map-frame"
-      );
-
-      gsap.set(elements, {
-        clearProps: "all",
-        opacity: 1,
-        x: 0,
-        y: 0,
-        scale: 1
-      });
-    });
-  };
-
-  const initStoryAnimations = () => {
-    if (!gsapAvailable() || !window.ScrollTrigger) {
-      return;
-    }
-
-    killStoryAnimations();
-
-    if (reducedMotion()) {
-      setReducedMotionState();
-      return;
-    }
-
-    window.gsap.registerPlugin(window.ScrollTrigger);
-
-    dom.stories.forEach((section, index) => {
-      const heading = section.querySelector("h1, h2");
-      const paragraphs = section.querySelectorAll(".narrative-copy p");
-      const indexMark = section.querySelector(".story-index");
-
-      /*
-       * Opening section:
-       * deliberately minimal. Only the main word moves.
-       */
-      if (section.classList.contains("story-opening")) {
-        if (!heading) return;
-
-        gsap.fromTo(
-          heading,
-          {
-            opacity: 0,
-            y: 45
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 1.2,
-            ease: "power3.out",
-            scrollTrigger: {
-              id: `story-${index}-opening`,
-              trigger: section,
-              start: "top 75%",
-              end: "bottom 25%",
-              toggleActions: "play reverse play reverse"
-            }
-          }
-        );
-
+  doc.addEventListener(
+    "keydown",
+    (event) => {
+      if (
+        menuOpen ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.shiftKey
+      ) {
         return;
       }
 
-      /*
-       * General section title.
-       */
-      if (heading) {
-        gsap.fromTo(
-          heading,
-          {
-            opacity: 0,
-            y: 45
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.85,
-            ease: "power3.out",
-            scrollTrigger: {
-              id: `story-${index}-heading`,
-              trigger: section,
-              start: "top 78%",
-              end: "top 35%",
-              toggleActions: "play reverse play reverse"
-            }
-          }
-        );
+      if (
+        event.key === "ArrowDown" &&
+        doc.activeElement === body
+      ) {
+        event.preventDefault();
+
+        if (
+          currentIndex <
+          sections.length - 1
+        ) {
+          scrollToSection(
+            currentIndex + 1
+          );
+        }
       }
 
-      /*
-       * Section number.
-       */
-      if (indexMark) {
-        gsap.fromTo(
-          indexMark,
-          {
-            opacity: 0
-          },
-          {
-            opacity: 0.55,
-            duration: 0.6,
-            scrollTrigger: {
-              id: `story-${index}-index`,
-              trigger: section,
-              start: "top 80%",
-              end: "top 40%",
-              toggleActions: "play reverse play reverse"
-            }
-          }
-        );
+      if (
+        event.key === "ArrowUp" &&
+        doc.activeElement === body
+      ) {
+        event.preventDefault();
+
+        if (currentIndex > 0) {
+          scrollToSection(
+            currentIndex - 1
+          );
+        }
       }
+    }
+  );
 
-      /*
-       * Narrative paragraphs.
-       */
-      if (paragraphs.length) {
-        gsap.fromTo(
-          paragraphs,
-          {
-            opacity: 0,
-            y: 30
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            stagger: 0.1,
-            ease: "power3.out",
-            scrollTrigger: {
-              id: `story-${index}-copy`,
-              trigger: section,
-              start: "top 65%",
-              end: "top 25%",
-              toggleActions: "play reverse play reverse"
-            }
-          }
-        );
+  /* =======================================================
+     SCROLL / ACTIVE SECTION
+     ======================================================= */
+
+  let scrollTicking = false;
+
+  function requestSectionUpdate() {
+    if (scrollTicking) return;
+
+    scrollTicking = true;
+
+    window.requestAnimationFrame(
+      () => {
+        updateSectionNavigation();
+        scrollTicking = false;
       }
+    );
+  }
 
-      /*
-       * COLLEGARE:
-       * the five fields appear independently before
-       * the text completes the relationship.
-       */
-      if (section.classList.contains("story-connect")) {
-        const words =
-          section.querySelectorAll(".connect-words span");
+  window.addEventListener(
+    "scroll",
+    requestSectionUpdate,
+    {
+      passive: true
+    }
+  );
 
-        if (words.length) {
-          gsap.fromTo(
+  window.addEventListener(
+    "resize",
+    requestSectionUpdate,
+    {
+      passive: true
+    }
+  );
+
+  /* =======================================================
+     GSAP / SCROLLTRIGGER
+     ======================================================= */
+
+  function gsapAvailable() {
+    return (
+      !reduceMotionQuery.matches &&
+      window.gsap &&
+      window.ScrollTrigger
+    );
+  }
+
+  function killStoryAnimations() {
+    if (!window.ScrollTrigger) return;
+
+    window.ScrollTrigger
+      .getAll()
+      .filter(
+        (trigger) =>
+          trigger.vars &&
+          trigger.vars.id &&
+          String(
+            trigger.vars.id
+          ).startsWith("story-")
+      )
+      .forEach(
+        (trigger) =>
+          trigger.kill()
+      );
+  }
+
+  function initStoryAnimations() {
+    if (!gsapAvailable()) {
+      sections.forEach(
+        (section) => {
+          section
+            .querySelectorAll(
+              ".eyebrow, h1, h2, p, .return-list span, .connect-words span, .person-frame, .map-frame"
+            )
+            .forEach(
+              (element) => {
+                element.style.opacity =
+                  "1";
+
+                element.style.transform =
+                  "none";
+              }
+            );
+        }
+      );
+
+      return;
+    }
+
+    window.gsap.registerPlugin(
+      window.ScrollTrigger
+    );
+
+    killStoryAnimations();
+
+    sections.forEach(
+      (section, index) => {
+        const eyebrow =
+          section.querySelector(
+            ".eyebrow"
+          );
+
+        const heading =
+          section.querySelector(
+            "h1, h2"
+          );
+
+        const paragraphs =
+          section.querySelectorAll(
+            ".narrative-copy p, .opening-copy p, .today-lead, .contact-lead"
+          );
+
+        const frame =
+          section.querySelector(
+            ".person-frame, .map-frame"
+          );
+
+        if (
+          section.classList.contains(
+            "story-opening"
+          )
+        ) {
+          const tl =
+            window.gsap.timeline({
+              scrollTrigger: {
+                id: `story-${index}-opening`,
+                trigger: section,
+                start: "top 70%",
+                once: true
+              }
+            });
+
+          tl.from(
+            eyebrow,
+            {
+              opacity: 0,
+              y: 18,
+              duration: 0.6,
+              ease: "power3.out"
+            }
+          )
+          .from(
+            heading,
+            {
+              opacity: 0,
+              y: 40,
+              duration: 0.9,
+              ease: "power4.out"
+            },
+            "-=0.35"
+          )
+          .from(
+            paragraphs,
+            {
+              opacity: 0,
+              y: 20,
+              duration: 0.65,
+              stagger: 0.12,
+              ease: "power3.out"
+            },
+            "-=0.35"
+          );
+
+          return;
+        }
+
+        if (
+          section.classList.contains(
+            "story-understand"
+          )
+        ) {
+          const items =
+            section.querySelectorAll(
+              ".understand-lead, .narrative-copy"
+            );
+
+          window.gsap.from(
+            items,
+            {
+              opacity: 0,
+              y: 45,
+              duration: 0.85,
+              stagger: 0.14,
+              ease: "power3.out",
+              scrollTrigger: {
+                id: `story-${index}-understand`,
+                trigger: section,
+                start: "top 68%",
+                once: true
+              }
+            }
+          );
+
+          return;
+        }
+
+        if (
+          section.classList.contains(
+            "story-return"
+          )
+        ) {
+          const items =
+            section.querySelectorAll(
+              ".return-copy > p, .return-list span"
+            );
+
+          window.gsap.from(
+            items,
+            {
+              opacity: 0,
+              y: 35,
+              duration: 0.75,
+              stagger: 0.12,
+              ease: "power3.out",
+              scrollTrigger: {
+                id: `story-${index}-return`,
+                trigger: section,
+                start: "top 68%",
+                once: true
+              }
+            }
+          );
+
+          return;
+        }
+
+        if (
+          section.classList.contains(
+            "story-connect"
+          )
+        ) {
+          const words =
+            section.querySelectorAll(
+              ".connect-words span"
+            );
+
+          window.gsap.from(
             words,
             {
               opacity: 0,
-              x: -35
-            },
-            {
-              opacity: 1,
-              x: 0,
+              x: -35,
               duration: 0.65,
-              stagger: 0.12,
+              stagger: 0.1,
               ease: "power3.out",
               scrollTrigger: {
                 id: `story-${index}-connect`,
                 trigger: section,
-                start: "top 70%",
-                end: "top 25%",
-                toggleActions: "play reverse play reverse"
+                start: "top 68%",
+                once: true
               }
             }
           );
+
+          return;
         }
-      }
 
-      /*
-       * OGGI:
-       * verbs enter one by one as a method.
-       */
-      if (section.classList.contains("story-today")) {
-        const verbs =
-          section.querySelectorAll(".today-lead span");
-
-        if (verbs.length) {
-          gsap.fromTo(
-            verbs,
-            {
-              opacity: 0,
-              y: 25
-            },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.6,
-              stagger: 0.1,
-              ease: "power3.out",
+        if (
+          section.classList.contains(
+            "story-today"
+          )
+        ) {
+          const tl =
+            window.gsap.timeline({
               scrollTrigger: {
                 id: `story-${index}-today`,
                 trigger: section,
-                start: "top 70%",
-                end: "top 25%",
-                toggleActions: "play reverse play reverse"
+                start: "top 68%",
+                once: true
               }
-            }
-          );
-        }
-      }
+            });
 
-      /*
-       * OBIETTIVO:
-       * the flow is treated as a single visual sequence.
-       */
-      if (section.classList.contains("story-objective")) {
-        const flow =
-          section.querySelectorAll(".objective-flow span");
-
-        if (flow.length) {
-          gsap.fromTo(
-            flow,
+          tl.from(
+            heading,
             {
               opacity: 0,
-              y: 20
-            },
+              y: 35,
+              duration: 0.8,
+              ease: "power4.out"
+            }
+          )
+          .from(
+            section.querySelector(
+              ".today-lead"
+            ),
             {
-              opacity: 1,
-              y: 0,
-              duration: 0.55,
-              stagger: 0.08,
+              opacity: 0,
+              y: 40,
+              duration: 0.8,
+              ease: "power4.out"
+            },
+            "-=0.35"
+          )
+          .from(
+            section.querySelector(
+              ".narrative-copy"
+            ),
+            {
+              opacity: 0,
+              y: 30,
+              duration: 0.7,
+              ease: "power3.out"
+            },
+            "-=0.35"
+          );
+
+          return;
+        }
+
+        if (frame) {
+          window.gsap.from(
+            frame,
+            {
+              opacity: 0,
+              y: 45,
+              duration: 1,
               ease: "power3.out",
               scrollTrigger: {
-                id: `story-${index}-objective`,
+                id: `story-${index}-frame`,
                 trigger: section,
-                start: "top 68%",
-                end: "top 25%",
-                toggleActions: "play reverse play reverse"
+                start: "top 70%",
+                once: true
+              }
+            }
+          );
+        }
+
+        const contentItems = [
+          eyebrow,
+          heading,
+          ...Array.from(paragraphs)
+        ].filter(Boolean);
+
+        if (contentItems.length) {
+          window.gsap.from(
+            contentItems,
+            {
+              opacity: 0,
+              y: 30,
+              duration: 0.75,
+              stagger: 0.1,
+              ease: "power3.out",
+              scrollTrigger: {
+                id: `story-${index}-generic`,
+                trigger: section,
+                start: "top 72%",
+                once: true
               }
             }
           );
         }
       }
-
-      /*
-       * Visual frames.
-       */
-      const frame =
-        section.querySelector(".person-frame, .map-frame");
-
-      if (frame) {
-        gsap.fromTo(
-          frame,
-          {
-            opacity: 0,
-            y: 30
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.9,
-            ease: "power3.out",
-            scrollTrigger: {
-              id: `story-${index}-frame`,
-              trigger: section,
-              start: "top 68%",
-              end: "top 25%",
-              toggleActions: "play reverse play reverse"
-            }
-          }
-        );
-      }
-    });
+    );
 
     window.ScrollTrigger.refresh();
-  };
+  }
 
   /* =======================================================
-     MOTION PREFERENCE
+     REDUCED MOTION DYNAMIC CHANGE
      ======================================================= */
 
-  const handleMotionPreferenceChange = () => {
-    if (gsapAvailable()) {
-      killStoryAnimations();
-    }
-
+  function handleMotionPreferenceChange() {
     initStoryAnimations();
 
     if (window.ScrollTrigger) {
       window.ScrollTrigger.refresh();
     }
-  };
+  }
+
+  if (
+    typeof reduceMotionQuery.addEventListener ===
+    "function"
+  ) {
+    reduceMotionQuery.addEventListener(
+      "change",
+      handleMotionPreferenceChange
+    );
+  } else if (
+    typeof reduceMotionQuery.addListener ===
+    "function"
+  ) {
+    reduceMotionQuery.addListener(
+      handleMotionPreferenceChange
+    );
+  }
 
   /* =======================================================
      HASH NAVIGATION
      ======================================================= */
 
-  const handleHashNavigation = () => {
-    const hash = window.location.hash;
+  function handleInitialHash() {
+    const hash =
+      window.location.hash;
 
     if (!hash) return;
 
-    const target = document.querySelector(hash);
+    const target =
+      doc.getElementById(
+        decodeURIComponent(
+          hash.slice(1)
+        )
+      );
 
-    if (!target || !target.classList.contains("story")) {
-      return;
-    }
+    if (!target) return;
 
-    window.setTimeout(() => {
-      const index = dom.stories.indexOf(target);
-
-      if (index >= 0) {
-        scrollToSection(index);
-      }
-    }, 100);
-  };
-
-  /* =======================================================
-     RESIZE / SCROLL
-     ======================================================= */
-
-  const requestSectionUpdate = () => {
-    if (state.scrollRaf) return;
-
-    state.scrollRaf = window.requestAnimationFrame(() => {
-      state.scrollRaf = null;
-      updateSectionNavigation();
-    });
-  };
-
-  const handleResize = () => {
-    requestSectionUpdate();
-
-    if (window.ScrollTrigger) {
-      window.ScrollTrigger.refresh();
-    }
-  };
+    window.setTimeout(
+      () => {
+        target.scrollIntoView({
+          behavior:
+            reduceMotionQuery.matches
+              ? "auto"
+              : "smooth",
+          block: "start"
+        });
+      },
+      250
+    );
+  }
 
   /* =======================================================
-     EVENT LISTENERS
+     PAGE VISIBILITY / BFCACHE
      ======================================================= */
 
-  dom.menuToggle?.addEventListener("click", toggleMenu);
-
-  dom.menu?.addEventListener(
-    "keydown",
-    handleMenuKeydown
-  );
-
-  dom.menu
-    ?.querySelectorAll("a")
-    .forEach((link) => {
-      link.addEventListener("click", handleMenuLinkClick);
-    });
-
-  dom.sectionPrev?.addEventListener(
-    "click",
-    goPrevious
-  );
-
-  dom.sectionNext?.addEventListener(
-    "click",
-    goNext
-  );
-
   document.addEventListener(
-    "keydown",
-    handleArrowNavigation
-  );
-
-  document.addEventListener(
-    "keydown",
-    (event) => {
-      if (event.key === "Escape" && state.standbyVisible) {
-        hideStandby();
-        resetStandbyTimer();
-      }
-    }
-  );
-
-  window.addEventListener(
-    "scroll",
-    requestSectionUpdate,
-    { passive: true }
-  );
-
-  window.addEventListener(
-    "resize",
-    handleResize,
-    { passive: true }
-  );
-
-  window.addEventListener(
-    "pointermove",
-    handleActivity,
-    { passive: true }
-  );
-
-  window.addEventListener(
-    "pointerdown",
-    resetStandbyTimer,
-    { passive: true }
-  );
-
-  window.addEventListener(
-    "keydown",
-    resetStandbyTimer
-  );
-
-  window.addEventListener(
-    "wheel",
-    resetStandbyTimer,
-    { passive: true }
-  );
-
-  window.addEventListener(
-    "touchstart",
-    resetStandbyTimer,
-    { passive: true }
-  );
-
-  window.addEventListener(
-    "load",
+    "visibilitychange",
     () => {
-      hideLoader();
-      updateSectionNavigation();
-      initStoryAnimations();
-      handleHashNavigation();
-
-      window.setTimeout(() => {
-        updateSectionNavigation();
+      if (document.hidden) {
+        hideStandby();
+      } else {
+        resetStandbyTimer();
 
         if (window.ScrollTrigger) {
           window.ScrollTrigger.refresh();
         }
-      }, 100);
-    },
-    { once: true }
+      }
+    }
   );
 
   window.addEventListener(
     "pageshow",
     () => {
-      updateSectionNavigation();
+      resetStandbyTimer();
 
       if (window.ScrollTrigger) {
         window.ScrollTrigger.refresh();
       }
+
+      requestSectionUpdate();
     }
   );
 
   /* =======================================================
-     REDUCED MOTION MEDIA QUERY
+     INITIALIZATION
      ======================================================= */
 
-  const motionQuery = window.matchMedia(
-    "(prefers-reduced-motion: reduce)"
-  );
+  function init() {
+    menuOpen = false;
 
-  if (typeof motionQuery.addEventListener === "function") {
-    motionQuery.addEventListener(
-      "change",
-      handleMotionPreferenceChange
+    if (menu) {
+      menu.inert = true;
+      menu.classList.remove("is-open");
+      menu.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+    }
+
+    setMenuTabState(true);
+    setBackgroundInteractionDisabled(false);
+    updateMenuLabel();
+
+    updateSectionNavigation(0);
+
+    initLoader();
+    initStoryAnimations();
+
+    handleInitialHash();
+
+    window.setTimeout(
+      () => {
+        updateSectionNavigation();
+      },
+      50
     );
-  } else if (
-    typeof motionQuery.addListener === "function"
+
+    resetStandbyTimer();
+
+    if (window.ScrollTrigger) {
+      window.setTimeout(
+        () => {
+          window.ScrollTrigger.refresh();
+        },
+        150
+      );
+    }
+  }
+
+  if (
+    document.readyState ===
+    "loading"
   ) {
-    motionQuery.addListener(
-      handleMotionPreferenceChange
+    document.addEventListener(
+      "DOMContentLoaded",
+      init,
+      {
+        once: true
+      }
     );
+  } else {
+    init();
   }
-
-  /* =======================================================
-     FAILSAFE
-     ======================================================= */
-
-  window.setTimeout(
-    hideLoader,
-    CONFIG.loaderFailsafe
-  );
-
-  /* =======================================================
-     INITIAL STATE
-     ======================================================= */
-
-  setMenuTabState(false);
-
-  if (dom.menu) {
-    dom.menu.inert = true;
-    dom.menu.setAttribute("aria-hidden", "true");
-  }
-
-  if (dom.main) {
-    dom.main.inert = false;
-    dom.main.setAttribute("aria-hidden", "false");
-  }
-
-  if (dom.footer) {
-    dom.footer.inert = false;
-    dom.footer.setAttribute("aria-hidden", "false");
-  }
-
-  updateMenuLabel(false);
-  updateSectionNavigation();
-  resetStandbyTimer();
 
 })();
