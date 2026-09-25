@@ -1703,3 +1703,236 @@ a {
     min-height: auto;
   }
 }
+/* ==========================================================================
+   FINAL POLISH — ACCESSIBILITY / NAVIGATION / MOBILE / ROBUSTNESS
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Focus
+   -------------------------------------------------------------------------- */
+
+:where(
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  summary,
+  [tabindex]
+):focus {
+  outline: none;
+}
+
+:where(
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  summary,
+  [tabindex]
+):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 5px;
+}
+
+.menu-toggle:focus-visible,
+.section-nav-button:focus-visible {
+  outline-offset: 4px;
+}
+
+
+/* --------------------------------------------------------------------------
+   Menu / modal state
+   -------------------------------------------------------------------------- */
+
+#site-menu[aria-hidden="true"] {
+  pointer-events: none;
+}
+
+#site-menu[aria-hidden="false"] {
+  pointer-events: auto;
+}
+
+body.menu-open {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+#site-menu[role="dialog"] {
+  isolation: isolate;
+}
+
+
+/* --------------------------------------------------------------------------
+   Section navigation
+   -------------------------------------------------------------------------- */
+
+.section-nav-button:disabled,
+.section-nav-button[aria-disabled="true"] {
+  opacity: 0.28;
+  cursor: default;
+  pointer-events: none;
+}
+
+
+/* --------------------------------------------------------------------------
+   Scroll positioning
+   -------------------------------------------------------------------------- */
+
+.story {
+  scroll-margin-top: calc(
+    var(--header-h) + var(--scroll-offset, 12px)
+  );
+}
+
+
+/* --------------------------------------------------------------------------
+   SVG / animation rendering
+   -------------------------------------------------------------------------- */
+
+.runner-bone,
+.runner-body,
+.edu-path,
+.management-line,
+.network-link,
+.presence-main,
+.presence-branch,
+.objective-progress {
+  vector-effect: non-scaling-stroke;
+}
+
+.digital-device,
+.digital-grid,
+.digital-emergence,
+.crt-monitor,
+.person-frame {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+
+/* --------------------------------------------------------------------------
+   Mobile: visual rhythm
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 700px) {
+  :root {
+    --header-h: 64px;
+    --nav-h: 72px;
+    --gutter: 6vw;
+  }
+
+  .story {
+    min-height: 100svh;
+    min-height: 100dvh;
+  }
+
+  .story-content {
+    min-height: 100svh;
+    min-height: 100dvh;
+
+    padding-top:
+      calc(var(--header-h) + 6vh);
+
+    padding-bottom:
+      calc(var(--nav-h) + 6vh);
+  }
+
+  /*
+   * Preserve large typography without allowing long words / headings
+   * to create horizontal overflow on narrow devices.
+   */
+  .story h1,
+  .story h2,
+  .story h3,
+  .hero-title {
+    overflow-wrap: break-word;
+    text-wrap: balance;
+  }
+
+  .story-copy,
+  .narrative-copy {
+    text-wrap: pretty;
+  }
+
+  /*
+   * Avoid expensive 3D effects on touch devices.
+   * The visual identity remains unchanged.
+   */
+  .digital-device,
+  .crt-monitor {
+    transform-style: flat;
+  }
+
+  /*
+   * Reduce accidental horizontal overflow caused by large SVG artwork.
+   */
+  .story svg {
+    max-width: 100%;
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   Very narrow devices
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 380px) {
+  :root {
+    --gutter: 5vw;
+  }
+
+  .story-content {
+    padding-top:
+      calc(var(--header-h) + 5vh);
+
+    padding-bottom:
+      calc(var(--nav-h) + 5vh);
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   Landscape phones
+   -------------------------------------------------------------------------- */
+
+@media (
+  orientation: landscape
+) and (
+  max-height: 560px
+) {
+  .story-content {
+    padding-top:
+      calc(var(--header-h) + 4vh);
+
+    padding-bottom:
+      calc(var(--nav-h) + 4vh);
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   Reduced motion
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .story *,
+  .story *::before,
+  .story *::after {
+    animation-delay: 0ms !important;
+  }
+
+  #standby {
+    display: none !important;
+  }
+}
