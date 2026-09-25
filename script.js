@@ -129,6 +129,11 @@
   function initMenuSemantics() {
     if (!dom.menu) return;
 
+    /*
+     * The existing HTML remains usable.
+     * We enhance it here so the implementation does not require
+     * structural duplication.
+     */
     dom.menu.setAttribute("role", "dialog");
     dom.menu.setAttribute("aria-modal", "true");
     dom.menu.setAttribute(
@@ -144,12 +149,10 @@
         "aria-controls",
         dom.menu.id
       );
-
       dom.menuToggle.setAttribute(
         "aria-expanded",
         "false"
       );
-
       dom.menuToggle.setAttribute(
         "aria-label",
         "Apri menu"
@@ -157,16 +160,14 @@
     }
   }
 
-  function setMenuState(
-    open,
-    { restoreFocus = true } = {}
-  ) {
+  function setMenuState(open, { restoreFocus = true } = {}) {
     if (!dom.menu || !dom.menuToggle) return;
 
     if (open === state.menuOpen) return;
 
     if (open) {
       state.lastFocused = document.activeElement;
+
       state.menuOpen = true;
 
       dom.menuToggle.setAttribute(
@@ -189,6 +190,9 @@
 
       dom.body.classList.add("menu-open");
 
+      /*
+       * Standby must never appear while the navigation is open.
+       */
       stopStandbyTimer();
 
       requestAnimationFrame(() => {
@@ -196,9 +200,7 @@
         const first = focusables[0];
 
         if (first) {
-          first.focus({
-            preventScroll: true
-          });
+          first.focus({ preventScroll: true });
         }
       });
 
@@ -289,12 +291,9 @@
 
     initMenuSemantics();
 
-    dom.menuToggle.addEventListener(
-      "click",
-      () => {
-        setMenuState(!state.menuOpen);
-      }
-    );
+    dom.menuToggle.addEventListener("click", () => {
+      setMenuState(!state.menuOpen);
+    });
 
     dom.menu.addEventListener(
       "keydown",
@@ -302,44 +301,38 @@
     );
 
     dom.menuLinks.forEach((link) => {
-      link.addEventListener(
-        "click",
-        (event) => {
-          const target =
-            link.getAttribute("href");
+      link.addEventListener("click", (event) => {
+        const target = link.getAttribute("href");
 
-          if (
-            !target ||
-            !target.startsWith("#")
-          ) {
-            setMenuState(false);
-            return;
-          }
-
-          const id = target.slice(1);
-
-          const index =
-            state.sections.findIndex(
-              (section) =>
-                section.id === id
-            );
-
-          if (index === -1) {
-            setMenuState(false);
-            return;
-          }
-
-          event.preventDefault();
-
-          setMenuState(false, {
-            restoreFocus: false
-          });
-
-          window.setTimeout(() => {
-            scrollToSection(index);
-          }, 20);
+        if (!target || !target.startsWith("#")) {
+          setMenuState(false);
+          return;
         }
-      );
+
+        const id = target.slice(1);
+        const index = state.sections.findIndex(
+          (section) => section.id === id
+        );
+
+        if (index === -1) {
+          setMenuState(false);
+          return;
+        }
+
+        event.preventDefault();
+
+        /*
+         * Navigate through the same deterministic system
+         * used by prev/next and keyboard controls.
+         */
+        setMenuState(false, {
+          restoreFocus: false
+        });
+
+        window.setTimeout(() => {
+          scrollToSection(index);
+        }, 20);
+      });
     });
   }
 
@@ -355,6 +348,9 @@
     if (!section) return;
 
     if (state.activeIndex === index) {
+      /*
+       * Even if the index did not change, update disabled states.
+       */
       updateSectionButtons();
       return;
     }
@@ -366,19 +362,15 @@
         String(index + 1).padStart(2, "0");
     }
 
-    dom.sections.forEach(
-      (item, itemIndex) => {
-        item.toggleAttribute(
-          "data-active",
-          itemIndex === index
-        );
-      }
-    );
+    dom.sections.forEach((item, itemIndex) => {
+      item.toggleAttribute(
+        "data-active",
+        itemIndex === index
+      );
+    });
 
     dom.menuLinks.forEach((link) => {
-      const target =
-        link.getAttribute("href");
-
+      const target = link.getAttribute("href");
       const isCurrent =
         target === `#${section.id}`;
 
@@ -388,9 +380,7 @@
           "location"
         );
       } else {
-        link.removeAttribute(
-          "aria-current"
-        );
+        link.removeAttribute("aria-current");
       }
     });
 
@@ -400,25 +390,21 @@
   function updateSectionButtons() {
     if (!dom.sectionButtons.length) return;
 
-    dom.sectionButtons.forEach(
-      (button) => {
-        const direction =
-          button.dataset.direction;
+    dom.sectionButtons.forEach((button) => {
+      const direction = button.dataset.direction;
 
-        const disabled =
-          direction === "prev"
-            ? state.activeIndex <= 0
-            : state.activeIndex >=
-              state.sections.length - 1;
+      const disabled =
+        direction === "prev"
+          ? state.activeIndex <= 0
+          : state.activeIndex >=
+            state.sections.length - 1;
 
-        button.disabled = disabled;
-
-        button.setAttribute(
-          "aria-disabled",
-          String(disabled)
-        );
-      }
-    );
+      button.disabled = disabled;
+      button.setAttribute(
+        "aria-disabled",
+        String(disabled)
+      );
+    });
   }
 
   function calculateActiveSection() {
@@ -426,19 +412,18 @@
 
     if (!sections.length) return;
 
+    /*
+     * A fixed virtual marker is more deterministic than comparing
+     * section centres. This also behaves correctly when a section
+     * becomes taller than the viewport on mobile.
+     */
     const marker =
       window.innerHeight *
-      (window.innerWidth <= 700
-        ? 0.32
-        : 0.42);
+      (window.innerWidth <= 700 ? 0.32 : 0.42);
 
     let containingIndex = -1;
 
-    for (
-      let index = 0;
-      index < sections.length;
-      index += 1
-    ) {
+    for (let index = 0; index < sections.length; index += 1) {
       const rect =
         sections[index].getBoundingClientRect();
 
@@ -456,31 +441,23 @@
       return;
     }
 
-    let closestIndex =
-      state.activeIndex;
+    /*
+     * Fallback for the small gaps that can occur during fast scrolling.
+     */
+    let closestIndex = state.activeIndex;
+    let closestDistance = Infinity;
 
-    let closestDistance =
-      Infinity;
+    sections.forEach((section, index) => {
+      const rect =
+        section.getBoundingClientRect();
 
-    sections.forEach(
-      (section, index) => {
-        const rect =
-          section.getBoundingClientRect();
+      const distance = Math.abs(rect.top - marker);
 
-        const distance =
-          Math.abs(
-            rect.top - marker
-          );
-
-        if (
-          distance <
-          closestDistance
-        ) {
-          closestDistance = distance;
-          closestIndex = index;
-        }
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = index;
       }
-    );
+    });
 
     updateSectionUI(closestIndex);
   }
@@ -511,14 +488,10 @@
 
     const nextIndex = Math.max(
       0,
-      Math.min(
-        index,
-        sections.length - 1
-      )
+      Math.min(index, sections.length - 1)
     );
 
-    const section =
-      sections[nextIndex];
+    const section = sections[nextIndex];
 
     state.isNavigating = true;
 
@@ -534,29 +507,20 @@
       block: "start"
     });
 
-    clearTimeout(
-      state.navigationTimer
-    );
+    clearTimeout(state.navigationTimer);
 
-    state.navigationTimer =
-      window.setTimeout(() => {
-        state.isNavigating = false;
-        calculateActiveSection();
-      }, CONFIG.navigationReleaseDelay);
+    state.navigationTimer = window.setTimeout(() => {
+      state.isNavigating = false;
+      calculateActiveSection();
+    }, CONFIG.navigationReleaseDelay);
   }
 
   function handleHash({
     initial = false
   } = {}) {
-    let hash = "";
-
-    try {
-      hash = decodeURIComponent(
-        window.location.hash.slice(1)
-      );
-    } catch {
-      hash = "";
-    }
+    const hash = decodeURIComponent(
+      window.location.hash.slice(1)
+    );
 
     if (!hash) {
       updateSectionUI(0);
@@ -571,19 +535,21 @@
       return;
     }
 
-    const index =
-      state.sections.findIndex(
-        (section) =>
-          section.id === hash
-      );
+    const index = state.sections.findIndex(
+      (section) => section.id === hash
+    );
 
     if (index === -1) {
+      /*
+       * Do not silently rewrite an invalid user-provided hash
+       * unless we are explicitly initializing.
+       */
       if (initial) {
         history.replaceState(
           null,
           "",
           window.location.pathname +
-            window.location.search
+          window.location.search
         );
 
         updateSectionUI(0);
@@ -605,46 +571,34 @@
   }
 
   function initSectionNavigation() {
-    dom.sectionButtons.forEach(
-      (button) => {
-        button.addEventListener(
-          "click",
-          () => {
-            if (button.disabled) return;
+    dom.sectionButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        if (button.disabled) return;
 
-            const direction =
-              button.dataset.direction;
+        const direction =
+          button.dataset.direction;
 
-            const delta =
-              direction === "prev"
-                ? -1
-                : 1;
+        const delta =
+          direction === "prev"
+            ? -1
+            : 1;
 
-            scrollToSection(
-              state.activeIndex +
-                delta
-            );
-          }
+        scrollToSection(
+          state.activeIndex + delta
         );
-      }
-    );
+      });
+    });
 
     document.addEventListener(
       "keydown",
       (event) => {
         if (state.menuOpen) return;
 
-        if (
-          isTextEntryTarget(
-            event.target
-          )
-        ) {
+        if (isTextEntryTarget(event.target)) {
           return;
         }
 
-        if (
-          event.key === "ArrowDown"
-        ) {
+        if (event.key === "ArrowDown") {
           event.preventDefault();
 
           scrollToSection(
@@ -652,9 +606,7 @@
           );
         }
 
-        if (
-          event.key === "ArrowUp"
-        ) {
+        if (event.key === "ArrowUp") {
           event.preventDefault();
 
           scrollToSection(
@@ -672,10 +624,7 @@
    */
 
   function stopStandbyTimer() {
-    clearTimeout(
-      state.standbyTimer
-    );
-
+    clearTimeout(state.standbyTimer);
     state.standbyTimer = null;
   }
 
@@ -687,10 +636,7 @@
 
     state.standbyVisible = true;
 
-    dom.standby.classList.add(
-      "is-visible"
-    );
-
+    dom.standby.classList.add("is-visible");
     dom.standby.setAttribute(
       "aria-hidden",
       "false"
@@ -702,10 +648,7 @@
 
     state.standbyVisible = false;
 
-    dom.standby.classList.remove(
-      "is-visible"
-    );
-
+    dom.standby.classList.remove("is-visible");
     dom.standby.setAttribute(
       "aria-hidden",
       "true"
@@ -723,11 +666,10 @@
       return;
     }
 
-    state.standbyTimer =
-      window.setTimeout(
-        showStandby,
-        CONFIG.standbyDelay
-      );
+    state.standbyTimer = window.setTimeout(
+      showStandby,
+      CONFIG.standbyDelay
+    );
   }
 
   function wakeFromStandby() {
@@ -750,33 +692,29 @@
       "touchstart"
     ];
 
-    activityEvents.forEach(
-      (eventName) => {
-        window.addEventListener(
-          eventName,
-          () => {
-            if (
-              state.standbyWakeTimer
-            ) {
-              return;
-            }
+    activityEvents.forEach((eventName) => {
+      window.addEventListener(
+        eventName,
+        () => {
+          if (state.standbyWakeTimer) return;
 
-            wakeFromStandby();
+          wakeFromStandby();
 
-            state.standbyWakeTimer =
-              window.setTimeout(() => {
-                state.standbyWakeTimer =
-                  null;
-              },
-              CONFIG.standbyWakeThrottle);
-          },
-          {
-            passive: true
-          }
-        );
-      }
-    );
+          state.standbyWakeTimer =
+            window.setTimeout(() => {
+              state.standbyWakeTimer = null;
+            }, CONFIG.standbyWakeThrottle);
+        },
+        {
+          passive: true
+        }
+      );
+    });
 
+    /*
+     * Pointer movement is useful on desktop, but it does not need
+     * to wake the interface hundreds of times per second.
+     */
     window.addEventListener(
       "pointermove",
       () => {
@@ -791,10 +729,8 @@
 
         state.standbyWakeTimer =
           window.setTimeout(() => {
-            state.standbyWakeTimer =
-              null;
-          },
-          CONFIG.standbyWakeThrottle);
+            state.standbyWakeTimer = null;
+          }, CONFIG.standbyWakeThrottle);
       },
       {
         passive: true
@@ -825,11 +761,8 @@
         state.reducedMotion
       ) {
         dom.loader.style.opacity = "0";
-        dom.loader.style.visibility =
-          "hidden";
-        dom.loader.style.pointerEvents =
-          "none";
-
+        dom.loader.style.visibility = "hidden";
+        dom.loader.style.pointerEvents = "none";
         return;
       }
 
@@ -847,82 +780,12 @@
     window.addEventListener(
       "load",
       finish,
-      {
-        once: true
-      }
+      { once: true }
     );
 
     window.setTimeout(
       finish,
       CONFIG.loaderFailsafe
-    );
-  }
-
-  /*
-   * --------------------------------------------------------------------------
-   * SVG HELPERS
-   * --------------------------------------------------------------------------
-   */
-
-  function prepareStroke(element) {
-    if (
-      !element ||
-      typeof element.getTotalLength !==
-        "function"
-    ) {
-      return 1000;
-    }
-
-    const length =
-      element.getTotalLength();
-
-    gsap.set(element, {
-      strokeDasharray: length,
-      strokeDashoffset: length
-    });
-
-    return length;
-  }
-
-  function drawElements(
-    timeline,
-    elements,
-    position,
-    options = {}
-  ) {
-    const {
-      duration = 0.55,
-      stagger = 0.05,
-      ease = "power2.out"
-    } = options;
-
-    const validElements =
-      [...elements].filter(
-        (element) =>
-          element &&
-          typeof element.getTotalLength ===
-            "function"
-      );
-
-    validElements.forEach(
-      (element) => {
-        prepareStroke(element);
-      }
-    );
-
-    if (!validElements.length) {
-      return;
-    }
-
-    timeline.to(
-      validElements,
-      {
-        strokeDashoffset: 0,
-        duration,
-        stagger,
-        ease
-      },
-      position
     );
   }
 
@@ -941,16 +804,17 @@
       return;
     }
 
-    gsap.registerPlugin(
-      ScrollTrigger
-    );
+    gsap.registerPlugin(ScrollTrigger);
 
+    /*
+     * Kill/revert our own previous responsive context if initGsap
+     * is accidentally called more than once.
+     */
     if (state.gsapMM) {
       state.gsapMM.revert();
     }
 
-    state.gsapMM =
-      gsap.matchMedia();
+    state.gsapMM = gsap.matchMedia();
 
     /*
      * ----------------------------------------------------------------------
@@ -961,410 +825,59 @@
     state.gsapMM.add(
       "(prefers-reduced-motion: no-preference)",
       () => {
-
         /*
-         * Generic story reveal.
-         *
-         * Science is deliberately excluded because its text enters
-         * only after the visual system has completed.
+         * Generic story reveal
          */
         gsap.utils.toArray(
           ".story-copy > *, .section-heading > *, .narrative-copy > *"
-        )
-          .filter(
-            (element) =>
-              !element.closest(
-                ".science-text-block"
-              )
-          )
-          .forEach((element) => {
-            gsap.fromTo(
-              element,
-              {
-                y: 28,
-                opacity: 0
-              },
-              {
-                y: 0,
-                opacity: 1,
-                duration: 0.9,
-                ease: "power3.out",
-                scrollTrigger: {
-                  trigger: element,
-                  start: "top 82%",
-                  once: true
-                }
+        ).forEach((element) => {
+          gsap.fromTo(
+            element,
+            {
+              y: 28,
+              opacity: 0
+            },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.9,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: element,
+                start: "top 82%",
+                once: true
               }
-            );
+            }
+          );
+        });
+
+        /*
+         * Runner
+         */
+        gsap.utils.toArray(
+          ".runner-bone, .runner-body"
+        ).forEach((path) => {
+          const length =
+            typeof path.getTotalLength === "function"
+              ? path.getTotalLength()
+              : 1000;
+
+          gsap.set(path, {
+            strokeDasharray: length,
+            strokeDashoffset: length
           });
 
-        /*
-         * ------------------------------------------------------------------
-         * SPORT
-         *
-         * Fotogramma impossibile:
-         * posizione → posizione → sovrapposizione → traiettoria.
-         * ------------------------------------------------------------------
-         */
-
-        const sportFrames =
-          gsap.utils.toArray(
-            ".sport-motion-frame"
-          );
-
-        const sportTraces =
-          gsap.utils.toArray(
-            ".sport-motion-trace"
-          );
-
-        if (
-          sportFrames.length &&
-          document.querySelector(
-            ".story-sport"
-          )
-        ) {
-          const sportTimeline =
-            gsap.timeline({
-              scrollTrigger: {
-                trigger:
-                  ".story-sport",
-                start: "top 68%",
-                once: true
-              }
-            });
-
-          sportFrames.forEach(
-            (frame, index) => {
-              const segments =
-                frame.querySelectorAll(
-                  ".motion-segment"
-                );
-
-              const points =
-                frame.querySelectorAll(
-                  ".motion-point"
-                );
-
-              gsap.set(frame, {
-                opacity: 0,
-                transformOrigin:
-                  "center center"
-              });
-
-              gsap.set(points, {
-                scale: 0.35,
-                transformOrigin:
-                  "center center"
-              });
-
-              segments.forEach(
-                (segment) => {
-                  prepareStroke(
-                    segment
-                  );
-                }
-              );
-
-              const revealPosition =
-                index === 0
-                  ? 0
-                  : `+=${0.18}`;
-
-              sportTimeline.to(
-                frame,
-                {
-                  opacity:
-                    index ===
-                    sportFrames.length - 1
-                      ? 0.82
-                      : 0.55,
-                  duration: 0.28,
-                  ease: "power2.out"
-                },
-                revealPosition
-              );
-
-              sportTimeline.to(
-                segments,
-                {
-                  strokeDashoffset: 0,
-                  duration: 0.48,
-                  stagger: 0.045,
-                  ease: "power2.inOut"
-                },
-                "<"
-              );
-
-              sportTimeline.to(
-                points,
-                {
-                  scale: 1,
-                  duration: 0.34,
-                  stagger: 0.035,
-                  ease: "power2.out"
-                },
-                "<0.08"
-              );
-
-              if (
-                index <
-                sportFrames.length - 1
-              ) {
-                sportTimeline.to(
-                  frame,
-                  {
-                    opacity: 0.22,
-                    duration: 0.28,
-                    ease: "power2.out"
-                  },
-                  ">"
-                );
-              }
+          gsap.to(path, {
+            strokeDashoffset: 0,
+            duration: 1.6,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: ".story-sport",
+              start: "top 65%",
+              once: true
             }
-          );
-
-          prepareStroke(
-            sportTraces[0]
-          );
-
-          prepareStroke(
-            sportTraces[1]
-          );
-
-          prepareStroke(
-            sportTraces[2]
-          );
-
-          sportTimeline.to(
-            sportTraces,
-            {
-              strokeDashoffset: 0,
-              duration: 0.9,
-              stagger: 0.13,
-              ease: "power2.inOut"
-            },
-            ">"
-          );
-        }
-
-        /*
-         * ------------------------------------------------------------------
-         * SCIENZE MOTORIE
-         *
-         * CORPO → CONNESSIONI → SISTEMA → RETE → TESTO
-         * ------------------------------------------------------------------
-         */
-
-        const scienceSection =
-          document.querySelector(
-            ".story-science"
-          );
-
-        const scienceText =
-          document.querySelector(
-            ".science-text-block"
-          );
-
-        const scienceBodySegments =
-          gsap.utils.toArray(
-            ".science-body-segment"
-          );
-
-        const scienceBodyNodes =
-          gsap.utils.toArray(
-            ".science-body-node"
-          );
-
-        const scienceConnections =
-          gsap.utils.toArray(
-            ".science-connection"
-          );
-
-        const scienceField =
-          gsap.utils.toArray(
-            ".science-field-ring"
-          );
-
-        const scienceNetworkLinks =
-          gsap.utils.toArray(
-            ".science-network-link"
-          );
-
-        const scienceNetworkNodes =
-          gsap.utils.toArray(
-            ".science-network-node"
-          );
-
-        if (
-          scienceSection &&
-          scienceText
-        ) {
-          const scienceTimeline =
-            gsap.timeline({
-              scrollTrigger: {
-                trigger:
-                  scienceSection,
-                start: "top 68%",
-                once: true
-              }
-            });
-
-          /*
-           * CORPO
-           */
-          gsap.set(
-            scienceBodyNodes,
-            {
-              scale: 0,
-              transformOrigin:
-                "center center"
-            }
-          );
-
-          scienceBodySegments.forEach(
-            (segment) => {
-              prepareStroke(
-                segment
-              );
-            }
-          );
-
-          scienceTimeline.to(
-            scienceBodyNodes,
-            {
-              scale: 1,
-              duration: 0.42,
-              stagger: 0.055,
-              ease: "power2.out"
-            }
-          );
-
-          scienceTimeline.to(
-            scienceBodySegments,
-            {
-              strokeDashoffset: 0,
-              duration: 0.75,
-              stagger: 0.055,
-              ease: "power2.inOut"
-            },
-            "<0.08"
-          );
-
-          /*
-           * CONNESSIONI
-           */
-          scienceConnections.forEach(
-            (connection) => {
-              prepareStroke(
-                connection
-              );
-            }
-          );
-
-          scienceTimeline.to(
-            scienceConnections,
-            {
-              strokeDashoffset: 0,
-              duration: 0.65,
-              stagger: 0.06,
-              ease: "power2.inOut"
-            },
-            "+=0.08"
-          );
-
-          /*
-           * SISTEMA
-           */
-          gsap.set(
-            scienceField,
-            {
-              opacity: 0,
-              scale: 0.82,
-              transformOrigin:
-                "center center"
-            }
-          );
-
-          scienceTimeline.to(
-            scienceField,
-            {
-              opacity: 0.12,
-              scale: 1,
-              duration: 0.8,
-              stagger: 0.08,
-              ease: "power2.out"
-            },
-            "+=0.05"
-          );
-
-          /*
-           * RETE
-           */
-          scienceNetworkLinks.forEach(
-            (link) => {
-              prepareStroke(link);
-            }
-          );
-
-          gsap.set(
-            scienceNetworkNodes,
-            {
-              scale: 0,
-              transformOrigin:
-                "center center"
-            }
-          );
-
-          scienceTimeline.to(
-            scienceNetworkLinks,
-            {
-              strokeDashoffset: 0,
-              duration: 0.85,
-              stagger: 0.06,
-              ease: "power2.inOut"
-            },
-            "+=0.05"
-          );
-
-          scienceTimeline.to(
-            scienceNetworkNodes,
-            {
-              scale: 1,
-              duration: 0.5,
-              stagger: 0.045,
-              ease: "power2.out"
-            },
-            "<0.1"
-          );
-
-          /*
-           * TESTO — entra solo dopo il sistema.
-           */
-          const scienceTextElements =
-            scienceText.querySelectorAll(
-              ".section-heading > *, .narrative-copy > p, .practice-theory"
-            );
-
-          gsap.set(
-            scienceTextElements,
-            {
-              opacity: 0,
-              y: 26
-            }
-          );
-
-          scienceTimeline.to(
-            scienceTextElements,
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.72,
-              stagger: 0.1,
-              ease: "power3.out"
-            },
-            "+=0.2"
-          );
-        }
+          });
+        });
 
         /*
          * Education network
@@ -1373,15 +886,21 @@
           ".edu-path"
         ).forEach((path) => {
           const length =
-            prepareStroke(path);
+            typeof path.getTotalLength === "function"
+              ? path.getTotalLength()
+              : 1000;
+
+          gsap.set(path, {
+            strokeDasharray: length,
+            strokeDashoffset: length
+          });
 
           gsap.to(path, {
             strokeDashoffset: 0,
             duration: 1.8,
             ease: "power2.inOut",
             scrollTrigger: {
-              trigger:
-                ".story-education",
+              trigger: ".story-education",
               start: "top 70%",
               once: true
             }
@@ -1392,8 +911,7 @@
           ".edu-node",
           {
             scale: 0,
-            transformOrigin:
-              "center"
+            transformOrigin: "center"
           },
           {
             scale: 1,
@@ -1401,8 +919,7 @@
             stagger: 0.1,
             ease: "power2.out",
             scrollTrigger: {
-              trigger:
-                ".story-education",
+              trigger: ".story-education",
               start: "top 65%",
               once: true
             }
@@ -1423,8 +940,7 @@
             duration: 1.8,
             ease: "power2.inOut",
             scrollTrigger: {
-              trigger:
-                ".story-connect",
+              trigger: ".story-connect",
               start: "top 70%",
               once: true
             }
@@ -1435,8 +951,7 @@
           ".network-node",
           {
             scale: 0,
-            transformOrigin:
-              "center"
+            transformOrigin: "center"
           },
           {
             scale: 1,
@@ -1444,8 +959,7 @@
             stagger: 0.12,
             ease: "back.out(1.4)",
             scrollTrigger: {
-              trigger:
-                ".story-connect",
+              trigger: ".story-connect",
               start: "top 65%",
               once: true
             }
@@ -1467,8 +981,7 @@
             stagger: 0.1,
             ease: "power2.inOut",
             scrollTrigger: {
-              trigger:
-                ".story-from-here",
+              trigger: ".story-from-here",
               start: "top 70%",
               once: true
             }
@@ -1479,8 +992,7 @@
           ".presence-node, .presence-end",
           {
             scale: 0,
-            transformOrigin:
-              "center"
+            transformOrigin: "center"
           },
           {
             scale: 1,
@@ -1488,8 +1000,7 @@
             stagger: 0.12,
             ease: "back.out(1.4)",
             scrollTrigger: {
-              trigger:
-                ".story-from-here",
+              trigger: ".story-from-here",
               start: "top 65%",
               once: true
             }
@@ -1511,69 +1022,12 @@
             duration: 1.3,
             ease: "power3.inOut",
             scrollTrigger: {
-              trigger:
-                ".story-person",
+              trigger: ".story-person",
               start: "top 65%",
               once: true
             }
           }
         );
-
-        /*
-         * Firma autoriale
-         */
-        document
-          .querySelectorAll(
-            ".author-signature"
-          )
-          .forEach((signature) => {
-
-            const strokes =
-              signature.querySelectorAll(
-                ".signature-stroke, .signature-flourish"
-              );
-
-            strokes.forEach(
-              (stroke) => {
-                prepareStroke(
-                  stroke
-                );
-              }
-            );
-
-            const trigger =
-              signature.closest(
-                ".story-person"
-              ) ||
-              signature.closest(
-                ".site-footer"
-              ) ||
-              signature;
-
-            const timeline =
-              gsap.timeline({
-                scrollTrigger: {
-                  trigger,
-                  start:
-                    trigger.classList.contains(
-                      "site-footer"
-                    )
-                      ? "top 88%"
-                      : "top 68%",
-                  once: true
-                }
-              });
-
-            timeline.to(
-              strokes,
-              {
-                strokeDashoffset: 0,
-                duration: 1.35,
-                stagger: 0.075,
-                ease: "power2.inOut"
-              }
-            );
-          });
 
         /*
          * Contact
@@ -1590,15 +1044,19 @@
             duration: 1.1,
             ease: "power3.out",
             scrollTrigger: {
-              trigger:
-                ".story-contact",
+              trigger: ".story-contact",
               start: "top 70%",
               once: true
             }
           }
         );
 
-        return () => {};
+        return () => {
+          /*
+           * gsap.matchMedia automatically reverts the animations
+           * and ScrollTriggers created inside this context.
+           */
+        };
       }
     );
 
@@ -1611,14 +1069,11 @@
     state.gsapMM.add(
       "(min-width: 701px) and (prefers-reduced-motion: no-preference)",
       () => {
-
         /*
          * CRT
          */
         const crt =
-          document.querySelector(
-            ".crt-monitor"
-          );
+          document.querySelector(".crt-monitor");
 
         if (crt) {
           gsap.fromTo(
@@ -1635,14 +1090,55 @@
               duration: 1.25,
               ease: "power3.out",
               scrollTrigger: {
-                trigger:
-                  ".story-computer",
+                trigger: ".story-computer",
                 start: "top 70%",
                 once: true
               }
             }
           );
         }
+
+        /*
+         * Science
+         */
+        gsap.fromTo(
+          ".visual-science .orbit",
+          {
+            scale: 0.85,
+            opacity: 0
+          },
+          {
+            scale: 1,
+            opacity: 1,
+            duration: 1.3,
+            stagger: 0.08,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: ".story-science",
+              start: "top 70%",
+              once: true
+            }
+          }
+        );
+
+        gsap.fromTo(
+          ".visual-science .measure-point",
+          {
+            scale: 0,
+            transformOrigin: "center"
+          },
+          {
+            scale: 1,
+            duration: 0.7,
+            stagger: 0.08,
+            ease: "back.out(1.5)",
+            scrollTrigger: {
+              trigger: ".story-science",
+              start: "top 65%",
+              once: true
+            }
+          }
+        );
 
         /*
          * Management
@@ -1659,8 +1155,7 @@
             stagger: 0.08,
             ease: "power2.out",
             scrollTrigger: {
-              trigger:
-                ".story-management",
+              trigger: ".story-management",
               start: "top 65%",
               once: true
             }
@@ -1671,8 +1166,7 @@
           ".management-core, .management-end",
           {
             scale: 0,
-            transformOrigin:
-              "center"
+            transformOrigin: "center"
           },
           {
             scale: 1,
@@ -1680,8 +1174,7 @@
             stagger: 0.15,
             ease: "back.out(1.4)",
             scrollTrigger: {
-              trigger:
-                ".story-management",
+              trigger: ".story-management",
               start: "top 60%",
               once: true
             }
@@ -1690,12 +1183,14 @@
 
         /*
          * Digital transformation
+         *
+         * Scrub is retained because this is one of the visual anchors
+         * of the page.
          */
         const digitalTimeline =
           gsap.timeline({
             scrollTrigger: {
-              trigger:
-                ".story-digital",
+              trigger: ".story-digital",
               start: "top bottom",
               end: "center center",
               scrub: 1.2
@@ -1756,7 +1251,6 @@
 
         todayWords.forEach(
           (word, index) => {
-
             gsap.fromTo(
               word,
               {
@@ -1785,9 +1279,7 @@
                 opacity: 0.25,
                 scrollTrigger: {
                   trigger:
-                    todayWords[
-                      index + 1
-                    ],
+                    todayWords[index + 1],
                   start: "top 68%",
                   end: "top 48%",
                   scrub: 0.5
@@ -1852,16 +1344,17 @@
      * ----------------------------------------------------------------------
      * MOBILE
      * ----------------------------------------------------------------------
+     *
+     * Mobile keeps the visual language but avoids the heaviest scrub-based
+     * effects and 3D transformations.
      */
 
     state.gsapMM.add(
       "(max-width: 700px) and (prefers-reduced-motion: no-preference)",
       () => {
-
         gsap.utils.toArray(
           ".digital-device, .crt-monitor"
         ).forEach((element) => {
-
           gsap.fromTo(
             element,
             {
@@ -1880,16 +1373,14 @@
               }
             }
           );
-
         });
 
         /*
-         * SVG più leggere su mobile.
+         * Shorter / lighter SVG reveals on mobile.
          */
         gsap.utils.toArray(
-          ".management-line"
+          ".management-line, .network-link"
         ).forEach((path) => {
-
           const length =
             typeof path.getTotalLength ===
             "function"
@@ -1911,39 +1402,6 @@
               once: true
             }
           });
-
-        });
-
-        /*
-         * Il network mantiene un'unica animazione:
-         * non viene duplicato dal blocco desktop.
-         */
-        gsap.utils.toArray(
-          ".network-link"
-        ).forEach((path) => {
-
-          const length =
-            typeof path.getTotalLength ===
-            "function"
-              ? path.getTotalLength()
-              : 1000;
-
-          gsap.set(path, {
-            strokeDasharray: length,
-            strokeDashoffset: length
-          });
-
-          gsap.to(path, {
-            strokeDashoffset: 0,
-            duration: 1.15,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: path,
-              start: "top 82%",
-              once: true
-            }
-          });
-
         });
 
         return () => {};
@@ -2008,19 +1466,15 @@
     window.addEventListener(
       "resize",
       () => {
-        clearTimeout(
-          resizeTimer
-        );
+        clearTimeout(resizeTimer);
 
         resizeTimer =
           window.setTimeout(() => {
-
             if (window.ScrollTrigger) {
               window.ScrollTrigger.refresh();
             }
 
             calculateActiveSection();
-
           }, CONFIG.resizeDebounce);
       },
       {
@@ -2042,12 +1496,10 @@
       );
 
     const update = (event) => {
-
       state.reducedMotion =
         event.matches;
 
       if (state.reducedMotion) {
-
         stopStandbyTimer();
         hideStandby();
 
@@ -2059,12 +1511,9 @@
         if (window.ScrollTrigger) {
           window.ScrollTrigger.refresh();
         }
-
       } else {
-
         startStandbyTimer();
         initGsap();
-
       }
     };
 
@@ -2088,7 +1537,6 @@
    */
 
   function init() {
-
     initMenu();
     initSectionNavigation();
     initStandby();
@@ -2118,6 +1566,10 @@
 
     calculateActiveSection();
 
+    /*
+     * Give the browser one frame to settle fonts/layout,
+     * then initialize ScrollTrigger.
+     */
     window.setTimeout(
       initGsap,
       50
@@ -2138,5 +1590,4 @@
   } else {
     init();
   }
-
 })();
