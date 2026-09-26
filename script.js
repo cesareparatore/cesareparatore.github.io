@@ -67,12 +67,6 @@
         "section-progress-dot"
       ),
 
-    sectionPrev:
-      document.getElementById("section-prev"),
-
-    sectionNext:
-      document.getElementById("section-next"),
-
     sections: [
       ...document.querySelectorAll(".story")
     ],
@@ -89,12 +83,6 @@
   };
 
   state.sections = dom.sections;
-
-  /*
-   * --------------------------------------------------------------------------
-   * UTILITIES
-   * --------------------------------------------------------------------------
-   */
 
   const focusableSelector = [
     "a[href]",
@@ -154,32 +142,19 @@
     );
   }
 
-  function formatSectionNumber(index) {
-    if (
-      typeof index !== "number" ||
-      index < 0 ||
-      index >= state.sections.length
-    ) {
-      return "—";
-    }
-
-    return String(index + 1).padStart(2, "0");
-  }
-
-  /*
-   * --------------------------------------------------------------------------
-   * HEADER SECTION NAVIGATION
-   * --------------------------------------------------------------------------
-   */
-
   function animateHeaderSectionChange() {
     const titleWrap =
       dom.activeSectionTitleWrap;
 
+    const title =
+      dom.activeSectionTitle;
+
     const dot =
       dom.sectionProgressDot;
 
-    if (!titleWrap && !dot) return;
+    if (!titleWrap && !title && !dot) {
+      return;
+    }
 
     if (
       state.reducedMotion ||
@@ -188,81 +163,53 @@
       return;
     }
 
-    titleWrap?.classList.remove("is-changing");
-    dot?.classList.remove("is-pulsing");
+    titleWrap?.classList.remove(
+      "is-changing"
+    );
 
-    /*
-     * Restart CSS transitions/animations deterministically.
-     */
+    title?.classList.remove(
+      "is-entering"
+    );
+
+    dot?.classList.remove(
+      "is-pulsing"
+    );
+
     void titleWrap?.offsetWidth;
+    void title?.offsetWidth;
     void dot?.offsetWidth;
 
-    titleWrap?.classList.add("is-changing");
-    dot?.classList.add("is-pulsing");
+    titleWrap?.classList.add(
+      "is-changing"
+    );
+
+    title?.classList.add(
+      "is-entering"
+    );
+
+    dot?.classList.add(
+      "is-pulsing"
+    );
 
     window.setTimeout(() => {
-      titleWrap?.classList.remove("is-changing");
-      dot?.classList.remove("is-pulsing");
-    }, 720);
-  }
-
-  function animateHeaderNumbers() {
-    if (
-      state.reducedMotion ||
-      prefersReducedMotion()
-    ) {
-      return;
-    }
-
-    const elements = [
-      dom.activeSectionTitle,
-      dom.sectionPrev,
-      dom.sectionNext
-    ].filter(Boolean);
-
-    if (!elements.length) return;
-
-    if (window.gsap) {
-      gsap.fromTo(
-        elements,
-        {
-          y: 5,
-          opacity: 0.35
-        },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.42,
-          stagger: 0.035,
-          ease: "power3.out",
-          overwrite: true
-        }
+      titleWrap?.classList.remove(
+        "is-changing"
       );
 
-      return;
-    }
-
-    elements.forEach((element) => {
-      element.animate(
-        [
-          {
-            opacity: 0.35,
-            transform: "translateY(5px)"
-          },
-          {
-            opacity: 1,
-            transform: "translateY(0)"
-          }
-        ],
-        {
-          duration: 420,
-          easing: "cubic-bezier(.22,.61,.36,1)"
-        }
+      title?.classList.remove(
+        "is-entering"
       );
-    });
+
+      dot?.classList.remove(
+        "is-pulsing"
+      );
+    }, 820);
   }
 
-  function updateHeaderSectionUI(index, changed = true) {
+  function updateHeaderSectionUI(
+    index,
+    changed = true
+  ) {
     const section =
       state.sections[index];
 
@@ -271,12 +218,6 @@
     const total =
       state.sections.length;
 
-    const previousIndex =
-      index - 1;
-
-    const nextIndex =
-      index + 1;
-
     if (dom.activeSectionTitle) {
       dom.activeSectionTitle.textContent =
         section.dataset.title ||
@@ -284,22 +225,6 @@
         "";
     }
 
-    if (dom.sectionPrev) {
-      dom.sectionPrev.textContent =
-        formatSectionNumber(previousIndex);
-    }
-
-    if (dom.sectionNext) {
-      dom.sectionNext.textContent =
-        formatSectionNumber(nextIndex);
-    }
-
-    /*
-     * Progress is based on the active section.
-     *
-     * 01 = 0%
-     * 14 = 100%
-     */
     const progress =
       total <= 1
         ? 0
@@ -353,15 +278,8 @@
 
     if (changed) {
       animateHeaderSectionChange();
-      animateHeaderNumbers();
     }
   }
-
-  /*
-   * --------------------------------------------------------------------------
-   * ACCESSIBILITY / MENU
-   * --------------------------------------------------------------------------
-   */
 
   function initMenuSemantics() {
     if (!dom.menu) return;
@@ -456,10 +374,6 @@
         "false"
       );
 
-      /*
-       * Header remains visually unchanged.
-       * Only its central section navigator fades away.
-       */
       dom.body.classList.add(
         "menu-open"
       );
@@ -608,14 +522,6 @@
       handleMenuKeydown
     );
 
-    /*
-     * IMPORTANT:
-     * The menu remains independent from the section navigator.
-     *
-     * Existing hrefs are intentionally preserved because the actual
-     * internal-page URLs were not supplied yet. When those pages exist,
-     * their hrefs can be replaced without changing the navigation engine.
-     */
     dom.menuLinks.forEach((link) => {
       link.addEventListener(
         "click",
@@ -661,12 +567,6 @@
     });
   }
 
-  /*
-   * --------------------------------------------------------------------------
-   * SECTION TRACKING
-   * --------------------------------------------------------------------------
-   */
-
   function updateSectionUI(
     index,
     { force = false } = {}
@@ -698,10 +598,6 @@
       }
     );
 
-    /*
-     * Section navigation is deliberately separate
-     * from the internal menu.
-     */
     updateSectionButtons();
 
     updateHeaderSectionUI(
@@ -722,11 +618,16 @@
         const direction =
           button.dataset.direction;
 
-        const disabled =
+        const targetIndex =
           direction === "prev"
-            ? state.activeIndex <= 0
-            : state.activeIndex >=
-              state.sections.length - 1;
+            ? state.activeIndex - 1
+            : state.activeIndex + 1;
+
+        const targetSection =
+          state.sections[targetIndex];
+
+        const disabled =
+          !targetSection;
 
         button.disabled =
           disabled;
@@ -735,6 +636,27 @@
           "aria-disabled",
           String(disabled)
         );
+
+        if (targetSection) {
+          const title =
+            targetSection.dataset.title ||
+            targetSection.id ||
+            "";
+
+          button.setAttribute(
+            "aria-label",
+            direction === "prev"
+              ? `Vai a ${title}`
+              : `Vai a ${title}`
+          );
+        } else {
+          button.setAttribute(
+            "aria-label",
+            direction === "prev"
+              ? "Sezione precedente non disponibile"
+              : "Sezione successiva non disponibile"
+          );
+        }
       }
     );
   }
@@ -745,11 +667,6 @@
 
     if (!sections.length) return;
 
-    /*
-     * A fixed virtual marker is more deterministic than comparing
-     * section centres. This also behaves correctly when a section
-     * becomes taller than the viewport on mobile.
-     */
     const marker =
       window.innerHeight *
       (
@@ -787,9 +704,6 @@
       return;
     }
 
-    /*
-     * Fallback for small gaps during fast scrolling.
-     */
     let closestIndex =
       state.activeIndex >= 0
         ? state.activeIndex
@@ -1027,12 +941,6 @@
     );
   }
 
-  /*
-   * --------------------------------------------------------------------------
-   * STANDBY
-   * --------------------------------------------------------------------------
-   */
-
   function stopStandbyTimer() {
     clearTimeout(
       state.standbyTimer
@@ -1170,12 +1078,6 @@
     startStandbyTimer();
   }
 
-  /*
-   * --------------------------------------------------------------------------
-   * LOADER
-   * --------------------------------------------------------------------------
-   */
-
   function initLoader() {
     if (!dom.loader) return;
 
@@ -1228,12 +1130,6 @@
     );
   }
 
-  /*
-   * --------------------------------------------------------------------------
-   * GSAP
-   * --------------------------------------------------------------------------
-   */
-
   function initGsap() {
     if (
       state.reducedMotion ||
@@ -1253,12 +1149,6 @@
 
     state.gsapMM =
       gsap.matchMedia();
-
-    /*
-     * ----------------------------------------------------------------------
-     * ALL DEVICES
-     * ----------------------------------------------------------------------
-     */
 
     state.gsapMM.add(
       "(prefers-reduced-motion: no-preference)",
@@ -1473,12 +1363,6 @@
         return () => {};
       }
     );
-
-    /*
-     * ----------------------------------------------------------------------
-     * DESKTOP / LARGE TABLET
-     * ----------------------------------------------------------------------
-     */
 
     state.gsapMM.add(
       "(min-width: 701px) and (prefers-reduced-motion: no-preference)",
@@ -1740,12 +1624,6 @@
       }
     );
 
-    /*
-     * ----------------------------------------------------------------------
-     * MOBILE
-     * ----------------------------------------------------------------------
-     */
-
     state.gsapMM.add(
       "(max-width: 700px) and (prefers-reduced-motion: no-preference)",
       () => {
@@ -1809,12 +1687,6 @@
     });
   }
 
-  /*
-   * --------------------------------------------------------------------------
-   * VISIBILITY / PAGE LIFECYCLE
-   * --------------------------------------------------------------------------
-   */
-
   function initVisibility() {
     document.addEventListener(
       "visibilitychange",
@@ -1850,12 +1722,6 @@
     );
   }
 
-  /*
-   * --------------------------------------------------------------------------
-   * RESIZE
-   * --------------------------------------------------------------------------
-   */
-
   function initResize() {
     let resizeTimer;
 
@@ -1882,12 +1748,6 @@
       }
     );
   }
-
-  /*
-   * --------------------------------------------------------------------------
-   * REDUCED MOTION LIVE UPDATE
-   * --------------------------------------------------------------------------
-   */
 
   function initReducedMotionListener() {
     const mediaQuery =
@@ -1943,12 +1803,6 @@
     }
   }
 
-  /*
-   * --------------------------------------------------------------------------
-   * INIT
-   * --------------------------------------------------------------------------
-   */
-
   function init() {
     initMenu();
     initSectionNavigation();
@@ -1973,9 +1827,6 @@
       }
     );
 
-    /*
-     * Initial header state.
-     */
     updateSectionUI(
       0,
       { force: true }
@@ -1987,10 +1838,6 @@
 
     calculateActiveSection();
 
-    /*
-     * Give the browser one frame to settle fonts/layout,
-     * then initialize ScrollTrigger.
-     */
     window.setTimeout(
       initGsap,
       50
