@@ -15,7 +15,7 @@
     menuOpen: false,
     lastFocused: null,
     sections: [],
-    activeIndex: 0,
+    activeIndex: -1,
     ticking: false,
     standbyTimer: null,
     standbyVisible: false,
@@ -42,7 +42,36 @@
     main: document.getElementById("main-content"),
     footer: document.querySelector(".site-footer"),
 
-    sectionCurrent: document.getElementById("section-current"),
+    headerSectionNavigation:
+      document.getElementById(
+        "header-section-navigation"
+      ),
+
+    activeSectionTitle:
+      document.getElementById(
+        "active-section-title"
+      ),
+
+    activeSectionTitleWrap:
+      document.querySelector(
+        ".active-section-title-wrap"
+      ),
+
+    sectionProgressFill:
+      document.getElementById(
+        "section-progress-fill"
+      ),
+
+    sectionProgressDot:
+      document.getElementById(
+        "section-progress-dot"
+      ),
+
+    sectionPrev:
+      document.getElementById("section-prev"),
+
+    sectionNext:
+      document.getElementById("section-next"),
 
     sections: [
       ...document.querySelectorAll(".story")
@@ -53,7 +82,9 @@
     ],
 
     sectionButtons: [
-      ...document.querySelectorAll(".section-nav-button")
+      ...document.querySelectorAll(
+        ".section-nav-button"
+      )
     ]
   };
 
@@ -95,7 +126,9 @@
     if (!element) return false;
 
     return (
-      element.matches("input, textarea, select") ||
+      element.matches(
+        "input, textarea, select"
+      ) ||
       element.isContentEditable
     );
   }
@@ -109,7 +142,8 @@
   function setHash(id) {
     if (!id) return;
 
-    const currentHash = window.location.hash.slice(1);
+    const currentHash =
+      window.location.hash.slice(1);
 
     if (currentHash === id) return;
 
@@ -118,6 +152,209 @@
       "",
       `#${encodeURIComponent(id)}`
     );
+  }
+
+  function formatSectionNumber(index) {
+    if (
+      typeof index !== "number" ||
+      index < 0 ||
+      index >= state.sections.length
+    ) {
+      return "—";
+    }
+
+    return String(index + 1).padStart(2, "0");
+  }
+
+  /*
+   * --------------------------------------------------------------------------
+   * HEADER SECTION NAVIGATION
+   * --------------------------------------------------------------------------
+   */
+
+  function animateHeaderSectionChange() {
+    const titleWrap =
+      dom.activeSectionTitleWrap;
+
+    const dot =
+      dom.sectionProgressDot;
+
+    if (!titleWrap && !dot) return;
+
+    if (
+      state.reducedMotion ||
+      prefersReducedMotion()
+    ) {
+      return;
+    }
+
+    titleWrap?.classList.remove("is-changing");
+    dot?.classList.remove("is-pulsing");
+
+    /*
+     * Restart CSS transitions/animations deterministically.
+     */
+    void titleWrap?.offsetWidth;
+    void dot?.offsetWidth;
+
+    titleWrap?.classList.add("is-changing");
+    dot?.classList.add("is-pulsing");
+
+    window.setTimeout(() => {
+      titleWrap?.classList.remove("is-changing");
+      dot?.classList.remove("is-pulsing");
+    }, 720);
+  }
+
+  function animateHeaderNumbers() {
+    if (
+      state.reducedMotion ||
+      prefersReducedMotion()
+    ) {
+      return;
+    }
+
+    const elements = [
+      dom.activeSectionTitle,
+      dom.sectionPrev,
+      dom.sectionNext
+    ].filter(Boolean);
+
+    if (!elements.length) return;
+
+    if (window.gsap) {
+      gsap.fromTo(
+        elements,
+        {
+          y: 5,
+          opacity: 0.35
+        },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.42,
+          stagger: 0.035,
+          ease: "power3.out",
+          overwrite: true
+        }
+      );
+
+      return;
+    }
+
+    elements.forEach((element) => {
+      element.animate(
+        [
+          {
+            opacity: 0.35,
+            transform: "translateY(5px)"
+          },
+          {
+            opacity: 1,
+            transform: "translateY(0)"
+          }
+        ],
+        {
+          duration: 420,
+          easing: "cubic-bezier(.22,.61,.36,1)"
+        }
+      );
+    });
+  }
+
+  function updateHeaderSectionUI(index, changed = true) {
+    const section =
+      state.sections[index];
+
+    if (!section) return;
+
+    const total =
+      state.sections.length;
+
+    const previousIndex =
+      index - 1;
+
+    const nextIndex =
+      index + 1;
+
+    if (dom.activeSectionTitle) {
+      dom.activeSectionTitle.textContent =
+        section.dataset.title ||
+        section.id ||
+        "";
+    }
+
+    if (dom.sectionPrev) {
+      dom.sectionPrev.textContent =
+        formatSectionNumber(previousIndex);
+    }
+
+    if (dom.sectionNext) {
+      dom.sectionNext.textContent =
+        formatSectionNumber(nextIndex);
+    }
+
+    /*
+     * Progress is based on the active section.
+     *
+     * 01 = 0%
+     * 14 = 100%
+     */
+    const progress =
+      total <= 1
+        ? 0
+        : (index / (total - 1)) * 100;
+
+    if (dom.sectionProgressFill) {
+      if (
+        state.reducedMotion ||
+        prefersReducedMotion()
+      ) {
+        dom.sectionProgressFill.style.width =
+          `${progress}%`;
+      } else if (window.gsap) {
+        gsap.to(
+          dom.sectionProgressFill,
+          {
+            width: `${progress}%`,
+            duration: changed ? 0.7 : 0,
+            ease: "power3.out",
+            overwrite: true
+          }
+        );
+      } else {
+        dom.sectionProgressFill.style.width =
+          `${progress}%`;
+      }
+    }
+
+    if (dom.sectionProgressDot) {
+      if (
+        state.reducedMotion ||
+        prefersReducedMotion()
+      ) {
+        dom.sectionProgressDot.style.left =
+          `${progress}%`;
+      } else if (window.gsap) {
+        gsap.to(
+          dom.sectionProgressDot,
+          {
+            left: `${progress}%`,
+            duration: changed ? 0.7 : 0,
+            ease: "power3.out",
+            overwrite: true
+          }
+        );
+      } else {
+        dom.sectionProgressDot.style.left =
+          `${progress}%`;
+      }
+    }
+
+    if (changed) {
+      animateHeaderSectionChange();
+      animateHeaderNumbers();
+    }
   }
 
   /*
@@ -129,30 +366,42 @@
   function initMenuSemantics() {
     if (!dom.menu) return;
 
-    /*
-     * The existing HTML remains usable.
-     * We enhance it here so the implementation does not require
-     * structural duplication.
-     */
-    dom.menu.setAttribute("role", "dialog");
-    dom.menu.setAttribute("aria-modal", "true");
+    dom.menu.setAttribute(
+      "role",
+      "dialog"
+    );
+
+    dom.menu.setAttribute(
+      "aria-modal",
+      "true"
+    );
+
     dom.menu.setAttribute(
       "aria-label",
       "Navigazione principale"
     );
 
-    dom.menu.setAttribute("aria-hidden", "true");
-    dom.menu.setAttribute("inert", "");
+    dom.menu.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    dom.menu.setAttribute(
+      "inert",
+      ""
+    );
 
     if (dom.menuToggle) {
       dom.menuToggle.setAttribute(
         "aria-controls",
         dom.menu.id
       );
+
       dom.menuToggle.setAttribute(
         "aria-expanded",
         "false"
       );
+
       dom.menuToggle.setAttribute(
         "aria-label",
         "Apri menu"
@@ -160,13 +409,22 @@
     }
   }
 
-  function setMenuState(open, { restoreFocus = true } = {}) {
-    if (!dom.menu || !dom.menuToggle) return;
+  function setMenuState(
+    open,
+    { restoreFocus = true } = {}
+  ) {
+    if (
+      !dom.menu ||
+      !dom.menuToggle
+    ) {
+      return;
+    }
 
     if (open === state.menuOpen) return;
 
     if (open) {
-      state.lastFocused = document.activeElement;
+      state.lastFocused =
+        document.activeElement;
 
       state.menuOpen = true;
 
@@ -181,26 +439,44 @@
       );
 
       if (dom.menuToggleLabel) {
-        dom.menuToggleLabel.textContent = "CHIUDI";
+        dom.menuToggleLabel.textContent =
+          "CHIUDI";
       }
 
-      dom.menu.classList.add("is-open");
-      dom.menu.removeAttribute("inert");
-      dom.menu.setAttribute("aria-hidden", "false");
+      dom.menu.classList.add(
+        "is-open"
+      );
 
-      dom.body.classList.add("menu-open");
+      dom.menu.removeAttribute(
+        "inert"
+      );
+
+      dom.menu.setAttribute(
+        "aria-hidden",
+        "false"
+      );
 
       /*
-       * Standby must never appear while the navigation is open.
+       * Header remains visually unchanged.
+       * Only its central section navigator fades away.
        */
+      dom.body.classList.add(
+        "menu-open"
+      );
+
       stopStandbyTimer();
 
       requestAnimationFrame(() => {
-        const focusables = getFocusable(dom.menu);
-        const first = focusables[0];
+        const focusables =
+          getFocusable(dom.menu);
+
+        const first =
+          focusables[0];
 
         if (first) {
-          first.focus({ preventScroll: true });
+          first.focus({
+            preventScroll: true
+          });
         }
       });
 
@@ -209,9 +485,19 @@
 
     state.menuOpen = false;
 
-    dom.menu.classList.remove("is-open");
-    dom.menu.setAttribute("aria-hidden", "true");
-    dom.menu.setAttribute("inert", "");
+    dom.menu.classList.remove(
+      "is-open"
+    );
+
+    dom.menu.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
+    dom.menu.setAttribute(
+      "inert",
+      ""
+    );
 
     dom.menuToggle.setAttribute(
       "aria-expanded",
@@ -224,18 +510,24 @@
     );
 
     if (dom.menuToggleLabel) {
-      dom.menuToggleLabel.textContent = "MENU";
+      dom.menuToggleLabel.textContent =
+        "MENU";
     }
 
-    dom.body.classList.remove("menu-open");
+    dom.body.classList.remove(
+      "menu-open"
+    );
 
     startStandbyTimer();
 
     if (
       restoreFocus &&
       state.lastFocused &&
-      document.contains(state.lastFocused) &&
-      typeof state.lastFocused.focus === "function"
+      document.contains(
+        state.lastFocused
+      ) &&
+      typeof state.lastFocused.focus ===
+        "function"
     ) {
       requestAnimationFrame(() => {
         state.lastFocused.focus({
@@ -258,15 +550,21 @@
 
     if (event.key !== "Tab") return;
 
-    const focusables = getFocusable(dom.menu);
+    const focusables =
+      getFocusable(dom.menu);
 
     if (!focusables.length) {
       event.preventDefault();
       return;
     }
 
-    const first = focusables[0];
-    const last = focusables[focusables.length - 1];
+    const first =
+      focusables[0];
+
+    const last =
+      focusables[
+        focusables.length - 1
+      ];
 
     if (
       event.shiftKey &&
@@ -287,52 +585,79 @@
   }
 
   function initMenu() {
-    if (!dom.menu || !dom.menuToggle) return;
+    if (
+      !dom.menu ||
+      !dom.menuToggle
+    ) {
+      return;
+    }
 
     initMenuSemantics();
 
-    dom.menuToggle.addEventListener("click", () => {
-      setMenuState(!state.menuOpen);
-    });
+    dom.menuToggle.addEventListener(
+      "click",
+      () => {
+        setMenuState(
+          !state.menuOpen
+        );
+      }
+    );
 
     dom.menu.addEventListener(
       "keydown",
       handleMenuKeydown
     );
 
+    /*
+     * IMPORTANT:
+     * The menu remains independent from the section navigator.
+     *
+     * Existing hrefs are intentionally preserved because the actual
+     * internal-page URLs were not supplied yet. When those pages exist,
+     * their hrefs can be replaced without changing the navigation engine.
+     */
     dom.menuLinks.forEach((link) => {
-      link.addEventListener("click", (event) => {
-        const target = link.getAttribute("href");
+      link.addEventListener(
+        "click",
+        (event) => {
+          const target =
+            link.getAttribute("href");
 
-        if (!target || !target.startsWith("#")) {
-          setMenuState(false);
-          return;
+          if (
+            !target ||
+            !target.startsWith("#")
+          ) {
+            setMenuState(false, {
+              restoreFocus: false
+            });
+            return;
+          }
+
+          const id =
+            target.slice(1);
+
+          const index =
+            state.sections.findIndex(
+              (section) =>
+                section.id === id
+            );
+
+          if (index === -1) {
+            setMenuState(false);
+            return;
+          }
+
+          event.preventDefault();
+
+          setMenuState(false, {
+            restoreFocus: false
+          });
+
+          window.setTimeout(() => {
+            scrollToSection(index);
+          }, 20);
         }
-
-        const id = target.slice(1);
-        const index = state.sections.findIndex(
-          (section) => section.id === id
-        );
-
-        if (index === -1) {
-          setMenuState(false);
-          return;
-        }
-
-        event.preventDefault();
-
-        /*
-         * Navigate through the same deterministic system
-         * used by prev/next and keyboard controls.
-         */
-        setMenuState(false, {
-          restoreFocus: false
-        });
-
-        window.setTimeout(() => {
-          scrollToSection(index);
-        }, 20);
-      });
+      );
     });
   }
 
@@ -342,73 +667,81 @@
    * --------------------------------------------------------------------------
    */
 
-  function updateSectionUI(index) {
-    const section = state.sections[index];
+  function updateSectionUI(
+    index,
+    { force = false } = {}
+  ) {
+    const section =
+      state.sections[index];
 
     if (!section) return;
 
-    if (state.activeIndex === index) {
-      /*
-       * Even if the index did not change, update disabled states.
-       */
+    const changed =
+      state.activeIndex !== index;
+
+    if (
+      !force &&
+      !changed
+    ) {
       updateSectionButtons();
       return;
     }
 
     state.activeIndex = index;
 
-    if (dom.sectionCurrent) {
-      dom.sectionCurrent.textContent =
-        String(index + 1).padStart(2, "0");
-    }
-
-    dom.sections.forEach((item, itemIndex) => {
-      item.toggleAttribute(
-        "data-active",
-        itemIndex === index
-      );
-    });
-
-    dom.menuLinks.forEach((link) => {
-      const target = link.getAttribute("href");
-      const isCurrent =
-        target === `#${section.id}`;
-
-      if (isCurrent) {
-        link.setAttribute(
-          "aria-current",
-          "location"
+    dom.sections.forEach(
+      (item, itemIndex) => {
+        item.toggleAttribute(
+          "data-active",
+          itemIndex === index
         );
-      } else {
-        link.removeAttribute("aria-current");
       }
-    });
+    );
 
+    /*
+     * Section navigation is deliberately separate
+     * from the internal menu.
+     */
     updateSectionButtons();
+
+    updateHeaderSectionUI(
+      index,
+      changed
+    );
   }
 
   function updateSectionButtons() {
-    if (!dom.sectionButtons.length) return;
+    if (
+      !dom.sectionButtons.length
+    ) {
+      return;
+    }
 
-    dom.sectionButtons.forEach((button) => {
-      const direction = button.dataset.direction;
+    dom.sectionButtons.forEach(
+      (button) => {
+        const direction =
+          button.dataset.direction;
 
-      const disabled =
-        direction === "prev"
-          ? state.activeIndex <= 0
-          : state.activeIndex >=
-            state.sections.length - 1;
+        const disabled =
+          direction === "prev"
+            ? state.activeIndex <= 0
+            : state.activeIndex >=
+              state.sections.length - 1;
 
-      button.disabled = disabled;
-      button.setAttribute(
-        "aria-disabled",
-        String(disabled)
-      );
-    });
+        button.disabled =
+          disabled;
+
+        button.setAttribute(
+          "aria-disabled",
+          String(disabled)
+        );
+      }
+    );
   }
 
   function calculateActiveSection() {
-    const sections = state.sections;
+    const sections =
+      state.sections;
 
     if (!sections.length) return;
 
@@ -419,13 +752,22 @@
      */
     const marker =
       window.innerHeight *
-      (window.innerWidth <= 700 ? 0.32 : 0.42);
+      (
+        window.innerWidth <= 700
+          ? 0.32
+          : 0.42
+      );
 
     let containingIndex = -1;
 
-    for (let index = 0; index < sections.length; index += 1) {
+    for (
+      let index = 0;
+      index < sections.length;
+      index += 1
+    ) {
       const rect =
-        sections[index].getBoundingClientRect();
+        sections[index]
+          .getBoundingClientRect();
 
       if (
         rect.top <= marker &&
@@ -436,34 +778,58 @@
       }
     }
 
-    if (containingIndex !== -1) {
-      updateSectionUI(containingIndex);
+    if (
+      containingIndex !== -1
+    ) {
+      updateSectionUI(
+        containingIndex
+      );
       return;
     }
 
     /*
-     * Fallback for the small gaps that can occur during fast scrolling.
+     * Fallback for small gaps during fast scrolling.
      */
-    let closestIndex = state.activeIndex;
-    let closestDistance = Infinity;
+    let closestIndex =
+      state.activeIndex >= 0
+        ? state.activeIndex
+        : 0;
 
-    sections.forEach((section, index) => {
-      const rect =
-        section.getBoundingClientRect();
+    let closestDistance =
+      Infinity;
 
-      const distance = Math.abs(rect.top - marker);
+    sections.forEach(
+      (section, index) => {
+        const rect =
+          section.getBoundingClientRect();
 
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestIndex = index;
+        const distance =
+          Math.abs(
+            rect.top - marker
+          );
+
+        if (
+          distance <
+          closestDistance
+        ) {
+          closestDistance =
+            distance;
+
+          closestIndex =
+            index;
+        }
       }
-    });
+    );
 
-    updateSectionUI(closestIndex);
+    updateSectionUI(
+      closestIndex
+    );
   }
 
   function handleScroll() {
-    if (!CONFIG.scrollTrackingRaf) {
+    if (
+      !CONFIG.scrollTrackingRaf
+    ) {
       calculateActiveSection();
       return;
     }
@@ -482,21 +848,32 @@
     index,
     behavior = "smooth"
   ) {
-    const sections = state.sections;
+    const sections =
+      state.sections;
 
     if (!sections.length) return;
 
-    const nextIndex = Math.max(
-      0,
-      Math.min(index, sections.length - 1)
-    );
+    const nextIndex =
+      Math.max(
+        0,
+        Math.min(
+          index,
+          sections.length - 1
+        )
+      );
 
-    const section = sections[nextIndex];
+    const section =
+      sections[nextIndex];
 
     state.isNavigating = true;
 
-    updateSectionUI(nextIndex);
-    setHash(section.id);
+    updateSectionUI(
+      nextIndex
+    );
+
+    setHash(
+      section.id
+    );
 
     section.scrollIntoView({
       behavior:
@@ -507,23 +884,32 @@
       block: "start"
     });
 
-    clearTimeout(state.navigationTimer);
+    clearTimeout(
+      state.navigationTimer
+    );
 
-    state.navigationTimer = window.setTimeout(() => {
-      state.isNavigating = false;
-      calculateActiveSection();
-    }, CONFIG.navigationReleaseDelay);
+    state.navigationTimer =
+      window.setTimeout(() => {
+        state.isNavigating =
+          false;
+
+        calculateActiveSection();
+      }, CONFIG.navigationReleaseDelay);
   }
 
   function handleHash({
     initial = false
   } = {}) {
-    const hash = decodeURIComponent(
-      window.location.hash.slice(1)
-    );
+    const hash =
+      decodeURIComponent(
+        window.location.hash.slice(1)
+      );
 
     if (!hash) {
-      updateSectionUI(0);
+      updateSectionUI(
+        0,
+        { force: true }
+      );
 
       if (initial) {
         window.scrollTo({
@@ -535,15 +921,13 @@
       return;
     }
 
-    const index = state.sections.findIndex(
-      (section) => section.id === hash
-    );
+    const index =
+      state.sections.findIndex(
+        (section) =>
+          section.id === hash
+      );
 
     if (index === -1) {
-      /*
-       * Do not silently rewrite an invalid user-provided hash
-       * unless we are explicitly initializing.
-       */
       if (initial) {
         history.replaceState(
           null,
@@ -552,53 +936,77 @@
           window.location.search
         );
 
-        updateSectionUI(0);
+        updateSectionUI(
+          0,
+          { force: true }
+        );
       }
 
       return;
     }
 
-    state.activeIndex = index;
+    state.activeIndex =
+      index;
 
     requestAnimationFrame(() => {
-      state.sections[index].scrollIntoView({
-        behavior: "auto",
-        block: "start"
-      });
+      state.sections[index]
+        .scrollIntoView({
+          behavior: "auto",
+          block: "start"
+        });
 
-      updateSectionUI(index);
+      updateSectionUI(
+        index,
+        { force: true }
+      );
     });
   }
 
   function initSectionNavigation() {
-    dom.sectionButtons.forEach((button) => {
-      button.addEventListener("click", () => {
-        if (button.disabled) return;
+    dom.sectionButtons.forEach(
+      (button) => {
+        button.addEventListener(
+          "click",
+          () => {
+            if (button.disabled) {
+              return;
+            }
 
-        const direction =
-          button.dataset.direction;
+            const direction =
+              button.dataset.direction;
 
-        const delta =
-          direction === "prev"
-            ? -1
-            : 1;
+            const delta =
+              direction === "prev"
+                ? -1
+                : 1;
 
-        scrollToSection(
-          state.activeIndex + delta
+            scrollToSection(
+              state.activeIndex +
+                delta
+            );
+          }
         );
-      });
-    });
+      }
+    );
 
     document.addEventListener(
       "keydown",
       (event) => {
-        if (state.menuOpen) return;
-
-        if (isTextEntryTarget(event.target)) {
+        if (state.menuOpen) {
           return;
         }
 
-        if (event.key === "ArrowDown") {
+        if (
+          isTextEntryTarget(
+            event.target
+          )
+        ) {
+          return;
+        }
+
+        if (
+          event.key === "ArrowDown"
+        ) {
           event.preventDefault();
 
           scrollToSection(
@@ -606,7 +1014,9 @@
           );
         }
 
-        if (event.key === "ArrowUp") {
+        if (
+          event.key === "ArrowUp"
+        ) {
           event.preventDefault();
 
           scrollToSection(
@@ -624,7 +1034,10 @@
    */
 
   function stopStandbyTimer() {
-    clearTimeout(state.standbyTimer);
+    clearTimeout(
+      state.standbyTimer
+    );
+
     state.standbyTimer = null;
   }
 
@@ -636,7 +1049,10 @@
 
     state.standbyVisible = true;
 
-    dom.standby.classList.add("is-visible");
+    dom.standby.classList.add(
+      "is-visible"
+    );
+
     dom.standby.setAttribute(
       "aria-hidden",
       "false"
@@ -648,7 +1064,10 @@
 
     state.standbyVisible = false;
 
-    dom.standby.classList.remove("is-visible");
+    dom.standby.classList.remove(
+      "is-visible"
+    );
+
     dom.standby.setAttribute(
       "aria-hidden",
       "true"
@@ -666,10 +1085,11 @@
       return;
     }
 
-    state.standbyTimer = window.setTimeout(
-      showStandby,
-      CONFIG.standbyDelay
-    );
+    state.standbyTimer =
+      window.setTimeout(
+        showStandby,
+        CONFIG.standbyDelay
+      );
   }
 
   function wakeFromStandby() {
@@ -692,29 +1112,35 @@
       "touchstart"
     ];
 
-    activityEvents.forEach((eventName) => {
-      window.addEventListener(
-        eventName,
-        () => {
-          if (state.standbyWakeTimer) return;
+    activityEvents.forEach(
+      (eventName) => {
+        window.addEventListener(
+          eventName,
+          () => {
+            if (
+              state.standbyWakeTimer
+            ) {
+              return;
+            }
 
-          wakeFromStandby();
+            wakeFromStandby();
 
-          state.standbyWakeTimer =
-            window.setTimeout(() => {
-              state.standbyWakeTimer = null;
-            }, CONFIG.standbyWakeThrottle);
-        },
-        {
-          passive: true
-        }
-      );
-    });
+            state.standbyWakeTimer =
+              window.setTimeout(
+                () => {
+                  state.standbyWakeTimer =
+                    null;
+                },
+                CONFIG.standbyWakeThrottle
+              );
+          },
+          {
+            passive: true
+          }
+        );
+      }
+    );
 
-    /*
-     * Pointer movement is useful on desktop, but it does not need
-     * to wake the interface hundreds of times per second.
-     */
     window.addEventListener(
       "pointermove",
       () => {
@@ -728,9 +1154,13 @@
         wakeFromStandby();
 
         state.standbyWakeTimer =
-          window.setTimeout(() => {
-            state.standbyWakeTimer = null;
-          }, CONFIG.standbyWakeThrottle);
+          window.setTimeout(
+            () => {
+              state.standbyWakeTimer =
+                null;
+            },
+            CONFIG.standbyWakeThrottle
+          );
       },
       {
         passive: true
@@ -760,21 +1190,30 @@
         !window.gsap ||
         state.reducedMotion
       ) {
-        dom.loader.style.opacity = "0";
-        dom.loader.style.visibility = "hidden";
-        dom.loader.style.pointerEvents = "none";
+        dom.loader.style.opacity =
+          "0";
+
+        dom.loader.style.visibility =
+          "hidden";
+
+        dom.loader.style.pointerEvents =
+          "none";
+
         return;
       }
 
-      gsap.to(dom.loader, {
-        autoAlpha: 0,
-        duration: 0.8,
-        ease: "power2.out",
-        onComplete: () => {
-          dom.loader.style.pointerEvents =
-            "none";
+      gsap.to(
+        dom.loader,
+        {
+          autoAlpha: 0,
+          duration: 0.8,
+          ease: "power2.out",
+          onComplete: () => {
+            dom.loader.style.pointerEvents =
+              "none";
+          }
         }
-      });
+      );
     };
 
     window.addEventListener(
@@ -804,17 +1243,16 @@
       return;
     }
 
-    gsap.registerPlugin(ScrollTrigger);
+    gsap.registerPlugin(
+      ScrollTrigger
+    );
 
-    /*
-     * Kill/revert our own previous responsive context if initGsap
-     * is accidentally called more than once.
-     */
     if (state.gsapMM) {
       state.gsapMM.revert();
     }
 
-    state.gsapMM = gsap.matchMedia();
+    state.gsapMM =
+      gsap.matchMedia();
 
     /*
      * ----------------------------------------------------------------------
@@ -825,9 +1263,6 @@
     state.gsapMM.add(
       "(prefers-reduced-motion: no-preference)",
       () => {
-        /*
-         * Generic story reveal
-         */
         gsap.utils.toArray(
           ".story-copy > *, .section-heading > *, .narrative-copy > *"
         ).forEach((element) => {
@@ -851,14 +1286,12 @@
           );
         });
 
-        /*
-         * Runner
-         */
         gsap.utils.toArray(
           ".runner-bone, .runner-body"
         ).forEach((path) => {
           const length =
-            typeof path.getTotalLength === "function"
+            typeof path.getTotalLength ===
+            "function"
               ? path.getTotalLength()
               : 1000;
 
@@ -879,14 +1312,12 @@
           });
         });
 
-        /*
-         * Education network
-         */
         gsap.utils.toArray(
           ".edu-path"
         ).forEach((path) => {
           const length =
-            typeof path.getTotalLength === "function"
+            typeof path.getTotalLength ===
+            "function"
               ? path.getTotalLength()
               : 1000;
 
@@ -926,9 +1357,6 @@
           }
         );
 
-        /*
-         * Network
-         */
         gsap.fromTo(
           ".network-link",
           {
@@ -966,9 +1394,6 @@
           }
         );
 
-        /*
-         * Presence
-         */
         gsap.fromTo(
           ".presence-main, .presence-branch",
           {
@@ -1007,9 +1432,6 @@
           }
         );
 
-        /*
-         * Portrait
-         */
         gsap.fromTo(
           ".person-frame",
           {
@@ -1029,9 +1451,6 @@
           }
         );
 
-        /*
-         * Contact
-         */
         gsap.fromTo(
           ".contact-lead",
           {
@@ -1051,12 +1470,7 @@
           }
         );
 
-        return () => {
-          /*
-           * gsap.matchMedia automatically reverts the animations
-           * and ScrollTriggers created inside this context.
-           */
-        };
+        return () => {};
       }
     );
 
@@ -1069,11 +1483,10 @@
     state.gsapMM.add(
       "(min-width: 701px) and (prefers-reduced-motion: no-preference)",
       () => {
-        /*
-         * CRT
-         */
         const crt =
-          document.querySelector(".crt-monitor");
+          document.querySelector(
+            ".crt-monitor"
+          );
 
         if (crt) {
           gsap.fromTo(
@@ -1098,9 +1511,6 @@
           );
         }
 
-        /*
-         * Science
-         */
         gsap.fromTo(
           ".visual-science .orbit",
           {
@@ -1140,9 +1550,6 @@
           }
         );
 
-        /*
-         * Management
-         */
         gsap.fromTo(
           ".management-line",
           {
@@ -1181,12 +1588,6 @@
           }
         );
 
-        /*
-         * Digital transformation
-         *
-         * Scrub is retained because this is one of the visual anchors
-         * of the page.
-         */
         const digitalTimeline =
           gsap.timeline({
             scrollTrigger: {
@@ -1241,9 +1642,6 @@
             "<0.1"
           );
 
-        /*
-         * Today
-         */
         const todayWords =
           gsap.utils.toArray(
             ".today-method span"
@@ -1275,23 +1673,23 @@
               index <
               todayWords.length - 1
             ) {
-              gsap.to(word, {
-                opacity: 0.25,
-                scrollTrigger: {
-                  trigger:
-                    todayWords[index + 1],
-                  start: "top 68%",
-                  end: "top 48%",
-                  scrub: 0.5
+              gsap.to(
+                word,
+                {
+                  opacity: 0.25,
+                  scrollTrigger: {
+                    trigger:
+                      todayWords[index + 1],
+                    start: "top 68%",
+                    end: "top 48%",
+                    scrub: 0.5
+                  }
                 }
-              });
+              );
             }
           }
         );
 
-        /*
-         * Objective
-         */
         const objectiveProgress =
           document.querySelector(
             ".objective-progress"
@@ -1315,8 +1713,10 @@
           gsap.set(
             objectiveProgress,
             {
-              strokeDasharray: length,
-              strokeDashoffset: length
+              strokeDasharray:
+                length,
+              strokeDashoffset:
+                length
             }
           );
 
@@ -1344,9 +1744,6 @@
      * ----------------------------------------------------------------------
      * MOBILE
      * ----------------------------------------------------------------------
-     *
-     * Mobile keeps the visual language but avoids the heaviest scrub-based
-     * effects and 3D transformations.
      */
 
     state.gsapMM.add(
@@ -1375,9 +1772,6 @@
           );
         });
 
-        /*
-         * Shorter / lighter SVG reveals on mobile.
-         */
         gsap.utils.toArray(
           ".management-line, .network-link"
         ).forEach((path) => {
@@ -1388,8 +1782,10 @@
               : 1000;
 
           gsap.set(path, {
-            strokeDasharray: length,
-            strokeDashoffset: length
+            strokeDasharray:
+              length,
+            strokeDashoffset:
+              length
           });
 
           gsap.to(path, {
@@ -1466,11 +1862,15 @@
     window.addEventListener(
       "resize",
       () => {
-        clearTimeout(resizeTimer);
+        clearTimeout(
+          resizeTimer
+        );
 
         resizeTimer =
           window.setTimeout(() => {
-            if (window.ScrollTrigger) {
+            if (
+              window.ScrollTrigger
+            ) {
               window.ScrollTrigger.refresh();
             }
 
@@ -1499,7 +1899,9 @@
       state.reducedMotion =
         event.matches;
 
-      if (state.reducedMotion) {
+      if (
+        state.reducedMotion
+      ) {
         stopStandbyTimer();
         hideStandby();
 
@@ -1511,9 +1913,18 @@
         if (window.ScrollTrigger) {
           window.ScrollTrigger.refresh();
         }
+
+        updateHeaderSectionUI(
+          state.activeIndex >= 0
+            ? state.activeIndex
+            : 0,
+          false
+        );
       } else {
         startStandbyTimer();
         initGsap();
+
+        calculateActiveSection();
       }
     };
 
@@ -1526,7 +1937,9 @@
         update
       );
     } else {
-      mediaQuery.addListener(update);
+      mediaQuery.addListener(
+        update
+      );
     }
   }
 
@@ -1558,6 +1971,14 @@
       () => {
         handleHash();
       }
+    );
+
+    /*
+     * Initial header state.
+     */
+    updateSectionUI(
+      0,
+      { force: true }
     );
 
     handleHash({
