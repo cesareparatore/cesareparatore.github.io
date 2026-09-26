@@ -1243,7 +1243,7 @@
           ".runner-bone, .runner-body"
         ).forEach((path) => {
           const length =
-            typeof path.getTotalLength ===
+            typeof path.getTotalLength() ===
             "function"
               ? path.getTotalLength()
               : 1000;
@@ -1269,7 +1269,7 @@
           ".edu-path"
         ).forEach((path) => {
           const length =
-            typeof path.getTotalLength ===
+            typeof path.getTotalLength() ===
             "function"
               ? path.getTotalLength()
               : 1000;
@@ -1717,7 +1717,7 @@
           ".management-line, .network-link"
         ).forEach((path) => {
           const length =
-            typeof path.getTotalLength ===
+            typeof path.getTotalLength() ===
             "function"
               ? path.getTotalLength()
               : 1000;
