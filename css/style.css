@@ -214,16 +214,15 @@ a {
 .header-section-navigation {
   position: absolute;
   z-index: 3;
-  top: 5px;
+  top: 50%;
   left: 50%;
-  width: min(560px, calc(100% - 250px));
-  height: calc(var(--header-h) - 10px);
-  display: flex;
-  flex-direction: column;
+  width: min(620px, calc(100% - 250px));
+  height: 60px;
+  display: grid;
+  grid-template-rows: 24px 34px;
+  row-gap: 2px;
   align-items: center;
-  justify-content: flex-start;
-  gap: 7px;
-  transform: translateX(-50%);
+  transform: translate(-50%, -13px);
   pointer-events: none;
   transition:
     opacity .35s var(--ease),
@@ -232,13 +231,13 @@ a {
 
 .active-section-title-wrap {
   position: relative;
-  flex: 0 0 auto;
+  justify-self: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 27px;
-  max-width: min(72vw, 420px);
-  padding: 6px 17px 7px;
+  min-height: 24px;
+  max-width: min(72vw, 460px);
+  padding: 5px 17px 6px;
   border: 1px solid rgba(241,239,232,.2);
   border-radius: 999px;
   background: rgba(241,239,232,.035);
@@ -246,7 +245,6 @@ a {
     inset 0 0 0 1px rgba(255,255,255,.015),
     0 8px 30px rgba(0,0,0,.12);
   overflow: hidden;
-  transform: translateY(3px)
 }
 
 .active-section-title-wrap::before {
@@ -290,11 +288,17 @@ a {
   animation: titleSweep .8s var(--ease-sharp) both;
 }
 
+.active-section-title-wrap.is-changing {
+  animation: headerPillPulse .76s var(--ease-sharp) both;
+}
+
 .active-section-title {
   display: block;
   position: relative;
   z-index: 1;
   white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
   font-family: "Space Grotesk", sans-serif;
   font-size: .62rem;
   line-height: 1;
@@ -304,25 +308,50 @@ a {
 }
 
 .active-section-title.is-entering {
-  animation: headerTitleReveal .68s var(--ease-sharp) both;
+  animation: headerTitleReveal .72s var(--ease-sharp) both;
 }
 
 @keyframes headerTitleReveal {
   0% {
     opacity: 0;
-    transform: translateY(7px);
+    transform: translateY(7px) scale(.985);
     filter: blur(4px);
   }
 
-  52% {
+  42% {
     opacity: 1;
+    transform: translateY(0) scale(1.01);
     filter: blur(0);
   }
 
   100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
     filter: blur(0);
+  }
+}
+
+@keyframes headerPillPulse {
+  0% {
+    border-color: rgba(241,239,232,.2);
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.015),
+      0 8px 30px rgba(0,0,0,.12);
+  }
+
+  28% {
+    border-color: rgba(241,239,232,.45);
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.035),
+      0 0 0 1px rgba(168,255,106,.05),
+      0 0 28px rgba(168,255,106,.08);
+  }
+
+  100% {
+    border-color: rgba(241,239,232,.2);
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.015),
+      0 8px 30px rgba(0,0,0,.12);
   }
 }
 
@@ -354,10 +383,10 @@ a {
 
 .section-progress {
   width: 100%;
-  height: 43px;
+  height: 34px;
   display: flex;
   align-items: center;
-  gap: 13px;
+  gap: 10px;
   pointer-events: auto;
 }
 
@@ -431,17 +460,35 @@ a {
 }
 
 .section-progress-dot.is-pulsing {
-  box-shadow:
-    0 0 0 7px rgba(168,255,106,.08),
-    0 0 22px rgba(168,255,106,.45);
-  transform: translate(-50%, -50%) scale(1.2);
+  animation: headerDotPulse .82s var(--ease-sharp) both;
+}
+
+@keyframes headerDotPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(.7);
+    box-shadow: 0 0 0 0 rgba(168,255,106,0);
+  }
+
+  35% {
+    transform: translate(-50%, -50%) scale(1.35);
+    box-shadow:
+      0 0 0 7px rgba(168,255,106,.08),
+      0 0 22px rgba(168,255,106,.2);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow:
+      0 0 0 0 rgba(168,255,106,0),
+      0 0 12px rgba(241,239,232,.4);
+  }
 }
 
 .section-nav-button {
   appearance: none;
   flex: 0 0 auto;
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   padding: 0;
   display: inline-flex;
   align-items: center;
@@ -478,19 +525,18 @@ a {
 
 .section-nav-arrow {
   display: block;
-  font-size: .95rem;
+  font-size: .85rem;
   line-height: 1;
 }
 
 /*
  * Quando il menu è aperto il modulo centrale scompare,
- * ma il contenitore/header mantiene esattamente la stessa
- * geometria, posizione e colore.
+ * ma header, logo e MENU restano geometricamente stabili.
  */
 
 body.menu-open .header-section-navigation {
   opacity: 0;
-  transform: translateX(-50%) scale(.96);
+  transform: translate(-50%, -13px) scale(.96);
   pointer-events: none;
 }
 
@@ -1521,7 +1567,21 @@ body.menu-open .header-section-navigation {
   }
 
   .header-section-navigation {
+    top: 50%;
     width: min(500px, calc(100% - 220px));
+    height: 56px;
+    grid-template-rows: 22px 32px;
+    row-gap: 2px;
+    transform: translate(-50%, -12px);
+  }
+
+  body.menu-open .header-section-navigation {
+    transform: translate(-50%, -12px) scale(.96);
+  }
+
+  .section-nav-button {
+    width: 32px;
+    height: 32px;
   }
 
   .split-content,
@@ -1631,33 +1691,39 @@ body.menu-open .header-section-navigation {
   }
 
   .header-section-navigation {
-    top: 4px;
-    width: min(62vw, 330px);
-    height: calc(var(--header-h) - 8px);
-    gap: 5px;
+    top: 50%;
+    width: min(68vw, 360px);
+    height: 53px;
+    grid-template-rows: 20px 31px;
+    row-gap: 2px;
+    transform: translate(-50%, -12px);
+  }
+
+  body.menu-open .header-section-navigation {
+    transform: translate(-50%, -12px) scale(.96);
   }
 
   .active-section-title-wrap {
     min-height: 22px;
-    max-width: 52vw;
+    max-width: 100%;
     padding: 4px 12px 5px;
   }
 
   .active-section-title {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: .52rem;
-    letter-spacing: .13em;
+    overflow: visible;
+    text-overflow: clip;
+    font-size: clamp(.44rem, 1.7vw, .54rem);
+    letter-spacing: .12em;
   }
 
   .section-progress {
-    height: 38px;
+    height: 31px;
     gap: 7px;
   }
 
   .section-nav-button {
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
   }
 
   .section-nav-arrow {
@@ -1925,11 +1991,11 @@ body.menu-open .header-section-navigation {
   }
 
   .header-section-navigation {
-    width: min(58vw, 260px);
+    width: min(64vw, 300px);
   }
 
   .active-section-title-wrap {
-    max-width: 44vw;
+    max-width: 100%;
   }
 
   .section-progress {
@@ -1970,9 +2036,16 @@ body.menu-open .header-section-navigation {
   }
 
   .header-section-navigation {
-    top: 3px;
-    height: 66px;
-    width: min(48vw, 480px);
+    top: 50%;
+    height: 48px;
+    width: min(52vw, 480px);
+    grid-template-rows: 18px 28px;
+    row-gap: 2px;
+    transform: translate(-50%, -12px);
+  }
+
+  body.menu-open .header-section-navigation {
+    transform: translate(-50%, -12px) scale(.96);
   }
 
   .active-section-title-wrap {
@@ -1981,12 +2054,12 @@ body.menu-open .header-section-navigation {
   }
 
   .section-progress {
-    height: 34px;
+    height: 28px;
   }
 
   .section-nav-button {
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
   }
 
   .story-content {
