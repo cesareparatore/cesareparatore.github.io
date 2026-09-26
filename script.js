@@ -613,29 +613,80 @@
       return;
     }
 
+    const total =
+      state.sections.length;
+
+    const activeIndex =
+      state.activeIndex;
+
     dom.sectionButtons.forEach(
       (button) => {
         const direction =
           button.dataset.direction;
 
-        const targetIndex =
-          direction === "prev"
-            ? state.activeIndex - 1
-            : state.activeIndex + 1;
+        const isFirst =
+          activeIndex === 0;
+
+        const isLast =
+          activeIndex === total - 1;
+
+        const isPrevious =
+          direction === "prev";
+
+        const isNext =
+          direction === "next";
+
+        const hidePrevious =
+          isPrevious && isFirst;
+
+        const shouldWrapNext =
+          isNext && isLast;
+
+        let targetIndex;
+
+        if (isPrevious) {
+          targetIndex =
+            activeIndex - 1;
+        } else if (shouldWrapNext) {
+          targetIndex = 0;
+        } else {
+          targetIndex =
+            activeIndex + 1;
+        }
 
         const targetSection =
           state.sections[targetIndex];
 
+        const hidden =
+          hidePrevious;
+
         const disabled =
+          hidden ||
           !targetSection;
+
+        button.hidden =
+          hidden;
 
         button.disabled =
           disabled;
 
         button.setAttribute(
+          "aria-hidden",
+          String(hidden)
+        );
+
+        button.setAttribute(
           "aria-disabled",
           String(disabled)
         );
+
+        if (hidden) {
+          button.setAttribute(
+            "aria-label",
+            "Sezione precedente non disponibile"
+          );
+          return;
+        }
 
         if (targetSection) {
           const title =
@@ -645,9 +696,7 @@
 
           button.setAttribute(
             "aria-label",
-            direction === "prev"
-              ? `Vai a ${title}`
-              : `Vai a ${title}`
+            `Vai a ${title}`
           );
         } else {
           button.setAttribute(
@@ -889,14 +938,28 @@
             const direction =
               button.dataset.direction;
 
-            const delta =
+            const total =
+              state.sections.length;
+
+            let targetIndex;
+
+            if (
               direction === "prev"
-                ? -1
-                : 1;
+            ) {
+              targetIndex =
+                state.activeIndex - 1;
+            } else if (
+              state.activeIndex ===
+              total - 1
+            ) {
+              targetIndex = 0;
+            } else {
+              targetIndex =
+                state.activeIndex + 1;
+            }
 
             scrollToSection(
-              state.activeIndex +
-                delta
+              targetIndex
             );
           }
         );
