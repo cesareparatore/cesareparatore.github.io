@@ -645,9 +645,7 @@
 
           button.setAttribute(
             "aria-label",
-            direction === "prev"
-              ? `Vai a ${title}`
-              : `Vai a ${title}`
+            `Vai a ${title}`
           );
         } else {
           button.setAttribute(
