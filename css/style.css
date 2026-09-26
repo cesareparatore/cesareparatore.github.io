@@ -246,6 +246,7 @@ a {
     inset 0 0 0 1px rgba(255,255,255,.015),
     0 8px 30px rgba(0,0,0,.12);
   overflow: hidden;
+  transform: translateY(3px)
 }
 
 .active-section-title-wrap::before {
