@@ -1,5 +1,16 @@
+/* ============================================================
+   CESARE PARATORE
+   GUARDARE. CAPIRE. FARE.
+   HOMEPAGE SCRIPT
+============================================================ */
+
 (() => {
   "use strict";
+
+
+  /* ==========================================================
+     CONFIG
+  ========================================================== */
 
   const CONFIG = {
     standbyDelay: 45000,
@@ -11,449 +22,183 @@
     navigationReleaseDelay: 900
   };
 
+
+  /* ==========================================================
+     STATE
+  ========================================================== */
+
   const state = {
     menuOpen: false,
-    lastFocused: null,
-    sections: [],
-    activeIndex: -1,
     ticking: false,
+    activeIndex: 0,
+    sections: [],
+    reducedMotion: false,
+    standby: false,
     standbyTimer: null,
-    standbyVisible: false,
     standbyWakeTimer: null,
+    resizeTimer: null,
     navigationTimer: null,
-    reducedMotion: window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches,
-    gsapMM: null,
     isNavigating: false
   };
+
+
+  /* ==========================================================
+     DOM
+  ========================================================== */
 
   const dom = {
     body: document.body,
     html: document.documentElement,
 
-    loader: document.getElementById("loader"),
-    standby: document.getElementById("standby"),
+    loader: document.querySelector("#site-loader"),
+    standby: document.querySelector("#standby"),
 
-    menuToggle: document.getElementById("menu-toggle"),
-    menuToggleLabel: document.querySelector(".menu-toggle-label"),
-    menu: document.getElementById("site-menu"),
+    header: document.querySelector("#site-header"),
 
-    main: document.getElementById("main-content"),
-    footer: document.querySelector(".site-footer"),
+    menuToggle: document.querySelector("#menu-toggle"),
+    menu: document.querySelector("#site-menu"),
+    menuLinks: [...document.querySelectorAll(".menu-nav a")],
 
-    headerSectionNavigation:
-      document.getElementById(
-        "header-section-navigation"
-      ),
+    main: document.querySelector("#main-content"),
 
-    activeSectionTitle:
-      document.getElementById(
-        "active-section-title"
-      ),
+    sections: [...document.querySelectorAll(".story")],
 
-    activeSectionTitleWrap:
-      document.querySelector(
-        ".active-section-title-wrap"
-      ),
+    activeTitle: document.querySelector("#active-section-title"),
+    progressFill: document.querySelector("#section-progress-fill"),
+    progressDot: document.querySelector("#section-progress-dot"),
 
-    sectionProgressFill:
-      document.getElementById(
-        "section-progress-fill"
-      ),
+    previousButton: document.querySelector("#section-prev"),
+    nextButton: document.querySelector("#section-next"),
 
-    sectionProgressDot:
-      document.getElementById(
-        "section-progress-dot"
-      ),
-
-    sections: [
-      ...document.querySelectorAll(".story")
-    ],
-
-    menuLinks: [
-      ...document.querySelectorAll(".menu-nav a")
-    ],
-
-    sectionButtons: [
-      ...document.querySelectorAll(
-        ".section-nav-button"
-      )
-    ]
+    footer: document.querySelector(".site-footer")
   };
 
-  state.sections = dom.sections;
 
-  const focusableSelector = [
-    "a[href]",
-    "button:not([disabled])",
-    "input:not([disabled])",
-    "select:not([disabled])",
-    "textarea:not([disabled])",
-    "summary",
-    "[tabindex]:not([tabindex='-1'])"
-  ].join(",");
+  /* ==========================================================
+     UTILITIES
+  ========================================================== */
 
-  function getFocusable(container) {
-    if (!container) return [];
+  const clamp = (value, min, max) => {
+    return Math.min(Math.max(value, min), max);
+  };
 
-    return [...container.querySelectorAll(focusableSelector)]
-      .filter((element) => {
-        const style = window.getComputedStyle(element);
 
-        return (
-          !element.hasAttribute("disabled") &&
-          !element.hasAttribute("inert") &&
-          style.display !== "none" &&
-          style.visibility !== "hidden"
-        );
-      });
-  }
+  const debounce = (callback, delay) => {
+    return (...args) => {
+      window.clearTimeout(state.resizeTimer);
 
-  function isTextEntryTarget(element) {
-    if (!element) return false;
+      state.resizeTimer = window.setTimeout(() => {
+        callback(...args);
+      }, delay);
+    };
+  };
 
-    return (
-      element.matches(
-        "input, textarea, select"
-      ) ||
-      element.isContentEditable
-    );
-  }
 
-  function prefersReducedMotion() {
+  const prefersReducedMotion = () => {
     return window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
-  }
+  };
 
-  function setHash(id) {
-    if (!id) return;
 
-    const currentHash =
-      window.location.hash.slice(1);
+  const getSectionTitle = (section) => {
+    return section?.dataset?.title || "";
+  };
 
-    if (currentHash === id) return;
 
-    history.replaceState(
-      null,
-      "",
-      `#${encodeURIComponent(id)}`
-    );
-  }
+  const getCurrentScrollY = () => {
+    return window.scrollY || window.pageYOffset || 0;
+  };
 
-  function animateHeaderSectionChange() {
-    const titleWrap =
-      dom.activeSectionTitleWrap;
 
-    const title =
-      dom.activeSectionTitle;
+  /* ==========================================================
+     LOADER
+  ========================================================== */
 
-    const dot =
-      dom.sectionProgressDot;
+  const hideLoader = () => {
+    if (!dom.loader) return;
 
-    if (!titleWrap && !title && !dot) {
+    dom.loader.classList.add("is-hidden");
+    dom.body.classList.remove("is-loading");
+  };
+
+
+  const initLoader = () => {
+    dom.body.classList.add("is-loading");
+
+    window.setTimeout(hideLoader, CONFIG.loaderFailsafe);
+
+    if (document.readyState === "complete") {
+      window.setTimeout(hideLoader, 300);
       return;
     }
 
-    if (
-      state.reducedMotion ||
-      prefersReducedMotion()
-    ) {
-      return;
-    }
+    window.addEventListener(
+      "load",
+      () => {
+        window.setTimeout(hideLoader, 350);
+      },
+      { once: true }
+    );
+  };
 
-    titleWrap?.classList.remove(
-      "is-changing"
+
+  /* ==========================================================
+     MENU
+  ========================================================== */
+
+  const setMenuState = (open) => {
+    state.menuOpen = open;
+
+    dom.body.classList.toggle(
+      "menu-is-open",
+      open
     );
 
-    title?.classList.remove(
-      "is-entering"
+    dom.menu?.classList.toggle(
+      "is-open",
+      open
     );
 
-    dot?.classList.remove(
-      "is-pulsing"
+    dom.menuToggle?.setAttribute(
+      "aria-expanded",
+      String(open)
     );
 
-    void titleWrap?.offsetWidth;
-    void title?.offsetWidth;
-    void dot?.offsetWidth;
-
-    titleWrap?.classList.add(
-      "is-changing"
-    );
-
-    title?.classList.add(
-      "is-entering"
-    );
-
-    dot?.classList.add(
-      "is-pulsing"
-    );
-
-    window.setTimeout(() => {
-      titleWrap?.classList.remove(
-        "is-changing"
-      );
-
-      title?.classList.remove(
-        "is-entering"
-      );
-
-      dot?.classList.remove(
-        "is-pulsing"
-      );
-    }, 820);
-  }
-
-  function updateHeaderSectionUI(
-    index,
-    changed = true
-  ) {
-    const section =
-      state.sections[index];
-
-    if (!section) return;
-
-    const total =
-      state.sections.length;
-
-    if (dom.activeSectionTitle) {
-      dom.activeSectionTitle.textContent =
-        section.dataset.title ||
-        section.id ||
-        "";
-    }
-
-    const progress =
-      total <= 1
-        ? 0
-        : (index / (total - 1)) * 100;
-
-    if (dom.sectionProgressFill) {
-      if (
-        state.reducedMotion ||
-        prefersReducedMotion()
-      ) {
-        dom.sectionProgressFill.style.width =
-          `${progress}%`;
-      } else if (window.gsap) {
-        gsap.to(
-          dom.sectionProgressFill,
-          {
-            width: `${progress}%`,
-            duration: changed ? 0.7 : 0,
-            ease: "power3.out",
-            overwrite: true
-          }
-        );
-      } else {
-        dom.sectionProgressFill.style.width =
-          `${progress}%`;
-      }
-    }
-
-    if (dom.sectionProgressDot) {
-      if (
-        state.reducedMotion ||
-        prefersReducedMotion()
-      ) {
-        dom.sectionProgressDot.style.left =
-          `${progress}%`;
-      } else if (window.gsap) {
-        gsap.to(
-          dom.sectionProgressDot,
-          {
-            left: `${progress}%`,
-            duration: changed ? 0.7 : 0,
-            ease: "power3.out",
-            overwrite: true
-          }
-        );
-      } else {
-        dom.sectionProgressDot.style.left =
-          `${progress}%`;
-      }
-    }
-
-    if (changed) {
-      animateHeaderSectionChange();
-    }
-  }
-
-  function initMenuSemantics() {
-    if (!dom.menu) return;
-
-    dom.menu.setAttribute(
-      "role",
-      "dialog"
-    );
-
-    dom.menu.setAttribute(
-      "aria-modal",
-      "true"
-    );
-
-    dom.menu.setAttribute(
-      "aria-label",
-      "Navigazione principale"
-    );
-
-    dom.menu.setAttribute(
+    dom.menu?.setAttribute(
       "aria-hidden",
-      "true"
+      String(!open)
     );
-
-    dom.menu.setAttribute(
-      "inert",
-      ""
-    );
-
-    if (dom.menuToggle) {
-      dom.menuToggle.setAttribute(
-        "aria-controls",
-        dom.menu.id
-      );
-
-      dom.menuToggle.setAttribute(
-        "aria-expanded",
-        "false"
-      );
-
-      dom.menuToggle.setAttribute(
-        "aria-label",
-        "Apri menu"
-      );
-    }
-  }
-
-  function setMenuState(
-    open,
-    { restoreFocus = true } = {}
-  ) {
-    if (
-      !dom.menu ||
-      !dom.menuToggle
-    ) {
-      return;
-    }
-
-    if (open === state.menuOpen) return;
 
     if (open) {
-      state.lastFocused =
-        document.activeElement;
-
-      state.menuOpen = true;
-
-      dom.menuToggle.setAttribute(
-        "aria-expanded",
-        "true"
+      document.addEventListener(
+        "keydown",
+        handleMenuKeydown
       );
 
-      dom.menuToggle.setAttribute(
-        "aria-label",
-        "Chiudi menu"
+      const firstLink = dom.menuLinks[0];
+
+      window.setTimeout(() => {
+        firstLink?.focus();
+      }, 250);
+
+    } else {
+      document.removeEventListener(
+        "keydown",
+        handleMenuKeydown
       );
 
-      if (dom.menuToggleLabel) {
-        dom.menuToggleLabel.textContent =
-          "CHIUDI";
-      }
-
-      dom.menu.classList.add(
-        "is-open"
-      );
-
-      dom.menu.removeAttribute(
-        "inert"
-      );
-
-      dom.menu.setAttribute(
-        "aria-hidden",
-        "false"
-      );
-
-      dom.body.classList.add(
-        "menu-open"
-      );
-
-      stopStandbyTimer();
-
-      requestAnimationFrame(() => {
-        const focusables =
-          getFocusable(dom.menu);
-
-        const first =
-          focusables[0];
-
-        if (first) {
-          first.focus({
-            preventScroll: true
-          });
-        }
-      });
-
-      return;
+      dom.menuToggle?.focus();
     }
+  };
 
-    state.menuOpen = false;
 
-    dom.menu.classList.remove(
-      "is-open"
-    );
+  const toggleMenu = () => {
+    setMenuState(!state.menuOpen);
+  };
 
-    dom.menu.setAttribute(
-      "aria-hidden",
-      "true"
-    );
 
-    dom.menu.setAttribute(
-      "inert",
-      ""
-    );
-
-    dom.menuToggle.setAttribute(
-      "aria-expanded",
-      "false"
-    );
-
-    dom.menuToggle.setAttribute(
-      "aria-label",
-      "Apri menu"
-    );
-
-    if (dom.menuToggleLabel) {
-      dom.menuToggleLabel.textContent =
-        "MENU";
-    }
-
-    dom.body.classList.remove(
-      "menu-open"
-    );
-
-    startStandbyTimer();
-
-    if (
-      restoreFocus &&
-      state.lastFocused &&
-      document.contains(
-        state.lastFocused
-      ) &&
-      typeof state.lastFocused.focus ===
-        "function"
-    ) {
-      requestAnimationFrame(() => {
-        state.lastFocused.focus({
-          preventScroll: true
-        });
-      });
-    }
-
-    state.lastFocused = null;
-  }
-
-  function handleMenuKeydown(event) {
+  const handleMenuKeydown = (event) => {
     if (!state.menuOpen) return;
 
     if (event.key === "Escape") {
@@ -464,1461 +209,940 @@
 
     if (event.key !== "Tab") return;
 
-    const focusables =
-      getFocusable(dom.menu);
+    const focusable = [
+      dom.menuToggle,
+      ...dom.menuLinks
+    ].filter(Boolean);
 
-    if (!focusables.length) {
-      event.preventDefault();
-      return;
-    }
+    if (!focusable.length) return;
 
-    const first =
-      focusables[0];
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
 
-    const last =
-      focusables[
-        focusables.length - 1
-      ];
-
-    if (
-      event.shiftKey &&
-      document.activeElement === first
-    ) {
+    if (event.shiftKey && document.activeElement === first) {
       event.preventDefault();
       last.focus();
-      return;
-    }
-
-    if (
-      !event.shiftKey &&
-      document.activeElement === last
-    ) {
+    } else if (!event.shiftKey && document.activeElement === last) {
       event.preventDefault();
       first.focus();
     }
-  }
+  };
 
-  function initMenu() {
-    if (
-      !dom.menu ||
-      !dom.menuToggle
-    ) {
-      return;
-    }
 
-    initMenuSemantics();
-
-    dom.menuToggle.addEventListener(
+  const initMenu = () => {
+    dom.menuToggle?.addEventListener(
       "click",
-      () => {
-        setMenuState(
-          !state.menuOpen
-        );
-      }
-    );
-
-    dom.menu.addEventListener(
-      "keydown",
-      handleMenuKeydown
+      toggleMenu
     );
 
     dom.menuLinks.forEach((link) => {
-      link.addEventListener(
-        "click",
-        (event) => {
-          const target =
-            link.getAttribute("href");
-
-          if (
-            !target ||
-            !target.startsWith("#")
-          ) {
-            setMenuState(false, {
-              restoreFocus: false
-            });
-            return;
-          }
-
-          const id =
-            target.slice(1);
-
-          const index =
-            state.sections.findIndex(
-              (section) =>
-                section.id === id
-            );
-
-          if (index === -1) {
-            setMenuState(false);
-            return;
-          }
-
-          event.preventDefault();
-
-          setMenuState(false, {
-            restoreFocus: false
-          });
-
-          window.setTimeout(() => {
-            scrollToSection(index);
-          }, 20);
-        }
-      );
+      link.addEventListener("click", () => {
+        setMenuState(false);
+      });
     });
-  }
+  };
 
-  function updateSectionUI(
-    index,
-    { force = false } = {}
-  ) {
-    const section =
-      state.sections[index];
+
+  /* ==========================================================
+     SECTION NAVIGATION
+  ========================================================== */
+
+  const updateHeaderSectionUI = (index) => {
+    const section = state.sections[index];
 
     if (!section) return;
 
-    const changed =
-      state.activeIndex !== index;
+    const title = getSectionTitle(section);
 
-    if (
-      !force &&
-      !changed
-    ) {
-      updateSectionButtons();
-      return;
+    if (dom.activeTitle) {
+      dom.activeTitle.textContent = title;
+    }
+
+    dom.previousButton?.toggleAttribute(
+      "disabled",
+      index <= 0
+    );
+
+    dom.nextButton?.toggleAttribute(
+      "disabled",
+      index >= state.sections.length - 1
+    );
+
+    const progress = state.sections.length > 1
+      ? index / (state.sections.length - 1)
+      : 0;
+
+    if (dom.progressFill) {
+      dom.progressFill.style.width =
+        `${progress * 100}%`;
+    }
+
+    if (dom.progressDot) {
+      dom.progressDot.style.left =
+        `${progress * 100}%`;
     }
 
     state.activeIndex = index;
+  };
 
-    dom.sections.forEach(
-      (item, itemIndex) => {
-        item.toggleAttribute(
-          "data-active",
-          itemIndex === index
-        );
+
+  const calculateActiveSection = () => {
+    const viewportPoint =
+      getCurrentScrollY() +
+      window.innerHeight * 0.38;
+
+    let closestIndex = 0;
+    let closestDistance = Infinity;
+
+    state.sections.forEach((section, index) => {
+      const rect = section.getBoundingClientRect();
+
+      const absoluteTop =
+        rect.top + getCurrentScrollY();
+
+      const distance =
+        Math.abs(absoluteTop - viewportPoint);
+
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = index;
       }
-    );
-
-    updateSectionButtons();
-
-    updateHeaderSectionUI(
-      index,
-      changed
-    );
-  }
-
-  function updateSectionButtons() {
-    if (
-      !dom.sectionButtons.length
-    ) {
-      return;
-    }
-
-    const total =
-      state.sections.length;
-
-    const activeIndex =
-      state.activeIndex;
-
-    dom.sectionButtons.forEach(
-      (button) => {
-        const direction =
-          button.dataset.direction;
-
-        const isFirst =
-          activeIndex === 0;
-
-        const isLast =
-          activeIndex === total - 1;
-
-        const isPrevious =
-          direction === "prev";
-
-        const isNext =
-          direction === "next";
-
-        const hidePrevious =
-          isPrevious && isFirst;
-
-        const shouldWrapNext =
-          isNext && isLast;
-
-        let targetIndex;
-
-        if (isPrevious) {
-          targetIndex =
-            activeIndex - 1;
-        } else if (shouldWrapNext) {
-          targetIndex = 0;
-        } else {
-          targetIndex =
-            activeIndex + 1;
-        }
-
-        const targetSection =
-          state.sections[targetIndex];
-
-        const hidden =
-          hidePrevious;
-
-        const disabled =
-          hidden ||
-          !targetSection;
-
-        button.hidden =
-          hidden;
-
-        button.disabled =
-          disabled;
-
-        button.setAttribute(
-          "aria-hidden",
-          String(hidden)
-        );
-
-        button.setAttribute(
-          "aria-disabled",
-          String(disabled)
-        );
-
-        if (hidden) {
-          button.setAttribute(
-            "aria-label",
-            "Sezione precedente non disponibile"
-          );
-          return;
-        }
-
-        if (targetSection) {
-          const title =
-            targetSection.dataset.title ||
-            targetSection.id ||
-            "";
-
-          button.setAttribute(
-            "aria-label",
-            `Vai a ${title}`
-          );
-        } else {
-          button.setAttribute(
-            "aria-label",
-            direction === "prev"
-              ? "Sezione precedente non disponibile"
-              : "Sezione successiva non disponibile"
-          );
-        }
-      }
-    );
-  }
-
-  function calculateActiveSection() {
-    const sections =
-      state.sections;
-
-    if (!sections.length) return;
-
-    const marker =
-      window.innerHeight *
-      (
-        window.innerWidth <= 700
-          ? 0.32
-          : 0.42
-      );
-
-    let containingIndex = -1;
-
-    for (
-      let index = 0;
-      index < sections.length;
-      index += 1
-    ) {
-      const rect =
-        sections[index]
-          .getBoundingClientRect();
-
-      if (
-        rect.top <= marker &&
-        rect.bottom > marker
-      ) {
-        containingIndex = index;
-        break;
-      }
-    }
-
-    if (
-      containingIndex !== -1
-    ) {
-      updateSectionUI(
-        containingIndex
-      );
-      return;
-    }
-
-    let closestIndex =
-      state.activeIndex >= 0
-        ? state.activeIndex
-        : 0;
-
-    let closestDistance =
-      Infinity;
-
-    sections.forEach(
-      (section, index) => {
-        const rect =
-          section.getBoundingClientRect();
-
-        const distance =
-          Math.abs(
-            rect.top - marker
-          );
-
-        if (
-          distance <
-          closestDistance
-        ) {
-          closestDistance =
-            distance;
-
-          closestIndex =
-            index;
-        }
-      }
-    );
-
-    updateSectionUI(
-      closestIndex
-    );
-  }
-
-  function handleScroll() {
-    if (
-      !CONFIG.scrollTrackingRaf
-    ) {
-      calculateActiveSection();
-      return;
-    }
-
-    if (state.ticking) return;
-
-    state.ticking = true;
-
-    requestAnimationFrame(() => {
-      calculateActiveSection();
-      state.ticking = false;
     });
-  }
 
-  function scrollToSection(
-    index,
-    behavior = "smooth"
-  ) {
-    const sections =
-      state.sections;
+    return closestIndex;
+  };
 
-    if (!sections.length) return;
 
-    const nextIndex =
-      Math.max(
-        0,
-        Math.min(
-          index,
-          sections.length - 1
-        )
-      );
+  const updateSectionUI = () => {
+    const index = calculateActiveSection();
 
-    const section =
-      sections[nextIndex];
+    if (index !== state.activeIndex) {
+      updateHeaderSectionUI(index);
+    } else if (!dom.activeTitle?.textContent) {
+      updateHeaderSectionUI(index);
+    }
+  };
+
+
+  const scrollToSection = (index) => {
+    const target = state.sections[index];
+
+    if (!target) return;
 
     state.isNavigating = true;
 
-    updateSectionUI(
-      nextIndex
-    );
-
-    setHash(
-      section.id
-    );
-
-    section.scrollIntoView({
-      behavior:
-        state.reducedMotion ||
-        prefersReducedMotion()
-          ? "auto"
-          : behavior,
-      block: "start"
-    });
-
-    clearTimeout(
+    window.clearTimeout(
       state.navigationTimer
     );
 
-    state.navigationTimer =
-      window.setTimeout(() => {
-        state.isNavigating =
-          false;
+    updateHeaderSectionUI(index);
 
-        calculateActiveSection();
-      }, CONFIG.navigationReleaseDelay);
-  }
+    const targetTop =
+      target.getBoundingClientRect().top +
+      getCurrentScrollY() -
+      CONFIG.scrollOffset;
 
-  function handleHash({
-    initial = false
-  } = {}) {
-    const hash =
-      decodeURIComponent(
-        window.location.hash.slice(1)
-      );
+    window.scrollTo({
+      top: Math.max(0, targetTop),
+      behavior: state.reducedMotion
+        ? "auto"
+        : "smooth"
+    });
 
-    if (!hash) {
-      updateSectionUI(
+    state.navigationTimer = window.setTimeout(() => {
+      state.isNavigating = false;
+    }, CONFIG.navigationReleaseDelay);
+  };
+
+
+  const goPrevious = () => {
+    const targetIndex =
+      clamp(
+        state.activeIndex - 1,
         0,
-        { force: true }
+        state.sections.length - 1
       );
 
-      if (initial) {
-        window.scrollTo({
-          top: 0,
-          behavior: "auto"
-        });
-      }
+    scrollToSection(targetIndex);
+  };
 
+
+  const goNext = () => {
+    const targetIndex =
+      clamp(
+        state.activeIndex + 1,
+        0,
+        state.sections.length - 1
+      );
+
+    scrollToSection(targetIndex);
+  };
+
+
+  const handleHash = () => {
+    const hash = window.location.hash;
+
+    if (!hash) return;
+
+    const target = document.querySelector(hash);
+
+    if (!target || !target.classList.contains("story")) {
       return;
     }
 
-    const index =
-      state.sections.findIndex(
-        (section) =>
-          section.id === hash
-      );
+    const index = state.sections.indexOf(target);
 
-    if (index === -1) {
-      if (initial) {
-        history.replaceState(
-          null,
-          "",
-          window.location.pathname +
-          window.location.search
-        );
+    if (index < 0) return;
 
-        updateSectionUI(
-          0,
-          { force: true }
-        );
-      }
+    window.setTimeout(() => {
+      scrollToSection(index);
+    }, 150);
+  };
 
-      return;
-    }
 
-    state.activeIndex =
-      index;
+  const initSectionNavigation = () => {
+    state.sections = dom.sections;
 
-    requestAnimationFrame(() => {
-      state.sections[index]
-        .scrollIntoView({
-          behavior: "auto",
-          block: "start"
-        });
+    updateHeaderSectionUI(0);
 
-      updateSectionUI(
-        index,
-        { force: true }
-      );
-    });
-  }
-
-  function initSectionNavigation() {
-    dom.sectionButtons.forEach(
-      (button) => {
-        button.addEventListener(
-          "click",
-          () => {
-            if (button.disabled) {
-              return;
-            }
-
-            const direction =
-              button.dataset.direction;
-
-            const total =
-              state.sections.length;
-
-            let targetIndex;
-
-            if (
-              direction === "prev"
-            ) {
-              targetIndex =
-                state.activeIndex - 1;
-            } else if (
-              state.activeIndex ===
-              total - 1
-            ) {
-              targetIndex = 0;
-            } else {
-              targetIndex =
-                state.activeIndex + 1;
-            }
-
-            scrollToSection(
-              targetIndex
-            );
-          }
-        );
-      }
+    dom.previousButton?.addEventListener(
+      "click",
+      goPrevious
     );
 
-    document.addEventListener(
-      "keydown",
-      (event) => {
-        if (state.menuOpen) {
-          return;
-        }
-
-        if (
-          isTextEntryTarget(
-            event.target
-          )
-        ) {
-          return;
-        }
-
-        if (
-          event.key === "ArrowDown"
-        ) {
-          event.preventDefault();
-
-          scrollToSection(
-            state.activeIndex + 1
-          );
-        }
-
-        if (
-          event.key === "ArrowUp"
-        ) {
-          event.preventDefault();
-
-          scrollToSection(
-            state.activeIndex - 1
-          );
-        }
-      }
-    );
-  }
-
-  function stopStandbyTimer() {
-    clearTimeout(
-      state.standbyTimer
-    );
-
-    state.standbyTimer = null;
-  }
-
-  function showStandby() {
-    if (!dom.standby) return;
-    if (state.menuOpen) return;
-    if (document.hidden) return;
-    if (state.reducedMotion) return;
-
-    state.standbyVisible = true;
-
-    dom.standby.classList.add(
-      "is-visible"
-    );
-
-    dom.standby.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-  }
-
-  function hideStandby() {
-    if (!dom.standby) return;
-
-    state.standbyVisible = false;
-
-    dom.standby.classList.remove(
-      "is-visible"
-    );
-
-    dom.standby.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-  }
-
-  function startStandbyTimer() {
-    stopStandbyTimer();
-
-    if (
-      state.reducedMotion ||
-      state.menuOpen ||
-      document.hidden
-    ) {
-      return;
-    }
-
-    state.standbyTimer =
-      window.setTimeout(
-        showStandby,
-        CONFIG.standbyDelay
-      );
-  }
-
-  function wakeFromStandby() {
-    hideStandby();
-    startStandbyTimer();
-  }
-
-  function initStandby() {
-    if (!dom.standby) return;
-
-    dom.standby.setAttribute(
-      "aria-hidden",
-      "true"
-    );
-
-    const activityEvents = [
-      "pointerdown",
-      "keydown",
-      "wheel",
-      "touchstart"
-    ];
-
-    activityEvents.forEach(
-      (eventName) => {
-        window.addEventListener(
-          eventName,
-          () => {
-            if (
-              state.standbyWakeTimer
-            ) {
-              return;
-            }
-
-            wakeFromStandby();
-
-            state.standbyWakeTimer =
-              window.setTimeout(
-                () => {
-                  state.standbyWakeTimer =
-                    null;
-                },
-                CONFIG.standbyWakeThrottle
-              );
-          },
-          {
-            passive: true
-          }
-        );
-      }
-    );
-
-    window.addEventListener(
-      "pointermove",
-      () => {
-        if (
-          state.standbyWakeTimer ||
-          state.menuOpen
-        ) {
-          return;
-        }
-
-        wakeFromStandby();
-
-        state.standbyWakeTimer =
-          window.setTimeout(
-            () => {
-              state.standbyWakeTimer =
-                null;
-            },
-            CONFIG.standbyWakeThrottle
-          );
-      },
-      {
-        passive: true
-      }
-    );
-
-    startStandbyTimer();
-  }
-
-  function initLoader() {
-    if (!dom.loader) return;
-
-    let finished = false;
-
-    const finish = () => {
-      if (finished) return;
-
-      finished = true;
-
-      if (
-        !window.gsap ||
-        state.reducedMotion
-      ) {
-        dom.loader.style.opacity =
-          "0";
-
-        dom.loader.style.visibility =
-          "hidden";
-
-        dom.loader.style.pointerEvents =
-          "none";
-
-        return;
-      }
-
-      gsap.to(
-        dom.loader,
-        {
-          autoAlpha: 0,
-          duration: 0.8,
-          ease: "power2.out",
-          onComplete: () => {
-            dom.loader.style.pointerEvents =
-              "none";
-          }
-        }
-      );
-    };
-
-    window.addEventListener(
-      "load",
-      finish,
-      { once: true }
-    );
-
-    window.setTimeout(
-      finish,
-      CONFIG.loaderFailsafe
-    );
-  }
-
-  function initGsap() {
-    if (
-      state.reducedMotion ||
-      !window.gsap ||
-      !window.ScrollTrigger
-    ) {
-      return;
-    }
-
-    gsap.registerPlugin(
-      ScrollTrigger
-    );
-
-    if (state.gsapMM) {
-      state.gsapMM.revert();
-    }
-
-    state.gsapMM =
-      gsap.matchMedia();
-
-    state.gsapMM.add(
-      "(prefers-reduced-motion: no-preference)",
-      () => {
-        gsap.utils.toArray(
-          ".story-copy > *, .section-heading > *, .narrative-copy > *"
-        ).forEach((element) => {
-          gsap.fromTo(
-            element,
-            {
-              y: 28,
-              opacity: 0
-            },
-            {
-              y: 0,
-              opacity: 1,
-              duration: 0.9,
-              ease: "power3.out",
-              scrollTrigger: {
-                trigger: element,
-                start: "top 82%",
-                once: true
-              }
-            }
-          );
-        });
-
-        gsap.utils.toArray(
-          ".runner-bone, .runner-body"
-        ).forEach((path) => {
-          const length =
-            typeof path.getTotalLength() ===
-            "function"
-              ? path.getTotalLength()
-              : 1000;
-
-          gsap.set(path, {
-            strokeDasharray: length,
-            strokeDashoffset: length
-          });
-
-          gsap.to(path, {
-            strokeDashoffset: 0,
-            duration: 1.6,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: ".story-sport",
-              start: "top 65%",
-              once: true
-            }
-          });
-        });
-
-        gsap.utils.toArray(
-          ".edu-path"
-        ).forEach((path) => {
-          const length =
-            typeof path.getTotalLength() ===
-            "function"
-              ? path.getTotalLength()
-              : 1000;
-
-          gsap.set(path, {
-            strokeDasharray: length,
-            strokeDashoffset: length
-          });
-
-          gsap.to(path, {
-            strokeDashoffset: 0,
-            duration: 1.8,
-            ease: "power2.inOut",
-            scrollTrigger: {
-              trigger: ".story-education",
-              start: "top 70%",
-              once: true
-            }
-          });
-        });
-
-        gsap.fromTo(
-          ".edu-node",
-          {
-            scale: 0,
-            transformOrigin: "center"
-          },
-          {
-            scale: 1,
-            duration: 0.55,
-            stagger: 0.1,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: ".story-education",
-              start: "top 65%",
-              once: true
-            }
-          }
-        );
-
-        gsap.fromTo(
-          ".network-link",
-          {
-            strokeDasharray: 1800,
-            strokeDashoffset: 1800
-          },
-          {
-            strokeDashoffset: 0,
-            duration: 1.8,
-            ease: "power2.inOut",
-            scrollTrigger: {
-              trigger: ".story-connect",
-              start: "top 70%",
-              once: true
-            }
-          }
-        );
-
-        gsap.fromTo(
-          ".network-node",
-          {
-            scale: 0,
-            transformOrigin: "center"
-          },
-          {
-            scale: 1,
-            duration: 0.7,
-            stagger: 0.12,
-            ease: "back.out(1.4)",
-            scrollTrigger: {
-              trigger: ".story-connect",
-              start: "top 65%",
-              once: true
-            }
-          }
-        );
-
-        gsap.fromTo(
-          ".presence-main, .presence-branch",
-          {
-            strokeDasharray: 1200,
-            strokeDashoffset: 1200
-          },
-          {
-            strokeDashoffset: 0,
-            duration: 1.8,
-            stagger: 0.1,
-            ease: "power2.inOut",
-            scrollTrigger: {
-              trigger: ".story-from-here",
-              start: "top 70%",
-              once: true
-            }
-          }
-        );
-
-        gsap.fromTo(
-          ".presence-node, .presence-end",
-          {
-            scale: 0,
-            transformOrigin: "center"
-          },
-          {
-            scale: 1,
-            duration: 0.6,
-            stagger: 0.12,
-            ease: "back.out(1.4)",
-            scrollTrigger: {
-              trigger: ".story-from-here",
-              start: "top 65%",
-              once: true
-            }
-          }
-        );
-
-        gsap.fromTo(
-          ".person-frame",
-          {
-            clipPath:
-              "inset(0 0 100% 0)"
-          },
-          {
-            clipPath:
-              "inset(0 0 0% 0)",
-            duration: 1.3,
-            ease: "power3.inOut",
-            scrollTrigger: {
-              trigger: ".story-person",
-              start: "top 65%",
-              once: true
-            }
-          }
-        );
-
-        gsap.fromTo(
-          ".contact-lead",
-          {
-            y: 45,
-            opacity: 0
-          },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 1.1,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: ".story-contact",
-              start: "top 70%",
-              once: true
-            }
-          }
-        );
-
-        return () => {};
-      }
-    );
-
-    state.gsapMM.add(
-      "(min-width: 701px) and (prefers-reduced-motion: no-preference)",
-      () => {
-        const crt =
-          document.querySelector(
-            ".crt-monitor"
-          );
-
-        if (crt) {
-          gsap.fromTo(
-            crt,
-            {
-              opacity: 0,
-              y: 35,
-              rotateY: -13
-            },
-            {
-              opacity: 1,
-              y: 0,
-              rotateY: -7,
-              duration: 1.25,
-              ease: "power3.out",
-              scrollTrigger: {
-                trigger: ".story-computer",
-                start: "top 70%",
-                once: true
-              }
-            }
-          );
-        }
-
-        gsap.fromTo(
-          ".visual-science .orbit",
-          {
-            scale: 0.85,
-            opacity: 0
-          },
-          {
-            scale: 1,
-            opacity: 1,
-            duration: 1.3,
-            stagger: 0.08,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: ".story-science",
-              start: "top 70%",
-              once: true
-            }
-          }
-        );
-
-        gsap.fromTo(
-          ".visual-science .measure-point",
-          {
-            scale: 0,
-            transformOrigin: "center"
-          },
-          {
-            scale: 1,
-            duration: 0.7,
-            stagger: 0.08,
-            ease: "back.out(1.5)",
-            scrollTrigger: {
-              trigger: ".story-science",
-              start: "top 65%",
-              once: true
-            }
-          }
-        );
-
-        gsap.fromTo(
-          ".management-line",
-          {
-            strokeDasharray: 1000,
-            strokeDashoffset: 1000
-          },
-          {
-            strokeDashoffset: 0,
-            duration: 1.5,
-            stagger: 0.08,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: ".story-management",
-              start: "top 65%",
-              once: true
-            }
-          }
-        );
-
-        gsap.fromTo(
-          ".management-core, .management-end",
-          {
-            scale: 0,
-            transformOrigin: "center"
-          },
-          {
-            scale: 1,
-            duration: 0.65,
-            stagger: 0.15,
-            ease: "back.out(1.4)",
-            scrollTrigger: {
-              trigger: ".story-management",
-              start: "top 60%",
-              once: true
-            }
-          }
-        );
-
-        const digitalTimeline =
-          gsap.timeline({
-            scrollTrigger: {
-              trigger: ".story-digital",
-              start: "top bottom",
-              end: "center center",
-              scrub: 1.2
-            }
-          });
-
-        digitalTimeline
-          .fromTo(
-            ".digital-device",
-            {
-              scale: 0.88,
-              y: 70,
-              rotateY: -15
-            },
-            {
-              scale: 1,
-              y: 0,
-              rotateY: -7,
-              ease: "none"
-            }
-          )
-          .fromTo(
-            ".digital-grid",
-            {
-              opacity: 0.1,
-              scale: 0.8
-            },
-            {
-              opacity: 0.8,
-              scale: 1.15,
-              ease: "none"
-            },
-            "<"
-          )
-          .fromTo(
-            ".digital-emergence",
-            {
-              opacity: 0,
-              x: 80,
-              scale: 0.7
-            },
-            {
-              opacity: 1,
-              x: 0,
-              scale: 1,
-              ease: "none"
-            },
-            "<0.1"
-          );
-
-        const todayWords =
-          gsap.utils.toArray(
-            ".today-method span"
-          );
-
-        todayWords.forEach(
-          (word, index) => {
-            gsap.fromTo(
-              word,
-              {
-                opacity: 0.12,
-                x: 50
-              },
-              {
-                opacity: 1,
-                x: 0,
-                duration: 0.8,
-                ease: "power3.out",
-                scrollTrigger: {
-                  trigger: word,
-                  start: "top 82%",
-                  end: "top 55%",
-                  scrub: 0.7
-                }
-              }
-            );
-
-            if (
-              index <
-              todayWords.length - 1
-            ) {
-              gsap.to(
-                word,
-                {
-                  opacity: 0.25,
-                  scrollTrigger: {
-                    trigger:
-                      todayWords[index + 1],
-                    start: "top 68%",
-                    end: "top 48%",
-                    scrub: 0.5
-                  }
-                }
-              );
-            }
-          }
-        );
-
-        const objectiveProgress =
-          document.querySelector(
-            ".objective-progress"
-          );
-
-        const objectiveBase =
-          document.querySelector(
-            ".objective-base"
-          );
-
-        if (
-          objectiveProgress &&
-          objectiveBase
-        ) {
-          const length =
-            typeof objectiveBase.getTotalLength ===
-            "function"
-              ? objectiveBase.getTotalLength()
-              : 1000;
-
-          gsap.set(
-            objectiveProgress,
-            {
-              strokeDasharray:
-                length,
-              strokeDashoffset:
-                length
-            }
-          );
-
-          gsap.to(
-            objectiveProgress,
-            {
-              strokeDashoffset: 0,
-              ease: "none",
-              scrollTrigger: {
-                trigger:
-                  ".story-objective",
-                start: "top 70%",
-                end: "bottom 60%",
-                scrub: 1
-              }
-            }
-          );
-        }
-
-        return () => {};
-      }
-    );
-
-    state.gsapMM.add(
-      "(max-width: 700px) and (prefers-reduced-motion: no-preference)",
-      () => {
-        gsap.utils.toArray(
-          ".digital-device, .crt-monitor"
-        ).forEach((element) => {
-          gsap.fromTo(
-            element,
-            {
-              opacity: 0,
-              y: 24
-            },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.8,
-              ease: "power3.out",
-              scrollTrigger: {
-                trigger: element,
-                start: "top 82%",
-                once: true
-              }
-            }
-          );
-        });
-
-        gsap.utils.toArray(
-          ".management-line, .network-link"
-        ).forEach((path) => {
-          const length =
-            typeof path.getTotalLength() ===
-            "function"
-              ? path.getTotalLength()
-              : 1000;
-
-          gsap.set(path, {
-            strokeDasharray:
-              length,
-            strokeDashoffset:
-              length
-          });
-
-          gsap.to(path, {
-            strokeDashoffset: 0,
-            duration: 1.15,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: path,
-              start: "top 82%",
-              once: true
-            }
-          });
-        });
-
-        return () => {};
-      }
-    );
-
-    requestAnimationFrame(() => {
-      ScrollTrigger.refresh();
-    });
-  }
-
-  function initVisibility() {
-    document.addEventListener(
-      "visibilitychange",
-      () => {
-        if (document.hidden) {
-          stopStandbyTimer();
-          return;
-        }
-
-        startStandbyTimer();
-
-        if (window.ScrollTrigger) {
-          window.setTimeout(() => {
-            window.ScrollTrigger.refresh();
-            calculateActiveSection();
-          }, 120);
-        }
-      }
-    );
-
-    window.addEventListener(
-      "pageshow",
-      () => {
-        if (window.ScrollTrigger) {
-          window.setTimeout(() => {
-            window.ScrollTrigger.refresh();
-          }, 80);
-        }
-
-        calculateActiveSection();
-        startStandbyTimer();
-      }
-    );
-  }
-
-  function initResize() {
-    let resizeTimer;
-
-    window.addEventListener(
-      "resize",
-      () => {
-        clearTimeout(
-          resizeTimer
-        );
-
-        resizeTimer =
-          window.setTimeout(() => {
-            if (
-              window.ScrollTrigger
-            ) {
-              window.ScrollTrigger.refresh();
-            }
-
-            calculateActiveSection();
-          }, CONFIG.resizeDebounce);
-      },
-      {
-        passive: true
-      }
-    );
-  }
-
-  function initReducedMotionListener() {
-    const mediaQuery =
-      window.matchMedia(
-        "(prefers-reduced-motion: reduce)"
-      );
-
-    const update = (event) => {
-      state.reducedMotion =
-        event.matches;
-
-      if (
-        state.reducedMotion
-      ) {
-        stopStandbyTimer();
-        hideStandby();
-
-        if (state.gsapMM) {
-          state.gsapMM.revert();
-          state.gsapMM = null;
-        }
-
-        if (window.ScrollTrigger) {
-          window.ScrollTrigger.refresh();
-        }
-
-        updateHeaderSectionUI(
-          state.activeIndex >= 0
-            ? state.activeIndex
-            : 0,
-          false
-        );
-      } else {
-        startStandbyTimer();
-        initGsap();
-
-        calculateActiveSection();
-      }
-    };
-
-    if (
-      typeof mediaQuery.addEventListener ===
-      "function"
-    ) {
-      mediaQuery.addEventListener(
-        "change",
-        update
-      );
-    } else {
-      mediaQuery.addListener(
-        update
-      );
-    }
-  }
-
-  function init() {
-    initMenu();
-    initSectionNavigation();
-    initStandby();
-    initLoader();
-    initVisibility();
-    initResize();
-    initReducedMotionListener();
-
-    window.addEventListener(
-      "scroll",
-      handleScroll,
-      {
-        passive: true
-      }
+    dom.nextButton?.addEventListener(
+      "click",
+      goNext
     );
 
     window.addEventListener(
       "hashchange",
+      handleHash
+    );
+
+    handleHash();
+  };
+
+
+  /* ==========================================================
+     SCROLL
+  ========================================================== */
+
+  const handleScroll = () => {
+    if (state.ticking) return;
+
+    state.ticking = true;
+
+    const update = () => {
+      updateSectionUI();
+      state.ticking = false;
+    };
+
+    if (
+      state.reducedMotion ||
+      !CONFIG.scrollTrackingRaf
+    ) {
+      update();
+    } else {
+      window.requestAnimationFrame(update);
+    }
+
+    wakeFromStandby();
+  };
+
+
+  const initScroll = () => {
+    window.addEventListener(
+      "scroll",
+      handleScroll,
+      { passive: true }
+    );
+  };
+
+
+  /* ==========================================================
+     STANDBY
+  ========================================================== */
+
+  const setStandby = (visible) => {
+    state.standby = visible;
+
+    dom.standby?.classList.toggle(
+      "is-visible",
+      visible
+    );
+
+    dom.standby?.setAttribute(
+      "aria-hidden",
+      String(!visible)
+    );
+  };
+
+
+  const resetStandbyTimer = () => {
+    window.clearTimeout(
+      state.standbyTimer
+    );
+
+    if (document.hidden) return;
+
+    state.standbyTimer = window.setTimeout(() => {
+      setStandby(true);
+    }, CONFIG.standbyDelay);
+  };
+
+
+  const wakeFromStandby = () => {
+    if (!state.standby) {
+      resetStandbyTimer();
+      return;
+    }
+
+    window.clearTimeout(
+      state.standbyWakeTimer
+    );
+
+    state.standbyWakeTimer = window.setTimeout(() => {
+      setStandby(false);
+      resetStandbyTimer();
+    }, CONFIG.standbyWakeThrottle);
+  };
+
+
+  const initStandby = () => {
+    [
+      "pointerdown",
+      "mousemove",
+      "touchstart",
+      "keydown"
+    ].forEach((eventName) => {
+      window.addEventListener(
+        eventName,
+        wakeFromStandby,
+        { passive: true }
+      );
+    });
+
+    document.addEventListener(
+      "visibilitychange",
       () => {
-        handleHash();
+        if (document.hidden) {
+          window.clearTimeout(
+            state.standbyTimer
+          );
+        } else {
+          resetStandbyTimer();
+        }
       }
     );
 
-    updateSectionUI(
-      0,
-      { force: true }
+    resetStandbyTimer();
+  };
+
+
+  /* ==========================================================
+     REDUCED MOTION
+  ========================================================== */
+
+  const updateReducedMotion = () => {
+    state.reducedMotion =
+      prefersReducedMotion();
+  };
+
+
+  const initReducedMotion = () => {
+    updateReducedMotion();
+
+    const mediaQuery = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
     );
 
-    handleHash({
-      initial: true
+    mediaQuery.addEventListener?.(
+      "change",
+      updateReducedMotion
+    );
+  };
+
+
+  /* ==========================================================
+     GSAP — GENERIC REVEALS
+  ========================================================== */
+
+  const initGsap = () => {
+    if (
+      state.reducedMotion ||
+      typeof window.gsap === "undefined" ||
+      typeof window.ScrollTrigger === "undefined"
+    ) {
+      initSimpleVisibility();
+      return;
+    }
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    initTextReveals();
+    initMovement();
+    initSystemList();
+    initMethod();
+    initPlace();
+    initPerson();
+    initPrinciple();
+    initContact();
+  };
+
+
+  /* ==========================================================
+     TEXT REVEALS
+  ========================================================== */
+
+  const initTextReveals = () => {
+    const sections = document.querySelectorAll(
+      ".story"
+    );
+
+    sections.forEach((section) => {
+      const eyebrow = section.querySelector(
+        ".reveal-line"
+      );
+
+      const title = section.querySelector(
+        ".story-title"
+      );
+
+      const paragraphs = section.querySelectorAll(
+        ".narrative-copy p"
+      );
+
+      const timeline = gsap.timeline({
+        paused: true
+      });
+
+      if (eyebrow) {
+        timeline.to(
+          eyebrow,
+          {
+            opacity: 1,
+            y: 0,
+            duration: .65,
+            ease: "power3.out"
+          },
+          0
+        );
+      }
+
+      if (title) {
+        timeline.fromTo(
+          title,
+          {
+            opacity: 0,
+            y: 45
+          },
+          {
+            opacity: 1,
+            y: 0,
+            duration: .9,
+            ease: "power3.out"
+          },
+          .12
+        );
+      }
+
+      if (paragraphs.length) {
+        timeline.fromTo(
+          paragraphs,
+          {
+            opacity: 0,
+            y: 24
+          },
+          {
+            opacity: 1,
+            y: 0,
+            duration: .55,
+            stagger: .045,
+            ease: "power2.out"
+          },
+          .28
+        );
+      }
+
+      ScrollTrigger.create({
+        trigger: section,
+        start: "top 72%",
+        once: true,
+        onEnter: () => timeline.play()
+      });
+    });
+  };
+
+
+  /* ==========================================================
+     MOVIMENTO
+  ========================================================== */
+
+  const initMovement = () => {
+    const section =
+      document.querySelector("#movimento");
+
+    if (!section) return;
+
+    const words =
+      section.querySelectorAll(
+        ".movement-word span"
+      );
+
+    gsap.fromTo(
+      words,
+      {
+        x: 90,
+        opacity: 0
+      },
+      {
+        x: 0,
+        opacity: (index) =>
+          index === 2 ? 1 : .55,
+        duration: 1.1,
+        stagger: .12,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: section,
+          start: "top 70%",
+          once: true
+        }
+      }
+    );
+  };
+
+
+  /* ==========================================================
+     SYSTEM LIST
+  ========================================================== */
+
+  const initSystemList = () => {
+    const section =
+      document.querySelector("#progettare");
+
+    if (!section) return;
+
+    const items =
+      section.querySelectorAll(
+        ".system-item"
+      );
+
+    gsap.fromTo(
+      items,
+      {
+        opacity: 0,
+        x: -24
+      },
+      {
+        opacity: 1,
+        x: 0,
+        duration: .7,
+        stagger: .1,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: section.querySelector(
+            ".system-list"
+          ),
+          start: "top 78%",
+          once: true
+        }
+      }
+    );
+  };
+
+
+  /* ==========================================================
+     METHOD
+  ========================================================== */
+
+  const initMethod = () => {
+    const section =
+      document.querySelector("#metodo");
+
+    if (!section) return;
+
+    const steps =
+      section.querySelectorAll(
+        ".method-step"
+      );
+
+    const arrows =
+      section.querySelectorAll(
+        ".method-arrow"
+      );
+
+    const timeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: section.querySelector(
+          ".method-sequence"
+        ),
+        start: "top 75%",
+        once: true
+      }
     });
 
-    calculateActiveSection();
-
-    window.setTimeout(
-      initGsap,
-      50
+    timeline.fromTo(
+      steps,
+      {
+        opacity: 0,
+        y: 24
+      },
+      {
+        opacity: 1,
+        y: 0,
+        duration: .65,
+        stagger: .14,
+        ease: "power2.out"
+      }
     );
-  }
 
-  if (
-    document.readyState ===
-    "loading"
-  ) {
+    timeline.fromTo(
+      arrows,
+      {
+        opacity: 0
+      },
+      {
+        opacity: 1,
+        duration: .35,
+        stagger: .1
+      },
+      "-=.6"
+    );
+  };
+
+
+  /* ==========================================================
+     PLACE / MAP
+  ========================================================== */
+
+  const initPlace = () => {
+    const section =
+      document.querySelector("#luogo");
+
+    if (!section) return;
+
+    const map =
+      section.querySelector(
+        ".place-map-wrap"
+      );
+
+    if (!map) return;
+
+    gsap.fromTo(
+      map,
+      {
+        opacity: 0,
+        y: 35
+      },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 1.1,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: section,
+          start: "top 65%",
+          once: true
+        }
+      }
+    );
+  };
+
+
+  /* ==========================================================
+     PERSON
+  ========================================================== */
+
+  const initPerson = () => {
+    const section =
+      document.querySelector("#chi-sono");
+
+    if (!section) return;
+
+    const image =
+      section.querySelector(
+        ".person-image-frame"
+      );
+
+    if (!image) return;
+
+    gsap.fromTo(
+      image,
+      {
+        clipPath: "inset(0 100% 0 0)"
+      },
+      {
+        clipPath: "inset(0 0% 0 0)",
+        duration: 1.2,
+        ease: "power4.inOut",
+        scrollTrigger: {
+          trigger: section,
+          start: "top 70%",
+          once: true
+        }
+      }
+    );
+
+    const img =
+      section.querySelector(
+        ".person-image"
+      );
+
+    if (img) {
+      gsap.fromTo(
+        img,
+        {
+          scale: 1.12
+        },
+        {
+          scale: 1.04,
+          duration: 1.5,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: section,
+            start: "top 70%",
+            once: true
+          }
+        }
+      );
+    }
+  };
+
+
+  /* ==========================================================
+     PRINCIPLE
+  ========================================================== */
+
+  const initPrinciple = () => {
+    const section =
+      document.querySelector("#principio");
+
+    if (!section) return;
+
+    const words =
+      section.querySelectorAll(
+        ".principle-words span"
+      );
+
+    const copy =
+      section.querySelector(
+        ".principle-copy"
+      );
+
+    const timeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: section,
+        start: "top 65%",
+        once: true
+      }
+    });
+
+    timeline.fromTo(
+      words,
+      {
+        opacity: 0,
+        y: 40
+      },
+      {
+        opacity: (index) => {
+          if (index === 0) return 1;
+          if (index === 2) return 1;
+          return .18;
+        },
+        y: 0,
+        duration: 1,
+        stagger: .18,
+        ease: "power3.out"
+      }
+    );
+
+    if (copy) {
+      timeline.fromTo(
+        copy,
+        {
+          opacity: 0,
+          y: 25
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: .7,
+          ease: "power2.out"
+        },
+        "-=.35"
+      );
+    }
+  };
+
+
+  /* ==========================================================
+     CONTACT
+  ========================================================== */
+
+  const initContact = () => {
+    const section =
+      document.querySelector("#da-qui");
+
+    if (!section) return;
+
+    const link =
+      section.querySelector(
+        ".contact-link"
+      );
+
+    if (!link) return;
+
+    gsap.fromTo(
+      link,
+      {
+        opacity: 0,
+        y: 20
+      },
+      {
+        opacity: 1,
+        y: 0,
+        duration: .7,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: link,
+          start: "top 85%",
+          once: true
+        }
+      }
+    );
+  };
+
+
+  /* ==========================================================
+     FALLBACK VISIBILITY
+  ========================================================== */
+
+  const initSimpleVisibility = () => {
+    const elements = document.querySelectorAll(
+      ".reveal-line, .story-title, .narrative-copy p, .system-item, .method-step, .contact-link"
+    );
+
+    elements.forEach((element) => {
+      element.style.opacity = "1";
+      element.style.transform = "none";
+    });
+  };
+
+
+  /* ==========================================================
+     RESIZE
+  ========================================================== */
+
+  const handleResize = debounce(() => {
+    updateSectionUI();
+
+    if (
+      typeof window.ScrollTrigger !== "undefined"
+    ) {
+      ScrollTrigger.refresh();
+    }
+  }, CONFIG.resizeDebounce);
+
+
+  const initResize = () => {
+    window.addEventListener(
+      "resize",
+      handleResize
+    );
+  };
+
+
+  /* ==========================================================
+     KEYBOARD SECTION NAVIGATION
+  ========================================================== */
+
+  const initKeyboardNavigation = () => {
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        if (
+          state.menuOpen ||
+          event.metaKey ||
+          event.ctrlKey ||
+          event.altKey
+        ) {
+          return;
+        }
+
+        if (event.key === "ArrowDown") {
+          event.preventDefault();
+          goNext();
+        }
+
+        if (event.key === "ArrowUp") {
+          event.preventDefault();
+          goPrevious();
+        }
+      }
+    );
+  };
+
+
+  /* ==========================================================
+     INIT
+  ========================================================== */
+
+  const init = () => {
+
+    initReducedMotion();
+
+    initLoader();
+
+    initMenu();
+
+    initSectionNavigation();
+
+    initScroll();
+
+    initStandby();
+
+    initResize();
+
+    initKeyboardNavigation();
+
+    /*
+     * Attende il caricamento di GSAP/ScrollTrigger
+     * senza bloccare la homepage.
+     */
+    const waitForGsap = () => {
+      if (
+        typeof window.gsap !== "undefined" &&
+        typeof window.ScrollTrigger !== "undefined"
+      ) {
+        initGsap();
+        return;
+      }
+
+      window.setTimeout(
+        waitForGsap,
+        100
+      );
+    };
+
+    waitForGsap();
+
+    updateSectionUI();
+  };
+
+
+  /* ==========================================================
+     DOM READY
+  ========================================================== */
+
+  if (document.readyState === "loading") {
     document.addEventListener(
       "DOMContentLoaded",
       init,
-      {
-        once: true
-      }
+      { once: true }
     );
   } else {
     init();
   }
+
 })();
