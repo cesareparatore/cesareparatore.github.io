@@ -206,7 +206,7 @@ a {
 .menu-toggle-label {
   display: inline-block;
   min-width: 58px;
-  text-align: right;
+  text-align: center;
 }
 
 /* HEADER SECTION NAVIGATION */
