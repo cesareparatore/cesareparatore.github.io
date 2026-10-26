@@ -433,7 +433,7 @@ body.header-menu-mode .menu-panel.is-open{transform:translateY(0) scale(1)}
 }
 .dock-logo:hover{transform:rotate(-7deg) scale(1.04);background:#fff}
 .dock-logo-mark{font-size:12px;font-weight:700;letter-spacing:-.06em}
-.dock-logo-image{display:block;width:22px;height:22px;object-fit:contain}
+.dock-logo-image{display:block;width:30px;height:30px;object-fit:contain}
 .dock-divider{width:1px;height:26px;margin:0 8px;background:rgba(242,240,234,.17);flex:0 0 auto}
 .dock-menu-toggle,.dock-audio-toggle{
   min-height:46px;
@@ -800,3 +800,7 @@ body.language-refreshing .site-header,body.language-refreshing .header-chapter,b
 .hero-clock{font-variant-numeric:tabular-nums;letter-spacing:.16em;font-size:12px;color:rgba(9,9,9,.62)}
 .hero-bottomline{color:rgba(255,255,255,.82)}
 @media(max-width:640px){.hero-inner{min-height:calc(100svh - var(--header-h) - 8vw);gap:20px}.hero-topline,.hero-bottomline{font-size:8px;letter-spacing:.09em}.hero-kicker,.hero-edition{max-width:48%}.hero-edition{text-align:right}}
+
+/* Hero clock matches the footer clock; GUARDA waits for the curtain to finish. */
+.hero-edition .footer-clock{color:#b8f35c;font-variant-numeric:tabular-nums;letter-spacing:.06em;margin-left:2px}.hero-edition .footer-location-dot{width:5px;height:5px;border-radius:50%;background:#b8f35c;box-shadow:0 0 8px rgba(184,243,92,.4);flex:0 0 auto;animation:footerDotPulse 1.2s ease-in-out infinite}
+body:not(.hero-intro-open) .hero-writing-copy{opacity:0;visibility:hidden}body.hero-intro-open .hero-writing-copy{visibility:visible;animation:heroDetailIn .8s var(--ease) .12s both}

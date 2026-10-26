@@ -748,3 +748,5 @@
   updateClock();
   window.setInterval(updateClock, 1000);
 })();
+
+(() => { const el=document.getElementById("heroClock"); if(!el)return; const tick=()=>{el.textContent=new Intl.DateTimeFormat("it-IT",{timeZone:"Europe/Rome",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false}).format(new Date())};tick();setInterval(tick,1000);})();
