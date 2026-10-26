@@ -773,10 +773,11 @@ body.language-refreshing .site-header,body.language-refreshing .header-chapter,b
 #territorio .territory-coverage .territory-coverage-intro{font-size:10px;line-height:1.5;letter-spacing:.14em;text-transform:uppercase;font-weight:650;color:rgba(9,9,9,.58);margin-bottom:10px}
 #territorio .territory-coverage .territory-coverage-list{color:#090909;font-weight:520}
 #territorio .territory-coverage .territory-coverage-note{font-size:.82rem;line-height:1.6;color:rgba(9,9,9,.58)}
-#territorio .territory-next-step{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:12px;margin-top:34px;padding:16px 0;border-top:1px solid rgba(9,9,9,.2);border-bottom:1px solid rgba(9,9,9,.2);font-size:clamp(.95rem,1.15vw,1.08rem);line-height:1.45;transition:opacity .2s ease}
-#territorio .territory-next-step span{font-size:.82rem;letter-spacing:.02em;font-weight:600;white-space:nowrap}
-#territorio .territory-next-step:hover,#territorio .territory-next-step:focus-visible{opacity:.62;outline-offset:5px}
-@media(max-width:620px){#territorio .territory-coverage{margin-top:24px}#territorio .territory-next-step{align-items:flex-start;flex-direction:column;gap:7px;margin-top:26px}}
+#territorio #territorio .territory-next-step{display:inline-flex;align-items:center;justify-content:flex-start;gap:10px;margin-top:34px;padding-bottom:7px;border-top:0;border-bottom:1px solid currentColor;font-size:10px;line-height:1.4;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;color:var(--ink);transition:gap .25s var(--ease),opacity .25s ease}
+#territorio .territory-next-step span{font-size:15px;letter-spacing:0;font-weight:400;white-space:nowrap;transition:transform .25s var(--ease)}
+#territorio .territory-next-step:hover,#territorio .territory-next-step:focus-visible{gap:16px;opacity:1;outline-offset:5px}
+#territorio .territory-next-step:hover span,#territorio .territory-next-step:focus-visible span{transform:translateX(3px)}
+@media(max-width:620px){#territorio .territory-coverage{margin-top:24px}#territorio .territory-next-step{margin-top:26px}}
 
 
 /* DOVE SONO — homepage intentionally reduced to one message and one action. */
@@ -804,3 +805,8 @@ body.language-refreshing .site-header,body.language-refreshing .header-chapter,b
 /* Hero clock matches the footer clock; GUARDA waits for the curtain to finish. */
 .hero-edition .footer-clock{color:#b8f35c;font-variant-numeric:tabular-nums;letter-spacing:.06em;margin-left:2px}.hero-edition .footer-location-dot{width:5px;height:5px;border-radius:50%;background:#b8f35c;box-shadow:0 0 8px rgba(184,243,92,.4);flex:0 0 auto;animation:footerDotPulse 1.2s ease-in-out infinite}
 body:not(.hero-intro-open) .hero-writing-copy{opacity:0;visibility:hidden}body.hero-intro-open .hero-writing-copy{visibility:visible;animation:heroDetailIn .8s var(--ease) .12s both}
+
+/* Hero clock: higher contrast on the light background, aligned with footer style. */
+.hero-edition .footer-clock{color:#365314;font-size:14px;font-weight:750;letter-spacing:.04em;margin-left:3px;text-shadow:none}
+.hero-edition .footer-location-dot{width:7px;height:7px;background:#4f7d12;box-shadow:0 0 0 2px rgba(79,125,18,.14);animation:footerDotPulse 1.2s ease-in-out infinite}
+@media(max-width:640px){.hero-edition .footer-clock{font-size:13px;font-weight:750}.hero-edition .footer-location-dot{width:6px;height:6px}}
