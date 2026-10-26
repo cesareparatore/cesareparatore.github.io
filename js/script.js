@@ -353,14 +353,30 @@
       wrapTextNodes(element);
     });
 
-    // Ritarda il link di DOVE SONO fino al termine della scrittura del testo precedente.
+    // DOVE SONO: il link resta davvero nascosto finché tutti i testi precedenti
+    // non hanno completato la scrittura. Lo mostriamo tramite una classe, non con
+    // un semplice delay CSS che può farlo apparire troppo presto.
     const territoryCta = copy.querySelector(".territory-next-step");
+    let territoryCtaTimer = null;
     if(territoryCta){
-      const priorChars = [...copy.querySelectorAll("[data-reveal]")]
-        .filter(element => element !== territoryCta && !territoryCta.contains(element))
-        .flatMap(element => [...element.querySelectorAll(".writing-char")]);
-      const lastDelay = priorChars.reduce((max, char) => Math.max(max, parseFloat(char.style.getPropertyValue("--char-delay")) || 0), 0);
-      territoryCta.style.setProperty("--territory-cta-delay", `${lastDelay + 0.2}s`);
+      territoryCta.classList.remove("territory-cta-ready");
+      const getPriorWritingDuration = () => {
+        const priorChars = [...copy.querySelectorAll("[data-reveal]")]
+          .filter(element => element !== territoryCta && !territoryCta.contains(element))
+          .flatMap(element => [...element.querySelectorAll(".writing-char")]);
+        const lastDelay = priorChars.reduce((max, char) => Math.max(max, parseFloat(char.style.getPropertyValue("--char-delay")) || 0), 0);
+        return lastDelay + 650;
+      };
+      const revealTerritoryCtaAfterWriting = () => {
+        if(territoryCtaTimer) window.clearTimeout(territoryCtaTimer);
+        territoryCta.classList.remove("territory-cta-ready");
+        territoryCtaTimer = window.setTimeout(() => {
+          if(copy.classList.contains("is-writing") || window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+            territoryCta.classList.add("territory-cta-ready");
+          }
+        }, getPriorWritingDuration());
+      };
+      copy.addEventListener("territoryWritingStarted", revealTerritoryCtaAfterWriting);
     }
 
     if("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches){
@@ -376,6 +392,7 @@
               writingTimer = window.setTimeout(() => {
                 if(section.getBoundingClientRect().bottom > 0 && section.getBoundingClientRect().top < window.innerHeight){
                   copy.classList.add("is-writing");
+                  copy.dispatchEvent(new Event("territoryWritingStarted"));
                 }
               }, copy.classList.contains("hero-writing-copy") ? 260 : 0);
             };
@@ -391,6 +408,7 @@
       writingObserver.observe(section);
     }else{
       copy.classList.add("is-writing");
+      if(territoryCta) territoryCta.classList.add("territory-cta-ready");
     }
   });
 

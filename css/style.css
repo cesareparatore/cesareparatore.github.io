@@ -819,3 +819,8 @@ body:not(.hero-intro-open) .hero-writing-copy{opacity:0;visibility:hidden}body.h
 .hero-edition .footer-clock{display:inline-block;margin-left:2px;padding:5px 8px;border:1px solid rgba(9,9,9,.16);border-radius:3px;background:rgba(255,255,255,.42);color:#343a2c;font-size:10px;font-weight:700;letter-spacing:.08em;font-variant-numeric:tabular-nums}
 .hero-edition .footer-location-dot{width:7px;height:7px;flex:0 0 7px;background:#596b36;box-shadow:0 0 0 3px rgba(89,107,54,.12)}
 @media(prefers-reduced-motion:reduce){.hero-bottomline{transition:none}}
+
+/* DOVE SONO: CTA visibile soltanto dopo il completamento della scrittura. */
+#territorio .territory-next-step{opacity:0!important;visibility:hidden;pointer-events:none;transition:opacity .65s ease,gap .25s var(--ease),border-color .25s ease}
+#territorio .territory-next-step.territory-cta-ready{opacity:1!important;visibility:visible;pointer-events:auto}
+@media(prefers-reduced-motion:reduce){#territorio .territory-next-step{opacity:1!important;visibility:visible;pointer-events:auto}}
