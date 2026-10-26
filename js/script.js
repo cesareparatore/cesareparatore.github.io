@@ -394,34 +394,35 @@
     }
   });
 
-  // Show “SCORRI PER ESPLORARE” only after the curtain has opened and GUARDA has finished typing.
+  // Reveal the scroll prompt after GUARDA finishes, with a fail-safe so it can never remain hidden.
   (() => {
     const heroCopy = document.querySelector(".hero-writing-copy");
     const heroBottom = document.querySelector(".hero-bottomline");
     const heroTitle = document.querySelector(".hero-title[data-reveal]");
     if (!heroCopy || !heroBottom || !heroTitle) return;
 
-    // Start hidden even if the intro event happened before this listener was attached.
-    heroBottom.classList.remove("is-scroll-visible");
-    let revealScheduled = false;
-    const waitForTitle = () => {
-      if (revealScheduled) return;
-      if (!document.body.classList.contains("hero-intro-open") || !heroCopy.classList.contains("is-writing")) {
-        window.setTimeout(waitForTitle, 100);
-        return;
-      }
-      const chars = [...heroTitle.querySelectorAll(".writing-char")];
-      if (!chars.length) {
-        window.setTimeout(waitForTitle, 100);
-        return;
-      }
-      revealScheduled = true;
-      const lastDelay = chars.reduce((max, char) => Math.max(max, parseFloat(char.style.getPropertyValue("--char-delay")) || 0), 0);
-      // The character delay is the end of the typewriter sequence; add a small breathing pause.
-      const typingDuration = lastDelay * 1000 + 120;
-      window.setTimeout(() => heroBottom.classList.add("is-scroll-visible"), typingDuration + 450);
+    let revealed = false;
+    let startedAt = 0;
+    const reveal = () => {
+      if (revealed) return;
+      revealed = true;
+      heroBottom.classList.add("is-scroll-visible");
     };
-    waitForTitle();
+    const check = () => {
+      if (revealed) return;
+      if (!startedAt && document.body.classList.contains("hero-intro-open")) startedAt = Date.now();
+      const chars = [...heroTitle.querySelectorAll(".writing-char")];
+      if (startedAt && heroCopy.classList.contains("is-writing") && chars.length) {
+        const lastDelay = chars.reduce((max, char) => Math.max(max, parseFloat(char.style.getPropertyValue("--char-delay")) || 0), 0);
+        // Keep the deliberate pause after the final character, then reveal the cue.
+        if (Date.now() - startedAt >= lastDelay * 1000 + 900) return reveal();
+      }
+      // Fail-safe for missing character spans or interrupted animation scripts.
+      if (startedAt && Date.now() - startedAt >= 9000) return reveal();
+      window.setTimeout(check, 100);
+    };
+    heroBottom.classList.remove("is-scroll-visible");
+    check();
   })();
 
   const worldsSection = document.getElementById("mondi");
