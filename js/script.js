@@ -394,26 +394,34 @@
     }
   });
 
-  // Show “SCORRI PER ESPLORARE” only after the full GUARDA typewriter sequence.
+  // Show “SCORRI PER ESPLORARE” only after the curtain has opened and GUARDA has finished typing.
   (() => {
     const heroCopy = document.querySelector(".hero-writing-copy");
     const heroBottom = document.querySelector(".hero-bottomline");
     const heroTitle = document.querySelector(".hero-title[data-reveal]");
     if (!heroCopy || !heroBottom || !heroTitle) return;
-    const revealScroll = () => {
+
+    // Start hidden even if the intro event happened before this listener was attached.
+    heroBottom.classList.remove("is-scroll-visible");
+    let revealScheduled = false;
+    const waitForTitle = () => {
+      if (revealScheduled) return;
+      if (!document.body.classList.contains("hero-intro-open") || !heroCopy.classList.contains("is-writing")) {
+        window.setTimeout(waitForTitle, 100);
+        return;
+      }
       const chars = [...heroTitle.querySelectorAll(".writing-char")];
+      if (!chars.length) {
+        window.setTimeout(waitForTitle, 100);
+        return;
+      }
+      revealScheduled = true;
       const lastDelay = chars.reduce((max, char) => Math.max(max, parseFloat(char.style.getPropertyValue("--char-delay")) || 0), 0);
-      const typingDuration = chars.length ? lastDelay * 1000 + 650 : 0;
-      window.setTimeout(() => heroBottom.classList.add("is-scroll-visible"), typingDuration + 250);
+      // The character delay is the end of the typewriter sequence; add a small breathing pause.
+      const typingDuration = lastDelay * 1000 + 120;
+      window.setTimeout(() => heroBottom.classList.add("is-scroll-visible"), typingDuration + 450);
     };
-    if (document.body.classList.contains("hero-intro-open") && heroCopy.classList.contains("is-writing")) revealScroll();
-    else window.addEventListener("heroIntroOpened", () => {
-      const waitForTyping = () => {
-        if (heroCopy.classList.contains("is-writing")) revealScroll();
-        else window.setTimeout(waitForTyping, 80);
-      };
-      waitForTyping();
-    }, { once: true });
+    waitForTitle();
   })();
 
   const worldsSection = document.getElementById("mondi");
