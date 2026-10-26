@@ -371,9 +371,10 @@
         if(territoryCtaTimer) window.clearTimeout(territoryCtaTimer);
         territoryCta.classList.remove("territory-cta-ready");
         territoryCtaTimer = window.setTimeout(() => {
-          if(copy.classList.contains("is-writing") || window.matchMedia("(prefers-reduced-motion: reduce)").matches){
-            territoryCta.classList.add("territory-cta-ready");
-          }
+          // Il timer parte insieme alla scrittura della sezione; non vincoliamo
+          // la comparsa allo stato momentaneo dell'IntersectionObserver, che
+          // potrebbe aver rimosso .is-writing durante lo scorrimento.
+          territoryCta.classList.add("territory-cta-ready");
         }, getPriorWritingDuration());
       };
       copy.addEventListener("territoryWritingStarted", revealTerritoryCtaAfterWriting);
