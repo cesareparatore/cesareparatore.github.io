@@ -353,6 +353,16 @@
       wrapTextNodes(element);
     });
 
+    // Ritarda il link di DOVE SONO fino al termine della scrittura del testo precedente.
+    const territoryCta = copy.querySelector(".territory-next-step");
+    if(territoryCta){
+      const priorChars = [...copy.querySelectorAll("[data-reveal]")]
+        .filter(element => element !== territoryCta && !territoryCta.contains(element))
+        .flatMap(element => [...element.querySelectorAll(".writing-char")]);
+      const lastDelay = priorChars.reduce((max, char) => Math.max(max, parseFloat(char.style.getPropertyValue("--char-delay")) || 0), 0);
+      territoryCta.style.setProperty("--territory-cta-delay", `${lastDelay + 0.2}s`);
+    }
+
     if("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches){
       let writingTimer = null;
       const writingObserver = new IntersectionObserver(entries => {
