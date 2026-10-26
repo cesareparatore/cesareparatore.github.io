@@ -810,3 +810,12 @@ body:not(.hero-intro-open) .hero-writing-copy{opacity:0;visibility:hidden}body.h
 .hero-edition .footer-clock{color:#365314;font-size:14px;font-weight:750;letter-spacing:.04em;margin-left:3px;text-shadow:none}
 .hero-edition .footer-location-dot{width:7px;height:7px;background:#4f7d12;box-shadow:0 0 0 2px rgba(79,125,18,.14);animation:footerDotPulse 1.2s ease-in-out infinite}
 @media(max-width:640px){.hero-edition .footer-clock{font-size:13px;font-weight:750}.hero-edition .footer-location-dot{width:6px;height:6px}}
+
+
+/* HERO refinement: reveal scroll prompt only after GUARDA has finished writing. */
+.hero-bottomline{opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .8s cubic-bezier(.22,.61,.36,1),transform .8s cubic-bezier(.22,.61,.36,1),visibility 0s linear .8s}
+.hero-bottomline.is-scroll-visible{opacity:1;visibility:visible;transform:translateY(0);transition-delay:0s}
+.hero-edition{gap:10px;letter-spacing:.09em}
+.hero-edition .footer-clock{display:inline-block;margin-left:2px;padding:5px 8px;border:1px solid rgba(9,9,9,.16);border-radius:3px;background:rgba(255,255,255,.42);color:#343a2c;font-size:10px;font-weight:700;letter-spacing:.08em;font-variant-numeric:tabular-nums}
+.hero-edition .footer-location-dot{width:7px;height:7px;flex:0 0 7px;background:#596b36;box-shadow:0 0 0 3px rgba(89,107,54,.12)}
+@media(prefers-reduced-motion:reduce){.hero-bottomline{transition:none}}

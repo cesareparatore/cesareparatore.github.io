@@ -394,6 +394,28 @@
     }
   });
 
+  // Show “SCORRI PER ESPLORARE” only after the full GUARDA typewriter sequence.
+  (() => {
+    const heroCopy = document.querySelector(".hero-writing-copy");
+    const heroBottom = document.querySelector(".hero-bottomline");
+    const heroTitle = document.querySelector(".hero-title[data-reveal]");
+    if (!heroCopy || !heroBottom || !heroTitle) return;
+    const revealScroll = () => {
+      const chars = [...heroTitle.querySelectorAll(".writing-char")];
+      const lastDelay = chars.reduce((max, char) => Math.max(max, parseFloat(char.style.getPropertyValue("--char-delay")) || 0), 0);
+      const typingDuration = chars.length ? lastDelay * 1000 + 650 : 0;
+      window.setTimeout(() => heroBottom.classList.add("is-scroll-visible"), typingDuration + 250);
+    };
+    if (document.body.classList.contains("hero-intro-open") && heroCopy.classList.contains("is-writing")) revealScroll();
+    else window.addEventListener("heroIntroOpened", () => {
+      const waitForTyping = () => {
+        if (heroCopy.classList.contains("is-writing")) revealScroll();
+        else window.setTimeout(waitForTyping, 80);
+      };
+      waitForTyping();
+    }, { once: true });
+  })();
+
   const worldsSection = document.getElementById("mondi");
   const worldWords = [...document.querySelectorAll(".worlds-word")];
 
