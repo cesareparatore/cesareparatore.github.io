@@ -84,7 +84,7 @@
     };
     if(panel) panel.addEventListener("transitionend", event => { if(event.propertyName === "transform") markIntroOpen(); }, {once:true});
     body.classList.add("is-ready");
-    window.setTimeout(markIntroOpen, 3500); // Fallback aligned with the slower curtain transition.
+    window.setTimeout(markIntroOpen, 5700); // Fallback aligned with the slower, smoother curtain transition.
   };
   const revealPage = () => {
     if(document.getElementById("sitePreloader")) {
