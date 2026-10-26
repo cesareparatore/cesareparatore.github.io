@@ -353,32 +353,7 @@
       wrapTextNodes(element);
     });
 
-    // DOVE SONO: il link resta davvero nascosto finché tutti i testi precedenti
-    // non hanno completato la scrittura. Lo mostriamo tramite una classe, non con
-    // un semplice delay CSS che può farlo apparire troppo presto.
-    const territoryCta = copy.querySelector(".territory-next-step");
-    let territoryCtaTimer = null;
-    if(territoryCta){
-      territoryCta.classList.remove("territory-cta-ready");
-      const getPriorWritingDuration = () => {
-        const priorChars = [...copy.querySelectorAll("[data-reveal]")]
-          .filter(element => element !== territoryCta && !territoryCta.contains(element))
-          .flatMap(element => [...element.querySelectorAll(".writing-char")]);
-        const lastDelay = priorChars.reduce((max, char) => Math.max(max, parseFloat(char.style.getPropertyValue("--char-delay")) || 0), 0);
-        return lastDelay + 650;
-      };
-      const revealTerritoryCtaAfterWriting = () => {
-        if(territoryCtaTimer) window.clearTimeout(territoryCtaTimer);
-        territoryCta.classList.remove("territory-cta-ready");
-        territoryCtaTimer = window.setTimeout(() => {
-          // Il timer parte insieme alla scrittura della sezione; non vincoliamo
-          // la comparsa allo stato momentaneo dell'IntersectionObserver, che
-          // potrebbe aver rimosso .is-writing durante lo scorrimento.
-          territoryCta.classList.add("territory-cta-ready");
-        }, getPriorWritingDuration());
-      };
-      copy.addEventListener("territoryWritingStarted", revealTerritoryCtaAfterWriting);
-    }
+    // Il CTA resta nel flusso di scrittura: i suoi caratteri compaiono dopo il testo precedente.
 
     if("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches){
       let writingTimer = null;

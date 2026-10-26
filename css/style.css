@@ -773,7 +773,7 @@ body.language-refreshing .site-header,body.language-refreshing .header-chapter,b
 #territorio .territory-coverage .territory-coverage-intro{font-size:10px;line-height:1.5;letter-spacing:.14em;text-transform:uppercase;font-weight:650;color:rgba(9,9,9,.58);margin-bottom:10px}
 #territorio .territory-coverage .territory-coverage-list{color:#090909;font-weight:520}
 #territorio .territory-coverage .territory-coverage-note{font-size:.82rem;line-height:1.6;color:rgba(9,9,9,.58)}
-#territorio #territorio .territory-next-step{display:inline-flex;align-items:center;justify-content:flex-start;gap:10px;margin-top:34px;padding-bottom:7px;border-top:0;border-bottom:1px solid currentColor;font-size:10px;line-height:1.4;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;color:var(--ink);transition:gap .25s var(--ease),opacity .25s ease}
+#territorio .territory-next-step{display:inline-flex;align-items:center;justify-content:flex-start;gap:10px;margin-top:34px;padding-bottom:7px;border-top:0;border-bottom:1px solid currentColor;font-size:10px;line-height:1.4;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;color:var(--ink);transition:gap .25s var(--ease),opacity .25s ease}
 #territorio .territory-next-step span{font-size:15px;letter-spacing:0;font-weight:400;white-space:nowrap;transition:transform .25s var(--ease)}
 #territorio .territory-next-step:hover,#territorio .territory-next-step:focus-visible{gap:16px;opacity:1;outline-offset:5px}
 #territorio .territory-next-step:hover span,#territorio .territory-next-step:focus-visible span{transform:translateX(3px)}
@@ -819,8 +819,3 @@ body:not(.hero-intro-open) .hero-writing-copy{opacity:0;visibility:hidden}body.h
 .hero-edition .footer-clock{display:inline-block;margin-left:2px;padding:5px 8px;border:1px solid rgba(9,9,9,.16);border-radius:3px;background:rgba(255,255,255,.42);color:#343a2c;font-size:10px;font-weight:700;letter-spacing:.08em;font-variant-numeric:tabular-nums}
 .hero-edition .footer-location-dot{width:7px;height:7px;flex:0 0 7px;background:#596b36;box-shadow:0 0 0 3px rgba(89,107,54,.12)}
 @media(prefers-reduced-motion:reduce){.hero-bottomline{transition:none}}
-
-/* DOVE SONO: CTA visibile soltanto dopo il completamento della scrittura. */
-#territorio .territory-next-step{opacity:0!important;visibility:hidden;pointer-events:none;transition:opacity .65s ease,gap .25s var(--ease),border-color .25s ease}
-#territorio .territory-next-step.territory-cta-ready{opacity:1!important;visibility:visible!important;pointer-events:auto!important}
-@media(prefers-reduced-motion:reduce){#territorio .territory-next-step{opacity:1!important;visibility:visible;pointer-events:auto}}
