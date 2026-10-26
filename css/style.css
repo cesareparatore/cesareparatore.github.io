@@ -822,5 +822,5 @@ body:not(.hero-intro-open) .hero-writing-copy{opacity:0;visibility:hidden}body.h
 
 /* DOVE SONO: CTA visibile soltanto dopo il completamento della scrittura. */
 #territorio .territory-next-step{opacity:0!important;visibility:hidden;pointer-events:none;transition:opacity .65s ease,gap .25s var(--ease),border-color .25s ease}
-#territorio .territory-next-step.territory-cta-ready{opacity:1!important;visibility:visible;pointer-events:auto}
+#territorio .territory-next-step.territory-cta-ready{opacity:1!important;visibility:visible!important;pointer-events:auto!important}
 @media(prefers-reduced-motion:reduce){#territorio .territory-next-step{opacity:1!important;visibility:visible;pointer-events:auto}}
