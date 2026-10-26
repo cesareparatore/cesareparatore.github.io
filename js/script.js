@@ -68,7 +68,6 @@
   const languageToggle = document.getElementById("languageToggle");
   const audioStatus = document.getElementById("audioStatus");
   const audioStatusMessage = document.getElementById("audioStatusMessage");
-  const audioVolume = document.getElementById("audioVolume");
   const menuLinks = [...document.querySelectorAll(".menu-link")];
   const chapterElements = sections.map(s => document.getElementById(s.id)).filter(Boolean);
   const revealElements = [...document.querySelectorAll("[data-reveal]")].filter(element => !element.closest(".writing-copy"));
@@ -85,7 +84,7 @@
     };
     if(panel) panel.addEventListener("transitionend", event => { if(event.propertyName === "transform") markIntroOpen(); }, {once:true});
     body.classList.add("is-ready");
-    window.setTimeout(markIntroOpen, 2450); // Fallback for reduced motion or missing transition events.
+    window.setTimeout(markIntroOpen, 3500); // Fallback aligned with the slower curtain transition.
   };
   const revealPage = () => {
     if(document.getElementById("sitePreloader")) {
@@ -512,7 +511,7 @@
   let currentLanguage = "it";
   const languageStrings = {
     en: {
-      "a.skip-link":"Skip to content", ".pause-label":"PAUSE", ".header-menu-label":"MENU", ".hero-title":"LOOK<span class=\"hero-dot\">.</span>", ".hero-kicker":"CESARE PARATORE <i>—</i> PORTFOLIO", ".hero-edition":"INDEPENDENT MIND · 2026",
+      "a.skip-link":"Skip to content", ".pause-label":"PAUSE", ".header-menu-label":"MENU", ".hero-title":"GUARDA<span class=\"hero-dot\">.</span>", ".hero-kicker":"CESARE PARATORE", ".hero-edition":"PARTINICO, IT",
       ".menu-list .menu-item:nth-child(1) .menu-link":"About me", ".menu-list .menu-item:nth-child(2) .menu-link":"Sport Manager",
       ".menu-list .menu-item:nth-child(3) .menu-link":"Kinesiologist", ".menu-list .menu-item:nth-child(4) .menu-link":"Running Coach",
       ".menu-list .menu-item:nth-child(5) .menu-link":"Trainer", ".menu-list .menu-item:nth-child(6) .menu-link":"Web Designer",
@@ -530,7 +529,7 @@
       ".back-to-top-label":"BACK TO TOP", ".footer-privacy":"Privacy ↗"
     },
     it: {
-      "a.skip-link":"Salta al contenuto", ".pause-label":"PAUSA", ".hero-title":"GUARDA<span class=\"hero-dot\">.</span>", ".hero-kicker":"CESARE PARATORE <i>—</i> PORTFOLIO", ".hero-edition":"MENTE INDIPENDENTE · 2026",
+      "a.skip-link":"Salta al contenuto", ".pause-label":"PAUSA", ".hero-title":"GUARDA<span class=\"hero-dot\">.</span>", ".hero-kicker":"CESARE PARATORE", ".hero-edition":"PARTINICO, IT",
       ".menu-list .menu-item:nth-child(1) .menu-link":"Chi sono", ".menu-list .menu-item:nth-child(2) .menu-link":"Sport Manager",
       ".menu-list .menu-item:nth-child(3) .menu-link":"Chinesiologo", ".menu-list .menu-item:nth-child(4) .menu-link":"Running Coach",
       ".menu-list .menu-item:nth-child(5) .menu-link":"Formatore", ".menu-list .menu-item:nth-child(6) .menu-link":"Web Designer",
@@ -636,37 +635,22 @@
   ambientAudio.volume = 0.32;
   ambientAudio.preload = "none";
   let audioPlaying = false;
-  let audioStatusTimer = null;
 
+  // Annunci audio solo per gli screen reader: nessun pannello flottante o controllo volume.
   function showAudioStatus(message){
     if(!audioStatus) return;
     if(audioStatusMessage) audioStatusMessage.textContent = message;
     else audioStatus.textContent = message;
-    audioStatus.classList.add("is-visible");
-    audioStatus.classList.toggle("is-playing", audioPlaying);
-    if(audioStatusTimer) clearTimeout(audioStatusTimer);
-    if(!audioPlaying){
-      audioStatusTimer = setTimeout(() => {
-        audioStatus.classList.remove("is-visible", "is-playing");
-      }, 2800);
-    }
   }
 
   function updateAudioButton(playing){
     audioPlaying = playing;
-    if(audioStatus) audioStatus.classList.toggle("is-playing", playing);
     [audioToggle,headerAudioToggle].forEach(button => {
       if(!button) return;
       button.setAttribute("aria-pressed",String(playing));
       button.setAttribute("aria-label",playing ? (currentLanguage === "en" ? "Pause audio" : "Metti in pausa l'audio") : (currentLanguage === "en" ? "Enable audio" : "Attiva audio"));
       const label = button.querySelector(".dock-audio-label, .header-audio-label");
       if(label) label.textContent = playing ? "ON" : "AUDIO";
-    });
-  }
-
-  if(audioVolume){
-    audioVolume.addEventListener("input", () => {
-      ambientAudio.volume = Math.max(0, Math.min(1, Number(audioVolume.value)));
     });
   }
 

@@ -85,7 +85,7 @@
   <div class="pause-panel pause-panel--right"></div>
 </div>
 <div class="pause-center" aria-hidden="true">
-  <div class="pause-monogram">CP</div>
+  <div class="pause-monogram"><img src="/assets/images/cp-mark.svg" alt="" aria-hidden="true"></div>
   <div class="pause-label">PAUSA</div>
 </div>
 
@@ -135,14 +135,14 @@
   <section id="guarda" class="hero chapter-section" data-section="guarda">
     <div class="section-inner hero-inner">
       <div class="hero-topline" aria-hidden="true">
-        <span class="hero-kicker">CESARE PARATORE <i>—</i> PORTFOLIO</span>
-        <span class="hero-edition">INDEPENDENT MIND · 2026</span>
+        <span class="hero-kicker">CESARE PARATORE</span>
+        <span class="hero-edition">PARTINICO, IT</span>
       </div>
       <div class="hero-writing-copy writing-copy">
         <h1 class="hero-title" data-reveal>GUARDA<span class="hero-dot">.</span></h1>
       </div>
       <div class="hero-bottomline">
-        <span class="hero-manifesto" data-hero-copy>Persone. Movimento. Idee.</span>
+        <span class="hero-manifesto hero-clock" data-live-clock aria-label="Ora locale">--:--</span>
         <a class="hero-scroll" href="#storia" aria-label="Scorri per esplorare"><span class="hero-scroll-label" data-hero-scroll>SCORRI PER ESPLORARE</span><span class="hero-scroll-arrow" aria-hidden="true">↓</span></a>
       </div>
     </div>
@@ -263,9 +263,6 @@
 </nav>
 <div class="audio-status" id="audioStatus" role="status" aria-live="polite" aria-atomic="true">
   <span class="audio-status-message" id="audioStatusMessage"></span>
-  <label class="audio-volume-control" for="audioVolume">VOLUME
-    <input id="audioVolume" type="range" min="0" max="1" step="0.01" value="0.32" aria-label="Volume audio">
-  </label>
 </div>
 
 <footer class="site-footer">
@@ -283,5 +280,8 @@
 </footer>
 
 <script src="js/script.js" defer></script>
+<script>
+(function(){const el=document.querySelector("[data-live-clock]");if(!el)return;function tick(){const d=new Date();el.textContent=new Intl.DateTimeFormat("it-IT",{timeZone:"Europe/Rome",hour:"2-digit",minute:"2-digit",hour12:false}).format(d)}tick();setInterval(tick,15000)})();
+</script>
 </body>
 </html>
