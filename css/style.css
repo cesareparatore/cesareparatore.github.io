@@ -122,6 +122,7 @@ main{position:relative;padding-top:var(--header-h)}
 .hero-edition{font-variant-numeric:tabular-nums}
 .hero-writing-copy{width:100%;position:relative}
 .hero-title{position:relative;display:block;width:max-content;max-width:100%;white-space:nowrap;will-change:letter-spacing}
+.hero-deck{max-width:46ch;margin:clamp(18px,2vw,30px) 0 0;font-size:clamp(.95rem,1.25vw,1.12rem);line-height:1.45;letter-spacing:.005em;color:rgba(9,9,9,.72)}
 /* Gesto distintivo dell’hero: un sottile riflesso lime attraversa la parola appena termina la scrittura. */
 .hero-title::after{content:"";position:absolute;z-index:2;left:0;top:-.07em;bottom:-.09em;width:2px;opacity:0;pointer-events:none;background:#b8f35c;box-shadow:0 0 10px rgba(184,243,92,.55),0 0 28px rgba(184,243,92,.2)}
 .hero-writing-copy.is-writing .hero-title::after{animation:heroWordSweep 1.08s cubic-bezier(.2,.7,.18,1) .34s both}
@@ -819,3 +820,33 @@ body:not(.hero-intro-open) .hero-writing-copy{opacity:0;visibility:hidden}body.h
 .hero-edition .footer-clock{display:inline-block;margin-left:2px;padding:5px 8px;border:1px solid rgba(9,9,9,.16);border-radius:3px;background:rgba(255,255,255,.42);color:#343a2c;font-size:10px;font-weight:700;letter-spacing:.08em;font-variant-numeric:tabular-nums}
 .hero-edition .footer-location-dot{width:7px;height:7px;flex:0 0 7px;background:#596b36;box-shadow:0 0 0 3px rgba(89,107,54,.12)}
 @media(prefers-reduced-motion:reduce){.hero-bottomline{transition:none}}
+
+/* Homepage-only polish: shorter entrance, clear keyboard focus, quieter loading. */
+body[data-page-label="GUARDA"] .curtain-panel{transition-duration:1.35s}
+body[data-page-label="GUARDA"] .curtain{animation-delay:2.8s}
+body[data-page-label="GUARDA"] .site-preloader{transition-duration:.35s}
+body[data-page-label="GUARDA"] .preloader-percent{font-variant-numeric:tabular-nums}
+body[data-page-label="GUARDA"] a:focus-visible,
+body[data-page-label="GUARDA"] button:focus-visible,
+body[data-page-label="GUARDA"] [tabindex]:focus-visible{
+  /* Two-tone ring stays visible on both the light canvas and dark header/footer. */
+  outline:3px solid #090909!important;
+  outline-offset:3px!important;
+  box-shadow:0 0 0 6px #f2f0ea!important;
+}
+@media(prefers-reduced-motion:reduce){
+  body[data-page-label="GUARDA"] .curtain{display:none}
+  body[data-page-label="GUARDA"] .site-preloader{display:none}
+}
+
+/* Keep the long display word within the mobile viewport. */
+@media(max-width:620px){
+  #principio .principle-title{font-size:clamp(3.2rem,13.5vw,5.4rem);letter-spacing:-.075em;overflow-wrap:anywhere}
+}
+
+
+/* Homepage loader: indeterminate instead of a misleading simulated percentage. */
+body[data-page-label="GUARDA"] .preloader-percent{font-size:10px;letter-spacing:.18em;text-transform:uppercase}
+body[data-page-label="GUARDA"] .preloader-fill{width:34%;transform:translateX(-110%);animation:homePreloaderIndeterminate 1.15s cubic-bezier(.22,.61,.36,1) infinite}
+@keyframes homePreloaderIndeterminate{from{transform:translateX(-110%)}to{transform:translateX(380%)}}
+@media(prefers-reduced-motion:reduce){body[data-page-label="GUARDA"] .preloader-fill{animation:none;transform:none}}

@@ -4,6 +4,34 @@
   const label = document.getElementById("preloaderPercent");
   const fill = document.getElementById("preloaderFill");
   if(!screen || !label || !fill) return;
+  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+    screen.remove();
+    window.dispatchEvent(new Event("sitePreloaderFinished"));
+    return;
+  }
+  const isHomePage = document.body?.dataset.pageLabel === "GUARDA";
+  if(isHomePage){
+    // Avoid presenting a simulated percentage as real loading progress on the homepage.
+    const started = Date.now();
+    let finished = false;
+    label.textContent = "CARICAMENTO";
+    const finish = () => {
+      if(finished) return;
+      finished = true;
+      window.setTimeout(() => {
+        screen.classList.add("is-done");
+        window.setTimeout(() => {
+          screen.remove();
+          window.dispatchEvent(new Event("sitePreloaderFinished"));
+        }, 350);
+      }, Math.max(0, 220 - (Date.now() - started)));
+    };
+    if(document.readyState === "complete") finish();
+    else window.addEventListener("load", finish, {once:true});
+    // Failsafe: a stalled asset must never leave the intro covering the page indefinitely.
+    window.setTimeout(finish, 2500);
+    return;
+  }
   let progress = 0;
   let ready = document.readyState === "complete";
   const started = Date.now();
@@ -14,7 +42,10 @@
     label.textContent = value + "%";
     fill.style.width = value + "%";
     if(ready && value >= 100){
-      window.setTimeout(() => { screen.classList.add("is-done"); window.setTimeout(() => { screen.remove(); window.dispatchEvent(new Event("sitePreloaderFinished")); }, 700); }, Math.max(350, 1200-(Date.now()-started)));
+      window.setTimeout(() => {
+        screen.classList.add("is-done");
+        window.setTimeout(() => { screen.remove(); window.dispatchEvent(new Event("sitePreloaderFinished")); }, isHomePage ? 350 : 700);
+      }, Math.max(isHomePage ? 180 : 350, (isHomePage ? 650 : 1200)-(Date.now()-started)));
       return;
     }
     window.setTimeout(update, 45);
@@ -55,6 +86,7 @@
   let chapterLabelTimer = null;
 
   const body = document.body;
+  const isHomePage = body.dataset.pageLabel === "GUARDA";
   const headerChapter = document.querySelector(".header-chapter");
   const chapterLabel = document.getElementById("chapterLabel");
   const chapterPrev = document.getElementById("chapterPrev");
@@ -74,6 +106,11 @@
 
   // Open the intro curtain only after the percentage preloader has completed.
   const openIntroCurtain = () => {
+    if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+      body.classList.add("is-ready", "hero-intro-open");
+      window.dispatchEvent(new Event("heroIntroOpened"));
+      return;
+    }
     const panel = document.querySelector(".curtain-panel--right");
     let introStarted = false;
     const markIntroOpen = () => {
@@ -84,7 +121,7 @@
     };
     if(panel) panel.addEventListener("transitionend", event => { if(event.propertyName === "transform") markIntroOpen(); }, {once:true});
     body.classList.add("is-ready");
-    window.setTimeout(markIntroOpen, 5700); // Fallback aligned with the slower, smoother curtain transition.
+    window.setTimeout(markIntroOpen, isHomePage ? 1800 : 5700); // Home intro failsafe; keep legacy timing on other pages.
   };
   const revealPage = () => {
     if(document.getElementById("sitePreloader")) {
@@ -96,7 +133,7 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", revealPage, {once:true});
   else revealPage();
   // Recovery if the preloader script fails for any reason.
-  window.setTimeout(() => { if(!body.classList.contains("is-ready")) openIntroCurtain(); }, 9000);
+  window.setTimeout(() => { if(!body.classList.contains("is-ready")) openIntroCurtain(); }, isHomePage ? 3500 : 9000);
 
   function updateChapter(index, animate=true){
     const safe = Math.max(0, Math.min(index, sections.length-1));
@@ -171,15 +208,32 @@
     }
   });
 
-  const sectionObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if(!entry.isIntersecting) return;
-      const index = sections.findIndex(s => s.id === entry.target.id);
-      if(index !== -1) updateChapter(index);
-    });
-  },{threshold:0,rootMargin:"-40% 0px -40% 0px"});
-
-  chapterElements.forEach(section => sectionObserver.observe(section));
+  if ("IntersectionObserver" in window) {
+    const sectionObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if(!entry.isIntersecting) return;
+        const index = sections.findIndex(s => s.id === entry.target.id);
+        if(index !== -1) updateChapter(index);
+      });
+    },{threshold:0,rootMargin:"-40% 0px -40% 0px"});
+    chapterElements.forEach(section => sectionObserver.observe(section));
+  } else {
+    // Graceful fallback for older browsers: update the active chapter on scroll.
+    const updateChapterFromViewport = () => {
+      const midpoint = window.innerHeight / 2;
+      let closestIndex = 0;
+      let closestDistance = Infinity;
+      chapterElements.forEach((section, index) => {
+        const rect = section.getBoundingClientRect();
+        const distance = midpoint < rect.top ? rect.top - midpoint : midpoint > rect.bottom ? midpoint - rect.bottom : 0;
+        if(distance < closestDistance){ closestDistance = distance; closestIndex = index; }
+      });
+      updateChapter(closestIndex, false);
+    };
+    window.addEventListener("scroll", updateChapterFromViewport, {passive:true});
+    window.addEventListener("resize", updateChapterFromViewport, {passive:true});
+    updateChapterFromViewport();
+  }
 
   // The chapter navigation detaches visually from the header after GUARDA.
   // The brand/menu header is visible at the opening and returns at the footer.
@@ -306,16 +360,19 @@
     if(!inside) closeMenu(false);
   });
 
-  const revealObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if(entry.isIntersecting){
-        entry.target.classList.add("is-visible");
-        revealObserver.unobserve(entry.target);
-      }
-    });
-  },{threshold:.12,rootMargin:"0px 0px -7% 0px"});
-
-  revealElements.forEach(element => revealObserver.observe(element));
+  if ("IntersectionObserver" in window) {
+    const revealObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting){
+          entry.target.classList.add("is-visible");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    },{threshold:.12,rootMargin:"0px 0px -7% 0px"});
+    revealElements.forEach(element => revealObserver.observe(element));
+  } else {
+    revealElements.forEach(element => element.classList.add("is-visible"));
+  }
 
   // Un solo ritmo di scrittura per TUTTE le sezioni: intervallo costante tra ogni carattere.
   // Titoli, paragrafi e link condividono la stessa sequenza e la stessa temporizzazione.
@@ -329,17 +386,18 @@
     const wrapTextNodes = node => {
       [...node.childNodes].forEach(child => {
         if(child.nodeType === Node.TEXT_NODE && child.nodeValue){
-          const fragment = document.createDocumentFragment();
+          // Keep each text run inside one wrapper so flex links do not treat every character as a separate item.
+          const group = document.createElement("span");
+          group.className = "writing-char-group";
           for(const character of child.nodeValue){
             const span = document.createElement("span");
             span.className = "writing-char";
-            span.setAttribute("aria-hidden","true");
             span.style.setProperty("--char-delay", `${characterIndex * WRITING_CHARACTER_INTERVAL}s`);
             span.textContent = character;
-            fragment.appendChild(span);
+            group.appendChild(span);
             characterIndex++;
           }
-          child.replaceWith(fragment);
+          child.replaceWith(group);
         }else if(child.nodeType === Node.ELEMENT_NODE && !child.classList.contains("writing-char")){
           wrapTextNodes(child);
         }
@@ -348,8 +406,8 @@
 
     targets.forEach(element => {
       const accessibleText = element.textContent.trim();
+      // Keep paragraph and heading text exposed to assistive technology; label only links.
       if(element.matches("a")) element.setAttribute("aria-label",accessibleText.replace(/\s*[↗→]\s*$/,""));
-      else element.setAttribute("aria-label",accessibleText);
       wrapTextNodes(element);
     });
 
@@ -384,7 +442,6 @@
       writingObserver.observe(section);
     }else{
       copy.classList.add("is-writing");
-      if(territoryCta) territoryCta.classList.add("territory-cta-ready");
     }
   });
 
@@ -494,13 +551,13 @@
   },{passive:true});
 
   function resetInactivityTimer(){
-    if(pauseActive) return;
     if(inactivityTimer) clearTimeout(inactivityTimer);
-    inactivityTimer=setTimeout(enterPause,30000);
+    if(pauseActive || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    inactivityTimer=setTimeout(enterPause,isHomePage ? 120000 : 30000);
   }
 
   function enterPause(){
-    if(pauseActive || menuOpen) return;
+    if(pauseActive || menuOpen || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     pauseActive=true;
     pauseRestoreY=window.scrollY;
     body.classList.add("is-paused");
@@ -587,7 +644,26 @@
   function setLanguage(language){
     currentLanguage = language === "en" ? "en" : "it";
     document.documentElement.lang = currentLanguage;
-    document.title = currentLanguage === "en" ? "Cesare Paratore | Sport, movement, training and web in Partinico" : "Cesare Paratore | Sport, movimento, formazione e web a Partinico";
+    if(isHomePage){
+      document.title = currentLanguage === "en" ? "Cesare Paratore | Sport, movement, training and web in Partinico" : "Cesare Paratore | Sport Manager & Chinesiologo a Partinico";
+      const descriptions = {
+        it: "Cesare Paratore, Sport Manager, Chinesiologo e Running Coach a Partinico. Valutazione motoria, preparazione atletica e progetti professionali, anche online.",
+        en: "Cesare Paratore is a Sport Manager, Kinesiologist and Running Coach in Sicily, working on movement, athletic training and professional projects in person or online."
+      };
+      const description = descriptions[currentLanguage];
+      const localeMeta = document.querySelector("meta[property=\"og:locale\"]");
+      if(localeMeta) localeMeta.setAttribute("content", currentLanguage === "en" ? "en_US" : "it_IT");
+      [
+        ["meta[name=\"description\"]", "content"],
+        ["meta[property=\"og:description\"]", "content"],
+        ["meta[name=\"twitter:description\"]", "content"]
+      ].forEach(([selector, attribute]) => { const meta = document.querySelector(selector); if(meta) meta.setAttribute(attribute, description); });
+      const socialTitle = document.querySelector("meta[property=\"og:title\"]");
+      const twitterTitle = document.querySelector("meta[name=\"twitter:title\"]");
+      const localizedTitle = currentLanguage === "en" ? document.title : "Cesare Paratore | Sport Manager & Chinesiologo a Partinico";
+      if(socialTitle) socialTitle.setAttribute("content", localizedTitle);
+      if(twitterTitle) twitterTitle.setAttribute("content", localizedTitle);
+    }
     if(languageToggle){languageToggle.setAttribute("aria-pressed",String(currentLanguage === "en"));languageToggle.setAttribute("aria-label",currentLanguage === "en" ? "Switch language to Italian" : "Switch language to English");}
     Object.keys(languageStrings.it).forEach(selector => {
       const element = document.querySelector(selector);
@@ -597,33 +673,35 @@
     });
     const heroCopy = document.querySelector("[data-hero-copy]");
     const heroScroll = document.querySelector("[data-hero-scroll]");
-    if(heroCopy) heroCopy.textContent = currentLanguage === "en" ? "People. Movement. Ideas." : "Persone. Movimento. Idee.";
+    if(heroCopy) heroCopy.textContent = currentLanguage === "en" ? "Sport, movement, education and digital projects." : "Sport, movimento, formazione e progetti digitali.";
     if(heroScroll) heroScroll.textContent = currentLanguage === "en" ? "SCROLL TO EXPLORE" : "SCORRI PER ESPLORARE";
     // Translation replaces HTML nodes; rebuild the character spans so English uses the same typewriter effect.
     const writingInterval = 0.04;
     document.querySelectorAll(".writing-copy").forEach(copy => {
       copy.querySelectorAll(".writing-char").forEach(span => span.replaceWith(document.createTextNode(span.textContent || "")));
+      copy.querySelectorAll(".writing-char-group").forEach(group => group.replaceWith(document.createTextNode(group.textContent || "")));
       let charIndex = 0;
       const wrapTextNodes = node => {
         [...node.childNodes].forEach(child => {
           if(child.nodeType === Node.TEXT_NODE && child.nodeValue) {
-            const fragment = document.createDocumentFragment();
+            const group = document.createElement("span");
+            group.className = "writing-char-group";
             for(const character of child.nodeValue) {
               const span = document.createElement("span");
               span.className = "writing-char";
-              span.setAttribute("aria-hidden", "true");
               span.style.setProperty("--char-delay", `${charIndex * writingInterval}s`);
               span.textContent = character;
-              fragment.appendChild(span);
+              group.appendChild(span);
               charIndex++;
             }
-            child.replaceWith(fragment);
+            child.replaceWith(group);
           } else if(child.nodeType === Node.ELEMENT_NODE && !child.classList.contains("writing-char")) wrapTextNodes(child);
         });
       };
       copy.querySelectorAll("[data-reveal]").forEach(target => {
         const accessibleText = target.textContent.trim();
-        target.setAttribute("aria-label", target.matches("a") ? accessibleText.replace(/\s*[↗→]\s*$/, "") : accessibleText);
+        // Do not put aria-label on generic paragraphs: preserve their text as normal accessible content.
+        if(target.matches("a")) target.setAttribute("aria-label", accessibleText.replace(/\s*[↗→]\s*$/, ""));
         wrapTextNodes(target);
       });
       const section = copy.closest(".chapter-section") || copy;
@@ -651,6 +729,11 @@
     if(languageSwitchBusy) return;
     languageSwitchBusy = true;
     const nextLanguage = currentLanguage === "it" ? "en" : "it";
+    if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+      setLanguage(nextLanguage);
+      languageSwitchBusy = false;
+      return;
+    }
     document.body.classList.add("language-refreshing");
     languageRefresh.classList.add("is-active");
     languageToggle.disabled = true;
@@ -773,15 +856,15 @@
 })();
 
 
-// Footer local clock — Partinico (Europe/Rome)
-(function initFooterClock(){
-  const clock = document.getElementById('footerClock');
-  if (!clock) return;
-  const updateClock = () => {
-    clock.textContent = new Intl.DateTimeFormat('it-IT', { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(new Date());
+// One shared clock timer updates the hero and footer without duplicate intervals.
+(function initLocalClocks(){
+  const formatter = new Intl.DateTimeFormat("it-IT", {timeZone:"Europe/Rome", hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false});
+  const update = () => {
+    const now = formatter.format(new Date());
+    ["heroClock", "footerClock"].forEach(id => { const element = document.getElementById(id); if(element) element.textContent = now; });
+    const live = document.querySelector("[data-live-clock]");
+    if(live) live.textContent = new Intl.DateTimeFormat(document.documentElement.lang === "en" ? "en-GB" : "it-IT", {timeZone:"Europe/Rome", hour:"2-digit", minute:"2-digit", hour12:false}).format(new Date());
   };
-  updateClock();
-  window.setInterval(updateClock, 1000);
+  update();
+  window.setInterval(update, 1000);
 })();
-
-(() => { const el=document.getElementById("heroClock"); if(!el)return; const tick=()=>{el.textContent=new Intl.DateTimeFormat("it-IT",{timeZone:"Europe/Rome",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false}).format(new Date())};tick();setInterval(tick,1000);})();
