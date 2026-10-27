@@ -4,6 +4,7 @@
   --text-color: #f2f0ea;
   --text-muted: rgba(242, 240, 234, 0.6);
   --border-color: rgba(242, 240, 234, 0.12);
+  --accent-color: #ffffff;
   --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --safe-top: max(1rem, env(safe-area-inset-top));
   --safe-bottom: max(1rem, env(safe-area-inset-bottom));
@@ -66,9 +67,9 @@ button, a {
   background: linear-gradient(180deg, rgba(9,9,9,0.9) 0%, rgba(9,9,9,0) 100%);
 }
 
-.logo img {
-  width: 32px;
-  height: 32px;
+.logo img, .dock-logo-image {
+  width: 28px;
+  height: 28px;
   display: block;
 }
 
@@ -106,12 +107,6 @@ button, a {
   padding: 0.6rem 1.2rem;
   border-radius: 999px;
   z-index: 90;
-}
-
-.dock-logo-image {
-  width: 20px;
-  height: 20px;
-  display: block;
 }
 
 .section-inner {
@@ -256,4 +251,9 @@ details.faq-accordion summary::after {
 
 details[open].faq-accordion summary::after {
   content: "−";
+}
+
+[data-reveal] {
+  opacity: 1; /* Fallback sicuro se JS non carica */
+  transform: translateY(0);
 }
