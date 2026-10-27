@@ -1,29 +1,125 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#090909">
-<title>Chi Sono | Cesare Paratore</title>
+<meta name="description" content="Scopri il percorso di Cesare Paratore tra sport, movimento, formazione e digitale: cinque ambiti professionali affrontati con ascolto, metodo e obiettivi concreti.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Chi sono | Cesare Paratore — Sport, movimento e digitale">
+<meta property="og:description" content="Scopri il percorso di Cesare Paratore tra sport, movimento, formazione e digitale: cinque ambiti professionali affrontati con ascolto, metodo e obiettivi concreti.">
+<meta property="og:locale" content="it_IT">
+<meta name="author" content="Cesare Paratore">
+<meta name="robots" content="index,follow">
+<title>Chi sono | Cesare Paratore — Sport, movimento e digitale</title>
 <link rel="canonical" href="https://cesareparatore.github.io/chi-sono/">
-<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+
+.detail-page{background:#f2f0ea;color:#090909;min-height:100vh;padding-top:58px}
+.detail-page .site-header{display:block}
+.detail-header-inner{display:flex;align-items:center;justify-content:space-between;gap:24px;width:min(1200px,calc(100% - 48px));margin:auto}
+.detail-back{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#f2f0ea;opacity:.85}
+.detail-back:hover,.detail-back:focus-visible{opacity:1}
+.detail-main{width:min(1200px,calc(100% - 48px));margin:0 auto;padding:clamp(78px,12vw,160px) 0 120px}
+.detail-kicker{margin:0 0 24px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:rgba(9,9,9,.58);font-weight:600}
+.detail-title{margin:0 0 clamp(48px,8vw,104px);font-size:clamp(5rem,16vw,13rem);line-height:.78;letter-spacing:-.09em;font-weight:500}
+.detail-title span{color:#8b8b80}
+.detail-lead-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(32px,8vw,120px);align-items:start;border-top:1px solid rgba(9,9,9,.22);padding-top:28px}
+.detail-lead{font-size:clamp(1.5rem,3.2vw,3.2rem);line-height:1.08;letter-spacing:-.055em;max-width:18ch;margin:0}
+.detail-body{font-size:1rem;line-height:1.75;color:rgba(9,9,9,.72);max-width:55ch;margin:0}
+.detail-section{margin-top:clamp(84px,12vw,150px);display:grid;grid-template-columns:.7fr 1.3fr;gap:clamp(28px,7vw,100px);border-top:1px solid rgba(9,9,9,.22);padding-top:24px}
+.detail-index{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:rgba(9,9,9,.58)}
+.detail-section h2{margin:0 0 22px;font-size:clamp(2rem,5vw,4.5rem);line-height:.98;letter-spacing:-.065em;font-weight:500}
+.detail-section p{max-width:62ch;font-size:1rem;line-height:1.75;color:rgba(9,9,9,.72)}
+.detail-town-list{list-style:none;padding:0;margin:30px 0 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 24px;border-top:1px solid rgba(9,9,9,.18)}
+.detail-town-list li{padding:13px 0;border-bottom:1px solid rgba(9,9,9,.14);font-size:.96rem}
+.detail-modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:28px}
+.detail-mode{border-top:2px solid #090909;padding-top:16px}
+.detail-mode h3{font-size:1.15rem;margin:0 0 10px;font-weight:600;letter-spacing:-.025em}
+.detail-mode p{margin:0;font-size:.95rem}
+.detail-map-wrap{margin-top:28px;max-width:760px}
+.detail-map{width:100%;aspect-ratio:16/9;border:0;display:block;filter:grayscale(.55) saturate(.82)}
+.detail-map-note{font-size:.82rem!important;line-height:1.6!important;margin-top:12px;color:rgba(9,9,9,.58)!important}
+.detail-closing{margin-top:clamp(100px,15vw,180px);padding-top:28px;border-top:1px solid rgba(9,9,9,.22);display:flex;align-items:end;justify-content:space-between;gap:24px}
+.detail-closing p{font-size:clamp(2rem,5vw,4.5rem);line-height:.98;letter-spacing:-.065em;max-width:15ch;margin:0}
+.detail-cta{display:inline-flex;align-items:center;gap:18px;border-bottom:1px solid #090909;padding:14px 0;font-size:.92rem;white-space:nowrap}
+.detail-cta:hover,.detail-cta:focus-visible{opacity:.62}
+.detail-footer{background:#090909;color:#f2f0ea;padding:28px 24px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+.detail-footer a{opacity:.8} .detail-footer a:hover{opacity:1}
+@media(max-width:700px){
+ .detail-header-inner,.detail-main{width:calc(100% - 36px)}
+ .detail-lead-grid,.detail-section{grid-template-columns:1fr;gap:22px}
+ .detail-town-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 16px}
+ .detail-modes{grid-template-columns:1fr}
+ .detail-closing{align-items:start;flex-direction:column}
+ .detail-title{font-size:clamp(5rem,23vw,9rem)}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+.detail-main{padding-bottom:clamp(64px,10vw,120px)}
+.detail-section p{max-width:68ch;line-height:1.8}
+.detail-quicklinks{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.detail-quicklinks a{border:1px solid rgba(9,9,9,.22);border-radius:999px;padding:12px 16px;font-size:11px;letter-spacing:.04em;transition:background .2s,color .2s}
+.detail-quicklinks a:hover,.detail-quicklinks a:focus-visible{background:#090909;color:#f2f0ea;outline:2px solid transparent}
+.detail-header-inner{grid-template-columns:auto 1fr auto}
+.detail-lang{grid-column:2;justify-self:end}
+@media(max-width:600px){.detail-main{width:calc(100% - 36px)}.detail-header-inner{width:calc(100% - 36px)}.detail-title{font-size:clamp(58px,17vw,104px)}}
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","name":"Chi sono | Cesare Paratore","inLanguage":"it-IT","about":{"@type":"Person","name":"Cesare Paratore"}}
+</script>
+<meta property="og:url" content="https://cesareparatore.github.io/chi-sono/">
+<meta property="og:image" content="https://cesareparatore.github.io/assets/images/cp-foto.webp">
+<meta property="og:image:alt" content="Foto di Cesare Paratore">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Chi sono | Cesare Paratore — Sport, movimento e digitale">
+<meta name="twitter:description" content="Scopri il percorso di Cesare Paratore tra sport, movimento, formazione e digitale: cinque ambiti professionali affrontati con ascolto, metodo e obiettivi concreti.">
+<meta name="twitter:image" content="https://cesareparatore.github.io/assets/images/cp-foto.webp">
+<link rel="icon" type="image/svg+xml" href="https://cesareparatore.github.io/assets/images/cp-mark.svg">
 </head>
-<body>
-<header class="site-header">
-  <a class="logo" href="/" aria-label="Home"><img src="/assets/images/cp-mark.svg" alt="" aria-hidden="true"></a>
-</header>
-<main>
-  <section class="section-inner">
-    <div class="writing-copy">
-      <h1 class="hero-title">CHI SONO<span class="hero-dot">.</span></h1>
-      <p>Sezione ufficiale del Digital HQ di Cesare Paratore. Operatività a Partinico (PA) e nei 25 km limitrofi, oltre a consulenze digitali nazionali.</p>
-      <a class="story-more" href="/">Torna alla Home <span aria-hidden="true">↗</span></a>
-    </div>
+<body class="detail-page">
+<header class="site-header"><div class="detail-header-inner">
+<a class="logo" href="/" aria-label="Cesare Paratore, pagina iniziale"><img src="/assets/images/cp-mark.svg" alt="" aria-hidden="true"></a>
+<a class="detail-back" href="/">← Torna alla home</a>
+</div></header>
+<main id="main-content" class="detail-main">
+<p class="detail-kicker" data-it="IL FILO CONDUTTORE · CESARE PARATORE" data-en="IL FILO CONDUTTORE · CESARE PARATORE">IL FILO CONDUTTORE · CESARE PARATORE</p>
+<h1 class="detail-title" data-it="CHI SONO." data-en="ABOUT ME.">CHI SONO<span>.</span></h1>
+<div class="detail-lead-grid">
+<p class="detail-lead" data-it="Curiosità diverse, un unico modo di affrontare i problemi." data-en="Different interests, one way of approaching problems.">Curiosità diverse, un unico modo di affrontare i problemi.</p>
+<p class="detail-body" data-it="Il mio percorso attraversa sport, movimento, formazione e digitale. Non li considero mondi isolati: mi interessa capire il contesto, individuare ciò che serve e trasformarlo in un percorso concreto. Ogni progetto parte dall’ascolto e da un obiettivo condiviso." data-en="My path spans sport, movement, education and digital work. I do not see them as isolated worlds: I focus on understanding the context, identifying what is needed and turning it into a practical path. Every project begins with listening and a shared goal.">Il mio percorso attraversa sport, movimento, formazione e digitale. Non li considero mondi isolati: mi interessa capire il contesto, individuare ciò che serve e trasformarlo in un percorso concreto. Ogni progetto parte dall’ascolto e da un obiettivo condiviso.</p>
+</div>
+
+  <section class="detail-section" aria-labelledby="section-1">
+    <div class="detail-index">01 / <span data-it="APPROFONDIMENTO" data-en="DETAILS">APPROFONDIMENTO</span></div>
+    <div><h2 id="section-1" data-it="Un approccio, non una formula" data-en="An approach, not a formula">Un approccio, non una formula</h2>
+    <p data-it="Ogni persona e ogni progetto hanno esigenze diverse. Per questo preferisco partire dalle domande giuste, chiarire le priorità e scegliere strumenti coerenti con il risultato che vogliamo raggiungere." data-en="Every person and project has different needs. I start with the right questions, clarify priorities and choose tools that fit the result we want to achieve.">Ogni persona e ogni progetto hanno esigenze diverse. Per questo preferisco partire dalle domande giuste, chiarire le priorità e scegliere strumenti coerenti con il risultato che vogliamo raggiungere.</p></div>
   </section>
+  <section class="detail-section" aria-labelledby="section-2">
+    <div class="detail-index">02 / <span data-it="APPROFONDIMENTO" data-en="DETAILS">APPROFONDIMENTO</span></div>
+    <div><h2 id="section-2" data-it="Cinque ambiti, stessa attenzione" data-en="Five fields, the same attention">Cinque ambiti, stessa attenzione</h2>
+    <p data-it="Sport Manager, Chinesiologo, Running Coach, Formatore e Web Designer: cinque ambiti distinti, con competenze e obiettivi specifici. La home li presenta sullo stesso piano; le pagine dedicate aiutano a capire quale sia più vicino alla tua esigenza." data-en="Sport Manager, Kinesiologist, Running Coach, Trainer and Web Designer: five distinct fields, each with its own skills and goals. The homepage presents them equally; dedicated pages help you find the one that fits your needs.">Sport Manager, Chinesiologo, Running Coach, Formatore e Web Designer: cinque ambiti distinti, con competenze e obiettivi specifici. La home li presenta sullo stesso piano; le pagine dedicate aiutano a capire quale sia più vicino alla tua esigenza.</p></div>
+  </section>
+<div class="detail-closing">
+<p data-it="Ogni progetto comincia da una buona conversazione." data-en="Every project starts with a good conversation.">Ogni progetto comincia da una buona conversazione.</p>
+<div class="detail-quicklinks"><a href="/#contatto" data-it="Parliamo del tuo progetto ↗" data-en="Let’s talk about your project ↗">Parliamo del tuo progetto ↗</a><a href="/dove-sono/" data-it="Dove opero ↗" data-en="Where I work ↗">Dove opero ↗</a></div>
+</div>
 </main>
-<footer class="site-footer">
-  <div>Cesare Paratore</div>
-  <div><a href="/privacy/">Privacy ↗</a></div>
-</footer>
-</body>
-</html>
+<footer class="detail-footer"><span>© Cesare Paratore</span><a href="/privacy/">Privacy ↗</a><a href="/">Home ↗</a></footer>
+<script>
+(() => {
+ const button=document.createElement('button');
+ button.type='button';button.className='detail-lang';button.textContent='IT / EN';
+ button.setAttribute('aria-label','Switch language to English');
+ document.querySelector('.detail-header-inner').appendChild(button);
+ let english=false;
+ button.addEventListener('click',() => {
+   english=!english;document.documentElement.lang=english?'en':'it';
+   document.querySelectorAll('[data-it][data-en]').forEach(el=>{el.textContent=english?el.dataset.en:el.dataset.it;});
+   document.querySelector('.detail-back').textContent=english?'← Back to home':'← Torna alla home';
+   button.setAttribute('aria-label',english?'Switch language to Italian':'Switch language to English');
+ });
+})();
+</script>
+</body></html>

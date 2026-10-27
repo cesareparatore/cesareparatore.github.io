@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://cesareparatore.github.io/</loc><priority>1.0</priority></url>
-  <url><loc>https://cesareparatore.github.io/chinesiologo/</loc><priority>0.9</priority></url>
-  <url><loc>https://cesareparatore.github.io/running-coach/</loc><priority>0.9</priority></url>
-  <url><loc>https://cesareparatore.github.io/sport-manager/</loc><priority>0.8</priority></url>
-  <url><loc>https://cesareparatore.github.io/formatore/</loc><priority>0.8</priority></url>
-  <url><loc>https://cesareparatore.github.io/web-designer/</loc><priority>0.8</priority></url>
-  <url><loc>https://cesareparatore.github.io/chi-sono/</loc><priority>0.7</priority></url>
-  <url><loc>https://cesareparatore.github.io/dove-sono/</loc><priority>0.7</priority></url>
-  <url><loc>https://cesareparatore.github.io/contatti/</loc><priority>0.8</priority></url>
-  <url><loc>https://cesareparatore.github.io/privacy/</loc><priority>0.4</priority></url>
+  <url><loc>https://cesareparatore.github.io/</loc></url>
+  <url><loc>https://cesareparatore.github.io/privacy/</loc></url>
+  <url><loc>https://cesareparatore.github.io/dove-sono/</loc></url>
+  <url><loc>https://cesareparatore.github.io/chi-sono/</loc></url>
+  <url><loc>https://cesareparatore.github.io/sport-manager/</loc></url>
+  <url><loc>https://cesareparatore.github.io/chinesiologo/</loc></url>
+  <url><loc>https://cesareparatore.github.io/running-coach/</loc></url>
+  <url><loc>https://cesareparatore.github.io/formatore/</loc></url>
+  <url><loc>https://cesareparatore.github.io/web-designer/</loc></url>
+  <url><loc>https://cesareparatore.github.io/contatti/</loc></url>
 </urlset>
