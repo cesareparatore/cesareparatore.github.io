@@ -1,4 +1,3 @@
 User-agent: *
 Allow: /
-
 Sitemap: https://cesareparatore.github.io/sitemap.xml
