@@ -1,13 +1,10 @@
-/* Cesare Paratore — Digital HQ CSS 10/10 Master */
+/* Cesare Paratore — Digital HQ CEO Mode CSS 10/10 */
 :root {
   --bg-color: #090909;
   --text-color: #f2f0ea;
-  --text-muted: rgba(242, 240, 234, 0.6);
-  --border-color: rgba(242, 240, 234, 0.12);
-  --accent-color: #ffffff;
+  --text-muted: rgba(242, 240, 234, 0.65);
+  --border-color: rgba(242, 240, 234, 0.15);
   --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --safe-top: max(1rem, env(safe-area-inset-top));
-  --safe-bottom: max(1rem, env(safe-area-inset-bottom));
 }
 
 *, *::before, *::after {
@@ -16,42 +13,19 @@
   padding: 0;
 }
 
-html {
+html, body {
   background-color: var(--bg-color);
   color: var(--text-color);
   font-family: var(--font-main);
   font-size: 16px;
-  line-height: 1.5;
+  line-height: 1.6;
   scroll-behavior: smooth;
-  -webkit-text-size-adjust: 100%;
-}
-
-body {
-  background-color: var(--bg-color);
-  color: var(--text-color);
   overflow-x: hidden;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
 }
 
-button, a {
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
+a {
   color: inherit;
   text-decoration: none;
-}
-
-.skip-link {
-  position: absolute;
-  top: -100px;
-  left: 1rem;
-  background: var(--text-color);
-  color: var(--bg-color);
-  padding: 0.5rem 1rem;
-  z-index: 9999;
-}
-.skip-link:focus {
-  top: 1rem;
 }
 
 .site-header {
@@ -62,60 +36,23 @@ button, a {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--safe-top) 2rem 1rem 2rem;
+  padding: 1.5rem 2rem;
   z-index: 100;
-  background: linear-gradient(180deg, rgba(9,9,9,0.9) 0%, rgba(9,9,9,0) 100%);
+  background: rgba(9, 9, 9, 0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-color);
 }
 
-.logo img, .dock-logo-image {
+.logo img {
   width: 28px;
   height: 28px;
   display: block;
 }
 
-.header-utility-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  font-size: 0.85rem;
-  letter-spacing: 0.1em;
-}
-
-.menu-toggle {
-  background: none;
-  border: 1px solid var(--border-color);
-  color: var(--text-color);
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  font-size: 0.85rem;
-  letter-spacing: 0.1em;
-  border-radius: 4px;
-}
-
-.floating-dock {
-  position: fixed;
-  bottom: var(--safe-bottom);
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  background: rgba(20, 20, 20, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--border-color);
-  padding: 0.6rem 1.2rem;
-  border-radius: 999px;
-  z-index: 90;
-}
-
 .section-inner {
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 8rem 2rem;
-}
-
-.chapter-section {
+  padding: 8rem 2rem 4rem 2rem;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -123,7 +60,7 @@ button, a {
 }
 
 .hero-title {
-  font-size: clamp(3rem, 8vw, 7rem);
+  font-size: clamp(3rem, 7vw, 6rem);
   font-weight: 700;
   letter-spacing: -0.03em;
   margin-bottom: 1.5rem;
@@ -136,32 +73,8 @@ button, a {
 .writing-copy p {
   font-size: clamp(1.1rem, 2vw, 1.35rem);
   color: var(--text-muted);
-  margin-bottom: 1.2rem;
-  max-width: 52ch;
-}
-
-.story-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
-  align-items: center;
-}
-
-@media(max-width: 768px) {
-  .story-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.story-portrait {
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-  filter: grayscale(100%);
-  transition: filter 0.3s;
-}
-.story-portrait:hover {
-  filter: grayscale(0%);
+  margin-bottom: 1.5rem;
+  max-width: 50ch;
 }
 
 .story-more, .contact-link {
@@ -171,89 +84,15 @@ button, a {
   font-weight: 600;
   border-bottom: 1px solid var(--text-color);
   padding-bottom: 0.2rem;
-  margin-top: 1.5rem;
+  margin-top: 1rem;
 }
 
 .site-footer {
-  padding: 4rem 2rem;
+  padding: 3rem 2rem;
   border-top: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 0.85rem;
   color: var(--text-muted);
-}
-
-.footer-socials {
-  display: flex;
-  gap: 1.5rem;
-}
-
-.menu-panel {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--bg-color);
-  z-index: 105;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s;
-}
-
-.menu-panel[aria-hidden="false"] {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.menu-list {
-  list-style: none;
-  text-align: center;
-}
-
-.menu-item {
-  margin: 1.5rem 0;
-}
-
-.menu-link {
-  font-size: 2rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-details.faq-accordion {
-  border-top: 1px solid var(--border-color);
-  border-bottom: 1px solid var(--border-color);
-  padding: 1rem 0;
-  margin: 2rem 0;
-}
-
-details.faq-accordion summary {
-  font-size: 0.9rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  list-style: none;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-details.faq-accordion summary::after {
-  content: "+";
-  font-size: 1.2rem;
-}
-
-details[open].faq-accordion summary::after {
-  content: "−";
-}
-
-[data-reveal] {
-  opacity: 1; /* Fallback sicuro se JS non carica */
-  transform: translateY(0);
 }
