@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta name="theme-color" content="#090909">
 <meta name="color-scheme" content="light">
 <meta property="og:type" content="website">
@@ -273,7 +273,7 @@
         <h2 class="territory-title" data-reveal>QUI<span class="territory-title-dot">.</span></h2>
         <p data-reveal>Partinico è il mio punto di partenza, tra Palermo e Trapani.</p>
         <p data-reveal>Da qui incontro persone, idee e progetti in cinque ambiti diversi, con la stessa attenzione. In presenza a Partinico e nei 25 km (Alcamo, Terrasini, Cinisi, Balestrate, Palermo). Online, quando serve.</p>
-        <p class="territory-emphasis" data-reveal>Il luogo è un punto di partenza, non un confine.</p>
+        <p data-territory-emphasis data-reveal>Il luogo è un punto di partenza, non un confine.</p>
         <a class="story-more territory-next-step" href="/dove-sono/" data-reveal>Scopri dove opero <span aria-hidden="true">↗</span></a>
       </div>
     </div>
@@ -340,8 +340,6 @@
   function tick(){
     const now = new Date();
     ["heroClock", "footerClock"].forEach(function(id){ const el=document.getElementById(id); if(el) el.textContent=formatter.format(now); });
-    const live=document.querySelector("[data-live-clock]");
-    if(live) live.textContent=new Intl.DateTimeFormat("it-IT",{timeZone:"Europe/Rome",hour:"2-digit",minute:"2-digit",hour12:false}).format(now);
   }
   tick(); window.setInterval(tick,1000);
 })();
