@@ -42,12 +42,12 @@
   </url>
   <url>
     <loc>https://cesareparatore.github.io/contatti/</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://cesareparatore.github.io/privacy/</loc>
     <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
+    <priority>0.4</priority>
   </url>
 </urlset>
