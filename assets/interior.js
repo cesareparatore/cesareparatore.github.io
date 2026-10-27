@@ -1,62 +1,63 @@
-/* Progressive enhancement for the shared interior pages. */
+/* Progressive enhancement for the site's interior pages. */
 (() => {
   'use strict';
   const body = document.body;
-  const toggle = document.querySelector('.language-toggle');
-  const menuToggle = document.querySelector('.menu-toggle');
-  const nav = document.querySelector('#site-navigation');
-  const metaDescription = document.querySelector('meta[name="description"]');
-  const ogTitle = document.querySelector('meta[property="og:title"]');
-  const ogDescription = document.querySelector('meta[property="og:description"]');
-  const titleFor = lang => lang === 'en' ? body.dataset.titleEn : body.dataset.titleIt;
-  const descriptionFor = lang => lang === 'en' ? body.dataset.descriptionEn : body.dataset.descriptionIt;
+  const languageButton = document.querySelector('.language-toggle');
+  const menuButton = document.querySelector('.menu-toggle');
+  const navigation = document.querySelector('#site-navigation');
+  const translatable = [...document.querySelectorAll('[data-it][data-en]')];
+  const titleIt = body.dataset.titleIt || document.title;
+  const titleEn = body.dataset.titleEn || titleIt;
+  const descriptionIt = body.dataset.descriptionIt || '';
+  const descriptionEn = body.dataset.descriptionEn || descriptionIt;
+  const descriptionTag = document.querySelector('meta[name="description"]');
+  const ogTitleTag = document.querySelector('meta[property="og:title"]');
+  const ogDescriptionTag = document.querySelector('meta[property="og:description"]');
+  const twitterTitleTag = document.querySelector('meta[name="twitter:title"]');
+  const twitterDescriptionTag = document.querySelector('meta[name="twitter:description"]');
+  let language = 'it';
 
-  function setLanguage(lang) {
-    const next = lang === 'en' ? 'en' : 'it';
-    document.documentElement.lang = next;
-    document.querySelectorAll('[data-it][data-en]').forEach(el => {
-      const value = el.dataset[next];
-      if (value !== undefined) el.textContent = value;
-    });
-    const title = titleFor(next);
-    const description = descriptionFor(next);
-    if (title) document.title = title;
-    if (description && metaDescription) metaDescription.content = description;
-    if (title && ogTitle) ogTitle.content = title;
-    if (description && ogDescription) ogDescription.content = description;
-    if (menuToggle) {
-      const open = menuToggle.getAttribute('aria-expanded') === 'true';
-      menuToggle.setAttribute('aria-label', open ? (next === 'en' ? 'Close menu' : 'Chiudi menu') : (next === 'en' ? 'Open menu' : 'Apri menu'));
+  function applyLanguage(nextLanguage) {
+    language = nextLanguage === 'en' ? 'en' : 'it';
+    body.lang = language;
+    for (const element of translatable) {
+      const value = element.dataset[language];
+      if (value !== undefined) element.textContent = value;
     }
-    if (toggle) {
-      toggle.setAttribute('aria-pressed', String(next === 'en'));
-      toggle.setAttribute('aria-label', next === 'it' ? 'Switch language to English' : 'Passa alla lingua italiana');
+    document.title = language === 'en' ? titleEn : titleIt;
+    const activeTitle = language === 'en' ? titleEn : titleIt;
+    const activeDescription = language === 'en' ? descriptionEn : descriptionIt;
+    if (descriptionTag) descriptionTag.content = activeDescription;
+    if (ogTitleTag) ogTitleTag.content = activeTitle;
+    if (ogDescriptionTag) ogDescriptionTag.content = activeDescription;
+    if (twitterTitleTag) twitterTitleTag.content = activeTitle;
+    if (twitterDescriptionTag) twitterDescriptionTag.content = activeDescription;
+    if (languageButton) {
+      languageButton.setAttribute('aria-pressed', String(language === 'en'));
+      languageButton.setAttribute('aria-label', language === 'it' ? 'Switch language to English' : 'Passa alla lingua italiana');
+      languageButton.textContent = language === 'it' ? 'IT / EN' : 'EN / IT';
     }
-    try { localStorage.setItem('cp-language', next); } catch (_) { /* Storage may be unavailable. */ }
+    document.documentElement.dataset.language = language;
   }
 
-  function setMenu(open) {
-    if (!menuToggle || !nav) return;
-    nav.classList.toggle('is-open', open);
-    menuToggle.setAttribute('aria-expanded', String(open));
-    const english = document.documentElement.lang.toLowerCase().startsWith('en');
-    menuToggle.setAttribute('aria-label', open ? (english ? 'Close menu' : 'Chiudi menu') : (english ? 'Open menu' : 'Apri menu'));
-  }
-
-  if (toggle) {
-    toggle.addEventListener('click', () => {
-      const currentlyEnglish = document.documentElement.lang.toLowerCase().startsWith('en');
-      setLanguage(currentlyEnglish ? 'it' : 'en');
-    });
-  }
-  if (menuToggle && nav) {
-    menuToggle.addEventListener('click', () => setMenu(menuToggle.getAttribute('aria-expanded') !== 'true'));
-    nav.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setMenu(false)));
-    document.addEventListener('keydown', event => { if (event.key === 'Escape') { setMenu(false); menuToggle.focus(); } });
-    window.addEventListener('resize', () => { if (window.matchMedia('(min-width: 921px)').matches) setMenu(false); });
-  }
-
-  let preferred = 'it';
-  try { const saved = localStorage.getItem('cp-language'); if (saved === 'it' || saved === 'en') preferred = saved; } catch (_) { /* Use the page language. */ }
-  if (preferred !== 'it') setLanguage(preferred);
+  languageButton?.addEventListener('click', () => applyLanguage(language === 'it' ? 'en' : 'it'));
+  menuButton?.addEventListener('click', () => {
+    if (!navigation) return;
+    const expanded = menuButton.getAttribute('aria-expanded') === 'true';
+    menuButton.setAttribute('aria-expanded', String(!expanded));
+    navigation.classList.toggle('is-open', !expanded);
+  });
+  navigation?.addEventListener('click', event => {
+    if (event.target.closest('a') && menuButton) {
+      menuButton.setAttribute('aria-expanded', 'false');
+      navigation.classList.remove('is-open');
+    }
+  });
+  window.addEventListener('resize', () => {
+    if (window.matchMedia('(min-width: 721px)').matches && navigation && menuButton) {
+      navigation.classList.remove('is-open');
+      menuButton.setAttribute('aria-expanded', 'false');
+    }
+  }, { passive: true });
+  applyLanguage('it');
 })();
