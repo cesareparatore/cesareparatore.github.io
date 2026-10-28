@@ -24,3 +24,12 @@ Questa documentazione accompagna la versione di progetto verificata localmente. 
 
 ## Aggiornamento biografia (Missione 4.1)
 La pagina «Chi sono» e la sua versione inglese includono ora la storia personale fornita dal titolare, strutturata in sei tappe e collegata a un breve riepilogo in homepage. I titoli di studio sono riportati soltanto nei termini dichiarati; ateneo, anno e denominazioni ufficiali restano da confermare. I test statici vanno rieseguiti prima della pubblicazione.
+
+## Missione 5.0 — coerenza e accessibilità di base
+
+- Le pagine interne utilizzano ora lo stesso monogramma SVG della homepage, anziché una versione testuale diversa.
+- Il colore della barra browser è uniformato al fondo avorio del sito.
+- Gli indicatori di focus da tastiera sono espliciti e distinguibili sia sui fondi chiari sia su quelli scuri.
+- Il quality checker ora controlla questi elementi per ridurre il rischio di regressioni future.
+- Esiti locali aggiuntivi: 28/28 risorse HTTP 200 nello smoke test statico; parser CSS/JSON-LD/sitemap e `node --check` superati.
+- Limite: browser visuale, Lighthouse, test screen reader e verifica live non sono stati completati; vedere `docs/REPORT-TEST.md`.

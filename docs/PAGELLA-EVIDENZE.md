@@ -23,3 +23,18 @@ Questa pagella non sostiene che il sito abbia raggiunto il massimo livello. Most
 ## Evidenze dell’intervento locale 4.0
 
 La homepage e la pagina territoriale, sia in italiano sia in inglese, riportano in HTML statico tutti i 17 comuni indicati dall’utente. La pagina territoriale raggruppa i comuni per provincia e chiarisce che la lista descrive un bacino di riferimento, non sedi secondarie o disponibilità garantita. I title e le description delle pagine di servizio sono stati resi più specifici rispetto al servizio e al riferimento a Partinico. Questo migliora chiarezza e coerenza on-page, ma non dimostra ranking locale, citazioni da parte di IA o aumento di richieste.
+
+## Aggiornamento Missione 5.0 — 28 ottobre 2026
+
+| Categoria | Valutazione aggiornata | Base della valutazione | Limite attuale |
+|---|---:|---|---|
+| Grafica e coerenza visiva | 7,5/10, stima sul codice | CSS condiviso delle pagine interne, monogramma SVG allineato alla homepage, palette e `theme-color` coerenti | Non è stato possibile ispezionare le pagine renderizzate; non si certifica ancora l'assenza di difetti responsive |
+| UX e navigazione | 7,5/10, stima | Menu interno con Escape e chiusura esterna, skip link, link locali verificati, route lingua presenti | Nessun test d'uso o verifica interattiva in browser |
+| Performance | Non valutata | Alcune scelte statiche sono conservative, inclusi audio senza preload anticipato | Lighthouse e Core Web Vitals non misurati; non assegnare un voto numerico senza dati |
+| Accessibilità | 6,5/10, stima provvisoria | Skip link, attributi `alt`, landmark, `lang`, movimento ridotto e focus visibile con coppie colore ad alto contrasto; controlli statici di base superati | Audit WCAG 2.2 AA completo, screen reader, zoom/reflow e test manuali non eseguiti |
+| SEO tecnico | 8/10, revisione statica | 20 URL sitemap, canonical, `hreflang`, `og:url`, JSON-LD e link locali verificati | Sito live, indicizzazione e ranking non verificati |
+| Credibilità professionale | 6,5/10, stima sui contenuti disponibili | Storia personale fornita dal titolare e descrizione dei servizi; nessuna qualifica inventata | Titoli ufficiali, atenei, anni, incarichi, prove e testimonianze da confermare |
+| Privacy e sicurezza | 6/10, stima provvisoria | Informativa prudente, nessun loader analytics autonomo, referrer policy e link esterni con rel controllati | Trattamenti effettivi, log, retention e header live da verificare; non è un parere legale |
+| Manutenibilità e QA | 8,5/10, revisione statica | Checker ampliato, workflow CI presente, 28/28 risorse HTTP locali 200, sintassi JS e parser CSS superati | Workflow remoto non eseguito; nessuna suite browser end-to-end |
+
+**Nota:** i voti numerici sono stime qualitative sul pacchetto locale, non metriche di laboratorio. La performance resta non valutata perché non è stata misurata; non è corretto trasformare l'assenza di dati in un voto inventato.

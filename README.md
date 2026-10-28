@@ -10,7 +10,7 @@ Sito statico multipagina per GitHub Pages, senza framework o dipendenze runtime 
 - `en/`: versioni statiche inglesi della homepage e delle nove pagine interne (`/en/`, `/en/chi-sono/`, ecc.), con `lang`, canonical e `hreflang` dedicati.
 - `404.html`: pagina di errore personalizzata per GitHub Pages.
 - `css/style.css`, `js/script.js`: stile e interazioni della homepage.
-- `assets/interior.css`, `assets/interior.js`: design system e interazioni delle pagine interne.
+- `assets/interior.css`, `assets/interior.js`: design system e interazioni delle pagine interne; il monogramma SVG è condiviso con la homepage e i focus da tastiera sono espliciti.
 - `assets/404.js`: localizza la pagina 404 in base al percorso richiesto.
 - `assets/images/`: ritratto e marchio SVG.
 - `assets/audio/`: traccia audio esistente; l'audio non viene avviato automaticamente.
@@ -30,7 +30,7 @@ node --check assets/interior.js
 node --check assets/404.js
 ```
 
-Il controllo Python verifica i riferimenti locali, le ancore, gli ID e gli attributi duplicati, il DOCTYPE, i metadati principali, i JSON-LD, canonical, `og:url`, `hreflang` reciproci, la copertura della sitemap e l'URL sitemap in `robots.txt`. È un controllo statico leggero, non sostituisce un validatore HTML5/CSS completo né i test browser.
+Il controllo Python verifica i riferimenti locali, le ancore, gli ID e gli attributi duplicati, il DOCTYPE, i metadati principali, i JSON-LD, canonical, `og:url`, `hreflang` reciproci, la copertura della sitemap, l'URL sitemap in `robots.txt`, il colore `theme-color`, il monogramma SVG condiviso e la presenza delle regole di focus visibile. È un controllo statico leggero, non sostituisce un validatore HTML5/CSS completo né i test browser.
 
 ## Pubblicazione su GitHub Pages
 

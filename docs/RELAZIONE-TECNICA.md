@@ -48,3 +48,14 @@ Chromium è installato, ma la navigazione di Playwright verso `http://127.0.0.1`
 - Pagine Chinesiologo e Running Coach: processo più concreto e perimetro dell’attività più chiaro; indicato che non si tratta di diagnosi o trattamento sanitario.
 - JSON-LD: riferimento Person normalizzato tra le pagine; rimosso dalla homepage il tema “valutazione posturale” perché non risultava spiegato in modo coerente nelle pagine di servizio esaminate.
 - Google Business Profile non è stato modificato, come richiesto.
+
+## Missione 5.0 — coerenza visiva e focus da tastiera
+
+- Sostituito il marchio testuale `CP` nelle 18 testate interne con lo stesso monogramma SVG già impiegato nella homepage; i percorsi sono relativi alla posizione di ogni pagina e sono stati controllati.
+- Uniformato `theme-color` a `#f2f0ea`, coerente con il fondo avorio del sistema grafico.
+- Aggiunto un indicatore di focus tastiera esplicito e ad alto contrasto sia al foglio CSS della homepage sia al foglio condiviso delle pagine interne. Sui fondi scuri il contorno passa al lime; sui fondi chiari usa il verde scuro.
+- Esteso `scripts/quality-check.py` per intercettare regressioni nel colore della barra del browser, nell'uso del monogramma SVG e nella presenza delle regole di focus visibile.
+- Verificato il rapporto di contrasto dei due colori usati per il focus rispetto ai fondi di riferimento: verde scuro su avorio 11,53:1; lime su nero 15,18:1. Questi rapporti riguardano i colori di focus dichiarati, non costituiscono un audit WCAG completo di ogni testo e componente.
+- Non sono state rimosse pagine, contenuti o funzionalità. Non è stato eseguito alcun deploy o aggiornamento del repository remoto.
+
+La revisione rende più coerenti alcuni elementi identificativi e corregge una criticità concreta di navigazione da tastiera. Non sostituisce il confronto visivo in browser: Chromium continua a bloccare la navigazione locale con `ERR_BLOCKED_BY_ADMINISTRATOR`, quindi non sono dichiarati test responsive visuali, Lighthouse o test interattivi superati.

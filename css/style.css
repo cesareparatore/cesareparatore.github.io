@@ -840,3 +840,11 @@ body[data-page-label="GUARDA"] .preloader-percent{font-size:10px;letter-spacing:
 body[data-page-label="GUARDA"] .preloader-fill{width:34%;transform:translateX(-110%);animation:homePreloaderIndeterminate 1.15s cubic-bezier(.22,.61,.36,1) infinite}
 @keyframes homePreloaderIndeterminate{from{transform:translateX(-110%)}to{transform:translateX(380%)}}
 @media(prefers-reduced-motion:reduce){body[data-page-label="GUARDA"] .preloader-fill{animation:none;transform:none}}
+
+
+/* Missione 5.0: focus tastiera sempre visibile, anche sui link con hover personalizzato. */
+:where(a,button,[tabindex]):focus-visible{outline:3px solid #26350f!important;outline-offset:4px!important}
+.site-header :where(a,button,[tabindex]):focus-visible,
+.menu-panel :where(a,button,[tabindex]):focus-visible,
+.site-footer :where(a,button,[tabindex]):focus-visible,
+#contatto :where(a,button,[tabindex]):focus-visible{outline-color:#b8f35c!important}

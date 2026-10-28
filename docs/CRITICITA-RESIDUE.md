@@ -27,3 +27,9 @@ Non è stato eseguito il deploy; non sono stati inventati punteggi Lighthouse, r
 ## Informazioni professionali ancora da confermare dal titolare
 
 Per rafforzare ulteriormente esperienza, competenza e affidabilità senza inventare elementi, restano da raccogliere e verificare: (1) titoli di studio e qualifiche da pubblicare, con denominazioni esatte; (2) corsi/certificazioni pertinenti e relative fonti verificabili; (3) esperienze, incarichi e collaborazioni che si possono rendere pubblici; (4) esempi di progetti o percorsi reali pubblicabili con consenso e senza dati sensibili; (5) eventuali recensioni autentiche e relative fonti; (6) modalità e luoghi effettivi disponibili per gli incontri in presenza, servizio per servizio. Non sono stati inventati né inseriti nel sito dati non presenti nelle fonti disponibili.
+
+## Aggiornamento Missione 5.0 — 28 ottobre 2026
+
+**Corretto in questa revisione:** marchio SVG condiviso nelle testate interne; colore `theme-color` coerente; focus da tastiera reso esplicito nei due sistemi CSS; controlli automatici estesi per prevenire regressioni su questi punti. Lo smoke test HTTP locale ha restituito 200 su 28/28 risorse testate.
+
+**Ancora aperto:** la coerenza grafica è stata migliorata nel codice, ma non può essere certificata visivamente finché il browser è bloccato nell'ambiente. Restano da eseguire test responsive reali, confronto visuale homepage/pagine interne, audit WCAG manuale e automatizzato completo, Lighthouse mobile/desktop, verifica del sito live e conferma delle informazioni professionali/privacy da parte del titolare. Nessun punteggio Lighthouse o certificazione WCAG è stato assegnato.

@@ -126,6 +126,11 @@ for page in html_files:
     meta_counts = Counter(key for key, _ in parser.meta_keys)
     for key, count in meta_counts.items():
         if count > 1: fail(f'{rel}: metadato duplicato name/property="{key}" ({count} occorrenze)')
+    theme_colors = [value.lower() for key, value in parser.meta_keys if key == 'theme-color']
+    if theme_colors != ['#f2f0ea']:
+        fail(f'{rel}: theme-color non coerente; atteso #f2f0ea, trovato {theme_colors}')
+    if 'class="brand-mark"' in text and not re.search(r'class="brand-mark"><img alt="" src="[^"]*cp-mark\.svg"', text):
+        fail(f'{rel}: il marchio interno deve usare il monogramma SVG condiviso')
     if len([x for x in parser.meta_keys if x[0] == 'description' and x[1]]) != 1:
         fail(f'{rel}: meta description mancante, vuota o duplicata')
     # Canonical, language and reciprocal alternate URLs for indexable locale pages.
@@ -259,6 +264,12 @@ else:
     match = re.search(r'^Sitemap:\s*(\S+)\s*$', robots.read_text(encoding='utf-8'), re.I | re.M)
     if not match: fail('robots.txt: URL sitemap mancante')
     elif match.group(1) != 'https://cesareparatore.github.io/sitemap.xml': fail(f'robots.txt: URL sitemap errato: {match.group(1)}')
+
+# Keyboard focus must remain explicitly visible in both visual systems.
+for css_path in [ROOT / 'css/style.css', ROOT / 'assets/interior.css']:
+    css_text = css_path.read_text(encoding='utf-8')
+    if ':focus-visible' not in css_text or 'outline:3px solid #26350f!important' not in css_text:
+        fail(f'{css_path.relative_to(ROOT)}: indicatore di focus tastiera ad alto contrasto mancante')
 
 # Required publishing assets.
 for required in ['index.html','404.html','robots.txt','sitemap.xml','assets/interior.css','assets/interior.js','assets/404.js','css/style.css','js/script.js']:

@@ -84,3 +84,29 @@ Sono stati aggiunti contenuti statici territoriali alla homepage italiana e ingl
 - Archivio consegnato: 45 file, inclusa `.github/workflows/quality.yml`; `ZipFile.testzip()` restituisce `None`.
 - La biografia deriva dal racconto del titolare; non costituisce verifica indipendente dei titoli o degli incarichi. Gli estremi di ateneo, anno e denominazione ufficiale dei titoli restano da confermare.
 - Test browser reali, Lighthouse, screen reader e verifica del sito pubblicato restano non eseguiti.
+
+## Missione 5.0 — esiti aggiuntivi (28 ottobre 2026)
+
+| Controllo | Esito | Evidenza / limite |
+|---|---|---|
+| Marchio SVG condiviso nelle testate interne | PASS | Tutte le 18 pagine che usano `.brand-mark` puntano al file `cp-mark.svg`; i percorsi relativi sono stati risolti sul filesystem |
+| Colore della barra browser | PASS | `theme-color` normalizzato a `#f2f0ea` in tutte le 21 pagine di contenuto, inclusa la 404; il file di verifica Google è escluso perché non è una pagina HTML di contenuto |
+| Focus da tastiera: regole CSS | PASS statico | Regole esplicite presenti nei CSS homepage e interni; contorno verde scuro sui fondi chiari e lime sui fondi scuri |
+| Contrasto dei colori di focus | PASS per le coppie testate | Verde scuro `#26350f` su avorio `#f2f0ea`: 11,53:1; lime `#b8f35c` su nero `#090909`: 15,18:1. Non equivale alla verifica di tutti i contrasti del sito |
+| Checker aggiornato | PASS | `python scripts/quality-check.py` verifica anche theme-color, monogramma SVG e presenza delle regole focus-visible |
+| Sintassi JavaScript | PASS | `node --check` su `js/script.js`, `assets/interior.js`, `assets/404.js` |
+| Parsing HTML / JSON-LD / CSS / sitemap | PASS | 21 pagine contenuto controllate; 20 blocchi JSON-LD validi; CSS analizzato con `tinycss2` senza errori parser; XML sitemap valido |
+| HTTP smoke test locale | PASS | 28/28 URL della sitemap e risorse di supporto hanno risposto HTTP 200 tramite server statico locale; non è un test browser né un controllo del sito pubblicato |
+| Controlli statici accessibilità di base | PASS | 21 pagine controllate per landmark `main`, `h1`, skip link e immagini con attributo `alt`: nessuna criticità rilevata da questo controllo limitato |
+| Browser / responsive / interazioni | NON ESEGUITO | Playwright verso `127.0.0.1` bloccato da `ERR_BLOCKED_BY_ADMINISTRATOR`; nessuno screenshot browser dichiarato |
+| Lighthouse / Core Web Vitals | NON ESEGUITO | Nessun punteggio misurato o inventato |
+| Deploy / controllo live / Search Console | NON ESEGUITO | Il repository remoto e il sito pubblicato non sono stati modificati né verificati in questa missione |
+
+Comandi riproducibili:
+
+```bash
+python scripts/quality-check.py
+node --check js/script.js
+node --check assets/interior.js
+node --check assets/404.js
+```
