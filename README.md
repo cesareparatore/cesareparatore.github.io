@@ -17,7 +17,7 @@ Sito statico multipagina per GitHub Pages, senza framework o dipendenze runtime 
 - `robots.txt`, `sitemap.xml`, `.nojekyll`: file per la pubblicazione e la reperibilità.
 - `scripts/quality-check.py`: controlli statici riproducibili senza dipendenze Python esterne, inclusi canonical, `hreflang`, `og:url`, sitemap e struttura dei documenti.
 - `.github/workflows/quality.yml`: workflow di controllo statico e sintassi JavaScript su push e pull request.
-- `docs/`: relazione, report, matrice di accessibilità e criticità residue.
+- `docs/`: relazione, report, matrice di accessibilità, criticità residue e checklist delle informazioni professionali da confermare (`INFORMAZIONI-DA-CONFERMARE.md`).
 
 ## Controlli locali
 

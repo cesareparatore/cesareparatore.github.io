@@ -22,7 +22,7 @@
 | Riferimenti CSS locali e bilanciamento parentesi | Superato | Controllo statico leggero, non sostitutivo di un validatore CSS completo |
 | Parser CSS `tinycss2` | Superato | 0 errori parser nei due fogli CSS |
 | HTTP smoke test con server locale | Superato | tutte le 20 URL della sitemap e 8 file di supporto (`404.html`, `assets/404.js`, JS/CSS condivisi, `robots.txt`, `sitemap.xml`) restituiscono HTTP 200; non equivale a test browser o deploy |
-| Integrità ZIP finale | Superato | Archivio finale riaperto; `testzip()` restituisce `None`; inventario verificato sul progetto finale (44 file attesi) |
+| Integrità ZIP finale | Superato | Archivio finale riaperto; `testzip()` restituisce `None`; inventario verificato sul progetto finale (45 file attesi) |
 | Browser Chromium | Non eseguito con successo | `ERR_BLOCKED_BY_ADMINISTRATOR` durante la navigazione Playwright a `http://127.0.0.1`; non dichiarati test UI superati |
 | Lighthouse | Non eseguito | Nessun punteggio inventato |
 | Core Web Vitals sul campo | Non disponibili | Richiedono dati reali e sufficienti dal sito pubblicato |
@@ -33,10 +33,10 @@
 ## Inventario e confronto
 
 - File originali: 20.
-- File finali: 44.
+- File finali: 45.
 - File originali mancanti nella versione finale: 0.
 - Percorsi originali modificati: 15.
-- File aggiunti rispetto all’originale: 24 (incluse 10 pagine inglesi e il controller 404).
+- File aggiunti rispetto all’originale: 25 (incluse 10 pagine inglesi, il controller 404 e la checklist delle informazioni professionali da confermare).
 
 ## Comandi riproducibili
 
@@ -48,3 +48,23 @@ node --check assets/404.js
 ```
 
 Per completare il QA dopo il deploy: aprire ogni pagina in Chrome DevTools, verificare console e richieste, eseguire Lighthouse in condizioni documentate, provare tastiera e screen reader, e controllare Search Console. I target di riferimento per i Core Web Vitals sono LCP ≤ 2,5 s, INP ≤ 200 ms e CLS ≤ 0,1 al 75º percentile; in questa sessione non sono stati misurati.
+
+
+## Verifiche aggiuntive dopo l’intervento 4.0
+
+Sono stati aggiunti contenuti statici territoriali alla homepage italiana e inglese e alle pagine territoriali dedicate. La verifica automatica successiva controlla che i 17 comuni indicati siano presenti nel contenuto statico e che i riferimenti Person JSON-LD siano coerenti. Questi controlli non dimostrano posizionamento locale, indicizzazione o disponibilità effettiva degli incontri.
+
+
+### Esiti registrati per la revisione locale 4.0
+
+- `python scripts/quality-check.py`: PASS; 21 documenti HTML controllati, 20 URL in sitemap, controllo di presenza statica dei comuni e coerenza dell’identificatore Person.
+- `node --check js/script.js`: PASS.
+- `node --check assets/interior.js`: PASS.
+- `node --check assets/404.js`: PASS.
+- Parsing dei JSON-LD presenti: PASS (20 blocchi).
+- Parsing HTML con `lxml`: PASS, nessun messaggio ERROR/FATAL per le pagine del sito.
+- Parsing XML sitemap: PASS.
+- Parsing CSS con `tinycss2`: PASS, 0 errori nei 2 fogli di stile.
+- Presenza di tutti i 17 comuni target nell’HTML statico di `index.html`, `dove-sono/index.html`, `en/index.html` e `en/dove-sono/index.html`: PASS.
+- Coerenza del riferimento JSON-LD `Person`: PASS, identificatore `https://cesareparatore.github.io/#cesare-paratore`.
+- Test browser/Lighthouse e audit manuale WCAG: non completati in questo ambiente; non vengono dichiarati superati.

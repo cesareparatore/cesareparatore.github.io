@@ -22,3 +22,8 @@
 ## Cosa non è stato fatto
 
 Non è stato eseguito il deploy; non sono stati inventati punteggi Lighthouse, risultati di screen reader, misurazioni Core Web Vitals, certificazioni WCAG o conformità legale.
+
+
+## Informazioni professionali ancora da confermare dal titolare
+
+Per rafforzare ulteriormente esperienza, competenza e affidabilità senza inventare elementi, restano da raccogliere e verificare: (1) titoli di studio e qualifiche da pubblicare, con denominazioni esatte; (2) corsi/certificazioni pertinenti e relative fonti verificabili; (3) esperienze, incarichi e collaborazioni che si possono rendere pubblici; (4) esempi di progetti o percorsi reali pubblicabili con consenso e senza dati sensibili; (5) eventuali recensioni autentiche e relative fonti; (6) modalità e luoghi effettivi disponibili per gli incontri in presenza, servizio per servizio. Non sono stati inventati né inseriti nel sito dati non presenti nelle fonti disponibili.

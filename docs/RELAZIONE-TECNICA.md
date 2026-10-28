@@ -38,3 +38,13 @@ Sono state conservate homepage, otto pagine professionali, pagina privacy, ritra
 ## Limiti
 
 Chromium è installato, ma la navigazione di Playwright verso `http://127.0.0.1` è stata bloccata con `ERR_BLOCKED_BY_ADMINISTRATOR`. Non sono dichiarati test interattivi superati, punteggi Lighthouse, conformità WCAG completa, Core Web Vitals sul campo o deploy. Vedere `REPORT-TEST.md`.
+
+
+## Intervento 4.0 — chiarezza professionale e territorio
+
+- Homepage italiana e inglese: copy iniziale reso più esplicito su servizi e riferimento a Partinico; lista territoriale ora presente nell’HTML statico, non soltanto prevista dalle stringhe JavaScript.
+- Pagina “Dove opero” in entrambe le lingue: elenco dei comuni richiesti, raggruppamento per provincia e nota che chiarisce che l’elenco non equivale a sedi secondarie o disponibilità garantita.
+- Pagina “Chi sono”: posizionamento e metodo più espliciti, senza aggiungere titoli, certificazioni, risultati o anni di esperienza non documentati nel pacchetto.
+- Pagine Chinesiologo e Running Coach: processo più concreto e perimetro dell’attività più chiaro; indicato che non si tratta di diagnosi o trattamento sanitario.
+- JSON-LD: riferimento Person normalizzato tra le pagine; rimosso dalla homepage il tema “valutazione posturale” perché non risultava spiegato in modo coerente nelle pagine di servizio esaminate.
+- Google Business Profile non è stato modificato, come richiesto.

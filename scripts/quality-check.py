@@ -2,6 +2,7 @@
 """Dependency-free static checks for this GitHub Pages site."""
 from __future__ import annotations
 import json
+import html
 import re
 import sys
 import xml.etree.ElementTree as ET
@@ -96,6 +97,8 @@ html_files = sorted(p for p in ROOT.rglob('*.html') if '.git' not in p.parts)
 content_pages = [p for p in html_files if p.name != 'google566527af11144f2c.html']
 parsers: dict[Path, PageParser] = {}
 
+person_entity_ids: set[str] = set()
+
 for page in html_files:
     try: text = page.read_text(encoding='utf-8')
     except Exception as exc:
@@ -154,8 +157,31 @@ for page in html_files:
                 fail(f'{rel_path}: hreflang {language} mancante/errato; atteso {url}, trovato {parser.alternate_urls.get(language)}')
     for src in parser.img_missing_alt: fail(f'{rel}: immagine senza attributo alt: {src}')
     for block in parser.jsonld_blocks:
-        try: json.loads(block)
+        try:
+            data = json.loads(block)
+            nodes = data.get("@graph", []) if isinstance(data, dict) else []
+            if isinstance(data, dict) and data.get("@type") == "Person": nodes = [data]
+            for node in nodes:
+                if isinstance(node, dict) and node.get("@type") == "Person" and node.get("@id"):
+                    person_entity_ids.add(node["@id"])
         except Exception as exc: fail(f'{rel}: JSON-LD non valido: {exc}')
+
+if person_entity_ids != {"https://cesareparatore.github.io/#cesare-paratore"}:
+    fail(f"JSON-LD: riferimento Person non coerente tra le pagine: {sorted(person_entity_ids)}")
+
+# The geographic coverage must be present in crawlable HTML on both home and territory pages.
+required_towns = [
+    "Borgetto", "Giardinello", "Montelepre", "Trappeto", "Balestrate", "Terrasini",
+    "Cinisi", "Torretta", "San Giuseppe Jato", "San Cipirello", "Piana degli Albanesi",
+    "Altofonte", "Camporeale", "Carini", "Monreale", "Alcamo", "Castellammare del Golfo"
+]
+for rel_path in ["index.html", "dove-sono/index.html", "en/index.html", "en/dove-sono/index.html"]:
+    source = (ROOT / rel_path).read_text(encoding="utf-8")
+    source_without_code = re.sub(r"<script\b[^>]*>.*?</script>|<style\b[^>]*>.*?</style>", " ", source, flags=re.I | re.S)
+    visible_text = html.unescape(re.sub(r"<[^>]+>", " ", source_without_code))
+    missing_towns = [town for town in required_towns if town.casefold() not in visible_text.casefold()]
+    if missing_towns:
+        fail(f"{rel_path}: comuni target mancanti dal contenuto HTML statico: {', '.join(missing_towns)}")
 
 # Resolve local HTML references and fragments.
 for page, parser in parsers.items():
