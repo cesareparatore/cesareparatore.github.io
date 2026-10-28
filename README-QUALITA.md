@@ -38,3 +38,7 @@ La pagina «Chi sono» e la sua versione inglese includono ora la storia persona
 ## Missione 5.1 — header condiviso
 
 Le pagine interne utilizzano ora la stessa struttura header della homepage (monogramma, lingua, audio e menu) e un pannello menu coerente. I collegamenti sono localizzati per IT/EN. Il quality checker verifica che i controlli richiesti esistano e che gli ID del menu non siano duplicati. La verifica visiva completa in browser resta da eseguire: Chromium è bloccato nell'ambiente di lavoro.
+
+### Missione 5.2 — Header condiviso
+La testata usa ora un foglio dedicato `assets/header.css` condiviso dalla homepage e dalle pagine interne. La struttura dei controlli (monogramma, lingua, audio, menu) è mantenuta coerente; il menu interno adotta il posizionamento del menu della homepage. I controlli automatici sono passati, ma resta da effettuare un confronto visivo nel browser reale.
+

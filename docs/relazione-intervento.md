@@ -30,3 +30,10 @@ Aggiunte 10 route inglesi statiche sotto `/en/`; impostati `lang`, canonical, `o
 - `assets/interior.css` ora contiene lo stile condiviso della testata e del pannello menu, incluse regole responsive e `prefers-reduced-motion`.
 - Il quality checker controlla la presenza e l'unicità dei componenti essenziali dell'header sulle pagine interne.
 - Limite: il browser reale resta bloccato nell'ambiente; uniformità DOM/CSS e test statici sono verificati, ma non si dichiara un confronto visuale browser superato.
+
+## Revisione 5.2 — Header condiviso con la homepage
+
+È stato introdotto `assets/header.css`, caricato dopo il foglio principale in homepage e dopo il CSS interno nelle pagine di contenuto. In questo modo gli elementi comuni della testata (monogramma, selettore lingua, controllo audio, menu e pannello di navigazione) condividono le stesse regole visive. Le pagine interne sono in modalità `header-menu-mode`, così il pulsante MENU rimane visibile come nella homepage quando la testata è in uso. Il selettore lingua aggiorna `aria-pressed` per indicare correttamente la lingua attiva.
+
+Verifiche eseguite in questa revisione: controlli statici del progetto superati; `node --check` sugli script superato; parsing CSS senza errori; sitemap XML valida; smoke test HTTP locale 22/22 risorse con risposta 200; integrità ZIP verificata. Non è stato eseguito un confronto visivo browser perché Chromium non è disponibile nell’ambiente.
+

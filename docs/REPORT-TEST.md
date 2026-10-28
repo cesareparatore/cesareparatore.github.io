@@ -122,3 +122,15 @@ node --check assets/404.js
 - JSON-LD e sitemap: PASS, parsing statico.
 - Archivio finale: PASS, `ZipFile.testzip()` restituisce `None`.
 - Limite: test visuale reale e comportamento in browser non certificati perché Chromium è bloccato dall'ambiente (`ERR_BLOCKED_BY_ADMINISTRATOR`).
+
+## Aggiornamento Missione 5.2
+
+- `scripts/quality-check.py`: PASS.
+- `node --check assets/interior.js`: PASS.
+- `node --check js/script.js`: PASS.
+- Parsing CSS (`css/style.css`, `assets/interior.css`, `assets/header.css`): nessun errore rilevato.
+- Sitemap XML: valida.
+- Smoke test HTTP locale: 22/22 risorse con risposta 200.
+- Archivio ZIP: test integrità superato.
+- Verifica visiva in browser: non eseguita; ambiente Chromium bloccato/non disponibile.
+

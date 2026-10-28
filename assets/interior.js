@@ -28,7 +28,7 @@
     if(ogDescriptionTag&&activeDescription)ogDescriptionTag.content=activeDescription;
     if(twitterTitleTag)twitterTitleTag.content=activeTitle;
     if(twitterDescriptionTag&&activeDescription)twitterDescriptionTag.content=activeDescription;
-    if(languageButton){languageButton.setAttribute('aria-label',language==='it'?'Switch language to English':'Switch language to Italian');const current=languageButton.querySelector('.language-current');const other=languageButton.querySelector('.language-other');if(current&&other){current.textContent=language.toUpperCase();other.textContent=language==='it'?'EN':'IT';}else{languageButton.textContent=language==='it'?'IT / EN':'EN / IT';}}
+    if(languageButton){languageButton.setAttribute('aria-pressed',String(language==='en'));languageButton.setAttribute('aria-label',language==='it'?'Switch language to English':'Switch language to Italian');const current=languageButton.querySelector('.language-current');const other=languageButton.querySelector('.language-other');if(current&&other){current.textContent=language.toUpperCase();other.textContent=language==='it'?'EN':'IT';}else{languageButton.textContent=language==='it'?'IT / EN':'EN / IT';}}
     root.dataset.language=language;
     if(audioButton)audioButton.setAttribute('aria-label',language==='it'?(audioButton.getAttribute('aria-pressed')==='true'?'Disattiva audio':'Attiva audio'):(audioButton.getAttribute('aria-pressed')==='true'?'Turn audio off':'Turn audio on'));
     updateMenuLabel();
