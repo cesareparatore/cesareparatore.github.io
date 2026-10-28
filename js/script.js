@@ -1,57 +1,32 @@
-// Minimal percentage preloader: progresses smoothly, then yields to the existing curtain intro.
+// Non-numeric preloader: it never presents a simulated percentage as real progress.
 (function initSitePreloader(){
   const screen = document.getElementById("sitePreloader");
+  if(!screen) return;
   const label = document.getElementById("preloaderPercent");
-  const fill = document.getElementById("preloaderFill");
-  if(!screen || !label || !fill) return;
+  if(label) label.textContent = document.documentElement.lang === "en" ? "LOADING" : "CARICAMENTO";
+
+  let finished = false;
+  const finish = () => {
+    if(finished) return;
+    finished = true;
+    window.setTimeout(() => {
+      screen.classList.add("is-done");
+      window.setTimeout(() => {
+        screen.remove();
+        window.dispatchEvent(new Event("sitePreloaderFinished"));
+      }, window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 350);
+    }, 120);
+  };
+
   if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){
     screen.remove();
     window.dispatchEvent(new Event("sitePreloaderFinished"));
     return;
   }
-  const isHomePage = document.body?.dataset.pageLabel === "GUARDA";
-  if(isHomePage){
-    // Avoid presenting a simulated percentage as real loading progress on the homepage.
-    const started = Date.now();
-    let finished = false;
-    label.textContent = "CARICAMENTO";
-    const finish = () => {
-      if(finished) return;
-      finished = true;
-      window.setTimeout(() => {
-        screen.classList.add("is-done");
-        window.setTimeout(() => {
-          screen.remove();
-          window.dispatchEvent(new Event("sitePreloaderFinished"));
-        }, 350);
-      }, Math.max(0, 220 - (Date.now() - started)));
-    };
-    if(document.readyState === "complete") finish();
-    else window.addEventListener("load", finish, {once:true});
-    // Failsafe: a stalled asset must never leave the intro covering the page indefinitely.
-    window.setTimeout(finish, 2500);
-    return;
-  }
-  let progress = 0;
-  let ready = document.readyState === "complete";
-  const started = Date.now();
-  const update = () => {
-    if(!ready){ progress = Math.min(92, progress + Math.max(.16, (92-progress)*.022)); }
-    else { progress = Math.min(100, progress + Math.max(.65, (100-progress)*.13)); }
-    const value = Math.min(100, Math.floor(progress));
-    label.textContent = value + "%";
-    fill.style.width = value + "%";
-    if(ready && value >= 100){
-      window.setTimeout(() => {
-        screen.classList.add("is-done");
-        window.setTimeout(() => { screen.remove(); window.dispatchEvent(new Event("sitePreloaderFinished")); }, isHomePage ? 350 : 700);
-      }, Math.max(isHomePage ? 180 : 350, (isHomePage ? 650 : 1200)-(Date.now()-started)));
-      return;
-    }
-    window.setTimeout(update, 45);
-  };
-  window.addEventListener("load", () => { ready = true; }, {once:true});
-  window.setTimeout(update, 45);
+  if(document.readyState === "complete") finish();
+  else window.addEventListener("load", finish, {once:true});
+  // Never allow a stalled external or local resource to trap the visitor behind the intro.
+  window.setTimeout(finish, 2500);
 })();
 
 (() => {
@@ -747,11 +722,24 @@
     }, 760);
   });
 
+  // Optional analytics hook: emits only if a separate, already-loaded gtag exists.
+  // This site package does not load an analytics library itself.
+  document.querySelectorAll("[data-analytics-event]").forEach(element => {
+    element.addEventListener("click", () => {
+      if(typeof window.gtag !== "function") return;
+      window.gtag("event", element.dataset.analyticsEvent, {
+        event_category: element.dataset.analyticsCategory || "contact",
+        event_label: element.dataset.analyticsLabel || "homepage_cta"
+      });
+    });
+  });
+
   // Audio ambientale: traccia fornita per il portfolio.
-  const ambientAudio = new Audio("/assets/audio/Weight_of_Intent.mp3");
+  const ambientAudio = new Audio();
+  ambientAudio.preload = "none";
   ambientAudio.loop = true;
   ambientAudio.volume = 0.32;
-  ambientAudio.preload = "none";
+  ambientAudio.src = new URL("assets/audio/Weight_of_Intent.mp3", document.baseURI).href;
   let audioPlaying = false;
 
   // Annunci audio solo per gli screen reader: nessun pannello flottante o controllo volume.

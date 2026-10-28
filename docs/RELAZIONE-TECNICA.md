@@ -1,16 +1,37 @@
 # Relazione tecnica
 
-## Base e perimetro
-Base di lavoro: archivio `cesareparatore.github.io-main(1).zip` ricevuto nella conversazione, confrontato con le revisioni disponibili nel workspace. Il repository remoto non è stato verificato direttamente in questa sessione. L'archivio originale contiene 11 documenti HTML, CSS/JS homepage, immagini, marchio SVG, audio, robots.txt, sitemap.xml, .nojekyll e file di verifica Google.
+**Data:** 28 ottobre 2026. **Base di lavoro:** archivio originale `cesareparatore.github.io-main(1).zip` e versione `cesareparatore-final-2026.zip` disponibili nel workspace. Il repository remoto non è stato usato come fonte verificata in questa esecuzione.
 
-## Problema prioritario confermato
-Nell'archivio originale le pagine secondarie richiamavano `assets/interior.css` e `assets/interior.js`, ma i file mancavano. La versione consegnata include entrambi: stile condiviso e script per cambio lingua/menu responsive. I riferimenti interni delle pagine secondarie sono relativi.
+## Problemi e interventi verificati
 
-## Interventi inclusi
-- Conservate homepage, otto pagine professionali/informative, privacy, contenuti, immagini, marchio, audio, sitemap, robots e file di verifica.
-- Uniformati i metadati social delle pagine interne con immagine Open Graph/Twitter basata sull'immagine già presente.
-- Aggiunti README, relazione tecnica e report test.
-- Nessuna dipendenza runtime o build step introdotti.
+1. **Sitemap dichiarata male:** `robots.txt` puntava a `sitemap.xml.nojekyll`, URL errato. Corretto in `https://cesareparatore.github.io/sitemap.xml` e incluso un controllo automatico.
+2. **Privacy caricava lo script completo della homepage:** il vecchio file privacy richiamava `js/script.js`, che contiene interazioni e timer della homepage non necessari alla pagina privacy. La pagina è stata ricostruita usando il CSS e lo script condivisi delle pagine interne; ora la lingua funziona con attributi `data-it`/`data-en` e il menu è gestito dal codice condiviso leggero.
+3. **Preloader:** rimossa la logica di percentuale simulata non necessaria. Ora il preloader non dichiara un avanzamento numerico fittizio, rispetta `prefers-reduced-motion` e ha un timeout di recupero.
+4. **Audio:** la sorgente viene assegnata dopo aver impostato `preload = "none"`; il sito non avvia la traccia automaticamente.
+5. **Lingua e menu delle pagine interne:** la lingua è applicata a `document.documentElement.lang`; il menu supporta chiusura con Escape, focus iniziale e ripristino del focus nel caso di chiusura da tastiera.
+6. **Metadati social e referrer:** completati i campi di anteprima social mancanti sulle pagine contenuto e aggiunta una politica `strict-origin-when-cross-origin`.
+7. **Gestione degli errori:** aggiunta `404.html` per URL non trovati su GitHub Pages.
+8. **Qualità continua:** aggiunti `scripts/quality-check.py` e `.github/workflows/quality.yml` per ripetere i controlli statici e la sintassi JavaScript a ogni push o pull request.
+9. **Documentazione privacy:** il testo distingue ciò che emerge dal codice dalle verifiche di hosting e trattamento che richiedono informazioni esterne; non afferma una conformità legale definitiva. È stata individuata la presenza di un hook opzionale `gtag` sul click WhatsApp; l'handler è stato spostato dal markup inline a JavaScript e la privacy page segnala che la configurazione live va verificata.
 
-## Cautele e limiti
-Non sono state inventate qualifiche, recensioni o risultati. La privacy policy non è stata dichiarata legalmente conforme perché non sono noti tutti i trattamenti effettivi. Non sono stati aggiunti analytics o banner cookie. Non si dichiara deploy, certificazione WCAG, Lighthouse o Core Web Vitals sul campo. Chromium ha restituito `ERR_BLOCKED_BY_ADMINISTRATOR` sia su URL HTTP locale sia su file://, quindi le interazioni non sono state confermate in browser in questa sessione.
+## Elementi preservati
+
+Sono state conservate homepage, otto pagine professionali, pagina privacy, ritratto, marchio SVG, audio originale, sitemap, robots e file di verifica Google. Non sono state aggiunte dipendenze runtime, analytics, tracciamenti o qualifiche professionali inventate.
+
+## Scelte ancora aperte
+
+- **SEO multilingue:** le pagine professionali cambiano lingua tramite JavaScript sulla stessa URL. Questo è funzionale per l'utente, ma non equivale a pagine inglesi statiche autonome. Per un SEO internazionale più robusto servono URL distinti, contenuti tradotti completi, canonical e `hreflang` reciproci.
+- **Privacy:** i file non permettono di confermare log, retention, impostazioni effettive di GitHub Pages o trattamenti successivi su servizi terzi.
+- **Sicurezza HTTP:** la configurazione dei response header dipende dal provider e non è interamente controllabile da file statici su GitHub Pages.
+- **Design e UX:** il codice è stato controllato staticamente, ma non è stata disponibile una revisione visuale completa in browser.
+
+## Riferimenti tecnici consultati
+
+- W3C, WCAG 2.2: https://www.w3.org/TR/WCAG22/
+- Google Search Central, Core Web Vitals: https://developers.google.com/search/docs/appearance/core-web-vitals
+- Google Search Central, versioni localizzate e `hreflang`: https://developers.google.com/search/docs/specialty/international/localized-versions
+- GitHub Docs, configurazione della sorgente di pubblicazione Pages: https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site
+
+## Limiti
+
+Chromium è installato, ma la navigazione verso `file://` è stata bloccata con `ERR_BLOCKED_BY_ADMINISTRATOR`. Non sono dichiarati test interattivi superati, punteggi Lighthouse, conformità WCAG completa, Core Web Vitals sul campo o deploy. Vedere `REPORT-TEST.md`.
