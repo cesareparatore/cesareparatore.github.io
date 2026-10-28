@@ -20,3 +20,7 @@ Questa documentazione accompagna la versione di progetto verificata localmente. 
 ## Esito
 
 `python scripts/quality-check.py` e i controlli `node --check` su `js/script.js`, `assets/interior.js` e `assets/404.js` superano i controlli eseguiti in locale. La verifica browser è bloccata dall'ambiente; Lighthouse e i dati reali degli utenti non sono stati misurati. Consultare il report dei test e le criticità residue prima del deploy.
+
+
+## Aggiornamento biografia (Missione 4.1)
+La pagina «Chi sono» e la sua versione inglese includono ora la storia personale fornita dal titolare, strutturata in sei tappe e collegata a un breve riepilogo in homepage. I titoli di studio sono riportati soltanto nei termini dichiarati; ateneo, anno e denominazioni ufficiali restano da confermare. I test statici vanno rieseguiti prima della pubblicazione.

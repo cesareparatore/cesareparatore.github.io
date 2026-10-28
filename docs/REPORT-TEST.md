@@ -68,3 +68,19 @@ Sono stati aggiunti contenuti statici territoriali alla homepage italiana e ingl
 - Presenza di tutti i 17 comuni target nell’HTML statico di `index.html`, `dove-sono/index.html`, `en/index.html` e `en/dove-sono/index.html`: PASS.
 - Coerenza del riferimento JSON-LD `Person`: PASS, identificatore `https://cesareparatore.github.io/#cesare-paratore`.
 - Test browser/Lighthouse e audit manuale WCAG: non completati in questo ambiente; non vengono dichiarati superati.
+
+
+### Esiti registrati per la revisione biografica 4.1
+
+- `python scripts/quality-check.py`: PASS.
+- `node --check` su `js/script.js`, `assets/interior.js` e `assets/404.js`: PASS.
+- Parsing HTML tramite `lxml`: PASS sulle 21 pagine contenuto, escludendo il file di verifica Google privo di struttura HTML ordinaria.
+- Parsing JSON-LD: PASS, 20 blocchi JSON validi.
+- Parsing sitemap XML: PASS.
+- Parsing CSS tramite `tinycss2`: PASS, 0 errori del parser nei 2 fogli CSS.
+- Biografia bilingue: verificata la presenza della nuova sezione narrativa sia in `chi-sono/` sia in `en/chi-sono/`, con titoli e paragrafi associati a `data-it`/`data-en`.
+- Riepilogo homepage: aggiornato con i passaggi autobiografici principali, mantenendo un testo più breve rispetto alla pagina dedicata.
+- Presenza dei 17 comuni target nelle quattro pagine HTML territoriali/homepage IT/EN: PASS.
+- Archivio consegnato: 45 file, inclusa `.github/workflows/quality.yml`; `ZipFile.testzip()` restituisce `None`.
+- La biografia deriva dal racconto del titolare; non costituisce verifica indipendente dei titoli o degli incarichi. Gli estremi di ateneo, anno e denominazione ufficiale dei titoli restano da confermare.
+- Test browser reali, Lighthouse, screen reader e verifica del sito pubblicato restano non eseguiti.

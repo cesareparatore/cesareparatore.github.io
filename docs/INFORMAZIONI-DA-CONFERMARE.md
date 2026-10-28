@@ -11,6 +11,19 @@ Questa lista separa ciò che il sito attualmente dichiara da ciò che richiede c
 - [ ] Modalità di ricevimento: per ciascun servizio, luogo effettivo, necessità di appuntamento, area raggiungibile e possibilità online.
 - [ ] Contatti: confermare che numero WhatsApp, profili social e link siano attuali e gestiti dal titolare.
 
+## Nuova biografia personale
+
+La pagina «Chi sono» ora racconta, sulla base del racconto fornito direttamente dal titolare, questi passaggi: primo computer a 14 anni alla fine degli anni Novanta; primo lavoro a 19 anni legato alla curiosità informatica; avvicinamento alla corsa e al calcio; fondazione e gestione di una squadra; percorso da atleta e allenatore; laurea in Scienze Motorie; ingresso nella scuola come docente; laurea magistrale in Management dello Sport; ritorno alla programmazione e creazione del sito.
+
+Prima di usare la biografia come dossier professionale o per candidature, confermare e, se opportuno, documentare:
+- [ ] Denominazione ufficiale dei due titoli di studio, ateneo e anni di conseguimento.
+- [ ] Denominazione esatta del primo lavoro informatico e dell'attività svolta, se si desidera renderla più precisa pubblicamente.
+- [ ] Nome/periodo della squadra fondata e ruolo ricoperto, se si decide di indicare dettagli identificativi.
+- [ ] Denominazione dell'incarico di docenza e periodo, se è pertinente e pubblicabile.
+- [ ] Coerenza della traduzione inglese con i titoli di studio ufficiali; «Sport and Exercise Sciences» è una resa descrittiva, non una certificazione del nome legale del corso.
+
+La narrazione è stata fornita in prima persona dal titolare e non è stata verificata tramite fonti indipendenti. Non sono stati aggiunti anni, nomi di istituzioni, qualifiche aggiuntive o risultati non dichiarati.
+
 ## Principio editoriale
 
 Pubblicare soltanto affermazioni verificabili. Non inventare anni di esperienza, risultati, qualifiche, certificazioni, clienti, numeri, premi o recensioni. Il bacino territoriale descritto sul sito è indicativo e non promette disponibilità in presenza in ogni comune.
