@@ -42,8 +42,8 @@ button{font:inherit;-webkit-tap-highlight-color:transparent}
 .language-toggle{color:rgba(242,240,234,.75);padding-inline:8px}
 .language-toggle:hover,.menu-toggle:hover{color:var(--accent)}
 .menu-toggle{display:inline-flex;align-items:center;justify-content:flex-end;gap:10px;min-width:70px}
-.menu-toggle::after{content:"";width:15px;height:1px;background:currentColor;box-shadow:0 5px 0 currentColor;display:inline-block;transition:transform .25s var(--ease),box-shadow .25s var(--ease)}
-.menu-toggle[aria-expanded="true"]::after{transform:translateY(2.5px) rotate(45deg);box-shadow:0 0 0 transparent}
+/* Icona menu: disegnata una sola volta da .header-menu-icon in assets/header.css. */
+
 .site-nav{position:fixed;left:50%;right:auto;bottom:calc(100px + env(safe-area-inset-bottom,0px));width:min(390px,calc(100vw - 32px));max-height:calc(100dvh - 130px - env(safe-area-inset-bottom,0px));overflow-y:auto;padding:10px 20px 14px;background:rgba(24,24,24,.97);color:var(--page);border:1px solid rgba(242,240,234,.16);border-radius:2px;box-shadow:0 12px 45px rgba(0,0,0,.28);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);transform:translate(-50%,12px) scale(.985);transform-origin:bottom center;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s var(--ease),transform .3s var(--ease),visibility .25s ease}
 .site-nav.is-open{transform:translate(-50%,0) scale(1);opacity:1;visibility:visible;pointer-events:auto}
 .site-nav ul{list-style:none;margin:0;padding:0;display:block}
