@@ -110,3 +110,15 @@ node --check js/script.js
 node --check assets/interior.js
 node --check assets/404.js
 ```
+
+
+## Missione 5.1 — header condiviso (28 ottobre 2026)
+
+- Header homepage riutilizzato su 18 pagine interne IT/EN: PASS statico; struttura e controlli richiesti presenti.
+- Menu panel: PASS statico; `menuPanel` e `site-navigation` presenti una sola volta per pagina.
+- Percorsi di navigazione: PASS tramite `python scripts/quality-check.py`, che risolve i riferimenti locali.
+- `node --check assets/interior.js`: PASS.
+- Parsing CSS con `tinycss2`: PASS, zero errori parser nei due fogli CSS.
+- JSON-LD e sitemap: PASS, parsing statico.
+- Archivio finale: PASS, `ZipFile.testzip()` restituisce `None`.
+- Limite: test visuale reale e comportamento in browser non certificati perché Chromium è bloccato dall'ambiente (`ERR_BLOCKED_BY_ADMINISTRATOR`).

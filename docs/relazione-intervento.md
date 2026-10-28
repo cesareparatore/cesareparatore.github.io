@@ -19,3 +19,14 @@ Aggiunte 10 route inglesi statiche sotto `/en/`; impostati `lang`, canonical, `o
 - La homepage riprende una versione più breve della storia, per rendere immediato il filo conduttore senza trasformare la prima schermata in un'autobiografia lunga.
 - I contenuti autobiografici si basano sul racconto fornito dal titolare; non sono una verifica indipendente dei titoli o degli incarichi. La checklist `docs/INFORMAZIONI-DA-CONFERMARE.md` indica cosa documentare prima di usare tali dettagli come prove formali.
 - Google Business Profile resta fuori dal perimetro di questo intervento.
+
+
+## Missione 5.1 — header identico alla homepage
+
+- Le 18 pagine interne IT/EN ora riutilizzano la stessa struttura di testata della homepage: monogramma SVG, controllo lingua, controllo audio e pulsante menu con icone a due linee.
+- Il menu interno è stato ricostruito con la stessa struttura visiva del pannello della homepage, con percorsi corretti per le versioni italiane e inglesi.
+- La barra di navigazione capitoli non è stata copiata sulle pagine interne perché serve a scorrere le sezioni della sola homepage e non avrebbe una funzione equivalente nelle pagine di servizio.
+- `assets/interior.js` gestisce apertura/chiusura del pannello, Escape, focus, cambio lingua e controllo audio riutilizzando la traccia già presente nel progetto.
+- `assets/interior.css` ora contiene lo stile condiviso della testata e del pannello menu, incluse regole responsive e `prefers-reduced-motion`.
+- Il quality checker controlla la presenza e l'unicità dei componenti essenziali dell'header sulle pagine interne.
+- Limite: il browser reale resta bloccato nell'ambiente; uniformità DOM/CSS e test statici sono verificati, ma non si dichiara un confronto visuale browser superato.

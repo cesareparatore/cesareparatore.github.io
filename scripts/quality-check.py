@@ -131,6 +131,15 @@ for page in html_files:
         fail(f'{rel}: theme-color non coerente; atteso #f2f0ea, trovato {theme_colors}')
     if 'class="brand-mark"' in text and not re.search(r'class="brand-mark"><img alt="" src="[^"]*cp-mark\.svg"', text):
         fail(f'{rel}: il marchio interno deve usare il monogramma SVG condiviso')
+    # Internal pages must reuse the homepage header controls and shared menu.
+    rel_header_path = page.relative_to(ROOT).as_posix()
+    is_home_route = rel_header_path in {'index.html', 'en/index.html'}
+    if page.name != '404.html' and not is_home_route:
+        for required_header_part in ('class="site-header"', 'class="logo"', 'class="header-utility-bar"', 'id="languageToggle"', 'id="headerAudioToggle"', 'id="menuToggle"', 'id="menuPanel"', 'class="menu-panel"'):
+            if required_header_part not in text:
+                fail(f'{rel}: header condiviso incompleto, manca {required_header_part}')
+        if text.count('id="menuPanel"') != 1 or text.count('id="site-navigation"') != 1:
+            fail(f'{rel}: header condiviso con ID menu duplicati o mancanti')
     if len([x for x in parser.meta_keys if x[0] == 'description' and x[1]]) != 1:
         fail(f'{rel}: meta description mancante, vuota o duplicata')
     # Canonical, language and reciprocal alternate URLs for indexable locale pages.

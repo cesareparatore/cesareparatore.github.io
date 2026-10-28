@@ -33,3 +33,8 @@ La pagina «Chi sono» e la sua versione inglese includono ora la storia persona
 - Il quality checker ora controlla questi elementi per ridurre il rischio di regressioni future.
 - Esiti locali aggiuntivi: 28/28 risorse HTTP 200 nello smoke test statico; parser CSS/JSON-LD/sitemap e `node --check` superati.
 - Limite: browser visuale, Lighthouse, test screen reader e verifica live non sono stati completati; vedere `docs/REPORT-TEST.md`.
+
+
+## Missione 5.1 — header condiviso
+
+Le pagine interne utilizzano ora la stessa struttura header della homepage (monogramma, lingua, audio e menu) e un pannello menu coerente. I collegamenti sono localizzati per IT/EN. Il quality checker verifica che i controlli richiesti esistano e che gli ID del menu non siano duplicati. La verifica visiva completa in browser resta da eseguire: Chromium è bloccato nell'ambiente di lavoro.

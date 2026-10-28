@@ -5,6 +5,9 @@
   const languageButton=document.querySelector('.language-toggle');
   const menuButton=document.querySelector('.menu-toggle');
   const navigation=document.querySelector('#site-navigation');
+  const menuPanel=document.querySelector('#menuPanel');
+  const audioButton=document.querySelector('#headerAudioToggle');
+  let headerAudio=null;
   const translatable=[...document.querySelectorAll('[data-it][data-en]')];
   const titleIt=body.dataset.titleIt||document.title, titleEn=body.dataset.titleEn||titleIt;
   const descriptionIt=body.dataset.descriptionIt||'', descriptionEn=body.dataset.descriptionEn||descriptionIt;
@@ -25,15 +28,16 @@
     if(ogDescriptionTag&&activeDescription)ogDescriptionTag.content=activeDescription;
     if(twitterTitleTag)twitterTitleTag.content=activeTitle;
     if(twitterDescriptionTag&&activeDescription)twitterDescriptionTag.content=activeDescription;
-    if(languageButton){languageButton.removeAttribute('aria-pressed');languageButton.setAttribute('aria-label',language==='it'?'Switch language to English':'Switch language to Italian');languageButton.textContent=language==='it'?'IT / EN':'EN / IT';}
+    if(languageButton){languageButton.setAttribute('aria-label',language==='it'?'Switch language to English':'Switch language to Italian');const current=languageButton.querySelector('.language-current');const other=languageButton.querySelector('.language-other');if(current&&other){current.textContent=language.toUpperCase();other.textContent=language==='it'?'EN':'IT';}else{languageButton.textContent=language==='it'?'IT / EN':'EN / IT';}}
     root.dataset.language=language;
+    if(audioButton)audioButton.setAttribute('aria-label',language==='it'?(audioButton.getAttribute('aria-pressed')==='true'?'Disattiva audio':'Attiva audio'):(audioButton.getAttribute('aria-pressed')==='true'?'Turn audio off':'Turn audio on'));
     updateMenuLabel();
   }
   function updateMenuLabel(){if(!menuButton)return;const open=menuButton.getAttribute('aria-expanded')==='true';menuButton.setAttribute('aria-label',open?(language==='it'?'Chiudi menu':'Close menu'):(language==='it'?'Apri menu':'Open menu'));}
   function setMenuOpen(open,{returnFocus=false}={}){
     if(!navigation||!menuButton)return;
-    const next=Boolean(open);menuButton.setAttribute('aria-expanded',String(next));navigation.classList.toggle('is-open',next);updateMenuLabel();
-    if(next){const first=navigation.querySelector('a[href]');if(first&&window.matchMedia('(max-width: 720px)').matches)first.focus();}
+    const next=Boolean(open);menuButton.setAttribute('aria-expanded',String(next));menuPanel?.classList.toggle('is-open',next);navigation.classList.toggle('is-open',next);if(menuPanel){menuPanel.setAttribute('aria-hidden',String(!next));menuPanel.inert=!next;}updateMenuLabel();
+    if(next){const first=navigation.querySelector('a[href]');if(first)first.focus();}
     else if(returnFocus)menuButton.focus();
   }
   languageButton?.addEventListener('click',()=>{const path=window.location.pathname;const inEnglishRoute=/^\/en(?:\/|$)/.test(path);const nextPath=inEnglishRoute?(path.replace(/^\/en(?=\/|$)/,'')||'/'):(path==='/'?'/en/':'/en'+path);window.location.assign(nextPath+window.location.search+window.location.hash);});
@@ -42,5 +46,10 @@
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&menuButton?.getAttribute('aria-expanded')==='true')setMenuOpen(false,{returnFocus:true});});
   document.addEventListener('click',event=>{if(menuButton?.getAttribute('aria-expanded')==='true'&&!navigation?.contains(event.target)&&!menuButton.contains(event.target))setMenuOpen(false);});
   window.addEventListener('resize',()=>{if(window.matchMedia('(min-width: 721px)').matches)setMenuOpen(false);},{passive:true});
+  audioButton?.addEventListener('click',()=>{
+    if(!headerAudio){headerAudio=new Audio('/assets/audio/Weight_of_Intent.mp3');headerAudio.loop=true;headerAudio.preload='none';headerAudio.addEventListener('ended',()=>{audioButton.classList.remove('is-playing');audioButton.setAttribute('aria-pressed','false');});}
+    if(headerAudio.paused){headerAudio.play().then(()=>{audioButton.classList.add('is-playing');audioButton.setAttribute('aria-pressed','true');audioButton.setAttribute('aria-label',language==='it'?'Disattiva audio':'Turn audio off');}).catch(()=>{audioButton.setAttribute('aria-pressed','false');});}
+    else{headerAudio.pause();audioButton.classList.remove('is-playing');audioButton.setAttribute('aria-pressed','false');audioButton.setAttribute('aria-label',language==='it'?'Attiva audio':'Turn audio on');}
+  });
   applyLanguage(language);
 })();
