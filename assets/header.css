@@ -44,6 +44,32 @@ body.header-menu-mode .menu-panel.is-open{transform:translateY(0) scale(1)}
 .menu-panel.is-open{transform:translate(-50%,0) scale(1);opacity:1;visibility:visible;pointer-events:auto}
 .menu-panel nav{display:block}.menu-list{list-style:none;margin:0;padding:0}.menu-item{border-top:1px solid rgba(242,240,234,.12)}.menu-item:last-child{border-bottom:1px solid rgba(242,240,234,.12)}
 .menu-link{position:relative;min-height:50px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:10px;font-weight:400;line-height:1;letter-spacing:.14em;text-transform:uppercase;color:rgba(242,240,234,.88);transition:color .25s ease}
-.menu-link::after{content:"↗";position:absolute;right:4px;opacity:0;transform:translateX(-5px);color:rgba(242,240,234,.55);transition:opacity .25s ease,transform .25s cubic-bezier(.22,.61,.36,1)}
+.menu-link::after{content:"";position:absolute;right:4px;width:12px;height:12px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Cpath d=%27M4 12 12 4M5 4h7v7%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.5%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Cpath d=%27M4 12 12 4M5 4h7v7%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.5%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E") center/contain no-repeat;opacity:0;transform:translateX(-5px);color:rgba(242,240,234,.55);transition:opacity .25s ease,transform .25s cubic-bezier(.22,.61,.36,1)}
 .menu-link:hover,.menu-link:focus-visible{color:#fff;outline:none}.menu-link:hover::after,.menu-link:focus-visible::after{opacity:1;transform:translateX(0)}
 @media(max-width:620px){.menu-panel{bottom:calc(86px + env(safe-area-inset-bottom,0px));width:min(345px,calc(100vw - 28px));padding:8px 16px 12px;max-height:calc(100dvh - 112px - env(safe-area-inset-bottom,0px))}}
+
+
+/* Crisp, resolution-independent directional icons: avoid platform-dependent Unicode glyphs. */
+.link-arrow-icon,.direction-arrow-icon{
+  display:inline-block;
+  width:1em;
+  height:1em;
+  max-width:none;
+  flex:0 0 auto;
+  overflow:visible;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.5;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  vertical-align:-.12em;
+}
+.story-more .link-arrow-icon{width:13px;height:13px;transition:transform .25s ease}
+#contatto .contact-link-arrow .link-arrow-icon{width:1.15em;height:1.15em;vertical-align:-.16em}
+.hero-scroll-arrow .direction-arrow-icon{width:13px;height:13px}
+.back-to-top-arrow .direction-arrow-icon{width:24px;height:24px;vertical-align:middle}
+.chapter-arrow .direction-arrow-icon{width:16px;height:16px;vertical-align:middle}
+@media (max-width:620px){
+  .link-arrow-icon{width:16px;height:16px}
+  .story-more .link-arrow-icon{width:14px;height:14px}
+}

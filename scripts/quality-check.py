@@ -274,6 +274,24 @@ else:
     if not match: fail('robots.txt: URL sitemap mancante')
     elif match.group(1) != 'https://cesareparatore.github.io/sitemap.xml': fail(f'robots.txt: URL sitemap errato: {match.group(1)}')
 
+# Missione 5.3: reject platform-dependent arrow glyphs in HTML and require SVG chapter controls.
+arrow_glyphs = "←→↗↓↑↖↘↙↕⇧⇩➜➔➤"
+for page in content_pages:
+    source = page.read_text(encoding="utf-8")
+    found_glyphs = sorted(set(ch for ch in arrow_glyphs if ch in source))
+    if found_glyphs:
+        fail(f"{page.relative_to(ROOT)}: frecce testuali dipendenti dal font presenti: {''.join(found_glyphs)}")
+for homepage in [ROOT / "index.html", ROOT / "en/index.html"]:
+    source = homepage.read_text(encoding="utf-8")
+    for control_id in ["chapterPrev", "chapterNext"]:
+        match = re.search(r'<button\b(?=[^>]*\bid="' + control_id + r'")[^>]*>(.*?)</button>', source, re.I | re.S)
+        if not match or 'class="direction-arrow-icon"' not in match.group(1):
+            fail(f"{homepage.relative_to(ROOT)}: {control_id} deve contenere un'icona SVG direzionale")
+for css_path in [ROOT / "css/style.css", ROOT / "assets/interior.css"]:
+    css_text = css_path.read_text(encoding="utf-8")
+    if ".link-arrow-icon,.direction-arrow-icon" not in css_text or "stroke-linecap:round" not in css_text:
+        fail(f"{css_path.relative_to(ROOT)}: stile condiviso delle frecce SVG mancante")
+
 # Keyboard focus must remain explicitly visible in both visual systems.
 for css_path in [ROOT / 'css/style.css', ROOT / 'assets/interior.css']:
     css_text = css_path.read_text(encoding='utf-8')

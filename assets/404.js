@@ -11,7 +11,7 @@
       element.textContent = value;
       const arrow = document.createElement('span');
       arrow.setAttribute('aria-hidden', 'true');
-      arrow.textContent = ' ↗';
+      arrow.innerHTML = '<svg class="link-arrow-icon" aria-hidden="true" focusable="false" viewBox="0 0 16 16"><path d="M5 11 11 5M5.5 5H11v5.5"/></svg>';
       element.appendChild(arrow);
     } else {
       element.textContent = value;

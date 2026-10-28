@@ -42,3 +42,12 @@ Le pagine interne utilizzano ora la stessa struttura header della homepage (mono
 ### Missione 5.2 — Header condiviso
 La testata usa ora un foglio dedicato `assets/header.css` condiviso dalla homepage e dalle pagine interne. La struttura dei controlli (monogramma, lingua, audio, menu) è mantenuta coerente; il menu interno adotta il posizionamento del menu della homepage. I controlli automatici sono passati, ma resta da effettuare un confronto visivo nel browser reale.
 
+
+
+## Missione 5.3 — icone direzionali e controllo regressioni
+
+- Le frecce visibili sono state convertite in SVG o maschere SVG per evitare differenze tra font e sistemi operativi; le stringhe JavaScript di cambio lingua sono state aggiornate per mantenere le stesse icone.
+- Il menu della homepage italiana e inglese usa ora lo stesso identificatore `site-navigation` delle pagine interne; il confronto strutturale locale ha rilevato la stessa sequenza DOM di header e menu in 20 route.
+- `scripts/quality-check.py` controlla ora le icone direzionali e impedisce il ritorno di frecce Unicode visibili nel markup.
+- Esiti aggiornati: quality checker, sintassi JS, parsing CSS/JSON-LD, confronto DOM e smoke test HTTP locale superati.
+- **Limite essenziale:** Playwright non riesce a navigare neppure sul server locale (`ERR_BLOCKED_BY_ADMINISTRATOR`). Nessun test visuale responsive, interattivo, Lighthouse o screen reader è dichiarato superato. Per dettagli consultare `docs/REPORT-TEST-MISSIONE-5.3.md`.

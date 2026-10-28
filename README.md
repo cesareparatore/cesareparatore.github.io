@@ -50,3 +50,8 @@ Il controllo Python verifica i riferimenti locali, le ancore, gli ID e gli attri
 - GitHub Pages non consente di configurare liberamente tutti gli header HTTP di sicurezza dal repository statico. Le impostazioni effettivamente disponibili vanno verificate nell'ambiente di hosting.
 
 Per evidenze e limiti consultare `docs/RELAZIONE-TECNICA.md`, `docs/REPORT-TEST.md`, `docs/MATRICE-ACCESSIBILITA.md`, `docs/PAGELLA-EVIDENZE.md` e `docs/CRITICITA-RESIDUE.md`.
+
+
+## Missione 5.3
+
+La correzione delle frecce SVG e i controlli eseguiti sono documentati in `docs/REPORT-TEST-MISSIONE-5.3.md`. La verifica visuale browser e Lighthouse resta esplicitamente aperta perché la navigazione è bloccata nell’ambiente di lavoro.

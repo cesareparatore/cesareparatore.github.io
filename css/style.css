@@ -87,7 +87,7 @@ body.header-menu-mode .header-menu-toggle{opacity:1;visibility:visible;pointer-e
 .menu-item{border-top:1px solid rgba(242,240,234,.12)}
 .menu-item:last-child{border-bottom:1px solid rgba(242,240,234,.12)}
 .menu-link{position:relative;min-height:50px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:10px;font-weight:400;line-height:1;letter-spacing:.14em;text-transform:uppercase;color:rgba(242,240,234,.88);transition:color .25s ease}
-.menu-link::after{content:"↗";position:absolute;right:4px;opacity:0;transform:translateX(-5px);color:rgba(242,240,234,.55);transition:opacity .25s ease,transform .25s var(--ease)}
+.menu-link::after{content:"";position:absolute;right:4px;width:12px;height:12px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Cpath d=%27M4 12 12 4M5 4h7v7%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.5%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Cpath d=%27M4 12 12 4M5 4h7v7%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.5%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E") center/contain no-repeat;opacity:0;transform:translateX(-5px);color:rgba(242,240,234,.55);transition:opacity .25s ease,transform .25s var(--ease)}
 .menu-link:hover,.menu-link:focus-visible{color:#fff;outline:none}
 .menu-link:hover::after,.menu-link:focus-visible::after{opacity:1;transform:translateX(0)}
 
@@ -168,7 +168,7 @@ body.hero-intro-open .hero-bottomline{animation:none}
 .story-more{display:inline-flex;align-items:center;gap:10px;margin-top:8px;padding-bottom:7px;border-bottom:1px solid currentColor;font-size:10px;line-height:1.4;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;color:var(--ink);transition:gap .25s var(--ease),opacity .25s ease}
 .story-more span{font-size:15px;transition:transform .25s var(--ease)}
 .story-more:hover,.story-more:focus-visible{gap:16px;outline:none}
-.story-more:hover span,.story-more:focus-visible span{transform:translateX(3px)}
+.story-more:hover .link-arrow-icon,.story-more:focus-visible .link-arrow-icon{transform:translateX(3px)}
 .story-portrait-wrap{position:sticky;top:calc(var(--header-h) + 30px)}
 .story-portrait{width:100%;aspect-ratio:753/941;height:auto;display:block;box-sizing:border-box;border:1px solid rgba(9,9,9,.22);object-fit:contain;object-position:center;background:transparent}
 .story-note{margin-top:13px;font-size:10px;line-height:1.4;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
@@ -259,9 +259,15 @@ body.hero-intro-open .hero-bottomline{animation:none}
   transition:opacity .3s ease,transform .45s var(--ease),letter-spacing .35s ease
 }
 .world-door-cta::after{
-  content:"→";
-  font-size:11px;
-  letter-spacing:0;
+  content:"";
+  display:inline-block;
+  flex:0 0 12px;
+  width:12px;
+  height:12px;
+  margin-left:1px;
+  background:currentColor;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Cpath d=%27M2.5 8h11M9 3.5 13.5 8 9 12.5%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.5%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Cpath d=%27M2.5 8h11M9 3.5 13.5 8 9 12.5%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.5%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E") center/contain no-repeat;
   transition:transform .35s var(--ease)
 }
 .worlds-word.active .world-word-label{animation:world-register .82s var(--ease) both}
@@ -848,3 +854,29 @@ body[data-page-label="GUARDA"] .preloader-fill{width:34%;transform:translateX(-1
 .menu-panel :where(a,button,[tabindex]):focus-visible,
 .site-footer :where(a,button,[tabindex]):focus-visible,
 #contatto :where(a,button,[tabindex]):focus-visible{outline-color:#b8f35c!important}
+
+
+/* Crisp, resolution-independent directional icons: avoid platform-dependent Unicode glyphs. */
+.link-arrow-icon,.direction-arrow-icon{
+  display:inline-block;
+  width:1em;
+  height:1em;
+  max-width:none;
+  flex:0 0 auto;
+  overflow:visible;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.5;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  vertical-align:-.12em;
+}
+.story-more .link-arrow-icon{width:13px;height:13px;transition:transform .25s ease}
+#contatto .contact-link-arrow .link-arrow-icon{width:1.15em;height:1.15em;vertical-align:-.16em}
+.hero-scroll-arrow .direction-arrow-icon{width:13px;height:13px}
+.back-to-top-arrow .direction-arrow-icon{width:24px;height:24px;vertical-align:middle}
+.chapter-arrow .direction-arrow-icon{width:16px;height:16px;vertical-align:middle}
+@media (max-width:620px){
+  .link-arrow-icon{width:16px;height:16px}
+  .story-more .link-arrow-icon{width:14px;height:14px}
+}
