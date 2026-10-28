@@ -892,3 +892,17 @@ body[data-page-label="GUARDA"] .preloader-fill{width:34%;transform:translateX(-1
 @media(prefers-reduced-motion:reduce){
   .writing-copy.has-deferred-writing .deferred-after-writing,.writing-copy.has-deferred-writing.is-writing .deferred-after-writing{opacity:1;visibility:visible;transform:none;animation:none;pointer-events:auto}
 }
+
+/* Accessibilità: il focus non deve sparire quando i componenti animati azzerano l'outline. */
+:root{--focus-ring:#111;--focus-halo:#fff}
+:where(a,button,input,select,textarea,summary,[tabindex]):focus-visible{
+  outline:3px solid var(--focus-ring)!important;
+  outline-offset:3px!important;
+  box-shadow:0 0 0 5px var(--focus-halo)!important;
+  position:relative;
+  z-index:2;
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto!important}
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}

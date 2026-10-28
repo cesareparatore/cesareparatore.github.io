@@ -229,3 +229,16 @@ h1,h2{font-weight:500;letter-spacing:-.065em;line-height:.98}
   .link-arrow-icon{width:16px;height:16px}
   .story-more .link-arrow-icon{width:14px;height:14px}
 }
+
+/* Focus robusto anche sui link/pulsanti con regole locali che disattivano l'outline. */
+:where(a,button,input,select,textarea,summary,[tabindex]):focus-visible{
+  outline:3px solid #111!important;
+  outline-offset:3px!important;
+  box-shadow:0 0 0 5px #fff!important;
+  position:relative;
+  z-index:2;
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto!important}
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
