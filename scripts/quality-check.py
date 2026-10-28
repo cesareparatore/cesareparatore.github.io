@@ -30,17 +30,31 @@ class PageParser(HTMLParser):
         self.img_missing_alt: list[str] = []
         self.document_lang = ''
         self.canonical_count = 0
+        self.canonical_urls: list[str] = []
+        self.alternate_urls: dict[str, str] = {}
+        self.og_urls: list[str] = []
+        self.doctype_count = 0
+        self.duplicate_attrs: list[str] = []
         self.unsafe_blank_links: list[str] = []
         self.inline_handlers: list[str] = []
         self.stack: list[str] = []
 
     def handle_starttag(self, tag, attrs):
+        names = [name.lower() for name, _ in attrs]
+        duplicate_names = [name for name, count in Counter(names).items() if count > 1]
+        self.duplicate_attrs.extend(duplicate_names)
         attrs = dict(attrs)
         self.stack.append(tag)
         if tag == 'html': self.document_lang = attrs.get('lang', '')
         if any(name.lower().startswith('on') for name in attrs):
             self.inline_handlers.extend(name for name in attrs if name.lower().startswith('on'))
-        if tag == 'link' and 'canonical' in (attrs.get('rel', '').lower().split()): self.canonical_count += 1
+        if tag == 'link':
+            rel_values = attrs.get('rel', '').lower().split()
+            if 'canonical' in rel_values:
+                self.canonical_count += 1
+                if attrs.get('href'): self.canonical_urls.append(attrs['href'])
+            if 'alternate' in rel_values and attrs.get('hreflang') and attrs.get('href'):
+                self.alternate_urls[attrs['hreflang'].lower()] = attrs['href']
         if tag == 'a' and attrs.get('target', '').lower() == '_blank':
             rel = set((attrs.get('rel') or '').lower().split())
             if not {'noopener', 'noreferrer'}.issubset(rel): self.unsafe_blank_links.append(attrs.get('href', '(href mancante)'))
@@ -50,6 +64,8 @@ class PageParser(HTMLParser):
         if tag == 'meta':
             key = attrs.get('name') or attrs.get('property')
             if key: self.meta_keys.append((key.lower(), attrs.get('content', '').strip()))
+            if attrs.get('property', '').lower() == 'og:url' and attrs.get('content'):
+                self.og_urls.append(attrs['content'].strip())
         if tag in ('a', 'link') and attrs.get('href') is not None: self.refs.append(('href', attrs['href']))
         if tag in ('img', 'script', 'source', 'audio', 'video', 'iframe') and attrs.get('src') is not None: self.refs.append(('src', attrs['src']))
         if tag == 'img' and 'alt' not in attrs: self.img_missing_alt.append(attrs.get('src', '(src mancante)'))
@@ -65,6 +81,9 @@ class PageParser(HTMLParser):
         if tag in self.stack:
             index = len(self.stack) - 1 - self.stack[::-1].index(tag)
             self.stack = self.stack[:index]
+
+    def handle_decl(self, decl):
+        if decl.strip().lower().startswith('doctype html'): self.doctype_count += 1
 
     def handle_data(self, data):
         if self.title_depth: self.title_text += data
@@ -86,6 +105,8 @@ for page in html_files:
     except Exception as exc: fail(f'{page.relative_to(ROOT)}: parsing HTML fallito: {exc}')
     parsers[page] = parser
     if page.name == 'google566527af11144f2c.html': continue
+    if parser.doctype_count != 1: fail(f'{page.relative_to(ROOT)}: atteso un solo DOCTYPE HTML5, trovati {parser.doctype_count}')
+    if parser.duplicate_attrs: fail(f'{page.relative_to(ROOT)}: attributi HTML duplicati: {", ".join(sorted(set(parser.duplicate_attrs)))}')
     rel = page.relative_to(ROOT)
     if len(parser.titles) != 1 or not parser.titles[0]: fail(f'{rel}: deve avere un solo <title> non vuoto')
     if not parser.document_lang: fail(f'{rel}: attributo lang mancante su <html>')
@@ -104,8 +125,33 @@ for page in html_files:
         if count > 1: fail(f'{rel}: metadato duplicato name/property="{key}" ({count} occorrenze)')
     if len([x for x in parser.meta_keys if x[0] == 'description' and x[1]]) != 1:
         fail(f'{rel}: meta description mancante, vuota o duplicata')
-    if len([x for x in parser.refs if x[0] == 'href' and x[1].lower().startswith('https://cesareparatore.github.io/') and 'canonical' not in x[1]]) < 0:
-        pass
+    # Canonical, language and reciprocal alternate URLs for indexable locale pages.
+    if page.name != '404.html':
+        rel_path = page.relative_to(ROOT)
+        is_english = rel_path.parts[0] == 'en'
+        if rel_path.as_posix() == 'index.html': route = '/'
+        elif is_english and rel_path.as_posix() == 'en/index.html': route = '/en/'
+        elif page.name == 'index.html': route = '/' + '/'.join(rel_path.parts[:-1]) + '/'
+        else: route = '/' + rel_path.as_posix()
+        expected_url = 'https://cesareparatore.github.io' + route
+        expected_lang = 'en' if is_english else 'it'
+        if parser.document_lang.lower() != expected_lang:
+            fail(f'{rel_path}: lang="{parser.document_lang}" non coerente con la route (atteso {expected_lang})')
+        if parser.canonical_urls != [expected_url]:
+            fail(f'{rel_path}: canonical non coerente; atteso {expected_url}, trovato {parser.canonical_urls}')
+        if parser.og_urls != [expected_url]:
+            fail(f'{rel_path}: og:url non coerente; atteso {expected_url}, trovato {parser.og_urls}')
+        it_route = route[3:] if is_english and route.startswith('/en/') else ('/' if is_english and route == '/en/' else route)
+        if not it_route.startswith('/'): it_route = '/' + it_route
+        en_route = '/en/' if it_route == '/' else '/en' + it_route
+        expected_alternates = {
+            'it': 'https://cesareparatore.github.io' + it_route,
+            'en': 'https://cesareparatore.github.io' + en_route,
+            'x-default': 'https://cesareparatore.github.io' + it_route,
+        }
+        for language, url in expected_alternates.items():
+            if parser.alternate_urls.get(language) != url:
+                fail(f'{rel_path}: hreflang {language} mancante/errato; atteso {url}, trovato {parser.alternate_urls.get(language)}')
     for src in parser.img_missing_alt: fail(f'{rel}: immagine senza attributo alt: {src}')
     for block in parser.jsonld_blocks:
         try: json.loads(block)
@@ -161,6 +207,19 @@ sitemap = ROOT / 'sitemap.xml'
 try:
     tree = ET.parse(sitemap)
     locs = [el.text.strip() for el in tree.getroot().iter() if el.tag.endswith('loc') and el.text]
+    if len(locs) != len(set(locs)): fail('sitemap.xml: URL duplicati')
+    expected_locs = set()
+    for page in content_pages:
+        if page.name == '404.html': continue
+        rel_path = page.relative_to(ROOT)
+        if rel_path.as_posix() == 'index.html': route = '/'
+        elif rel_path.parts[0] == 'en' and rel_path.as_posix() == 'en/index.html': route = '/en/'
+        elif rel_path.parts[0] == 'en': route = '/en/' + '/'.join(rel_path.parts[1:-1]) + '/'
+        elif page.name == 'index.html': route = '/' + '/'.join(rel_path.parts[:-1]) + '/'
+        else: route = '/' + rel_path.as_posix()
+        expected_locs.add('https://cesareparatore.github.io' + route)
+    if set(locs) != expected_locs:
+        fail(f'sitemap.xml: URL non coerenti con le pagine indicizzabili (mancanti={sorted(expected_locs-set(locs))}; extra={sorted(set(locs)-expected_locs)})')
     for loc in locs:
         if not loc.startswith('https://cesareparatore.github.io/'): fail(f'sitemap.xml: URL fuori dal dominio previsto: {loc}')
         path = urlsplit(loc).path
@@ -176,7 +235,7 @@ else:
     elif match.group(1) != 'https://cesareparatore.github.io/sitemap.xml': fail(f'robots.txt: URL sitemap errato: {match.group(1)}')
 
 # Required publishing assets.
-for required in ['index.html','404.html','robots.txt','sitemap.xml','assets/interior.css','assets/interior.js','css/style.css','js/script.js']:
+for required in ['index.html','404.html','robots.txt','sitemap.xml','assets/interior.css','assets/interior.js','assets/404.js','css/style.css','js/script.js']:
     if not (ROOT / required).exists(): fail(f'file richiesto mancante: {required}')
 
 print(f'Pagine HTML analizzate: {len(content_pages)} contenuto + verifica Google')

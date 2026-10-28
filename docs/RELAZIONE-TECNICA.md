@@ -13,6 +13,9 @@
 7. **Gestione degli errori:** aggiunta `404.html` per URL non trovati su GitHub Pages.
 8. **Qualità continua:** aggiunti `scripts/quality-check.py` e `.github/workflows/quality.yml` per ripetere i controlli statici e la sintassi JavaScript a ogni push o pull request.
 9. **Documentazione privacy:** il testo distingue ciò che emerge dal codice dalle verifiche di hosting e trattamento che richiedono informazioni esterne; non afferma una conformità legale definitiva. È stata individuata la presenza di un hook opzionale `gtag` sul click WhatsApp; l'handler è stato spostato dal markup inline a JavaScript e la privacy page segnala che la configurazione live va verificata.
+10. **SEO internazionale:** aggiunte 10 pagine inglesi statiche sotto `en/`, una per ciascuna pagina indicizzabile italiana. Le pagine EN hanno `lang="en"`, title e description inglesi, canonical auto-riferito, `og:url`, JSON-LD `inLanguage` e link `hreflang` reciproci (`it`, `en`, `x-default`). La sitemap include 20 URL. Il selettore lingua porta alla pagina corrispondente anziché cambiare solo il testo sulla stessa URL; il vecchio overlay di cambio lingua non più necessario è stato rimosso.
+11. **404 localizzata:** `404.html` seleziona testo e destinazione della homepage in base al percorso italiano o `/en/`.
+12. **Controlli statici estesi:** il checker verifica anche DOCTYPE unico, attributi duplicati, coerenza canonical/`og:url`, coppie `hreflang` e copertura completa della sitemap.
 
 ## Elementi preservati
 
@@ -20,7 +23,7 @@ Sono state conservate homepage, otto pagine professionali, pagina privacy, ritra
 
 ## Scelte ancora aperte
 
-- **SEO multilingue:** le pagine professionali cambiano lingua tramite JavaScript sulla stessa URL. Questo è funzionale per l'utente, ma non equivale a pagine inglesi statiche autonome. Per un SEO internazionale più robusto servono URL distinti, contenuti tradotti completi, canonical e `hreflang` reciproci.
+- **SEO multilingue live:** le URL statiche inglesi e i metadati corrispondenti sono presenti nel pacchetto. Restano da verificare dopo il deploy che GitHub Pages pubblichi tutte le route, che le pagine rispondano correttamente e che Google le elabori come previsto.
 - **Privacy:** i file non permettono di confermare log, retention, impostazioni effettive di GitHub Pages o trattamenti successivi su servizi terzi.
 - **Sicurezza HTTP:** la configurazione dei response header dipende dal provider e non è interamente controllabile da file statici su GitHub Pages.
 - **Design e UX:** il codice è stato controllato staticamente, ma non è stata disponibile una revisione visuale completa in browser.
@@ -34,4 +37,4 @@ Sono state conservate homepage, otto pagine professionali, pagina privacy, ritra
 
 ## Limiti
 
-Chromium è installato, ma la navigazione verso `file://` è stata bloccata con `ERR_BLOCKED_BY_ADMINISTRATOR`. Non sono dichiarati test interattivi superati, punteggi Lighthouse, conformità WCAG completa, Core Web Vitals sul campo o deploy. Vedere `REPORT-TEST.md`.
+Chromium è installato, ma la navigazione di Playwright verso `http://127.0.0.1` è stata bloccata con `ERR_BLOCKED_BY_ADMINISTRATOR`. Non sono dichiarati test interattivi superati, punteggi Lighthouse, conformità WCAG completa, Core Web Vitals sul campo o deploy. Vedere `REPORT-TEST.md`.

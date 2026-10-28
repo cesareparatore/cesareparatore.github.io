@@ -575,10 +575,10 @@
 
 
   // Language switcher for the complete home page.
-  let currentLanguage = "it";
+  let currentLanguage = document.documentElement.lang === "en" ? "en" : "it";
   const languageStrings = {
     en: {
-      "a.skip-link":"Skip to content", ".pause-label":"PAUSE", ".header-menu-label":"MENU", ".hero-title":"GUARDA<span class=\"hero-dot\">.</span>", ".hero-kicker":"CESARE PARATORE", ".hero-edition":"PARTINICO, IT",
+      "a.skip-link":"Skip to content", ".pause-label":"PAUSE", ".header-menu-label":"MENU", ".hero-title":"LOOK<span class=\"hero-dot\">.</span>", ".hero-kicker":"CESARE PARATORE", ".hero-edition":"PARTINICO, ITALY",
       ".menu-list .menu-item:nth-child(1) .menu-link":"About me", ".menu-list .menu-item:nth-child(2) .menu-link":"Sport Manager",
       ".menu-list .menu-item:nth-child(3) .menu-link":"Kinesiologist", ".menu-list .menu-item:nth-child(4) .menu-link":"Running Coach",
       ".menu-list .menu-item:nth-child(5) .menu-link":"Trainer", ".menu-list .menu-item:nth-child(6) .menu-link":"Web Designer",
@@ -591,7 +591,7 @@
       ".worlds-word[data-world='running-coach'] .world-door-cta":"OPEN", ".worlds-word[data-world='formatore'] .world-door-cta":"OPEN", ".worlds-word[data-world='web-designer'] .world-door-cta":"OPEN",
       ".principle-title":"PURPOSE<span class=\"principle-title-dot\">.</span>", ".principle-copy p:nth-child(1)":"It is not about everything I can do.", ".principle-copy p:nth-child(2)":"It is about where you want to go.",
       ".principle-copy p:nth-child(3)":"From there, everything changes:<br>what I look at,<br>what I choose,<br>what I connect.", ".principle-copy p:nth-child(4)":"Because there is no one-size-fits-all path.", ".principle-emphasis":"There is the one that works for you.",
-      ".territory-kicker":"PARTINICO · WESTERN SICILY", ".territory-title":"HERE<span class=\"territory-title-dot\">.</span>", ".territory-copy p:nth-of-type(2)":"Partinico is my starting point, between Palermo and Trapani.", ".territory-copy p:nth-of-type(3)":"From here, I work with people, ideas and projects across five fields, with the same attention. In person when possible. Online when useful.", ".territory-copy p:nth-of-type(4)":"A place is a starting point, not a boundary.", ".territory-coverage-intro":"The area we can start from", ".territory-coverage-list":"Partinico and nearby towns: Borgetto, Giardinello, Montelepre, Trappeto, Balestrate, Terrasini, Cinisi, Torretta, San Giuseppe Jato, San Cipirello, Piana degli Albanesi, Altofonte, Camporeale, Carini, Monreale, Alcamo and Castellammare del Golfo.", ".territory-coverage-note":"A reference area between the provinces of Palermo and Trapani. In-person availability depends on the service and is agreed case by case; for suitable projects, distance need not prevent us from starting online.", ".territory-next-step":"Discover where I work <span>↗</span>", ".territory-emphasis":"A place is a starting point, not a boundary.",
+      ".territory-kicker":"PARTINICO · WESTERN SICILY", ".territory-title":"HERE<span class=\"territory-title-dot\">.</span>", ".territory-copy p:nth-of-type(1)":"Partinico is my starting point, between Palermo and Trapani.", ".territory-copy p:nth-of-type(2)":"From here, I work with people, ideas and projects across five fields, with the same attention. In person when possible. Online when useful.", ".territory-coverage-intro":"The area we can start from", ".territory-coverage-list":"Partinico and nearby towns: Borgetto, Giardinello, Montelepre, Trappeto, Balestrate, Terrasini, Cinisi, Torretta, San Giuseppe Jato, San Cipirello, Piana degli Albanesi, Altofonte, Camporeale, Carini, Monreale, Alcamo and Castellammare del Golfo.", ".territory-coverage-note":"A reference area between the provinces of Palermo and Trapani. In-person availability depends on the service and is agreed case by case; for suitable projects, distance need not prevent us from starting online.", ".territory-next-step":"Discover where I work <span>↗</span>", ".territory-emphasis":"A place is a starting point, not a boundary.",
       ".territory-caption":"Partinico · Western Sicily", ".territory-map-note":"Stadio Comunale “G. La Franca” is a reference for some local activities, not a professional studio or public-facing business address. Meeting locations are agreed according to the service.", ".contact-overline span:nth-child(2)":"THE NEXT STEP", ".contact-title":"LET’S TALK<span class=\"contact-title-dot\">.</span>", ".contact-lead":"The first step is understanding what you want to make possible.", ".contact-closer":"Let’s see how far we can go together.", "#contactLink":"<span>Message me on WhatsApp</span><span class=\"contact-link-arrow\" aria-hidden=\"true\">↗</span>",
       ".back-to-top-label":"BACK TO TOP", ".footer-privacy":"Privacy ↗"
     },
@@ -607,7 +607,7 @@
       ".story-signature-line":"Capire le cose complesse, renderle semplici e costruire soluzioni che funzionano davvero.", ".story-more":"Scopri chi sono ↗",
       ".worlds-word[data-world='sport-manager'] .world-door-cta":"APRI", ".worlds-word[data-world='chinesiologo'] .world-door-cta":"APRI", ".worlds-word[data-world='chinesiologo'] .world-word-label":"CHINESIOLOGO", ".worlds-word[data-world='formatore'] .world-word-label":"FORMATORE", ".worlds-word[data-world='running-coach'] .world-door-cta":"APRI", ".worlds-word[data-world='formatore'] .world-door-cta":"APRI", ".worlds-word[data-world='web-designer'] .world-door-cta":"APRI",
       ".principle-title":"OBIETTIVO<span class=\"principle-title-dot\">.</span>", ".principle-copy p:nth-child(1)":"Il punto non è tutto ciò che so fare.", ".principle-copy p:nth-child(2)":"Il punto è dove vuoi arrivare.", ".principle-copy p:nth-child(3)":"Da lì cambia tutto:<br>ciò che guardo,<br>ciò che scelgo,<br>ciò che metto in relazione.", ".principle-copy p:nth-child(4)":"Perché non esiste una strada uguale per tutti.", ".principle-emphasis":"Esiste quella che serve a te.",
-      ".territory-kicker":"PARTINICO · SICILIA OCCIDENTALE", ".territory-title":"QUI<span class=\"territory-title-dot\">.</span>", ".territory-copy p:nth-of-type(2)":"Partinico è il mio punto di partenza, tra Palermo e Trapani.", ".territory-copy p:nth-of-type(3)":"Da qui incontro persone, idee e progetti in cinque ambiti diversi, con la stessa attenzione. In presenza, quando possibile. Online, quando serve.", ".territory-copy p:nth-of-type(4)":"Il luogo è un punto di partenza, non un confine.", ".territory-coverage-intro":"Il territorio da cui possiamo partire", ".territory-coverage-list":"Partinico e i comuni vicini: Borgetto, Giardinello, Montelepre, Trappeto, Balestrate, Terrasini, Cinisi, San Giuseppe Jato, Piana degli Albanesi, Altofonte, San Cipirello, Torretta, Carini, Alcamo e Castellammare del Golfo.", ".territory-coverage-note":"Un’area di riferimento tra la provincia di Palermo e quella di Trapani. La disponibilità in presenza dipende dal servizio e viene concordata caso per caso; per i progetti compatibili, la distanza non impedisce di iniziare online.", ".territory-next-step":"Scopri dove opero <span>↗</span>", ".territory-emphasis":"Il luogo è un punto di partenza, non un confine.", ".territory-caption":"Partinico · Sicilia occidentale", ".territory-map-note":"Lo Stadio Comunale “G. La Franca” è un riferimento per alcune attività sul territorio: non è uno studio professionale né una sede aperta al pubblico. Il luogo dell’incontro si concorda in base al servizio.", ".contact-overline span:nth-child(2)":"IL PROSSIMO PASSO", ".contact-title":"PARLIAMONE<span class=\"contact-title-dot\">.</span>", ".contact-lead":"Il primo passo è capire cosa vuoi rendere possibile.", ".contact-closer":"Vediamo fin dove possiamo arrivare insieme.", "#contactLink":"<span>Scrivimi su WhatsApp</span><span class=\"contact-link-arrow\" aria-hidden=\"true\">↗</span>", ".back-to-top-label":"TORNA SU", ".footer-privacy":"Privacy ↗"
+      ".territory-kicker":"PARTINICO · SICILIA OCCIDENTALE", ".territory-title":"QUI<span class=\"territory-title-dot\">.</span>", ".territory-copy p:nth-of-type(1)":"Partinico è il mio punto di partenza, tra Palermo e Trapani.", ".territory-copy p:nth-of-type(2)":"Da qui incontro persone, idee e progetti in cinque ambiti diversi, con la stessa attenzione. In presenza a Partinico e nell’area tra Palermo e Trapani, secondo il servizio e la disponibilità concordata. Online, quando serve.", ".territory-coverage-intro":"Il territorio da cui possiamo partire", ".territory-coverage-list":"Partinico e i comuni vicini: Borgetto, Giardinello, Montelepre, Trappeto, Balestrate, Terrasini, Cinisi, San Giuseppe Jato, Piana degli Albanesi, Altofonte, San Cipirello, Torretta, Carini, Alcamo e Castellammare del Golfo.", ".territory-coverage-note":"Un’area di riferimento tra la provincia di Palermo e quella di Trapani. La disponibilità in presenza dipende dal servizio e viene concordata caso per caso; per i progetti compatibili, la distanza non impedisce di iniziare online.", ".territory-next-step":"Scopri dove opero <span>↗</span>", ".territory-emphasis":"Il luogo è un punto di partenza, non un confine.", ".territory-caption":"Partinico · Sicilia occidentale", ".territory-map-note":"Lo Stadio Comunale “G. La Franca” è un riferimento per alcune attività sul territorio: non è uno studio professionale né una sede aperta al pubblico. Il luogo dell’incontro si concorda in base al servizio.", ".contact-overline span:nth-child(2)":"IL PROSSIMO PASSO", ".contact-title":"PARLIAMONE<span class=\"contact-title-dot\">.</span>", ".contact-lead":"Il primo passo è capire cosa vuoi rendere possibile.", ".contact-closer":"Vediamo fin dove possiamo arrivare insieme.", "#contactLink":"<span>Scrivimi su WhatsApp</span><span class=\"contact-link-arrow\" aria-hidden=\"true\">↗</span>", ".back-to-top-label":"TORNA SU", ".footer-privacy":"Privacy ↗"
     }
   };
   const originalMarkup = new Map();
@@ -694,32 +694,11 @@
     document.querySelectorAll(".world-door-link").forEach(link => { const world = link.closest(".worlds-word")?.dataset.world; const names = currentLanguage === "en" ? {"sport-manager":"Sport Manager","chinesiologo":"Kinesiologist","running-coach":"Running Coach","formatore":"Trainer","web-designer":"Web Designer"} : {"sport-manager":"Sport Manager","chinesiologo":"Chinesiologo","running-coach":"Running Coach","formatore":"Formatore","web-designer":"Web Designer"}; link.setAttribute("aria-label",(currentLanguage === "en" ? "Open " : "Apri ") + (names[world] || "")); });
     updateAudioButton(audioPlaying);
   }
-  let languageSwitchBusy = false;
-  const languageRefresh = document.createElement("div");
-  languageRefresh.className = "language-refresh-overlay";
-  languageRefresh.setAttribute("aria-hidden", "true");
-  languageRefresh.innerHTML = '<span class="language-refresh-mark"></span><span class="language-refresh-caption">RECONFIGURING EXPERIENCE</span>';
-  document.body.appendChild(languageRefresh);
   if(languageToggle) languageToggle.addEventListener("click",() => {
-    if(languageSwitchBusy) return;
-    languageSwitchBusy = true;
-    const nextLanguage = currentLanguage === "it" ? "en" : "it";
-    if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){
-      setLanguage(nextLanguage);
-      languageSwitchBusy = false;
-      return;
-    }
-    document.body.classList.add("language-refreshing");
-    languageRefresh.classList.add("is-active");
-    languageToggle.disabled = true;
-    // Brief cinematic fade first; only then update the actual copy.
-    window.setTimeout(() => setLanguage(nextLanguage), 280);
-    window.setTimeout(() => {
-      languageRefresh.classList.remove("is-active");
-      document.body.classList.remove("language-refreshing");
-      languageToggle.disabled = false;
-      languageSwitchBusy = false;
-    }, 760);
+    const path = window.location.pathname;
+    const inEnglishRoute = /^\/en(?:\/|$)/.test(path);
+    const nextPath = inEnglishRoute ? (path.replace(/^\/en(?=\/|$)/, "") || "/") : (path === "/" ? "/en/" : "/en" + path);
+    window.location.assign(nextPath + window.location.search + window.location.hash);
   });
 
   // Optional analytics hook: emits only if a separate, already-loaded gtag exists.
@@ -739,7 +718,7 @@
   ambientAudio.preload = "none";
   ambientAudio.loop = true;
   ambientAudio.volume = 0.32;
-  ambientAudio.src = new URL("assets/audio/Weight_of_Intent.mp3", document.baseURI).href;
+  ambientAudio.src = new URL("/assets/audio/Weight_of_Intent.mp3", window.location.origin).href;
   let audioPlaying = false;
 
   // Annunci audio solo per gli screen reader: nessun pannello flottante o controllo volume.
@@ -833,6 +812,8 @@
     }
   }
 
+  // Apply the current route's language after audio state and all helpers are initialized.
+  setLanguage(currentLanguage);
   updateChapter(0,false);
   setActiveWorld(0);
   setupWorldDoorNavigation();

@@ -4,7 +4,7 @@ Obiettivo: WCAG 2.2 livello AA. Questa matrice documenta la presenza di accorgim
 
 | Area | Evidenza nel codice | Stato |
 |---|---|---|
-| Lingua del documento | `lang="it"` nei documenti; lo script delle pagine interne aggiorna `document.documentElement.lang` quando cambia lingua | Verificato staticamente |
+| Lingua del documento | Pagine italiane con `lang="it"`; pagine statiche `/en/` con `lang="en"`; il selettore naviga alla route equivalente | Verificato staticamente; test browser non eseguito |
 | Salta al contenuto | Link skip-link nelle pagine contenuto | Presente; test tastiera browser non eseguito |
 | Focus visibile | Regola `:focus-visible` in `assets/interior.css`; regole focus nella homepage | Presente; contrasto e comportamento da provare in browser |
 | Navigazione mobile | `aria-expanded`, `aria-controls`, chiusura Escape, focus sul primo link e ritorno del focus al pulsante | Implementato; test interattivo non eseguito per blocco browser |

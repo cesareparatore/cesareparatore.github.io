@@ -13,7 +13,7 @@
   const ogDescriptionTag=document.querySelector('meta[property="og:description"]');
   const twitterTitleTag=document.querySelector('meta[name="twitter:title"]');
   const twitterDescriptionTag=document.querySelector('meta[name="twitter:description"]');
-  let language='it';
+  let language=root.lang==='en'?'en':'it';
   function applyLanguage(nextLanguage) {
     language=nextLanguage==='en'?'en':'it'; root.lang=language;
     for(const element of translatable){const value=element.dataset[language];if(value!==undefined)element.textContent=value;}
@@ -25,7 +25,7 @@
     if(ogDescriptionTag&&activeDescription)ogDescriptionTag.content=activeDescription;
     if(twitterTitleTag)twitterTitleTag.content=activeTitle;
     if(twitterDescriptionTag&&activeDescription)twitterDescriptionTag.content=activeDescription;
-    if(languageButton){languageButton.setAttribute('aria-pressed',String(language==='en'));languageButton.setAttribute('aria-label',language==='it'?'Switch language to English':'Passa alla lingua italiana');languageButton.textContent=language==='it'?'IT / EN':'EN / IT';}
+    if(languageButton){languageButton.removeAttribute('aria-pressed');languageButton.setAttribute('aria-label',language==='it'?'Switch language to English':'Switch language to Italian');languageButton.textContent=language==='it'?'IT / EN':'EN / IT';}
     root.dataset.language=language;
     updateMenuLabel();
   }
@@ -36,11 +36,11 @@
     if(next){const first=navigation.querySelector('a[href]');if(first&&window.matchMedia('(max-width: 720px)').matches)first.focus();}
     else if(returnFocus)menuButton.focus();
   }
-  languageButton?.addEventListener('click',()=>applyLanguage(language==='it'?'en':'it'));
+  languageButton?.addEventListener('click',()=>{const path=window.location.pathname;const inEnglishRoute=/^\/en(?:\/|$)/.test(path);const nextPath=inEnglishRoute?(path.replace(/^\/en(?=\/|$)/,'')||'/'):(path==='/'?'/en/':'/en'+path);window.location.assign(nextPath+window.location.search+window.location.hash);});
   menuButton?.addEventListener('click',()=>setMenuOpen(menuButton.getAttribute('aria-expanded')!=='true'));
   navigation?.addEventListener('click',event=>{if(event.target.closest('a'))setMenuOpen(false);});
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&menuButton?.getAttribute('aria-expanded')==='true')setMenuOpen(false,{returnFocus:true});});
   document.addEventListener('click',event=>{if(menuButton?.getAttribute('aria-expanded')==='true'&&!navigation?.contains(event.target)&&!menuButton.contains(event.target))setMenuOpen(false);});
   window.addEventListener('resize',()=>{if(window.matchMedia('(min-width: 721px)').matches)setMenuOpen(false);},{passive:true});
-  applyLanguage('it');
+  applyLanguage(language);
 })();

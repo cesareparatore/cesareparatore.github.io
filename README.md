@@ -7,13 +7,15 @@ Sito statico multipagina per GitHub Pages, senza framework o dipendenze runtime 
 - `index.html`: homepage scrollytelling.
 - `chi-sono/`, `sport-manager/`, `chinesiologo/`, `running-coach/`, `formatore/`, `web-designer/`, `dove-sono/`, `contatti/`: pagine professionali.
 - `privacy/`: informativa bilingue che descrive il perimetro verificabile dal codice e segnala le verifiche privacy ancora necessarie.
+- `en/`: versioni statiche inglesi della homepage e delle nove pagine interne (`/en/`, `/en/chi-sono/`, ecc.), con `lang`, canonical e `hreflang` dedicati.
 - `404.html`: pagina di errore personalizzata per GitHub Pages.
 - `css/style.css`, `js/script.js`: stile e interazioni della homepage.
 - `assets/interior.css`, `assets/interior.js`: design system e interazioni delle pagine interne.
+- `assets/404.js`: localizza la pagina 404 in base al percorso richiesto.
 - `assets/images/`: ritratto e marchio SVG.
 - `assets/audio/`: traccia audio esistente; l'audio non viene avviato automaticamente.
 - `robots.txt`, `sitemap.xml`, `.nojekyll`: file per la pubblicazione e la reperibilità.
-- `scripts/quality-check.py`: controlli statici riproducibili senza dipendenze Python esterne.
+- `scripts/quality-check.py`: controlli statici riproducibili senza dipendenze Python esterne, inclusi canonical, `hreflang`, `og:url`, sitemap e struttura dei documenti.
 - `.github/workflows/quality.yml`: workflow di controllo statico e sintassi JavaScript su push e pull request.
 - `docs/`: relazione, report, matrice di accessibilità e criticità residue.
 
@@ -25,9 +27,10 @@ Requisiti: Python 3 e Node.js 22 o compatibile.
 python scripts/quality-check.py
 node --check js/script.js
 node --check assets/interior.js
+node --check assets/404.js
 ```
 
-Il controllo Python verifica i riferimenti locali, le ancore, gli ID duplicati, i metadati principali, i JSON-LD, i riferimenti CSS locali, la sitemap e l'URL sitemap in `robots.txt`. È un controllo statico leggero, non sostituisce un validatore HTML5/CSS completo né i test browser.
+Il controllo Python verifica i riferimenti locali, le ancore, gli ID e gli attributi duplicati, il DOCTYPE, i metadati principali, i JSON-LD, canonical, `og:url`, `hreflang` reciproci, la copertura della sitemap e l'URL sitemap in `robots.txt`. È un controllo statico leggero, non sostituisce un validatore HTML5/CSS completo né i test browser.
 
 ## Pubblicazione su GitHub Pages
 
@@ -41,7 +44,7 @@ Il controllo Python verifica i riferimenti locali, le ancore, gli ID duplicati, 
 
 ## Limiti noti
 
-- La lingua inglese delle pagine professionali è attualmente applicata lato client sulla stessa URL. Il contenuto può cambiare in browser, ma non costituisce una coppia di URL statici IT/EN indicizzabili in modo indipendente. La strategia multilingue SEO resta un miglioramento prioritario.
+- Le versioni inglesi sono generate come pagine statiche sotto `/en/`; le versioni italiane restano nelle URL esistenti. Le coppie sono dichiarate tramite `hreflang`, canonical auto-riferiti e sitemap. La corretta pubblicazione e l'indicizzazione vanno ancora confermate dopo il deploy.
 - Il testo privacy è prudente e descrive ciò che emerge dal codice; non costituisce una verifica legale definitiva. Confermare hosting, trattamenti, log, retention e servizi effettivamente attivi.
 - In questa sessione Chromium ha bloccato l'apertura dei file locali con `ERR_BLOCKED_BY_ADMINISTRATOR`. Non sono dichiarati test browser, Lighthouse, screen reader, Core Web Vitals sul campo o deploy superati.
 - GitHub Pages non consente di configurare liberamente tutti gli header HTTP di sicurezza dal repository statico. Le impostazioni effettivamente disponibili vanno verificate nell'ambiente di hosting.

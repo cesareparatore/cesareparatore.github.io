@@ -632,16 +632,6 @@ body.contact-return-mode.footer-signature-complete .back-to-top::before,body.con
 @media(max-width:620px){.header-utility-bar .language-toggle{width:46px;min-width:46px;height:24px;min-height:24px}.header-utility-bar .language-toggle::before{width:19px;height:18px}.header-utility-bar .language-toggle .language-current,.header-utility-bar .language-toggle .language-other{width:19px;height:18px;flex-basis:19px}.header-utility-bar .language-toggle[aria-pressed="true"]::before{transform:translateX(21px)}}
 
 
-/* Transizione cinematografica quando si cambia lingua: breve refresh visivo, poi i testi cambiano. */
-.language-refresh-overlay{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:17px;background:rgba(10,10,10,.96);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .22s ease,visibility .22s ease;backdrop-filter:blur(12px)}
-.language-refresh-overlay.is-active{opacity:1;visibility:visible}
-.language-refresh-mark{width:34px;height:34px;border:1px solid rgba(184,243,92,.22);border-top-color:#b8f35c;border-right-color:#b8f35c;border-radius:50%;animation:language-refresh-spin .62s cubic-bezier(.5,.1,.3,.9) infinite}
-.language-refresh-caption{font-size:8px;letter-spacing:.28em;color:rgba(242,240,234,.72);animation:language-refresh-pulse .7s ease-in-out infinite alternate}
-body.language-refreshing .site-header,body.language-refreshing .header-chapter,body.language-refreshing main,body.language-refreshing .site-footer,body.language-refreshing .floating-dock{filter:blur(5px);opacity:.16;transform:translateY(2px);transition:filter .25s ease,opacity .25s ease,transform .25s ease}
-.header-utility-bar .language-toggle:disabled{cursor:wait;opacity:.7}
-@keyframes language-refresh-spin{to{transform:rotate(360deg)}}
-@keyframes language-refresh-pulse{from{opacity:.42;letter-spacing:.22em}to{opacity:1;letter-spacing:.3em}}
-@media(prefers-reduced-motion:reduce){.language-refresh-mark,.language-refresh-caption{animation:none!important}.language-refresh-overlay,body.language-refreshing .site-header,body.language-refreshing .header-chapter,body.language-refreshing main,body.language-refreshing .site-footer,body.language-refreshing .floating-dock{transition:none!important}}
 
 @media(max-width:620px){.site-footer{grid-template-columns:1fr auto;gap:22px 12px;padding:28px 20px}.site-footer .signature{grid-column:1/-1;grid-row:1;justify-self:center}.footer-socials{grid-column:1;grid-row:2}.footer-meta{grid-column:2;grid-row:2;gap:12px}.footer-local-time{gap:7px}.footer-local-place,.footer-local-country{font-size:9px;letter-spacing:.08em}}
 

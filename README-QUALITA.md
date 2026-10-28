@@ -11,8 +11,12 @@ Questa documentazione accompagna la versione di progetto verificata localmente. 
 - Rifatta la pagina privacy con il CSS condiviso, contenuto bilingue, metadati social completi e dichiarazioni più caute sui limiti della verifica del codice.
 - Aggiunti pagina `404.html`, controlli statici riproducibili e workflow GitHub Actions.
 - Uniformati i metadati social e aggiunta una politica `referrer` esplicita nelle pagine contenuto.
+- Aggiunte 10 pagine inglesi statiche in `en/`, con `lang="en"`, canonical autonomo, `hreflang` reciproco, metadati social e JSON-LD localizzati; sitemap estesa da 10 a 20 URL. Il selettore lingua ora porta alla pagina equivalente nell'altra lingua.
+- Corretta la traduzione della sezione territorio della homepage e tradotti i titoli brevi delle pagine inglesi.
+- Localizzata la pagina 404 in base al percorso (`/en/...` o italiano) senza aggiungere servizi esterni.
+- Estesi i controlli statici per verificare DOCTYPE, attributi duplicati, canonical, `og:url`, `hreflang` e corrispondenza completa della sitemap.
 - Rimosso l’handler HTML inline per l’evento WhatsApp; l’evento opzionale è ora gestito da JavaScript e viene inviato solo se `window.gtag` esiste già. Nel pacchetto non è incluso un loader analytics.
 
 ## Esito
 
-`python scripts/quality-check.py`, `node --check js/script.js` e `node --check assets/interior.js` superano i controlli eseguiti in locale. La verifica browser è bloccata dall'ambiente; Lighthouse e i dati reali degli utenti non sono stati misurati. Consultare il report dei test e le criticità residue prima del deploy.
+`python scripts/quality-check.py` e i controlli `node --check` su `js/script.js`, `assets/interior.js` e `assets/404.js` superano i controlli eseguiti in locale. La verifica browser è bloccata dall'ambiente; Lighthouse e i dati reali degli utenti non sono stati misurati. Consultare il report dei test e le criticità residue prima del deploy.

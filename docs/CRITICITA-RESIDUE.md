@@ -8,7 +8,7 @@
 
 ## P1 — Priorità alta
 
-4. **SEO multilingue:** creare URL statici distinti per le versioni inglesi se l'obiettivo è l'indicizzazione indipendente; completare traduzioni, canonical, `hreflang`, sitemap e test per coppie linguistiche. La traduzione attuale è client-side sulla stessa URL.
+4. **SEO multilingue live:** le 10 pagine inglesi statiche, canonical, `hreflang` e sitemap da 20 URL sono presenti e superano i controlli locali. Dopo il deploy, verificare le route reali e l'indicizzazione con Search Console; nessun risultato di Google è stato osservato in questa sessione.
 5. **Accessibilità completa:** completare contrasto, tastiera, zoom/reflow, screen reader e verifica criterio per criterio WCAG 2.2 AA.
 6. **Verifica dei contenuti professionali:** confermare che servizi, ambito geografico, descrizioni e recapiti siano aggiornati e corrispondano all'offerta reale.
 7. **Validazione HTML/CSS completa:** eseguire validatori dedicati; il controllo locale incluso è statico e intenzionalmente leggero.
@@ -17,7 +17,7 @@
 
 8. **Dati sul campo:** monitorare Core Web Vitals e indicizzazione dopo che il sito avrà traffico e dati sufficienti.
 9. **Header di sicurezza:** verificare gli header HTTP realmente forniti da GitHub Pages; il repository statico non consente di configurare arbitrariamente tutti gli header.
-10. **Test browser in CI:** se si sceglie in futuro di introdurre browser automation, aggiungerla solo con una dipendenza mantenuta e senza complicare inutilmente il sito statico.
+10. **Test browser in CI:** valutare una suite browser automatizzata in CI con versione di Playwright fissata e dipendenze di sviluppo bloccate. Non è stata introdotta in questa revisione perché il browser locale è bloccato e non è stato possibile verificarne il funzionamento end-to-end.
 
 ## Cosa non è stato fatto
 

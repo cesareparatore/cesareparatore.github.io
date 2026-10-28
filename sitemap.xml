@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://cesareparatore.github.io/</loc>
@@ -6,9 +6,34 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://cesareparatore.github.io/chi-sono/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://cesareparatore.github.io/chinesiologo/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/contatti/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/dove-sono/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/formatore/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/privacy/</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
   <url>
     <loc>https://cesareparatore.github.io/running-coach/</loc>
@@ -21,33 +46,58 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://cesareparatore.github.io/formatore/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://cesareparatore.github.io/web-designer/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://cesareparatore.github.io/chi-sono/</loc>
+    <loc>https://cesareparatore.github.io/en/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/en/chi-sono/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://cesareparatore.github.io/dove-sono/</loc>
+    <loc>https://cesareparatore.github.io/en/chinesiologo/</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://cesareparatore.github.io/contatti/</loc>
+    <loc>https://cesareparatore.github.io/en/contatti/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://cesareparatore.github.io/privacy/</loc>
+    <loc>https://cesareparatore.github.io/en/dove-sono/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/en/formatore/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/en/privacy/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/en/running-coach/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/en/sport-manager/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/en/web-designer/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>

@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="utf-8">
@@ -9,15 +9,17 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Pagina non trovata | Cesare Paratore</title>
   <link rel="stylesheet" href="/assets/interior.css">
+  <script defer src="/assets/404.js"></script>
 </head>
 <body>
+  <a class="skip-link" href="#main-content" data-it="Salta al contenuto" data-en="Skip to content">Salta al contenuto</a>
   <main id="main-content">
     <section class="hero">
       <div class="hero-inner">
-        <p class="eyebrow">ERRORE 404</p>
-        <h1>Questa pagina non esiste.</h1>
-        <p class="hero-intro">Il collegamento potrebbe essere obsoleto oppure l'indirizzo potrebbe contenere un errore.</p>
-        <p><a class="cta-link" href="/">Torna alla homepage <span aria-hidden="true">↗</span></a></p>
+        <p class="eyebrow" data-it="ERRORE 404" data-en="ERROR 404">ERRORE 404</p>
+        <h1 data-it="Questa pagina non esiste." data-en="This page does not exist.">Questa pagina non esiste.</h1>
+        <p class="hero-intro" data-it="Il collegamento potrebbe essere obsoleto oppure l'indirizzo potrebbe contenere un errore." data-en="The link may be outdated, or the address may contain a typo.">Il collegamento potrebbe essere obsoleto oppure l'indirizzo potrebbe contenere un errore.</p>
+        <p><a class="cta-link" id="home-link" href="/" data-it="Torna alla homepage" data-en="Return to the homepage">Torna alla homepage <span aria-hidden="true">↗</span></a></p>
       </div>
     </section>
   </main>
