@@ -350,12 +350,23 @@
   }
 
   // Un solo ritmo di scrittura per TUTTE le sezioni: intervallo costante tra ogni carattere.
-  // Titoli, paragrafi e link condividono la stessa sequenza e la stessa temporizzazione.
+  // I link di azione restano nascosti finché il testo precedente non ha completato la comparsa.
   const WRITING_CHARACTER_INTERVAL = 0.04;
+  const syncDeferredLinkDelays = copy => {
+    const textChars = [...copy.querySelectorAll(".writing-char")].filter(char => !char.closest(".deferred-after-writing"));
+    const maxDelay = textChars.reduce((max, char) => {
+      const delay = parseFloat(char.style.getPropertyValue("--char-delay")) || 0;
+      return Math.max(max, delay);
+    }, 0);
+    copy.querySelectorAll(".deferred-after-writing").forEach(link => {
+      link.style.setProperty("--deferred-reveal-delay", `${maxDelay + 0.18}s`);
+    });
+  };
   const writingCopies = [...document.querySelectorAll(".writing-copy")];
   writingCopies.forEach(copy => {
+    if(copy.querySelector(".deferred-after-writing")) copy.classList.add("has-deferred-writing");
     const section = copy.closest(".chapter-section") || copy;
-    const targets = [...copy.querySelectorAll("[data-reveal]")];
+    const targets = [...copy.querySelectorAll("[data-reveal]")].filter(element => !element.matches(".deferred-after-writing"));
     let characterIndex = 0;
 
     const wrapTextNodes = node => {
@@ -385,8 +396,9 @@
       if(element.matches("a")) element.setAttribute("aria-label",accessibleText.replace(/\s*[↗→]\s*$/,""));
       wrapTextNodes(element);
     });
+    syncDeferredLinkDelays(copy);
 
-    // Il CTA resta nel flusso di scrittura: i suoi caratteri compaiono dopo il testo precedente.
+    // I link di azione vengono mostrati solo dopo l’ultima lettera del testo precedente.
 
     if("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches){
       let writingTimer = null;
@@ -584,14 +596,14 @@
       ".menu-list .menu-item:nth-child(5) .menu-link":"Trainer", ".menu-list .menu-item:nth-child(6) .menu-link":"Web Designer",
       ".menu-list .menu-item:nth-child(7) .menu-link":"Where I am", ".menu-list .menu-item:nth-child(8) .menu-link":"Contact",
       "#chapterPrev":"Previous chapter", "#chapterNext":"Next chapter", ".story-intro":"The curiosity to understand. The desire to build.",
-      ".story-copy p:nth-of-type(2)":"I have always needed to understand how things work. At fourteen, I opened up my first computer to discover its logic; today, that same curiosity guides how I approach problems, ideas and projects.",
-      ".story-copy p:nth-of-type(3)":"Over time, I have explored different worlds, from sport to teaching and programming. Different experiences, connected by one common thread: turning complexity into something clear, concrete and useful.",
+      ".story-copy p:nth-of-type(2)":"At fourteen, I opened my first computer to understand how it worked. In sport, I started with running, then played football and helped build and lead a team; returning to running led me to become both an athlete and a coach. Through Sport and Exercise Sciences, teaching and programming, I kept following the same curiosity: understanding how things work and finding practical ways to make them better.",
+      ".story-copy p:nth-of-type(3)":"My path continued through Sport and Exercise Sciences, teaching and a master’s degree in Sport Management. Each experience gave me different tools to observe, understand and explain things more clearly. Programming became a return to my roots: the same curiosity, now with new tools.",
       ".story-signature-line":"Understanding complex things, making them simple, and building solutions that really work.",
       ".story-more":"Discover who I am <svg class='link-arrow-icon' aria-hidden='true' focusable='false' viewBox='0 0 16 16'><path d='M5 11 11 5M5.5 5H11v5.5'/></svg>", ".worlds-word[data-world='sport-manager'] .world-door-cta":"OPEN", ".worlds-word[data-world='chinesiologo'] .world-door-cta":"OPEN", ".worlds-word[data-world='chinesiologo'] .world-word-label":"KINESIOLOGIST", ".worlds-word[data-world='formatore'] .world-word-label":"TRAINER",
       ".worlds-word[data-world='running-coach'] .world-door-cta":"OPEN", ".worlds-word[data-world='formatore'] .world-door-cta":"OPEN", ".worlds-word[data-world='web-designer'] .world-door-cta":"OPEN",
       ".principle-title":"PURPOSE<span class=\"principle-title-dot\">.</span>", ".principle-copy p:nth-child(1)":"It is not about everything I can do.", ".principle-copy p:nth-child(2)":"It is about where you want to go.",
       ".principle-copy p:nth-child(3)":"From there, everything changes:<br>what I look at,<br>what I choose,<br>what I connect.", ".principle-copy p:nth-child(4)":"Because there is no one-size-fits-all path.", ".principle-emphasis":"There is the one that works for you.",
-      ".territory-kicker":"PARTINICO · WESTERN SICILY", ".territory-title":"HERE<span class=\"territory-title-dot\">.</span>", ".territory-copy p:nth-of-type(1)":"Partinico is my starting point, between Palermo and Trapani.", ".territory-copy p:nth-of-type(2)":"From here, I work with people, ideas and projects across five fields, with the same attention. In person when possible. Online when useful.", ".territory-coverage-intro":"Towns in the reference area", ".territory-coverage-list":"Partinico and the towns identified across the provinces of Palermo and Trapani: Borgetto, Giardinello, Montelepre, Trappeto, Balestrate, Terrasini, Cinisi, Torretta, San Giuseppe Jato, San Cipirello, Piana degli Albanesi, Altofonte, Camporeale, Carini, Monreale, Alcamo and Castellammare del Golfo.", ".territory-coverage-note":"This is a reference area, not a list of additional offices or guaranteed in-person availability. Meeting location and format are agreed before an appointment.", ".territory-next-step":"Discover where I work <svg class='link-arrow-icon' aria-hidden='true' focusable='false' viewBox='0 0 16 16'><path d='M5 11 11 5M5.5 5H11v5.5'/></svg>", ".territory-emphasis":"A place is a starting point, not a boundary.",
+      ".territory-kicker":"PARTINICO · WESTERN SICILY", ".territory-title":"HERE<span class=\"territory-title-dot\">.</span>", ".territory-copy p:nth-of-type(1)":"Partinico is my starting point, between Palermo and Trapani.", ".territory-copy p:nth-of-type(2)":"From here, I work with people, ideas and projects across five fields, with the same attention. In person when possible. Online when useful.", ".territory-coverage-intro":"Nearby towns around Partinico", ".territory-coverage-list":"I receive people in Partinico who travel from the provinces of Palermo and Trapani, especially from nearby towns that are easy to reach: Borgetto, Giardinello, Montelepre, Trappeto, Balestrate, Terrasini, Cinisi, Torretta, San Giuseppe Jato, San Cipirello, Piana degli Albanesi, Altofonte, Camporeale, Carini, Monreale, Alcamo and Castellammare del Golfo.", ".territory-coverage-note":"This is a reference area, not a list of additional offices or guaranteed in-person availability. Meeting location and format are agreed before an appointment.", ".territory-next-step":"Discover where I work <svg class='link-arrow-icon' aria-hidden='true' focusable='false' viewBox='0 0 16 16'><path d='M5 11 11 5M5.5 5H11v5.5'/></svg>", ".territory-emphasis":"A place is a starting point, not a boundary.",
       ".territory-caption":"Partinico · Western Sicily", ".territory-map-note":"Stadio Comunale “G. La Franca” is a reference for some local activities, not a professional studio or public-facing business address. Meeting locations are agreed according to the service.", ".contact-overline span:nth-child(2)":"THE NEXT STEP", ".contact-title":"LET’S TALK<span class=\"contact-title-dot\">.</span>", ".contact-lead":"The first step is understanding what you want to make possible.", ".contact-closer":"Let’s see how far we can go together.", "#contactLink":"<span>Message me on WhatsApp</span><span class=\"contact-link-arrow\" aria-hidden=\"true\"><svg class='link-arrow-icon' aria-hidden='true' focusable='false' viewBox='0 0 16 16'><path d='M5 11 11 5M5.5 5H11v5.5'/></svg></span>",
       ".back-to-top-label":"BACK TO TOP", ".footer-privacy":"Privacy <svg class='link-arrow-icon' aria-hidden='true' focusable='false' viewBox='0 0 16 16'><path d='M5 11 11 5M5.5 5H11v5.5'/></svg>"
     },
@@ -602,12 +614,12 @@
       ".menu-list .menu-item:nth-child(5) .menu-link":"Formatore", ".menu-list .menu-item:nth-child(6) .menu-link":"Web Designer",
       ".menu-list .menu-item:nth-child(7) .menu-link":"Dove sono", ".menu-list .menu-item:nth-child(8) .menu-link":"Contatti",
       ".story-intro":"La curiosità di capire. Il desiderio di costruire.",
-      ".story-copy p:nth-of-type(2)":"Ho sempre avuto bisogno di capire come funzionano le cose. A quattordici anni aprivo il mio primo computer per scoprirne la logica; oggi quella stessa curiosità guida il mio modo di affrontare problemi, idee e progetti.",
-      ".story-copy p:nth-of-type(3)":"Nel tempo ho esplorato mondi diversi, dallo sport all’insegnamento, fino alla programmazione. Esperienze differenti, unite da un unico filo conduttore: trasformare la complessità in qualcosa di chiaro, concreto e utile.",
+      ".story-copy p:nth-of-type(2)":"A quattordici anni aprivo il mio primo computer per capirne i meccanismi. Nello sport ho iniziato con la corsa, poi ho giocato a calcio e ho contribuito a costruire e guidare una squadra; il ritorno alla corsa mi ha portato a essere atleta e allenatore. Tra Scienze Motorie, insegnamento e programmazione, ho seguito la stessa curiosità: capire come funzionano le cose e trovare modi concreti per migliorarle.",
+      ".story-copy p:nth-of-type(3)":"Il percorso è proseguito dagli studi in Scienze Motorie all’insegnamento e alla laurea magistrale in Management dello Sport. Ogni esperienza mi ha dato strumenti diversi per osservare, comprendere e spiegare meglio. La programmazione è stata un ritorno alle origini: la stessa curiosità, con nuovi strumenti.",
       ".story-signature-line":"Capire le cose complesse, renderle semplici e costruire soluzioni che funzionano davvero.", ".story-more":"Scopri chi sono <svg class='link-arrow-icon' aria-hidden='true' focusable='false' viewBox='0 0 16 16'><path d='M5 11 11 5M5.5 5H11v5.5'/></svg>",
       ".worlds-word[data-world='sport-manager'] .world-door-cta":"APRI", ".worlds-word[data-world='chinesiologo'] .world-door-cta":"APRI", ".worlds-word[data-world='chinesiologo'] .world-word-label":"CHINESIOLOGO", ".worlds-word[data-world='formatore'] .world-word-label":"FORMATORE", ".worlds-word[data-world='running-coach'] .world-door-cta":"APRI", ".worlds-word[data-world='formatore'] .world-door-cta":"APRI", ".worlds-word[data-world='web-designer'] .world-door-cta":"APRI",
       ".principle-title":"OBIETTIVO<span class=\"principle-title-dot\">.</span>", ".principle-copy p:nth-child(1)":"Il punto non è tutto ciò che so fare.", ".principle-copy p:nth-child(2)":"Il punto è dove vuoi arrivare.", ".principle-copy p:nth-child(3)":"Da lì cambia tutto:<br>ciò che guardo,<br>ciò che scelgo,<br>ciò che metto in relazione.", ".principle-copy p:nth-child(4)":"Perché non esiste una strada uguale per tutti.", ".principle-emphasis":"Esiste quella che serve a te.",
-      ".territory-kicker":"PARTINICO · SICILIA OCCIDENTALE", ".territory-title":"QUI<span class=\"territory-title-dot\">.</span>", ".territory-copy p:nth-of-type(1)":"Partinico è il mio punto di partenza, tra Palermo e Trapani.", ".territory-copy p:nth-of-type(2)":"Da qui incontro persone, idee e progetti in cinque ambiti diversi, con la stessa attenzione. In presenza a Partinico e nell’area tra Palermo e Trapani, secondo il servizio e la disponibilità concordata. Online, quando serve.", ".territory-coverage-intro":"Comuni del bacino di riferimento", ".territory-coverage-list":"Partinico e comuni indicati tra le province di Palermo e Trapani: Borgetto, Giardinello, Montelepre, Trappeto, Balestrate, Terrasini, Cinisi, Torretta, San Giuseppe Jato, San Cipirello, Piana degli Albanesi, Altofonte, Camporeale, Carini, Monreale, Alcamo e Castellammare del Golfo.", ".territory-coverage-note":"L’elenco descrive il bacino di riferimento, non sedi secondarie o disponibilità garantite. Il luogo dell’incontro e la modalità si concordano prima dell’appuntamento.", ".territory-next-step":"Scopri dove opero <span aria-hidden='true'><svg class='link-arrow-icon' aria-hidden='true' focusable='false' viewBox='0 0 16 16'><path d='M5 11 11 5M5.5 5H11v5.5'/></svg></span>", ".territory-emphasis":"Il luogo è un punto di partenza, non un confine.", ".territory-caption":"Partinico · Sicilia occidentale", ".territory-map-note":"Lo Stadio Comunale “G. La Franca” è un riferimento per alcune attività sul territorio: non è uno studio professionale né una sede aperta al pubblico. Il luogo dell’incontro si concorda in base al servizio.", ".contact-overline span:nth-child(2)":"IL PROSSIMO PASSO", ".contact-title":"PARLIAMONE<span class=\"contact-title-dot\">.</span>", ".contact-lead":"Il primo passo è capire cosa vuoi rendere possibile.", ".contact-closer":"Vediamo fin dove possiamo arrivare insieme.", "#contactLink":"<span>Scrivimi su WhatsApp</span><span class=\"contact-link-arrow\" aria-hidden=\"true\"><svg class='link-arrow-icon' aria-hidden='true' focusable='false' viewBox='0 0 16 16'><path d='M5 11 11 5M5.5 5H11v5.5'/></svg></span>", ".back-to-top-label":"TORNA SU", ".footer-privacy":"Privacy <svg class='link-arrow-icon' aria-hidden='true' focusable='false' viewBox='0 0 16 16'><path d='M5 11 11 5M5.5 5H11v5.5'/></svg>"
+      ".territory-kicker":"PARTINICO · SICILIA OCCIDENTALE", ".territory-title":"QUI<span class=\"territory-title-dot\">.</span>", ".territory-copy p:nth-of-type(1)":"Partinico è il mio punto di partenza, tra Palermo e Trapani.", ".territory-copy p:nth-of-type(2)":"Da qui incontro persone, idee e progetti in cinque ambiti diversi, con la stessa attenzione. In presenza a Partinico e nell’area tra Palermo e Trapani, secondo il servizio e la disponibilità concordata. Online, quando serve.", ".territory-coverage-intro":"Comuni vicini a Partinico", ".territory-coverage-list":"Ricevo a Partinico persone provenienti dalle province di Palermo e Trapani, soprattutto dai comuni più vicini e facilmente raggiungibili: Borgetto, Giardinello, Montelepre, Trappeto, Balestrate, Terrasini, Cinisi, Torretta, San Giuseppe Jato, San Cipirello, Piana degli Albanesi, Altofonte, Camporeale, Carini, Monreale, Alcamo e Castellammare del Golfo.", ".territory-coverage-note":"L’elenco descrive il bacino di riferimento, non sedi secondarie o disponibilità garantite. Il luogo dell’incontro e la modalità si concordano prima dell’appuntamento.", ".territory-next-step":"Scopri dove opero <span aria-hidden='true'><svg class='link-arrow-icon' aria-hidden='true' focusable='false' viewBox='0 0 16 16'><path d='M5 11 11 5M5.5 5H11v5.5'/></svg></span>", ".territory-emphasis":"Il luogo è un punto di partenza, non un confine.", ".territory-caption":"Partinico · Sicilia occidentale", ".territory-map-note":"Lo Stadio Comunale “G. La Franca” è un riferimento per alcune attività sul territorio: non è uno studio professionale né una sede aperta al pubblico. Il luogo dell’incontro si concorda in base al servizio.", ".contact-overline span:nth-child(2)":"IL PROSSIMO PASSO", ".contact-title":"PARLIAMONE<span class=\"contact-title-dot\">.</span>", ".contact-lead":"Il primo passo è capire cosa vuoi rendere possibile.", ".contact-closer":"Vediamo fin dove possiamo arrivare insieme.", "#contactLink":"<span>Scrivimi su WhatsApp</span><span class=\"contact-link-arrow\" aria-hidden=\"true\"><svg class='link-arrow-icon' aria-hidden='true' focusable='false' viewBox='0 0 16 16'><path d='M5 11 11 5M5.5 5H11v5.5'/></svg></span>", ".back-to-top-label":"TORNA SU", ".footer-privacy":"Privacy <svg class='link-arrow-icon' aria-hidden='true' focusable='false' viewBox='0 0 16 16'><path d='M5 11 11 5M5.5 5H11v5.5'/></svg>"
     }
   };
   const originalMarkup = new Map();
@@ -674,11 +686,13 @@
         });
       };
       copy.querySelectorAll("[data-reveal]").forEach(target => {
+        if(target.matches(".deferred-after-writing")) return;
         const accessibleText = target.textContent.trim();
         // Do not put aria-label on generic paragraphs: preserve their text as normal accessible content.
         if(target.matches("a")) target.setAttribute("aria-label", accessibleText.replace(/\s*[↗→]\s*$/, ""));
         wrapTextNodes(target);
       });
+      syncDeferredLinkDelays(copy);
       const section = copy.closest(".chapter-section") || copy;
       copy.classList.remove("is-writing");
       if(section.getBoundingClientRect().bottom > 0 && section.getBoundingClientRect().top < window.innerHeight) {
