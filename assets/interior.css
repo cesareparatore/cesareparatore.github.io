@@ -242,3 +242,16 @@ h1,h2{font-weight:500;letter-spacing:-.065em;line-height:.98}
   html{scroll-behavior:auto!important}
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+/* Override ad alta specificità per componenti con regole locali che azzerano l'outline. */
+:is(.menu-link,.site-nav a,.header-menu-toggle,.header-audio-toggle,.audio-toggle):focus-visible,
+.site-header :is(a,button,[tabindex]):focus-visible,
+.site-nav :is(a,button,[tabindex]):focus-visible,
+.site-footer :is(a,button,[tabindex]):focus-visible,
+.cta-band :is(a,button,[tabindex]):focus-visible{
+  outline:3px solid var(--accent,#b8f35c)!important;
+  outline-offset:4px!important;
+  box-shadow:0 0 0 5px #111!important;
+  position:relative;
+  z-index:5;
+}
