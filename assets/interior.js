@@ -3,6 +3,11 @@
   'use strict';
   const body=document.body, root=document.documentElement;
   root.classList.add('js-enabled');
+  const footerClock=document.getElementById('footerClock');
+  const updateFooterClock=()=>{if(footerClock)footerClock.textContent=new Intl.DateTimeFormat('it-IT',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit'}).format(new Date());};
+  updateFooterClock();
+  if(footerClock)window.setInterval(updateFooterClock,30000);
+  document.getElementById('footerBackTop')?.addEventListener('click',()=>window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));
   const languageButton=document.querySelector('.language-toggle');
   const menuButton=document.querySelector('.menu-toggle');
   const navigation=document.querySelector('#site-navigation');
