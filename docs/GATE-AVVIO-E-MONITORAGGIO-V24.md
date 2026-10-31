@@ -1,3 +1,5 @@
+> **Nota di applicazione alla fase corrente:** il dominio canonico della build locale è `https://cesareparatore.github.io/`. Il controllo della titolarità e configurazione di `cesareparatore.it` resta un gate per la futura migrazione, non un'autorizzazione a configurarlo ora. Nessun cambio di dominio o modifica remota è consentito senza autorizzazione esplicita.
+
 # Gate di avvio e monitoraggio — Versione 2.4
 
 Questa checklist è un registro operativo iniziale. Le caselle non selezionate sono attività aperte, non requisiti implicitamente soddisfatti.

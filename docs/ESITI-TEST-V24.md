@@ -1,3 +1,5 @@
+> **Nota di versione e precedenza:** questo registro riporta gli esiti di una build precedente configurata sul dominio `cesareparatore.it`. Non descrive la configurazione corrente. Per la build attuale prevale `SCELTA-DOMINIO-FASE-CORRENTE-2026-10-31.md`, che imposta `https://cesareparatore.github.io/` e rinvia il dominio personalizzato. I risultati di questa tabella sono storici e non vanno usati per certificare la build corrente.
+
 # Esiti test tecnici locali — Versione 2.4
 
 **Data:** 31 ottobre 2026. Test eseguiti sul contenuto estratto dell'archivio aggiornato prima della creazione dello ZIP finale.

@@ -81,3 +81,8 @@ Il rapporto `docs/VERIFICA-INTEGRALE-2026-10-31.md` registra anche parsing HTML/
 ## Revisione progressiva 31/10/2026
 
 La copia di lavoro include un fallback progressivo senza JavaScript per rendere visibili i contenuti e accessibili i link del menu. Dettagli e limiti: `docs/REPORT-MODIFICHE-31-10-2026.md`, `docs/AUDIT-COMPLETO-E-PIANO-10-10-2026-10-31.md`, `docs/REPORT-TEST-EFFETTIVI-31-10-2026.md` e `docs/PAGELLA-FINALE-31-10-2026.md`. Il pacchetto resta non pubblicato e non certificato; nessun punteggio 10/10 viene dichiarato.
+
+
+## Revisione locale — 31 ottobre 2026
+
+La copia di lavoro contiene anche la correzione del menu no-JavaScript (rimozione dell’`aria-hidden` iniziale sulle 20 pagine) e il checker aggiornato. Consultare `docs/REPORT-REVISIONE-AGGIUNTIVA-31-10-2026.md` per il rilievo e i limiti. Per il dominio della fase corrente prevale `docs/SCELTA-DOMINIO-FASE-CORRENTE-2026-10-31.md`; alcune relazioni storiche documentano build precedenti e sono annotate come tali.

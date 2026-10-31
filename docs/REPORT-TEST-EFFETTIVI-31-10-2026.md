@@ -14,11 +14,11 @@
 | Parser JSON-LD | PASS | 20 blocchi JSON-LD parseabili |
 | Tokenizer CSS | PASS | 3 fogli CSS, nessun token di errore rilevato |
 | XML sitemap | PASS | `sitemap.xml` parseabile |
-| Fallback no-JS statico | PASS | Flag enhancement presente sulle pagine con script; menu non `inert` nel markup; regole CSS fallback presenti |
+| Fallback no-JS statico | PASS statico | Flag enhancement presente sulle pagine con script; menu senza `aria-hidden`/`inert` nel markup iniziale; regole CSS fallback presenti; checker aggiornato per rilevare regressioni |
 
 ## Test non eseguiti o non verificabili
 
-- Browser end-to-end: non eseguito in questa sessione; precedenti tentativi sono stati bloccati dall'ambiente con `ERR_BLOCKED_BY_ADMINISTRATOR`.
+- Browser end-to-end: tentativo Chromium headless sul server locale terminato per timeout senza DOM né screenshot; NON ESEGUIBILE nell'ambiente corrente. Dettagli in `REPORT-REVISIONE-AGGIUNTIVA-31-10-2026.md`.
 - Test visuale/screenshot su viewport e dispositivi reali.
 - Test interattivo menu, audio, lingua, capitoli, preloader, 404.
 - Lighthouse/PageSpeed, LCP, INP, CLS, peso e waterfall di rete.
@@ -27,6 +27,10 @@
 - DNS, redirect, TLS, status HTTP, header, CNAME e GitHub Pages Settings.
 - Search Console, Bing Webmaster, indicizzazione, ranking e citazioni AI.
 - Revisione privacy/legale e verifica log/retention reali.
+
+## Secondo passaggio: correzione markup menu
+
+Rilevato e corretto `aria-hidden="true"` iniziale su 20 menu; il checker ora fallisce se trova menu statici `aria-hidden` o `inert`. La correzione è verificata staticamente, non tramite screen reader o browser.
 
 ## Interpretazione
 

@@ -1,6 +1,6 @@
 # Pagella finale — 31 ottobre 2026
 
-**Valutazione complessiva provvisoria: 8,0/10 per il pacchetto locale.** Non è un voto del sito live, né una certificazione. I punteggi di aree non misurate sono indicati come non valutabili o stime prudenti.
+**Valutazione complessiva provvisoria: 8,0/10 per il pacchetto locale, come sintesi qualitativa e non come media ponderata.** Non è un voto del sito live, né una certificazione. Le aree non misurate restano non valutabili o stime prudenti. Il secondo passaggio ha corretto un difetto accessibile del menu no-JS, ma non autorizza ad aumentare i voti di art direction, motion, typography, accessibilità o AI Visibility senza i rispettivi test. Questa pagella a 12 aree del sito è distinta dalla rubrica PSAI a 12 criteri ponderati su 100 punti, che valuta la qualità del framework/documento e non la visibilità del sito.
 
 | Area | Punteggio | Evidenze | Test/limiti | Per arrivare a 10/10 |
 |---|---:|---|---|---|
@@ -10,7 +10,7 @@
 | Interaction design | 7,0/10, stima statica | Menu, navigazione capitoli, audio opzionale, stati ARIA e fallback migliorato | Nessun test runtime; fallback no-JS controllato staticamente | E2E su tutte le interazioni e test di errore/stato |
 | UX e conversione | 7,5/10, stima contenuti/struttura | CTA contatto, pagine servizi, struttura IT/EN e percorsi tematici | Nessun test con utenti o analytics autorizzati | Task testing, misurazione conversioni e semplificazione dove i dati lo richiedono |
 | Responsive design | Non valutabile | CSS include numerosi breakpoint e layout fluidi | Nessuna prova browser o device | Screenshot e test su viewport, orientamenti, zoom e contenuti lunghi |
-| Accessibilità | 6,5/10, provvisorio | Skip link, focus styles, `lang`, alt, riduzione movimento; menu inizializzato via JS | Nessun audit WCAG completo, screen reader o contrasto sistematico | Audit WCAG 2.2 AA criterio per criterio e remediation verificata |
+| Accessibilità | 6,5/10, provvisorio | Skip link, focus styles, `lang`, alt, riduzione movimento; corretto `aria-hidden` iniziale dei menu su 20 pagine | Nessun audit WCAG completo, screen reader, test browser o contrasto sistematico | Audit WCAG 2.2 AA criterio per criterio e remediation verificata |
 | Performance | Non valutabile | Audio con preload conservativo; immagini WebP e asset locali | Nessun Lighthouse/Core Web Vitals | Misure reali mobile/desktop, budget e regressione automatica |
 | Codice e manutenibilità | 8,5/10 | Struttura statica, asset locali, script separati, controlli automatici e fallback migliorato | Nessuna suite E2E; validazione W3C non eseguita | Test browser in CI, riduzione duplicazioni CSS e documentazione componenti |
 | SEO tecnica | 9,0/10, statica | Canonical/hreflang, sitemap 20 URL, robots, 20 JSON-LD e controlli link | Dominio live, status e indicizzazione non verificati | Verifica live e Search Console/Bing dopo autorizzazione |

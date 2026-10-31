@@ -1,5 +1,7 @@
 # Relazione conclusiva di revisione — PSAI v2.4
 
+> **Nota di versione e precedenza:** questa relazione documenta una revisione di un archivio precedente, nel quale il dominio configurato era `cesareparatore.it`. Per la copia di lavoro corrente prevale la decisione successiva registrata in `SCELTA-DOMINIO-FASE-CORRENTE-2026-10-31.md`: canonical locale `https://cesareparatore.github.io/`; il dominio `.it` resta rinviato. Le conclusioni di questa relazione sul dominio non descrivono la build corrente.
+
 **Data:** 31 ottobre 2026  
 **Archivio esaminato:** `cesareparatore-PSAI-v2.4-revisione-2026-10-31.zip`  
 **Dominio configurato nei file:** `https://cesareparatore.it/`  

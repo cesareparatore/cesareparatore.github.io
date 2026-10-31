@@ -40,6 +40,7 @@ Non è stato possibile verificare DNS, redirect HTTP, TLS, CNAME remoto, GitHub 
 3. I contenuti con `data-reveal` e il testo hero restano visibili senza JS.
 4. Il menu non è più marcato `inert`/`aria-hidden` nel markup iniziale; gli script applicano lo stato chiuso e non interattivo dopo l'inizializzazione. Senza JS, i link restano presenti e navigabili.
 5. Aggiunto fallback CSS leggibile per menu homepage e pagine interne.
+6. Nel secondo passaggio, rimosso `aria-hidden="true"` residuo dal markup statico dei 20 menu e aggiunto un controllo automatico contro la regressione.
 6. Nessuna dipendenza esterna aggiunta, nessun contenuto professionale inventato, nessun cambio di dominio o crawler policy.
 
 ## Cosa resta necessario per il 10/10

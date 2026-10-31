@@ -16,10 +16,14 @@ class PageScan(HTMLParser):
         self.links = []
         self.ids = []
         self.images_without_alt = []
+        self.menu_panels_blocked = 0
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
         if attrs.get('id'):
             self.ids.append(attrs['id'])
+        if tag == 'aside' and 'menu-panel' in (attrs.get('class') or '').split():
+            if attrs.get('aria-hidden') == 'true' or 'inert' in attrs:
+                self.menu_panels_blocked += 1
         if tag == 'a' and attrs.get('href'):
             self.links.append(('href', attrs['href']))
         elif tag in ('script', 'img', 'source'):
@@ -70,6 +74,8 @@ for page in html_files:
             errors.append(f'{page.relative_to(ROOT)}: id duplicato {ident!r} ({count} volte)')
     for src in scan.images_without_alt:
         errors.append(f'{page.relative_to(ROOT)}: immagine senza attributo alt: {src}')
+    if scan.menu_panels_blocked:
+        errors.append(f'{page.relative_to(ROOT)}: menu statico nascosto alle tecnologie assistive o inert nel markup iniziale')
     for attr, value in scan.links:
         target = local_target(page, value)
         if target is not None and not target.exists():
@@ -80,4 +86,4 @@ if errors:
     for error in errors:
         print('- ' + error)
     sys.exit(1)
-print(f'PASS — {len(html_files)} pagine HTML; link e risorse locali risolti; nessun ID duplicato; tutte le immagini hanno alt.')
+print(f'PASS — {len(html_files)} pagine HTML; link e risorse locali risolti; nessun ID duplicato; immagini con alt; menu statici non bloccati nel markup iniziale.')

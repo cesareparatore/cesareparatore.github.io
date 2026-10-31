@@ -6,7 +6,7 @@ Rendere il sito progressivamente fruibile anche quando JavaScript non è disponi
 
 ## File aggiornati
 
-- 20 pagine HTML IT/EN: flag `js-enabled` inserito prima dei fogli CSS; rimosso lo stato `inert`/`aria-hidden` dal markup statico del menu.
+- 20 pagine HTML IT/EN: flag `js-enabled` inserito prima dei fogli CSS; rimosso `aria-hidden`/`inert` dal markup statico iniziale del menu. Nel secondo passaggio è stato eliminato anche `aria-hidden="true"`, che era rimasto in tutte le 20 pagine e rendeva il fallback non esposto alle tecnologie assistive.
 - `js/script.js`: il menu homepage viene impostato come chiuso/inert dopo l'inizializzazione.
 - `assets/interior.js`: attivazione del flag `js-enabled` e inizializzazione del menu come chiuso/inert.
 - `css/style.css`: fallback senza JS per preloader, curtain, contenuti reveal e menu.
@@ -28,3 +28,7 @@ Con JavaScript attivo, l'interfaccia mantiene il flusso interattivo esistente. S
 ## Limiti
 
 Il fallback è stato verificato staticamente; non è stato possibile confermare il rendering e la navigazione effettivi in un browser nell'ambiente corrente. È necessario un collaudo manuale senza JavaScript e con JavaScript attivo prima di considerare chiuso il gate.
+
+## Correzione aggiuntiva del secondo passaggio
+
+Il controllo manuale del markup ha rilevato `aria-hidden="true"` residuo su tutti i menu iniziali. È stato rimosso in tutte le 20 pagine IT/EN e il checker di integrità è stato aggiornato per impedire regressioni. Il dettaglio è in `REPORT-REVISIONE-AGGIUNTIVA-31-10-2026.md`.
