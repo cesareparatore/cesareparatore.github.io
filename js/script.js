@@ -261,6 +261,7 @@
   window.addEventListener("resize", updateMenuPlacement);
 
   let menuOpen = false;
+  if(menuPanel){ menuPanel.setAttribute("aria-hidden","true"); menuPanel.inert = true; }
   let lastMenuTrigger = menuToggle || dockMenuToggle;
   updateMenuPlacement();
 

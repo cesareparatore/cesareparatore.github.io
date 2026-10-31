@@ -2,6 +2,7 @@
 (() => {
   'use strict';
   const body=document.body, root=document.documentElement;
+  root.classList.add('js-enabled');
   const languageButton=document.querySelector('.language-toggle');
   const menuButton=document.querySelector('.menu-toggle');
   const navigation=document.querySelector('#site-navigation');
@@ -34,6 +35,7 @@
     updateMenuLabel();
   }
   function updateMenuLabel(){if(!menuButton)return;const open=menuButton.getAttribute('aria-expanded')==='true';menuButton.setAttribute('aria-label',open?(language==='it'?'Chiudi menu':'Close menu'):(language==='it'?'Apri menu':'Open menu'));}
+  if(menuPanel){menuPanel.setAttribute('aria-hidden','true');menuPanel.inert=true;}
   function setMenuOpen(open,{returnFocus=false}={}){
     if(!navigation||!menuButton)return;
     const next=Boolean(open);menuButton.setAttribute('aria-expanded',String(next));menuPanel?.classList.toggle('is-open',next);navigation.classList.toggle('is-open',next);if(menuPanel){menuPanel.setAttribute('aria-hidden',String(!next));menuPanel.inert=!next;}updateMenuLabel();

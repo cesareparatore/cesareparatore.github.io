@@ -948,3 +948,14 @@ a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid 
 /* Titolo manifesto su due righe: proporzioni controllate anche su viewport stretti. */
 .hero-title{width:auto;white-space:normal;font-size:clamp(3.25rem,13.2vw,12.6rem);line-height:.82;letter-spacing:-.09em;overflow-wrap:normal}
 @media(max-width:620px){.hero-title{font-size:clamp(2.65rem,12vw,5.2rem);line-height:.86;letter-spacing:-.085em}}
+
+
+/* Progressive enhancement: the experience remains readable and navigable without JavaScript. */
+html:not(.js-enabled) .site-preloader,
+html:not(.js-enabled) .curtain,
+html:not(.js-enabled) .pause-curtain,
+html:not(.js-enabled) .pause-center{display:none!important}
+html:not(.js-enabled) .hero-writing-copy{opacity:1!important;visibility:visible!important;animation:none!important}
+html:not(.js-enabled) [data-reveal]{opacity:1!important;visibility:visible!important;transform:none!important;clip-path:none!important}
+html:not(.js-enabled) .menu-panel{position:relative!important;inset:auto!important;transform:none!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;width:min(100% - 32px,720px)!important;max-height:none!important;margin:18px auto!important;padding:8px 16px!important;border-radius:2px!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+html:not(.js-enabled) .menu-link{min-height:44px}

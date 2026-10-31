@@ -77,3 +77,7 @@ Consultare `docs/RELAZIONE-FINALE-REVISIONE-PSAI-V24.md`, `docs/TEST-EFFETTIVI-R
 ## Verifica integrale aggiuntiva — 31/10/2026
 
 Il rapporto `docs/VERIFICA-INTEGRALE-2026-10-31.md` registra anche parsing HTML/CSS, parsing dei 20 blocchi JSON-LD e controllo dei link con `target="_blank"`. I test browser sono stati tentati ma bloccati dall'ambiente (`ERR_BLOCKED_BY_ADMINISTRATOR`); non sono dichiarati test visuali, Lighthouse, WCAG completa o verifiche live. Il punteggio complessivo documentabile resta provvisoriamente 8,0/10 e non viene dichiarato 9,5/10.
+
+## Revisione progressiva 31/10/2026
+
+La copia di lavoro include un fallback progressivo senza JavaScript per rendere visibili i contenuti e accessibili i link del menu. Dettagli e limiti: `docs/REPORT-MODIFICHE-31-10-2026.md`, `docs/AUDIT-COMPLETO-E-PIANO-10-10-2026-10-31.md`, `docs/REPORT-TEST-EFFETTIVI-31-10-2026.md` e `docs/PAGELLA-FINALE-31-10-2026.md`. Il pacchetto resta non pubblicato e non certificato; nessun punteggio 10/10 viene dichiarato.
