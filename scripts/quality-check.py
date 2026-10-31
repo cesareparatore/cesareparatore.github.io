@@ -150,7 +150,7 @@ for page in html_files:
         elif is_english and rel_path.as_posix() == 'en/index.html': route = '/en/'
         elif page.name == 'index.html': route = '/' + '/'.join(rel_path.parts[:-1]) + '/'
         else: route = '/' + rel_path.as_posix()
-        expected_url = 'https://cesareparatore.it' + route
+        expected_url = 'https://cesareparatore.github.io' + route
         expected_lang = 'en' if is_english else 'it'
         if parser.document_lang.lower() != expected_lang:
             fail(f'{rel_path}: lang="{parser.document_lang}" non coerente con la route (atteso {expected_lang})')
@@ -162,9 +162,9 @@ for page in html_files:
         if not it_route.startswith('/'): it_route = '/' + it_route
         en_route = '/en/' if it_route == '/' else '/en' + it_route
         expected_alternates = {
-            'it': 'https://cesareparatore.it' + it_route,
-            'en': 'https://cesareparatore.it' + en_route,
-            'x-default': 'https://cesareparatore.it' + it_route,
+            'it': 'https://cesareparatore.github.io' + it_route,
+            'en': 'https://cesareparatore.github.io' + en_route,
+            'x-default': 'https://cesareparatore.github.io' + it_route,
         }
         for language, url in expected_alternates.items():
             if parser.alternate_urls.get(language) != url:
@@ -180,7 +180,7 @@ for page in html_files:
                     person_entity_ids.add(node["@id"])
         except Exception as exc: fail(f'{rel}: JSON-LD non valido: {exc}')
 
-if person_entity_ids != {"https://cesareparatore.it/#cesare-paratore"}:
+if person_entity_ids != {"https://cesareparatore.github.io/#cesare-paratore"}:
     fail(f"JSON-LD: riferimento Person non coerente tra le pagine: {sorted(person_entity_ids)}")
 
 # The geographic coverage must be present in crawlable HTML on both home and territory pages.
@@ -257,11 +257,11 @@ try:
         elif rel_path.parts[0] == 'en': route = '/en/' + '/'.join(rel_path.parts[1:-1]) + '/'
         elif page.name == 'index.html': route = '/' + '/'.join(rel_path.parts[:-1]) + '/'
         else: route = '/' + rel_path.as_posix()
-        expected_locs.add('https://cesareparatore.it' + route)
+        expected_locs.add('https://cesareparatore.github.io' + route)
     if set(locs) != expected_locs:
         fail(f'sitemap.xml: URL non coerenti con le pagine indicizzabili (mancanti={sorted(expected_locs-set(locs))}; extra={sorted(set(locs)-expected_locs)})')
     for loc in locs:
-        if not loc.startswith('https://cesareparatore.it/'): fail(f'sitemap.xml: URL fuori dal dominio previsto: {loc}')
+        if not loc.startswith('https://cesareparatore.github.io/'): fail(f'sitemap.xml: URL fuori dal dominio previsto: {loc}')
         path = urlsplit(loc).path
         target = ROOT / path.lstrip('/')
         if path.endswith('/'): target = target / 'index.html'
@@ -272,7 +272,7 @@ if not robots.exists(): fail('robots.txt mancante')
 else:
     match = re.search(r'^Sitemap:\s*(\S+)\s*$', robots.read_text(encoding='utf-8'), re.I | re.M)
     if not match: fail('robots.txt: URL sitemap mancante')
-    elif match.group(1) != 'https://cesareparatore.it/sitemap.xml': fail(f'robots.txt: URL sitemap errato: {match.group(1)}')
+    elif match.group(1) != 'https://cesareparatore.github.io/sitemap.xml': fail(f'robots.txt: URL sitemap errato: {match.group(1)}')
 
 # Missione 5.3: reject platform-dependent arrow glyphs in HTML and require SVG chapter controls.
 arrow_glyphs = "←→↗↓↑↖↘↙↕⇧⇩➜➔➤"

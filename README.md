@@ -1,6 +1,6 @@
 # Cesare Paratore — sito personale
 
-Sito statico multipagina per GitHub Pages, senza framework o dipendenze runtime aggiuntive. L'archivio è preparato per il dominio personalizzato `cesareparatore.it`, con `CNAME` incluso. L’associazione DNS e GitHub Pages deve essere verificata prima della pubblicazione.
+Sito statico multipagina per GitHub Pages, senza framework o dipendenze runtime aggiuntive. La fase corrente usa il dominio GitHub Pages `https://cesareparatore.github.io/`. Il dominio personalizzato `cesareparatore.it` è rinviato: non è configurato nel pacchetto e potrà essere attivato soltanto dopo il raggiungimento e la verifica documentata del punteggio 10/10.
 
 ## Struttura
 
@@ -14,7 +14,7 @@ Sito statico multipagina per GitHub Pages, senza framework o dipendenze runtime 
 - `assets/404.js`: localizza la pagina 404 in base al percorso richiesto.
 - `assets/images/`: ritratto e marchio SVG.
 - `assets/audio/`: traccia audio esistente; l'audio non viene avviato automaticamente.
-- `robots.txt`, `sitemap.xml`, `CNAME`, `.nojekyll`: file per la pubblicazione e la reperibilità. Le direttive crawler sono distinte per finalità; vedi `docs/REVISIONE-PSAI-V24-2026-10-31.md`.
+- `robots.txt`, `sitemap.xml`, `.nojekyll`: file per la pubblicazione e la reperibilità. Le direttive crawler sono distinte per finalità; vedi `docs/REVISIONE-PSAI-V24-2026-10-31.md`.
 - `scripts/quality-check.py`: controlli statici riproducibili senza dipendenze Python esterne, inclusi canonical, `hreflang`, `og:url`, sitemap e struttura dei documenti.
 - `.github/workflows/quality.yml`: workflow di controllo statico e sintassi JavaScript su push e pull request.
 - `docs/`: relazione, report, matrice di accessibilità, criticità residue e checklist delle informazioni professionali da confermare (`INFORMAZIONI-DA-CONFERMARE.md`).
@@ -31,6 +31,10 @@ node --check assets/404.js
 ```
 
 Il controllo Python verifica i riferimenti locali, le ancore, gli ID e gli attributi duplicati, il DOCTYPE, i metadati principali, i JSON-LD, canonical, `og:url`, `hreflang` reciproci, la copertura della sitemap, l'URL sitemap in `robots.txt`, il colore `theme-color`, il monogramma SVG condiviso e la presenza delle regole di focus visibile. È un controllo statico leggero, non sostituisce un validatore HTML5/CSS completo né i test browser.
+
+## Dominio della fase corrente
+
+Canonical, Open Graph, JSON-LD, hreflang, sitemap e robots.txt sono allineati a `https://cesareparatore.github.io/`. Il file `CNAME` è assente intenzionalmente. Non configurare `cesareparatore.it` prima della verifica documentata 10/10 e di una successiva autorizzazione esplicita. L’indirizzo email `info@cesareparatore.it` resta invariato perché è un recapito, non il dominio web.
 
 ## Pubblicazione su GitHub Pages
 
@@ -69,3 +73,7 @@ Consultare `docs/RELAZIONE-FINALE-REVISIONE-PSAI-V24.md`, `docs/TEST-EFFETTIVI-R
 ## Aggiornamento creativo 31/10/2026
 
 È disponibile il livello di art direction CSS e motion editoriale, con contenuti statici (nessuna scrittura carattere per carattere). Vedi `docs/REPORT-AGGIORNAMENTO-CREATIVO-2026-10-31.md`. Questa consegna è una build da esaminare: non è stata pubblicata online.
+
+## Verifica integrale aggiuntiva — 31/10/2026
+
+Il rapporto `docs/VERIFICA-INTEGRALE-2026-10-31.md` registra anche parsing HTML/CSS, parsing dei 20 blocchi JSON-LD e controllo dei link con `target="_blank"`. I test browser sono stati tentati ma bloccati dall'ambiente (`ERR_BLOCKED_BY_ADMINISTRATOR`); non sono dichiarati test visuali, Lighthouse, WCAG completa o verifiche live. Il punteggio complessivo documentabile resta provvisoriamente 8,0/10 e non viene dichiarato 9,5/10.

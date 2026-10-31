@@ -18,4 +18,4 @@ Allow: /
 User-agent: OAI-AdsBot
 Disallow: /
 
-Sitemap: https://cesareparatore.it/sitemap.xml
+Sitemap: https://cesareparatore.github.io/sitemap.xml
