@@ -561,17 +561,7 @@
     window.location.assign(nextPath + window.location.search + window.location.hash);
   });
 
-  // Optional analytics hook: emits only if a separate, already-loaded gtag exists.
-  // This site package does not load an analytics library itself.
-  document.querySelectorAll("[data-analytics-event]").forEach(element => {
-    element.addEventListener("click", () => {
-      if(typeof window.gtag !== "function") return;
-      window.gtag("event", element.dataset.analyticsEvent, {
-        event_category: element.dataset.analyticsCategory || "contact",
-        event_label: element.dataset.analyticsLabel || "homepage_cta"
-      });
-    });
-  });
+  // No analytics or visitor-tracking code is included in this site.
 
   // Audio ambientale: traccia fornita per il portfolio.
   const ambientAudio = new Audio();

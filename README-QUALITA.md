@@ -15,7 +15,7 @@ Questa documentazione accompagna la versione di progetto verificata localmente. 
 - Corretta la traduzione della sezione territorio della homepage e tradotti i titoli brevi delle pagine inglesi.
 - Localizzata la pagina 404 in base al percorso (`/en/...` o italiano) senza aggiungere servizi esterni.
 - Estesi i controlli statici per verificare DOCTYPE, attributi duplicati, canonical, `og:url`, `hreflang` e corrispondenza completa della sitemap.
-- Rimosso l’handler HTML inline per l’evento WhatsApp; l’evento opzionale è ora gestito da JavaScript e viene inviato solo se `window.gtag` esiste già. Nel pacchetto non è incluso un loader analytics.
+- Rimosso il precedente handler opzionale per l’invio di eventi a `gtag`: questa build non contiene codice Google Analytics, Tag Manager, advertising o profilazione. La configurazione effettiva del provider resta da controllare online.
 
 ## Esito
 

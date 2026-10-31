@@ -1,16 +1,20 @@
-# Audit della pagina Privacy — 28 ottobre 2026
+# Audit della pagina Privacy — aggiornamento 31 ottobre 2026
 
-La pagina è stata aggiornata usando il CSS e lo script condivisi delle pagine interne, evitando di caricare lo script completo della homepage e i suoi timer/effetti. Il contenuto ora è bilingue e descrive esplicitamente i limiti della verifica del codice.
+Questa nota aggiorna e supera le osservazioni storiche del 28 ottobre 2026.
 
-## Evidenza da non trascurare
+## Stato del codice in questa build
 
-Nella CTA WhatsApp della homepage è presente un handler inline che invia `click_whatsapp` a `gtag` **solo se** `window.gtag` esiste già. Nel pacchetto esaminato non è stato trovato un loader autonomo di Google Analytics/gtag, ma l'handler potrebbe essere attivato da uno script o da una configurazione esterna non inclusa nell'archivio. Perciò non è corretto affermare senza ulteriori controlli che analytics non venga usato nel sito pubblicato.
+- Rimosso l'handler opzionale che inviava eventi a `gtag` al clic sulla CTA WhatsApp.
+- Il pacchetto non contiene loader di Google Analytics, Google Tag Manager, strumenti di advertising o script di profilazione.
+- I collegamenti social Instagram e LinkedIn sono stati rimossi dalle pagine e dai dati strutturati.
+- I canali di contatto pubblicati sono email e WhatsApp.
+- La pagina Privacy descrive GitHub Pages come hosting attuale e OVHcloud come fornitore email. La migrazione dell'hosting a OVHcloud è pianificata, non ancora eseguita.
 
-## Informazioni da confermare prima di considerare completa l'informativa
+## Verifiche ancora necessarie
 
-- Se `gtag`, Google Analytics, Tag Manager o altri strumenti vengono aggiunti dalla configurazione di hosting o da modifiche non incluse nell'archivio.
-- Eventuali cookie, richieste di terze parti, log tecnici e retention del provider di hosting.
-- Identità e contatti completi del titolare, finalità, basi giuridiche e tempi di conservazione applicabili ai trattamenti reali.
-- Modalità operative per le richieste sui diritti e gli eventuali trasferimenti dei dati.
+- Cookie, log tecnici, richieste di terze parti e tempi di conservazione effettivi del provider GitHub Pages.
+- Dettagli contrattuali e ruoli privacy relativi al servizio email OVHcloud.
+- Identità e contatti completi del titolare, finalità, basi giuridiche, destinatari, tempi di conservazione e modalità operative per l'esercizio dei diritti.
+- Nuovo aggiornamento dell'informativa dopo la migrazione effettiva dell'hosting a OVHcloud.
 
-La pagina aggiornata non costituisce un parere legale né una certificazione di conformità.
+La pagina non costituisce un parere legale né una certificazione di conformità. Le informazioni tecniche sui log e sulla retention non sono deducibili dal solo codice statico.

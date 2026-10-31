@@ -1,6 +1,6 @@
 # Cesare Paratore — sito personale
 
-Sito statico multipagina per GitHub Pages, senza framework o dipendenze runtime aggiuntive. La fase corrente usa il dominio GitHub Pages `https://cesareparatore.github.io/`. Il dominio personalizzato `cesareparatore.it` è rinviato: non è configurato nel pacchetto e potrà essere attivato soltanto dopo il raggiungimento e la verifica documentata del punteggio 10/10.
+Sito statico multipagina, senza framework o dipendenze runtime aggiuntive. GitHub Pages è l’ambiente temporaneo durante la revisione; la destinazione definitiva prevista è OVHcloud, con dominio `cesareparatore.it`, soltanto dopo collaudo, approvazione esplicita e verifica di DNS/HTTPS. Il pacchetto non modifica repository, hosting o DNS e non è pubblicato da questa consegna.
 
 ## Struttura
 
@@ -32,19 +32,13 @@ node --check assets/404.js
 
 Il controllo Python verifica i riferimenti locali, le ancore, gli ID e gli attributi duplicati, il DOCTYPE, i metadati principali, i JSON-LD, canonical, `og:url`, `hreflang` reciproci, la copertura della sitemap, l'URL sitemap in `robots.txt`, il colore `theme-color`, il monogramma SVG condiviso e la presenza delle regole di focus visibile. È un controllo statico leggero, non sostituisce un validatore HTML5/CSS completo né i test browser.
 
-## Dominio della fase corrente
+## Dominio e strategia di hosting
 
-Canonical, Open Graph, JSON-LD, hreflang, sitemap e robots.txt sono allineati a `https://cesareparatore.github.io/`. Il file `CNAME` è assente intenzionalmente. Non configurare `cesareparatore.it` prima della verifica documentata 10/10 e di una successiva autorizzazione esplicita. L’indirizzo email `info@cesareparatore.it` resta invariato perché è un recapito, non il dominio web.
+Durante la revisione il pacchetto conserva canonical, Open Graph, JSON-LD, hreflang, sitemap e robots.txt allineati a `https://cesareparatore.github.io/`. Il file `CNAME` è assente intenzionalmente. La destinazione definitiva concordata è OVHcloud con `cesareparatore.it`; la migrazione verrà preparata dopo i test e avviata soltanto con autorizzazione esplicita. Al momento del passaggio dovranno essere aggiornati gli URL canonici, sitemap, robots, JSON-LD e informativa privacy in modo coordinato. L’email `info@cesareparatore.it` resta invariata.
 
-## Pubblicazione su GitHub Pages
+## Strategia di pubblicazione
 
-1. Fai una copia del repository e conserva una versione recuperabile prima di sostituire file.
-2. Estrai lo ZIP e copia **il contenuto** dell'archivio nella root del repository; `index.html`, `assets/`, `css/`, `js/`, le pagine e `.github/` devono essere al livello corretto.
-3. In **Settings → Pages**, verifica branch e cartella sorgente configurati.
-4. Esegui commit e push. Il workflow `Static quality checks` deve concludersi con esito positivo; questo workflow controlla la qualità statica e non pubblica il sito da solo.
-5. Attendi il deploy di GitHub Pages e verifica URL, menu, lingua, contatti, immagini, pagina privacy e pagina 404.
-6. Esegui Lighthouse da Chrome DevTools sulle pagine principali in modalità mobile e desktop; registra data, versione e condizioni.
-7. Controlla Search Console per indicizzazione e, quando disponibili, Core Web Vitals sul campo.
+Non pubblicare questa build durante la revisione. Prima: conserva una copia recuperabile del repository, esegui i test locali e browser, verifica accessibilità e prestazioni, e approva il contenuto. In seguito si prepara la migrazione a OVHcloud: copia dei file nella root corretta, verifica delle impostazioni di hosting, configurazione DNS autorizzata, HTTPS, redirect e aggiornamento coordinato di canonical, Open Graph, JSON-LD, hreflang, sitemap e robots. Dopo il via libera esplicito, pubblica e controlla tutte le pagine, la lingua, i contatti, le immagini, privacy e 404. Infine esegui Lighthouse mobile/desktop e monitora Search Console, Bing Webmaster Tools e Core Web Vitals quando disponibili.
 
 ## Limiti noti
 
