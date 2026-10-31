@@ -2,7 +2,7 @@
 
 | ID | Classe | Punto | Stato | Responsabile / prova necessaria | Effetto sulla pubblicazione |
 |---|---|---|---|---|---|
-| G-01 | COND | Approvare le decisioni OAI-SearchBot, GPTBot, ChatGPT-User, OAI-AdsBot | Aperto | Titolare: conferma esplicita delle quattro scelte | Da chiudere prima di considerare approvata la policy crawler |
+| G-01 | COND | Approvare le decisioni OAI-SearchBot, GPTBot, ChatGPT-User, OAI-AdsBot | CHIUSO — decisione del titolare ricevuta il 31/10/2026 | Istruzione esplicita: OAI-SearchBot e ChatGPT-User consentiti; GPTBot e OAI-AdsBot bloccati. Applicata e verificata in robots.txt locale | Policy approvata; resta distinta la verifica dei crawler effettivi tramite log |
 | G-02 | COND | Confermare titoli L-22 e LM-47, denominazioni ufficiali e prove | Aperto | Titolare: documenti/denominazioni ufficiali | Correggere o limitare eventuali formulazioni non confermate |
 | G-03 | COND | Confermare profilo FIDAL TP0833 e attualità | Aperto | Titolare: verifica del profilo e autorizzazione a collegarlo | Non blocca il caricamento tecnico; blocca l'uso come prova aggiornata |
 | G-04 | COND | Confermare le cinque aree come attività attualmente offerte o aree descrittive/esperienziali | Aperto | Titolare: conferma per ciascuna area | Potrebbe richiedere revisione copy/CTA |
@@ -28,6 +28,6 @@
 
 ## Richiesta circoscritta al titolare
 
-Prima della pubblicazione, serve una conferma esplicita delle quattro direttive crawler e la conferma che le cinque aree professionali e i recapiti pubblicati siano attuali. Per titoli e profilo FIDAL, fornire o indicare le fonti ufficiali da usare. Per privacy e dominio, serve il coinvolgimento di chi gestisce hosting/DNS e dei servizi effettivamente attivi.
+La decisione sulle quattro direttive crawler è stata confermata e recepita. Prima della pubblicazione resta necessaria la conferma che le cinque aree professionali e i recapiti pubblicati siano attuali. Per titoli e profilo FIDAL, fornire o indicare le fonti ufficiali da usare. Per privacy e dominio, serve il coinvolgimento di chi gestisce hosting/DNS e dei servizi effettivamente attivi.
 
 Non inviare credenziali o password in chat. Gli accessi ai servizi devono essere gestiti direttamente dal titolare nei rispettivi pannelli.
