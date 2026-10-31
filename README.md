@@ -101,3 +101,7 @@ Per questa revisione fanno fede i documenti più recenti:
 - `docs/DICHIARAZIONE-NON-PUBBLICAZIONE-2026-10-31.md`: attestazione delle sole operazioni locali.
 
 La pagella storica `docs/PAGELLA-FINALE-31-10-2026.md` contiene una sintesi qualitativa provvisoria 8,0/10: non è un punteggio ponderato e non va letta come valutazione conclusiva di questa revisione. La valutazione aggiornata è quella nel documento `VALUTAZIONE-PSAI-E-AREE-SITO-2026-10-31.md`.
+
+## Revisione PSAI V2.4 — regole tecniche 5.1–5.5
+
+La revisione tecnica offline aggiornata al 31 ottobre 2026 è documentata in `docs/REPORT-REVISIONE-PSAI-V24-REGOLE-TECNICHE-5-1-5-5-2026-10-31.md`; il registro dei test è in `docs/REGISTRO-TEST-PSAI-V24-5-1-5-5-2026-10-31.md`. Per ripetere il controllo tecnico locale: `python scripts/check-psai-technical.py`. I risultati locali non attestano indicizzazione, prestazioni live, citazioni AI o certificazione indipendente.
