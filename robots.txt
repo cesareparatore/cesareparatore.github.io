@@ -1,4 +1,21 @@
+# Regole distinte per finalità diverse. L'accesso non garantisce indicizzazione o citazione.
 User-agent: *
 Allow: /
 
-Sitemap: https://cesareparatore.github.io/sitemap.xml
+# Ricerca web ChatGPT: consentita per favorire la reperibilità nelle esperienze di ricerca.
+User-agent: OAI-SearchBot
+Allow: /
+
+# Addestramento: bloccato in assenza di un consenso esplicito separato.
+User-agent: GPTBot
+Disallow: /
+
+# Fetch attivato da una richiesta dell'utente: consentito.
+User-agent: ChatGPT-User
+Allow: /
+
+# Verifica di pagine pubblicitarie: non necessaria, non risultano campagne configurate.
+User-agent: OAI-AdsBot
+Disallow: /
+
+Sitemap: https://cesareparatore.it/sitemap.xml

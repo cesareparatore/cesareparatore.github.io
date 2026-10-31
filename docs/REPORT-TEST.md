@@ -66,7 +66,7 @@ Sono stati aggiunti contenuti statici territoriali alla homepage italiana e ingl
 - Parsing XML sitemap: PASS.
 - Parsing CSS con `tinycss2`: PASS, 0 errori nei 2 fogli di stile.
 - Presenza di tutti i 17 comuni target nell’HTML statico di `index.html`, `dove-sono/index.html`, `en/index.html` e `en/dove-sono/index.html`: PASS.
-- Coerenza del riferimento JSON-LD `Person`: PASS, identificatore `https://cesareparatore.github.io/#cesare-paratore`.
+- Coerenza del riferimento JSON-LD `Person`: PASS, identificatore `https://cesareparatore.it/#cesare-paratore`.
 - Test browser/Lighthouse e audit manuale WCAG: non completati in questo ambiente; non vengono dichiarati superati.
 
 

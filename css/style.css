@@ -916,3 +916,35 @@ body[data-page-label="GUARDA"] .preloader-fill{width:34%;transform:translateX(-1
   position:relative;
   z-index:5;
 }
+
+
+/* ART DIRECTION 2026 — motion editoriale, contenuti sempre statici. */
+:root{--motion-ease:cubic-bezier(.2,.75,.2,1);--motion-fast:220ms;--motion-base:620ms}
+html{scroll-behavior:smooth}
+.hero{isolation:isolate;overflow:hidden;background:radial-gradient(ellipse at 78% 18%,rgba(184,243,92,.13),transparent 34%),var(--page-a)}
+.hero::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.22;background-image:linear-gradient(rgba(9,9,9,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(9,9,9,.07) 1px,transparent 1px);background-size:64px 64px;mask-image:linear-gradient(to bottom,black,transparent 82%)}
+.hero::after{content:"";position:absolute;z-index:-1;width:min(58vw,780px);aspect-ratio:1;border:1px solid rgba(9,9,9,.10);border-radius:50%;right:-19vw;top:-30vw;box-shadow:0 0 0 42px rgba(9,9,9,.018),0 0 0 92px rgba(9,9,9,.014);pointer-events:none}
+.hero-title{animation:editorialTitleIn 1.05s var(--motion-ease) both;letter-spacing:-.085em}
+.hero-dot,.principle-title-dot,.territory-title-dot,.contact-title-dot{transition:color .35s ease,text-shadow .35s ease}
+.hero-title:hover .hero-dot{color:#91d936;text-shadow:0 0 28px rgba(184,243,92,.48)}
+.hero-writing-copy::after{transform:scaleX(1);transition:none}
+.hero-topline,.hero-bottomline{opacity:1;visibility:visible;transform:none;animation:none}
+.hero-bottomline{margin-top:clamp(22px,4vw,48px)}
+.hero-scroll-arrow{transition:transform .3s var(--motion-ease),background .3s,color .3s,border-color .3s}
+.hero-scroll:hover .hero-scroll-arrow{transform:translateY(3px)}
+.story-portrait{transition:transform .8s var(--motion-ease),filter .8s var(--motion-ease)}
+.story-portrait-wrap:hover .story-portrait{transform:scale(1.012);filter:contrast(1.035)}
+.worlds-word,.service-card,.detail-aside,.contact-link,.story-more{transition:transform .35s var(--motion-ease),border-color .35s ease,background-color .35s ease,box-shadow .35s ease}
+.worlds-word:hover,.service-card:hover{transform:translateY(-4px)}
+.story-more:hover,.story-more:focus-visible{transform:translateX(3px)}
+a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid #789e32;outline-offset:5px;border-radius:2px}
+@keyframes editorialTitleIn{from{opacity:0;transform:translateY(22px);filter:blur(8px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+/* Le CTA sono sempre disponibili: nessun testo o collegamento attende una scrittura simulata. */
+.writing-copy [data-reveal]{opacity:1!important;visibility:visible!important;transform:none!important;clip-path:none!important}
+.writing-copy .deferred-after-writing,.writing-copy.has-deferred-writing .deferred-after-writing{opacity:1!important;visibility:visible!important;transform:none!important;animation:none!important;pointer-events:auto!important}
+@media(max-width:700px){.hero::before{background-size:42px 42px;opacity:.14}.hero::after{width:90vw;right:-45vw;top:-20vw}.hero-title{animation-duration:.75s}.story-portrait-wrap:hover .story-portrait{transform:none}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.hero-title{animation:none!important}.hero-topline,.hero-bottomline{opacity:1!important;visibility:visible!important;transform:none!important;animation:none!important}.story-portrait,.worlds-word,.service-card,.detail-aside,.contact-link,.story-more,.hero-scroll-arrow{transition:none!important}.story-portrait-wrap:hover .story-portrait{transform:none;filter:none}}
+
+/* Titolo manifesto su due righe: proporzioni controllate anche su viewport stretti. */
+.hero-title{width:auto;white-space:normal;font-size:clamp(3.25rem,13.2vw,12.6rem);line-height:.82;letter-spacing:-.09em;overflow-wrap:normal}
+@media(max-width:620px){.hero-title{font-size:clamp(2.65rem,12vw,5.2rem);line-height:.86;letter-spacing:-.085em}}

@@ -4,7 +4,7 @@
 
 ## Problemi e interventi verificati
 
-1. **Sitemap dichiarata male:** `robots.txt` puntava a `sitemap.xml.nojekyll`, URL errato. Corretto in `https://cesareparatore.github.io/sitemap.xml` e incluso un controllo automatico.
+1. **Sitemap dichiarata male:** `robots.txt` puntava a `sitemap.xml.nojekyll`, URL errato. Corretto in `https://cesareparatore.it/sitemap.xml` e incluso un controllo automatico.
 2. **Privacy caricava lo script completo della homepage:** il vecchio file privacy richiamava `js/script.js`, che contiene interazioni e timer della homepage non necessari alla pagina privacy. La pagina è stata ricostruita usando il CSS e lo script condivisi delle pagine interne; ora la lingua funziona con attributi `data-it`/`data-en` e il menu è gestito dal codice condiviso leggero.
 3. **Preloader:** rimossa la logica di percentuale simulata non necessaria. Ora il preloader non dichiara un avanzamento numerico fittizio, rispetta `prefers-reduced-motion` e ha un timeout di recupero.
 4. **Audio:** la sorgente viene assegnata dopo aver impostato `preload = "none"`; il sito non avvia la traccia automaticamente.

@@ -24,6 +24,15 @@ Prima di usare la biografia come dossier professionale o per candidature, confer
 
 La narrazione è stata fornita in prima persona dal titolare e non è stata verificata tramite fonti indipendenti. Non sono stati aggiunti anni, nomi di istituzioni, qualifiche aggiuntive o risultati non dichiarati.
 
+## Dati privacy e fornitori da completare
+
+- [x] Comune indicato dal titolare: Partinico (PA), Sicilia. Non è stato inserito un indirizzo civico perché non fornito.
+- [x] Provider email indicato dal titolare: OVHcloud.
+- [ ] Verificare il prodotto/servizio OVHcloud effettivamente utilizzato, i ruoli privacy e gli eventuali accordi/garanzie applicabili.
+- [ ] Inserire e verificare l’indirizzo professionale completo e gli ulteriori dati identificativi richiesti, se applicabili.
+- [ ] Definire i tempi o criteri effettivi di conservazione dei messaggi che non generano un rapporto professionale.
+- [ ] Verificare le impostazioni e le condizioni applicabili a WhatsApp e ai servizi di hosting.
+
 ## Principio editoriale
 
 Pubblicare soltanto affermazioni verificabili. Non inventare anni di esperienza, risultati, qualifiche, certificazioni, clienti, numeri, premi o recensioni. Il bacino territoriale descritto sul sito è indicativo e non promette disponibilità in presenza in ogni comune.

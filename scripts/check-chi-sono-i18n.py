@@ -30,7 +30,7 @@ for i,(a,b) in enumerate(zip(it.items,en.items)):
     if a[0]!=b[0]: errors.append(f'elemento {i}: tag differente {a[0]} / {b[0]}')
     if a[1]!=b[1]: errors.append(f'elemento {i}: data-it non coerente fra pagine')
     if a[2]!=b[2]: errors.append(f'elemento {i}: data-en non coerente fra pagine')
-base='https://cesareparatore.github.io'
+base='https://cesareparatore.it'
 for parser,route in ((it,'/chi-sono/'),(en,'/en/chi-sono/')):
     if parser.canonical != [base+route]: errors.append(f'canonical errato per {route}: {parser.canonical}')
     expected={'it':base+'/chi-sono/','en':base+'/en/chi-sono/','x-default':base+'/chi-sono/'}

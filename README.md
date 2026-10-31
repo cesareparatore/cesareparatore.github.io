@@ -1,6 +1,6 @@
 # Cesare Paratore — sito personale
 
-Sito statico multipagina per GitHub Pages, senza framework o dipendenze runtime aggiuntive. L'archivio è preparato per il repository utente `cesareparatore.github.io`, quindi i percorsi e gli URL canonici fanno riferimento alla root del dominio `https://cesareparatore.github.io/`.
+Sito statico multipagina per GitHub Pages, senza framework o dipendenze runtime aggiuntive. L'archivio è preparato per il dominio personalizzato `cesareparatore.it`, con `CNAME` incluso. L’associazione DNS e GitHub Pages deve essere verificata prima della pubblicazione.
 
 ## Struttura
 
@@ -14,7 +14,7 @@ Sito statico multipagina per GitHub Pages, senza framework o dipendenze runtime 
 - `assets/404.js`: localizza la pagina 404 in base al percorso richiesto.
 - `assets/images/`: ritratto e marchio SVG.
 - `assets/audio/`: traccia audio esistente; l'audio non viene avviato automaticamente.
-- `robots.txt`, `sitemap.xml`, `.nojekyll`: file per la pubblicazione e la reperibilità.
+- `robots.txt`, `sitemap.xml`, `CNAME`, `.nojekyll`: file per la pubblicazione e la reperibilità. Le direttive crawler sono distinte per finalità; vedi `docs/REVISIONE-PSAI-V24-2026-10-31.md`.
 - `scripts/quality-check.py`: controlli statici riproducibili senza dipendenze Python esterne, inclusi canonical, `hreflang`, `og:url`, sitemap e struttura dei documenti.
 - `.github/workflows/quality.yml`: workflow di controllo statico e sintassi JavaScript su push e pull request.
 - `docs/`: relazione, report, matrice di accessibilità, criticità residue e checklist delle informazioni professionali da confermare (`INFORMAZIONI-DA-CONFERMARE.md`).
@@ -55,3 +55,17 @@ Per evidenze e limiti consultare `docs/RELAZIONE-TECNICA.md`, `docs/REPORT-TEST.
 ## Missione 5.3
 
 La correzione delle frecce SVG e i controlli eseguiti sono documentati in `docs/REPORT-TEST-MISSIONE-5.3.md`. La verifica visuale browser e Lighthouse resta esplicitamente aperta perché la navigazione è bloccata nell’ambiente di lavoro.
+
+## Standard PERSONAL SEARCH & AI VISIBILITY v2.4
+
+La revisione del pacchetto, i limiti e i gate aperti sono documentati in `docs/REVISIONE-PSAI-V24-2026-10-31.md`, `docs/GATE-AVVIO-E-MONITORAGGIO-V24.md` e `docs/ESITI-TEST-V24.md`. Il pacchetto non è stato pubblicato. DNS, browser, WCAG 2.2 completa, Lighthouse, KPI, pilot AI, Search Console/Bing e revisione indipendente restano da eseguire.
+
+
+## Consegna conclusiva PSAI v2.4
+
+Consultare `docs/RELAZIONE-FINALE-REVISIONE-PSAI-V24.md`, `docs/TEST-EFFETTIVI-REVISIONE-FINALE.md`, `docs/REGISTRO-GATE-REVISIONE-FINALE.md` e `docs/CHECKLIST-PUBBLICAZIONE-MONITORAGGIO-PSAI-V24.md` per esiti e gate. Il pacchetto non è pubblicato e richiede autorizzazione esplicita del titolare.
+
+
+## Aggiornamento creativo 31/10/2026
+
+È disponibile il livello di art direction CSS e motion editoriale, con contenuti statici (nessuna scrittura carattere per carattere). Vedi `docs/REPORT-AGGIORNAMENTO-CREATIVO-2026-10-31.md`. Questa consegna è una build da esaminare: non è stata pubblicata online.
