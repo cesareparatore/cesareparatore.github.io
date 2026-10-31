@@ -86,3 +86,18 @@ La copia di lavoro include un fallback progressivo senza JavaScript per rendere 
 ## Revisione locale — 31 ottobre 2026
 
 La copia di lavoro contiene anche la correzione del menu no-JavaScript (rimozione dell’`aria-hidden` iniziale sulle 20 pagine) e il checker aggiornato. Consultare `docs/REPORT-REVISIONE-AGGIUNTIVA-31-10-2026.md` per il rilievo e i limiti. Per il dominio della fase corrente prevale `docs/SCELTA-DOMINIO-FASE-CORRENTE-2026-10-31.md`; alcune relazioni storiche documentano build precedenti e sono annotate come tali.
+
+## Audit e consegna probatoria — 31/10/2026
+
+Per questa revisione fanno fede i documenti più recenti:
+
+- `docs/ISTRUZIONI-ORIGINALI-UTENTE-2026-10-31.txt`: brief originale conservato.
+- `docs/PSAI-V2.4-STANDARD-OPERATIVO-ORIGINALE.md`: standard V2.4 integrale disponibile nel materiale ricevuto.
+- `docs/AUDIT-INIZIALE-2026-10-31.md`: inventario e criticità dell'archivio di partenza.
+- `docs/REPORT-INTERVENTI-2026-10-31.md`: interventi documentali effettivamente eseguiti e file coinvolti.
+- `docs/REPORT-TEST-EVIDENZE-2026-10-31.md`: registro test con stati, comandi, evidenze e limiti.
+- `docs/VALUTAZIONE-PSAI-E-AREE-SITO-2026-10-31.md`: calcolo C1–C12 e valutazione distinta delle 12 aree del sito.
+- `docs/REQUISITI-APERTI-E-PIANO-CHIUSURA-2026-10-31.md`: gate, responsabili necessari e prove di chiusura.
+- `docs/DICHIARAZIONE-NON-PUBBLICAZIONE-2026-10-31.md`: attestazione delle sole operazioni locali.
+
+La pagella storica `docs/PAGELLA-FINALE-31-10-2026.md` contiene una sintesi qualitativa provvisoria 8,0/10: non è un punteggio ponderato e non va letta come valutazione conclusiva di questa revisione. La valutazione aggiornata è quella nel documento `VALUTAZIONE-PSAI-E-AREE-SITO-2026-10-31.md`.

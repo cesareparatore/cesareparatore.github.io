@@ -1,0 +1,22 @@
+DATA: 2026-10-31
+$ python scripts/quality-check.py
+Pagine HTML analizzate: 21 contenuto + verifica Google
+File CSS analizzati: 3
+URL sitemap: 20
+ESITO: PASS — controlli statici superati
+EXIT:0
+$ python scripts/check-site-integrity.py
+PASS — 22 pagine HTML; link e risorse locali risolti; nessun ID duplicato; immagini con alt; menu statici non bloccati nel markup iniziale.
+EXIT:0
+$ python scripts/check-chi-sono-i18n.py
+PASS — 34 coppie IT/EN coerenti; lang, canonical e hreflang verificati.
+EXIT:0
+$ node --check js/script.js
+EXIT:0
+$ node --check assets/interior.js
+EXIT:0
+$ node --check assets/404.js
+EXIT:0
+$ python HTML/CSS/JSON-LD/XML parse
+HTML=22; JSONLD=20; CSS=3; HTML/JSONLD_ERRORS=0; CSS_ERRORS=0; SITEMAP_XML=VALID
+EXIT:0

@@ -1,0 +1,271 @@
+Voglio portare **cesareparatore.it** al massimo livello qualitativo possibile, senza compromessi sulla qualità del codice, sull'identità visiva, sulle prestazioni, sull'accessibilità, sulla SEO e sulla visibilità nei motori di ricerca e nei sistemi di intelligenza artificiale.
+
+Il riferimento creativo è:
+
+**«La pagina che Steve Jobs realizzerebbe oggi per sé, ma costruita su di me.»**
+
+Il riferimento metodologico è:
+
+**PERSONAL SEARCH & AI VISIBILITY — VERSIONE 2.4 — STANDARD OPERATIVO E METODOLOGICO.**
+
+Sito attualmente da analizzare:
+https://cesareparatore.github.io/
+
+**ATTENZIONE: ho rilevato che l'indirizzo GitHub Pages sembra reindirizzare a cesareparatore.it.** È un punto prioritario. Non dare per scontato che il comportamento sia corretto o che dipenda dal codice. Verifica e distingui, per quanto tecnicamente possibile, redirect HTTP, configurazione GitHub Pages, file CNAME, DNS, HTTPS, canonical, sitemap, robots.txt e collegamenti interni. Se non puoi verificare direttamente un elemento, dichiaralo esplicitamente e indicami come verificarlo. Non inventare risultati.
+
+## 1. OBIETTIVO GENERALE
+
+Voglio un sito personale di livello internazionale, con una personalità visiva fortissima, una struttura impeccabile e un'identità riconoscibile.
+
+Non voglio un semplice restyling, un template moderno, una raccolta di effetti o una copia di Apple.
+
+Voglio un progetto originale, essenziale, memorabile, sofisticato e profondamente coerente con la mia identità:
+
+**NIENTE È SCOLLEGATO.**
+
+Il sito deve comunicare in modo immediato e credibile chi sono, cosa faccio, come collego le mie competenze e quale valore posso offrire.
+
+Deve sembrare progettato con una direzione creativa eccezionale, curato in ogni dettaglio e realizzato con codice pulito, robusto e manutenibile.
+
+## 2. PRIMA DI MODIFICARE: ANALISI COMPLETA
+
+Esamina tutti i file disponibili del progetto, non soltanto la homepage.
+
+Analizza:
+- struttura delle cartelle e architettura;
+- tutte le pagine HTML, in italiano e inglese;
+- CSS, JavaScript, immagini, font e risorse;
+- componenti, navigazione, menu e footer;
+- responsive design e comportamento mobile;
+- SEO tecnica e dati strutturati;
+- robots.txt, sitemap.xml, canonical, hreflang e metadati;
+- collegamenti interni ed esterni;
+- accessibilità;
+- performance e caricamento;
+- sicurezza e privacy;
+- documentazione e script di controllo;
+- coerenza tra contenuti visibili, dati strutturati e informazioni pubblicate.
+
+Individua errori, duplicazioni, codice inutilizzato, conflitti CSS, JavaScript fragile, problemi semantici, collegamenti errati, dipendenze superflue e qualsiasi elemento che impedisca di raggiungere un risultato eccellente.
+
+Non modificare prima di aver compreso l'architettura esistente.
+
+## 3. DIREZIONE ARTISTICA E VISUAL SYSTEM
+
+Progetta una direzione artistica originale e completa.
+
+Voglio un sistema visivo coerente, non una serie di pagine indipendenti.
+
+Lavora su:
+- identità visiva e art direction;
+- tipografia di livello editoriale;
+- gerarchie e composizione;
+- griglie e proporzioni;
+- spaziature e ritmo visivo;
+- colori e contrasti;
+- superfici, texture e dettagli;
+- immagini e trattamento fotografico;
+- icone e microelementi;
+- sistema di componenti riutilizzabili;
+- coerenza tra tutte le pagine e le due lingue.
+
+La homepage deve avere una presenza scenica straordinaria, ma anche essere immediatamente comprensibile.
+
+Ogni scelta deve avere una ragione. Evita decorazioni fini a sé stesse, effetti gratuiti, estetica generica da template, gradienti abusati e animazioni che compromettono leggibilità o prestazioni.
+
+## 4. MOTION DESIGN E INTERAZIONI
+
+Progetta un linguaggio di movimento coerente e raffinato.
+
+Valuta e realizza, dove opportuno:
+- transizioni tra sezioni;
+- animazioni tipografiche;
+- microinterazioni;
+- hover e focus;
+- menu e navigazione;
+- feedback dei controlli;
+- entrate progressive dei contenuti;
+- effetti di scroll;
+- transizioni tra pagine, se tecnicamente appropriate.
+
+Le animazioni devono essere fluide, intenzionali e leggere.
+
+Rispetta `prefers-reduced-motion`, tastiera, touch e dispositivi meno potenti. Non sacrificare accessibilità, stabilità del layout, velocità o usabilità per ottenere effetti scenici.
+
+## 5. QUALITÀ DEL CODICE — PRIORITÀ ASSOLUTA
+
+Presta particolare attenzione al codice.
+
+Non voglio correzioni superficiali o modifiche che funzionano soltanto nella homepage.
+
+Per ogni intervento:
+- mantieni una struttura chiara e coerente;
+- evita duplicazioni e codice morto;
+- non introdurre dipendenze inutili;
+- non rompere funzionalità esistenti;
+- evita selettori CSS fragili e conflitti di specificità;
+- gestisci correttamente eventi e stato JavaScript;
+- usa HTML semantico e accessibile;
+- verifica tutti i percorsi relativi e assoluti;
+- controlla console, errori e risorse mancanti;
+- mantieni compatibilità tra pagine italiane e inglesi;
+- proteggi il funzionamento su mobile e desktop;
+- commenta il codice dove il commento aggiunge valore;
+- non nascondere gli errori con workaround;
+- non introdurre soluzioni temporanee senza documentarle.
+
+Prima di modificare un file, valuta le conseguenze sulle altre parti del sito. Dopo ogni gruppo di modifiche, esegui i controlli pertinenti.
+
+## 6. PERSONAL SEARCH & AI VISIBILITY V2.4
+
+Applica integralmente lo standard operativo e metodologico V2.4, non una sua versione semplificata.
+
+Verifica e migliora:
+- identità digitale e disambiguazione;
+- coerenza delle informazioni tra le pagine;
+- contenuti originali, utili e verificabili;
+- architettura semantica;
+- SEO tecnica;
+- dati strutturati coerenti con i contenuti visibili;
+- canonical, hreflang, sitemap e robots;
+- accessibilità e fruibilità;
+- leggibilità da parte dei crawler;
+- distinzione tra OAI-SearchBot, GPTBot, ChatGPT-User e OAI-AdsBot;
+- fonti e riferimenti verificabili;
+- misurazione della visibilità organica e AI;
+- metodologia di test ripetibile;
+- privacy, sicurezza e governance;
+- documentazione delle evidenze.
+
+Non inventare competenze, qualifiche, collaborazioni, clienti, risultati, recensioni o riconoscimenti.
+
+Non promettere posizionamenti, citazioni da parte delle AI o risultati che non possono essere garantiti.
+
+Non dichiarare conformità GDPR, WCAG o altre certificazioni senza le verifiche e le valutazioni necessarie.
+
+Il punteggio 100/100 potrà essere dichiarato soltanto quando tutti i criteri previsti dallo standard saranno documentati, verificati e sottoposti alle necessarie valutazioni indipendenti, compreso il pilot previsto. Distingui sempre la qualità del progetto dalla visibilità effettivamente ottenuta.
+
+## 7. IDENTITÀ E INFORMAZIONI AUTORIZZATE
+
+Utilizza esclusivamente informazioni documentate e già presenti nel progetto o esplicitamente confermate.
+
+Dati di riferimento:
+- Cesare Paratore;
+- Sport Manager;
+- Chinesiologo;
+- Running Coach;
+- Formatore;
+- Web Designer;
+- lauree LM-47 e L-22;
+- Partinico (PA), Sicilia;
+- slogan: «NIENTE È SCOLLEGATO.»;
+- email: info@cesareparatore.it;
+- WhatsApp: +39 375 605 2674;
+- profilo FIDAL: https://albotecnici.fidal.it/site/view?id=TP0833.
+
+Non aggiungere informazioni biografiche o professionali non dimostrate. Non alterare il significato delle qualifiche.
+
+## 8. DOMINIO E PUBBLICAZIONE
+
+Analizza con particolare attenzione il comportamento di:
+
+https://cesareparatore.github.io/
+https://cesareparatore.it/
+
+Voglio capire esattamente perché il primo indirizzo sembra reindirizzare al secondo e quali conseguenze questo comporta.
+
+Controlla la coerenza di:
+- URL canonici;
+- sitemap;
+- robots.txt;
+- collegamenti interni;
+- metadati;
+- dati strutturati;
+- configurazione GitHub Pages;
+- eventuale CNAME;
+- documentazione.
+
+**Non modificare DNS, repository remoto, impostazioni GitHub, dominio o sito online. Non pubblicare e non distribuire nulla senza una mia approvazione esplicita.**
+
+Lavora sui file locali e prepara un progetto verificabile.
+
+Il dominio personalizzato `.it` dovrà essere utilizzato come destinazione definitiva soltanto quando il progetto avrà raggiunto e documentato il livello richiesto. Non considerare un semplice cambio di URL come una soluzione a un problema di redirect.
+
+## 9. TEST E VALIDAZIONE
+
+Non limitarti a dire che il sito è stato migliorato.
+
+Esegui tutti i test concretamente disponibili e documenta i risultati.
+
+Prevedi almeno:
+- validazione HTML e struttura;
+- controllo integrità dei collegamenti;
+- verifica delle risorse locali;
+- controllo CSS e JavaScript;
+- controllo JSON-LD;
+- validazione XML della sitemap;
+- verifica canonical e hreflang;
+- verifica dei percorsi e degli URL;
+- controllo delle versioni italiana e inglese;
+- test responsive;
+- verifica accessibilità;
+- verifica performance;
+- controllo degli errori;
+- verifica del comportamento delle interazioni.
+
+Quando possibile, esegui test reali su browser e dispositivi. Se l'ambiente non consente una verifica, non simulare il risultato e non segnare il controllo come superato.
+
+Distingui sempre:
+1. test eseguito e superato;
+2. test eseguito e fallito;
+3. test non eseguibile;
+4. verifica esterna ancora necessaria.
+
+## 10. MODALITÀ DI LAVORO
+
+Procedi per fasi, senza saltare i controlli:
+
+**FASE A — Audit:** analisi completa e rapporto delle criticità.
+
+**FASE B — Strategia:** direzione artistica, architettura, design system e priorità.
+
+**FASE C — Realizzazione:** implementazione coordinata su tutte le pagine e tutti i componenti interessati.
+
+**FASE D — Ottimizzazione:** codice, performance, accessibilità, SEO e AI visibility.
+
+**FASE E — Collaudo:** test tecnici, funzionali, visivi e responsive.
+
+**FASE F — Revisione:** correggi tutte le criticità rilevate e ripeti i test.
+
+**FASE G — Consegna:** prepara una versione completa, documentata e verificabile.
+
+Non fermarti a una proposta grafica o a un elenco di suggerimenti: voglio che tu realizzi concretamente il lavoro sui file disponibili, nei limiti degli strumenti e delle verifiche effettivamente possibili.
+
+Se una decisione richiede una mia scelta o un'autorizzazione, fermati su quel punto e chiedimela. Non inventare approvazioni.
+
+## 11. CONSEGNA FINALE
+
+Voglio ricevere:
+1. progetto completo aggiornato;
+2. archivio ZIP integro;
+3. rapporto delle modifiche effettuate;
+4. elenco dei file modificati e dei motivi;
+5. risultati dei test con evidenze;
+6. criticità ancora aperte;
+7. verifiche esterne ancora necessarie;
+8. valutazione motivata del livello raggiunto;
+9. piano preciso per arrivare al massimo livello possibile.
+
+Non dichiarare un 10/10 per compiacermi. Preferisco una valutazione severa, trasparente e dimostrabile.
+
+## 12. PRINCIPIO FINALE
+
+Voglio il massimo livello possibile, non il massimo effetto scenico.
+
+Ogni dettaglio deve contribuire a un'unica esperienza: identità, contenuto, design, codice, accessibilità, prestazioni, SEO e riconoscibilità.
+
+**Il risultato deve essere un sito personale eccezionale, tecnicamente solido, esteticamente memorabile e metodologicamente verificabile.**
+
+Prima di tutto, verifica i file e il problema del redirect. Poi procedi con metodo, attenzione estrema al codice e controllo continuo della qualità.
+
+Non pubblicare nulla senza la mia autorizzazione esplicita.
