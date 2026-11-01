@@ -116,25 +116,19 @@
     const current = sections[safe];
 
     if(animate){
-      headerChapter.classList.add("is-changing");
+      if(headerChapter) headerChapter.classList.add("is-changing");
       if(chapterLabelTimer) window.clearTimeout(chapterLabelTimer);
       chapterLabelTimer = window.setTimeout(() => {
-        chapterLabel.textContent = current.label;
-        headerChapter.classList.remove("is-changing");
+        if(chapterLabel) chapterLabel.textContent = current.label;
+        if(headerChapter) headerChapter.classList.remove("is-changing");
       },120);
     }else{
-      chapterLabel.textContent = current.label;
+      if(chapterLabel) chapterLabel.textContent = current.label;
     }
 
-    chapterPrev.disabled = safe === 0;
-    chapterPrev.setAttribute("aria-label", document.documentElement.lang === "en" ? "Previous section" : "Sezione precedente");
-    chapterPrev.title = chapterPrev.getAttribute("aria-label");
-    chapterNext.disabled = safe === sections.length-1;
-    chapterNext.setAttribute("aria-label", safe === sections.length-1
-      ? (document.documentElement.lang === "en" ? "No next section" : "Nessuna sezione successiva")
-      : (document.documentElement.lang === "en" ? "Next section" : "Sezione successiva"));
-    chapterNext.title = chapterNext.getAttribute("aria-label");
-    headerChapter.setAttribute("aria-label", document.documentElement.lang === "en" ? "Section navigation" : "Navigazione tra le sezioni");
+    // La navigazione a frecce è stata rimossa dalla homepage: resta soltanto
+    // l'aggiornamento interno dello stato delle sezioni, senza controlli visibili.
+    if(headerChapter) headerChapter.setAttribute("aria-label", document.documentElement.lang === "en" ? "Section navigation" : "Navigazione tra le sezioni");
 
     updateChapterProgress();
   }
@@ -165,13 +159,6 @@
     resetInactivityTimer();
   }
 
-  chapterPrev?.addEventListener("click",() => {
-    if(currentSectionIndex>0) scrollToSection(currentSectionIndex-1);
-  });
-
-  chapterNext?.addEventListener("click",() => {
-    if(currentSectionIndex < sections.length-1) scrollToSection(currentSectionIndex+1);
-  });
 
   if ("IntersectionObserver" in window) {
     const sectionObserver = new IntersectionObserver(entries => {
