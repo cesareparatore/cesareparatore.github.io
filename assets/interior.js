@@ -59,6 +59,7 @@
     else{headerAudio.pause();audioButton.classList.remove('is-playing');audioButton.setAttribute('aria-pressed','false');audioButton.setAttribute('aria-label',language==='it'?'Attiva audio':'Turn audio on');}
   });
   // Header behaviour shared with the homepage: visible at the opening and again at the footer.
+  const main=document.querySelector('main');
   const heroSection=main?.querySelector(':scope > .hero');
   const siteFooter=document.querySelector('.site-footer');
   let footerVisible=false;
@@ -87,7 +88,6 @@
   backToTop?.addEventListener('click',()=>window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));
 
   // Navigazione tra le sezioni delle pagine interne: controlli laterali, centrati a metà viewport.
-  const main=document.querySelector('main');
   const pageSections=main?[...main.querySelectorAll(':scope > section')]:[];
   if(pageSections.length>1){
     pageSections.forEach((section,index)=>{
