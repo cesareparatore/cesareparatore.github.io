@@ -51,3 +51,9 @@ La testata usa ora un foglio dedicato `assets/header.css` condiviso dalla homepa
 - `scripts/quality-check.py` controlla ora le icone direzionali e impedisce il ritorno di frecce Unicode visibili nel markup.
 - Esiti aggiornati: quality checker, sintassi JS, parsing CSS/JSON-LD, confronto DOM e smoke test HTTP locale superati.
 - **Limite essenziale:** Playwright non riesce a navigare neppure sul server locale (`ERR_BLOCKED_BY_ADMINISTRATOR`). Nessun test visuale responsive, interattivo, Lighthouse o screen reader è dichiarato superato. Per dettagli consultare `docs/REPORT-TEST-MISSIONE-5.3.md`.
+
+## Audit ed esecuzione — 1 novembre 2026
+
+La revisione della build `cesareparatore-home-behavior-unificato-2026-11-01.zip` ha superato i controlli statici e lo smoke test HTTP locale inclusi nel progetto. È stata inoltre uniformata la favicon SVG del monogramma CP su tutte le 21 pagine di contenuto e sulla pagina 404. Il rapporto completo, con punteggi preliminari delle 16 aree, criticità residue e limiti di verifica, è in `docs/AUDIT-COMPLETO-ESECUZIONE-2026-11-01.md`.
+
+Il punteggio medio preliminare del pacchetto è 7,3/10 e non rappresenta una certificazione del sito pubblicato. Browser end-to-end, Lighthouse/Core Web Vitals, audit WCAG 2.2 AA completo, verifica privacy reale, indicizzazione live e conferme professionali restano aperti. Nessun deploy o modifica remota è stato effettuato.
