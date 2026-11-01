@@ -354,3 +354,36 @@ body.chapter-float-mode .site-header{opacity:0;visibility:hidden;pointer-events:
 body:not(.chapter-float-mode) .site-header{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0);transition:opacity .25s ease,visibility .25s ease,transform .3s var(--ease)}
 @media(max-width:760px){#contatto.contact{padding:25vw 24px 24vw}#contatto .contact-title{font-size:clamp(3.5rem,14vw,7rem);margin-bottom:15vw;letter-spacing:-.09em}#contatto .contact-bottom{grid-template-columns:1fr;gap:34px;margin-left:0}#contatto .contact-lead{max-width:24ch;font-size:clamp(1.15rem,4.6vw,1.5rem)}#contatto .contact-action-group{margin-top:0}#contatto .contact-closer{max-width:16ch;font-size:clamp(2.35rem,8.2vw,4rem);margin-bottom:38px}#contatto .contact-link{font-size:1rem;padding-bottom:13px;gap:30px}.back-to-top{width:36px;height:36px;margin:20px auto 24px}.back-to-top-arrow{font-size:23px}}
 @media(prefers-reduced-motion:reduce){#contatto .contact-link,#contatto .contact-link-arrow,.back-to-top,.site-header{transition:none!important}}
+
+
+/* Firma footer: regole copiate dalla homepage (css/style.css), senza varianti locali. */
+.site-footer{min-height:120px;padding:28px 20px;display:flex;align-items:center;justify-content:center;background:#090909;color:#f2f0ea;border-top:0}
+.site-footer .signature{justify-self:center}
+.signature{position:relative;display:inline-flex;align-items:center;justify-content:center;padding-bottom:18px;padding-right:.24em;font-family:"Brush Script MT","Segoe Script",cursive;font-size:clamp(2.8rem,4.5vw,5rem);line-height:1;font-style:italic;transform:rotate(-3.5deg);opacity:0;clip-path:inset(0 100% 0 0);transition:clip-path 2.25s cubic-bezier(.65,0,.25,1),opacity .35s ease;will-change:clip-path,opacity}
+.signature.is-signing{opacity:1;clip-path:inset(-.08em -.12em -.08em 0)}
+.signature::after{content:"";position:absolute;left:2%;right:0;bottom:0;height:1px;background:rgba(242,240,234,.7);transform:scaleX(0);transform-origin:left center;transition:transform .65s ease .95s}
+.signature.is-signing::after{transform:scaleX(1)}
+.signature::before{content:"";position:absolute;right:-2%;bottom:-1px;width:3px;height:3px;background:rgba(242,240,234,.9);border-radius:50%;opacity:0;transition:opacity .2s ease 2s}
+.signature.is-signing::before{opacity:1}
+@media(prefers-reduced-motion:reduce){.signature{transition:none;clip-path:none;opacity:1}.signature::after{transition:none;transform:scaleX(1)}.signature::before{transition:none;opacity:1}}
+@media(max-width:520px){.site-footer{min-height:105px;padding:24px 16px}}
+
+
+/* Footer identico alla homepage: Privacy, ritorno circolare, Partinico e orologio. */
+.footer-info-band{background:#f2f0ea;color:#090909;padding:20px clamp(24px,5vw,76px);border-top:1px solid rgba(9,9,9,.12)}
+.footer-info-inner{max-width:var(--content);min-height:34px;margin-inline:auto;display:grid;grid-template-columns:minmax(0,1fr) 42px minmax(0,1fr);align-items:center;gap:20px}
+.footer-info-band .footer-privacy{justify-self:start;align-self:center;color:rgba(9,9,9,.72);font-size:10px;line-height:1.4;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;transition:color .2s ease}
+.footer-info-band .footer-privacy:hover,.footer-info-band .footer-privacy:focus-visible{color:#090909}
+.footer-info-band .footer-local-time{justify-self:end;display:flex;align-items:center;text-align:right}
+.footer-info-band .footer-local-place{display:inline-flex;align-items:center;gap:6px;color:rgba(9,9,9,.72);font-size:10px;line-height:1.4;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.footer-info-band .footer-clock{color:#426b12;font-variant-numeric:tabular-nums;letter-spacing:.06em;margin-left:2px}
+.footer-info-band .footer-location-dot{width:5px;height:5px;flex:0 0 5px;border-radius:50%;background:#426b12;box-shadow:0 0 8px rgba(66,107,18,.3);animation:footerDotPulse 1.2s ease-in-out infinite}
+@keyframes footerDotPulse{0%,100%{opacity:1;box-shadow:0 0 8px rgba(66,107,18,.45);transform:scale(1)}50%{opacity:.28;box-shadow:0 0 2px rgba(66,107,18,.12);transform:scale(.78)}}
+.footer-info-inner .back-to-top{margin:0;justify-self:center;align-self:center}
+@media(max-width:520px){.footer-info-band{padding:17px 20px}.footer-info-inner{grid-template-columns:minmax(0,1fr) 36px minmax(0,1fr);gap:8px}.footer-info-band .footer-privacy,.footer-info-band .footer-local-place{font-size:8px;letter-spacing:.06em}.footer-info-band .footer-local-time{grid-column:3;grid-row:1;justify-self:end}.footer-info-band .footer-local-place{white-space:normal;text-align:right}.footer-info-inner .back-to-top{grid-column:2;grid-row:1;width:36px;height:36px}.footer-info-band .footer-privacy{grid-column:1;grid-row:1}}
+@media(prefers-reduced-motion:reduce){.footer-info-band .footer-location-dot{animation:none}}
+/* Il tasto torna su segue la stessa sequenza della firma della homepage. */
+body.contact-return-mode .back-to-top{opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-7px) scale(.86)}
+body.contact-return-mode.footer-signature-complete .back-to-top{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0) scale(1);border-color:rgba(242,240,234,.68);box-shadow:0 0 28px rgba(242,240,234,.12),0 0 0 1px rgba(242,240,234,.04)}
+body.contact-return-mode.footer-signature-complete .back-to-top-orbit{opacity:1;transform:scale(1)}
+body.contact-return-mode.footer-signature-complete .back-to-top::before,body.contact-return-mode.footer-signature-complete .back-to-top::after{opacity:.9;transform:scale(1) rotate(0)}

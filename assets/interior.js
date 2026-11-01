@@ -4,10 +4,10 @@
   const body=document.body, root=document.documentElement;
   root.classList.add('js-enabled');
   const footerClock=document.getElementById('footerClock');
-  const updateFooterClock=()=>{if(footerClock)footerClock.textContent=new Intl.DateTimeFormat('it-IT',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit'}).format(new Date());};
+  const footerClockFormatter=new Intl.DateTimeFormat('it-IT',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+  const updateFooterClock=()=>{if(footerClock)footerClock.textContent=footerClockFormatter.format(new Date());};
   updateFooterClock();
-  if(footerClock)window.setInterval(updateFooterClock,30000);
-  document.getElementById('footerBackTop')?.addEventListener('click',()=>window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));
+  if(footerClock)window.setInterval(updateFooterClock,1000);
   const languageButton=document.querySelector('.language-toggle');
   const menuButton=document.querySelector('.menu-toggle');
   const navigation=document.querySelector('#site-navigation');
@@ -78,12 +78,56 @@
     const floating=!atHero&&!atFooter;
     body.classList.toggle('header-menu-mode',atHero||atFooter);
     body.classList.toggle('footer-menu-mode',atFooter);
+    body.classList.toggle('contact-return-mode',atFooter);
     body.classList.toggle('chapter-float-mode',floating);
     if(menuButton&&floating&&menuButton.getAttribute('aria-expanded')==='true')setMenuOpen(false);
   }
   window.addEventListener('scroll',updateHeaderPlacement,{passive:true});
   window.addEventListener('resize',updateHeaderPlacement,{passive:true});
   updateHeaderPlacement();
+  // Stessa logica della homepage: la firma si rivela quando il footer entra in vista.
+  const signature=document.querySelector('.signature');
+  let signatureCompleteTimer=null;
+  function resetSignatureCompletion(){
+    if(signatureCompleteTimer){clearTimeout(signatureCompleteTimer);signatureCompleteTimer=null;}
+    body.classList.remove('footer-signature-complete');
+  }
+  function markSignatureComplete(){
+    resetSignatureCompletion();
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      body.classList.add('footer-signature-complete');
+      return;
+    }
+    signatureCompleteTimer=window.setTimeout(()=>{
+      if(siteFooter&&siteFooter.getBoundingClientRect().top<window.innerHeight&&siteFooter.getBoundingClientRect().bottom>0){
+        body.classList.add('footer-signature-complete');
+      }
+      signatureCompleteTimer=null;
+    },2350);
+  }
+  if(signature&&siteFooter){
+    if('IntersectionObserver' in window){
+      const signatureObserver=new IntersectionObserver(entries=>{
+        entries.forEach(entry=>{
+          if(entry.isIntersecting){
+            resetSignatureCompletion();
+            signature.classList.remove('is-signing');
+            void signature.offsetWidth;
+            signature.classList.add('is-signing');
+            markSignatureComplete();
+          }else{
+            resetSignatureCompletion();
+            signature.classList.remove('is-signing');
+          }
+        });
+      },{threshold:0.35});
+      signatureObserver.observe(siteFooter);
+    }else{
+      signature.classList.add('is-signing');
+      markSignatureComplete();
+    }
+  }
+
   const backToTop=document.getElementById('backToTop');
   backToTop?.addEventListener('click',()=>window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));
 
