@@ -127,14 +127,14 @@
     }
 
     chapterPrev.disabled = safe === 0;
-
-    if(safe === sections.length-1){
-      chapterNext.innerHTML = '<svg class="direction-arrow-icon" aria-hidden="true" focusable="false" viewBox="0 0 16 16"><path d="M6 3 1.5 7.5 6 12M2 7.5h7a4 4 0 0 1 0 8h-1"/></svg>';
-      chapterNext.setAttribute("aria-label","Torna all'inizio");
-    }else{
-      chapterNext.innerHTML = '<svg class="direction-arrow-icon" aria-hidden="true" focusable="false" viewBox="0 0 16 16"><path d="M2.5 8h11M9 3.5 13.5 8 9 12.5"/></svg>';
-      chapterNext.setAttribute("aria-label","Capitolo successivo");
-    }
+    chapterPrev.setAttribute("aria-label", document.documentElement.lang === "en" ? "Previous section" : "Sezione precedente");
+    chapterPrev.title = chapterPrev.getAttribute("aria-label");
+    chapterNext.disabled = safe === sections.length-1;
+    chapterNext.setAttribute("aria-label", safe === sections.length-1
+      ? (document.documentElement.lang === "en" ? "No next section" : "Nessuna sezione successiva")
+      : (document.documentElement.lang === "en" ? "Next section" : "Sezione successiva"));
+    chapterNext.title = chapterNext.getAttribute("aria-label");
+    headerChapter.setAttribute("aria-label", document.documentElement.lang === "en" ? "Section navigation" : "Navigazione tra le sezioni");
 
     updateChapterProgress();
   }
@@ -170,17 +170,7 @@
   });
 
   chapterNext?.addEventListener("click",() => {
-    if(currentSectionIndex===sections.length-1){
-      const footer = document.querySelector(".site-footer");
-      if(footer){
-        footer.scrollIntoView({
-          behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
-          block:"start"
-        });
-      }
-    }else{
-      scrollToSection(currentSectionIndex+1);
-    }
+    if(currentSectionIndex < sections.length-1) scrollToSection(currentSectionIndex+1);
   });
 
   if ("IntersectionObserver" in window) {
@@ -253,14 +243,25 @@
     body.classList.toggle("header-menu-mode", atHero || atFooter);
     body.classList.toggle("footer-menu-mode", atFooter);
     body.classList.toggle("chapter-float-mode", floatingChapterMode);
+    updateChapterNavVisibility();
 
     if(menuOpen && (atHero || atFooter) && lastMenuTrigger === dockMenuToggle) lastMenuTrigger = menuToggle;
     if(menuOpen && floatingChapterMode && lastMenuTrigger === menuToggle) lastMenuTrigger = dockMenuToggle;
   }
   window.addEventListener("scroll", updateMenuPlacement, {passive:true});
   window.addEventListener("resize", updateMenuPlacement);
+  window.addEventListener("scroll", updateChapterNavVisibility, {passive:true});
+  window.addEventListener("resize", updateChapterNavVisibility);
 
   let menuOpen = false;
+  function updateChapterNavVisibility(){
+    if(!headerChapter) return;
+    const contactAction = document.querySelector("#contactLink, .contact-link");
+    const actionRect = contactAction?.getBoundingClientRect();
+    const arrowRects = [...headerChapter.querySelectorAll('.chapter-arrow')].map(button => button.getBoundingClientRect());
+    const overlapsContactAction = Boolean(actionRect && actionRect.width && actionRect.height && arrowRects.some(rect => rect.left < actionRect.right && rect.right > actionRect.left && rect.top < actionRect.bottom && rect.bottom > actionRect.top));
+    body.classList.toggle("chapter-nav-obscured", menuOpen || overlapsContactAction);
+  }
   if(menuPanel){ menuPanel.setAttribute("aria-hidden","true"); menuPanel.inert = true; }
   let lastMenuTrigger = menuToggle || dockMenuToggle;
   updateMenuPlacement();
@@ -280,6 +281,7 @@
 
   function openMenu(trigger=(document.body.classList.contains("header-menu-mode") ? menuToggle : dockMenuToggle)){
     menuOpen = true;
+    body.classList.add("chapter-nav-obscured");
     lastMenuTrigger = trigger || menuToggle || dockMenuToggle;
     menuPanel.classList.add("is-open");
     syncMenuButtons(true);
@@ -291,6 +293,7 @@
 
   function closeMenu(restoreFocus=true){
     menuOpen = false;
+    updateChapterNavVisibility();
     menuPanel.classList.remove("is-open");
     syncMenuButtons(false);
     menuPanel.setAttribute("aria-hidden","true");
