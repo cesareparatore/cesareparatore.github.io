@@ -1000,14 +1000,14 @@ body.chapter-float-mode .chapter-arrow{width:44px;height:44px}
 @media(max-width:520px){.footer-info-inner{grid-template-columns:minmax(0,1fr) 42px minmax(0,1fr);gap:8px}.footer-info-band .footer-privacy{grid-column:1;grid-row:1}.footer-info-inner .back-to-top{grid-column:2;grid-row:1;width:36px;height:36px}.footer-info-band .footer-local-time{grid-column:3;grid-row:1;justify-self:end}.footer-info-band .footer-local-place,.footer-info-band .footer-privacy{font-size:8px;letter-spacing:.06em}.footer-info-band .footer-local-place{white-space:normal;text-align:right}}
 
 
-/* Navigazione capitoli flottante: ai lati del viewport, centrata a metà altezza su ogni dispositivo. */
-.header-chapter{top:50%!important;right:18px;bottom:auto!important;left:18px;width:auto;min-width:0!important;height:auto;padding:0;display:flex;justify-content:space-between;align-items:center;gap:0;transform:translateY(-50%);border:0;border-radius:0;background:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;pointer-events:none}
-body.chapter-float-mode .header-chapter{top:50%!important;right:18px;bottom:auto!important;left:18px;min-width:0;height:auto;padding:0;display:flex;justify-content:space-between;gap:0;transform:translateY(-50%);border:0;border-radius:0;background:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;pointer-events:none}
+/* Navigazione capitoli flottante: frecce fuori dalla colonna di lettura, centrate in altezza. */
+.header-chapter{top:50%!important;right:max(14px,calc((100vw - min(100vw,var(--content,1180px)))/2 + 18px));bottom:auto!important;left:max(14px,calc((100vw - min(100vw,var(--content,1180px)))/2 + 18px));width:auto;min-width:0!important;height:auto;padding:0;display:flex;justify-content:space-between;align-items:center;gap:0;transform:translateY(-50%);border:0;border-radius:0;background:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;pointer-events:none}
+body.chapter-float-mode .header-chapter{top:50%!important;right:max(14px,calc((100vw - min(100vw,var(--content,1180px)))/2 + 18px));bottom:auto!important;left:max(14px,calc((100vw - min(100vw,var(--content,1180px)))/2 + 18px));min-width:0;height:auto;padding:0;display:flex;justify-content:space-between;gap:0;transform:translateY(-50%);border:0;border-radius:0;background:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;pointer-events:none}
 .header-chapter .chapter-arrow{pointer-events:auto;width:48px;height:48px;border:1px solid rgba(242,240,234,.48);background:rgba(9,9,9,.94);color:#f2f0ea;box-shadow:0 5px 20px rgba(0,0,0,.2)}
 .header-chapter .chapter-arrow:disabled{opacity:.28;cursor:not-allowed}
 .header-chapter .chapter-center{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 body.chapter-nav-obscured .header-chapter{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
-@media(max-width:620px){.header-chapter,body.chapter-float-mode .header-chapter{top:50%!important;right:9px;bottom:auto!important;left:9px;gap:0}.header-chapter .chapter-arrow{width:44px;height:44px}}
+@media(max-width:620px){.header-chapter,body.chapter-float-mode .header-chapter{top:50%!important;right:12px;bottom:auto!important;left:12px;gap:0}.header-chapter .chapter-arrow{width:44px;height:44px}}
 @media(orientation:landscape) and (max-height:520px) and (max-width:900px){.header-chapter,body.chapter-float-mode .header-chapter{right:10px;left:10px}.header-chapter .chapter-arrow{width:40px;height:40px}}
 @media(prefers-reduced-motion:reduce){
   .header-chapter,.header-chapter .chapter-arrow,.header-chapter .chapter-arrow::before{transition:none!important}
@@ -1021,3 +1021,7 @@ body.chapter-nav-obscured .header-chapter{opacity:0!important;visibility:hidden!
 .back-to-top-arrow .direction-arrow-icon{width:21px;height:21px;}
 .back-to-top-label,.back-to-top-orbit{display:none!important;}
 @media(max-width:620px){.back-to-top{width:44px;height:44px;margin:20px auto 24px}.back-to-top-arrow .direction-arrow-icon{width:19px;height:19px}}
+
+/* Freccia Privacy sempre visibile e allineata, come nelle pagine interne. */
+.footer-info-band .footer-privacy .link-arrow-icon{display:inline-block!important;width:12px;height:12px;margin-left:3px;vertical-align:-2px;opacity:1;visibility:visible;stroke:currentColor;stroke-width:1.6;transition:transform .2s ease}
+.footer-info-band .footer-privacy:hover .link-arrow-icon,.footer-info-band .footer-privacy:focus-visible .link-arrow-icon{transform:translate(2px,-2px)}
