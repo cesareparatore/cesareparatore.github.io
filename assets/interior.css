@@ -387,3 +387,12 @@ body.contact-return-mode .back-to-top{opacity:0;visibility:hidden;pointer-events
 body.contact-return-mode.footer-signature-complete .back-to-top{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0) scale(1);border-color:rgba(242,240,234,.68);box-shadow:0 0 28px rgba(242,240,234,.12),0 0 0 1px rgba(242,240,234,.04)}
 body.contact-return-mode.footer-signature-complete .back-to-top-orbit{opacity:1;transform:scale(1)}
 body.contact-return-mode.footer-signature-complete .back-to-top::before,body.contact-return-mode.footer-signature-complete .back-to-top::after{opacity:.9;transform:scale(1) rotate(0)}
+
+/* Pulsante torna-su: stesso linguaggio visivo delle frecce circolari destra/sinistra. */
+.back-to-top{width:48px;height:48px;margin:24px auto 30px;border:1px solid rgba(242,240,234,.48);border-radius:50%;background:rgba(9,9,9,.94);color:#f2f0ea;box-shadow:0 5px 20px rgba(0,0,0,.2);}
+.back-to-top::before{content:"";inset:-5px;border:1px solid rgba(242,240,234,.22);border-radius:50%;opacity:.65;transform:scale(.88);}
+.back-to-top::after{content:none;}
+.back-to-top:hover,.back-to-top:focus-visible{background:#171717;border-color:#f2f0ea;color:#fff;box-shadow:0 0 22px rgba(242,240,234,.14);}
+.back-to-top-arrow .direction-arrow-icon{width:21px;height:21px;}
+.back-to-top-label,.back-to-top-orbit{display:none!important;}
+@media(max-width:620px){.back-to-top{width:44px;height:44px;margin:20px auto 24px}.back-to-top-arrow .direction-arrow-icon{width:19px;height:19px}}

@@ -1012,3 +1012,12 @@ body.chapter-nav-obscured .header-chapter{opacity:0!important;visibility:hidden!
 @media(prefers-reduced-motion:reduce){
   .header-chapter,.header-chapter .chapter-arrow,.header-chapter .chapter-arrow::before{transition:none!important}
 }
+
+/* Pulsante torna-su: stesso linguaggio visivo delle frecce circolari destra/sinistra. */
+.back-to-top{width:48px;height:48px;margin:24px auto 30px;border:1px solid rgba(242,240,234,.48);border-radius:50%;background:rgba(9,9,9,.94);color:#f2f0ea;box-shadow:0 5px 20px rgba(0,0,0,.2);}
+.back-to-top::before{content:"";inset:-5px;border:1px solid rgba(242,240,234,.22);border-radius:50%;opacity:.65;transform:scale(.88);}
+.back-to-top::after{content:none;}
+.back-to-top:hover,.back-to-top:focus-visible{background:#171717;border-color:#f2f0ea;color:#fff;box-shadow:0 0 22px rgba(242,240,234,.14);}
+.back-to-top-arrow .direction-arrow-icon{width:21px;height:21px;}
+.back-to-top-label,.back-to-top-orbit{display:none!important;}
+@media(max-width:620px){.back-to-top{width:44px;height:44px;margin:20px auto 24px}.back-to-top-arrow .direction-arrow-icon{width:19px;height:19px}}
