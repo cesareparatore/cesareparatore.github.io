@@ -1,0 +1,14 @@
+/* Footer canonico: regole originali della homepage, riutilizzate senza variazioni. */
+.site-footer{min-height:120px;display:flex;align-items:center;justify-content:center;padding:28px 20px;background:#090909;color:#f2f0ea;border-top:0}
+.site-footer .signature{justify-self:auto;margin:0 auto;text-align:center}
+.signature{position:relative;display:inline-flex;align-items:center;justify-content:center;padding-bottom:18px;padding-right:.24em;font-family:"Brush Script MT","Segoe Script",cursive;font-size:clamp(2.8rem,4.5vw,5rem);line-height:1;font-style:italic;transform:rotate(-3.5deg);opacity:0;clip-path:inset(0 100% 0 0);transition:clip-path 2.25s cubic-bezier(.65,0,.25,1),opacity .35s ease;will-change:clip-path,opacity}
+.signature.is-signing{opacity:1;clip-path:inset(-.08em -.12em -.08em 0)}
+.signature::after{content:"";position:absolute;left:2%;right:0;bottom:0;height:1px;background:rgba(242,240,234,.7);transform:scaleX(0);transform-origin:left center;transition:transform .65s ease .95s}
+.signature.is-signing::after{transform:scaleX(1)}
+.signature::before{content:"";position:absolute;right:-2%;bottom:-1px;width:3px;height:3px;background:rgba(242,240,234,.9);border-radius:50%;opacity:0;transition:opacity .2s ease 2s}
+.signature.is-signing::before{opacity:1}
+@media(prefers-reduced-motion:reduce){.signature{transition:none;clip-path:none;opacity:1}.signature::after{transition:none;transform:scaleX(1)}.signature::before{transition:none;opacity:1}}
+@media(max-width:520px){.site-footer{min-height:105px;padding:24px 16px}}
+/* La freccia Privacy mantiene l'SVG originale della home, sempre visibile. */
+.footer-info-band .footer-privacy .link-arrow-icon{display:inline-block!important;width:12px;height:12px;margin-left:3px;vertical-align:-2px;opacity:1;visibility:visible;stroke:currentColor;stroke-width:1.6;transition:transform .2s ease}
+.footer-info-band .footer-privacy:hover .link-arrow-icon,.footer-info-band .footer-privacy:focus-visible .link-arrow-icon{transform:translate(2px,-2px)}

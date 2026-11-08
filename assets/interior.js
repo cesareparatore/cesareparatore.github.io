@@ -25,7 +25,7 @@
   let language=root.lang==='en'?'en':'it';
   function applyLanguage(nextLanguage) {
     language=nextLanguage==='en'?'en':'it'; root.lang=language;
-    for(const element of translatable){const value=element.dataset[language];if(value!==undefined)element.textContent=value;}
+    for(const element of translatable){const value=element.dataset[language];if(value!==undefined){const icon=element.matches('.footer-privacy')?element.querySelector('svg.link-arrow-icon'):null;if(icon){element.textContent='';element.append(document.createTextNode(value+' '));element.append(icon);}else{element.textContent=value;}}}
     const activeTitle=language==='en'?titleEn:titleIt;
     const activeDescription=language==='en'?descriptionEn:descriptionIt;
     document.title=activeTitle;

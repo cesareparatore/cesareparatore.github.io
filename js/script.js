@@ -470,11 +470,11 @@
   let currentLanguage = document.documentElement.lang === "en" ? "en" : "it";
   const languageStrings = {
     en: {
-      "a.skip-link":"Skip to content", ".pause-label":"PAUSE", ".header-menu-label":"MENU", ".hero-title":"LOOK<span class=\"hero-dot\">.</span>", ".hero-kicker":"CESARE PARATORE", ".hero-edition":"PARTINICO, ITALY",
-      ".menu-list .menu-item:nth-child(1) .menu-link":"About me", ".menu-list .menu-item:nth-child(2) .menu-link":"Sport Manager",
-      ".menu-list .menu-item:nth-child(3) .menu-link":"Kinesiologist", ".menu-list .menu-item:nth-child(4) .menu-link":"Running Coach",
-      ".menu-list .menu-item:nth-child(5) .menu-link":"Trainer", ".menu-list .menu-item:nth-child(6) .menu-link":"Web Designer",
-      ".menu-list .menu-item:nth-child(7) .menu-link":"Where I am", ".menu-list .menu-item:nth-child(8) .menu-link":"Contact",
+      ".menu-list .menu-item:nth-child(1) .menu-link":"Home", "a.skip-link":"Skip to content", ".pause-label":"PAUSE", ".header-menu-label":"MENU", ".hero-title":"LOOK<span class=\"hero-dot\">.</span>", ".hero-kicker":"CESARE PARATORE", ".hero-edition":"PARTINICO, ITALY",
+      ".menu-list .menu-item:nth-child(2) .menu-link":"About me", ".menu-list .menu-item:nth-child(3) .menu-link":"Sport Manager",
+      ".menu-list .menu-item:nth-child(4) .menu-link":"Kinesiologist", ".menu-list .menu-item:nth-child(5) .menu-link":"Running Coach",
+      ".menu-list .menu-item:nth-child(6) .menu-link":"Trainer", ".menu-list .menu-item:nth-child(7) .menu-link":"Web Designer",
+      ".menu-list .menu-item:nth-child(8) .menu-link":"Where I am", ".menu-list .menu-item:nth-child(9) .menu-link":"Contact",
       "#chapterPrev":"Previous chapter", "#chapterNext":"Next chapter", ".story-intro":"The curiosity to understand. The desire to build.",
       ".story-copy p:nth-of-type(2)":"At fourteen, I opened my first computer to understand how it worked. In sport, I started with running, then played football and helped build and lead a team; returning to running led me to become both an athlete and a coach. Through Sport and Exercise Sciences, teaching and programming, I kept following the same curiosity: understanding how things work and finding practical ways to make them better.",
       ".story-copy p:nth-of-type(3)":"My path continued through Sport and Exercise Sciences, teaching and a master’s degree in Sport Management. Each experience gave me different tools to observe, understand and explain things more clearly. Programming became a return to my roots: the same curiosity, now with new tools.",
@@ -488,11 +488,11 @@
       ".back-to-top-label":"BACK TO TOP", ".footer-privacy":"Privacy <svg class='link-arrow-icon' aria-hidden='true' focusable='false' viewBox='0 0 16 16'><path d='M5 11 11 5M5.5 5H11v5.5'/></svg>"
     },
     it: {
-      "a.skip-link":"Salta al contenuto", ".pause-label":"PAUSA", ".hero-title":"GUARDA<span class=\"hero-dot\">.</span>", ".hero-kicker":"CESARE PARATORE", ".hero-edition":"PARTINICO, IT",
-      ".menu-list .menu-item:nth-child(1) .menu-link":"Chi sono", ".menu-list .menu-item:nth-child(2) .menu-link":"Sport Manager",
-      ".menu-list .menu-item:nth-child(3) .menu-link":"Chinesiologo", ".menu-list .menu-item:nth-child(4) .menu-link":"Running Coach",
-      ".menu-list .menu-item:nth-child(5) .menu-link":"Formatore", ".menu-list .menu-item:nth-child(6) .menu-link":"Web Designer",
-      ".menu-list .menu-item:nth-child(7) .menu-link":"Dove sono", ".menu-list .menu-item:nth-child(8) .menu-link":"Contatti",
+      ".menu-list .menu-item:nth-child(1) .menu-link":"Home", "a.skip-link":"Salta al contenuto", ".pause-label":"PAUSA", ".hero-title":"GUARDA<span class=\"hero-dot\">.</span>", ".hero-kicker":"CESARE PARATORE", ".hero-edition":"PARTINICO, IT",
+      ".menu-list .menu-item:nth-child(2) .menu-link":"Chi sono", ".menu-list .menu-item:nth-child(3) .menu-link":"Sport Manager",
+      ".menu-list .menu-item:nth-child(4) .menu-link":"Chinesiologo", ".menu-list .menu-item:nth-child(5) .menu-link":"Running Coach",
+      ".menu-list .menu-item:nth-child(6) .menu-link":"Formatore", ".menu-list .menu-item:nth-child(7) .menu-link":"Web Designer",
+      ".menu-list .menu-item:nth-child(8) .menu-link":"Dove sono", ".menu-list .menu-item:nth-child(9) .menu-link":"Contatti",
       ".story-intro":"La curiosità di capire. Il desiderio di costruire.",
       ".story-copy p:nth-of-type(2)":"A quattordici anni aprivo il mio primo computer per capirne i meccanismi. Nello sport ho iniziato con la corsa, poi ho giocato a calcio e ho contribuito a costruire e guidare una squadra; il ritorno alla corsa mi ha portato a essere atleta e allenatore. Tra Scienze Motorie, insegnamento e programmazione, ho seguito la stessa curiosità: capire come funzionano le cose e trovare modi concreti per migliorarle.",
       ".story-copy p:nth-of-type(3)":"Il percorso è proseguito dagli studi in Scienze Motorie all’insegnamento e alla laurea magistrale in Management dello Sport. Ogni esperienza mi ha dato strumenti diversi per osservare, comprendere e spiegare meglio. La programmazione è stata un ritorno alle origini: la stessa curiosità, con nuovi strumenti.",
