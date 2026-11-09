@@ -4,7 +4,7 @@
   const body=document.body, root=document.documentElement;
   root.classList.add('js-enabled');
   const footerClock=document.getElementById('footerClock');
-  const footerClockFormatter=new Intl.DateTimeFormat('it-IT',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+  let footerClockFormatter=new Intl.DateTimeFormat(root.lang==='en'?'en-GB':'it-IT',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
   const updateFooterClock=()=>{if(footerClock)footerClock.textContent=footerClockFormatter.format(new Date());};
   updateFooterClock();
   if(footerClock)window.setInterval(updateFooterClock,1000);
@@ -25,6 +25,7 @@
   let language=root.lang==='en'?'en':'it';
   function applyLanguage(nextLanguage) {
     language=nextLanguage==='en'?'en':'it'; root.lang=language;
+    footerClockFormatter=new Intl.DateTimeFormat(language==='en'?'en-GB':'it-IT',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
     for(const element of translatable){const value=element.dataset[language];if(value!==undefined){const icon=element.matches('.footer-privacy')?element.querySelector('svg.link-arrow-icon'):null;if(icon){element.textContent='';element.append(document.createTextNode(value+' '));element.append(icon);}else{element.textContent=value;}}}
     const activeTitle=language==='en'?titleEn:titleIt;
     const activeDescription=language==='en'?descriptionEn:descriptionIt;
@@ -129,6 +130,7 @@
   }
 
   const backToTop=document.getElementById('backToTop');
+  if(backToTop) backToTop.setAttribute('aria-label',root.lang==='en'?'Back to top':'Torna all’inizio della pagina');
   backToTop?.addEventListener('click',()=>window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));
 
   // La navigazione tra sezioni avviene tramite contenuto, menu e normali link contestuali.

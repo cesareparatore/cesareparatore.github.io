@@ -192,6 +192,7 @@
   const heroSection = document.getElementById("guarda");
   const siteFooter = document.querySelector(".site-footer");
   const backToTop = document.getElementById("backToTop");
+  if (backToTop) backToTop.setAttribute("aria-label", document.documentElement.lang === "en" ? "Back to top" : "Torna all’inizio della pagina");
   // Il pulsante resta nascosto durante CONTATTO e compare soltanto quando il footer entra in vista.
   function updateReturnButtonVisibility(){
     if(!siteFooter) return;
@@ -471,10 +472,10 @@
   const languageStrings = {
     en: {
       ".menu-list .menu-item:nth-child(1) .menu-link":"Home", "a.skip-link":"Skip to content", ".pause-label":"PAUSE", ".header-menu-label":"MENU", ".hero-title":"LOOK<span class=\"hero-dot\">.</span>", ".hero-kicker":"CESARE PARATORE", ".hero-edition":"PARTINICO, ITALY",
-      ".menu-list .menu-item:nth-child(2) .menu-link":"About me", ".menu-list .menu-item:nth-child(3) .menu-link":"Sport Manager",
+      ".menu-list .menu-item:nth-child(2) .menu-link":"About", ".menu-list .menu-item:nth-child(3) .menu-link":"Sport Manager",
       ".menu-list .menu-item:nth-child(4) .menu-link":"Kinesiologist", ".menu-list .menu-item:nth-child(5) .menu-link":"Running Coach",
       ".menu-list .menu-item:nth-child(6) .menu-link":"Trainer", ".menu-list .menu-item:nth-child(7) .menu-link":"Web Designer",
-      ".menu-list .menu-item:nth-child(8) .menu-link":"Where I am", ".menu-list .menu-item:nth-child(9) .menu-link":"Contact",
+      ".menu-list .menu-item:nth-child(8) .menu-link":"Where I work", ".menu-list .menu-item:nth-child(9) .menu-link":"Contact",
       "#chapterPrev":"Previous chapter", "#chapterNext":"Next chapter", ".story-intro":"The curiosity to understand. The desire to build.",
       ".story-copy p:nth-of-type(2)":"At fourteen, I opened my first computer to understand how it worked. In sport, I started with running, then played football and helped build and lead a team; returning to running led me to become both an athlete and a coach. Through Sport and Exercise Sciences, teaching and programming, I kept following the same curiosity: understanding how things work and finding practical ways to make them better.",
       ".story-copy p:nth-of-type(3)":"My path continued through Sport and Exercise Sciences, teaching and a master’s degree in Sport Management. Each experience gave me different tools to observe, understand and explain things more clearly. Programming became a return to my roots: the same curiosity, now with new tools.",
