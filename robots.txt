@@ -1,5 +1,4 @@
-# Policy dei crawler: ricerca consentita, training negato senza consenso esplicito.
-# Consentire la ricerca tradizionale e il recupero richiesto dagli utenti.
+# Policy dei crawler: ricerca e recupero su richiesta consentiti; training negato senza consenso esplicito.
 User-agent: *
 Allow: /
 
@@ -15,7 +14,6 @@ Allow: /
 User-agent: DuckDuckBot
 Allow: /
 
-# Ricerca e grounding: consentiti.
 User-agent: OAI-SearchBot
 Allow: /
 
@@ -23,6 +21,9 @@ User-agent: ChatGPT-User
 Allow: /
 
 User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
 Allow: /
 
 User-agent: Claude-SearchBot
@@ -40,9 +41,6 @@ Allow: /
 User-agent: Amzn-User
 Allow: /
 
-# Training/corpus: negato in assenza di consenso esplicito.
-# Nota: i crawler con finalità miste sono trattati con cautela; la policy
-# va riesaminata quando i provider pubblicano agenti separati e documentati.
 User-agent: GPTBot
 Disallow: /
 
@@ -58,7 +56,12 @@ Disallow: /
 User-agent: Amazonbot
 Disallow: /
 
-# Nessuna campagna pubblicitaria OAI configurata nel progetto.
+User-agent: Applebot-Extended
+Disallow: /
+
+User-agent: Meta-ExternalAgent
+Disallow: /
+
 User-agent: OAI-AdsBot
 Disallow: /
 
