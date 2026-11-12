@@ -1,20 +1,64 @@
-# Regole distinte per finalità diverse. L'accesso non garantisce indicizzazione o citazione.
+# Governance crawler — policy di progetto 10/10 v3.4
+# Consentire la ricerca tradizionale e il recupero richiesto dagli utenti.
 User-agent: *
 Allow: /
 
-# Ricerca web ChatGPT: consentita per favorire la reperibilità nelle esperienze di ricerca.
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Bravebot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+# Ricerca e grounding: consentiti.
 User-agent: OAI-SearchBot
 Allow: /
 
-# Addestramento: bloccato in assenza di un consenso esplicito separato.
-User-agent: GPTBot
-Disallow: /
-
-# Fetch attivato da una richiesta dell'utente: consentito.
 User-agent: ChatGPT-User
 Allow: /
 
-# Verifica di pagine pubblicitarie: non necessaria, non risultano campagne configurate.
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Amzn-SearchBot
+Allow: /
+
+User-agent: Amzn-User
+Allow: /
+
+# Training/corpus: negato in assenza di consenso esplicito.
+# Nota: i crawler con finalità miste sono trattati con cautela; la policy
+# va riesaminata quando i provider pubblicano agenti separati e documentati.
+User-agent: GPTBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: Amazonbot
+Disallow: /
+
+# Nessuna campagna pubblicitaria OAI configurata nel progetto.
 User-agent: OAI-AdsBot
 Disallow: /
 

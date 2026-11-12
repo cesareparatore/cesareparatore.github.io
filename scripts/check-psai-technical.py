@@ -81,7 +81,7 @@ for raw in robots.splitlines():
  elif k in ('allow','disallow') and agents:
   rules.append((k,v))
 flush_group()
-required={'oai-searchbot':('allow','/'),'gptbot':('disallow','/'),'chatgpt-user':('allow','/'),'oai-adsbot':('disallow','/')}
+required={'googlebot':('allow','/'),'bingbot':('allow','/'),'bravebot':('allow','/'),'duckduckbot':('allow','/'),'oai-searchbot':('allow','/'),'chatgpt-user':('allow','/'),'perplexitybot':('allow','/'),'gptbot':('disallow','/'),'google-extended':('disallow','/'),'claudebot':('disallow','/'),'oai-adsbot':('disallow','/')}
 for ua,rule in required.items():
  if rule not in groups.get(ua,[]): fail(f'robots.txt: regola {rule} assente per {ua}')
 # 5.4: valid sitemap, unique URLs, exact set matching indexable HTML, canonical host only.
