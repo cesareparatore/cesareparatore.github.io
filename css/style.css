@@ -824,21 +824,21 @@ body:not(.hero-intro-open) .hero-writing-copy{opacity:0;visibility:hidden}body.h
 @media(prefers-reduced-motion:reduce){.hero-bottomline{transition:none}}
 
 /* Homepage-only polish: shorter entrance, clear keyboard focus, quieter loading. */
-body[data-page-label="GUARDA"] .curtain-panel{transition-duration:1.35s}
-body[data-page-label="GUARDA"] .curtain{animation-delay:2.8s}
-body[data-page-label="GUARDA"] .site-preloader{transition-duration:.35s}
-body[data-page-label="GUARDA"] .preloader-percent{font-variant-numeric:tabular-nums}
-body[data-page-label="GUARDA"] a:focus-visible,
-body[data-page-label="GUARDA"] button:focus-visible,
-body[data-page-label="GUARDA"] [tabindex]:focus-visible{
+body:is([data-page-label="GUARDA"],[data-page-label="LOOK"]) .curtain-panel{transition-duration:1.35s}
+body:is([data-page-label="GUARDA"],[data-page-label="LOOK"]) .curtain{animation-delay:2.8s}
+body:is([data-page-label="GUARDA"],[data-page-label="LOOK"]) .site-preloader{transition-duration:.35s}
+body:is([data-page-label="GUARDA"],[data-page-label="LOOK"]) .preloader-percent{font-variant-numeric:tabular-nums}
+body:is([data-page-label="GUARDA"],[data-page-label="LOOK"]) a:focus-visible,
+body:is([data-page-label="GUARDA"],[data-page-label="LOOK"]) button:focus-visible,
+body:is([data-page-label="GUARDA"],[data-page-label="LOOK"]) [tabindex]:focus-visible{
   /* Two-tone ring stays visible on both the light canvas and dark header/footer. */
   outline:3px solid #090909!important;
   outline-offset:3px!important;
   box-shadow:0 0 0 6px #f2f0ea!important;
 }
 @media(prefers-reduced-motion:reduce){
-  body[data-page-label="GUARDA"] .curtain{display:none}
-  body[data-page-label="GUARDA"] .site-preloader{display:none}
+  body:is([data-page-label="GUARDA"],[data-page-label="LOOK"]) .curtain{display:none}
+  body:is([data-page-label="GUARDA"],[data-page-label="LOOK"]) .site-preloader{display:none}
 }
 
 /* Keep the long display word within the mobile viewport. */
@@ -848,10 +848,10 @@ body[data-page-label="GUARDA"] [tabindex]:focus-visible{
 
 
 /* Homepage loader: indeterminate instead of a misleading simulated percentage. */
-body[data-page-label="GUARDA"] .preloader-percent{font-size:10px;letter-spacing:.18em;text-transform:uppercase}
-body[data-page-label="GUARDA"] .preloader-fill{width:34%;transform:translateX(-110%);animation:homePreloaderIndeterminate 1.15s cubic-bezier(.22,.61,.36,1) infinite}
+body:is([data-page-label="GUARDA"],[data-page-label="LOOK"]) .preloader-percent{font-size:10px;letter-spacing:.18em;text-transform:uppercase}
+body:is([data-page-label="GUARDA"],[data-page-label="LOOK"]) .preloader-fill{width:34%;transform:translateX(-110%);animation:homePreloaderIndeterminate 1.15s cubic-bezier(.22,.61,.36,1) infinite}
 @keyframes homePreloaderIndeterminate{from{transform:translateX(-110%)}to{transform:translateX(380%)}}
-@media(prefers-reduced-motion:reduce){body[data-page-label="GUARDA"] .preloader-fill{animation:none;transform:none}}
+@media(prefers-reduced-motion:reduce){body:is([data-page-label="GUARDA"],[data-page-label="LOOK"]) .preloader-fill{animation:none;transform:none}}
 
 
 /* Missione 5.0: focus tastiera sempre visibile, anche sui link con hover personalizzato. */
@@ -1031,3 +1031,5 @@ body.chapter-nav-obscured .header-chapter{opacity:0!important;visibility:hidden!
 /* Freccia Privacy sempre visibile e allineata, come nelle pagine interne. */
 .footer-info-band .footer-privacy .link-arrow-icon{display:inline-block!important;width:12px;height:12px;margin-left:3px;vertical-align:-2px;opacity:1;visibility:visible;stroke:currentColor;stroke-width:1.6;transition:transform .2s ease}
 .footer-info-band .footer-privacy:hover .link-arrow-icon,.footer-info-band .footer-privacy:focus-visible .link-arrow-icon{transform:translate(2px,-2px)}
+/* Intro saltato per la navigazione interna (classe impostata nello <head> prima del primo paint). */
+html.intro-skip .site-preloader,html.intro-skip .curtain{display:none}

@@ -1,123 +1,143 @@
-<?xml version='1.0' encoding='utf-8'?>
-<ns0:urlset xmlns:ns0="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <ns0:url>
-    <ns0:loc>https://cesareparatore.github.io/</ns0:loc>
-    <ns0:changefreq>weekly</ns0:changefreq>
-    <ns0:priority>1.0</ns0:priority>
-    <ns0:lastmod>2026-11-12</ns0:lastmod>
-  </ns0:url>
-  <ns0:url>
-    <ns0:loc>https://cesareparatore.github.io/chi-sono/</ns0:loc>
-    <ns0:changefreq>monthly</ns0:changefreq>
-    <ns0:priority>0.7</ns0:priority>
-    <ns0:lastmod>2026-11-12</ns0:lastmod>
-  </ns0:url>
-  <ns0:url>
-    <ns0:loc>https://cesareparatore.github.io/chinesiologo/</ns0:loc>
-    <ns0:changefreq>monthly</ns0:changefreq>
-    <ns0:priority>0.9</ns0:priority>
-    <ns0:lastmod>2026-11-12</ns0:lastmod>
-  </ns0:url>
-  <ns0:url>
-    <ns0:loc>https://cesareparatore.github.io/contatti/</ns0:loc>
-    <ns0:changefreq>monthly</ns0:changefreq>
-    <ns0:priority>0.8</ns0:priority>
-    <ns0:lastmod>2026-11-12</ns0:lastmod>
-  </ns0:url>
-  <ns0:url>
-    <ns0:loc>https://cesareparatore.github.io/dove-sono/</ns0:loc>
-    <ns0:changefreq>monthly</ns0:changefreq>
-    <ns0:priority>0.7</ns0:priority>
-    <ns0:lastmod>2026-11-12</ns0:lastmod>
-  </ns0:url>
-  <ns0:url>
-    <ns0:loc>https://cesareparatore.github.io/formatore/</ns0:loc>
-    <ns0:changefreq>monthly</ns0:changefreq>
-    <ns0:priority>0.8</ns0:priority>
-    <ns0:lastmod>2026-11-12</ns0:lastmod>
-  </ns0:url>
-  <ns0:url>
-    <ns0:loc>https://cesareparatore.github.io/privacy/</ns0:loc>
-    <ns0:changefreq>yearly</ns0:changefreq>
-    <ns0:priority>0.4</ns0:priority>
-    <ns0:lastmod>2026-11-12</ns0:lastmod>
-  </ns0:url>
-  <ns0:url>
-    <ns0:loc>https://cesareparatore.github.io/running-coach/</ns0:loc>
-    <ns0:changefreq>monthly</ns0:changefreq>
-    <ns0:priority>0.9</ns0:priority>
-    <ns0:lastmod>2026-11-12</ns0:lastmod>
-  </ns0:url>
-  <ns0:url>
-    <ns0:loc>https://cesareparatore.github.io/sport-manager/</ns0:loc>
-    <ns0:changefreq>monthly</ns0:changefreq>
-    <ns0:priority>0.8</ns0:priority>
-    <ns0:lastmod>2026-11-12</ns0:lastmod>
-  </ns0:url>
-  <ns0:url>
-    <ns0:loc>https://cesareparatore.github.io/web-designer/</ns0:loc>
-    <ns0:changefreq>monthly</ns0:changefreq>
-    <ns0:priority>0.8</ns0:priority>
-    <ns0:lastmod>2026-11-12</ns0:lastmod>
-  </ns0:url>
-  <ns0:url>
-    <ns0:loc>https://cesareparatore.github.io/en/</ns0:loc>
-    <ns0:changefreq>weekly</ns0:changefreq>
-    <ns0:priority>1.0</ns0:priority>
-    <ns0:lastmod>2026-11-12</ns0:lastmod>
-  </ns0:url>
-  <ns0:url>
-    <ns0:loc>https://cesareparatore.github.io/en/chi-sono/</ns0:loc>
-    <ns0:changefreq>monthly</ns0:changefreq>
-    <ns0:priority>0.7</ns0:priority>
-    <ns0:lastmod>2026-11-12</ns0:lastmod>
-  </ns0:url>
-  <ns0:url>
-    <ns0:loc>https://cesareparatore.github.io/en/chinesiologo/</ns0:loc>
-    <ns0:changefreq>monthly</ns0:changefreq>
-    <ns0:priority>0.9</ns0:priority>
-    <ns0:lastmod>2026-11-12</ns0:lastmod>
-  </ns0:url>
-  <ns0:url>
-    <ns0:loc>https://cesareparatore.github.io/en/contatti/</ns0:loc>
-    <ns0:changefreq>monthly</ns0:changefreq>
-    <ns0:priority>0.8</ns0:priority>
-    <ns0:lastmod>2026-11-12</ns0:lastmod>
-  </ns0:url>
-  <ns0:url>
-    <ns0:loc>https://cesareparatore.github.io/en/dove-sono/</ns0:loc>
-    <ns0:changefreq>monthly</ns0:changefreq>
-    <ns0:priority>0.7</ns0:priority>
-    <ns0:lastmod>2026-11-12</ns0:lastmod>
-  </ns0:url>
-  <ns0:url>
-    <ns0:loc>https://cesareparatore.github.io/en/formatore/</ns0:loc>
-    <ns0:changefreq>monthly</ns0:changefreq>
-    <ns0:priority>0.8</ns0:priority>
-    <ns0:lastmod>2026-11-12</ns0:lastmod>
-  </ns0:url>
-  <ns0:url>
-    <ns0:loc>https://cesareparatore.github.io/en/privacy/</ns0:loc>
-    <ns0:changefreq>yearly</ns0:changefreq>
-    <ns0:priority>0.4</ns0:priority>
-    <ns0:lastmod>2026-11-12</ns0:lastmod>
-  </ns0:url>
-  <ns0:url>
-    <ns0:loc>https://cesareparatore.github.io/en/running-coach/</ns0:loc>
-    <ns0:changefreq>monthly</ns0:changefreq>
-    <ns0:priority>0.9</ns0:priority>
-    <ns0:lastmod>2026-11-12</ns0:lastmod>
-  </ns0:url>
-  <ns0:url>
-    <ns0:loc>https://cesareparatore.github.io/en/sport-manager/</ns0:loc>
-    <ns0:changefreq>monthly</ns0:changefreq>
-    <ns0:priority>0.8</ns0:priority>
-    <ns0:lastmod>2026-11-12</ns0:lastmod>
-  </ns0:url>
-  <ns0:url>
-    <ns0:loc>https://cesareparatore.github.io/en/web-designer/</ns0:loc>
-    <ns0:changefreq>monthly</ns0:changefreq>
-    <ns0:priority>0.8</ns0:priority>
-    <ns0:lastmod>2026-11-12</ns0:lastmod>
-  </ns0:url>
-</ns0:urlset>
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://cesareparatore.github.io/</loc>
+    <lastmod>2026-11-12</lastmod>
+    <xhtml:link rel="alternate" hreflang="it" href="https://cesareparatore.github.io/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cesareparatore.github.io/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cesareparatore.github.io/"/>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/en/</loc>
+    <lastmod>2026-11-12</lastmod>
+    <xhtml:link rel="alternate" hreflang="it" href="https://cesareparatore.github.io/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cesareparatore.github.io/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cesareparatore.github.io/"/>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/chi-sono/</loc>
+    <lastmod>2026-11-12</lastmod>
+    <xhtml:link rel="alternate" hreflang="it" href="https://cesareparatore.github.io/chi-sono/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cesareparatore.github.io/en/chi-sono/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cesareparatore.github.io/chi-sono/"/>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/en/chi-sono/</loc>
+    <lastmod>2026-11-12</lastmod>
+    <xhtml:link rel="alternate" hreflang="it" href="https://cesareparatore.github.io/chi-sono/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cesareparatore.github.io/en/chi-sono/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cesareparatore.github.io/chi-sono/"/>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/sport-manager/</loc>
+    <lastmod>2026-11-12</lastmod>
+    <xhtml:link rel="alternate" hreflang="it" href="https://cesareparatore.github.io/sport-manager/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cesareparatore.github.io/en/sport-manager/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cesareparatore.github.io/sport-manager/"/>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/en/sport-manager/</loc>
+    <lastmod>2026-11-12</lastmod>
+    <xhtml:link rel="alternate" hreflang="it" href="https://cesareparatore.github.io/sport-manager/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cesareparatore.github.io/en/sport-manager/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cesareparatore.github.io/sport-manager/"/>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/chinesiologo/</loc>
+    <lastmod>2026-11-12</lastmod>
+    <xhtml:link rel="alternate" hreflang="it" href="https://cesareparatore.github.io/chinesiologo/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cesareparatore.github.io/en/chinesiologo/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cesareparatore.github.io/chinesiologo/"/>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/en/chinesiologo/</loc>
+    <lastmod>2026-11-12</lastmod>
+    <xhtml:link rel="alternate" hreflang="it" href="https://cesareparatore.github.io/chinesiologo/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cesareparatore.github.io/en/chinesiologo/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cesareparatore.github.io/chinesiologo/"/>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/running-coach/</loc>
+    <lastmod>2026-11-12</lastmod>
+    <xhtml:link rel="alternate" hreflang="it" href="https://cesareparatore.github.io/running-coach/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cesareparatore.github.io/en/running-coach/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cesareparatore.github.io/running-coach/"/>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/en/running-coach/</loc>
+    <lastmod>2026-11-12</lastmod>
+    <xhtml:link rel="alternate" hreflang="it" href="https://cesareparatore.github.io/running-coach/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cesareparatore.github.io/en/running-coach/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cesareparatore.github.io/running-coach/"/>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/formatore/</loc>
+    <lastmod>2026-11-12</lastmod>
+    <xhtml:link rel="alternate" hreflang="it" href="https://cesareparatore.github.io/formatore/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cesareparatore.github.io/en/formatore/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cesareparatore.github.io/formatore/"/>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/en/formatore/</loc>
+    <lastmod>2026-11-12</lastmod>
+    <xhtml:link rel="alternate" hreflang="it" href="https://cesareparatore.github.io/formatore/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cesareparatore.github.io/en/formatore/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cesareparatore.github.io/formatore/"/>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/web-designer/</loc>
+    <lastmod>2026-11-12</lastmod>
+    <xhtml:link rel="alternate" hreflang="it" href="https://cesareparatore.github.io/web-designer/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cesareparatore.github.io/en/web-designer/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cesareparatore.github.io/web-designer/"/>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/en/web-designer/</loc>
+    <lastmod>2026-11-12</lastmod>
+    <xhtml:link rel="alternate" hreflang="it" href="https://cesareparatore.github.io/web-designer/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cesareparatore.github.io/en/web-designer/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cesareparatore.github.io/web-designer/"/>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/dove-sono/</loc>
+    <lastmod>2026-11-12</lastmod>
+    <xhtml:link rel="alternate" hreflang="it" href="https://cesareparatore.github.io/dove-sono/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cesareparatore.github.io/en/dove-sono/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cesareparatore.github.io/dove-sono/"/>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/en/dove-sono/</loc>
+    <lastmod>2026-11-12</lastmod>
+    <xhtml:link rel="alternate" hreflang="it" href="https://cesareparatore.github.io/dove-sono/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cesareparatore.github.io/en/dove-sono/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cesareparatore.github.io/dove-sono/"/>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/contatti/</loc>
+    <lastmod>2026-11-12</lastmod>
+    <xhtml:link rel="alternate" hreflang="it" href="https://cesareparatore.github.io/contatti/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cesareparatore.github.io/en/contatti/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cesareparatore.github.io/contatti/"/>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/en/contatti/</loc>
+    <lastmod>2026-11-12</lastmod>
+    <xhtml:link rel="alternate" hreflang="it" href="https://cesareparatore.github.io/contatti/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cesareparatore.github.io/en/contatti/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cesareparatore.github.io/contatti/"/>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/privacy/</loc>
+    <lastmod>2026-11-12</lastmod>
+    <xhtml:link rel="alternate" hreflang="it" href="https://cesareparatore.github.io/privacy/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cesareparatore.github.io/en/privacy/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cesareparatore.github.io/privacy/"/>
+  </url>
+  <url>
+    <loc>https://cesareparatore.github.io/en/privacy/</loc>
+    <lastmod>2026-11-12</lastmod>
+    <xhtml:link rel="alternate" hreflang="it" href="https://cesareparatore.github.io/privacy/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://cesareparatore.github.io/en/privacy/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://cesareparatore.github.io/privacy/"/>
+  </url>
+</urlset>

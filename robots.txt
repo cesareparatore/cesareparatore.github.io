@@ -1,4 +1,4 @@
-# Governance crawler — policy di progetto 10/10 v3.4
+# Policy dei crawler: ricerca consentita, training negato senza consenso esplicito.
 # Consentire la ricerca tradizionale e il recupero richiesto dagli utenti.
 User-agent: *
 Allow: /

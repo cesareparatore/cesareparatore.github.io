@@ -18,7 +18,8 @@
     }, 120);
   };
 
-  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+  // Internal navigation (same-site referrer) skips the intro: it is meant as a first impression, not a page transition.
+  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches || document.documentElement.classList.contains("intro-skip")){
     screen.remove();
     window.dispatchEvent(new Event("sitePreloaderFinished"));
     return;
@@ -26,7 +27,7 @@
   if(document.readyState === "complete") finish();
   else window.addEventListener("load", finish, {once:true});
   // Never allow a stalled external or local resource to trap the visitor behind the intro.
-  window.setTimeout(finish, 2500);
+  window.setTimeout(finish, 1500);
 })();
 
 (() => {
@@ -61,7 +62,7 @@
   let chapterLabelTimer = null;
 
   const body = document.body;
-  const isHomePage = body.dataset.pageLabel === "GUARDA";
+  const isHomePage = ["GUARDA", "LOOK"].includes(body.dataset.pageLabel);
   const headerChapter = document.querySelector(".header-chapter");
   const chapterLabel = document.getElementById("chapterLabel");
   const chapterPrev = document.getElementById("chapterPrev");
@@ -81,7 +82,7 @@
 
   // Open the intro curtain only after the percentage preloader has completed.
   const openIntroCurtain = () => {
-    if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+    if(window.matchMedia("(prefers-reduced-motion: reduce)").matches || document.documentElement.classList.contains("intro-skip")){
       body.classList.add("is-ready", "hero-intro-open");
       window.dispatchEvent(new Event("heroIntroOpened"));
       return;
@@ -467,84 +468,9 @@
   });
 
 
-  // Language switcher for the complete home page.
+  // Language: IT and EN are separate static pages (/ and /en/). The toggle only navigates
+  // between routes, so no runtime text replacement is needed (and none must overwrite the HTML).
   let currentLanguage = document.documentElement.lang === "en" ? "en" : "it";
-  const languageStrings = {
-    en: {
-      ".menu-list .menu-item:nth-child(1) .menu-link":"Home", "a.skip-link":"Skip to content", ".pause-label":"PAUSE", ".header-menu-label":"MENU", ".hero-title":"LOOK<span class=\"hero-dot\">.</span>", ".hero-kicker":"CESARE PARATORE", ".hero-edition":"PARTINICO, ITALY",
-      ".menu-list .menu-item:nth-child(2) .menu-link":"About", ".menu-list .menu-item:nth-child(3) .menu-link":"Sport Manager",
-      ".menu-list .menu-item:nth-child(4) .menu-link":"Kinesiologist", ".menu-list .menu-item:nth-child(5) .menu-link":"Running Coach",
-      ".menu-list .menu-item:nth-child(6) .menu-link":"Trainer", ".menu-list .menu-item:nth-child(7) .menu-link":"Web Designer",
-      ".menu-list .menu-item:nth-child(8) .menu-link":"Where I work", ".menu-list .menu-item:nth-child(9) .menu-link":"Contact",
-      "#chapterPrev":"Previous chapter", "#chapterNext":"Next chapter", ".story-intro":"The curiosity to understand. The desire to build.",
-      ".story-copy p:nth-of-type(2)":"At fourteen, I opened my first computer to understand how it worked. In sport, I started with running, then played football and helped build and lead a team; returning to running led me to become both an athlete and a coach. Through Sport and Exercise Sciences, teaching and programming, I kept following the same curiosity: understanding how things work and finding practical ways to make them better.",
-      ".story-copy p:nth-of-type(3)":"My path continued through Sport and Exercise Sciences, teaching and a master’s degree in Sport Management. Each experience gave me different tools to observe, understand and explain things more clearly. Programming became a return to my roots: the same curiosity, now with new tools.",
-      ".story-signature-line":"Understanding complex things, making them simple, and building solutions that really work.",
-      ".story-more":"Discover who I am <svg class='link-arrow-icon' aria-hidden='true' focusable='false' viewBox='0 0 16 16'><path d='M5 11 11 5M5.5 5H11v5.5'/></svg>", ".worlds-word[data-world='sport-manager'] .world-door-cta":"OPEN", ".worlds-word[data-world='chinesiologo'] .world-door-cta":"OPEN", ".worlds-word[data-world='chinesiologo'] .world-word-label":"KINESIOLOGIST", ".worlds-word[data-world='formatore'] .world-word-label":"TRAINER",
-      ".worlds-word[data-world='running-coach'] .world-door-cta":"OPEN", ".worlds-word[data-world='formatore'] .world-door-cta":"OPEN", ".worlds-word[data-world='web-designer'] .world-door-cta":"OPEN",
-      ".principle-title":"PURPOSE<span class=\"principle-title-dot\">.</span>", ".principle-copy p:nth-child(1)":"It is not about everything I can do.", ".principle-copy p:nth-child(2)":"It is about where you want to go.",
-      ".principle-copy p:nth-child(3)":"From there, everything changes:<br>what I look at,<br>what I choose,<br>what I connect.", ".principle-copy p:nth-child(4)":"Because there is no one-size-fits-all path.", ".principle-emphasis":"There is the one that works for you.",
-      ".territory-kicker":"PARTINICO · WESTERN SICILY", ".territory-title":"HERE<span class=\"territory-title-dot\">.</span>", ".territory-copy p:nth-of-type(1)":"Partinico is my starting point, between Palermo and Trapani.", ".territory-copy p:nth-of-type(2)":"From here, I meet people, listen to ideas and take part in projects across five different fields. In person in Partinico and the surrounding area, depending on the service and agreed availability. Online when useful.", ".territory-coverage-intro":"Nearby towns around Partinico", ".territory-coverage-list":"I receive people in Partinico who travel from the provinces of Palermo and Trapani, especially from nearby towns that are easy to reach: Borgetto, Giardinello, Montelepre, Trappeto, Balestrate, Terrasini, Cinisi, Torretta, San Giuseppe Jato, San Cipirello, Piana degli Albanesi, Altofonte, Camporeale, Carini, Monreale, Alcamo and Castellammare del Golfo.", ".territory-coverage-note":"This is a reference area, not a list of additional offices or guaranteed in-person availability. Meeting location and format are agreed before an appointment.", ".territory-next-step":"Discover where I work <svg class='link-arrow-icon' aria-hidden='true' focusable='false' viewBox='0 0 16 16'><path d='M5 11 11 5M5.5 5H11v5.5'/></svg>", ".territory-emphasis":"A place is a starting point, not a boundary.",
-      ".territory-caption":"Partinico · Western Sicily", ".territory-map-note":"Stadio Comunale “G. La Franca” is a reference for some local activities, not a professional studio or public-facing business address. Meeting locations are agreed according to the service.", ".contact-overline span:nth-child(2)":"THE NEXT STEP", ".contact-title":"LET’S TALK<span class=\"contact-title-dot\">.</span>", ".contact-lead":"The first step is understanding what you want to make possible.", ".contact-closer":"Let’s see how far we can go together.", "#contactLink":"<span>Message me on WhatsApp</span><span class=\"contact-link-arrow\" aria-hidden=\"true\"><svg class='link-arrow-icon' aria-hidden='true' focusable='false' viewBox='0 0 16 16'><path d='M5 11 11 5M5.5 5H11v5.5'/></svg></span>",
-      ".back-to-top-label":"BACK TO TOP", ".footer-privacy":"Privacy <svg class='link-arrow-icon' aria-hidden='true' focusable='false' viewBox='0 0 16 16'><path d='M5 11 11 5M5.5 5H11v5.5'/></svg>"
-    },
-    it: {
-      ".menu-list .menu-item:nth-child(1) .menu-link":"Home", "a.skip-link":"Salta al contenuto", ".pause-label":"PAUSA", ".hero-title":"GUARDA<span class=\"hero-dot\">.</span>", ".hero-kicker":"CESARE PARATORE", ".hero-edition":"PARTINICO, IT",
-      ".menu-list .menu-item:nth-child(2) .menu-link":"Chi sono", ".menu-list .menu-item:nth-child(3) .menu-link":"Sport Manager",
-      ".menu-list .menu-item:nth-child(4) .menu-link":"Chinesiologo", ".menu-list .menu-item:nth-child(5) .menu-link":"Running Coach",
-      ".menu-list .menu-item:nth-child(6) .menu-link":"Formatore", ".menu-list .menu-item:nth-child(7) .menu-link":"Web Designer",
-      ".menu-list .menu-item:nth-child(8) .menu-link":"Dove sono", ".menu-list .menu-item:nth-child(9) .menu-link":"Contatti",
-      ".story-intro":"La curiosità di capire. Il desiderio di costruire.",
-      ".story-copy p:nth-of-type(2)":"A quattordici anni aprivo il mio primo computer per capirne i meccanismi. Nello sport ho iniziato con la corsa, poi ho giocato a calcio e ho contribuito a costruire e guidare una squadra; il ritorno alla corsa mi ha portato a essere atleta e allenatore. Tra Scienze Motorie, insegnamento e programmazione, ho seguito la stessa curiosità: capire come funzionano le cose e trovare modi concreti per migliorarle.",
-      ".story-copy p:nth-of-type(3)":"Il percorso è proseguito dagli studi in Scienze Motorie all’insegnamento e alla laurea magistrale in Management dello Sport. Ogni esperienza mi ha dato strumenti diversi per osservare, comprendere e spiegare meglio. La programmazione è stata un ritorno alle origini: la stessa curiosità, con nuovi strumenti.",
-      ".story-signature-line":"Capire le cose complesse, renderle semplici e costruire soluzioni che funzionano davvero.", ".story-more":"Scopri chi sono <svg class='link-arrow-icon' aria-hidden='true' focusable='false' viewBox='0 0 16 16'><path d='M5 11 11 5M5.5 5H11v5.5'/></svg>",
-      ".worlds-word[data-world='sport-manager'] .world-door-cta":"APRI", ".worlds-word[data-world='chinesiologo'] .world-door-cta":"APRI", ".worlds-word[data-world='chinesiologo'] .world-word-label":"CHINESIOLOGO", ".worlds-word[data-world='formatore'] .world-word-label":"FORMATORE", ".worlds-word[data-world='running-coach'] .world-door-cta":"APRI", ".worlds-word[data-world='formatore'] .world-door-cta":"APRI", ".worlds-word[data-world='web-designer'] .world-door-cta":"APRI",
-      ".principle-title":"OBIETTIVO<span class=\"principle-title-dot\">.</span>", ".principle-copy p:nth-child(1)":"Il punto non è tutto ciò che so fare.", ".principle-copy p:nth-child(2)":"Il punto è dove vuoi arrivare.", ".principle-copy p:nth-child(3)":"Da lì cambia tutto:<br>ciò che guardo,<br>ciò che scelgo,<br>ciò che metto in relazione.", ".principle-copy p:nth-child(4)":"Perché non esiste una strada uguale per tutti.", ".principle-emphasis":"Esiste quella che serve a te.",
-      ".territory-kicker":"PARTINICO · SICILIA OCCIDENTALE", ".territory-title":"QUI<span class=\"territory-title-dot\">.</span>", ".territory-copy p:nth-of-type(1)":"Partinico è il mio punto di partenza, tra Palermo e Trapani.", ".territory-copy p:nth-of-type(2)":"Da qui incontro persone, ascolto idee e prendo parte a progetti in cinque ambiti diversi. In presenza a Partinico e nell’area tra Palermo e Trapani, secondo il servizio e la disponibilità concordata. Online, quando serve.", ".territory-coverage-intro":"Comuni vicini a Partinico", ".territory-coverage-list":"Ricevo a Partinico persone provenienti dalle province di Palermo e Trapani, soprattutto dai comuni più vicini e facilmente raggiungibili: Borgetto, Giardinello, Montelepre, Trappeto, Balestrate, Terrasini, Cinisi, Torretta, San Giuseppe Jato, San Cipirello, Piana degli Albanesi, Altofonte, Camporeale, Carini, Monreale, Alcamo e Castellammare del Golfo.", ".territory-coverage-note":"L’elenco descrive il bacino di riferimento, non sedi secondarie o disponibilità garantite. Il luogo dell’incontro e la modalità si concordano prima dell’appuntamento.", ".territory-next-step":"Scopri dove opero <span aria-hidden='true'><svg class='link-arrow-icon' aria-hidden='true' focusable='false' viewBox='0 0 16 16'><path d='M5 11 11 5M5.5 5H11v5.5'/></svg></span>", ".territory-emphasis":"Il luogo è un punto di partenza, non un confine.", ".territory-caption":"Partinico · Sicilia occidentale", ".territory-map-note":"Lo Stadio Comunale “G. La Franca” è un riferimento per alcune attività sul territorio: non è uno studio professionale né una sede aperta al pubblico. Il luogo dell’incontro si concorda in base al servizio.", ".contact-overline span:nth-child(2)":"IL PROSSIMO PASSO", ".contact-title":"PARLIAMONE<span class=\"contact-title-dot\">.</span>", ".contact-lead":"Il primo passo è capire cosa vuoi rendere possibile.", ".contact-closer":"Vediamo fin dove possiamo arrivare insieme.", "#contactLink":"<span>Scrivimi su WhatsApp</span><span class=\"contact-link-arrow\" aria-hidden=\"true\"><svg class='link-arrow-icon' aria-hidden='true' focusable='false' viewBox='0 0 16 16'><path d='M5 11 11 5M5.5 5H11v5.5'/></svg></span>", ".back-to-top-label":"TORNA SU", ".footer-privacy":"Privacy <svg class='link-arrow-icon' aria-hidden='true' focusable='false' viewBox='0 0 16 16'><path d='M5 11 11 5M5.5 5H11v5.5'/></svg>"
-    }
-  };
-  const originalMarkup = new Map();
-  Object.keys(languageStrings.it).forEach(selector => {
-    const element = document.querySelector(selector);
-    if(element) originalMarkup.set(selector, element.innerHTML);
-  });
-  const chapterLabels = {it:["GUARDA","STORIA","OGGI","PRINCIPIO","DOVE SONO","CONTATTO"],en:["LOOK","STORY","TODAY","PURPOSE","LOCATION","CONTACT"]};
-  function setLanguage(language){
-    currentLanguage = language === "en" ? "en" : "it";
-    document.documentElement.lang = currentLanguage;
-    if(isHomePage){
-      document.title = currentLanguage === "en" ? "Cesare Paratore | Sport, movement, training and web in Partinico" : "Cesare Paratore | Sport Manager e Chinesiologo a Partinico";
-      const descriptions = {
-        it: "Cesare Paratore, Sport Manager e Chinesiologo a Partinico. Attività motoria, running coaching, formazione e progetti digitali; modalità concordate in base al servizio.",
-        en: "Cesare Paratore is a Sport Manager and Kinesiologist based in Partinico, Sicily. Services include movement, running coaching, training and digital projects, with arrangements depending on the service."
-      };
-      const description = descriptions[currentLanguage];
-      const localeMeta = document.querySelector("meta[property=\"og:locale\"]");
-      if(localeMeta) localeMeta.setAttribute("content", currentLanguage === "en" ? "en_US" : "it_IT");
-      [
-        ["meta[name=\"description\"]", "content"],
-        ["meta[property=\"og:description\"]", "content"],
-        ["meta[name=\"twitter:description\"]", "content"]
-      ].forEach(([selector, attribute]) => { const meta = document.querySelector(selector); if(meta) meta.setAttribute(attribute, description); });
-      const socialTitle = document.querySelector("meta[property=\"og:title\"]");
-      const twitterTitle = document.querySelector("meta[name=\"twitter:title\"]");
-      const localizedTitle = currentLanguage === "en" ? document.title : "Cesare Paratore | Sport Manager e Chinesiologo a Partinico";
-      if(socialTitle) socialTitle.setAttribute("content", localizedTitle);
-      if(twitterTitle) twitterTitle.setAttribute("content", localizedTitle);
-    }
-    if(languageToggle){languageToggle.setAttribute("aria-pressed",String(currentLanguage === "en"));languageToggle.setAttribute("aria-label",currentLanguage === "en" ? "Switch language to Italian" : "Switch language to English");}
-    Object.keys(languageStrings.it).forEach(selector => {
-      const element = document.querySelector(selector);
-      if(!element) return;
-      const value = currentLanguage === "it" ? originalMarkup.get(selector) : languageStrings.en[selector];
-      if(value !== undefined && value !== null) element.innerHTML = value;
-    });
-    const heroCopy = document.querySelector("[data-hero-copy]");
-    const heroScroll = document.querySelector("[data-hero-scroll]");
-    if(heroCopy) heroCopy.textContent = currentLanguage === "en" ? "Sport Manager and Kinesiologist in Partinico. Movement, running coaching, training and digital projects." : "Sport Manager e Chinesiologo a Partinico. Attività motoria, running coaching, formazione e progetti digitali.";
-    if(heroScroll) heroScroll.textContent = currentLanguage === "en" ? "SCROLL TO EXPLORE" : "SCORRI PER ESPLORARE";
-
-  }
   if(languageToggle) languageToggle.addEventListener("click",() => {
     const path = window.location.pathname;
     const inEnglishRoute = /^\/en(?:\/|$)/.test(path);
@@ -594,7 +520,7 @@
         showAudioStatus(currentLanguage === "en" ? "Audio on" : "Audio attivo");
       }catch(error){
         updateAudioButton(false);
-        showAudioStatus(currentLanguage === "en" ? "Audio file not available at assets/audio/Weight_of_Intent.mp3." : "File audio non disponibile in assets/audio/Weight_of_Intent.mp3.");
+        showAudioStatus(currentLanguage === "en" ? "Audio is not available right now." : "Audio non disponibile al momento.");
       }
     });
   });
@@ -602,7 +528,7 @@
   ambientAudio.addEventListener("ended",() => updateAudioButton(false));
   ambientAudio.addEventListener("error",() => {
     updateAudioButton(false);
-    showAudioStatus("Audio non disponibile: puoi continuare a navigare normalmente.");
+    showAudioStatus(currentLanguage === "en" ? "Audio unavailable: you can keep browsing normally." : "Audio non disponibile: puoi continuare a navigare normalmente.");
   });
   ambientAudio.addEventListener("pause",() => {
     if(audioPlaying) updateAudioButton(false);
@@ -653,8 +579,6 @@
     }
   }
 
-  // Apply the current route's language after audio state and all helpers are initialized.
-  setLanguage(currentLanguage);
   updateChapter(0,false);
   setActiveWorld(0);
   setupWorldDoorNavigation();
