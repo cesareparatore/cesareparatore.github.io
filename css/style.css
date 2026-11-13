@@ -3,7 +3,7 @@
   --muted:rgba(9,9,9,.58);--header-h:58px;
   --color-brand:#b8f35c;--color-surface:#f2f0ea;--color-text:#090909;
   --font-sans:Arial,Helvetica,sans-serif;--font-display:Arial,Helvetica,sans-serif;
-  --text-base:1rem;--text-lg:1.125rem;--text-xl:1.375rem;
+  --text-xs:.8125rem;--text-sm:.875rem;--text-base:1rem;--text-lg:1.125rem;--text-xl:1.375rem;--text-2xl:1.75rem;--text-3xl:clamp(2rem,1.4rem + 2.5vw,3rem);--line-height-body:1.6;--content-reading:72ch;--space-12:3rem;--radius-full:999px;--shadow-soft:0 8px 28px rgba(0,0,0,.12);
   --space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;--space-6:1.5rem;--space-8:2rem;
   --radius-sm:.375rem;--radius-md:.75rem;--radius-lg:1.25rem;
   --motion-fast:120ms;--motion-base:200ms;--motion-slow:320ms;
@@ -1033,3 +1033,20 @@ body.chapter-nav-obscured .header-chapter{opacity:0!important;visibility:hidden!
 .footer-info-band .footer-privacy:hover .link-arrow-icon,.footer-info-band .footer-privacy:focus-visible .link-arrow-icon{transform:translate(2px,-2px)}
 /* Intro saltato per la navigazione interna (classe impostata nello <head> prima del primo paint). */
 html.intro-skip .site-preloader,html.intro-skip .curtain{display:none}
+
+
+/* Sistema 10/10 v3.4 — baseline trasversale di leggibilità e accessibilità. */
+:where(p,li,dd,blockquote){line-height:var(--line-height-body,1.6)}
+:where(a,button,input,select,textarea,[tabindex]):focus-visible{
+  outline:2px solid currentColor;
+  outline-offset:4px;
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto!important}
+  *,*::before,*::after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+    scroll-behavior:auto!important;
+  }
+}

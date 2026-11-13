@@ -394,3 +394,6 @@ body.contact-return-mode.footer-signature-complete .back-to-top::before,body.con
 /* Freccia Privacy sempre visibile e allineata, come nella homepage. */
 .footer-info-band .footer-privacy .link-arrow-icon{display:inline-block!important;width:12px;height:12px;margin-left:3px;vertical-align:-2px;opacity:1;visibility:visible;stroke:currentColor;stroke-width:1.6;transition:transform .2s ease}
 .footer-info-band .footer-privacy:hover .link-arrow-icon,.footer-info-band .footer-privacy:focus-visible .link-arrow-icon{transform:translate(2px,-2px)}
+
+.contact-action-group{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.contact-action-group .contact-link--email{display:inline-flex;align-items:center}
