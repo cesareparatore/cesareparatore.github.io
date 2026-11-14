@@ -1,5 +1,7 @@
 // Non-numeric preloader: it never presents a simulated percentage as real progress.
 (function initSitePreloader(){
+  // A very slow script may arrive after the head failsafe removed js-enabled: restore it before touching the DOM.
+  document.documentElement.classList.add("js-enabled");
   const screen = document.getElementById("sitePreloader");
   if(!screen) return;
   const label = document.getElementById("preloaderPercent");
@@ -261,11 +263,13 @@
       button.setAttribute("aria-expanded",String(isOpen));
       button.classList.toggle("is-open",isOpen);
     });
+    const en = document.documentElement.lang === "en";
+    const closeLabel = en ? "CLOSE" : "CHIUDI";
     const dockLabel = dockMenuToggle?.querySelector(".dock-menu-label");
-    if(dockLabel) dockLabel.textContent = isOpen ? "CHIUDI" : "MENU";
+    if(dockLabel) dockLabel.textContent = isOpen ? closeLabel : "MENU";
     const headerLabel = menuToggle?.querySelector(".header-menu-label");
-    if(headerLabel) headerLabel.textContent = isOpen ? "CHIUDI" : "MENU";
-    if(menuToggle) menuToggle.setAttribute("aria-label", isOpen ? "Chiudi menu" : "Apri menu");
+    if(headerLabel) headerLabel.textContent = isOpen ? closeLabel : "MENU";
+    if(menuToggle) menuToggle.setAttribute("aria-label", en ? (isOpen ? "Close menu" : "Open menu") : (isOpen ? "Chiudi menu" : "Apri menu"));
   }
 
   function openMenu(trigger=(document.body.classList.contains("header-menu-mode") ? menuToggle : dockMenuToggle)){

@@ -927,7 +927,7 @@ body:is([data-page-label="GUARDA"],[data-page-label="LOOK"]) .preloader-fill{wid
 /* ART DIRECTION 2026 — motion editoriale, contenuti sempre statici. */
 :root{--motion-ease:cubic-bezier(.2,.75,.2,1);--motion-fast:220ms;--motion-base:620ms}
 html{scroll-behavior:smooth}
-.hero{isolation:isolate;overflow:hidden;background:radial-gradient(ellipse at 78% 18%,rgba(184,243,92,.13),transparent 34%),var(--page-a)}
+.hero{position:relative;isolation:isolate;overflow:hidden;background:radial-gradient(ellipse at 78% 18%,rgba(184,243,92,.13),transparent 34%),var(--page-a)}
 .hero::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.22;background-image:linear-gradient(rgba(9,9,9,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(9,9,9,.07) 1px,transparent 1px);background-size:64px 64px;mask-image:linear-gradient(to bottom,black,transparent 82%)}
 .hero::after{content:"";position:absolute;z-index:-1;width:min(58vw,780px);aspect-ratio:1;border:1px solid rgba(9,9,9,.10);border-radius:50%;right:-19vw;top:-30vw;box-shadow:0 0 0 42px rgba(9,9,9,.018),0 0 0 92px rgba(9,9,9,.014);pointer-events:none}
 .hero-title{animation:editorialTitleIn 1.05s var(--motion-ease) both;letter-spacing:-.085em}
